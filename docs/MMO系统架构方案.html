@@ -125,9 +125,10 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <h1>双世界 MMO · 系统架构方案</h1>
   <p class="lead">以《完美国际2》的长线养成与强社交为骨架，副本节奏参考《龙之谷》的短会话日常与周常。战斗改为目标锁定的技能释放，不再采用龙之谷的无锁定连段。表世界与里世界仍分开承载生活和副本。</p>
   <div class="meta">
+    <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.6</b></span>
-    <span>变更：<b>主线改为《梦长生》背景：仙路已断、结伴寻境、秘境成局、逆行不止</b></span>
+    <span>文档版本：<b>v1.7</b></span>
+    <span>变更：<b>四个职业一转各两条分支，共八条</b></span>
   </div>
 </header>
 
@@ -208,7 +209,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   </table>
 
   <h3><span class="n">2.1</span>幕一 · 仙路已断</h3>
-  <p>玩家在灵气稀薄的路上学会怎么打，并被一处凡间<strong>门派</strong>收下。门派只教低阶技能，总称<strong>天地玄黄</strong>。15 级的一转是认职责：战、弓、法、牧是四种分工，不是血统。幕末玩家听到秘境的消息：据说里面灵气无尽，可以突破瓶颈。</p>
+  <p>玩家在灵气稀薄的路上学会怎么打，并被一处凡间<strong>门派</strong>收下。门派只教低阶技能，总称<strong>天地玄黄</strong>。15 级的一转是认职责：战、弓、法、牧各选一条分支，不是血统。幕末玩家听到秘境的消息：据说里面灵气无尽，可以突破瓶颈。</p>
 
   <h3><span class="n">2.2</span>幕二 · 结伴寻境</h3>
   <p>路上结识同行的修士，也碰上追杀。深渊是每天还能够进秘境的次数，疲劳是身体的限度，大世界走动不消耗它。第一座巢穴就是秘境外围。进去以后才知道，这里不是传闻里的灵气之地，凶物和机关都在。强化是把秘境里带出的材料回火到武器上，回火失败只是没吃住，武器不会碎。</p>
@@ -401,7 +402,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <table>
     <tr><th style="width:150px">模块</th><th style="width:66px" class="c">来源</th><th>设计要点</th><th style="width:52px" class="c">优先级</th></tr>
     <tr><td>锁定技能战斗</td><td class="c"><span class="tag mix">简化</span></td><td>选定目标后按冷却释放技能。去掉无锁定、翻滚无敌、浮空连段、霸体破防、墙壁追击、后摇取消</td><td class="c">P0</td></tr>
-    <tr><td>职业与转职</td><td class="c"><span class="tag mix">融合</span></td><td>4 基础职业 → 8 分支（15/45 级），保留龙之谷定位；种族只做外观与剧情，不做属性差异</td><td class="c">P0</td></tr>
+    <tr><td>职业与转职</td><td class="c"><span class="tag mix">融合</span></td><td>战、弓、法、牧在 15 级各选一条：镇岳/破军、穿杨/罗网、赤霄/玄缚、生息/诫律。45 级二转只推进这条分支。种族只做外观与剧情</td><td class="c">P0</td></tr>
     <tr><td>技能与天赋</td><td class="c"><span class="tag dn">龙之谷</span></td><td>双天赋树（PVE/PVP 分离），EX 技能进阶，免费洗点</td><td class="c">P0</td></tr>
     <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>炼体到大乘共九境，每境分初、中、后、圆满。立仙走金仙，立魔走散仙，尽头是极境。只开大世界权限和每阶约 2–3% 被动，不卡副本</td><td class="c">P1</td></tr>
     <tr><td>装备强化</td><td class="c"><span class="tag dn">龙之谷</span></td><td>20 级上限，失败掉级不碎裂，保护券，<strong>无损继承</strong></td><td class="c">P0</td></tr>
@@ -496,6 +497,21 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>精神</td><td>蓝量</td><td>法、牧的主属性，进入攻击或治疗</td></tr>
     <tr><td>体力</td><td>血量</td><td>生命</td></tr>
   </table>
+
+  <h3><span class="n">8.3</span>八条分支</h3>
+  <p class="sub">15 级一转时，四个职业各选一条。45 级二转不另开分支，只把选定的这条往前推。技能仍由分支决定，武器外形不单独改职业。</p>
+  <table>
+    <tr><th style="width:52px">职业</th><th style="width:64px">分支</th><th style="width:72px">武器</th><th>一转定下的职责</th><th>二转推进</th></tr>
+    <tr><td rowspan="2">战</td><td>镇岳</td><td>长锤</td><td>守。拉住仇恨，替队友减伤</td><td>保护罩得更稳，破防后更容易站住</td></tr>
+    <tr><td>破军</td><td>长刀</td><td>攻。近身打硬目标</td><td>更容易打出破防，单体伤害更高</td></tr>
+    <tr><td rowspan="2">弓</td><td>穿杨</td><td>弓箭</td><td>点杀。打远处的关键目标</td><td>对单目标的穿透和收尾更明确</td></tr>
+    <tr><td>罗网</td><td>弓箭、匕首</td><td>限制。减速、困住、照顾一片区域。匕首只用来布置，不另成刺客</td><td>限制的时间更长，范围更清楚</td></tr>
+    <tr><td rowspan="2">法</td><td>赤霄</td><td>长剑</td><td>爆发。剑作法器，打一片或打一个高伤技能</td><td>法术段数和范围按纹章再分开</td></tr>
+    <tr><td>玄缚</td><td>长剑</td><td>控制。定身、减速、削弱，不治疗</td><td>控制更稳，削弱更针对硬目标</td></tr>
+    <tr><td rowspan="2">牧</td><td>生息</td><td>无固定武器</td><td>治疗。回复和净化</td><td>群体回复和紧急抬人更明确</td></tr>
+    <tr><td>诫律</td><td>无固定武器</td><td>削弱。给敌人挂减益，附带少量伤害。不抢镇岳的仇恨</td><td>减益可以配合破防窗口</td></tr>
+  </table>
+  <p>八条分支的具体技能名留到 P0 再拆。这里先锁职责，避免后来做成八套差不多的输出。</p>
 </section>
 
 <!-- 08 -->
@@ -729,7 +745,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 </section>
 
 <footer>
-  <p>本文档为系统架构层面的方案草案，用于对齐设计方向与排期边界。具体数值、技能表、掉落表需在 P0 阶段通过原型验证后另行拆解。版本变更记在同目录的《更新记录》。</p>
+  <p>本文档为云锦繁星的系统架构草案，用于对齐设计方向与排期边界。具体数值、技能表、掉落表需在 P0 阶段通过原型验证后另行拆解。版本变更记在同目录的《更新记录》。</p>
 </footer>
 
 </main>
