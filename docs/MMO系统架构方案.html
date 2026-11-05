@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.15</b></span>
-    <span>变更：<b>低级本、高级本可单人或组队；高难及以上只能组队并限次</b></span>
+    <span>文档版本：<b>v1.16</b></span>
+    <span>变更：<b>客户端定为 Unity，首发平台 Android</b></span>
   </div>
 </header>
 
@@ -707,7 +707,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 <!-- 14 -->
 <section id="s14">
   <h2><span class="n">15</span>技术架构</h2>
-  <p class="sub">分服集群 + 战斗实例动态扩缩。战斗按技能结算，不做逐帧攻击盒。</p>
+  <p class="sub">客户端用 Unity，首发平台是 Android。服务端仍是分服集群，不放进引擎。</p>
 
   <figure>
     <svg viewBox="0 0 900 372" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',sans-serif">
@@ -719,7 +719,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
       </defs>
 
       <rect x="40" y="20" width="820" height="42" rx="8" fill="#FFFFFF" stroke="#DED9CC" stroke-width="0.8"/>
-      <text x="450" y="46" font-size="12.5" fill="#3C3A34" text-anchor="middle">客户端 · 移动端 / PC　表现层 · 目标选择 · 技能请求</text>
+      <text x="450" y="46" font-size="12.5" fill="#3C3A34" text-anchor="middle">客户端 · Unity / Android　表现层 · 目标选择 · 技能请求</text>
 
       <line x1="450" y1="62" x2="450" y2="78" stroke="#B4B2A9" stroke-width="1" marker-end="url(#ar2)"/>
 
@@ -760,7 +760,11 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <figcaption>图 2 · 服务端分层：世界服与战斗服物理隔离，战斗服只处理技能结算</figcaption>
   </figure>
 
-  <h3><span class="n">15.1</span>三个工程要点</h3>
+  <h3><span class="n">15.1</span>客户端</h3>
+  <p>客户端用 Unity 开发，首发只做 Android。世界服、战斗服、社交服和数据库不进 Unity，继续按独立进程部署。Unity 只负责表现、点选目标和发送技能请求。</p>
+  <p>副本里的模型和技能按完整规格显示，同屏就是队伍里的人。主城近处的人保持完整外形，远处改为简模，再远只留名字。城战收进专门战场：周围的人显示完整，超出同屏上限的人只留队伍颜色和血条。首发加载几块相连的密区，不一次加载整片大陆。</p>
+
+  <h3><span class="n">15.2</span>三个工程要点</h3>
   <ol class="steps">
     <li><strong>战斗服独立部署、按需拉起。</strong>每个副本实例一个独立进程，镜像预启动池化，冷启动控制在 3 秒内。世界服压力再大也不影响副本结算。</li>
     <li><strong>世界服降频。</strong>大世界只做位置广播与事件通知，同步频率 5–10Hz。玩家在大世界是移动的坐标加状态，技能结算放在副本实例里。</li>
@@ -775,7 +779,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <table>
     <tr><th style="width:88px">阶段</th><th style="width:210px">交付内容</th><th>要验证的问题</th></tr>
-    <tr><td><strong>P0 战斗验证</strong></td><td>5 职业、每职业一组主动技能、1 个 Boss、锁定释放与冷却循环</td><td>目标好不好选、技能分不分得清、Boss 的阶段读不读得懂？</td></tr>
+    <tr><td><strong>P0 战斗验证</strong></td><td>Unity Android 包，5 职业、每职业一组主动技能、1 个 Boss、锁定释放与冷却循环</td><td>在手机上目标好不好选、技能分不分得清、Boss 的阶段读不读得懂？</td></tr>
     <tr><td><strong>P1 循环闭合</strong></td><td>深渊 + 四人巢穴 + 强化 + 能量结晶 + 拍卖行 + 疲劳</td><td>一天的循环是否成立？投入产出是否让人想明天再来？</td></tr>
     <tr><td><strong>P2 社交成立</strong></td><td>公会 + 公会秘境 + 竞技场 + 战场 + 二转</td><td>玩家有没有理由留下来跟同一批人玩？</td></tr>
     <tr><td><strong>P3 长线承载</strong></td><td>大世界 + 境界 + 领地城战 + 家园 + 赛季</td><td>半年后还有没有新目标可追？</td></tr>
@@ -790,6 +794,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <table>
     <tr><th style="width:180px">风险</th><th style="width:64px" class="c">等级</th><th>对策</th></tr>
+    <tr><td>主城同屏过挤</td><td class="c">中</td><td>分线。近处完整外形，远处简模，再远只留名字。城战放在专门战场，超上限的人只留队伍颜色和血条</td></tr>
     <tr><td>技能前摇与延迟反馈</td><td class="c">中</td><td>服务器按一次技能结算一次。客户端先播前摇，回包后校正伤害与硬直。不做逐帧回滚，首测仍要覆盖高延迟</td></tr>
     <tr><td>双轨成长造成认知负担</td><td class="c">中</td><td>境界在 45 级后才开启。只有该大版本的新副本看境界，日常和旧副本仍看等级。界面写明还差哪一段</td></tr>
     <tr><td>装备入口一次给太多</td><td class="c">中</td><td>强化、强化转移与能量结晶在 40 级前逐个解锁，一次只出现一个新入口</td></tr>
