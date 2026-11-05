@@ -100,21 +100,22 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 <nav>
   <div class="navtitle">目录</div>
   <a href="#s1">01 方案定位</a>
-  <a href="#s2">02 母体基因对比</a>
-  <a href="#s3">03 冲突与取舍</a>
-  <a href="#s4">04 总体架构</a>
-  <a href="#s5">05 模块清单</a>
-  <a href="#s6">06 战斗系统</a>
-  <a href="#s7">07 成长双轨</a>
-  <a href="#s8">08 装备体系</a>
-  <a href="#s9">09 副本梯度</a>
-  <a href="#s10">10 社交三层</a>
-  <a href="#s11">11 经济模型</a>
-  <a href="#s12">12 PVP 分层</a>
-  <a href="#s13">13 节奏与投放</a>
-  <a href="#s14">14 技术架构</a>
-  <a href="#s15">15 里程碑</a>
-  <a href="#s16">16 风险清单</a>
+  <a href="#story">02 故事主线</a>
+  <a href="#s2">03 母体基因对比</a>
+  <a href="#s3">04 冲突与取舍</a>
+  <a href="#s4">05 总体架构</a>
+  <a href="#s5">06 模块清单</a>
+  <a href="#s6">07 战斗系统</a>
+  <a href="#s7">08 成长双轨</a>
+  <a href="#s8">09 装备体系</a>
+  <a href="#s9">10 副本梯度</a>
+  <a href="#s10">11 社交三层</a>
+  <a href="#s11">12 经济模型</a>
+  <a href="#s12">13 PVP 分层</a>
+  <a href="#s13">14 节奏与投放</a>
+  <a href="#s14">15 技术架构</a>
+  <a href="#s15">16 里程碑</a>
+  <a href="#s16">17 风险清单</a>
 </nav>
 
 <main>
@@ -125,8 +126,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <p class="lead">以《完美国际2》的长线养成与强社交为骨架，副本节奏参考《龙之谷》的短会话日常与周常。战斗改为目标锁定的技能释放，不再采用龙之谷的无锁定连段。表世界与里世界仍分开承载生活和副本。</p>
   <div class="meta">
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.2</b></span>
-    <span>变更：<b>移除龙之谷连段战斗；副本可单人可多人，多人一次抵多次</b></span>
+    <span>文档版本：<b>v1.4</b></span>
+    <span>变更：<b>摘入《梦长生》设定：境界、灵石、丹药与生活副职</b></span>
   </div>
 </header>
 
@@ -164,9 +165,92 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   </ol>
 </section>
 
+<!-- story -->
+<section id="story">
+  <h2><span class="n">02</span>故事主线</h2>
+  <p class="sub">主线名字叫「裂衡」。它负责把系统交到玩家手里，并给满级之后的领地冲突一个来由。规则仍以系统章节为准。</p>
+
+  <p>衡陆原来是一整块陆地。上古用龙把世界钉成两层：人生活的<strong>表世界</strong>，和锁住灾厄的<strong>里世界</strong>。龙不是入侵的怪兽，而是钉住两界的锁。锁松了，地表裂开缝，缝那边的东西会漏出来。这些缝叫<strong>裂隙</strong>。人在这套锁上求长生，这条修炼传统就叫<strong>长生</strong>。</p>
+  <p>玩家是能走进裂隙、再把东西带回来的人，称<strong>封隙人</strong>。这样的人很多。主线讲的是玩家自己怎么认清这些锁，满级之后，谁来掌管松动的锁，交给公会、领地和赛季。</p>
+
+  <div class="callout">
+    <div class="h">故事要守住的四件事</div>
+    <p>城镇里只对话、交接和生活，战斗全部发生在裂隙实例里。种族只影响外观和出身对白，不决定阵营，也不产生属性差。仙与魔都成立，主线不宣判哪一边是对的。境界决定能去地表的哪些地方，不决定能进哪本副本。</p>
+  </div>
+
+  <h3>四幕</h3>
+  <table>
+    <tr><th style="width:108px">幕</th><th style="width:118px">等级</th><th>玩家经历</th><th style="width:168px">顺手打开的系统</th></tr>
+    <tr>
+      <td><strong>路裂</strong></td>
+      <td>1–20 级<br>0–4 小时</td>
+      <td>去边城的路上裂隙张开。玩家学会选目标、看前摇、拉开或挡住关键招，独自打过第一只漏出来的隙兽，带回第一块锁片。</td>
+      <td>主线关卡、15 级一转</td>
+    </tr>
+    <tr>
+      <td><strong>松锁</strong></td>
+      <td>20–45 级<br>4–14 小时</td>
+      <td>所谓龙墓其实是第二道锁。锁片按份脱落：一个人可以一层层揭，人到齐则一次揭开多层。守隙司的巡隙做不完，是因为身体一天只能越界有限次。</td>
+      <td>深渊、巢穴、疲劳、强化</td>
+    </tr>
+    <tr>
+      <td><strong>立名</strong></td>
+      <td>45–60 级<br>14–25 小时</td>
+      <td>守隙司不再代玩家做选择。玩家自己立仙或立魔，取得不同的地表通行权。边城守不住所有裂隙，城主把锁的守护和税收包给公会。</td>
+      <td>境界、二转、纹章、龙玉共鸣、公会</td>
+    </tr>
+    <tr>
+      <td><strong>总钥</strong></td>
+      <td>满级之后</td>
+      <td>龙巢是衡龙所在的总锁。揭开它并不结束故事。锁片已经散进各城，谁掌管地表的锁，谁就收税、开商店、打城战。之后每赛季换一块正在松动的锁。</td>
+      <td>龙巢、领地城战、赛季</td>
+    </tr>
+  </table>
+
+  <h3><span class="n">2.1</span>幕一 · 路裂</h3>
+  <p>边城吏目<strong>沈照</strong>把玩家收为临时封隙人，并引入一处凡间<strong>门派</strong>。门派只教低阶技能，总称<strong>天地玄黄</strong>。15 级的一转在剧情里是认职责：战、弓、法、牧是守隙的四种分工，不是血统。幕末玩家独自走入城外的浅缝，击败隙兽，发现兽不是从别处来的，是锁里面掉出来的。</p>
+
+  <h3><span class="n">2.2</span>幕二 · 松锁</h3>
+  <p>深渊是守隙司每天的巡隙。疲劳是一个人一天还能越界几次，大世界走动不消耗它。第一座巢穴被当地人叫做龙墓，沈照留下的话写明：那是锁，而且有人在抽它。强化是用锁片给武器回火，回火失败只是没吃住，武器不会碎。</p>
+  <p>份额在故事里也说得通。锁片按份脱落。单人一次揭开一份，组满人数一次揭开与人数相同的份数，同时花掉同样多的额度。一周能揭开的总量不变。</p>
+
+  <h3><span class="n">2.3</span>幕三 · 立名</h3>
+  <p>45 级后玩家必须给自己立一个名字，沈照不再代选。</p>
+  <ul>
+    <li><strong>立仙</strong>：继续修补边界，进入<strong>圣地</strong>。开放高空航路，以及一批被封存的城区。圣地传授高阶技能，总称<strong>法则神通</strong>。</li>
+    <li><strong>立魔</strong>：改用裂隙里的力量行走，进入缝外的传承。开放荒域，以及另一套领地席位。高阶技能同样是法则神通，不比圣地少，也不比圣地多。</li>
+  </ul>
+  <p>圣地不增加每天或每周的副本次数。次数仍只看疲劳和周份额。</p>
+  <p>两条路都能进此后全部副本。差别在地表能去哪、飞行、以及领地政治里站在哪一种话语上。抽锁牟利的人是前封隙人<strong>裴衔</strong>。他代表「拆锁可以换钱」这套说法。玩家选魔，并不等于投靠他；选仙，也不等于守隙司永远正确。</p>
+  <p>二转和纹章发生在这里：职责分开，纹章是把锁片的纹路刻进技能。城主把几处锁的守护权和税收包给公会，玩家从这里进入公会。</p>
+
+  <h3><span class="n">2.4</span>幕四 · 总钥</h3>
+  <p>龙巢每周只能揭开有限层，所以用单人份计。八个人一起进去，一次揭开八份，当周额度用完；一个人就一层层揭。衡龙这一战是把总锁重新钉住或暂且按住，不是把世界打赢。</p>
+  <p>裴衔已经把锁片卖进各城。此后的冲突不再加长个人主线，而变成哪一个公会掌管哪一块地表的锁。城战、税收、专属商店都从这里来。世界 Boss 是锁芯短暂顶到地表的一角：人在表世界争夺归属，击杀结算仍收回裂隙实例。</p>
+
+  <h3>主线关卡</h3>
+  <p class="sub">八场单人关卡，只负责教学和把玩家送到下一个系统门口。龙巢、深渊和巢穴的重复刷取不写进这个列表。</p>
+  <table>
+    <tr><th style="width:48px">序</th><th style="width:140px">关卡</th><th>发生的事</th><th style="width:120px">结束时玩家会什么</th></tr>
+    <tr><td>1</td><td>路边的裂口</td><td>第一道缝张开，只教选目标和放技能</td><td>锁定、普攻、一个主动技能</td></tr>
+    <tr><td>2</td><td>隙兽</td><td>第一只漏出来的兽。进门前必须会处理前摇</td><td>拉开，或用防御技能挡住关键招</td></tr>
+    <tr><td>3</td><td>边城委托</td><td>沈照收玩家为临时封隙人，完成一次城外短缝</td><td>回城交任务、整理背包</td></tr>
+    <tr><td>4</td><td>第一块锁片</td><td>浅缝尽头不是兽穴，而是一块松动的锁</td><td>知道副本掉落从锁里来</td></tr>
+    <tr><td>5</td><td>龙墓不是墓</td><td>第一座巢穴的主线首通。本地人的传说和锁的真相对上</td><td>进入可重复的巢穴</td></tr>
+    <tr><td>6</td><td>沈照的留话</td><td>沈照人已不在缝里，留下「有人在抽锁」</td><td>知道敌人是人，不是另一只兽</td></tr>
+    <tr><td>7</td><td>立名</td><td>在仙、魔两条短章里选一条，选完汇合</td><td>境界与对应的地表权限</td></tr>
+    <tr><td>8</td><td>城主的契约</td><td>城主把锁的守护和税收交给公会，主线停在龙巢门口</td><td>公会、以及满级循环的入口</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <div class="h">主线不承担的事</div>
+    <p>不把某一种族写成天选。不把仙魔写成正邪结局。不在主线里出售或赠送商城外观当关键道具。满级后不继续加长这条个人线，新的目标放到赛季的锁和城战上。</p>
+  </div>
+</section>
+
 <!-- 02 -->
 <section id="s2">
-  <h2><span class="n">02</span>母体基因对比</h2>
+  <h2><span class="n">03</span>母体基因对比</h2>
   <p class="sub">先看清两款游戏各自真正的结构性优势，再决定继承什么。</p>
 
   <table>
@@ -192,7 +276,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 03 -->
 <section id="s3">
-  <h2><span class="n">03</span>冲突与取舍</h2>
+  <h2><span class="n">04</span>冲突与取舍</h2>
   <p class="sub">五组硬冲突，逐条给出裁决，这是整份方案的地基。</p>
 
   <table>
@@ -227,7 +311,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 04 -->
 <section id="s4">
-  <h2><span class="n">04</span>总体架构</h2>
+  <h2><span class="n">05</span>总体架构</h2>
   <p class="sub">纵向六层，横向双世界。层负责依赖关系，双世界负责内容分区。</p>
 
   <figure>
@@ -311,7 +395,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 05 -->
 <section id="s5">
-  <h2><span class="n">05</span>模块清单</h2>
+  <h2><span class="n">06</span>模块清单</h2>
   <p class="sub">每个模块明确标注承袭来源与改造动作，方便排期时按「沿用 / 改造 / 自研」估算成本。</p>
 
   <table>
@@ -319,7 +403,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>锁定技能战斗</td><td class="c"><span class="tag mix">简化</span></td><td>选定目标后按冷却释放技能。去掉无锁定、翻滚无敌、浮空连段、霸体破防、墙壁追击、后摇取消</td><td class="c">P0</td></tr>
     <tr><td>职业与转职</td><td class="c"><span class="tag mix">融合</span></td><td>4 基础职业 → 8 分支（15/45 级），保留龙之谷定位；种族只做外观与剧情，不做属性差异</td><td class="c">P0</td></tr>
     <tr><td>技能与天赋</td><td class="c"><span class="tag dn">龙之谷</span></td><td>双天赋树（PVE/PVP 分离），EX 技能进阶，免费洗点</td><td class="c">P0</td></tr>
-    <tr><td>境界系统</td><td class="c"><span class="tag pw">完美</span></td><td>九阶 + 仙魔分岔，只开放大世界权限与被动加成，不卡副本</td><td class="c">P1</td></tr>
+    <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>炼体到大乘共九境，每境分初、中、后、圆满。立仙走金仙，立魔走散仙，尽头是极境。只开大世界权限和每阶约 2–3% 被动，不卡副本</td><td class="c">P1</td></tr>
     <tr><td>装备强化</td><td class="c"><span class="tag dn">龙之谷</span></td><td>20 级上限，失败掉级不碎裂，保护券，<strong>无损继承</strong></td><td class="c">P0</td></tr>
     <tr><td>龙玉镶嵌</td><td class="c"><span class="tag dn">龙之谷</span></td><td>攻击 / 防御 / 功能三类，部位限定，三连共鸣，可拆卸复用</td><td class="c">P0</td></tr>
     <tr><td>纹章</td><td class="c"><span class="tag dn">龙之谷</span></td><td>改造技能形态而非纯数值，是差异化构筑的主战场</td><td class="c">P1</td></tr>
@@ -344,10 +428,10 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 06 -->
 <section id="s6">
-  <h2><span class="n">06</span>战斗系统</h2>
+  <h2><span class="n">07</span>战斗系统</h2>
   <p class="sub">选定目标，按冷却放技能。连段、无敌帧和浮空追击不进入规格。</p>
 
-  <h3><span class="n">6.1</span>操作规格</h3>
+  <h3><span class="n">7.1</span>操作规格</h3>
   <div class="kv">
     <div class="k">锁定方式</div><div>先选定目标，技能朝该目标释放。可手动切换目标。不做无锁定朝向自控，也不做全场景自动索敌</div>
     <div class="k">移动</div><div>平时可移动。部分技能有短暂前摇，前摇期间可以走位，命中前可以打断施法。没有翻滚，没有无敌帧</div>
@@ -357,7 +441,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <div class="k">判定</div><div>服务器按一次技能结算命中与伤害。客户端播放施法，不做动作预测，也不做回滚</div>
   </div>
 
-  <h3><span class="n">6.2</span>伤害公式（分乘区，避免加法膨胀）</h3>
+  <h3><span class="n">7.2</span>伤害公式（分乘区，避免加法膨胀）</h3>
   <div class="formula">
 基础攻击 = (主属性 × 系数 + 装备固定攻击) × (1 + 境界加成)<br>
 强化后   = 基础攻击 × (1 + 强化系数 + 龙玉固定值/基础攻击)<br>
@@ -366,13 +450,13 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   </div>
   <p>四个乘区各自独立成长，任意一区单独堆叠都会被边际收益自然压制。这是把完美式长链数值<strong>收进可控区间</strong>的关键——玩家永远有地方投入，但单点极限不会失控。</p>
 
-  <h3><span class="n">6.3</span>网络同步策略</h3>
+  <h3><span class="n">7.3</span>网络同步策略</h3>
   <p>战斗服按<strong>一次技能请求结算一次</strong>。客户端先播放施法前摇，服务器回包后写入伤害和硬直。同步跟着技能走，不逐帧同步攻击盒，也不为延迟做命中宽容或动作回滚。</p>
 </section>
 
 <!-- 07 -->
 <section id="s7">
-  <h2><span class="n">07</span>成长双轨</h2>
+  <h2><span class="n">08</span>成长双轨</h2>
   <p class="sub">两条线服务两类人，而不是给所有人加两道门。</p>
 
   <table>
@@ -386,18 +470,42 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <p>境界只做<strong>锦上添花与身份标识</strong>。副本准入只看等级和装备，境界不成为第二道闸门。</p>
   </div>
 
-  <h3><span class="n">7.1</span>职业与转职</h3>
-  <p>四个基础职业保持战、弓、法、牧的分工，15 级一转、45 级二转、满级后开放觉醒。差别体现在技能功能和队伍职责上，不体现在连段操作上。种族只做外观与剧情，<strong>不绑定职业、不产生属性差异</strong>。</p>
+  <h3><span class="n">8.1</span>九境与仙魔</h3>
+  <p class="sub">境界的名字来自设定稿《梦长生》。九个基本境对上原来的「九阶」，仙魔分岔对上立名。</p>
+  <table>
+    <tr><th style="width:88px">层级</th><th>内容</th><th style="width:200px">在本方案里怎么用</th></tr>
+    <tr><td>基本九境</td><td>炼体（1–9 阶）、筑基、结丹、元婴、化神、返虚、合体、渡劫、大乘</td><td>45 级后按任务链推进，每境约 +2–3% 被动</td></tr>
+    <tr><td>境内四段</td><td>初期、中期、后期、大圆满</td><td>后期就可以尝试突破下一境。大圆满把这一境的被动给满，并多给一点可分配属性</td></tr>
+    <tr><td>立仙</td><td>金仙，分初期到大圆满</td><td>材料更重，境界推进更快。材料来自副本、采集和玩家交易</td></tr>
+    <tr><td>立魔</td><td>散仙，1–12 阶</td><td>突破门槛更低，需要的历练更多，推进更慢</td></tr>
+    <tr><td>极境</td><td>两边的共同尽头</td><td>满级长线身份，只再开一层地表权限，不单独加一套战斗规则</td></tr>
+  </table>
+  <p>突破看三项，不看副本门票：<strong>修为</strong>来自大世界里的日常修行，不耗疲劳；<strong>历练</strong>来自副本；<strong>炼心</strong>来自主线和境界任务里的选择。突破消耗灵石。失败只花掉这次材料，境界不掉回去。</p>
+  <div class="callout warn">
+    <div class="h">设定稿里有一条不采用</div>
+    <p>原稿把金仙写成充值档，把散仙写成贫民档。本方案不把境界卖成两条付费身份。金仙和散仙只是立仙、立魔的名字，商城不卖突破材料，也不卖加速境界的道具。</p>
+  </div>
+
+  <h3><span class="n">8.2</span>职业、武器与加点</h3>
+  <p>四个基础职业保持战、弓、法、牧的分工，15 级一转、45 级二转、满级后开放觉醒。差别体现在技能功能和队伍职责上。种族只做外观与剧情，<strong>不绑定职业、不产生属性差异</strong>。</p>
+  <p>设定稿里的武器是长刀、长剑、弓箭、长锤、匕首，装备通用，只卡加点。本方案留下这些武器外形，能学会的技能仍由职业决定，避免一个人同时拿到坦克、刺客和治疗的全套职责。</p>
+  <table>
+    <tr><th style="width:88px">属性</th><th>设定稿里的意思</th><th>本方案</th></tr>
+    <tr><td>力量</td><td>携带更多物品</td><td>战的主属性，进入攻击。负重改由背包容量处理，不占这条属性</td></tr>
+    <tr><td>敏捷</td><td>速度</td><td>弓的主属性，进入攻击</td></tr>
+    <tr><td>精神</td><td>蓝量</td><td>法、牧的主属性，进入攻击或治疗</td></tr>
+    <tr><td>体力</td><td>血量</td><td>生命</td></tr>
+  </table>
 </section>
 
 <!-- 08 -->
 <section id="s8">
-  <h2><span class="n">08</span>装备体系</h2>
+  <h2><span class="n">09</span>装备体系</h2>
   <p class="sub">把完美式的八层改造成四层，同时保住「有得投」的深度感。</p>
 
   <table>
     <tr><th style="width:110px">层级</th><th style="width:130px">系统</th><th>规则</th><th style="width:110px">继承策略</th></tr>
-    <tr><td>第 1 层</td><td>品阶与套装</td><td>白 → 蓝 → 紫 → 橙，每档 3–4 套，随版本梯度替换</td><td>不继承（自然换代）</td></tr>
+    <tr><td>第 1 层</td><td>品阶与套装</td><td>白 → 绿（精良）→ 蓝 → 紫 → 橙，每档 3–4 套，随版本梯度替换。同品阶装备通用，穿戴仍看等级和职业</td><td>不继承（自然换代）</td></tr>
     <tr><td>第 2 层</td><td>强化</td><td>上限 20 级，失败掉 1 级不掉阶，保护券来自副本，消耗金币</td><td><strong>全额无损继承</strong></td></tr>
     <tr><td>第 3 层</td><td>龙玉镶嵌</td><td>三类龙玉，部位限定，三连共鸣触发套装效果，可拆卸复用</td><td><strong>拆卸带走</strong></td></tr>
     <tr><td>第 4 层</td><td>纹章</td><td>改造技能形态（CD、范围、追加段数），角色级而非装备级</td><td>角色级，永久持有</td></tr>
@@ -409,11 +517,23 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <div class="h">「无损继承」是整个经济系统的安全阀</div>
     <p>只要玩家相信投入不会作废，他就敢在过渡装备上花钱；敢花钱，拍卖行才有流动性；有流动性，搬砖玩家才有活路。这一条比任何数值设计都更能延长生命周期。</p>
   </div>
+
+  <h3><span class="n">9.1</span>丹药、坐骑、灵兽与副职</h3>
+  <p class="sub">从设定稿留下能接上现有四层装备的部分。会多出一层战斗词条的，不留下。</p>
+  <table>
+    <tr><th style="width:110px">设定</th><th>留下的规则</th><th style="width:72px" class="c">优先级</th></tr>
+    <tr><td>丹药</td><td>筑基丹、破镜丹用于境界突破。回春丹、气血丹是回复药。都从副本和炼丹来，商城不卖，也不能代替复活</td><td class="c">P1</td></tr>
+    <tr><td>坐骑</td><td>玩法坐骑分普通和高级，只差移动速度。商城坐骑只换外观，不叠加速度，不进战斗</td><td class="c">P2</td></tr>
+    <tr><td>灵兽</td><td>普通、高级、神兽只做收集、外观和生活协助，不进入伤害公式</td><td class="c">P2</td></tr>
+    <tr><td>裁缝、铁匠、巧匠</td><td>做衣服、武器、饰品的胚子和外观，产物仍走上面的四层装备</td><td class="c">P2</td></tr>
+    <tr><td>炼丹师</td><td>做境界丹和回复药</td><td class="c">P1</td></tr>
+    <tr><td>制符、附魔</td><td>原稿是限时属性和永久附加词条。不采用，避免在四层装备之外再加数值</td><td class="c">不做</td></tr>
+  </table>
 </section>
 
 <!-- 09 -->
 <section id="s9">
-  <h2><span class="n">09</span>副本梯度</h2>
+  <h2><span class="n">10</span>副本梯度</h2>
   <p class="sub">五档结构，每档对应一种玩家动机与一种产出。</p>
 
   <table>
@@ -425,7 +545,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>公会秘境</td><td>1–4 人</td><td>个人活跃 × 人数</td><td>公会贡献、科技材料、稀有外观，按人数倍增</td><td>组织荣誉</td></tr>
   </table>
 
-  <h3><span class="n">9.1</span>单人与多人共用同一份额度</h3>
+  <h3><span class="n">10.1</span>单人与多人共用同一份额度</h3>
   <p>除主线外，同一副本可以单人进，也可以一直组到人数上限。主线保持单人，它负责教学，不参与刷本折算。</p>
   <p>结算只认一条：<strong>每人本次获得的产出 = 单人通关产出 × 进本人数</strong>，<strong>每人扣掉的疲劳、周份额或个人活跃 = 同样的倍数</strong>。多人打一次，相当于这个人把单人要刷的几次合成一次清掉。一天或一周的总产出不变，省下来的是次数和时间。</p>
   <p>怪物生命和伤害按进本人数缩放，机制不变。单人打得完，满员只是更快花完同一份额。</p>
@@ -443,7 +563,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 10 -->
 <section id="s10">
-  <h2><span class="n">10</span>社交三层</h2>
+  <h2><span class="n">11</span>社交三层</h2>
   <p class="sub">每一层解决一种关系，不重叠、不越级。</p>
 
   <div class="kv">
@@ -457,12 +577,13 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 11 -->
 <section id="s11">
-  <h2><span class="n">11</span>经济模型</h2>
+  <h2><span class="n">12</span>经济模型</h2>
   <p class="sub">半开放：付费货币可流通，但战力材料不进商城。</p>
 
   <table>
     <tr><th style="width:88px">货币</th><th style="width:130px">获取</th><th>用途</th><th>流通性</th></tr>
     <tr><td><strong>金币</strong></td><td>副本、任务、拍卖行出售</td><td>修理、强化、拍卖行购买、税</td><td>玩家间自由流通</td></tr>
+    <tr><td><strong>灵石</strong></td><td>采集、副本、玩家交易</td><td>境界突破、炼丹。下品、中品、上品、极品、仙晶，相邻一档按 10000:1 兑换</td><td>玩家间自由流通。仙晶是最高档灵石，不是充值货币</td></tr>
     <tr><td><strong>元宝</strong></td><td>充值、寄售所得</td><td>商城外观、便利道具、拍卖行手续费抵扣</td><td>可通过寄售换金币</td></tr>
     <tr><td>绑定资源</td><td>活动、成长任务</td><td>仅限自用，不可交易</td><td>不可流通</td></tr>
   </table>
@@ -471,13 +592,13 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <div class="callout warn">
     <div class="h">商城边界</div>
-    <p>只卖：外观、坐骑、家园装饰、背包与仓库扩容、传送与便利、赛季通行证。绝不卖：强化石、龙玉、装备、属性道具、复活币（复活消耗游戏内金币）。</p>
+    <p>只卖：外观、纯外观坐骑、家园装饰、背包与仓库扩容、传送与便利、赛季通行证。绝不卖：强化石、龙玉、灵石、丹药、装备、属性道具、复活币（复活消耗游戏内金币）。</p>
   </div>
 </section>
 
 <!-- 12 -->
 <section id="s12">
-  <h2><span class="n">12</span>PVP 分层</h2>
+  <h2><span class="n">13</span>PVP 分层</h2>
   <p class="sub">三层战力各自成立，互不污染。</p>
 
   <table>
@@ -492,7 +613,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 13 -->
 <section id="s13">
-  <h2><span class="n">13</span>节奏与投放</h2>
+  <h2><span class="n">14</span>节奏与投放</h2>
   <p class="sub">三档时间结构，对应三种玩家。</p>
 
   <table>
@@ -502,7 +623,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td><strong>无限</strong></td><td>大世界探索、采集、家园、钓鱼、外观收集</td><td>材料、外观、成就、社交资本</td><td>长在线玩家：把时间换成差异</td></tr>
   </table>
 
-  <h3><span class="n">13.1</span>阶段化成长曲线</h3>
+  <h3><span class="n">14.1</span>阶段化成长曲线</h3>
   <ul>
     <li><strong>1–20 级（0–4h）</strong>：只教一件事——怎么打。学会选目标、看前摇、按冷却放技能。第一个 Boss 前必须会拉开距离，或用防御技能挡住关键招。</li>
     <li><strong>20–45 级（4–14h）</strong>：开放深渊与首个巢穴。单人能打完，组满人数一次抵多次。装备强化首次登场。</li>
@@ -513,7 +634,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 14 -->
 <section id="s14">
-  <h2><span class="n">14</span>技术架构</h2>
+  <h2><span class="n">15</span>技术架构</h2>
   <p class="sub">分服集群 + 战斗实例动态扩缩。战斗按技能结算，不做逐帧攻击盒。</p>
 
   <figure>
@@ -567,7 +688,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <figcaption>图 2 · 服务端分层：世界服与战斗服物理隔离，战斗服只处理技能结算</figcaption>
   </figure>
 
-  <h3><span class="n">14.1</span>三个工程要点</h3>
+  <h3><span class="n">15.1</span>三个工程要点</h3>
   <ol class="steps">
     <li><strong>战斗服独立部署、按需拉起。</strong>每个副本实例一个独立进程，镜像预启动池化，冷启动控制在 3 秒内。世界服压力再大也不影响副本结算。</li>
     <li><strong>世界服降频。</strong>大世界只做位置广播与事件通知，同步频率 5–10Hz。玩家在大世界是移动的坐标加状态，技能结算放在副本实例里。</li>
@@ -577,7 +698,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 15 -->
 <section id="s15">
-  <h2><span class="n">15</span>里程碑</h2>
+  <h2><span class="n">16</span>里程碑</h2>
   <p class="sub">四个阶段，每个阶段都有一个明确的「验证问题」。</p>
 
   <table>
@@ -593,7 +714,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
 <!-- 16 -->
 <section id="s16">
-  <h2><span class="n">16</span>风险清单</h2>
+  <h2><span class="n">17</span>风险清单</h2>
 
   <table>
     <tr><th style="width:180px">风险</th><th style="width:64px" class="c">等级</th><th>对策</th></tr>
