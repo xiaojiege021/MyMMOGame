@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.9</b></span>
-    <span>变更：<b>保护券只从商城购买，副本不产出</b></span>
+    <span>文档版本：<b>v1.10</b></span>
+    <span>变更：<b>十一段大境界；元婴起每段一个大版本，新副本看境界</b></span>
   </div>
 </header>
 
@@ -176,7 +176,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <div class="callout">
     <div class="h">故事要守住的四件事</div>
-    <p>城镇里只对话、交接和生活，战斗全部发生在裂隙实例里。种族只影响外观和出身对白，不决定阵营，也不产生属性差。仙与魔都成立，主线不宣判哪一边是对的。境界决定能去地表的哪些地方，不决定能进哪本副本。</p>
+    <p>城镇里只对话、交接和生活，战斗全部发生在裂隙实例里。种族只影响外观和出身对白，不决定阵营，也不产生属性差。仙与魔都成立，主线不宣判哪一边是对的。境界决定能去地表的哪些地方。首发副本仍只看等级；元婴之后，每个大版本新增的副本还要先突破到对应大境界。</p>
   </div>
 
   <h3>四幕</h3>
@@ -300,7 +300,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr>
       <td>成长深度</td>
       <td>等级 + 境界双门禁容易造成新手「两处卡关」，境界再卡副本会把已经学会技能的玩家挡在门外</td>
-      <td><strong>分轨分工</strong>：等级管内容准入，境界管大世界权限与被动加成，<em>不做双重硬卡点</em></td>
+      <td><strong>分轨分工</strong>：等级管首发副本、装备和职业。境界管大世界权限，并从元婴起卡住该大版本的新副本。旧副本不随之提高门槛</td>
     </tr>
     <tr>
       <td>社交结构</td>
@@ -404,7 +404,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>锁定技能战斗</td><td class="c"><span class="tag mix">简化</span></td><td>选定目标后按冷却释放技能。去掉无锁定、翻滚无敌、浮空连段、霸体破防、墙壁追击、后摇取消</td><td class="c">P0</td></tr>
     <tr><td>职业与转职</td><td class="c"><span class="tag mix">融合</span></td><td>战、弓、法、牧在 15 级各选一条：镇岳/破军、穿杨/罗网、赤霄/玄缚、生息/诫律。45 级二转只推进这条分支。种族只做外观与剧情</td><td class="c">P0</td></tr>
     <tr><td>技能与天赋</td><td class="c"><span class="tag dn">龙之谷</span></td><td>双天赋树（PVE/PVP 分离），EX 技能进阶，免费洗点</td><td class="c">P0</td></tr>
-    <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>炼体到大乘共九境，每境分初、中、后、圆满。立仙走金仙，立魔走散仙，尽头是极境。只开大世界权限和每阶约 2–3% 被动，不卡副本</td><td class="c">P1</td></tr>
+    <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>十一段：炼体到大乘，然后金仙或散仙，最后极境。每段分初、中、后、圆满。元婴起每段一个大版本，该版本的新副本要先突破到这一段</td><td class="c">P1</td></tr>
     <tr><td>装备强化</td><td class="c"><span class="tag pw">完美</span></td><td>上限 +12。失败掉 1 级，不碎裂，不清零。换装用强化转移，不自动继承</td><td class="c">P0</td></tr>
     <tr><td>能量结晶镶嵌</td><td class="c"><span class="tag mix">融合</span></td><td>原龙玉改为能量结晶。攻击 / 防御 / 功能三类，部位限定，三连共鸣，可拆卸复用</td><td class="c">P0</td></tr>
     <tr><td>装备重铸</td><td class="c"><span class="tag pw">完美</span></td><td>合并完美系龙珠 / 天书 / 重铸为单一「精铸」入口，最多两层</td><td class="c">P2</td></tr>
@@ -462,25 +462,32 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <table>
     <tr><th style="width:80px">轨道</th><th style="width:170px">节奏</th><th>作用</th><th style="width:150px">门禁对象</th></tr>
     <tr><td><strong>等级</strong></td><td>主线推进，1–60 级约 20–25 小时</td><td>解锁职业分支、技能、副本层级；决定基础属性</td><td>副本准入、装备穿戴</td></tr>
-    <tr><td><strong>境界</strong></td><td>任务链推进，全程跨度 3–6 个月</td><td>被动属性小幅加成（每阶约 +2~3%）、解锁大世界权限与生活玩法</td><td>大世界区域、飞行、领地参与</td></tr>
+    <tr><td><strong>境界</strong></td><td>任务链推进。首发走到结丹，其后每段一个大版本</td><td>每阶约 +2~3% 被动，解锁大世界权限，并打开对应大版本的新副本</td><td>大世界区域、飞行、领地，以及元婴起的新副本</td></tr>
   </table>
 
   <div class="callout">
-    <div class="h">为什么境界不进副本门槛</div>
-    <p>境界只做<strong>锦上添花与身份标识</strong>。副本准入只看等级和装备，境界不成为第二道闸门。</p>
+    <div class="h">境界卡住的是新版本副本</div>
+    <p>首发副本只看等级和装备。从元婴起，每个大版本新增的副本要先突破到该大境界。已经开放的旧副本不提高门槛。突破用的历练来自当前能进的副本，新副本本身不是突破门票。</p>
   </div>
 
-  <h3><span class="n">8.1</span>九境与仙魔</h3>
-  <p class="sub">境界的名字来自设定稿《梦长生》。九个基本境对上原来的「九阶」，仙魔分岔对上秘境成局里的选择。</p>
+  <h3><span class="n">8.1</span>十一段大境界</h3>
+  <p class="sub">十一段按顺序走完。前九段名字来自设定稿《梦长生》。第十段由秘境成局里的仙魔选择决定叫金仙还是散仙。第十一段是极境。</p>
   <table>
-    <tr><th style="width:88px">层级</th><th>内容</th><th style="width:200px">在本方案里怎么用</th></tr>
-    <tr><td>基本九境</td><td>炼体（1–9 阶）、筑基、结丹、元婴、化神、返虚、合体、渡劫、大乘</td><td>45 级后按任务链推进，每境约 +2–3% 被动</td></tr>
-    <tr><td>境内四段</td><td>初期、中期、后期、大圆满</td><td>后期就可以尝试突破下一境。大圆满把这一境的被动给满，并多给一点可分配属性</td></tr>
-    <tr><td>立仙</td><td>金仙，分初期到大圆满</td><td>材料更重，境界推进更快。材料来自副本、采集和玩家交易</td></tr>
-    <tr><td>立魔</td><td>散仙，1–12 阶</td><td>突破门槛更低，需要的历练更多，推进更慢</td></tr>
-    <tr><td>极境</td><td>两边的共同尽头</td><td>满级长线身份，只再开一层地表权限，不单独加一套战斗规则</td></tr>
+    <tr><th style="width:52px">顺序</th><th style="width:108px">大境界</th><th>何时开放</th><th>新副本</th></tr>
+    <tr><td>1</td><td>炼体</td><td>首发。45 级进入</td><td>没有。这段仍只看等级</td></tr>
+    <tr><td>2</td><td>筑基</td><td>首发</td><td>没有</td></tr>
+    <tr><td>3</td><td>结丹</td><td>首发的尽头</td><td>没有。停在大圆满，等元婴版本</td></tr>
+    <tr><td>4</td><td>元婴</td><td>第一个大版本</td><td>该版本新增的副本，要先突破到元婴</td></tr>
+    <tr><td>5</td><td>化神</td><td>下一个大版本</td><td>同上，门槛是化神</td></tr>
+    <tr><td>6</td><td>返虚</td><td>下一个大版本</td><td>门槛是返虚</td></tr>
+    <tr><td>7</td><td>合体</td><td>下一个大版本</td><td>门槛是合体</td></tr>
+    <tr><td>8</td><td>渡劫</td><td>下一个大版本</td><td>门槛是渡劫</td></tr>
+    <tr><td>9</td><td>大乘</td><td>下一个大版本</td><td>门槛是大乘</td></tr>
+    <tr><td>10</td><td>金仙 / 散仙</td><td>大乘之后的大版本。立仙进入金仙，立魔进入散仙</td><td>门槛是这一段。金仙材料更重、推进更快；散仙门槛更低、历练更多、推进更慢</td></tr>
+    <tr><td>11</td><td>极境</td><td>最后一个大境界版本。两边在这里会合</td><td>门槛是极境。只再开一层地表权限，不另做一套战斗规则</td></tr>
   </table>
-  <p>突破看三项，不看副本门票：<strong>修为</strong>来自大世界里的日常修行，不耗疲劳；<strong>历练</strong>来自副本；<strong>炼心</strong>来自主线和境界任务里的选择。突破消耗灵石。失败只花掉这次材料，境界不掉回去。</p>
+  <p>每一段内部仍分初期、中期、后期、大圆满。后期就可以尝试突破下一段。大圆满把这一段约 2%–3% 的被动给满，并多给一点可分配属性。版本还没开时，不能提前突破到下一段。第十段的材料都来自副本、采集和玩家交易。</p>
+  <p>突破看三项：<strong>修为</strong>来自大世界里的日常修行，不耗疲劳；<strong>历练</strong>来自当前已经能进的副本；<strong>炼心</strong>来自主线和境界任务里的选择。突破消耗灵石。失败只花掉这次材料，境界不掉回去。</p>
   <div class="callout warn">
     <div class="h">设定稿里有一条不采用</div>
     <p>原稿把金仙写成充值档，把散仙写成贫民档。本方案不把境界卖成两条付费身份。金仙和散仙只是立仙、立魔的名字，商城不卖突破材料，也不卖加速境界的道具。</p>
@@ -583,6 +590,10 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   </div>
 
   <p>关键设计仍是<strong>巢穴与疲劳解绑</strong>。疲劳只限制可重复刷的材料本，装备产出走周份额。上班族可以单人把份额打完，有队时用一次满员抵掉多次。</p>
+
+  <h3><span class="n">10.2</span>一部分副本看境界</h3>
+  <p>主线、深渊、首发的巢穴、首发的龙巢、公会秘境，准入只看等级。这些本在炼体、筑基、结丹期间都能按等级去打。</p>
+  <p>从元婴起，每个大版本新增一档副本。进这档副本要先突破到该大境界，等级够而境界不够就不能进。旧版本的副本保持原来的等级门槛。单人、多人的份额算法不变，新副本单独计算自己的周份额，不把旧副本的次数抬高。</p>
 </section>
 
 <!-- 10 -->
@@ -652,7 +663,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <li><strong>1–20 级（0–4h）</strong>：只教一件事——怎么打。学会选目标、看前摇、按冷却放技能。第一个 Boss 前必须会拉开距离，或用防御技能挡住关键招。</li>
     <li><strong>20–45 级（4–14h）</strong>：开放深渊与首个巢穴。单人能打完，组满人数一次抵多次。装备强化首次登场。</li>
     <li><strong>45–60 级（14–25h）</strong>：二转、能量结晶共鸣、公会，构筑开始分化。</li>
-    <li><strong>满级后</strong>：龙巢 + 境界 + 领地 + 赛季，进入长线循环。</li>
+    <li><strong>满级后</strong>：首发龙巢、结丹，然后按大版本进入元婴、化神，直到金仙或散仙，最后是极境。每一段打开该版本的新副本，并继续领地和赛季。</li>
   </ul>
 </section>
 
@@ -743,7 +754,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <table>
     <tr><th style="width:180px">风险</th><th style="width:64px" class="c">等级</th><th>对策</th></tr>
     <tr><td>技能前摇与延迟反馈</td><td class="c">中</td><td>服务器按一次技能结算一次。客户端先播前摇，回包后校正伤害与硬直。不做逐帧回滚，首测仍要覆盖高延迟</td></tr>
-    <tr><td>双轨成长造成认知负担</td><td class="c">中</td><td>境界在 45 级后才开启，且不设副本门槛；UI 上永远只显示「下一步该做什么」</td></tr>
+    <tr><td>双轨成长造成认知负担</td><td class="c">中</td><td>境界在 45 级后才开启。只有该大版本的新副本看境界，日常和旧副本仍看等级。界面写明还差哪一段</td></tr>
     <tr><td>装备入口一次给太多</td><td class="c">中</td><td>强化、强化转移与能量结晶在 40 级前逐个解锁，一次只出现一个新入口</td></tr>
     <tr><td>半开放经济被工作室套利</td><td class="c">高</td><td>绑定双轨 + 解绑成本递减 + 寄售抽税 + 异常交易监控；金币产出与等级强绑定</td></tr>
     <tr><td>大世界内容量不足，沦为跑图</td><td class="c">高</td><td>大世界只做「有事件的区域」而非「大片空地」；先做 3 张高密度地图再谈扩张</td></tr>
