@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.13</b></span>
-    <span>变更：<b>坦克主属性改为体力，体力越高仇恨越稳</b></span>
+    <span>文档版本：<b>v1.14</b></span>
+    <span>变更：<b>增加挖矿与采药；材料不由 NPC 出售</b></span>
   </div>
 </header>
 
@@ -417,6 +417,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>战场</td><td class="c"><span class="tag mix">融合</span></td><td>10v10 目标争夺，装备部分生效 + 场次平衡系数</td><td class="c">P1</td></tr>
     <tr><td>交易体系</td><td class="c"><span class="tag mix">融合</span></td><td>拍卖行（金币）+ 摆摊 + 元宝寄售，绑定 / 非绑双轨</td><td class="c">P1</td></tr>
     <tr><td>家园师徒</td><td class="c"><span class="tag mix">融合</span></td><td>家园种植产出家园币（只换外观与便捷），师徒给经验加成</td><td class="c">P2</td></tr>
+    <tr><td>挖矿与采药</td><td class="c"><span class="tag mix">融合</span></td><td>生活技能，谁都能学，可同时学。药给炼丹，矿给铁匠，灵石矿脉出灵石。不耗疲劳。NPC 只卖工具</td><td class="c">P1</td></tr>
     <tr><td>收集图鉴</td><td class="c"><span class="tag pw">完美</span></td><td>战灵式卡组降级为「英灵图鉴」，只提供收集度与被动小加成</td><td class="c">P2</td></tr>
   </table>
 
@@ -580,10 +581,20 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>丹药</td><td>筑基丹、破镜丹用于境界突破。回春丹、气血丹是回复药。都从副本和炼丹来，商城不卖，也不能代替复活</td><td class="c">P1</td></tr>
     <tr><td>坐骑</td><td>玩法坐骑分普通和高级，只差移动速度。商城坐骑只换外观，不叠加速度，不进战斗</td><td class="c">P2</td></tr>
     <tr><td>灵兽</td><td>普通、高级、神兽只做收集、外观和生活协助，不进入伤害公式</td><td class="c">P2</td></tr>
-    <tr><td>裁缝、铁匠、巧匠</td><td>做衣服、武器、饰品的胚子和外观，产物仍走上面的三层装备</td><td class="c">P2</td></tr>
-    <tr><td>炼丹师</td><td>做境界丹和回复药</td><td class="c">P1</td></tr>
+    <tr><td>裁缝、铁匠、巧匠</td><td>做衣服、武器、饰品的胚子和外观。铁匠的胚子消耗矿石。产物仍走上面的三层装备</td><td class="c">P2</td></tr>
+    <tr><td>炼丹师</td><td>用药材做境界丹和回复药。药材来自采药和副本</td><td class="c">P1</td></tr>
     <tr><td>制符、附魔</td><td>原稿是限时属性和永久附加词条。不采用，避免在三层装备之外再加数值</td><td class="c">不做</td></tr>
   </table>
+
+  <h3><span class="n">9.3</span>挖矿与采药</h3>
+  <p class="sub">表世界的生活技能。谁都能学，可以同时学，不替代五个战斗职业。采集不耗疲劳。</p>
+  <table>
+    <tr><th style="width:72px">技能</th><th>节点</th><th>交给谁</th></tr>
+    <tr><td>挖矿</td><td>矿脉，以及灵石矿脉</td><td>矿石给铁匠做武器和防具胚子。灵石矿脉出灵石，用于境界突破和炼丹</td></tr>
+    <tr><td>采药</td><td>药草</td><td>药材给炼丹师做境界丹和回复药</td></tr>
+  </table>
+  <p>节点长在大世界里，按地表的境界区域刷新。元婴之后，更高一级的矿和药随该大境界的版本一起开放。副本仍可掉一部分成品丹药和胚子。矿、药、灵石、丹药和胚子可以玩家交易。</p>
+  <p>城镇 NPC 出售镐、药锄和背包。矿、药、灵石、丹药和胚子不在 NPC 和商城出售。</p>
 </section>
 
 <!-- 09 -->
@@ -651,7 +662,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <div class="callout warn">
     <div class="h">商城边界</div>
-    <p>只卖：外观、纯外观坐骑、家园装饰、背包与仓库扩容、传送与便利、赛季通行证、保护券。保护券购买后绑定，不能上架。它不增加属性，只挡住一次强化掉级，而且副本、任务都不产出。绝不卖：强化石、转移石、能量结晶、灵石、丹药、装备、属性道具、复活币（复活消耗游戏内金币）。</p>
+    <p>只卖：外观、纯外观坐骑、家园装饰、背包与仓库扩容、传送与便利、赛季通行证、保护券。保护券购买后绑定，不能上架。它不增加属性，只挡住一次强化掉级，而且副本、任务都不产出。绝不卖：强化石、转移石、能量结晶、灵石、丹药、矿石、药材、装备胚子、装备、属性道具、复活币（复活消耗游戏内金币）。城镇 NPC 同样不卖这些材料，只卖镐、药锄和背包。</p>
   </div>
 </section>
 
@@ -679,7 +690,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><th style="width:86px">档位</th><th style="width:150px">机制</th><th>产出定位</th><th style="width:120px">面向人群</th></tr>
     <tr><td><strong>日限</strong></td><td>疲劳 6000 点 / 日，温泉恢复 1500</td><td>强化石、能量结晶碎片、金币等可再生资源</td><td>轻度玩家：每日 1 小时</td></tr>
     <tr><td><strong>周限</strong></td><td>巢穴 12 单人份 / 周、龙巢 8 单人份 / 周、城战 1 次 / 周。满员一次按人数抵扣</td><td>套装、图纸、特武等不可再生装备</td><td>核心玩家：每周固定活动</td></tr>
-    <tr><td><strong>无限</strong></td><td>大世界探索、采集、家园、钓鱼、外观收集</td><td>材料、外观、成就、社交资本</td><td>长在线玩家：把时间换成差异</td></tr>
+    <tr><td><strong>无限</strong></td><td>大世界探索、挖矿、采药、家园、钓鱼、外观收集</td><td>矿石、药材、灵石、外观、成就、社交资本</td><td>长在线玩家：把时间换成材料</td></tr>
   </table>
 
   <h3><span class="n">14.1</span>阶段化成长曲线</h3>
