@@ -1,0 +1,11 @@
+{
+    "FileVersion": "1.0.0",
+    "PackageName": "Launch",
+    "PackageVersion": "1",
+    "Wrappers": [
+        {
+            "BundleGUID": "ec66f67cc3186da5a590e5c521e606e8",
+            "FileName": "ec66f67cc3186da5a590e5c521e606e8.bundle"
+        }
+    ]
+}

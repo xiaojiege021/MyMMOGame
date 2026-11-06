@@ -3,6 +3,8 @@
     "com.unity.inputsystem": "1.7.0",
     "com.unity.render-pipelines.universal": "14.0.11",
     "com.unity.ugui": "1.0.0",
+    "com.tuyoogame.yooasset": "https://github.com/tuyoogame/YooAsset.git?path=/Assets/YooAsset#2.3.19",
+    "com.unity.test-framework": "1.1.33",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
