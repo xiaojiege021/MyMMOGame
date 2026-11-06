@@ -3,4 +3,12 @@
 .env
 gamedb.env
 *.env
+[Ll]ibrary/
+[Tt]emp/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Bb]uild/
+[Bb]uilds/
+[Oo]bj/
+[Bb]in/
 

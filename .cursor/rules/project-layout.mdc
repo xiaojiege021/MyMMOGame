@@ -1,0 +1,15 @@
+---
+description: 新建目录、代码和资源时按开发架构第 15 节，热更和 AB 不提前也不另起一套
+alwaysApply: true
+---
+
+# 目录、资源、热更
+
+新建文件夹、代码文件和资源前，先读 `docs/开发架构.md` 第 15 节。目录不存在时按那一节创建，不另起一套。
+
+- 当前启动行没写到的系统，不提前建它的目录。
+- AB 从 E6 开始用 YooAsset 打。代码热更从 E7 开始用 HybridCLR。P0-2a 才把玩法装进热更程序集和 Launch 这组 AB。
+- 不用 Addressables，也不另做一套 AssetBundle 流程。
+- 伤害、扣费、发奖不放进 Unity 热更程序集当权威。
+- 数值放 `config/` 的 JSON。地点和人物编号用方案正文 2.5 到 2.7 的名字。
+- 不提交 `Library/`、`Temp/`、`Logs/`、`UserSettings/`、`obj/`、`bin/`、`.env`、`gamedb.env`。
