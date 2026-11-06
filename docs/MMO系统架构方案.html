@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.42</b></span>
-    <span>变更：<b>生息一转就能复活，二转少扣经验；卷轴冷却分开计</b></span>
+    <span>文档版本：<b>v1.43</b></span>
+    <span>变更：<b>排上世界 Boss，组队和宗门加经验，师徒先拿掉</b></span>
   </div>
 </header>
 
@@ -454,7 +454,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <table>
     <tr><th style="width:96px">层</th><th style="width:190px">包含内容</th><th>对下层的依赖</th></tr>
     <tr><td><strong>L6 经济商业</strong></td><td>双货币、拍卖行、寄售、商城、通行证</td><td>所有产出与消耗的最终结算口</td></tr>
-    <tr><td><strong>L5 社交组织</strong></td><td>小队、宗门、领地、师徒、家园</td><td>把装备与战力转化为组织地位</td></tr>
+    <tr><td><strong>L5 社交组织</strong></td><td>小队、宗门、领地、家园</td><td>把装备与战力转化为组织地位</td></tr>
     <tr><td><strong>L4 内容玩法</strong></td><td>副本、战场、城战、世界 Boss、日常</td><td>产出材料、验证战力、制造话题</td></tr>
     <tr><td><strong>L3 装备物品</strong></td><td>品阶、制作随机、强化、能量结晶、强化转移</td><td>把养成投入兑换成可感知的数值</td></tr>
     <tr><td><strong>L2 角色成长</strong></td><td>职业转职、技能树、等级、境界、觉醒</td><td>提供玩法身份与操作上限</td></tr>
@@ -472,20 +472,21 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>锁定技能战斗</td><td class="c"><span class="tag mix">简化</span></td><td>选定目标后按冷却释放技能。去掉无锁定、翻滚无敌、浮空连段、霸体破防、墙壁追击、后摇取消</td><td class="c">P0</td></tr>
     <tr><td>职业与转职</td><td class="c"><span class="tag mix">融合</span></td><td>坦克、战士、法师、射手、牧师在 15 级各选一条分支。45 级二转只推进这条分支。种族只做外观与剧情，不锁职业</td><td class="c">P0</td></tr>
     <tr><td>技能与天赋</td><td class="c"><span class="tag dn">龙之谷</span></td><td>双天赋树（PVE/PVP 分离），EX 技能进阶，免费洗点</td><td class="c">P0</td></tr>
-    <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>十一段：炼体到大乘，然后金仙或散仙，最后极境。每段分初、中、后、圆满。元婴起每段一个大版本，该版本的新副本要先突破到这一段</td><td class="c">P1</td></tr>
-    <tr><td>装备强化</td><td class="c"><span class="tag pw">完美</span></td><td>上限 +12。+6 以前成功率高，+7 起明显变难，+10 以上只靠高难材料且成功率很低。失败掉 1 级，不碎、不清零，也没有失败必成</td><td class="c">P0</td></tr>
-    <tr><td>能量结晶镶嵌</td><td class="c"><span class="tag mix">融合</span></td><td>原龙玉改为能量结晶。攻击 / 防御 / 功能三类，部位限定，三连共鸣，可拆卸复用</td><td class="c">P0</td></tr>
+    <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>十一段：炼体到大乘，然后金仙或散仙，最后极境。每段分初、中、后、圆满。元婴起每段一个大版本，该版本的新副本要先突破到这一段</td><td class="c">P3</td></tr>
+    <tr><td>装备强化</td><td class="c"><span class="tag pw">完美</span></td><td>上限 +12。+6 以前成功率高，+7 起明显变难，+10 以上只靠高难材料且成功率很低。失败掉 1 级，不碎、不清零，也没有失败必成</td><td class="c">P1</td></tr>
+    <tr><td>能量结晶镶嵌</td><td class="c"><span class="tag mix">融合</span></td><td>原龙玉改为能量结晶。攻击 / 防御 / 功能三类，部位限定，三连共鸣，可拆卸复用</td><td class="c">P1</td></tr>
     <tr><td>装备制作</td><td class="c"><span class="tag pw">完美</span></td><td>胚子做成装备时，主属性和最多两条附加属性在区间内随机一次。对照完美的制造浮动。不能重铸，不能精铸，不能再洗</td><td class="c">P2</td></tr>
-    <tr><td>疲劳值</td><td class="c"><span class="tag dn">龙之谷</span></td><td>日限 6000 点，只作用于副本，大世界零消耗，温泉恢复</td><td class="c">P0</td></tr>
-    <tr><td>副本体系</td><td class="c"><span class="tag mix">融合</span></td><td>低级本、高级本可单人或组到上限，多人一次抵多份，总额不变。高难及以上只能组队，每人有进入次数，产出不按人数翻倍</td><td class="c">P0</td></tr>
+    <tr><td>疲劳值</td><td class="c"><span class="tag dn">龙之谷</span></td><td>日限 6000 点，只作用于副本，大世界零消耗，温泉恢复</td><td class="c">P1</td></tr>
+    <tr><td>副本体系</td><td class="c"><span class="tag mix">融合</span></td><td>低级本、高级本可单人或组到上限，多人一次抵多份，总额不变。高难及以上只能组队，每人有进入次数，产出不按人数翻倍</td><td class="c">P1</td></tr>
     <tr><td>随机副本</td><td class="c"><span class="tag pw">完美</span></td><td>每周一个随机地貌词缀副本，产出稀有外观，纯荣誉向</td><td class="c">P2</td></tr>
-    <tr><td>宗门体系</td><td class="c"><span class="tag mix">融合</span></td><td>完美帮派五级。1 级上限 10 人，5 级为顶级，上限 200 人。贡献 / 建设 / 科技仍在，进本仍是小队</td><td class="c">P1</td></tr>
-    <tr><td>领地城战</td><td class="c"><span class="tag pw">完美</span></td><td>宗门占领地块获税收与专属商店，并掌管辖区内的灵石矿脉。每周一次，跨服可参与</td><td class="c">P2</td></tr>
-    <tr><td>竞技场</td><td class="c"><span class="tag dn">龙之谷</span></td><td>1v1 / 3v3，属性模板统一，赛季段位与专属外观</td><td class="c">P1</td></tr>
-    <tr><td>战场</td><td class="c"><span class="tag mix">融合</span></td><td>10v10 目标争夺，装备部分生效 + 场次平衡系数</td><td class="c">P1</td></tr>
+    <tr><td>世界 Boss</td><td class="c"><span class="tag mix">融合</span></td><td>按时刻在地表入口出现。进去后是战斗服的一场实例，上限 20 人，一个人也能进。归属只记名字，不加属性</td><td class="c">P3</td></tr>
+    <tr><td>宗门体系</td><td class="c"><span class="tag mix">融合</span></td><td>完美帮派五级。1 级上限 10 人，5 级为顶级，上限 200 人。贡献 / 建设 / 科技仍在，进本仍是小队</td><td class="c">P2</td></tr>
+    <tr><td>领地城战</td><td class="c"><span class="tag pw">完美</span></td><td>宗门占领地块获税收与专属商店，并掌管辖区内的灵石矿脉。每周一次，跨服可参与</td><td class="c">P3</td></tr>
+    <tr><td>竞技场</td><td class="c"><span class="tag dn">龙之谷</span></td><td>1v1 / 3v3，属性模板统一，赛季段位与专属外观</td><td class="c">P2</td></tr>
+    <tr><td>战场</td><td class="c"><span class="tag mix">融合</span></td><td>10v10 目标争夺，装备部分生效 + 场次平衡系数</td><td class="c">P2</td></tr>
     <tr><td>交易体系</td><td class="c"><span class="tag mix">融合</span></td><td>拍卖行（金币）+ 摆摊 + 元宝寄售，绑定 / 非绑双轨</td><td class="c">P1</td></tr>
-    <tr><td>商城与通行证</td><td class="c"><span class="tag mix">融合</span></td><td>元宝直接标价。外观、幻形、洞府与宗门展示、扩容、传送符、红符、蓝符、复活卷轴、月叠、第二角色栏、通行证、保护券。不卖金币和战力材料</td><td class="c">P1</td></tr>
-    <tr><td>家园师徒</td><td class="c"><span class="tag mix">融合</span></td><td>家园种植产出家园币（只换外观与便捷），师徒给经验加成</td><td class="c">P2</td></tr>
+    <tr><td>商城与通行证</td><td class="c"><span class="tag mix">融合</span></td><td>元宝直接标价。外观、幻形、洞府与宗门展示、扩容、传送符、红符、蓝符、复活卷轴、限时经验道具、月叠、第二角色栏、通行证、保护券。不卖金币和战力材料</td><td class="c">P1</td></tr>
+    <tr><td>家园</td><td class="c"><span class="tag mix">融合</span></td><td>家园种植产出家园币，只换外观和便捷</td><td class="c">P3</td></tr>
     <tr><td>挖矿与采药</td><td class="c"><span class="tag mix">融合</span></td><td>生活技能，谁都能学，可同时学。药给炼丹，矿给铁匠。灵石矿脉由主城把控，玩家不个人采集。不耗疲劳。NPC 只卖工具</td><td class="c">P1</td></tr>
     <tr><td>收集图鉴</td><td class="c"><span class="tag pw">完美</span></td><td>战灵式卡组降级为「英灵图鉴」，只提供收集度与被动小加成</td><td class="c">P2</td></tr>
   </table>
@@ -569,7 +570,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <div class="h">设定稿里有一条不采用</div>
     <p>原稿把金仙写成充值档，把散仙写成贫民档。本方案不采用。金仙和散仙只是立仙、立魔的名字，材料、历练、被动和副本次数相同。商城不卖突破材料，也不卖加速境界的道具。</p>
   </div>
-  <p>花钱和不花钱的差别在外观和便捷。到达金仙才能买金仙外观，到达散仙才能买散仙外观。传送符、红符、蓝符、复活卷轴、少量保护券、背包和仓库、月叠、第二角色栏只省时间。等级、+12、十一段和副本次数的上限相同。</p>
+  <p>花钱和不花钱的差别在外观和便捷。到达金仙才能买金仙外观，到达散仙才能买散仙外观。传送符、红符、蓝符、复活卷轴、限时经验道具、少量保护券、背包和仓库、月叠、第二角色栏只省时间。等级、+12、十一段和副本次数的上限相同。</p>
 
   <h3><span class="n">8.2</span>职业、武器与加点</h3>
   <p>五个基础职业是坦克、战士、法师、射手、牧师。15 级一转、45 级二转、满级后开放觉醒。差别体现在技能功能和队伍职责上。小队仍是 4 人：通常是一名坦克、一名牧师，再加两名输出。五职业是职责种类，不是要求每队各带一个。</p>
@@ -730,6 +731,15 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <h3><span class="n">10.3</span>一部分副本看境界</h3>
   <p>主线、深渊、首发的巢穴、宗门秘境，准入只看等级。这些本在炼体、筑基、结丹期间都能按等级去打。首发龙巢也只看等级，但它是高难，仍然要组队，并且占用每周 1 次。</p>
   <p>从元婴起，每个大版本新增一档副本。进这档副本要先突破到该大境界，等级够而境界不够就不能进。旧版本的副本保持原来的等级门槛。新副本若标成低级或高级，份额单独计算，不把旧副本的次数抬高。若标成高难或更高，进入次数也单独计算。</p>
+
+  <h3><span class="n">10.4</span>世界 Boss</h3>
+  <p class="sub">秘境里的东西短暂冲到地表。人在表世界看见入口，打起来仍在战斗服的一场实例里。</p>
+  <ul>
+    <li>按配置的时刻，在已经开放的某一处地表入口出现。同一时刻只有一场。被击杀或时间到，入口就关。元婴之后可以换入口，不另开一块大陆。</li>
+    <li>进去以后由战斗服结算。世界服不结算这场技能。人数上限走配置，首发 20 人。一个人也能进，不满员照样开，不要求百人在线。</li>
+    <li>每人这一场一份个人奖励，含经验和这场配置的掉落。掉落仍是能量结晶和允许的装备、材料，不掉灵石，不增加别的副本次数。组队和宗门的经验加成在这里同样生效。</li>
+    <li>这一场伤害最高的宗门，在下一场刷新前把名字记在入口上。没有宗门的人能进，也能拿个人奖励。归属不加属性，不改税收，不把灵石矿脉转走。</li>
+  </ul>
 </section>
 
 <!-- 10 -->
@@ -738,12 +748,13 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <p class="sub">每一层解决一种关系，不重叠、不越级。</p>
 
   <div class="kv">
-    <div class="k">小队（4 人）</div><div>战斗单元。固定队触发默契加成（同队 10 场以上解锁小额增益），鼓励长期组队而非随机匹配</div>
+    <div class="k">小队（4 人）</div><div>战斗单元。同一场里至少两个人，结算时每人多一截少量经验。只加经验，不加伤害、掉落和副本次数。单人没有这截</div>
     <div class="k">宗门（五级）</div><div>名册和组织。1 级上限 10 人，5 级为顶级，上限 200 人。贡献 / 建设 / 科技三条线。科技只在城战生效。宗门 NPC 只卖基础药品和辅助物品，不卖材料。200 人是名册，不是进本人数</div>
     <div class="k">阵营 · 领地（全服）</div><div>政治单元。地块税收、灵石矿脉、跨服城战、赛季排名，制造服务器级的话题与身份</div>
   </div>
 
   <p>材料不靠加入宗门才能拿到。副本掉落和特殊任务奖励是材料的两条发放途径，挖矿和采药仍给矿石和药材。宗门 NPC 只卖基础药品和辅助物品。宗门秘境仍是小队打分，科技只在城战里生效。</p>
+  <p>经验加成有三处，都只加经验，都不能把等级写出 100。副本、竞技场、战场、城战和世界 Boss 结算时才算。表世界没有战斗结算，走动不加。组队那一截：同一场至少两个人，每人少量加成，比例走配置。宗门那一截：其中至少两个人同属一个宗门时，这些同门再多一截，这一截更窄。不同门的队友只有组队那一截。经验道具从商城买，绑定，用了以后按配置的一段时间提高经验，时间到就消失。同时只生效一个，再用一张只刷新剩余时间，倍率不叠。副本、任务、月叠和通行证不发这种道具。</p>
 
   <h3><span class="n">11.1</span>宗门等级</h3>
   <p class="sub">等级仍是五级。人数按本方案：1 级 10 人，5 级顶级 200 人。2 到 4 级把中间撑开，3 级是 60 人。职位用修仙称呼。</p>
@@ -768,7 +779,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><th style="width:88px">货币</th><th style="width:130px">获取</th><th>用途</th><th>流通性</th></tr>
     <tr><td><strong>金币</strong></td><td>副本、任务、拍卖行出售</td><td>修理、强化、强化转移、拍卖行购买、税</td><td>玩家间自由流通</td></tr>
     <tr><td><strong>灵石</strong></td><td>主城掌管的灵石矿脉，经修炼任务和境界任务发放；玩家交易</td><td>境界突破、炼丹。下品、中品、上品、极品、仙晶，相邻一档按 10000:1 兑换</td><td>玩家间自由流通。打怪基本不掉。仙晶是最高档灵石，不是充值货币</td></tr>
-    <tr><td><strong>元宝</strong></td><td>充值、寄售所得</td><td>商城上架的外观、便利、红符、蓝符、复活卷轴、月叠、通行证、保护券，以及拍卖行手续费抵扣</td><td>可通过寄售换金币</td></tr>
+    <tr><td><strong>元宝</strong></td><td>充值、寄售所得</td><td>商城上架的外观、便利、红符、蓝符、复活卷轴、限时经验道具、月叠、通行证、保护券，以及拍卖行手续费抵扣</td><td>可通过寄售换金币</td></tr>
     <tr><td>绑定资源</td><td>活动、成长任务</td><td>仅限自用，不可交易</td><td>不可流通</td></tr>
   </table>
 
@@ -795,7 +806,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>红符</td><td>绑定的生命回复消耗</td><td>只回复自己。回复不超过同级回春丹、气血丹，和红药、牧师治疗共用冷却。不复活，不治疗队友。不和蓝符共用冷却</td></tr>
     <tr><td>蓝符</td><td>绑定的蓝量回复消耗</td><td>只回复自己的蓝。回复不超过同级凝神丹、回灵丹，和蓝药共用冷却。不回血，不复活，不提高精神，不增加伤害。副本和任务不产出。不进月叠</td></tr>
     <tr><td>复活卷轴</td><td>绑定的自救消耗</td><td>只拉起自己，不能拉队友。只在当前这场副本、竞技场或城战里生效，结算后拒绝。拉起后按配置回到一小段生命，不满血，不回蓝，不加属性。扣经验按一转的基础值，不吃生息二转的减免，扣到当前等级的零经验为止，不掉级。冷却单独计算，时间长，秒数走配置。不开始生息复活技能的冷却，也不占用治疗、红符、蓝符的冷却。副本、任务、拍卖、月叠和通行证都不产出。不另卖复活币</td></tr>
-    <tr><td>月叠</td><td>三十天份的传送符和红符</td><td>给活跃账号按月续。这一叠里只有这两种符，不附带金币、材料和复活卷轴</td></tr>
+    <tr><td>限时经验道具</td><td>绑定的一段时间经验提高</td><td>只用在经验结算上。不加伤害、掉落、疲劳和副本次数。时间走配置，到点消失。同时只生效一个，再用一张只刷新剩余时间，倍率不叠。不能把等级写出 100。副本、任务、月叠和通行证不发</td></tr>
+    <tr><td>月叠</td><td>三十天份的传送符和红符</td><td>给活跃账号按月续。这一叠里只有这两种符，不附带金币、材料、复活卷轴和经验道具</td></tr>
     <tr><td>第二角色栏</td><td>同账号再养一名修士</td><td>装备、等级、境界不共享。外观收藏可以共享</td></tr>
     <tr><td>赛季通行证</td><td>免费轨给称号和少量外观碎片。付费轨给当季秘境外观、洞府摆件，以及很少几张保护券</td><td>不给金币、强化石、转移石、能量结晶、灵石、装备、副本次数</td></tr>
     <tr><td>保护券</td><td>挡住一次强化掉级。商城按张卖，通行证付费轨发很少几张</td><td>两处发的是同一种券，到账就绑定，不能上架。不加属性，不提高成功率。不卖必成券</td></tr>
@@ -876,7 +888,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
       <rect x="596" y="140" width="264" height="76" rx="8" fill="#EDF3EF" stroke="#CFE0D6" stroke-width="0.8"/>
       <text x="728" y="164" font-size="12.5" font-weight="600" fill="#0F5C4A" text-anchor="middle">社交服</text>
       <text x="728" y="183" font-size="10.5" fill="#5C6E64" text-anchor="middle">宗门 / 聊天 / 邮件</text>
-      <text x="728" y="199" font-size="10.5" fill="#5C6E64" text-anchor="middle">好友 · 师徒 · 家园</text>
+      <text x="728" y="199" font-size="10.5" fill="#5C6E64" text-anchor="middle">好友 · 家园</text>
 
       <line x1="172" y1="216" x2="172" y2="232" stroke="#B4B2A9" stroke-width="1" marker-end="url(#ar2)"/>
       <line x1="450" y1="216" x2="450" y2="232" stroke="#B4B2A9" stroke-width="1" marker-end="url(#ar2)"/>
@@ -917,7 +929,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td><strong>P0 战斗验证</strong></td><td>Unity Android 包，5 职业、每职业一组主动技能、1 个 Boss、锁定释放与冷却循环</td><td>在手机上目标好不好选、技能分不分得清、Boss 的阶段读不读得懂？</td></tr>
     <tr><td><strong>P1 循环闭合</strong></td><td>深渊 + 四人巢穴 + 强化 + 能量结晶 + 拍卖行 + 疲劳</td><td>一天的循环是否成立？投入产出是否让人想明天再来？</td></tr>
     <tr><td><strong>P2 社交成立</strong></td><td>宗门 + 宗门秘境 + 竞技场 + 战场 + 二转</td><td>玩家有没有理由留下来跟同一批人玩？</td></tr>
-    <tr><td><strong>P3 长线承载</strong></td><td>大世界 + 境界 + 领地城战 + 家园 + 赛季</td><td>半年后还有没有新目标可追？</td></tr>
+    <tr><td><strong>P3 长线承载</strong></td><td>大世界 + 境界 + 领地城战 + 世界 Boss + 家园 + 赛季</td><td>半年后还有没有新目标可追？</td></tr>
   </table>
 
   <p>顺序不能颠倒。P0 先确认战斗好不好懂、五个职业有没有差别。这一步没过，后面的养成没有可验证的战斗。</p>
