@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.19</b></span>
-    <span>变更：<b>灵石归主城，打怪掉能量结晶</b></span>
+    <span>文档版本：<b>v1.20</b></span>
+    <span>变更：<b>公会改五级，1 级 10 人，5 级 200 人</b></span>
   </div>
 </header>
 
@@ -411,7 +411,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>疲劳值</td><td class="c"><span class="tag dn">龙之谷</span></td><td>日限 6000 点，只作用于副本，大世界零消耗，温泉恢复</td><td class="c">P0</td></tr>
     <tr><td>副本体系</td><td class="c"><span class="tag mix">融合</span></td><td>低级本、高级本可单人或组到上限，多人一次抵多份，总额不变。高难及以上只能组队，每人有进入次数，产出不按人数翻倍</td><td class="c">P0</td></tr>
     <tr><td>随机副本</td><td class="c"><span class="tag pw">完美</span></td><td>每周一个随机地貌词缀副本，产出稀有外观，纯荣誉向</td><td class="c">P2</td></tr>
-    <tr><td>公会体系</td><td class="c"><span class="tag mix">融合</span></td><td>完美式资源中枢（贡献 / 建设 / 科技）+ 龙之谷式小队副本</td><td class="c">P1</td></tr>
+    <tr><td>公会体系</td><td class="c"><span class="tag mix">融合</span></td><td>完美帮派五级。1 级上限 10 人，5 级为顶级，上限 200 人。贡献 / 建设 / 科技仍在，进本仍是小队</td><td class="c">P1</td></tr>
     <tr><td>领地城战</td><td class="c"><span class="tag pw">完美</span></td><td>公会占领地块获税收与专属商店，并掌管辖区内的灵石矿脉。每周一次，跨服可参与</td><td class="c">P2</td></tr>
     <tr><td>竞技场</td><td class="c"><span class="tag dn">龙之谷</span></td><td>1v1 / 3v3，属性模板统一，赛季段位与专属外观</td><td class="c">P1</td></tr>
     <tr><td>战场</td><td class="c"><span class="tag mix">融合</span></td><td>10v10 目标争夺，装备部分生效 + 场次平衡系数</td><td class="c">P1</td></tr>
@@ -653,11 +653,24 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <div class="kv">
     <div class="k">小队（4 人）</div><div>战斗单元。固定队触发默契加成（同队 10 场以上解锁小额增益），鼓励长期组队而非随机匹配</div>
-    <div class="k">公会（60 人）</div><div>资源中枢。贡献 / 建设 / 科技三条线，公会商店是稀有材料的唯一稳定出口，科技提供领地战加成</div>
+    <div class="k">公会（五级）</div><div>资源中枢。1 级上限 10 人，5 级为顶级，上限 200 人。贡献 / 建设 / 科技三条线，公会商店是稀有材料的唯一稳定出口，科技提供领地战加成。200 人是名册，不是进本人数</div>
     <div class="k">阵营 · 领地（全服）</div><div>政治单元。地块税收、灵石矿脉、跨服城战、赛季排名，制造服务器级的话题与身份</div>
   </div>
 
   <p>《完美国际2》最值得学的一点是：<strong>它把高价值材料的唯一出口放在了公会里</strong>。玩家不是因为想社交才加公会，而是因为不加公会就拿不到材料。这个设计粗暴但极其有效。本方案保留这个逻辑，但把「百人副本」换成「小队打分」，降低组织门槛。</p>
+
+  <h3><span class="n">11.1</span>公会等级</h3>
+  <p class="sub">等级和职位沿用完美的帮派。人数按本方案：1 级 10 人，5 级顶级 200 人。2 到 4 级把中间撑开，3 级是 60 人。</p>
+  <table>
+    <tr><th style="width:72px">等级</th><th style="width:100px">人数上限</th><th>这一档</th></tr>
+    <tr><td>1</td><td>10</td><td>初建</td></tr>
+    <tr><td>2</td><td>30</td><td>开始能分工</td></tr>
+    <tr><td>3</td><td>60</td><td>中型公会</td></tr>
+    <tr><td>4</td><td>100</td><td>大型公会</td></tr>
+    <tr><td>5</td><td>200</td><td>顶级。到这里为止，不再往上加等级</td></tr>
+  </table>
+  <p>45 级之后可以建会。创建消耗金币，升级消耗公会建设。建设和贡献来自公会秘境和公会任务，不从商城买。名册满了就不能再收人。人数是名册上限，公会秘境、巢穴和龙巢的进本人数不变。</p>
+  <p>职位沿用帮主、副帮主、堂主、香主、帮众。名额上限是帮主 1、副帮主 1、堂主 4、香主 12，其余是帮众。1 级只有 10 个席位，任满为止，不要求把香主名额填满。帮主任免下级、改宣言和称号、收人、开除，传位只传给副帮主，不能直接退会。副帮主任免更低的职位，也可以收人和开除。堂主任免香主和帮众，可以收人。香主可以收人。有职位的人先辞成帮众，再退出公会。</p>
 </section>
 
 <!-- 11 -->
