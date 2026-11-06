@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.24</b></span>
-    <span>变更：<b>首发等级上限改为 100，大版本不抬</b></span>
+    <span>文档版本：<b>v1.25</b></span>
+    <span>变更：<b>补上商城上架清单，红符只回复自己</b></span>
   </div>
 </header>
 
@@ -161,7 +161,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <h3>三条不可退让的设计红线</h3>
   <ol>
     <li><strong>不设自动战斗与扫荡。</strong>战斗已经改成锁定释放，资源仍然要玩家自己进本打完，不改成挂机清怪。</li>
-    <li><strong>商城不卖战力材料。</strong>强化石、转移石、能量结晶、装备只能从副本和玩家交易获得。付费买外观、便利和时间效率。唯一例外是保护券：只在商城出售，副本不产出，用掉一次就挡住这一次强化掉级，不增加属性。</li>
+    <li><strong>商城不卖战力材料。</strong>强化石、转移石、能量结晶、装备只能从副本和玩家交易获得。付费买外观、便利和时间效率。保护券只挡住一次强化掉级，不加属性，不提高成功率。红符只回复自己的生命，回复不超过同级丹药。</li>
     <li><strong>不做装备损毁。</strong>强化失败最多掉 1 级，不掉阶、不碎裂，也不把强化清零。换装靠强化转移，保证玩家敢投。</li>
   </ol>
 </section>
@@ -421,6 +421,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>竞技场</td><td class="c"><span class="tag dn">龙之谷</span></td><td>1v1 / 3v3，属性模板统一，赛季段位与专属外观</td><td class="c">P1</td></tr>
     <tr><td>战场</td><td class="c"><span class="tag mix">融合</span></td><td>10v10 目标争夺，装备部分生效 + 场次平衡系数</td><td class="c">P1</td></tr>
     <tr><td>交易体系</td><td class="c"><span class="tag mix">融合</span></td><td>拍卖行（金币）+ 摆摊 + 元宝寄售，绑定 / 非绑双轨</td><td class="c">P1</td></tr>
+    <tr><td>商城与通行证</td><td class="c"><span class="tag mix">融合</span></td><td>元宝直接标价。外观、幻形、洞府与宗门展示、扩容、传送符、红符、月叠、第二角色栏、通行证、保护券。不卖金币和战力材料</td><td class="c">P1</td></tr>
     <tr><td>家园师徒</td><td class="c"><span class="tag mix">融合</span></td><td>家园种植产出家园币（只换外观与便捷），师徒给经验加成</td><td class="c">P2</td></tr>
     <tr><td>挖矿与采药</td><td class="c"><span class="tag mix">融合</span></td><td>生活技能，谁都能学，可同时学。药给炼丹，矿给铁匠。灵石矿脉由主城把控，玩家不个人采集。不耗疲劳。NPC 只卖工具</td><td class="c">P1</td></tr>
     <tr><td>收集图鉴</td><td class="c"><span class="tag pw">完美</span></td><td>战灵式卡组降级为「英灵图鉴」，只提供收集度与被动小加成</td><td class="c">P2</td></tr>
@@ -596,7 +597,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <p class="sub">从设定稿留下能接上现有三层装备的部分。会多出一层战斗词条的，不留下。</p>
   <table>
     <tr><th style="width:110px">设定</th><th>留下的规则</th><th style="width:72px" class="c">优先级</th></tr>
-    <tr><td>丹药</td><td>筑基丹、破镜丹用于境界突破。回春丹、气血丹是回复药。都从副本和炼丹来，商城不卖，也不能代替复活</td><td class="c">P1</td></tr>
+    <tr><td>丹药</td><td>筑基丹、破镜丹用于境界突破。回春丹、气血丹是回复药。都从副本和炼丹来，商城不卖这些丹，也不能代替复活。商城红符不是丹药，回复不超过同级的药</td><td class="c">P1</td></tr>
     <tr><td>坐骑</td><td>玩法坐骑分普通和高级，只差移动速度。商城坐骑只换外观，不叠加速度，不进战斗</td><td class="c">P2</td></tr>
     <tr><td>灵兽</td><td>普通、高级、神兽只做收集、外观和生活协助，不进入伤害公式</td><td class="c">P2</td></tr>
     <tr><td>裁缝、铁匠、巧匠</td><td>做衣服、武器、饰品的胚子和外观。铁匠的胚子消耗矿石。产物仍走上面的三层装备</td><td class="c">P2</td></tr>
@@ -689,7 +690,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><th style="width:88px">货币</th><th style="width:130px">获取</th><th>用途</th><th>流通性</th></tr>
     <tr><td><strong>金币</strong></td><td>副本、任务、拍卖行出售</td><td>修理、强化、强化转移、拍卖行购买、税</td><td>玩家间自由流通</td></tr>
     <tr><td><strong>灵石</strong></td><td>主城掌管的灵石矿脉，经修炼任务和境界任务发放；玩家交易</td><td>境界突破、炼丹。下品、中品、上品、极品、仙晶，相邻一档按 10000:1 兑换</td><td>玩家间自由流通。打怪基本不掉。仙晶是最高档灵石，不是充值货币</td></tr>
-    <tr><td><strong>元宝</strong></td><td>充值、寄售所得</td><td>商城外观、便利道具、拍卖行手续费抵扣</td><td>可通过寄售换金币</td></tr>
+    <tr><td><strong>元宝</strong></td><td>充值、寄售所得</td><td>商城上架的外观、便利、红符、月叠、通行证、保护券，以及拍卖行手续费抵扣</td><td>可通过寄售换金币</td></tr>
     <tr><td>绑定资源</td><td>活动、成长任务</td><td>仅限自用，不可交易</td><td>不可流通</td></tr>
   </table>
 
@@ -697,8 +698,29 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <div class="callout warn">
     <div class="h">商城边界</div>
-    <p>只卖：外观、纯外观坐骑、家园装饰、背包与仓库扩容、传送与便利、赛季通行证、保护券。保护券购买后绑定，不能上架。它不增加属性，只挡住一次强化掉级，而且副本、任务都不产出。绝不卖：强化石、转移石、能量结晶、灵石、丹药、矿石、药材、装备胚子、装备、属性道具、复活币（复活消耗游戏内金币）。城镇 NPC 同样不卖这些材料，只卖镐、药锄和背包。</p>
+    <p>官方现金只来自充值元宝。商品直接标价，不做抽卡。可以上架的种类写在 12.1。保护券和红符购买后绑定，副本和任务都不产出。绝不上架：金币、强化石、转移石、能量结晶、灵石、丹药、矿石、药材、装备胚子、装备、属性道具、复活币、解绑道具、蓝符、疲劳、副本次数、周份额、境界加速、宗门科技、领地加成。</p>
   </div>
+
+  <h3><span class="n">12.1</span>商城上架</h3>
+  <p class="sub">下面是商城可以卖的全部种类。没写在这张表里的，不上架。</p>
+  <table>
+    <tr><th style="width:108px">种类</th><th>上架什么</th><th>边界</th></tr>
+    <tr><td>服饰外观</td><td>衣服、染色、称号、入场动作</td><td>只改样子。染色只动服饰，不改种族。称号不加属性。主线不把商城外观当成关键道具</td></tr>
+    <tr><td>武器幻形</td><td>十八般、弓、弩、法杖，按职业和分支出售</td><td>只改样子，不改装备数值，不改分支技能</td></tr>
+    <tr><td>境界外观</td><td>到达该境界后才能买。首发备炼体、筑基、结丹。元婴起每个大版本一套。金仙和散仙各一套</td><td>不卖境界，不卖加速，不把金仙或散仙卖成身份</td></tr>
+    <tr><td>飞行拖尾</td><td>飞起来之后的拖尾</td><td>飞行仍由境界开放。没有飞行权限时，拖尾不让人飞</td></tr>
+    <tr><td>坐骑外观</td><td>纯外观坐骑</td><td>不叠加速度，不进战斗。玩法坐骑的速度差不在商城</td></tr>
+    <tr><td>洞府与家园</td><td>洞府外观、摆件、家园装饰</td><td>只做展示和生活。家园币仍只换外观和便捷</td></tr>
+    <tr><td>宗门展示</td><td>山门、旗帜、成员披风</td><td>别人进驻地能看见。不卖宗门科技，不卖领地加成</td></tr>
+    <tr><td>背包与仓库</td><td>背包扩容、仓库扩容</td><td>只加格子。城镇 NPC 仍卖基础背包、镐和药锄</td></tr>
+    <tr><td>传送符</td><td>可反复购买的传送消耗</td><td>绑定。只省路程，不加属性，不增加副本次数</td></tr>
+    <tr><td>红符</td><td>绑定的生命回复消耗</td><td>只回复自己。回复不超过同级回春丹、气血丹，和丹药、牧师治疗共用冷却。不复活，不治疗队友</td></tr>
+    <tr><td>月叠</td><td>三十天份的传送符和红符</td><td>给活跃账号按月续。这一叠里只有这两种符，不附带金币和材料</td></tr>
+    <tr><td>第二角色栏</td><td>同账号再养一名修士</td><td>装备、等级、境界不共享。外观收藏可以共享</td></tr>
+    <tr><td>赛季通行证</td><td>免费轨给称号和少量外观碎片。付费轨给当季秘境外观、洞府摆件，以及很少几张保护券</td><td>不给金币、强化石、转移石、能量结晶、灵石、装备、副本次数</td></tr>
+    <tr><td>保护券</td><td>挡住一次强化掉级</td><td>购买后绑定，不能上架。不加属性，不提高成功率。不卖必成券</td></tr>
+  </table>
+  <p>红符不是丹药。回春丹和气血丹仍从采药、炼丹和副本来，可以放到拍卖行。蓝符不上架，精神是攻击或治疗，不是可以喝空的蓝量。拍卖行抽走的金币直接销毁，不做成商品。</p>
 </section>
 
 <!-- 12 -->
