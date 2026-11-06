@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.17</b></span>
-    <span>变更：<b>按当前方案另写技术架构</b></span>
+    <span>文档版本：<b>v1.18</b></span>
+    <span>变更：<b>强化分段降成功率，+10 以上只靠高难材料</b></span>
   </div>
 </header>
 
@@ -405,7 +405,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>职业与转职</td><td class="c"><span class="tag mix">融合</span></td><td>坦克、战士、法师、射手、牧师在 15 级各选一条分支。45 级二转只推进这条分支。种族只做外观与剧情，不锁职业</td><td class="c">P0</td></tr>
     <tr><td>技能与天赋</td><td class="c"><span class="tag dn">龙之谷</span></td><td>双天赋树（PVE/PVP 分离），EX 技能进阶，免费洗点</td><td class="c">P0</td></tr>
     <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>十一段：炼体到大乘，然后金仙或散仙，最后极境。每段分初、中、后、圆满。元婴起每段一个大版本，该版本的新副本要先突破到这一段</td><td class="c">P1</td></tr>
-    <tr><td>装备强化</td><td class="c"><span class="tag pw">完美</span></td><td>上限 +12。失败掉 1 级，不碎裂，不清零。换装用强化转移，不自动继承</td><td class="c">P0</td></tr>
+    <tr><td>装备强化</td><td class="c"><span class="tag pw">完美</span></td><td>上限 +12。+6 以前成功率高，+7 起明显变难，+10 以上只靠高难材料且成功率很低。失败掉 1 级，不碎、不清零，也没有失败必成</td><td class="c">P0</td></tr>
     <tr><td>能量结晶镶嵌</td><td class="c"><span class="tag mix">融合</span></td><td>原龙玉改为能量结晶。攻击 / 防御 / 功能三类，部位限定，三连共鸣，可拆卸复用</td><td class="c">P0</td></tr>
     <tr><td>装备重铸</td><td class="c"><span class="tag pw">完美</span></td><td>合并完美系龙珠 / 天书 / 重铸为单一「精铸」入口，最多两层</td><td class="c">P2</td></tr>
     <tr><td>疲劳值</td><td class="c"><span class="tag dn">龙之谷</span></td><td>日限 6000 点，只作用于副本，大世界零消耗，温泉恢复</td><td class="c">P0</td></tr>
@@ -553,13 +553,23 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <table>
     <tr><th style="width:110px">层级</th><th style="width:130px">系统</th><th>规则</th><th style="width:110px">换装时</th></tr>
     <tr><td>第 1 层</td><td>品阶与套装</td><td>白 → 绿（精良）→ 蓝 → 紫 → 橙 → <strong>红</strong>。红是最高档。每档 3–4 套，随版本梯度替换。同品阶装备通用，穿戴仍看等级和职业</td><td>不继承，自然换代</td></tr>
-    <tr><td>第 2 层</td><td>强化</td><td>最高 +12。失败掉 1 级，不掉阶、不碎裂、不清零。保护券只从商城购买，副本不产出；用掉一次，挡住这一次掉级。强化本身消耗金币和强化石</td><td><strong>强化转移</strong></td></tr>
+    <tr><td>第 2 层</td><td>强化</td><td>最高 +12。三段成功率依次变低。失败掉 1 级，不掉阶、不碎裂、不清零，失败也不累积必成。保护券只防掉级，不提高成功率</td><td><strong>强化转移</strong></td></tr>
     <tr><td>第 3 层</td><td>能量结晶镶嵌</td><td>攻击、防御、功能三类。部位限定，三连共鸣触发套装效果，可拆卸复用</td><td><strong>拆卸带走</strong></td></tr>
   </table>
 
   <p>被砍掉的是<strong>龙珠、天书、重铸随机词条、纹章</strong>。养成入口只留品阶、强化、能量结晶。技能的冷却、范围和段数由分支与天赋决定，不再单开一层纹章。</p>
 
-  <h3><span class="n">9.1</span>强化转移</h3>
+  <h3><span class="n">9.1</span>强化难度</h3>
+  <p class="sub">上限仍是 +12。前段让人上手，后段把满级留成长期目标。具体概率走配置，不写死在服务端。</p>
+  <table>
+    <tr><th style="width:88px">目标</th><th>材料</th><th>成功率</th></tr>
+    <tr><td>+1 到 +6</td><td>深渊产出的低级强化石，外加金币</td><td>高。日常可以稳定冲到这里</td></tr>
+    <tr><td>+7 到 +9</td><td>巢穴产出的中级强化石。低级石不能代替</td><td>明显下降。失败掉 1 级，要在这一段来回磨</td></tr>
+    <tr><td>+10 到 +12</td><td>龙巢等高难本产出的高级强化石。低级石和中级石都不能用</td><td>压得很低。金币和石头消耗再抬一档。满级不是日常能随手点到的</td></tr>
+  </table>
+  <p>失败只掉 1 级，不掉阶、不碎裂、不清零。没有失败累计条，失败不会换成下一次必成。保护券只从商城购买，副本和任务不产出，购买后绑定。用掉一张，只挡住这一次掉级，不提高这次的成功率。</p>
+
+  <h3><span class="n">9.2</span>强化转移</h3>
   <p class="sub">对应完美国际的「扭转乾坤」。换装不自动带上旧强化，由玩家把等级从旧装备转到新装备。</p>
   <ul>
     <li>来源装备的强化必须高于目标，否则不能转，避免放反。</li>
@@ -574,7 +584,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <p>玩家敢在过渡装备上强化，是因为这级可以转到下一件装备上，投入不会作废。敢花钱，拍卖行才有流动性；有流动性，搬砖玩家才有活路。不采用完美端游里失败把强化清零的做法。</p>
   </div>
 
-  <h3><span class="n">9.2</span>丹药、坐骑、灵兽与副职</h3>
+  <h3><span class="n">9.3</span>丹药、坐骑、灵兽与副职</h3>
   <p class="sub">从设定稿留下能接上现有三层装备的部分。会多出一层战斗词条的，不留下。</p>
   <table>
     <tr><th style="width:110px">设定</th><th>留下的规则</th><th style="width:72px" class="c">优先级</th></tr>
@@ -586,7 +596,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>制符、附魔</td><td>原稿是限时属性和永久附加词条。不采用，避免在三层装备之外再加数值</td><td class="c">不做</td></tr>
   </table>
 
-  <h3><span class="n">9.3</span>挖矿与采药</h3>
+  <h3><span class="n">9.4</span>挖矿与采药</h3>
   <p class="sub">表世界的生活技能。谁都能学，可以同时学，不替代五个战斗职业。采集不耗疲劳。</p>
   <table>
     <tr><th style="width:72px">技能</th><th>节点</th><th>交给谁</th></tr>
@@ -605,10 +615,10 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <table>
     <tr><th style="width:88px">层级</th><th style="width:64px">难度</th><th style="width:100px">人数</th><th style="width:130px">消耗</th><th>产出</th><th style="width:88px">动机</th></tr>
     <tr><td>主线关卡</td><td>教学</td><td>仅 1 人</td><td>无</td><td>经验、基础装备、系统解锁</td><td>推进与教学</td></tr>
-    <tr><td>深渊日常</td><td>低级</td><td>1–4 人</td><td>疲劳 × 人数</td><td>强化石、能量结晶碎片，按人数倍增</td><td>日常养成</td></tr>
-    <tr><td>巢穴</td><td>高级</td><td>1–4 人</td><td>周份额 × 人数</td><td>套装部件、图纸、转移石，按人数倍增</td><td>装备主产</td></tr>
+    <tr><td>深渊日常</td><td>低级</td><td>1–4 人</td><td>疲劳 × 人数</td><td>低级强化石、能量结晶碎片，按人数倍增。低级石只够冲到 +6</td><td>日常养成</td></tr>
+    <tr><td>巢穴</td><td>高级</td><td>1–4 人</td><td>周份额 × 人数</td><td>套装部件、图纸、转移石、中级强化石，按人数倍增。中级石用于 +7 到 +9</td><td>装备主产</td></tr>
     <tr><td>公会秘境</td><td>高级</td><td>1–4 人</td><td>个人活跃 × 人数</td><td>公会贡献、科技材料、稀有外观，按人数倍增</td><td>组织荣誉</td></tr>
-    <tr><td>龙巢</td><td>高难</td><td>2–8 人</td><td>每人每周 1 次</td><td>红色毕业套装、特武、顶级能量结晶。一次一份，不按人数翻倍</td><td>版本目标</td></tr>
+    <tr><td>龙巢</td><td>高难</td><td>2–8 人</td><td>每人每周 1 次</td><td>红色毕业套装、特武、顶级能量结晶、高级强化石。一次一份，不按人数翻倍。高级石只用于 +10 到 +12</td><td>版本目标</td></tr>
   </table>
 
   <h3><span class="n">10.1</span>低级本与高级本</h3>
@@ -690,7 +700,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <table>
     <tr><th style="width:86px">档位</th><th style="width:150px">机制</th><th>产出定位</th><th style="width:120px">面向人群</th></tr>
-    <tr><td><strong>日限</strong></td><td>疲劳 6000 点 / 日，温泉恢复 1500</td><td>强化石、能量结晶碎片、金币等可再生资源</td><td>轻度玩家：每日 1 小时</td></tr>
+    <tr><td><strong>日限</strong></td><td>疲劳 6000 点 / 日，温泉恢复 1500</td><td>低级强化石、能量结晶碎片、金币。低级石只够把装备冲到 +6</td><td>轻度玩家：每日 1 小时</td></tr>
     <tr><td><strong>周限</strong></td><td>巢穴 12 单人份 / 周。龙巢等高难本每人每周 1 次，不按人数翻倍。城战 1 次 / 周</td><td>套装、图纸、特武等不可再生装备</td><td>核心玩家：每周固定活动</td></tr>
     <tr><td><strong>无限</strong></td><td>大世界探索、挖矿、采药、家园、钓鱼、外观收集</td><td>矿石、药材、灵石、外观、成就、社交资本</td><td>长在线玩家：把时间换成材料</td></tr>
   </table>
