@@ -5,6 +5,7 @@
 - 方案正文：[docs/MMO系统架构方案.html](docs/MMO系统架构方案.html)
 - 技术架构：[docs/技术架构.md](docs/技术架构.md)
 - 开发架构：[docs/开发架构.md](docs/开发架构.md)
+- 开发日志：[docs/开发日志.md](docs/开发日志.md)
 - 故事背景原稿：[docs/游戏背景.pdf](docs/游戏背景.pdf)
 - 设定原稿：[docs/游戏设定.pdf](docs/游戏设定.pdf)
 
