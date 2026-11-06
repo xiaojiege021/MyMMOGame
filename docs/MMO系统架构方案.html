@@ -127,8 +127,8 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   <div class="meta">
     <span>工作室：<b>云锦繁星</b></span>
     <span>参考母体：<b>龙之谷（手游化版本）</b> · <b>完美国际2（端游）</b></span>
-    <span>文档版本：<b>v1.39</b></span>
-    <span>变更：<b>五个职业都有蓝条，并加上蓝药和蓝符</b></span>
+    <span>文档版本：<b>v1.40</b></span>
+    <span>变更：<b>玩家制作装备时属性随机一次，不恢复精铸</b></span>
   </div>
 </header>
 
@@ -456,7 +456,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td><strong>L6 经济商业</strong></td><td>双货币、拍卖行、寄售、商城、通行证</td><td>所有产出与消耗的最终结算口</td></tr>
     <tr><td><strong>L5 社交组织</strong></td><td>小队、宗门、领地、师徒、家园</td><td>把装备与战力转化为组织地位</td></tr>
     <tr><td><strong>L4 内容玩法</strong></td><td>副本、战场、城战、世界 Boss、日常</td><td>产出材料、验证战力、制造话题</td></tr>
-    <tr><td><strong>L3 装备物品</strong></td><td>品阶、强化、能量结晶、强化转移</td><td>把养成投入兑换成可感知的数值</td></tr>
+    <tr><td><strong>L3 装备物品</strong></td><td>品阶、制作随机、强化、能量结晶、强化转移</td><td>把养成投入兑换成可感知的数值</td></tr>
     <tr><td><strong>L2 角色成长</strong></td><td>职业转职、技能树、等级、境界、觉醒</td><td>提供玩法身份与操作上限</td></tr>
     <tr><td><strong>L1 规则基座</strong></td><td>属性、五行、伤害公式、命中判定、CD 规则</td><td>不依赖任何上层，被全部上层调用</td></tr>
   </table>
@@ -475,7 +475,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>境界系统</td><td class="c"><span class="tag mix">融合</span></td><td>十一段：炼体到大乘，然后金仙或散仙，最后极境。每段分初、中、后、圆满。元婴起每段一个大版本，该版本的新副本要先突破到这一段</td><td class="c">P1</td></tr>
     <tr><td>装备强化</td><td class="c"><span class="tag pw">完美</span></td><td>上限 +12。+6 以前成功率高，+7 起明显变难，+10 以上只靠高难材料且成功率很低。失败掉 1 级，不碎、不清零，也没有失败必成</td><td class="c">P0</td></tr>
     <tr><td>能量结晶镶嵌</td><td class="c"><span class="tag mix">融合</span></td><td>原龙玉改为能量结晶。攻击 / 防御 / 功能三类，部位限定，三连共鸣，可拆卸复用</td><td class="c">P0</td></tr>
-    <tr><td>装备重铸</td><td class="c"><span class="tag pw">完美</span></td><td>合并完美系龙珠 / 天书 / 重铸为单一「精铸」入口，最多两层</td><td class="c">P2</td></tr>
+    <tr><td>装备制作</td><td class="c"><span class="tag pw">完美</span></td><td>胚子做成装备时，主属性和最多两条附加属性在区间内随机一次。对照完美的制造浮动。不能重铸，不能精铸，不能再洗</td><td class="c">P2</td></tr>
     <tr><td>疲劳值</td><td class="c"><span class="tag dn">龙之谷</span></td><td>日限 6000 点，只作用于副本，大世界零消耗，温泉恢复</td><td class="c">P0</td></tr>
     <tr><td>副本体系</td><td class="c"><span class="tag mix">融合</span></td><td>低级本、高级本可单人或组到上限，多人一次抵多份，总额不变。高难及以上只能组队，每人有进入次数，产出不按人数翻倍</td><td class="c">P0</td></tr>
     <tr><td>随机副本</td><td class="c"><span class="tag pw">完美</span></td><td>每周一个随机地貌词缀副本，产出稀有外观，纯荣誉向</td><td class="c">P2</td></tr>
@@ -492,7 +492,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
 
   <div class="callout warn">
     <div class="h">明确不做</div>
-    <p>不做龙之谷式无锁定连段：翻滚无敌、浮空追击、霸体破防、墙壁追击、后摇取消。不做野外即时 PK、不做装备碎毁、不做自动寻路打怪、不做多层随机词条洗练、不做需要百人在线的强制副本。</p>
+    <p>不做龙之谷式无锁定连段：翻滚无敌、浮空追击、霸体破防、墙壁追击、后摇取消。不做野外即时 PK、不做装备碎毁、不做自动寻路打怪、不做多层随机词条洗练、不做重铸和精铸、不做需要百人在线的强制副本。制作只在做成装备时随机一次。</p>
   </div>
 </section>
 
@@ -632,9 +632,21 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <tr><td>第 3 层</td><td>能量结晶镶嵌</td><td>攻击、防御、功能三类。部位限定，三连共鸣触发套装效果，可拆卸复用</td><td><strong>拆卸带走</strong></td></tr>
   </table>
 
-  <p>被砍掉的是<strong>龙珠、天书、重铸随机词条、纹章</strong>。养成入口只留品阶、强化、能量结晶。技能的冷却、范围和段数由分支与天赋决定，不再单开一层纹章。</p>
+  <p>被砍掉的是<strong>龙珠、天书、重铸、精铸、纹章</strong>。养成入口只留品阶、强化、能量结晶。技能的冷却、范围和段数由分支与天赋决定，不再单开一层纹章。制作时的一次随机不是第四层，也不能再洗。</p>
 
-  <h3><span class="n">9.1</span>强化难度</h3>
+  <h3><span class="n">9.1</span>制作时的属性</h3>
+  <p class="sub">对照完美的制造：同一配方做出来，属性值不一样。不对照血炼、龙珠、天书和重铸。</p>
+  <ul>
+    <li>胚子没有战斗属性。玩家把胚子按配方做成装备的那一次，服务端掷点。</li>
+    <li>主属性在配方的下限和上限之间取值。下限不低于该品阶基准，上限不超过下一品阶的基准。白装的上限不超过绿装基准，依此类推。红装没有更高一档，上限停在红装自己的区间。</li>
+    <li>再掷最多两条附加属性。种类只从这件装备的部位和品阶允许的表里来，数值也在各自区间内。</li>
+    <li>制作技能只提高掷到高值的权重，不抬高区间上限，不改变品阶。</li>
+    <li>掷定后写在这件装备上，成为它的基础属性。后面的强化按这个基础计算。转移只转强化等级，不转这些随机值。结晶不改它们。</li>
+    <li>不能对同一件再随机。不设重铸、精铸、血炼，也不能锁住一条再洗其余的。想要更好的数值，就再做一件。旧的可以交易。</li>
+    <li>副本直接掉落的成品用掉落表里的基准值，不走这次掷点。具体区间留在配置，不写死。</li>
+  </ul>
+
+  <h3><span class="n">9.2</span>强化难度</h3>
   <p class="sub">上限仍是 +12。前段让人上手，后段把满级留成长期目标。具体概率走配置，不写死在服务端。</p>
   <table>
     <tr><th style="width:88px">目标</th><th>材料</th><th>成功率</th></tr>
@@ -644,7 +656,7 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
   </table>
   <p>失败只掉 1 级，不掉阶、不碎裂、不清零。没有失败累计条，失败不会换成下一次必成。保护券只从商城购买，副本和任务不产出，购买后绑定。用掉一张，只挡住这一次掉级，不提高这次的成功率。</p>
 
-  <h3><span class="n">9.2</span>强化转移</h3>
+  <h3><span class="n">9.3</span>强化转移</h3>
   <p class="sub">对应完美国际的「扭转乾坤」。换装不自动带上旧强化，由玩家把等级从旧装备转到新装备。</p>
   <ul>
     <li>来源装备的强化必须高于目标，否则不能转，避免放反。</li>
@@ -659,19 +671,19 @@ footer{border-top:1px solid var(--line); padding-top:20px; font-size:12.5px; col
     <p>玩家敢在过渡装备上强化，是因为这级可以转到下一件装备上，投入不会作废。敢花钱，拍卖行才有流动性；有流动性，搬砖玩家才有活路。不采用完美端游里失败把强化清零的做法。</p>
   </div>
 
-  <h3><span class="n">9.3</span>丹药、坐骑、灵兽与副职</h3>
+  <h3><span class="n">9.4</span>丹药、坐骑、灵兽与副职</h3>
   <p class="sub">从设定稿留下能接上现有三层装备的部分。会多出一层战斗词条的，不留下。</p>
   <table>
     <tr><th style="width:110px">设定</th><th>留下的规则</th><th style="width:72px" class="c">优先级</th></tr>
     <tr><td>丹药</td><td>筑基丹、破镜丹用于境界突破。回春丹、气血丹回复生命。凝神丹、回灵丹回复蓝量，是蓝药。都从副本、炼丹和特殊任务来，可以进拍卖。商城不卖这些丹，也不能代替复活。蓝符不是蓝药，回复不超过同级凝神丹、回灵丹</td><td class="c">P1</td></tr>
     <tr><td>坐骑</td><td>玩法坐骑分普通和高级，只差移动速度。商城坐骑只换外观，不叠加速度，不进战斗</td><td class="c">P2</td></tr>
     <tr><td>灵兽</td><td>普通、高级、神兽只做收集、外观和生活协助，不进入伤害公式</td><td class="c">P2</td></tr>
-    <tr><td>裁缝、铁匠、巧匠</td><td>做衣服、武器、饰品的胚子和外观。铁匠的胚子消耗矿石。产物仍走上面的三层装备</td><td class="c">P2</td></tr>
+    <tr><td>裁缝、铁匠、巧匠</td><td>做衣服、武器、饰品的胚子和外观。铁匠的胚子消耗矿石。胚子做成装备时按 9.1 随机一次，之后仍走品阶、强化、能量结晶</td><td class="c">P2</td></tr>
     <tr><td>炼丹师</td><td>用药材做境界丹和回复药。药材来自采药和副本</td><td class="c">P1</td></tr>
     <tr><td>制符、附魔</td><td>原稿是限时属性和永久附加词条。不采用，避免在三层装备之外再加数值</td><td class="c">不做</td></tr>
   </table>
 
-  <h3><span class="n">9.4</span>挖矿与采药</h3>
+  <h3><span class="n">9.5</span>挖矿与采药</h3>
   <p class="sub">表世界的生活技能。谁都能学，可以同时学，不替代五个战斗职业。采集不耗疲劳。</p>
   <table>
     <tr><th style="width:72px">技能</th><th>节点</th><th>交给谁</th></tr>
