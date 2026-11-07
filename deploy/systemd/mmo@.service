@@ -1,0 +1,26 @@
+[Unit]
+Description=双世界 MMO 进程（%i）
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/mmo
+EnvironmentFile=-/srv/mmo/gamedb.env
+Environment=DOTNET_NOLOGO=1
+Environment=DOTNET_CLI_TELEMETRY_OPTOUT=1
+ExecStart=@DOTNET@ /srv/mmo/app/%i/%i.dll
+Restart=on-failure
+RestartSec=2
+KillSignal=SIGTERM
+KillMode=mixed
+TimeoutStopSec=15
+
+# 改代码只用换进程：本单元不设 ExecReload，进程内不卸载重载程序集。
+# 要降权运行时建 drop-in：systemctl edit mmo@%i ，写入 [Service] 与 User=game_dev
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
