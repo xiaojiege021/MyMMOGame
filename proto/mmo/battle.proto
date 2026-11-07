@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package mmo.battle;
+
+option csharp_namespace = "Mmo.Proto.Battle";
+
+// 副本里一条技能一次请求。字段按方案正文与技术架构第 4 节：
+// 请求带技能编号、目标编号和客户端认为的施放时刻。
+// 施法者不放在消息里，由这条连接的身份决定，客户端改不了。
+// 这一版只定义消息，结算在 P0-1b。
+message SkillRequest {
+  uint32 skill_id = 1;
+  uint64 target_id = 2;
+  int64 cast_time_ms = 3;
+}
+
+// 战斗服结算完回给本里的这条命。冷却和硬直都用毫秒。
+// 治疗和伤害分两个字段，没发生的那个是 0，不用一个字段兼两义。
+message SkillResult {
+  uint64 caster_id = 1;
+  uint32 skill_id = 2;
+  uint64 target_id = 3;
+  bool hit = 4;
+  int64 damage = 5;
+  int64 healing = 6;
+  uint32 stagger_ms = 7;
+  uint32 cooldown_ms = 8;
+}
