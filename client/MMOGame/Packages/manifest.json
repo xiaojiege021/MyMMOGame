@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.tuyoogame.yooasset": "https://github.com/tuyoogame/YooAsset.git?path=/Assets/YooAsset#2.3.19",
+    "com.tuyoogame.yooasset": "2.3.19",
     "com.unity.inputsystem": "1.7.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
@@ -36,5 +36,14 @@
     "com.unity.render-pipelines.universal": "14.0.11",
     "com.unity.test-framework": "1.1.33",
     "com.unity.ugui": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.tuyoogame.yooasset"
+      ]
+    }
+  ]
 }
