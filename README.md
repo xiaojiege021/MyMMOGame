@@ -6,12 +6,24 @@
 - 技术架构：[docs/技术架构.md](docs/技术架构.md)
 - 开发架构：[docs/开发架构.md](docs/开发架构.md)
 - 开发日志：[docs/开发日志.md](docs/开发日志.md)
+- 多机同步：[docs/多机同步.md](docs/多机同步.md)
 - 故事背景原稿：[docs/游戏背景.pdf](docs/游戏背景.pdf)
 - 设定原稿：[docs/游戏设定.pdf](docs/游戏设定.pdf)
 
 记录云锦繁星《双世界 MMO》方案的变更。新的记录写在最上面。
 
 工作室名称为云锦繁星。
+
+## v1.50 · 2026-11-07
+
+换机器接着做有了依据：多机同步一页、体检脚本、换行符锁死。
+
+- 新增 `docs/多机同步.md`。分三层讲：代码走 Git，环境每台装一次，运行时只留 Ubuntu 笔记本那一个真源。附换机器的命令和各机差异表。
+- 新增 `tools/bootstrap.sh`。报系统、命令、仓库落后几个提交、proto 生成物是否一致、E8 两端是否逐字相同、Unity 装在哪、IL2CPP 补丁有没有装。能自动做的做掉，装不了的只报告不动手。本机实测 1 项注意 0 项失败。
+- 新增 `.gitattributes`。文本一律 LF，`.ps1`、`.bat` 用 CRLF，图片和 dll 标 `binary`。加之前仓库里 CRLF 文件是 0 个，`git add --renormalize` 没有产生任何内容改动。
+- `tools/gen-proto.sh` 改两处。一是支持 Windows：Git Bash 下取 `tools/windows_x64/protoc.exe`，没有 `unzip` 就用 python 解包。二是生成前不再 `rm -rf` 输出目录，只删 `*.cs`，保住 `Common.cs.meta`——原先每跑一次就会删掉这个 meta，Unity 下次打开会重新发一个 GUID。
+- 核对：连跑两次 `gen-proto.sh`，生成物零改动；`check-e8.sh` 仍是 7 项全过。
+- 开发架构的目录表补了 `docs/` 一行，`tools/` 那行加上 `bootstrap.sh`。
 
 ## v1.49 · 2026-11-07
 

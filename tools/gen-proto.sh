@@ -26,16 +26,33 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+PROTOC_NAME="protoc"
 case "$(uname -s)" in
   Darwin) PLATFORM="macosx_universal" ;;
   Linux)  PLATFORM="linux_$( [ "$(uname -m)" = "aarch64" ] && echo arm64 || echo x64 )" ;;
+  MINGW*|MSYS*|CYGWIN*) PLATFORM="windows_x64"; PROTOC_NAME="protoc.exe" ;;
   *) echo "unsupported os: $(uname -s)" >&2; exit 3 ;;
 esac
 
 CACHE="$ROOT/.tools/grpc.tools-$GRPC_TOOLS_VERSION"
-PROTOC="$CACHE/tools/$PLATFORM/protoc"
+PROTOC="$CACHE/tools/$PLATFORM/$PROTOC_NAME"
 
-if [ ! -x "$PROTOC" ]; then
+unzip_pkg() {
+  if command -v unzip >/dev/null 2>&1; then
+    unzip -qo "$1" -d "$2"
+    return
+  fi
+  for PY in python3 python; do
+    if command -v "$PY" >/dev/null 2>&1; then
+      "$PY" -c 'import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])' "$1" "$2"
+      return
+    fi
+  done
+  echo "既没有 unzip 也没有 python，解不开 $1" >&2
+  exit 4
+}
+
+if [ ! -f "$PROTOC" ]; then
   echo "取 protoc $GRPC_TOOLS_VERSION ($PLATFORM)"
   mkdir -p "$CACHE"
   PKG="$ROOT/.tools/grpc.tools-$GRPC_TOOLS_VERSION.nupkg"
@@ -43,8 +60,8 @@ if [ ! -x "$PROTOC" ]; then
     curl -fsSL -o "$PKG" \
       "https://api.nuget.org/v3-flatcontainer/grpc.tools/$GRPC_TOOLS_VERSION/grpc.tools.$GRPC_TOOLS_VERSION.nupkg"
   fi
-  unzip -qo "$PKG" -d "$CACHE"
-  chmod +x "$PROTOC"
+  unzip_pkg "$PKG" "$CACHE"
+  chmod +x "$PROTOC" 2>/dev/null || true
 fi
 
 PROTOC_VERSION="$("$PROTOC" --version)"
@@ -52,10 +69,15 @@ echo "protoc: $PROTOC_VERSION"
 
 run() {
   local out="$1"
-  rm -rf "$out"
   mkdir -p "$out"
+  # 只清生成物，留着 .cs.meta：Unity 的 GUID 进仓库，删了会让两台机器的 GUID 对不上
+  find "$out" -maxdepth 1 -type f -name '*.cs' -delete
   # shellcheck disable=SC2046
   "$PROTOC" -I "$PROTO_DIR" --csharp_out="$out" $(cd "$PROTO_DIR" && find . -name '*.proto' | sed 's|^\./||' | sort)
+  for m in "$out"/*.cs.meta; do
+    [ -e "$m" ] || continue
+    [ -f "${m%.meta}" ] || rm -f "$m"
+  done
   echo "输出: ${out#"$ROOT"/}"
 }
 

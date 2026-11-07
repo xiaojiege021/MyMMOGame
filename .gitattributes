@@ -1,0 +1,40 @@
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.cs text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+*.proto text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.service text eol=lf
+
+*.unity text eol=lf
+*.prefab text eol=lf
+*.asset text eol=lf
+*.meta text eol=lf
+*.mat text eol=lf
+*.anim text eol=lf
+*.controller text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.psd binary
+*.pdf binary
+*.ttf binary
+*.otf binary
+*.dll binary
+*.so binary
+*.aar binary
+*.jar binary
+*.apk binary
+*.aab binary
+*.bundle binary
+*.tgz binary
+*.zip binary
+*.nupkg binary
