@@ -25,12 +25,31 @@ FAIL=0
 TMP="$(mktemp -d)"
 BATTLE_PID=""
 
+# 让目录「能列、不能建」。Windows 上 chmod 改的是 POSIX 位，NTFS 不认，chmod 500 之后照样能写，
+# 第 11 段就会假失败。这里落到 ACL：只拒 WD（建文件）和 AD（建子目录），保留 RD 列目录 ——
+# 列目录也得拒的话，战斗服启动时 SettlementStore.Count() 枚举就会崩，根本走不到写那一步。
+make_unwritable() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      MSYS_NO_PATHCONV=1 icacls "$(cygpath -w "$1")" /deny "*S-1-1-0:(WD,AD)" >/dev/null 2>&1 || true ;;
+    *) chmod 500 "$1" 2>/dev/null || true ;;
+  esac
+}
+
+make_writable() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      MSYS_NO_PATHCONV=1 icacls "$(cygpath -w "$1")" /remove:d "*S-1-1-0" >/dev/null 2>&1 || true ;;
+    *) chmod 700 "$1" 2>/dev/null || true ;;
+  esac
+}
+
 cleanup() {
   if [ -n "$BATTLE_PID" ] && kill -0 "$BATTLE_PID" 2>/dev/null; then
     kill -TERM "$BATTLE_PID" 2>/dev/null || true
     wait "$BATTLE_PID" 2>/dev/null || true
   fi
-  chmod 700 "$TMP/readonly" 2>/dev/null || true
+  [ -d "$TMP/readonly/settlements" ] && make_writable "$TMP/readonly/settlements"
   rm -rf "$TMP"
 }
 trap cleanup EXIT
@@ -327,7 +346,11 @@ fi
 echo "== 11. 写不下就不发号 =="
 # 结算目录不可写时，通关也不能给出一个查不到的事务号。
 mkdir -p "$TMP/readonly/settlements"
-chmod 500 "$TMP/readonly/settlements"
+make_unwritable "$TMP/readonly/settlements"
+if ( : > "$TMP/readonly/settlements/.probe" ) 2>/dev/null; then
+  echo "  注意：这个目录仍然可写，第 11 段的两项验不了（下面会失败，不是产品的问题）"
+  rm -f "$TMP/readonly/settlements/.probe" 2>/dev/null || true
+fi
 python3 - "$TMP" <<'PY'
 import json, os, sys
 tmp = sys.argv[1]
@@ -360,7 +383,7 @@ else
 fi
 
 stop_battle
-chmod 700 "$TMP/readonly"
+make_writable "$TMP/readonly/settlements"
 
 echo
 echo "P0-1b 核对：$PASS 项通过，$FAIL 项未通过"
