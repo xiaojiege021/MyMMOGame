@@ -14,3 +14,4 @@ gamedb.env
 client/MMOGame/Bundles/
 client/MMOGame/yoo/
 
+.tools/

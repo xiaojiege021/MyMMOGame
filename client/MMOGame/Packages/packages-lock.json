@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.code-philosophy.hybridclr": {
+      "version": "file:../../packages/hybridclr_unity",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.tuyoogame.yooasset": {
       "version": "https://github.com/tuyoogame/YooAsset.git?path=/Assets/YooAsset#2.3.19",
       "depth": 0,

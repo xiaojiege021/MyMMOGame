@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package mmo.common;
+
+option csharp_namespace = "Mmo.Proto.Common";
+
+// 这一版只有空消息，用来把生成链路跑通。
+// 服务端和客户端都从这一份 proto 生成，不各写一份。
+message Empty {
+}

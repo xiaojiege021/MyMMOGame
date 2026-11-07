@@ -13,6 +13,15 @@
 
 工作室名称为云锦繁星。
 
+## v1.47 · 2026-11-07
+
+接入 proto3 生成和 HybridCLR，E7、E8 两张卡开始做。
+
+- 新增 `proto/mmo/common.proto`，只有一条空消息。`tools/gen-proto.sh` 从 NuGet 取 protoc 35.1，同一份代码生成到 `src/Shared/Generated` 和 `Assets/Proto/Generated`，两端逐字相同。
+- 新增 `src/Shared`、`tools/ProtoProbe`、`tools/check-e8.sh`。E8 核对 7 项全过：两端都序列化出 0 字节的 `Mmo.Proto.Common.Empty`。
+- 新增 `client/packages/hybridclr_unity`（9.0.3，按版本进仓库）、`Assets/HotUpdate` 热更程序集、`Assets/AOT/HotUpdateLoader.cs`、`Assets/Editor/E7Check.cs`。E7 编辑器侧加载通过，IL2CPP 补丁和真机还没做。
+- 第 15 节目录表补上 `tools/`、`Assets/Proto`、`client/packages`、`.tools/`。E7、E8 条目写明包放哪、核对怎么跑。
+
 ## v1.46 · 2026-11-07
 
 方案正文对齐到 v1.45 的规则，并补上 E3 的核对办法。
