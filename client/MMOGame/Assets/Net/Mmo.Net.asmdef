@@ -1,0 +1,16 @@
+{
+    "name": "Mmo.Net",
+    "rootNamespace": "Mmo.Net",
+    "references": [
+        "Mmo.Proto"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
