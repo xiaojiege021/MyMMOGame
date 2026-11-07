@@ -13,6 +13,17 @@
 
 工作室名称为云锦繁星。
 
+## v1.49 · 2026-11-07
+
+YooAsset 改从 OpenUPM 拉，连不上 github.com 的机器也能打开工程。
+
+- `client/MMOGame/Packages/manifest.json` 里的 git 依赖换成版本号 `2.3.19`，加 `scopedRegistries` 指向 package.openupm.com，范围只放 `com.tuyoogame.yooasset`。
+- `packages-lock.json` 由 Unity 重新生成，来源从 `git` 变 `registry`，依赖仍是那四个，`com.unity.scriptablebuildpipeline` 1.21.25 保留。
+- 两个来源是同一份 2.3.19：解开 OpenUPM 的 tgz 和旧的 git 包缓存逐项比过，919 个文件一一对应，`.meta` 里的 GUID 没有一处不同。已打的 AB 和场景引用不受影响。
+- 这台 Mac 上 github.com 直接连不通（12 秒超时），package.openupm.com 正常。Windows 那台同样打不开 GitHub。
+- 开发架构的选型表补了「包来源」一行。
+- 本机 `Library/PackageCache` 里还是旧的 `com.tuyoogame.yooasset@5df594f7dc`，下次用 Unity 打开工程会自己换成 `@2.3.19`。
+
 ## v1.48 · 2026-11-07
 
 装上 HybridCLR 的 IL2CPP 补丁，E7 能出 Android 包了。
