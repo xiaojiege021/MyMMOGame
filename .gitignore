@@ -1,5 +1,6 @@
 .DS_Store
-.workbuddy/
+.workbuddy/*
+!.workbuddy/skills/
 .env
 gamedb.env
 *.env
