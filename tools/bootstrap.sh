@@ -69,10 +69,33 @@ else
   warn "没有上游分支，检查 remote"
 fi
 
+# Unity 先在前面探好：E8 核对脚本要用同一条路径，第 5 步只负责报出来。
+# 编辑器版本 2022.3.62f3c1，Hub 目录常写成 2022.3.62f3，两种都找。
+DIR_VERSION="$(printf '%s' "$UNITY_VERSION" | sed -E 's/c[0-9]+$//')"
+FOUND=""
+if [ -n "${UNITY:-}" ] && [ -x "${UNITY:-}" ]; then
+  FOUND="$UNITY"
+else
+  for v in "$UNITY_VERSION" "$DIR_VERSION"; do
+    [ -n "$v" ] || continue
+    for p in \
+      "/Applications/Unity/Hub/Editor/$v/Unity.app/Contents/MacOS/Unity" \
+      "$HOME/Applications/Unity/Hub/Editor/$v/Unity.app/Contents/MacOS/Unity" \
+      "/c/Program Files/Unity/Hub/Editor/$v/Editor/Unity.exe" \
+      "/c/Program Files/Unity/$v/Editor/Unity.exe" \
+      "/d/Program Files/Unity/Hub/Editor/$v/Editor/Unity.exe" \
+      "/d/Program Files/Unity/$v/Editor/Unity.exe"; do
+      [ -f "$p" ] && { FOUND="$p"; break 2; }
+    done
+  done
+fi
+
 if [ "$QUIET" = "0" ]; then
   echo "== 3. 生成 proto =="
   if bash "$ROOT/tools/gen-proto.sh"; then
-    if [ -z "$(git -C "$ROOT" status --porcelain src/Shared/Generated client/MMOGame/Assets/Proto/Generated)" ]; then
+    # 用内容比较，不用 status --porcelain：protoc 重写文件会改 mtime，
+    # Windows 上 git 会把它当成已修改（stat 缓存没刷新），内容其实一模一样。
+    if git -C "$ROOT" diff --quiet -- src/Shared/Generated client/MMOGame/Assets/Proto/Generated; then
       ok "生成物与仓库一致，没有手改过的生成代码"
     else
       bad "生成物和仓库不一致：要么 .proto 改了没提交，要么有人手改了生成代码"
@@ -83,6 +106,8 @@ if [ "$QUIET" = "0" ]; then
 
   echo "== 4. E8 两端一致 =="
   if [ -x "$ROOT/tools/check-e8.sh" ]; then
+    # check-e8.sh 里的 Unity 默认路径是 macOS 的，把这里探到的传给它
+    [ -n "$FOUND" ] && export UNITY="$FOUND"
     if bash "$ROOT/tools/check-e8.sh" >/tmp/mmo-bootstrap-e8.log 2>&1; then
       ok "$(grep -c '^  ok' /tmp/mmo-bootstrap-e8.log | tr -d ' ') 项通过，日志 /tmp/mmo-bootstrap-e8.log"
     else
@@ -94,22 +119,6 @@ if [ "$QUIET" = "0" ]; then
 fi
 
 echo "== 5. Unity =="
-# 编辑器版本 2022.3.62f3c1，Hub 目录常写成 2022.3.62f3，两种都找
-DIR_VERSION="$(printf '%s' "$UNITY_VERSION" | sed -E 's/c[0-9]+$//')"
-FOUND=""
-if [ -n "${UNITY:-}" ] && [ -x "${UNITY:-}" ]; then
-  FOUND="$UNITY"
-else
-  for v in "$UNITY_VERSION" "$DIR_VERSION"; do
-    [ -n "$v" ] || continue
-    for p in \
-      "/Applications/Unity/Hub/Editor/$v/Unity.app/Contents/MacOS/Unity" \
-      "$HOME/Applications/Unity/Hub/Editor/$v/Unity.app/Contents/MacOS/Unity" \
-      "/c/Program Files/Unity/Hub/Editor/$v/Editor/Unity.exe"; do
-      [ -f "$p" ] && { FOUND="$p"; break 2; }
-    done
-  done
-fi
 if [ -n "$FOUND" ]; then
   ok "找到 $FOUND"
   if [ "$UNITY_VERSION" != "$DIR_VERSION" ]; then
@@ -117,6 +126,7 @@ if [ -n "$FOUND" ]; then
   fi
 else
   warn "没找到 Unity ${UNITY_VERSION}。版本必须逐字相同，差一个补丁号资源会重转"
+  echo '        装在别处就指过去：UNITY="/d/某某/Unity.exe" tools/bootstrap.sh'
 fi
 
 echo "== 6. IL2CPP 补丁 =="
