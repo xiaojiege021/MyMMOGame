@@ -74,8 +74,10 @@ public static class E7Check
             throw new Exception("找不到 " + HotUpdateAsmdef);
         }
 
+        // 两条登记通道只能二选一：asmdef 和程序集名同时登记，打包会报
+        // hot update assembly:HotUpdate is duplicated。这里只留 asmdef，名字那条清空。
         settings.hotUpdateAssemblyDefinitions = new[] { asmdef };
-        settings.hotUpdateAssemblies = new[] { "HotUpdate" };
+        settings.hotUpdateAssemblies = Array.Empty<string>();
         HybridCLRSettings.Save();
         Debug.Log("hotupdate_registered=" + asmdef.name);
     }

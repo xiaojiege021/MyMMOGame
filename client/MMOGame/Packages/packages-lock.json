@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "com.code-philosophy.hybridclr": {
-      "version": "file:../../packages/hybridclr_unity",
+      "version": "file:com.code-philosophy.hybridclr",
       "depth": 0,
-      "source": "local",
+      "source": "embedded",
       "dependencies": {}
     },
     "com.tuyoogame.yooasset": {

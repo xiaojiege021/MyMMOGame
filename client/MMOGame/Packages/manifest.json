@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.code-philosophy.hybridclr": "file:../../packages/hybridclr_unity",
     "com.tuyoogame.yooasset": "https://github.com/tuyoogame/YooAsset.git?path=/Assets/YooAsset#2.3.19",
     "com.unity.inputsystem": "1.7.0",
     "com.unity.modules.ai": "1.0.0",
