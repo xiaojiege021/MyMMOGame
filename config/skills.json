@@ -1,0 +1,36 @@
+{
+  "schema": "skill-table/1",
+  "version": 1,
+  "skills": [
+    {
+      "id": 1001,
+      "name": "劈砍",
+      "damage": 120,
+      "range_mm": 3000,
+      "foreswing_ms": 400,
+      "recovery_ms": 300,
+      "cooldown_ms": 2000,
+      "stagger_ms": 300
+    },
+    {
+      "id": 1002,
+      "name": "穿云箭",
+      "damage": 260,
+      "range_mm": 30000,
+      "foreswing_ms": 600,
+      "recovery_ms": 400,
+      "cooldown_ms": 2000,
+      "stagger_ms": 200
+    },
+    {
+      "id": 1003,
+      "name": "横扫",
+      "damage": 340,
+      "range_mm": 5000,
+      "foreswing_ms": 900,
+      "recovery_ms": 600,
+      "cooldown_ms": 6000,
+      "stagger_ms": 800
+    }
+  ]
+}

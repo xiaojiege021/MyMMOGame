@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Battle</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 一条本机 WebSocket 入口。只用到 Kestrel 和 WebSocket 中间件，不引 MVC。 -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 技能请求和结果的类型来自 proto 生成物，和客户端同一份。 -->
+    <ProjectReference Include="../Shared/Shared.csproj" />
+  </ItemGroup>
 </Project>

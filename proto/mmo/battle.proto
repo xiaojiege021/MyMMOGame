@@ -7,7 +7,6 @@ option csharp_namespace = "Mmo.Proto.Battle";
 // 副本里一条技能一次请求。字段按方案正文与技术架构第 4 节：
 // 请求带技能编号、目标编号和客户端认为的施放时刻。
 // 施法者不放在消息里，由这条连接的身份决定，客户端改不了。
-// 这一版只定义消息，结算在 P0-1b。
 message SkillRequest {
   uint32 skill_id = 1;
   uint64 target_id = 2;
@@ -25,4 +24,92 @@ message SkillResult {
   int64 healing = 6;
   uint32 stagger_ms = 7;
   uint32 cooldown_ms = 8;
+  // 这一下之后目标还剩多少血。客户端照着这个改血条，不自己算。
+  int64 target_hp_after = 9;
+}
+
+// 拒绝的原因。客户端按这个停掉前摇，不改画面上的血量。
+enum SkillRejectReason {
+  SKILL_REJECT_UNSPECIFIED = 0;
+  // 这场已经结束，或者这个人不在这场里
+  SKILL_REJECT_NOT_IN_BATTLE = 1;
+  // 配置里没有这个技能编号
+  SKILL_REJECT_UNKNOWN_SKILL = 2;
+  // 目标已经不在场上
+  SKILL_REJECT_TARGET_GONE = 3;
+  // 施法者已经倒地
+  SKILL_REJECT_CASTER_DEAD = 4;
+  // 冷却没好，retry_after_ms 是还差多少
+  SKILL_REJECT_COOLDOWN = 5;
+  // 距离不够，这一下打不到
+  SKILL_REJECT_OUT_OF_RANGE = 6;
+  // 上一个技能还在前摇里，一次只结算一个
+  SKILL_REJECT_CASTING = 7;
+  // 上一个技能已经结算，后摇还没走完
+  SKILL_REJECT_RECOVERY = 8;
+}
+
+// 没有结算就退回来了。这条不改变任何人的生命。
+message SkillRejected {
+  uint32 skill_id = 1;
+  uint64 target_id = 2;
+  int64 cast_time_ms = 3;
+  SkillRejectReason reason = 4;
+  // 只有冷却没好时才有意义，其它原因填 0
+  uint32 retry_after_ms = 5;
+}
+
+// 命中判定之前取消这次施法。前摇里可以走位，也可以打断。
+// cast_time_ms 用来对上被取消的那一次，避免取消到后来的施法。
+message SkillCancelRequest {
+  uint32 skill_id = 1;
+  int64 cast_time_ms = 2;
+}
+
+// accepted 为真表示这次施法被撤掉了，没有伤害，冷却也退回去。
+// 为假表示已经结算完了，撤不回来，那一下照常生效。
+message SkillCancelled {
+  uint32 skill_id = 1;
+  int64 cast_time_ms = 2;
+  bool accepted = 3;
+}
+
+// 连上就开一场。P0 不做进本协议，网关鉴权也放到后续。
+message BattleOpened {
+  uint64 session_id = 1;
+  uint64 caster_id = 2;
+  uint64 boss_id = 3;
+  int64 boss_hp = 4;
+  int64 boss_hp_max = 5;
+  int64 caster_hp = 6;
+  int64 caster_hp_max = 7;
+  // 双方直线距离，毫米
+  uint32 distance_mm = 8;
+}
+
+// 这场收尾。settlement_id 是写进结算记录的事务号；
+// 没写成就为空，客户端不能拿空号去领奖。
+message BattleEnded {
+  uint64 session_id = 1;
+  bool cleared = 2;
+  string settlement_id = 3;
+  int64 exp_gain = 4;
+}
+
+// 一条 WebSocket 上跑多种消息，靠这个信封分辨。
+message ClientMessage {
+  oneof body {
+    SkillRequest skill = 1;
+    SkillCancelRequest cancel = 2;
+  }
+}
+
+message ServerMessage {
+  oneof body {
+    BattleOpened opened = 1;
+    SkillResult result = 2;
+    SkillRejected rejected = 3;
+    SkillCancelled cancelled = 4;
+    BattleEnded ended = 5;
+  }
 }

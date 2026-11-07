@@ -1,0 +1,18 @@
+{
+  "schema": "battle-config/1",
+  "listen": "127.0.0.1:0",
+  "settlement_dir": "var/battle/settlements",
+  "skill_table": "skills.json",
+  "caster": {
+    "id": 1,
+    "hp_max": 1200,
+    "spawn_mm": { "x": 6000, "y": 0 }
+  },
+  "boss": {
+    "id": 9001,
+    "name": "试炼石像",
+    "hp_max": 900,
+    "spawn_mm": { "x": 0, "y": 0 },
+    "exp_on_clear": 120
+  }
+}

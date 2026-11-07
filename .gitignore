@@ -15,4 +15,7 @@ gamedb.env
 client/MMOGame/Bundles/
 client/MMOGame/yoo/
 
+# 战斗进程运行时写下的结算记录，属于运行现场，不进仓库
+var/
+
 .tools/
