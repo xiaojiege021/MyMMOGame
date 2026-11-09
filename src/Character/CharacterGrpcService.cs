@@ -97,4 +97,50 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.AlreadyExists, "name_taken"));
         }
     }
+
+    /// <summary>
+    /// 写等级。上限 100 是大版本也不抬的（方案「成长与物品」），所以 101 直接拒绝，
+    /// 不静默夹到 100——夹住会让调用方以为写成功了。库层另有 CHECK，两边都挡。
+    /// </summary>
+    public override async Task<SetLevelResponse> SetLevel(SetLevelRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        if (request.Level < MinLevel || request.Level > MaxLevel)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "level_out_of_range"));
+        }
+
+        var level = await characters.SetLevelAsync(
+            account, (long)request.CharacterId, request.Level, context.CancellationToken);
+
+        if (level is null)
+        {
+            // 不是这个账号的角色，跟不存在一样处理，不泄漏别人的编号存不存在。
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "character_level account={Account} id={Id} level={Level}",
+            account, request.CharacterId, level);
+
+        return new SetLevelResponse
+        {
+            CharacterId = request.CharacterId,
+            Level = level.Value,
+        };
+    }
+
+    public const int MinLevel = 1;
+
+    public const int MaxLevel = 100;
 }

@@ -149,4 +149,58 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
         command.Parameters.AddWithValue(name);
         return await command.ExecuteNonQueryAsync(stopping);
     }
+
+    /// <summary>
+    /// 写等级。只改自己账号下的角色；带账号进 where，别人的编号改不动。
+    /// 返回 null 表示这行不归这个账号（或不存在），由调用方转成错误码。
+    /// </summary>
+    public async Task<int?> SetLevelAsync(
+        string account,
+        long characterId,
+        int level,
+        CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "update \"角色\".character set level = $3 "
+            + "where id = $2 and account = $1 returning level");
+        command.Parameters.AddWithValue(account);
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(level);
+
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return null;
+        }
+
+        return reader.GetInt32(0);
+    }
+
+    /// <summary>
+    /// 只给核对用：绕过接口直写库，验库层那道 CHECK 是不是真的在。
+    /// 正常路径不能走这里，写成 101 必须被数据库拒掉。
+    /// </summary>
+    public async Task RawWriteLevelAsync(long characterId, int level, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "update \"角色\".character set level = $2 where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(level);
+        await command.ExecuteNonQueryAsync(stopping);
+    }
+
+    /// <summary>只给核对用：读一行的等级与归属账号。</summary>
+    public async Task<(string Account, int Level)?> LevelOfAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select account, level from \"角色\".character where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return null;
+        }
+
+        return (reader.GetString(0), reader.GetInt32(1));
+    }
 }

@@ -37,4 +37,19 @@ message CreateCharacterResponse {
 // 角色服。角色的唯一写入在这里，网关只能转请求，不能直接写库。
 service CharacterService {
   rpc CreateCharacter(CreateCharacterRequest) returns (CreateCharacterResponse);
+
+  // 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
+  // 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。
+  rpc SetLevel(SetLevelRequest) returns (SetLevelResponse);
+}
+
+message SetLevelRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  int32 level = 3;
+}
+
+message SetLevelResponse {
+  uint64 character_id = 1;
+  int32 level = 2;
 }

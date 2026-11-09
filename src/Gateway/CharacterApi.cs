@@ -13,6 +13,8 @@ public static class CharacterApi
 {
     public sealed record CreateBody(string? Name, string? Race, string? Appearance, string? ClassId, string? Branch);
 
+    public sealed record LevelBody(ulong? CharacterId, int? Level);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -105,6 +107,74 @@ public static class CharacterApi
                 };
 
                 Console.WriteLine("character_reject account=" + account
+                    + " code=" + code + " http=" + http);
+                await WriteAsync(context, http, new { error = code });
+            }
+        });
+
+        // 写等级。上限 100 由角色服判，网关只转；越界是 400，不是静默改成 100。
+        app.MapPost("/character/level", async context =>
+        {
+            var token = TokenFrom(context.Request);
+            if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out var account, out _))
+            {
+                Console.WriteLine("level_reject reason=token");
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            LevelBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<LevelBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body is null || body.CharacterId is null || body.Level is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var updated = await client.SetLevelAsync(
+                    new SetLevelRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Level = body.Level.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("level_updated account=" + account
+                    + " id=" + updated.CharacterId
+                    + " level=" + updated.Level);
+
+                await WriteAsync(context, 200, new
+                {
+                    character_id = updated.CharacterId,
+                    level = updated.Level,
+                });
+            }
+            catch (RpcException ex)
+            {
+                var code = ex.Status.Detail;
+                var http = ex.StatusCode switch
+                {
+                    StatusCode.InvalidArgument => 400,
+                    StatusCode.NotFound => 404,
+                    StatusCode.Unavailable => 503,
+                    _ => 502,
+                };
+
+                Console.WriteLine("level_reject account=" + account
                     + " code=" + code + " http=" + http);
                 await WriteAsync(context, http, new { error = code });
             }

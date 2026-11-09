@@ -52,6 +52,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CreateCharacterRequest> __Marshaller_mmo_character_CreateCharacterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CreateCharacterRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CreateCharacterResponse> __Marshaller_mmo_character_CreateCharacterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CreateCharacterResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SetLevelRequest> __Marshaller_mmo_character_SetLevelRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SetLevelRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SetLevelResponse> __Marshaller_mmo_character_SetLevelResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SetLevelResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -60,6 +64,14 @@ namespace Mmo.Proto.Character {
         "CreateCharacter",
         __Marshaller_mmo_character_CreateCharacterRequest,
         __Marshaller_mmo_character_CreateCharacterResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.SetLevelRequest, global::Mmo.Proto.Character.SetLevelResponse> __Method_SetLevel = new grpc::Method<global::Mmo.Proto.Character.SetLevelRequest, global::Mmo.Proto.Character.SetLevelResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SetLevel",
+        __Marshaller_mmo_character_SetLevelRequest,
+        __Marshaller_mmo_character_SetLevelResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -73,6 +85,19 @@ namespace Mmo.Proto.Character {
     {
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CreateCharacterResponse> CreateCharacter(global::Mmo.Proto.Character.CreateCharacterRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
+      /// 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SetLevelResponse> SetLevel(global::Mmo.Proto.Character.SetLevelRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -126,6 +151,58 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_CreateCharacter, null, options, request);
       }
+      /// <summary>
+      /// 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
+      /// 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SetLevelResponse SetLevel(global::Mmo.Proto.Character.SetLevelRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SetLevel(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
+      /// 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SetLevelResponse SetLevel(global::Mmo.Proto.Character.SetLevelRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SetLevel, null, options, request);
+      }
+      /// <summary>
+      /// 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
+      /// 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SetLevelResponse> SetLevelAsync(global::Mmo.Proto.Character.SetLevelRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SetLevelAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
+      /// 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SetLevelResponse> SetLevelAsync(global::Mmo.Proto.Character.SetLevelRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SetLevel, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -140,7 +217,8 @@ namespace Mmo.Proto.Character {
     public static grpc::ServerServiceDefinition BindService(CharacterServiceBase serviceImpl)
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
-          .AddMethod(__Method_CreateCharacter, serviceImpl.CreateCharacter).Build();
+          .AddMethod(__Method_CreateCharacter, serviceImpl.CreateCharacter)
+          .AddMethod(__Method_SetLevel, serviceImpl.SetLevel).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -151,6 +229,7 @@ namespace Mmo.Proto.Character {
     public static void BindService(grpc::ServiceBinderBase serviceBinder, CharacterServiceBase serviceImpl)
     {
       serviceBinder.AddMethod(__Method_CreateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(serviceImpl.CreateCharacter));
+      serviceBinder.AddMethod(__Method_SetLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SetLevelRequest, global::Mmo.Proto.Character.SetLevelResponse>(serviceImpl.SetLevel));
     }
 
   }

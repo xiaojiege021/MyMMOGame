@@ -9,6 +9,9 @@ string? reportName = null;
 string? deleteName = null;
 var stats = false;
 var migrate = false;
+long rawLevelWrite = 0;
+var rawLevelValue = 0;
+long levelOf = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -32,6 +35,14 @@ for (var i = 0; i < args.Length; i++)
         case "--character-stats":
             stats = true;
             break;
+        // 只给核对用：绕过接口直写库，验库层 CHECK。不能当运维手段用。
+        case "--raw-level-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawLevelWrite);
+            int.TryParse(args[++i], out rawLevelValue);
+            break;
+        case "--level-of" when i + 1 < args.Length:
+            long.TryParse(args[++i], out levelOf);
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -39,7 +50,7 @@ for (var i = 0; i < args.Length; i++)
 }
 
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
-if (reportName != null || deleteName != null || stats || migrate)
+if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -71,6 +82,29 @@ if (reportName != null || deleteName != null || stats || migrate)
         if (stats)
         {
             Console.WriteLine("characters=" + await characters.CountAsync(CancellationToken.None));
+        }
+
+        if (rawLevelWrite != 0)
+        {
+            try
+            {
+                await characters.RawWriteLevelAsync(rawLevelWrite, rawLevelValue, CancellationToken.None);
+                Console.WriteLine("raw_level=written id=" + rawLevelWrite + " level=" + rawLevelValue);
+            }
+            catch (PostgresException ex)
+            {
+                // 核对要看到的就是这个：库层的 CHECK 把越界值挡住了。
+                Console.WriteLine("raw_level=rejected id=" + rawLevelWrite
+                    + " level=" + rawLevelValue + " sqlstate=" + ex.SqlState);
+            }
+        }
+
+        if (levelOf != 0)
+        {
+            var found = await characters.LevelOfAsync(levelOf, CancellationToken.None);
+            Console.WriteLine(found is null
+                ? "level=missing id=" + levelOf
+                : "level=ok id=" + levelOf + " account=" + found.Value.Account + " level=" + found.Value.Level);
         }
 
         if (reportName != null)
