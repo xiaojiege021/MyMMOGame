@@ -1,18 +1,91 @@
+using System.Net;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Npgsql;
+
 namespace Character;
 
-public sealed class CharacterProcess
+public sealed class CharacterProcess(string configPath)
 {
-    public async Task RunAsync(CancellationToken stopping)
+    public async Task<int> RunAsync(CancellationToken stopping)
     {
-        Console.WriteLine("ready name=Character pid=" + Environment.ProcessId);
+        CharacterConfig config;
         try
         {
-            await Task.Delay(Timeout.Infinite, stopping);
+            config = CharacterConfig.Load(configPath);
+        }
+        catch (ConfigException ex)
+        {
+            Console.WriteLine("config_error=" + ex.Message);
+            return 2;
+        }
+
+        // 三张表：出身、分支、职业编号。种族与分支都不带属性，只决定外观、对白与兵器。
+        RaceTable races;
+        BranchTable branches;
+        ClassIds classes;
+        try
+        {
+            races = RaceTable.Load("config/races.json");
+            branches = BranchTable.Load("config/branches.json");
+            classes = new ClassIds("config/classes.json");
+        }
+        catch (ConfigException ex)
+        {
+            Console.WriteLine("config_error=" + ex.Message);
+            return 2;
+        }
+
+        Console.WriteLine("config=" + configPath);
+        Console.WriteLine("listen=" + config.Listen);
+        Console.WriteLine("races=" + races.All.Count + " race_table_version=" + races.Version);
+        Console.WriteLine("branches=" + branches.All.Count + " branch_table_version=" + branches.Version);
+
+        var connectionString = DbEnv.Resolve();
+        Console.WriteLine("db_env=" + DbEnv.Source());
+
+        if (connectionString == null)
+        {
+            // 角色数据没有库就没法建号，这里直接不起来，免得看起来在跑其实什么都做不了。
+            Console.WriteLine("db_missing=1 需要 MMO_GAMEDB 或 " + DbEnv.DefaultEnvFile);
+            return 3;
+        }
+
+        await using var dataSource = NpgsqlDataSource.Create(DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
+        var characters = new CharacterRepository(dataSource);
+
+        var builder = WebApplication.CreateSlimBuilder();
+        // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
+        // 否则 Kestrel 在明文上只谈 HTTP/1.1，gRPC 握手直接失败。
+        if (!Uri.TryCreate(config.Listen, UriKind.Absolute, out var listenUri)
+            || !IPAddress.TryParse(listenUri.Host, out var listenAddress))
+        {
+            Console.WriteLine("config_error=listen 必须是带 IP 的地址：" + config.Listen);
+            return 2;
+        }
+
+        builder.WebHost.ConfigureKestrel(kestrel =>
+            kestrel.Listen(listenAddress, listenUri.Port, options => options.Protocols = HttpProtocols.Http2));
+        builder.Services.AddGrpc();
+        builder.Services.AddSingleton(characters);
+        builder.Services.AddSingleton(races);
+        builder.Services.AddSingleton(branches);
+        builder.Services.AddSingleton(classes);
+
+        var app = builder.Build();
+        app.MapGrpcService<CharacterGrpcService>();
+
+        // E3 认这一行：进程起来了，gRPC 也在听。
+        Console.WriteLine("ready name=Character pid=" + Environment.ProcessId);
+
+        try
+        {
+            await app.RunAsync(stopping);
         }
         catch (OperationCanceledException)
         {
         }
 
         Console.WriteLine("stopped name=Character pid=" + Environment.ProcessId);
+        return 0;
     }
 }

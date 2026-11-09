@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package mmo.character;
+
+option csharp_namespace = "Mmo.Proto.Character";
+
+// 创建一个角色。字段按技术架构第 6 节「角色主数据」：
+// 种族只影响外观与出身对白，不带属性、不锁职业，所以这里只有编号与外观；
+// 主线场次与立仙或立魔在创建时为空，不放进请求，直接由服务端落成空。
+message CreateCharacterRequest {
+  string account = 1;
+  string name = 2;
+  // 出身编号，四种之一。只决定外观默认值与对白，不带数值。
+  string race = 3;
+  // 外观选择，JSON 串。只影响样子，服务端不解析成属性。
+  string appearance = 4;
+  // warrior / archer / mage / priest / tank
+  string class_id = 5;
+  // 一转分支，可以不填。填了必须与职业对得上。
+  string branch = 6;
+}
+
+message CreateCharacterResponse {
+  uint64 character_id = 1;
+  string name = 2;
+  string race = 3;
+  string appearance = 4;
+  string class_id = 5;
+  string branch = 6;
+  int32 level = 7;
+  string realm = 8;
+  // 建好之后这两项必须是空的，客户端据此知道还没进主线、还没分路。
+  bool main_stage_empty = 9;
+  bool alignment_empty = 10;
+}
+
+// 角色服。角色的唯一写入在这里，网关只能转请求，不能直接写库。
+service CharacterService {
+  rpc CreateCharacter(CreateCharacterRequest) returns (CreateCharacterResponse);
+}

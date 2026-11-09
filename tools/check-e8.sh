@@ -40,18 +40,20 @@ else
   cat "$TMP/gen.log"
 fi
 
-if diff -r -q -x "*.meta" "$TMP/gen" "$SERVER_OUT" >/dev/null 2>&1; then
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$TMP/gen" "$SERVER_OUT" >/dev/null 2>&1; then
   ok "服务端生成物与仓库一致"
 else
   bad "服务端生成物和 proto 不一致，重新跑 tools/gen-proto.sh 并提交"
-  diff -r -x "*.meta" "$TMP/gen" "$SERVER_OUT" | head -10
+  diff -r -x "*.meta" -x "*Grpc.cs" "$TMP/gen" "$SERVER_OUT" | head -10
 fi
 
-if diff -r -q -x "*.meta" "$SERVER_OUT" "$CLIENT_OUT" >/dev/null 2>&1; then
-  ok "客户端与服务端两份生成物逐字相同"
+# 消息代码两端必须逐字相同；*Grpc.cs（服务契约）只生成在服务端——
+# 客户端不直连角色服，Unity 里也没有 Grpc 运行库。P1-1b1 起有这个区别。
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$SERVER_OUT" "$CLIENT_OUT" >/dev/null 2>&1; then
+  ok "两端消息代码逐字相同（gRPC 服务契约只在服务端）"
 else
   bad "两端生成物不同"
-  diff -r -x "*.meta" "$SERVER_OUT" "$CLIENT_OUT" | head -10
+  diff -r -x "*.meta" -x "*Grpc.cs" "$SERVER_OUT" "$CLIENT_OUT" | head -10
 fi
 
 echo "== 2. 服务端把空消息序列化一遍 =="

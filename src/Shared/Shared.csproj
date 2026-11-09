@@ -10,6 +10,8 @@
   <ItemGroup>
     <!-- 版本要和 tools/gen-proto.sh 里的 protoc 对齐：protoc 35.1 ↔ Google.Protobuf 3.35.1 -->
     <PackageReference Include="Google.Protobuf" Version="3.35.1" />
+    <!-- 服务端的 *Grpc.cs（服务契约）要用到 Grpc 的基类；客户端不生成这类文件。 -->
+    <PackageReference Include="Grpc.Core.Api" Version="2.85.0" />
   </ItemGroup>
 
 </Project>

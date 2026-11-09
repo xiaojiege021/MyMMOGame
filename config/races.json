@@ -1,0 +1,51 @@
+{
+  "schema": "race-table/1",
+  "version": 1,
+  "note": "种族只决定外观与出身对白，不决定阵营、不产生属性差、不锁职业（方案 8.4）。这张表里没有属性字段，也不要加。",
+  "races": [
+    {
+      "id": "chen",
+      "name": "尘民",
+      "origin": "灵气稀薄之后最常见的凡人",
+      "appearance": {
+        "body": "common",
+        "mark": "none",
+        "tone": "sun"
+      },
+      "dialogue_key": "race.chen"
+    },
+    {
+      "id": "mai",
+      "name": "脉裔",
+      "origin": "住在还没干涸的灵脉旁边",
+      "appearance": {
+        "body": "slim",
+        "mark": "jade_crack",
+        "tone": "pale"
+      },
+      "dialogue_key": "race.mai"
+    },
+    {
+      "id": "lan",
+      "name": "岚民",
+      "origin": "从前走高空航路的人，航路断了以后住在崖上",
+      "appearance": {
+        "body": "tall",
+        "mark": "none",
+        "tone": "wind"
+      },
+      "dialogue_key": "race.lan"
+    },
+    {
+      "id": "yuan",
+      "name": "渊户",
+      "origin": "世代守在秘境入口旁边的人家",
+      "appearance": {
+        "body": "stout",
+        "mark": "rope",
+        "tone": "dark"
+      },
+      "dialogue_key": "race.yuan"
+    }
+  ]
+}

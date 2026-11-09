@@ -9,5 +9,8 @@
   <ItemGroup>
     <!-- 账号表在 gamedb 的「角色」schema 里，驱动与 E1 一致。 -->
     <PackageReference Include="Npgsql" Version="10.0.3" />
+    <!-- 建角色要转给角色服，服与服走 gRPC（技术架构第 2 节）。 -->
+    <PackageReference Include="Grpc.Net.Client" Version="2.85.0" />
+    <ProjectReference Include="../Shared/Shared.csproj" />
   </ItemGroup>
 </Project>

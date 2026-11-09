@@ -61,29 +61,46 @@ if [ ! -f "$PROTOC" ]; then
       "https://api.nuget.org/v3-flatcontainer/grpc.tools/$GRPC_TOOLS_VERSION/grpc.tools.$GRPC_TOOLS_VERSION.nupkg"
   fi
   unzip_pkg "$PKG" "$CACHE"
-  chmod +x "$PROTOC" 2>/dev/null || true
+  # protoc 与 grpc 插件都要可执行，解压出来默认没有执行位。
+  chmod +x "$CACHE"/tools/*/protoc* "$CACHE"/tools/*/grpc_csharp_plugin* 2>/dev/null || true
 fi
 
 PROTOC_VERSION="$("$PROTOC" --version)"
 echo "protoc: $PROTOC_VERSION"
 
+# gRPC 服务端代码用同一个包里的插件生成。客户端不生成：
+# Unity 里没有 Grpc 运行库，客户端也不直连角色服（走网关的 HTTP 入口）。
+PLUGIN="$CACHE/tools/$PLATFORM/grpc_csharp_plugin"
+[ "$PROTOC_NAME" = "protoc.exe" ] && PLUGIN="$CACHE/tools/$PLATFORM/grpc_csharp_plugin.exe"
+
+proto_files() {
+  (cd "$PROTO_DIR" && find . -name '*.proto' | sed 's|^\./||' | sort)
+}
+
+# $1=输出目录 $2=1 时连 gRPC 服务代码一起生成
 run() {
-  local out="$1"
+  local out="$1" with_grpc="${2:-0}"
   mkdir -p "$out"
   # 只清生成物，留着 .cs.meta：Unity 的 GUID 进仓库，删了会让两台机器的 GUID 对不上
   find "$out" -maxdepth 1 -type f -name '*.cs' -delete
   # shellcheck disable=SC2046
-  "$PROTOC" -I "$PROTO_DIR" --csharp_out="$out" $(cd "$PROTO_DIR" && find . -name '*.proto' | sed 's|^\./||' | sort)
+  "$PROTOC" -I "$PROTO_DIR" --csharp_out="$out" $(proto_files)
+  if [ "$with_grpc" = "1" ]; then
+    # shellcheck disable=SC2046
+    "$PROTOC" -I "$PROTO_DIR" \
+      --plugin=protoc-gen-grpc="$PLUGIN" \
+      --grpc_out="$out" $(proto_files)
+  fi
   for m in "$out"/*.cs.meta; do
     [ -e "$m" ] || continue
     [ -f "${m%.meta}" ] || rm -f "$m"
   done
-  echo "输出: ${out#"$ROOT"/}"
+  echo "输出: ${out#"$ROOT"/} gRPC=$with_grpc"
 }
 
 if [ -n "$INTO" ]; then
-  run "$INTO"
+  run "$INTO" 1
 else
-  run "$SERVER_OUT"
-  run "$CLIENT_OUT"
+  run "$SERVER_OUT" 1
+  run "$CLIENT_OUT" 0
 fi

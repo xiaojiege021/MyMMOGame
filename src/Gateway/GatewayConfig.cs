@@ -7,13 +7,20 @@ namespace Gateway;
 /// 网关的启动配置。听地址、令牌有效期、口令哈希的迭代次数，以及战斗服在上游哪个地址。
 /// 连接串不在这里：它带密码，只从环境变量或 /srv/mmo/gamedb.env 读。
 /// </summary>
-public sealed record GatewayConfig(string Listen, int TokenTtlSeconds, int Pbkdf2Iterations, string BattleUpstream)
+public sealed record GatewayConfig(
+    string Listen,
+    int TokenTtlSeconds,
+    int Pbkdf2Iterations,
+    string BattleUpstream,
+    string CharacterUpstream)
 {
     public const int DefaultTokenTtlSeconds = 7200;
 
     public const int DefaultPbkdf2Iterations = 210_000;
 
     public const string DefaultBattleUpstream = "ws://127.0.0.1:60001/battle";
+
+    public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
 
     public static GatewayConfig Load(string path)
     {
@@ -64,7 +71,14 @@ public sealed record GatewayConfig(string Listen, int TokenTtlSeconds, int Pbkdf
             throw new ConfigException("battle_upstream 必须是 ws:// 或 wss:// 地址：" + upstream);
         }
 
-        return new GatewayConfig(listen, ttl, iterations, upstream);
+        var character = (wire.CharacterUpstream ?? DefaultCharacterUpstream).Trim().TrimEnd('/');
+        if (!Uri.TryCreate(character, UriKind.Absolute, out var characterUri)
+            || (characterUri.Scheme != "http" && characterUri.Scheme != "https"))
+        {
+            throw new ConfigException("character_upstream 必须是 http:// 或 https:// 地址：" + character);
+        }
+
+        return new GatewayConfig(listen, ttl, iterations, upstream, character);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -88,6 +102,9 @@ public sealed record GatewayConfig(string Listen, int TokenTtlSeconds, int Pbkdf
 
         [JsonPropertyName("battle_upstream")]
         public string? BattleUpstream { get; init; }
+
+        [JsonPropertyName("character_upstream")]
+        public string? CharacterUpstream { get; init; }
     }
 }
 
