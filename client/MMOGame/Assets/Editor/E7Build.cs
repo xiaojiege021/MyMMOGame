@@ -24,12 +24,21 @@ public static class E7Build
         var marker = HybridCLR.SettingsUtil.GeneratedCppDir + "/MethodBridge.inc";
         Debug.Log("build_methodbridge=" + (File.Exists(marker) ? "present" : "missing") + " file=" + marker);
 
-        // 编 Android 的热更 dll
-        CompileDllCommand.CompileDllAndroid();
-        var dllDir = HybridCLR.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(BuildTarget.Android);
-        var hotDll = Path.Combine(dllDir, "HotUpdate.dll");
-        var hotSize = File.Exists(hotDll) ? new FileInfo(hotDll).Length : -1;
-        Debug.Log("build_hotdll=" + (hotSize > 0 ? "ok" : "missing") + " size=" + hotSize + " dir=" + dllDir);
+        // 编 Android 的热更 dll，并复制成 Launch 包的原生资源
+        var hotDll = E6Build.PrepareHotDll(BuildTarget.Android);
+        var hotSize = new FileInfo(hotDll).Length;
+        Debug.Log("build_hotdll=" + (hotSize > 0 ? "ok" : "missing") + " size=" + hotSize);
+
+        // Launch AB 重打（含 Boss 场景与热更 dll），StreamingAssets 跟着更新
+        var ab = E6Build.BuildAndroidAb();
+        if (!ab.Success)
+        {
+            Debug.Log("build_result=AbFailed error=" + ab.ErrorInfo);
+            EditorApplication.Exit(1);
+            return;
+        }
+
+        Debug.Log("build_ab=ok " + ab.OutputPackageDirectory);
 
         // 上一次可能留了同名目录或 .aab，先清掉；另外明确要 apk 而不是 Gradle 工程
         if (Directory.Exists(ApkDir))

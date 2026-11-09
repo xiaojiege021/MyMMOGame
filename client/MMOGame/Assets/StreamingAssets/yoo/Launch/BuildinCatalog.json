@@ -4,6 +4,22 @@
     "PackageVersion": "1",
     "Wrappers": [
         {
+            "BundleGUID": "2d16d150f851e94db996f3d77c83d404",
+            "FileName": "2d16d150f851e94db996f3d77c83d404.bundle"
+        },
+        {
+            "BundleGUID": "c2c161b73d598006cf10413eeccbca23",
+            "FileName": "c2c161b73d598006cf10413eeccbca23.bundle"
+        },
+        {
+            "BundleGUID": "e38dc9cb8d6d2c99012e108473ebdb70",
+            "FileName": "e38dc9cb8d6d2c99012e108473ebdb70.bundle"
+        },
+        {
+            "BundleGUID": "e7ba7a6173f454555acaf97e3ad47cec",
+            "FileName": "e7ba7a6173f454555acaf97e3ad47cec.bundle"
+        },
+        {
             "BundleGUID": "ec66f67cc3186da5a590e5c521e606e8",
             "FileName": "ec66f67cc3186da5a590e5c521e606e8.bundle"
         }

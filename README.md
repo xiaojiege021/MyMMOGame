@@ -14,6 +14,20 @@
 
 工作室名称为云锦繁星。
 
+## v1.56 · 2026-11-09
+
+P0-2a 做完：第一次把玩法装进热更程序集和 Launch AB。平板上点中试炼石像，再换到训练木桩，目标编号进了技能请求。
+
+- Boss 场景 `Assets/Scenes/BossBattle.unity` 进 Launch 组：9001 试炼石像、9002 训练木桩。场景启动自己打印 `p02a_scene=ok targets=2`，核对认这行。
+- 点选在热更程序集 `Assets/HotUpdate`：`TargetSelector` 存当前编号与切换次数，`TargetPicker` 做射线与输入边沿，`BattleScene` 串起来；`BuildRequest(skillId)` 把当前编号填进 `TargetId`。
+- 真机结果：`select_target=9001 name=试炼石像 times=1` → `select_target=9002 name=训练木桩 times=3`。点空白不换目标，点到另一个才切换。
+- `tools/check-p0-2a.sh --device` 一条命令跑完出包、安装、启动、等场景日志、按屏幕比例 tap 两个目标、逐行比对，不用人盯。
+- 新增 `Assets/Editor/P02aScene.cs`（生成场景）、`P02aCheck.cs`（编辑器核对 7 项）、`E6Build.cs` 收集器加场景与热更 dll、`E7Build.cs` 出包。
+- 踩坑与修法：YooAsset 的 Android 读不了 builtin RawFile，热更 dll 改 TextAsset；平板横屏 2560×1600，坐标按 `target_screen` 换算；`activeInputHandler: 1` 时鼠标 API 失效，改 `Pointer.current` 边沿；一个文件两个 MonoBehaviour 会丢场景引用，`TargetPicker` 拆独立文件；`stripEngineCode=1` 剥掉 Physics，靠 `EngineKeepAlive.cs` 与 `link.xml` 保住。
+- E7 的关键词检查此前会把注释里提到的「伤害」当成违规，现在先剥注释再查词，注释也改了措辞。
+- 回归：e7 9、e8 7、p0-1a 15、p0-1b 31、p0-1c 33、p0-1d 31、p0-2a 编辑器 8，全部通过。
+- 技能表现（前摇动画、走位、回包）留给 P0-2b。
+
 ## v1.55 · 2026-11-07
 
 P0-1d 做完：前摇里打断没有伤害；进程重启后，没写入的奖励不会出现。

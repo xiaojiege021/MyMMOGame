@@ -15,6 +15,10 @@ gamedb.env
 client/MMOGame/Bundles/
 client/MMOGame/yoo/
 
+# 热更 dll 的中间产物，每次 E7Build 都会重新生成，不进仓库
+client/MMOGame/Assets/HotUpdateDlls/
+client/MMOGame/Assets/HotUpdateDlls.meta
+
 # 战斗进程运行时写下的结算记录，属于运行现场，不进仓库
 var/
 

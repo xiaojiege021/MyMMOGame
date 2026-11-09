@@ -17,7 +17,8 @@ MonoBehaviour:
   UniqueBundleName: 0
   Packages:
   - PackageName: Launch
-    PackageDesc: "\u70BC\u4F53\u5230\u7ED3\u4E39\u5360\u4F4D"
+    PackageDesc: "\u70BC\u4F53\u5230\u7ED3\u4E39\uFF1Amarker\u3001Boss \u573A\u666F\u3001\u70ED\u66F4
+      dll"
     EnableAddressable: 1
     SupportExtensionless: 1
     LocationToLower: 0
@@ -26,12 +27,28 @@ MonoBehaviour:
     IgnoreRuleName: NormalIgnoreRule
     Groups:
     - GroupName: Launch
-      GroupDesc: "\u70BC\u4F53\u5230\u7ED3\u4E39\u5360\u4F4D"
+      GroupDesc: "\u70BC\u4F53\u5230\u7ED3\u4E39"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
       - CollectPath: Assets/Art/Launch
         CollectorGUID: 77aee3a0e11b4413f895ce343f7702f2
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/Scenes/BossBattle.unity
+        CollectorGUID: e84efaba7e6a54e6d87db4c4b83c5f8c
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/HotUpdateDlls
+        CollectorGUID: 17b05bfd1219d4d68a930f77fbe90223
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory

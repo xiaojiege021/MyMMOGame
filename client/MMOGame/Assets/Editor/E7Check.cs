@@ -86,7 +86,7 @@ public static class E7Check
     {
         foreach (var file in Directory.GetFiles(HotUpdateDir, "*.cs", SearchOption.AllDirectories))
         {
-            var text = File.ReadAllText(file);
+            var text = StripComments(File.ReadAllText(file));
             foreach (var word in Forbidden)
             {
                 if (text.Contains(word))
@@ -98,6 +98,64 @@ public static class E7Check
         }
 
         return true;
+    }
+
+    // 注释里提一句「结算不在客户端算」只是说明分工，不代表热更里真在算。
+    // 先剥掉注释再查词，否则一句注释就能把整条检查顶掉；正常代码仍照查。
+    static string StripComments(string src)
+    {
+        var sb = new System.Text.StringBuilder(src.Length);
+        var i = 0;
+        while (i < src.Length)
+        {
+            if (src[i] == '/' && i + 1 < src.Length && src[i + 1] == '/')
+            {
+                while (i < src.Length && src[i] != '\n')
+                {
+                    i++;
+                }
+            }
+            else if (src[i] == '/' && i + 1 < src.Length && src[i + 1] == '*')
+            {
+                i += 2;
+                while (i + 1 < src.Length && !(src[i] == '*' && src[i + 1] == '/'))
+                {
+                    i++;
+                }
+                i = Math.Min(i + 2, src.Length);
+            }
+            else if (src[i] == '"' || src[i] == '\'')
+            {
+                var quote = src[i];
+                sb.Append(src[i]);
+                i++;
+                while (i < src.Length)
+                {
+                    sb.Append(src[i]);
+                    if (src[i] == '\\' && i + 1 < src.Length)
+                    {
+                        sb.Append(src[i + 1]);
+                        i += 2;
+                        continue;
+                    }
+
+                    if (src[i] == quote)
+                    {
+                        i++;
+                        break;
+                    }
+
+                    i++;
+                }
+            }
+            else
+            {
+                sb.Append(src[i]);
+                i++;
+            }
+        }
+
+        return sb.ToString();
     }
 
     // 编辑器里同名程序集已经加载过，直接 Assembly.Load 会撞名。
