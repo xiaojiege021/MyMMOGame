@@ -19,6 +19,7 @@ public sealed class CharacterGrpcService(
     ItemTable items,
     CurrencyTable currencies,
     DungeonTable dungeons,
+    DungeonEntryRepository dungeonEntries,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -459,7 +460,8 @@ public sealed class CharacterGrpcService(
 
     /// <summary>
     /// 进本。人数上限与「扣不扣疲劳、占不占份额」都来自 config/dungeons.json。
-    /// 主线 1 人、不扣不占——这一行只把「进得去且账不变」做实。
+    /// 主线 1 人、不扣不占（P1-2a 的路径）。扣疲劳的本（深渊）按人数倍增，
+    /// 到日上限就整笔拒绝；扣减与进本记录在一个事务里。
     /// 战斗服那边还有一道同样的上限（它按 party 开本），两道都挡。
     /// </summary>
     public override async Task<EnterDungeonResponse> EnterDungeon(
@@ -508,35 +510,76 @@ public sealed class CharacterGrpcService(
                 "dungeon_reject account={Account} id={Id} dungeon={Dungeon} party={Party} limit={Limit}",
                 account, characterId, dungeon.Id, partySize, dungeon.MaxPlayers);
 
+            return Rejected(
+                "party_too_large", dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
+        }
+
+        // 不扣疲劳的本（主线）：P1-2a 的路径，一行进本记录，账完全不动。
+        if (!dungeon.ChargesFatigue)
+        {
+            var entryId = await characters.RecordEntryAsync(
+                characterId, dungeon.Id, partySize, context.CancellationToken);
+
+            logger.LogInformation(
+                "dungeon_enter account={Account} id={Id} dungeon={Dungeon} party={Party} "
+                + "charges_fatigue={Charges} takes_share={Share} entry={Entry}",
+                account, characterId, dungeon.Id, partySize,
+                dungeon.ChargesFatigue, dungeon.TakesWeeklyShare, entryId);
+
             return new EnterDungeonResponse
             {
-                Allowed = false,
-                Reason = "party_too_large",
+                Allowed = true,
+                Reason = "",
                 MaxPlayers = (uint)dungeon.MaxPlayers,
                 Fatigue = reserves.Value.Fatigue,
                 WeeklyShare = reserves.Value.WeeklyShare,
+                EntryId = (ulong)entryId,
+                FatigueCost = 0,
+                FatigueDailyCap = dungeons.FatigueDailyCap,
             };
         }
 
-        var entryId = await characters.RecordEntryAsync(
-            characterId, dungeon.Id, partySize, context.CancellationToken);
+        // 扣疲劳的本（深渊）：cost = 单人基础 × 进本人数。
+        // 到上限整笔拒绝；跨天归零、扣账、记进本在一个事务里。
+        var outcome = await dungeonEntries.EnterWithFatigueAsync(
+            characterId, account, dungeon, partySize, dungeons.FatigueDailyCap,
+            context.CancellationToken);
+        if (outcome.Reason == "character_not_found")
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
 
-        // 主线不扣疲劳、不占份额，所以这里不写那两个列；
-        // 回的是进本之后的值，与进本前一致，客户端与核对都能直接比。
         logger.LogInformation(
             "dungeon_enter account={Account} id={Id} dungeon={Dungeon} party={Party} "
-            + "charges_fatigue={Fatigue} takes_share={Share} entry={Entry}",
+            + "allowed={Allowed} reason={Reason} cost={Cost} fatigue={Fatigue} cap={Cap} "
+            + "charges_fatigue={Charges} takes_share={Share} entry={Entry}",
             account, characterId, dungeon.Id, partySize,
-            dungeon.ChargesFatigue, dungeon.TakesWeeklyShare, entryId);
+            outcome.Allowed, outcome.Reason, outcome.FatigueCost, outcome.Fatigue,
+            outcome.DailyCap, dungeon.ChargesFatigue, dungeon.TakesWeeklyShare, outcome.EntryId);
 
         return new EnterDungeonResponse
         {
-            Allowed = true,
-            Reason = "",
+            Allowed = outcome.Allowed,
+            Reason = outcome.Reason,
             MaxPlayers = (uint)dungeon.MaxPlayers,
-            Fatigue = reserves.Value.Fatigue,
-            WeeklyShare = reserves.Value.WeeklyShare,
-            EntryId = (ulong)entryId,
+            Fatigue = outcome.Fatigue,
+            WeeklyShare = outcome.WeeklyShare,
+            // 允许进本时是库里的自增编号（> 0），被拒时是 0。
+            EntryId = (ulong)outcome.EntryId,
+            FatigueCost = outcome.FatigueCost,
+            FatigueDailyCap = outcome.DailyCap,
         };
     }
+
+    EnterDungeonResponse Rejected(string reason, DungeonDef dungeon, int fatigue, int weeklyShare) =>
+        new()
+        {
+            Allowed = false,
+            Reason = reason,
+            MaxPlayers = (uint)dungeon.MaxPlayers,
+            Fatigue = fatigue,
+            WeeklyShare = weeklyShare,
+            FatigueCost = 0,
+            FatigueDailyCap = dungeons.FatigueDailyCap,
+        };
 }

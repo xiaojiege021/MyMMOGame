@@ -164,11 +164,13 @@ else
   bad "角色服没有读扣减规则"
 fi
 
-# 主线进本不该写 fatigue / weekly_share：这两列只允许在别的行里改。
-if grep -nE 'update "角色"\.character set (fatigue|weekly_share)' "$ROOT/src/Character" 2>/dev/null >/dev/null; then
-  bad "有地方在改进本的疲劳与份额，主线会被扣"
+# 主线进本不扣疲劳：P1-2b1 起深渊会扣，但扣减只在 ChargesFatigue 分支里。
+if grep -q 'if (!dungeon.ChargesFatigue)' "$CHAR_SVC" \
+   && grep -q 'RecordEntryAsync' "$CHAR_SVC" \
+   && grep -q '"charges_fatigue": false' "$CFG"; then
+  ok "主线走不扣疲劳的分支，深渊的扣减碰不到主线"
 else
-  ok "没有地方在改疲劳与份额，主线进本动不了这两个数"
+  bad "主线的进本分支可能扣疲劳"
 fi
 
 echo "== 3. 环境与启动 =="
@@ -414,7 +416,8 @@ else
   bad "被拒的那次也记了一笔：${ENTRY_AFTER2}"
 fi
 
-RESP="$(enter_dungeon "$TOKEN" "$CHAR_ID" abyss 1)"
+# abyss 在 P1-2b1 起是已知副本，这里换一个真正不存在的编号。
+RESP="$(enter_dungeon "$TOKEN" "$CHAR_ID" no_such_dungeon 1)"
 split_response "$RESP"
 if [ "$CODE" = "400" ] && [ "$(json_field "$BODY" error)" = "unknown_dungeon" ]; then
   ok "未知副本：400 unknown_dungeon"

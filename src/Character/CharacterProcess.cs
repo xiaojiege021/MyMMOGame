@@ -33,7 +33,7 @@ public sealed class CharacterProcess(string configPath)
             classes = new ClassIds("config/classes.json");
             items = ItemTable.Load("config/items.json");
             currencies = CurrencyTable.Load("config/currency.json");
-            dungeons = DungeonTable.Load("config/dungeons.json");
+            dungeons = DungeonTable.Load(config.DungeonTable);
         }
         catch (ConfigException ex)
         {
@@ -48,7 +48,8 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("items=" + items.All.Count + " item_table_version=" + items.Version
             + " bag_slots=" + config.BagSlots);
         Console.WriteLine("currencies=" + currencies.All.Count + " currency_table_version=" + currencies.Version);
-        Console.WriteLine("dungeons=" + dungeons.All.Count + " dungeon_table_version=" + dungeons.Version);
+        Console.WriteLine("dungeons=" + dungeons.All.Count + " dungeon_table_version=" + dungeons.Version
+            + " fatigue_daily_cap=" + dungeons.FatigueDailyCap);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -65,6 +66,7 @@ public sealed class CharacterProcess(string configPath)
         var inventory = new InventoryRepository(dataSource);
         var currency = new CurrencyRepository(dataSource);
         var grants = new GrantRepository(dataSource, items, currencies, config);
+        var dungeonEntries = new DungeonEntryRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -89,6 +91,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(items);
         builder.Services.AddSingleton(currencies);
         builder.Services.AddSingleton(dungeons);
+        builder.Services.AddSingleton(dungeonEntries);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

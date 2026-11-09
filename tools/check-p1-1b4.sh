@@ -167,7 +167,10 @@ else
   bad "加减不是原子语句，或者扣钱仍走 upsert（会被 CHECK 提前拦下）"
 fi
 
-if grep -nE 'Math\.(Max|Clamp)\([^)]*0' "$SVC" "$REPO" 2>/dev/null >/dev/null; then
+# 只盯「余额」相关的夹值：服务里别的字段用 Math.Max(..., 0) 与余额无关，
+# 早期这条断言扫整个文件，会把进本回包的 entry_id 转换误判成夹余额。
+if grep -nE 'Math\.(Max|Clamp)\(' "$SVC" "$REPO" 2>/dev/null \
+   | grep -E 'amount|balance' >/dev/null; then
   bad "扣到负数时被夹到 0 了，调用方会以为扣成功"
 else
   ok "余额不足直接拒绝，不夹到 0"

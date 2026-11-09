@@ -593,6 +593,8 @@ public static class CharacterApi
                     + " allowed=" + result.Allowed
                     + " reason=" + result.Reason
                     + " fatigue=" + result.Fatigue
+                    + " cost=" + result.FatigueCost
+                    + " cap=" + result.FatigueDailyCap
                     + " share=" + result.WeeklyShare);
 
                 await WriteAsync(context, 200, new
@@ -603,6 +605,8 @@ public static class CharacterApi
                     fatigue = result.Fatigue,
                     weekly_share = result.WeeklyShare,
                     entry_id = result.EntryId,
+                    fatigue_cost = result.FatigueCost,
+                    fatigue_daily_cap = result.FatigueDailyCap,
                 });
             }
             catch (RpcException ex)

@@ -84,6 +84,10 @@ message EnterDungeonResponse {
   int32 fatigue = 4;
   int32 weekly_share = 5;
   uint64 entry_id = 6;
+  // 这一次要扣多少疲劳（深渊 = 单人基础 × 进本人数，主线 = 0），被拒时为 0。
+  int32 fatigue_cost = 7;
+  // 当天的疲劳上限，配置来自 config/dungeons.json。
+  int32 fatigue_daily_cap = 8;
 }
 
 // 一条变更：加/减货币，或者往格子里放物品。一个事务里可以混着来。

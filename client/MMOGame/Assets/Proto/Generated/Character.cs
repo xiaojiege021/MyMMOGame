@@ -34,65 +34,66 @@ namespace Mmo.Proto.Character {
             "bG0YCCABKAkSGAoQbWFpbl9zdGFnZV9lbXB0eRgJIAEoCBIXCg9hbGlnbm1l",
             "bnRfZW1wdHkYCiABKAgiZAoTRW50ZXJEdW5nZW9uUmVxdWVzdBIPCgdhY2Nv",
             "dW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBISCgpkdW5nZW9uX2lk",
-            "GAMgASgJEhIKCnBhcnR5X3NpemUYBCABKA0ihQEKFEVudGVyRHVuZ2VvblJl",
+            "GAMgASgJEhIKCnBhcnR5X3NpemUYBCABKA0itgEKFEVudGVyRHVuZ2VvblJl",
             "c3BvbnNlEg8KB2FsbG93ZWQYASABKAgSDgoGcmVhc29uGAIgASgJEhMKC21h",
             "eF9wbGF5ZXJzGAMgASgNEg8KB2ZhdGlndWUYBCABKAUSFAoMd2Vla2x5X3No",
-            "YXJlGAUgASgFEhAKCGVudHJ5X2lkGAYgASgEInAKCkdyYW50RW50cnkSMAoI",
-            "Y3VycmVuY3kYASABKAsyHC5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5RGVsdGFI",
-            "ABIoCgRpdGVtGAIgASgLMhgubW1vLmNoYXJhY3Rlci5JdGVtRGVsdGFIAEIG",
-            "CgRib2R5IiwKDUN1cnJlbmN5RGVsdGESDAoEa2luZBgBIAEoCRINCgVkZWx0",
-            "YRgCIAEoAyI5CglJdGVtRGVsdGESDAoEc2xvdBgBIAEoDRIPCgdpdGVtX2lk",
-            "GAIgASgJEg0KBWNvdW50GAMgASgFInYKEUFwcGx5R3JhbnRSZXF1ZXN0Eg8K",
-            "B2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEg4KBnR4bl9p",
-            "ZBgDIAEoCRIqCgdlbnRyaWVzGAQgAygLMhkubW1vLmNoYXJhY3Rlci5HcmFu",
-            "dEVudHJ5IoYBChJBcHBseUdyYW50UmVzcG9uc2USEQoJZHVwbGljYXRlGAEg",
-            "ASgIEjAKCGJhbGFuY2VzGAIgAygLMh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5j",
-            "eUJhbGFuY2USKwoFc2xvdHMYAyADKAsyHC5tbW8uY2hhcmFjdGVyLkludmVu",
-            "dG9yeVNsb3QiWAoSQWRkQ3VycmVuY3lSZXF1ZXN0Eg8KB2FjY291bnQYASAB",
-            "KAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEgwKBGtpbmQYAyABKAkSDQoFZGVs",
-            "dGEYBCABKAMiLwoPQ3VycmVuY3lCYWxhbmNlEgwKBGtpbmQYASABKAkSDgoG",
-            "YW1vdW50GAIgASgDIjsKEkdldEN1cnJlbmN5UmVxdWVzdBIPCgdhY2NvdW50",
-            "GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBCJHChNHZXRDdXJyZW5jeVJl",
-            "c3BvbnNlEjAKCGJhbGFuY2VzGAEgAygLMh4ubW1vLmNoYXJhY3Rlci5DdXJy",
-            "ZW5jeUJhbGFuY2UiRwoPU2V0TGV2ZWxSZXF1ZXN0Eg8KB2FjY291bnQYASAB",
-            "KAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEg0KBWxldmVsGAMgASgFIjcKEFNl",
-            "dExldmVsUmVzcG9uc2USFAoMY2hhcmFjdGVyX2lkGAEgASgEEg0KBWxldmVs",
-            "GAIgASgFImUKDkFkZEl0ZW1SZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoM",
-            "Y2hhcmFjdGVyX2lkGAIgASgEEgwKBHNsb3QYAyABKA0SDwoHaXRlbV9pZBgE",
-            "IAEoCRINCgVjb3VudBgFIAEoBSJMCg1JbnZlbnRvcnlTbG90EgwKBHNsb3QY",
-            "ASABKA0SDwoHaXRlbV9pZBgCIAEoCRINCgVjb3VudBgDIAEoBRINCgVib3Vu",
-            "ZBgEIAEoCCI9ChRMaXN0SW52ZW50b3J5UmVxdWVzdBIPCgdhY2NvdW50GAEg",
-            "ASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBCJXChVMaXN0SW52ZW50b3J5UmVz",
-            "cG9uc2USKwoFc2xvdHMYASADKAsyHC5tbW8uY2hhcmFjdGVyLkludmVudG9y",
-            "eVNsb3QSEQoJYmFnX3Nsb3RzGAIgASgNIkYKD0NhblRyYWRlUmVxdWVzdBIP",
-            "CgdhY2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIMCgRzbG90",
-            "GAMgASgNIjQKEENhblRyYWRlUmVzcG9uc2USEAoIdHJhZGFibGUYASABKAgS",
-            "DgoGcmVhc29uGAIgASgJMoYGChBDaGFyYWN0ZXJTZXJ2aWNlEmAKD0NyZWF0",
-            "ZUNoYXJhY3RlchIlLm1tby5jaGFyYWN0ZXIuQ3JlYXRlQ2hhcmFjdGVyUmVx",
-            "dWVzdBomLm1tby5jaGFyYWN0ZXIuQ3JlYXRlQ2hhcmFjdGVyUmVzcG9uc2US",
-            "SwoIU2V0TGV2ZWwSHi5tbW8uY2hhcmFjdGVyLlNldExldmVsUmVxdWVzdBof",
-            "Lm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXNwb25zZRJGCgdBZGRJdGVtEh0u",
-            "bW1vLmNoYXJhY3Rlci5BZGRJdGVtUmVxdWVzdBocLm1tby5jaGFyYWN0ZXIu",
-            "SW52ZW50b3J5U2xvdBJaCg1MaXN0SW52ZW50b3J5EiMubW1vLmNoYXJhY3Rl",
-            "ci5MaXN0SW52ZW50b3J5UmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuTGlzdElu",
-            "dmVudG9yeVJlc3BvbnNlEksKCENhblRyYWRlEh4ubW1vLmNoYXJhY3Rlci5D",
-            "YW5UcmFkZVJlcXVlc3QaHy5tbW8uY2hhcmFjdGVyLkNhblRyYWRlUmVzcG9u",
-            "c2USUAoLQWRkQ3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkFkZEN1cnJlbmN5",
-            "UmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3VycmVuY3lCYWxhbmNlElQKC0dl",
-            "dEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5jeVJlcXVlc3Qa",
-            "Ii5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVzcG9uc2USUQoKQXBwbHlH",
-            "cmFudBIgLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlcXVlc3QaIS5tbW8u",
-            "Y2hhcmFjdGVyLkFwcGx5R3JhbnRSZXNwb25zZRJXCgxFbnRlckR1bmdlb24S",
-            "Ii5tbW8uY2hhcmFjdGVyLkVudGVyRHVuZ2VvblJlcXVlc3QaIy5tbW8uY2hh",
-            "cmFjdGVyLkVudGVyRHVuZ2VvblJlc3BvbnNlQhaqAhNNbW8uUHJvdG8uQ2hh",
-            "cmFjdGVyYgZwcm90bzM="));
+            "YXJlGAUgASgFEhAKCGVudHJ5X2lkGAYgASgEEhQKDGZhdGlndWVfY29zdBgH",
+            "IAEoBRIZChFmYXRpZ3VlX2RhaWx5X2NhcBgIIAEoBSJwCgpHcmFudEVudHJ5",
+            "EjAKCGN1cnJlbmN5GAEgASgLMhwubW1vLmNoYXJhY3Rlci5DdXJyZW5jeURl",
+            "bHRhSAASKAoEaXRlbRgCIAEoCzIYLm1tby5jaGFyYWN0ZXIuSXRlbURlbHRh",
+            "SABCBgoEYm9keSIsCg1DdXJyZW5jeURlbHRhEgwKBGtpbmQYASABKAkSDQoF",
+            "ZGVsdGEYAiABKAMiOQoJSXRlbURlbHRhEgwKBHNsb3QYASABKA0SDwoHaXRl",
+            "bV9pZBgCIAEoCRINCgVjb3VudBgDIAEoBSJ2ChFBcHBseUdyYW50UmVxdWVz",
+            "dBIPCgdhY2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIOCgZ0",
+            "eG5faWQYAyABKAkSKgoHZW50cmllcxgEIAMoCzIZLm1tby5jaGFyYWN0ZXIu",
+            "R3JhbnRFbnRyeSKGAQoSQXBwbHlHcmFudFJlc3BvbnNlEhEKCWR1cGxpY2F0",
+            "ZRgBIAEoCBIwCghiYWxhbmNlcxgCIAMoCzIeLm1tby5jaGFyYWN0ZXIuQ3Vy",
+            "cmVuY3lCYWxhbmNlEisKBXNsb3RzGAMgAygLMhwubW1vLmNoYXJhY3Rlci5J",
+            "bnZlbnRvcnlTbG90IlgKEkFkZEN1cnJlbmN5UmVxdWVzdBIPCgdhY2NvdW50",
+            "GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIMCgRraW5kGAMgASgJEg0K",
+            "BWRlbHRhGAQgASgDIi8KD0N1cnJlbmN5QmFsYW5jZRIMCgRraW5kGAEgASgJ",
+            "Eg4KBmFtb3VudBgCIAEoAyI7ChJHZXRDdXJyZW5jeVJlcXVlc3QSDwoHYWNj",
+            "b3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQiRwoTR2V0Q3VycmVu",
+            "Y3lSZXNwb25zZRIwCghiYWxhbmNlcxgBIAMoCzIeLm1tby5jaGFyYWN0ZXIu",
+            "Q3VycmVuY3lCYWxhbmNlIkcKD1NldExldmVsUmVxdWVzdBIPCgdhY2NvdW50",
+            "GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBINCgVsZXZlbBgDIAEoBSI3",
+            "ChBTZXRMZXZlbFJlc3BvbnNlEhQKDGNoYXJhY3Rlcl9pZBgBIAEoBBINCgVs",
+            "ZXZlbBgCIAEoBSJlCg5BZGRJdGVtUmVxdWVzdBIPCgdhY2NvdW50GAEgASgJ",
+            "EhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIMCgRzbG90GAMgASgNEg8KB2l0ZW1f",
+            "aWQYBCABKAkSDQoFY291bnQYBSABKAUiTAoNSW52ZW50b3J5U2xvdBIMCgRz",
+            "bG90GAEgASgNEg8KB2l0ZW1faWQYAiABKAkSDQoFY291bnQYAyABKAUSDQoF",
+            "Ym91bmQYBCABKAgiPQoUTGlzdEludmVudG9yeVJlcXVlc3QSDwoHYWNjb3Vu",
+            "dBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQiVwoVTGlzdEludmVudG9y",
+            "eVJlc3BvbnNlEisKBXNsb3RzGAEgAygLMhwubW1vLmNoYXJhY3Rlci5JbnZl",
+            "bnRvcnlTbG90EhEKCWJhZ19zbG90cxgCIAEoDSJGCg9DYW5UcmFkZVJlcXVl",
+            "c3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDAoE",
+            "c2xvdBgDIAEoDSI0ChBDYW5UcmFkZVJlc3BvbnNlEhAKCHRyYWRhYmxlGAEg",
+            "ASgIEg4KBnJlYXNvbhgCIAEoCTKGBgoQQ2hhcmFjdGVyU2VydmljZRJgCg9D",
+            "cmVhdGVDaGFyYWN0ZXISJS5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3Rl",
+            "clJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlc3Bv",
+            "bnNlEksKCFNldExldmVsEh4ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlcXVl",
+            "c3QaHy5tbW8uY2hhcmFjdGVyLlNldExldmVsUmVzcG9uc2USRgoHQWRkSXRl",
+            "bRIdLm1tby5jaGFyYWN0ZXIuQWRkSXRlbVJlcXVlc3QaHC5tbW8uY2hhcmFj",
+            "dGVyLkludmVudG9yeVNsb3QSWgoNTGlzdEludmVudG9yeRIjLm1tby5jaGFy",
+            "YWN0ZXIuTGlzdEludmVudG9yeVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkxp",
+            "c3RJbnZlbnRvcnlSZXNwb25zZRJLCghDYW5UcmFkZRIeLm1tby5jaGFyYWN0",
+            "ZXIuQ2FuVHJhZGVSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5UcmFkZVJl",
+            "c3BvbnNlElAKC0FkZEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5BZGRDdXJy",
+            "ZW5jeVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFsYW5jZRJU",
+            "CgtHZXRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXF1",
+            "ZXN0GiIubW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5jeVJlc3BvbnNlElEKCkFw",
+            "cGx5R3JhbnQSIC5tbW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXF1ZXN0GiEu",
+            "bW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVzcG9uc2USVwoMRW50ZXJEdW5n",
+            "ZW9uEiIubW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXF1ZXN0GiMubW1v",
+            "LmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXNwb25zZUIWqgITTW1vLlByb3Rv",
+            "LkNoYXJhY3RlcmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CreateCharacterRequest), global::Mmo.Proto.Character.CreateCharacterRequest.Parser, new[]{ "Account", "Name", "Race", "Appearance", "ClassId", "Branch" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CreateCharacterResponse), global::Mmo.Proto.Character.CreateCharacterResponse.Parser, new[]{ "CharacterId", "Name", "Race", "Appearance", "ClassId", "Branch", "Level", "Realm", "MainStageEmpty", "AlignmentEmpty" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnterDungeonRequest), global::Mmo.Proto.Character.EnterDungeonRequest.Parser, new[]{ "Account", "CharacterId", "DungeonId", "PartySize" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnterDungeonResponse), global::Mmo.Proto.Character.EnterDungeonResponse.Parser, new[]{ "Allowed", "Reason", "MaxPlayers", "Fatigue", "WeeklyShare", "EntryId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnterDungeonResponse), global::Mmo.Proto.Character.EnterDungeonResponse.Parser, new[]{ "Allowed", "Reason", "MaxPlayers", "Fatigue", "WeeklyShare", "EntryId", "FatigueCost", "FatigueDailyCap" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.GrantEntry), global::Mmo.Proto.Character.GrantEntry.Parser, new[]{ "Currency", "Item" }, new[]{ "Body" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CurrencyDelta), global::Mmo.Proto.Character.CurrencyDelta.Parser, new[]{ "Kind", "Delta" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ItemDelta), global::Mmo.Proto.Character.ItemDelta.Parser, new[]{ "Slot", "ItemId", "Count" }, null, null, null, null),
@@ -1403,6 +1404,8 @@ namespace Mmo.Proto.Character {
       fatigue_ = other.fatigue_;
       weeklyShare_ = other.weeklyShare_;
       entryId_ = other.entryId_;
+      fatigueCost_ = other.fatigueCost_;
+      fatigueDailyCap_ = other.fatigueDailyCap_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1490,6 +1493,36 @@ namespace Mmo.Proto.Character {
       }
     }
 
+    /// <summary>Field number for the "fatigue_cost" field.</summary>
+    public const int FatigueCostFieldNumber = 7;
+    private int fatigueCost_;
+    /// <summary>
+    /// 这一次要扣多少疲劳（深渊 = 单人基础 × 进本人数，主线 = 0），被拒时为 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FatigueCost {
+      get { return fatigueCost_; }
+      set {
+        fatigueCost_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "fatigue_daily_cap" field.</summary>
+    public const int FatigueDailyCapFieldNumber = 8;
+    private int fatigueDailyCap_;
+    /// <summary>
+    /// 当天的疲劳上限，配置来自 config/dungeons.json。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FatigueDailyCap {
+      get { return fatigueDailyCap_; }
+      set {
+        fatigueDailyCap_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1511,6 +1544,8 @@ namespace Mmo.Proto.Character {
       if (Fatigue != other.Fatigue) return false;
       if (WeeklyShare != other.WeeklyShare) return false;
       if (EntryId != other.EntryId) return false;
+      if (FatigueCost != other.FatigueCost) return false;
+      if (FatigueDailyCap != other.FatigueDailyCap) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1524,6 +1559,8 @@ namespace Mmo.Proto.Character {
       if (Fatigue != 0) hash ^= Fatigue.GetHashCode();
       if (WeeklyShare != 0) hash ^= WeeklyShare.GetHashCode();
       if (EntryId != 0UL) hash ^= EntryId.GetHashCode();
+      if (FatigueCost != 0) hash ^= FatigueCost.GetHashCode();
+      if (FatigueDailyCap != 0) hash ^= FatigueDailyCap.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1566,6 +1603,14 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(48);
         output.WriteUInt64(EntryId);
       }
+      if (FatigueCost != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(FatigueCost);
+      }
+      if (FatigueDailyCap != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(FatigueDailyCap);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1600,6 +1645,14 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(48);
         output.WriteUInt64(EntryId);
       }
+      if (FatigueCost != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(FatigueCost);
+      }
+      if (FatigueDailyCap != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(FatigueDailyCap);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1627,6 +1680,12 @@ namespace Mmo.Proto.Character {
       }
       if (EntryId != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(EntryId);
+      }
+      if (FatigueCost != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FatigueCost);
+      }
+      if (FatigueDailyCap != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FatigueDailyCap);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1657,6 +1716,12 @@ namespace Mmo.Proto.Character {
       }
       if (other.EntryId != 0UL) {
         EntryId = other.EntryId;
+      }
+      if (other.FatigueCost != 0) {
+        FatigueCost = other.FatigueCost;
+      }
+      if (other.FatigueDailyCap != 0) {
+        FatigueDailyCap = other.FatigueDailyCap;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1701,6 +1766,14 @@ namespace Mmo.Proto.Character {
             EntryId = input.ReadUInt64();
             break;
           }
+          case 56: {
+            FatigueCost = input.ReadInt32();
+            break;
+          }
+          case 64: {
+            FatigueDailyCap = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -1742,6 +1815,14 @@ namespace Mmo.Proto.Character {
           }
           case 48: {
             EntryId = input.ReadUInt64();
+            break;
+          }
+          case 56: {
+            FatigueCost = input.ReadInt32();
+            break;
+          }
+          case 64: {
+            FatigueDailyCap = input.ReadInt32();
             break;
           }
         }

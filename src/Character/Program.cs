@@ -20,6 +20,11 @@ var rawCurrencyAmount = 0L;
 string? txnCount = null;
 long reservesOf = 0;
 long entryCountOf = 0;
+long fatigueStateOf = 0;
+long setFatigueDayId = 0;
+string? setFatigueDay = null;
+long rawFatigueId = 0;
+var rawFatigueValue = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -74,6 +79,20 @@ for (var i = 0; i < args.Length; i++)
         case "--entry-count" when i + 1 < args.Length:
             long.TryParse(args[++i], out entryCountOf);
             break;
+        // 只给核对用：读疲劳、周份额与日界（含跨天归零后的状态）。
+        case "--fatigue-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out fatigueStateOf);
+            break;
+        // 只给核对用：把日界改到别的一天，验第二天从 0 起算。
+        case "--set-fatigue-day" when i + 2 < args.Length:
+            long.TryParse(args[++i], out setFatigueDayId);
+            setFatigueDay = args[++i];
+            break;
+        // 只给核对用：绕过接口直写疲劳，验库层日上限 CHECK。
+        case "--raw-fatigue-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawFatigueId);
+            int.TryParse(args[++i], out rawFatigueValue);
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -83,7 +102,8 @@ for (var i = 0; i < args.Length; i++)
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
-    || reservesOf != 0 || entryCountOf != 0)
+    || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
+    || rawFatigueId != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -195,6 +215,46 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             command.Parameters.AddWithValue(entryCountOf);
             var value = await command.ExecuteScalarAsync(CancellationToken.None);
             Console.WriteLine("entry_count=" + Convert.ToInt32(value) + " id=" + entryCountOf);
+        }
+
+        if (fatigueStateOf != 0 || setFatigueDay != null || rawFatigueId != 0)
+        {
+            var dungeonEntries = new DungeonEntryRepository(dataSource);
+
+            if (fatigueStateOf != 0)
+            {
+                var state = await dungeonEntries.FatigueStateAsync(fatigueStateOf, CancellationToken.None);
+                Console.WriteLine(state is null
+                    ? "fatigue_state=missing id=" + fatigueStateOf
+                    : "fatigue_state=ok id=" + fatigueStateOf
+                      + " fatigue=" + state.Value.Fatigue
+                      + " weekly_share=" + state.Value.WeeklyShare
+                      + " day=" + state.Value.Day.ToString("yyyy-MM-dd"));
+            }
+
+            if (setFatigueDay != null && setFatigueDayId != 0
+                && DateOnly.TryParse(setFatigueDay, out var day))
+            {
+                await dungeonEntries.SetFatigueDayAsync(setFatigueDayId, day, CancellationToken.None);
+                Console.WriteLine("fatigue_day=set id=" + setFatigueDayId + " day=" + day.ToString("yyyy-MM-dd"));
+            }
+
+            if (rawFatigueId != 0)
+            {
+                try
+                {
+                    await dungeonEntries.RawWriteFatigueAsync(
+                        rawFatigueId, rawFatigueValue, CancellationToken.None);
+                    Console.WriteLine("raw_fatigue=written id=" + rawFatigueId
+                        + " fatigue=" + rawFatigueValue);
+                }
+                catch (PostgresException ex)
+                {
+                    // 核对要看到的就是这个：库层的 CHECK 把超过日上限的值挡住了。
+                    Console.WriteLine("raw_fatigue=rejected id=" + rawFatigueId
+                        + " fatigue=" + rawFatigueValue + " sqlstate=" + ex.SqlState);
+                }
+            }
         }
 
         if (reportName != null)

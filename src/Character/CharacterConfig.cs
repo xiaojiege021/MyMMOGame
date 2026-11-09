@@ -7,8 +7,10 @@ namespace Character;
 /// 角色服的启动配置：gRPC 听哪儿、连接池多大。
 /// 连接串不在这里，从环境或 /srv/mmo/gamedb.env 读。
 /// </summary>
-public sealed record CharacterConfig(string Listen, int DbPoolMax, int BagSlots)
+public sealed record CharacterConfig(string Listen, int DbPoolMax, int BagSlots, string DungeonTable)
 {
+    public const string DefaultDungeonTable = "config/dungeons.json";
+
     public static CharacterConfig Load(string path)
     {
         if (!File.Exists(path))
@@ -47,7 +49,14 @@ public sealed record CharacterConfig(string Listen, int DbPoolMax, int BagSlots)
             throw new ConfigException("bag_slots 必须在 1 到 200 之间，现在是 " + bagSlots);
         }
 
-        return new CharacterConfig(listen.TrimEnd('/'), pool, bagSlots);
+        // 副本表缺省读仓库那一份；核对脚本可以指到临时副本，改上限做隔离测试。
+        var dungeonTable = (wire.DungeonTable ?? DefaultDungeonTable).Trim();
+        if (dungeonTable.Length == 0)
+        {
+            throw new ConfigException("dungeon_table 不能为空");
+        }
+
+        return new CharacterConfig(listen.TrimEnd('/'), pool, bagSlots, dungeonTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -66,6 +75,9 @@ public sealed record CharacterConfig(string Listen, int DbPoolMax, int BagSlots)
 
         [JsonPropertyName("bag_slots")]
         public int? BagSlots { get; init; }
+
+        [JsonPropertyName("dungeon_table")]
+        public string? DungeonTable { get; init; }
     }
 }
 

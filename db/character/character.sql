@@ -37,3 +37,12 @@ ALTER TABLE "角色".character
     DROP CONSTRAINT IF EXISTS character_weekly_share_non_negative;
 ALTER TABLE "角色".character
     ADD CONSTRAINT character_weekly_share_non_negative CHECK (weekly_share >= 0);
+
+-- P1-2b1：疲劳是「一天」的上限，不是永久累计。记最后一次结算落在哪一天，
+-- 进本时发现日界变了就先归零。日界按数据库 current_date，不另设时区配置。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS fatigue_day date NOT NULL DEFAULT CURRENT_DATE;
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_fatigue_daily_cap;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_fatigue_daily_cap CHECK (fatigue <= 6000);
