@@ -1,0 +1,11 @@
+{
+  "schema": "world-region/1",
+  "id": "外环隙",
+  "name": "外环隙",
+  "chapters": [6],
+  "position": "听谣镇外侧的一道地表入口",
+  "neighbors": ["听谣镇"],
+  "faction": "",
+  "open": true,
+  "note": "第 6 场。第一座巢穴的门口。人进去才进实例"
+}

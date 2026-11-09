@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package mmo.world;
+option csharp_namespace = "Mmo.Proto.World";
+
+// 表世界的分线。世界服是分线的唯一写入方；在线状态在进程内存，不落库。
+// 位置同步（P1-3a2）与同屏档位（P1-3a3）不在这里。
+service WorldService {
+  rpc EnterLine(EnterLineRequest) returns (EnterLineResponse);
+  rpc LeaveLine(LeaveLineRequest) returns (LeaveLineResponse);
+  rpc ListRegions(ListRegionsRequest) returns (ListRegionsResponse);
+}
+
+// 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
+message EnterLineRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string region_id = 3;
+}
+
+message EnterLineResponse {
+  bool entered = 1;
+  string reason = 2;
+  string line_id = 3;
+  string region_id = 4;
+  uint32 line_no = 5;
+  uint32 line_size = 6;
+  uint32 line_capacity = 7;
+  bool duplicate = 8;
+  repeated string neighbors = 9;
+  repeated string dialogue_ids = 10;
+}
+
+message LeaveLineRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message LeaveLineResponse {
+  bool left = 1;
+  string line_id = 2;
+  uint32 line_size = 3;
+}
+
+message ListRegionsRequest {}
+
+message RegionInfo {
+  string id = 1;
+  string name = 2;
+  repeated uint32 chapters = 3;
+  repeated string neighbors = 4;
+  repeated string dialogue_ids = 5;
+  bool open = 6;
+}
+
+// 地点与开口的人的编号都从方案正文 2.5 到 2.7 读出来，供客户端与核对比对。
+message ListRegionsResponse {
+  uint32 version = 1;
+  repeated RegionInfo regions = 2;
+  repeated string speakers = 3;
+  repeated string factions = 4;
+}

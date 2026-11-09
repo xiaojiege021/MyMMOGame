@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using YooAsset;
@@ -42,6 +44,7 @@ public static class E6Build
         if (!manifest.Contains(AOT.LaunchSession.MarkerPath)
             || !manifest.Contains("BossBattle")
             || !manifest.Contains("HotUpdate")
+            || !AllRegionsIn(manifest)
             || HasLaterRealm(manifest))
         {
             Debug.Log("launch_check=fail android_manifest=" + manifestPath);
@@ -93,12 +96,16 @@ public static class E6Build
         }
 
         var package = AssetBundleCollectorSettingData.CreatePackage(PackageName);
-        package.PackageDesc = "炼体到结丹：marker、Boss 场景、热更 dll";
+        // P1-3a1 起还是这一个包、这一个组、这三处收集路径：
+        // 八块地表是 Assets/Art/Launch 的子目录，被 marker 这条 PackDirectory 一起收进来，
+        // 不另开 AB、不另起打包流程。
+        package.PackageDesc = "炼体到结丹：marker、八块地表、Boss 场景、热更 dll";
         package.EnableAddressable = true;
         package.AutoCollectShaders = false;
         var group = AssetBundleCollectorSettingData.CreateGroup(package, PackageName);
         group.GroupDesc = "炼体到结丹";
 
+        // 这一条收整个 Assets/Art/Launch，Region/ 子目录里的八块地表随之进同一组 Launch。
         var marker = new AssetBundleCollector();
         marker.CollectPath = "Assets/Art/Launch";
         marker.CollectorGUID = AssetDatabase.AssetPathToGUID(marker.CollectPath);
@@ -152,6 +159,26 @@ public static class E6Build
         parameters.UseAssetDependencyDB = true;
         return new BuiltinBuildPipeline().Run(parameters, true);
     }
+
+    /// <summary>八块首发地表的资源路径都在同一份 Launch manifest 里。</summary>
+    public static bool AllRegionsIn(string manifest)
+    {
+        // YooAsset 的 manifest 可能把中文写成 \uXXXX，两种写法都要认。
+        var text = DecodeUnicode(manifest);
+        foreach (var name in AOT.LaunchSession.RegionNames)
+        {
+            if (!text.Contains(AOT.LaunchSession.RegionRoot + "/" + name + ".txt"))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static string DecodeUnicode(string text) =>
+        Regex.Replace(text, @"\\u([0-9a-fA-F]{4})",
+            m => ((char)Convert.ToInt32(m.Groups[1].Value, 16)).ToString());
 
     static bool HasLaterRealm(string text)
     {

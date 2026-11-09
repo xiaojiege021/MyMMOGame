@@ -24,6 +24,7 @@ public sealed class GatewayProcess(string configPath)
         Console.WriteLine("pbkdf2_iterations=" + config.Pbkdf2Iterations);
         Console.WriteLine("battle_upstream=" + config.BattleUpstream);
         Console.WriteLine("character_upstream=" + config.CharacterUpstream);
+        Console.WriteLine("world_upstream=" + config.WorldUpstream);
 
         // 连接串带密码，日志只打来源。
         var connectionString = DbEnv.Resolve();
@@ -62,6 +63,9 @@ public sealed class GatewayProcess(string configPath)
 
         // 建角色同样只从网关进：认令牌，再 gRPC 转给角色服。
         CharacterApi.Map(app, tokens, config);
+
+        // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
+        WorldApi.Map(app, tokens, config);
 
         // 这一行是 E3 认的：进程起来了、后面还没开始接客。
         Console.WriteLine("ready name=Gateway pid=" + Environment.ProcessId);

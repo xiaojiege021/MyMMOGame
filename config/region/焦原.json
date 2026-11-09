@@ -1,0 +1,11 @@
+{
+  "schema": "world-region/1",
+  "id": "焦原",
+  "name": "焦原",
+  "chapters": [11],
+  "position": "从栖云城走出的另一条短支路。第 11 场才开",
+  "neighbors": ["栖云城"],
+  "faction": "焦原的修士",
+  "open": false,
+  "note": "荒域里的一段。立魔走完回到栖云城"
+}

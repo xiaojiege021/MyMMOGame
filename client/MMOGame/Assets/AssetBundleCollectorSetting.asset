@@ -17,8 +17,8 @@ MonoBehaviour:
   UniqueBundleName: 0
   Packages:
   - PackageName: Launch
-    PackageDesc: "\u70BC\u4F53\u5230\u7ED3\u4E39\uFF1Amarker\u3001Boss \u573A\u666F\u3001\u70ED\u66F4
-      dll"
+    PackageDesc: "\u70BC\u4F53\u5230\u7ED3\u4E39\uFF1Amarker\u3001\u516B\u5757\u5730\u8868\u3001Boss
+      \u573A\u666F\u3001\u70ED\u66F4 dll"
     EnableAddressable: 1
     SupportExtensionless: 1
     LocationToLower: 0

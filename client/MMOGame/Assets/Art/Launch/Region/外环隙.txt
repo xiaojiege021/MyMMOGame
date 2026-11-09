@@ -1,0 +1,3 @@
+region=外环隙
+chapters=6
+neighbors=听谣镇

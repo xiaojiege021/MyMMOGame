@@ -12,7 +12,8 @@ public sealed record GatewayConfig(
     int TokenTtlSeconds,
     int Pbkdf2Iterations,
     string BattleUpstream,
-    string CharacterUpstream)
+    string CharacterUpstream,
+    string WorldUpstream)
 {
     public const int DefaultTokenTtlSeconds = 7200;
 
@@ -21,6 +22,8 @@ public sealed record GatewayConfig(
     public const string DefaultBattleUpstream = "ws://127.0.0.1:60001/battle";
 
     public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
+
+    public const string DefaultWorldUpstream = "http://127.0.0.1:63000";
 
     public static GatewayConfig Load(string path)
     {
@@ -78,7 +81,14 @@ public sealed record GatewayConfig(
             throw new ConfigException("character_upstream 必须是 http:// 或 https:// 地址：" + character);
         }
 
-        return new GatewayConfig(listen, ttl, iterations, upstream, character);
+        var world = (wire.WorldUpstream ?? DefaultWorldUpstream).Trim().TrimEnd('/');
+        if (!Uri.TryCreate(world, UriKind.Absolute, out var worldUri)
+            || (worldUri.Scheme != "http" && worldUri.Scheme != "https"))
+        {
+            throw new ConfigException("world_upstream 必须是 http:// 或 https:// 地址：" + world);
+        }
+
+        return new GatewayConfig(listen, ttl, iterations, upstream, character, world);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -105,6 +115,9 @@ public sealed record GatewayConfig(
 
         [JsonPropertyName("character_upstream")]
         public string? CharacterUpstream { get; init; }
+
+        [JsonPropertyName("world_upstream")]
+        public string? WorldUpstream { get; init; }
     }
 }
 

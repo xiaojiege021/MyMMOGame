@@ -1,0 +1,11 @@
+{
+  "schema": "world-region/1",
+  "id": "枯岚道",
+  "name": "枯岚道",
+  "chapters": [1, 2],
+  "position": "起点。连着承露门",
+  "neighbors": ["承露门"],
+  "faction": "",
+  "open": true,
+  "note": "第 1、2 场。灵气薄，有挡路的凶兽。战斗仍进实例，道上只走路"
+}

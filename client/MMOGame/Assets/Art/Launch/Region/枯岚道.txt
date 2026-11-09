@@ -1,0 +1,3 @@
+region=枯岚道
+chapters=1,2
+neighbors=承露门

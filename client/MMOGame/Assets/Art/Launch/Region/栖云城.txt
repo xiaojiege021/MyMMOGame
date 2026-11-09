@@ -1,0 +1,3 @@
+region=栖云城
+chapters=12
+neighbors=听谣镇,旧天城区,焦原,龙巢门口

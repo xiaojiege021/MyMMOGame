@@ -1,0 +1,3 @@
+region=龙巢门口
+chapters=12
+neighbors=栖云城

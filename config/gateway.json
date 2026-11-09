@@ -3,5 +3,7 @@
   "listen": "http://127.0.0.1:61000",
   "token_ttl_s": 7200,
   "pbkdf2_iterations": 210000,
-  "battle_upstream": "ws://127.0.0.1:60001/battle"
+  "battle_upstream": "ws://127.0.0.1:60001/battle",
+  "character_upstream": "http://127.0.0.1:62000",
+  "world_upstream": "http://127.0.0.1:63000"
 }

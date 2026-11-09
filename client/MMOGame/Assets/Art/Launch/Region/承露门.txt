@@ -1,0 +1,3 @@
+region=承露门
+chapters=3
+neighbors=枯岚道,听谣镇

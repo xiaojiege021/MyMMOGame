@@ -1,0 +1,11 @@
+{
+  "schema": "world-region/1",
+  "id": "龙巢门口",
+  "name": "龙巢门口",
+  "chapters": [12],
+  "position": "栖云城外缘，能看见",
+  "neighbors": ["栖云城"],
+  "faction": "",
+  "open": true,
+  "note": "个人主线停在门口。龙巢本身是高难实例，不铺进这条个人线"
+}

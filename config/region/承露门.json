@@ -1,0 +1,11 @@
+{
+  "schema": "world-region/1",
+  "id": "承露门",
+  "name": "承露门",
+  "chapters": [3],
+  "position": "枯岚道尽头。连着听谣镇",
+  "neighbors": ["枯岚道", "听谣镇"],
+  "faction": "承露门",
+  "open": true,
+  "note": "第 3 场。凡间门派，教天地玄黄。不是玩家后来建立的宗门"
+}

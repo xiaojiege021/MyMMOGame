@@ -1,0 +1,11 @@
+{
+  "schema": "world-region/1",
+  "id": "旧天城区",
+  "name": "旧天城区",
+  "chapters": [11],
+  "position": "从栖云城走出的短支路。高空航路下面，第 11 场才开",
+  "neighbors": ["栖云城"],
+  "faction": "明霄圣地",
+  "open": false,
+  "note": "立仙走的一段封存城区。走完回到栖云城"
+}

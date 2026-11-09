@@ -1,0 +1,11 @@
+{
+  "schema": "world-region/1",
+  "id": "听谣镇",
+  "name": "听谣镇",
+  "chapters": [5],
+  "position": "承露门和栖云城之间",
+  "neighbors": ["承露门", "栖云城", "外环隙"],
+  "faction": "",
+  "open": true,
+  "note": "第 5 场。客栈卖落脚和传闻，不卖突破材料"
+}
