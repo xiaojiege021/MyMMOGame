@@ -12,6 +12,8 @@ var migrate = false;
 long rawLevelWrite = 0;
 var rawLevelValue = 0;
 long levelOf = 0;
+string? bindingOf = null;
+var bindingSlot = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -43,6 +45,11 @@ for (var i = 0; i < args.Length; i++)
         case "--level-of" when i + 1 < args.Length:
             long.TryParse(args[++i], out levelOf);
             break;
+        // 只给核对用：看这一格的 bound 与 bound_at 有没有一起落对。
+        case "--binding-of" when i + 2 < args.Length:
+            bindingOf = args[++i];
+            int.TryParse(args[++i], out bindingSlot);
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -50,7 +57,8 @@ for (var i = 0; i < args.Length; i++)
 }
 
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
-if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0)
+if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
+    || bindingOf != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -105,6 +113,16 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             Console.WriteLine(found is null
                 ? "level=missing id=" + levelOf
                 : "level=ok id=" + levelOf + " account=" + found.Value.Account + " level=" + found.Value.Level);
+        }
+
+        if (bindingOf != null)
+        {
+            var inventory = new InventoryRepository(dataSource);
+            var found = await inventory.BindingOfAsync(bindingOf, bindingSlot, CancellationToken.None);
+            Console.WriteLine(found is null
+                ? "binding=missing name=" + bindingOf + " slot=" + bindingSlot
+                : "binding=ok name=" + bindingOf + " slot=" + bindingSlot
+                  + " bound=" + found.Value.Bound + " bound_at_present=" + found.Value.BoundAtPresent);
         }
 
         if (reportName != null)

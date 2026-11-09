@@ -41,6 +41,16 @@ service CharacterService {
   // 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
   // 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。
   rpc SetLevel(SetLevelRequest) returns (SetLevelResponse);
+
+  // 背包：往一个格子里放东西。绑定规则由物品表决定，客户端说了不算。
+  rpc AddItem(AddItemRequest) returns (InventorySlot);
+
+  // 读回整个背包。这一行只给核对与后续行用，不做界面。
+  rpc ListInventory(ListInventoryRequest) returns (ListInventoryResponse);
+
+  // 这一格的物品能不能直接交易。绑定物品返回不可交易，原因 bound_item。
+  // 交易本身在 P1-5a，这里只给判定。
+  rpc CanTrade(CanTradeRequest) returns (CanTradeResponse);
 }
 
 message SetLevelRequest {
@@ -52,4 +62,41 @@ message SetLevelRequest {
 message SetLevelResponse {
   uint64 character_id = 1;
   int32 level = 2;
+}
+
+message AddItemRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint32 slot = 3;
+  string item_id = 4;
+  int32 count = 5;
+}
+
+message InventorySlot {
+  uint32 slot = 1;
+  string item_id = 2;
+  int32 count = 3;
+  bool bound = 4;
+}
+
+message ListInventoryRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message ListInventoryResponse {
+  repeated InventorySlot slots = 1;
+  uint32 bag_slots = 2;
+}
+
+message CanTradeRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint32 slot = 3;
+}
+
+message CanTradeResponse {
+  bool tradable = 1;
+  // tradable=false 时给原因：bound_item / slot_empty
+  string reason = 2;
 }

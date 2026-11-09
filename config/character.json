@@ -1,5 +1,6 @@
 {
   "schema": "character-config/1",
   "listen": "http://127.0.0.1:62000",
-  "db_pool_max": 8
+  "db_pool_max": 8,
+  "bag_slots": 40
 }

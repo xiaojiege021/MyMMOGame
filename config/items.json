@@ -1,0 +1,42 @@
+{
+  "schema": "item-table/1",
+  "version": 1,
+  "note": "bind 决定到账时是否绑定：none 不绑，on_pickup 拾取即绑（副本装备），always 到账即绑（商城买的符、券、卷轴）。绑定物品不能直接交易，解绑道具只解装备（P1-5c8）。",
+  "items": [
+    {
+      "id": "ore_iron",
+      "name": "铁矿",
+      "kind": "material",
+      "stack_max": 999,
+      "bind": "none"
+    },
+    {
+      "id": "herb_ling",
+      "name": "灵草",
+      "kind": "material",
+      "stack_max": 999,
+      "bind": "none"
+    },
+    {
+      "id": "sword_trial",
+      "name": "试炼长剑",
+      "kind": "equipment",
+      "stack_max": 1,
+      "bind": "on_pickup"
+    },
+    {
+      "id": "scroll_revive",
+      "name": "复活卷轴",
+      "kind": "consumable",
+      "stack_max": 20,
+      "bind": "always"
+    },
+    {
+      "id": "ticket_protect",
+      "name": "保护券",
+      "kind": "voucher",
+      "stack_max": 20,
+      "bind": "always"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ namespace Character;
 /// 角色服的启动配置：gRPC 听哪儿、连接池多大。
 /// 连接串不在这里，从环境或 /srv/mmo/gamedb.env 读。
 /// </summary>
-public sealed record CharacterConfig(string Listen, int DbPoolMax)
+public sealed record CharacterConfig(string Listen, int DbPoolMax, int BagSlots)
 {
     public static CharacterConfig Load(string path)
     {
@@ -40,7 +40,14 @@ public sealed record CharacterConfig(string Listen, int DbPoolMax)
             throw new ConfigException("db_pool_max 必须在 1 到 20 之间，现在是 " + pool);
         }
 
-        return new CharacterConfig(listen.TrimEnd('/'), pool);
+        // 背包格子数走配置：扩容道具留给后面的行，这一行只认这个默认值。
+        var bagSlots = wire.BagSlots ?? 40;
+        if (bagSlots < 1 || bagSlots > 200)
+        {
+            throw new ConfigException("bag_slots 必须在 1 到 200 之间，现在是 " + bagSlots);
+        }
+
+        return new CharacterConfig(listen.TrimEnd('/'), pool, bagSlots);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -56,6 +63,9 @@ public sealed record CharacterConfig(string Listen, int DbPoolMax)
 
         [JsonPropertyName("db_pool_max")]
         public int? DbPoolMax { get; init; }
+
+        [JsonPropertyName("bag_slots")]
+        public int? BagSlots { get; init; }
     }
 }
 

@@ -10,9 +10,12 @@ namespace Character;
 /// </summary>
 public sealed class CharacterGrpcService(
     CharacterRepository characters,
+    InventoryRepository inventory,
     RaceTable races,
     BranchTable branches,
     ClassIds classes,
+    ItemTable items,
+    CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
     public override async Task<CreateCharacterResponse> CreateCharacter(
@@ -143,4 +146,142 @@ public sealed class CharacterGrpcService(
     public const int MinLevel = 1;
 
     public const int MaxLevel = 100;
+
+    /// <summary>
+    /// 往一格放东西。绑定规则由物品表定，不看客户端说什么：
+    /// 副本装备拾取即绑，商城道具到账即绑，矿石药材这类不绑。
+    /// </summary>
+    public override async Task<InventorySlot> AddItem(AddItemRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var item = items.Find((request.ItemId ?? "").Trim());
+        if (item is null)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "unknown_item"));
+        }
+
+        if (request.Count < 1)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "count_invalid"));
+        }
+
+        if (request.Count > item.StackMax)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "stack_overflow"));
+        }
+
+        if (request.Slot < 1 || request.Slot > config.BagSlots)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        // 一格一样东西：已有的必须是同一件，而且加起来不能超过堆叠上限。
+        var existing = await inventory.GetSlotAsync(characterId, (int)request.Slot, context.CancellationToken);
+        if (existing is not null)
+        {
+            if (!string.Equals(existing.ItemId, item.Id, StringComparison.Ordinal))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_occupied"));
+            }
+
+            if (existing.Count + request.Count > item.StackMax)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "stack_overflow"));
+            }
+        }
+
+        var slot = await inventory.AddAsync(
+            characterId, (int)request.Slot, item, request.Count, context.CancellationToken);
+
+        logger.LogInformation(
+            "inventory_add account={Account} id={Id} slot={Slot} item={Item} count={Count} bound={Bound}",
+            account, characterId, slot.Slot, slot.ItemId, slot.Count, slot.Bound);
+
+        return new InventorySlot
+        {
+            Slot = (uint)slot.Slot,
+            ItemId = slot.ItemId,
+            Count = slot.Count,
+            Bound = slot.Bound,
+        };
+    }
+
+    public override async Task<ListInventoryResponse> ListInventory(
+        ListInventoryRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var response = new ListInventoryResponse { BagSlots = (uint)config.BagSlots };
+        foreach (var slot in await inventory.ListAsync(characterId, context.CancellationToken))
+        {
+            response.Slots.Add(new InventorySlot
+            {
+                Slot = (uint)slot.Slot,
+                ItemId = slot.ItemId,
+                Count = slot.Count,
+                Bound = slot.Bound,
+            });
+        }
+
+        return response;
+    }
+
+    /// <summary>
+    /// 这一格能不能直接交易。绑定就是不能——这是「绑定/非绑双轨」的判定点，
+    /// 交易本身（拍卖、寄售、摆摊）在 P1-5a 起，
+    /// </summary>
+    public override async Task<CanTradeResponse> CanTrade(CanTradeRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var slot = await inventory.GetSlotAsync(characterId, (int)request.Slot, context.CancellationToken);
+        if (slot is null)
+        {
+            return new CanTradeResponse { Tradable = false, Reason = "slot_empty" };
+        }
+
+        if (slot.Bound)
+        {
+            return new CanTradeResponse { Tradable = false, Reason = "bound_item" };
+        }
+
+        return new CanTradeResponse { Tradable = true, Reason = "" };
+    }
 }

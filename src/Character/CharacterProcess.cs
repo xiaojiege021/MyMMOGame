@@ -23,11 +23,13 @@ public sealed class CharacterProcess(string configPath)
         RaceTable races;
         BranchTable branches;
         ClassIds classes;
+        ItemTable items;
         try
         {
             races = RaceTable.Load("config/races.json");
             branches = BranchTable.Load("config/branches.json");
             classes = new ClassIds("config/classes.json");
+            items = ItemTable.Load("config/items.json");
         }
         catch (ConfigException ex)
         {
@@ -39,6 +41,8 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("listen=" + config.Listen);
         Console.WriteLine("races=" + races.All.Count + " race_table_version=" + races.Version);
         Console.WriteLine("branches=" + branches.All.Count + " branch_table_version=" + branches.Version);
+        Console.WriteLine("items=" + items.All.Count + " item_table_version=" + items.Version
+            + " bag_slots=" + config.BagSlots);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -52,6 +56,7 @@ public sealed class CharacterProcess(string configPath)
 
         await using var dataSource = NpgsqlDataSource.Create(DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
         var characters = new CharacterRepository(dataSource);
+        var inventory = new InventoryRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -67,9 +72,12 @@ public sealed class CharacterProcess(string configPath)
             kestrel.Listen(listenAddress, listenUri.Port, options => options.Protocols = HttpProtocols.Http2));
         builder.Services.AddGrpc();
         builder.Services.AddSingleton(characters);
+        builder.Services.AddSingleton(inventory);
         builder.Services.AddSingleton(races);
         builder.Services.AddSingleton(branches);
         builder.Services.AddSingleton(classes);
+        builder.Services.AddSingleton(items);
+        builder.Services.AddSingleton(config);
 
         var app = builder.Build();
         app.MapGrpcService<CharacterGrpcService>();

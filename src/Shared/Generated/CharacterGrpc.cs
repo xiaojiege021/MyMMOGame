@@ -56,6 +56,18 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SetLevelRequest> __Marshaller_mmo_character_SetLevelRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SetLevelRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SetLevelResponse> __Marshaller_mmo_character_SetLevelResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SetLevelResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AddItemRequest> __Marshaller_mmo_character_AddItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AddItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.InventorySlot> __Marshaller_mmo_character_InventorySlot = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.InventorySlot.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ListInventoryRequest> __Marshaller_mmo_character_ListInventoryRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ListInventoryRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ListInventoryResponse> __Marshaller_mmo_character_ListInventoryResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ListInventoryResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanTradeRequest> __Marshaller_mmo_character_CanTradeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanTradeRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanTradeResponse> __Marshaller_mmo_character_CanTradeResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanTradeResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -72,6 +84,30 @@ namespace Mmo.Proto.Character {
         "SetLevel",
         __Marshaller_mmo_character_SetLevelRequest,
         __Marshaller_mmo_character_SetLevelResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.AddItemRequest, global::Mmo.Proto.Character.InventorySlot> __Method_AddItem = new grpc::Method<global::Mmo.Proto.Character.AddItemRequest, global::Mmo.Proto.Character.InventorySlot>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "AddItem",
+        __Marshaller_mmo_character_AddItemRequest,
+        __Marshaller_mmo_character_InventorySlot);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ListInventoryRequest, global::Mmo.Proto.Character.ListInventoryResponse> __Method_ListInventory = new grpc::Method<global::Mmo.Proto.Character.ListInventoryRequest, global::Mmo.Proto.Character.ListInventoryResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ListInventory",
+        __Marshaller_mmo_character_ListInventoryRequest,
+        __Marshaller_mmo_character_ListInventoryResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.CanTradeRequest, global::Mmo.Proto.Character.CanTradeResponse> __Method_CanTrade = new grpc::Method<global::Mmo.Proto.Character.CanTradeRequest, global::Mmo.Proto.Character.CanTradeResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CanTrade",
+        __Marshaller_mmo_character_CanTradeRequest,
+        __Marshaller_mmo_character_CanTradeResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -98,6 +134,43 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SetLevelResponse> SetLevel(global::Mmo.Proto.Character.SetLevelRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 背包：往一个格子里放东西。绑定规则由物品表决定，客户端说了不算。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.InventorySlot> AddItem(global::Mmo.Proto.Character.AddItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 读回整个背包。这一行只给核对与后续行用，不做界面。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ListInventoryResponse> ListInventory(global::Mmo.Proto.Character.ListInventoryRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 这一格的物品能不能直接交易。绑定物品返回不可交易，原因 bound_item。
+      /// 交易本身在 P1-5a，这里只给判定。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CanTradeResponse> CanTrade(global::Mmo.Proto.Character.CanTradeRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -203,6 +276,154 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_SetLevel, null, options, request);
       }
+      /// <summary>
+      /// 背包：往一个格子里放东西。绑定规则由物品表决定，客户端说了不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.InventorySlot AddItem(global::Mmo.Proto.Character.AddItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AddItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 背包：往一个格子里放东西。绑定规则由物品表决定，客户端说了不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.InventorySlot AddItem(global::Mmo.Proto.Character.AddItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_AddItem, null, options, request);
+      }
+      /// <summary>
+      /// 背包：往一个格子里放东西。绑定规则由物品表决定，客户端说了不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.InventorySlot> AddItemAsync(global::Mmo.Proto.Character.AddItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AddItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 背包：往一个格子里放东西。绑定规则由物品表决定，客户端说了不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.InventorySlot> AddItemAsync(global::Mmo.Proto.Character.AddItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_AddItem, null, options, request);
+      }
+      /// <summary>
+      /// 读回整个背包。这一行只给核对与后续行用，不做界面。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ListInventoryResponse ListInventory(global::Mmo.Proto.Character.ListInventoryRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListInventory(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 读回整个背包。这一行只给核对与后续行用，不做界面。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ListInventoryResponse ListInventory(global::Mmo.Proto.Character.ListInventoryRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ListInventory, null, options, request);
+      }
+      /// <summary>
+      /// 读回整个背包。这一行只给核对与后续行用，不做界面。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ListInventoryResponse> ListInventoryAsync(global::Mmo.Proto.Character.ListInventoryRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListInventoryAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 读回整个背包。这一行只给核对与后续行用，不做界面。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ListInventoryResponse> ListInventoryAsync(global::Mmo.Proto.Character.ListInventoryRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ListInventory, null, options, request);
+      }
+      /// <summary>
+      /// 这一格的物品能不能直接交易。绑定物品返回不可交易，原因 bound_item。
+      /// 交易本身在 P1-5a，这里只给判定。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CanTradeResponse CanTrade(global::Mmo.Proto.Character.CanTradeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CanTrade(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 这一格的物品能不能直接交易。绑定物品返回不可交易，原因 bound_item。
+      /// 交易本身在 P1-5a，这里只给判定。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CanTradeResponse CanTrade(global::Mmo.Proto.Character.CanTradeRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CanTrade, null, options, request);
+      }
+      /// <summary>
+      /// 这一格的物品能不能直接交易。绑定物品返回不可交易，原因 bound_item。
+      /// 交易本身在 P1-5a，这里只给判定。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CanTradeResponse> CanTradeAsync(global::Mmo.Proto.Character.CanTradeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CanTradeAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 这一格的物品能不能直接交易。绑定物品返回不可交易，原因 bound_item。
+      /// 交易本身在 P1-5a，这里只给判定。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CanTradeResponse> CanTradeAsync(global::Mmo.Proto.Character.CanTradeRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CanTrade, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -218,7 +439,10 @@ namespace Mmo.Proto.Character {
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
           .AddMethod(__Method_CreateCharacter, serviceImpl.CreateCharacter)
-          .AddMethod(__Method_SetLevel, serviceImpl.SetLevel).Build();
+          .AddMethod(__Method_SetLevel, serviceImpl.SetLevel)
+          .AddMethod(__Method_AddItem, serviceImpl.AddItem)
+          .AddMethod(__Method_ListInventory, serviceImpl.ListInventory)
+          .AddMethod(__Method_CanTrade, serviceImpl.CanTrade).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -230,6 +454,9 @@ namespace Mmo.Proto.Character {
     {
       serviceBinder.AddMethod(__Method_CreateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(serviceImpl.CreateCharacter));
       serviceBinder.AddMethod(__Method_SetLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SetLevelRequest, global::Mmo.Proto.Character.SetLevelResponse>(serviceImpl.SetLevel));
+      serviceBinder.AddMethod(__Method_AddItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AddItemRequest, global::Mmo.Proto.Character.InventorySlot>(serviceImpl.AddItem));
+      serviceBinder.AddMethod(__Method_ListInventory, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ListInventoryRequest, global::Mmo.Proto.Character.ListInventoryResponse>(serviceImpl.ListInventory));
+      serviceBinder.AddMethod(__Method_CanTrade, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanTradeRequest, global::Mmo.Proto.Character.CanTradeResponse>(serviceImpl.CanTrade));
     }
 
   }
