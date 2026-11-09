@@ -1,0 +1,6 @@
+{
+  "schema": "gateway-config/1",
+  "listen": "http://127.0.0.1:61000",
+  "token_ttl_s": 7200,
+  "pbkdf2_iterations": 210000
+}
