@@ -40,12 +40,21 @@ public sealed class Encounter
     string _settlementId = "";
     bool _closed;
 
+    // 施法者的实时坐标。客户端报上来的位置只是「想去哪」，夹过之后才写进这两个。
+    // 距离判定读这里，不读出生点——否则走位就只是画面上的事，走近了照样打不中。
+    double _casterX;
+    double _casterY;
+    long _lastMoveMs;
+
     public Encounter(BattleConfig config, SettlementStore settlements, ulong sessionId)
     {
         _config = config;
         _settlements = settlements;
         SessionId = sessionId;
         _bossHp = config.Boss.HpMax;
+        _casterX = config.Caster.SpawnMm.X;
+        _casterY = config.Caster.SpawnMm.Y;
+        _lastMoveMs = NowMs();
     }
 
     public ulong SessionId { get; }
@@ -57,7 +66,7 @@ public sealed class Encounter
     {
         lock (_gate)
         {
-            return new BattleOpened
+            var opened = new BattleOpened
             {
                 SessionId = SessionId,
                 CasterId = _config.Caster.Id,
@@ -66,8 +75,29 @@ public sealed class Encounter
                 BossHpMax = _config.Boss.HpMax,
                 CasterHp = _config.Caster.HpMax,
                 CasterHpMax = _config.Caster.HpMax,
-                DistanceMm = BattleConfig.DistanceMm(_config.Caster.SpawnMm, _config.Boss.SpawnMm),
+                DistanceMm = DistanceToBossMm(),
+                ArenaRadiusMm = (uint)Math.Max(0, _config.Arena.RadiusMm),
+                MoveSpeedMmPerS = (uint)Math.Max(0, _config.Arena.MoveSpeedMmPerS),
+                CasterXMm = (int)Math.Round(_casterX),
+                CasterYMm = (int)Math.Round(_casterY),
             };
+
+            // 技能表随开场下发。客户端靠它播前摇、标名字，不自己存一份数字。
+            foreach (var skill in _config.Skills.All)
+            {
+                opened.Skills.Add(new SkillInfo
+                {
+                    SkillId = skill.Id,
+                    Name = skill.Name,
+                    RangeMm = skill.RangeMm,
+                    ForeswingMs = (uint)Math.Max(0, skill.ForeswingMs),
+                    RecoveryMs = (uint)Math.Max(0, skill.RecoveryMs),
+                    CooldownMs = (uint)Math.Max(0, skill.CooldownMs),
+                    StaggerMs = (uint)Math.Max(0, skill.StaggerMs),
+                });
+            }
+
+            return opened;
         }
     }
 
@@ -115,7 +145,7 @@ public sealed class Encounter
                 return rejected;
             }
 
-            var distance = BattleConfig.DistanceMm(_config.Caster.SpawnMm, _config.Boss.SpawnMm);
+            var distance = DistanceToBossMm();
             if (distance > skill.RangeMm)
             {
                 return Reject(request, SkillRejectReason.SkillRejectOutOfRange);
@@ -163,6 +193,72 @@ public sealed class Encounter
                 Accepted = true,
             };
         }
+    }
+
+    /// <summary>
+    /// 走位。客户端报的是「想去哪」，这里按场地半径和速度上限夹过才落位。
+    /// 夹完的位置回给客户端，它照这个摆自己；技能的距离判定用的也是这份坐标。
+    /// </summary>
+    public MoveState Move(MoveRequest request)
+    {
+        lock (_gate)
+        {
+            var bossX = (double)_config.Boss.SpawnMm.X;
+            var bossY = (double)_config.Boss.SpawnMm.Y;
+            var targetX = (double)request.XMm;
+            var targetY = (double)request.YMm;
+            var clamped = false;
+
+            // 场地是一个以 Boss 为圆心的圆，走出去就沿半径拉回来。
+            var radius = _config.Arena.RadiusMm;
+            var outX = targetX - bossX;
+            var outY = targetY - bossY;
+            var outLen = Math.Sqrt(outX * outX + outY * outY);
+            if (outLen > radius)
+            {
+                var scale = radius / outLen;
+                targetX = bossX + outX * scale;
+                targetY = bossY + outY * scale;
+                clamped = true;
+            }
+
+            // 两次上报之间最多走 速度 × 时间。间隔按服务端时钟算，客户端改不了；
+            // 单次封顶 200 毫秒，等于「一次上报最多走两步」——站着不动很久也不能
+            // 攒出一次瞬移。客户端 100 毫秒报一次，留了一倍的量和抖动的余量。
+            var now = NowMs();
+            var dtMs = Math.Clamp(now - _lastMoveMs, 1, 200);
+            _lastMoveMs = now;
+            var maxStep = _config.Arena.MoveSpeedMmPerS * dtMs / 1000.0;
+
+            var dx = targetX - _casterX;
+            var dy = targetY - _casterY;
+            var len = Math.Sqrt(dx * dx + dy * dy);
+            if (len > maxStep && len > 0)
+            {
+                var scale = maxStep / len;
+                targetX = _casterX + dx * scale;
+                targetY = _casterY + dy * scale;
+                clamped = true;
+            }
+
+            _casterX = targetX;
+            _casterY = targetY;
+
+            return new MoveState
+            {
+                XMm = (int)Math.Round(_casterX),
+                YMm = (int)Math.Round(_casterY),
+                DistanceMm = DistanceToBossMm(),
+                Clamped = clamped,
+            };
+        }
+    }
+
+    uint DistanceToBossMm()
+    {
+        var dx = _casterX - _config.Boss.SpawnMm.X;
+        var dy = _casterY - _config.Boss.SpawnMm.Y;
+        return (uint)Math.Round(Math.Sqrt(dx * dx + dy * dy));
     }
 
     /// <summary>推进时间。前摇到点就结算，这一下可能是收尾的一下。</summary>

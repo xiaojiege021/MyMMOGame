@@ -74,6 +74,36 @@ message SkillCancelled {
   bool accepted = 3;
 }
 
+// 前摇里可以走位。客户端报它想到的位置，服务端按速度上限和场地半径夹取，
+// 不直接采信客户端坐标；技能的距离判定用的是夹取之后的坐标。
+// client_time_ms 只用来对号，不当作权威时间。
+message MoveRequest {
+  int32 x_mm = 1;
+  int32 y_mm = 2;
+  int64 client_time_ms = 3;
+}
+
+// 夹取之后的实际位置，以及到目标的直线距离。
+// clamped 为真表示客户端报的位置越过了速度或场地边界，被服务端拉回来了。
+message MoveState {
+  int32 x_mm = 1;
+  int32 y_mm = 2;
+  uint32 distance_mm = 3;
+  bool clamped = 4;
+}
+
+// 开场时一起下发技能表。客户端按编号查前摇时长和名字，不在前端写死数值；
+// 伤害不下发，客户端只认 SkillResult 里的那一个数。
+message SkillInfo {
+  uint32 skill_id = 1;
+  string name = 2;
+  uint32 range_mm = 3;
+  uint32 foreswing_ms = 4;
+  uint32 recovery_ms = 5;
+  uint32 cooldown_ms = 6;
+  uint32 stagger_ms = 7;
+}
+
 // 连上就开一场。P0 不做进本协议，网关鉴权也放到后续。
 message BattleOpened {
   uint64 session_id = 1;
@@ -85,6 +115,14 @@ message BattleOpened {
   int64 caster_hp_max = 7;
   // 双方直线距离，毫米
   uint32 distance_mm = 8;
+  // 这一场可用的技能，按编号升序
+  repeated SkillInfo skills = 9;
+  // 场地半径与移动速度。客户端拿它做本地预摆放，最终位置仍以服务端为准
+  uint32 arena_radius_mm = 10;
+  uint32 move_speed_mm_per_s = 11;
+  // 施法者出生坐标，Boss 为原点。客户端照这个摆自己，不用从距离反推
+  int32 caster_x_mm = 12;
+  int32 caster_y_mm = 13;
 }
 
 // 这场收尾。settlement_id 是写进结算记录的事务号；
@@ -101,6 +139,7 @@ message ClientMessage {
   oneof body {
     SkillRequest skill = 1;
     SkillCancelRequest cancel = 2;
+    MoveRequest move = 3;
   }
 }
 
@@ -111,5 +150,6 @@ message ServerMessage {
     SkillRejected rejected = 3;
     SkillCancelled cancelled = 4;
     BattleEnded ended = 5;
+    MoveState moved = 6;
   }
 }

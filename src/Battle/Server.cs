@@ -178,6 +178,15 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
                         new ServerMessage { Cancelled = encounter.Cancel(inbound.Cancel) },
                         token);
                     break;
+
+                case ClientMessage.BodyOneofCase.Move:
+                    // 每次走位都回一条夹过的位置，客户端拿它对一下自己摆得对不对。
+                    await SendAsync(
+                        socket,
+                        send,
+                        new ServerMessage { Moved = encounter.Move(inbound.Move) },
+                        token);
+                    break;
             }
         }
     }

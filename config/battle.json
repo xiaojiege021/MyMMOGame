@@ -8,6 +8,10 @@
     "hp_max": 1200,
     "spawn_mm": { "x": 6000, "y": 0 }
   },
+  "arena": {
+    "radius_mm": 8000,
+    "move_speed_mm_per_s": 3000
+  },
   "boss": {
     "id": 9001,
     "name": "试炼石像",

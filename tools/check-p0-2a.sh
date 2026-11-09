@@ -3,7 +3,7 @@
 #
 # 默认只跑编辑器侧与静态断言（快）：
 #   1. 编辑器核对 P02aCheck：热更 dll 装载、Select 切换、请求构造、场景、包检查
-#   2. 静态断言：加载链在 AOT、点选只在热更程序集、热更目录不算伤害、场景被收集
+#   2. 静态断言：加载链在 AOT、点选只在热更程序集、热更目录不加血不算伤害、场景被收集
 #
 # 加 --device 再跑真机段（要先插好已授权的设备）：
 #   3. E7Build 出新 APK（含 Boss 场景与热更 dll 的 Launch AB）
@@ -60,8 +60,10 @@ done < /tmp/p02a-lines.txt
 
 echo "== 2. 静态断言 =="
 # 加载链在 AOT：热更 dll 的加载与场景加载都在主包侧
-python3 - "$PROJ" <<'PY' | while IFS= read -r line; do
-import sys, pathlib
+# 静态断言口径：热更目录只许读服务端给的值，不许自己加血算伤害（同 E7 与 P0-1c）
+# 注意别写成管道喂 while——子 shell 里 ok/bad 的计数出了管道就丢了
+STATIC_OUT="$(python3 - "$PROJ" <<'PY'
+import re, sys, pathlib
 proj = pathlib.Path(sys.argv[1])
 ls = (proj / 'Assets/AOT/LaunchSession.cs').read_text(encoding='utf-8')
 hb = (proj / 'Assets/Editor/E6Build.cs').read_text(encoding='utf-8')
@@ -73,6 +75,10 @@ for d in ('Assets/AOT', 'Assets/Net'):
         if 'TargetSelector' in t or 'TargetPicker' in t:
             aot_hits.append(f.name)
 hot_texts = ''.join(f.read_text(encoding='utf-8') for f in (proj / 'Assets/HotUpdate').glob('*.cs'))
+ARITH = re.compile(r'Hp(Max)?\s*[-+]=|\b\w*[Dd]amage\s*[-+]=')
+arith_hits = sorted({m.group(0).strip() for m in ARITH.finditer(hot_texts)})
+for h in arith_hits:
+    print('detail ' + h)
 checks = {
     'AOT 加载链：热更 dll、程序集、场景、顺序': (
         "LoadAssetAsync<TextAsset>" in ls and 'Assembly.Load' in ls
@@ -80,16 +86,19 @@ checks = {
     '收集器收场景与 dll': 'Assets/Scenes/BossBattle.unity' in hb and 'HotDllDir' in hb,
     '场景含两个目标编号': 'TargetId: 9001' in scene and 'TargetId: 9002' in scene,
     '点选只在热更程序集': not aot_hits,
-    '热更目录不算伤害': 'Damage' not in hot_texts and 'SkillResult' not in hot_texts,
+    '热更目录不加血、不算伤害': not arith_hits,
 }
 for k, v in checks.items():
     print(('ok   ' if v else 'FAIL ') + k)
 PY
+)"
+while IFS= read -r line; do
   case "$line" in
     "ok   "*) ok "${line#ok   }" ;;
-    *) bad "${line#FAIL }" ;;
+    "FAIL "*) bad "${line#FAIL }" ;;
+    "detail "*) detail "${line#detail }" ;;
   esac
-done
+done <<< "$STATIC_OUT"
 
 echo "== 3. 真机段 =="
 if [ "$DEVICE" = "1" ]; then

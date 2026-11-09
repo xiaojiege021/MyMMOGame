@@ -77,6 +77,14 @@ namespace HotUpdate
             _wasPressed = true;
             var position = pointer.position.ReadValue();
             Debug.Log("p02a_tap x=" + (int)position.x + " y=" + (int)position.y);
+
+            // 右下角是技能键和撤键，点在那儿不该顺手换个目标。
+            if (BattleHud.HitTest(position))
+            {
+                Debug.Log("p02a_tap ui=skip");
+                return;
+            }
+
             var ray = _camera.ScreenPointToRay(position);
             if (!Physics.Raycast(ray, out var hit, 100f))
             {

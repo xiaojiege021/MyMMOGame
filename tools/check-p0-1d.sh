@@ -132,10 +132,11 @@ else
   bad "断线那条路上会写结算，重启后就会多出没打完的奖励"
 fi
 
-if grep -qi 'settlement' -r "$ROOT/client/MMOGame/Assets/Net" "$ROOT/client/MMOGame/Assets/HotUpdate" 2>/dev/null; then
-  bad "客户端碰了结算记录"
+if grep -qE 'File\.(Write|Append|Create)|Directory\.Create|Npgsql|StreamWriter' \
+     -r "$ROOT/client/MMOGame/Assets/Net" "$ROOT/client/MMOGame/Assets/HotUpdate" 2>/dev/null; then
+  bad "客户端在写结算，这些只能来自服务端"
 else
-  ok "客户端不碰结算记录"
+  ok "客户端只读结算号，不落盘"
 fi
 
 if grep -qE 'Hp(Max)?[[:space:]]*[-+]=|(damage|Damage)[[:space:]]*[-+]=' \
@@ -162,7 +163,7 @@ fi
 
 if [ "$FAIL" -gt 0 ]; then
   echo
-  echo "P0-1d 核对：$PASS 项通过，$FAIL 项未通过（编译没过，后面的不跑）"
+  echo "P0-1d 核对：$PASS 项通过，$FAIL 项未通过（前面已有未通过项，后面依赖它的不跑）"
   exit 1
 fi
 

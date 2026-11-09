@@ -101,6 +101,23 @@ namespace Mmo.Net
             });
         }
 
+        /// <summary>
+        /// 前摇里走位。报的是想去的位置，服务端按速度上限和场地半径夹过之后
+        /// 回一条 MoveState；夹过的位置才是权威，客户端拿它校准。
+        /// </summary>
+        public Task SendMoveAsync(int xMm, int yMm, long clientTimeMs)
+        {
+            return SendAsync(new ClientMessage
+            {
+                Move = new MoveRequest
+                {
+                    XMm = xMm,
+                    YMm = yMm,
+                    ClientTimeMs = clientTimeMs,
+                },
+            });
+        }
+
         /// <summary>主线程取一条已经收到的消息。没有就返回 false，不阻塞。</summary>
         public bool TryReceive(out ServerMessage message)
         {

@@ -19,7 +19,23 @@ public static class E7Check
     const string HotUpdateAsmdef = "Assets/HotUpdate/HotUpdate.asmdef";
     const string HotUpdateDll = "HotUpdate.dll";
 
-    static readonly string[] Forbidden = { "Damage", "伤害", "扣血", "SetHp" };
+    // 热更侧可以读回包里的结算号（客户端领奖要用），但不能自己写结算：
+    // 落盘、建目录、写库都算越界。加减血量和伤害同样不行。
+    static readonly string[] Forbidden =
+    {
+        "扣血", "SetHp", "Npgsql", "StreamWriter", "File.WriteAll", "File.AppendAll", "Directory.CreateDirectory",
+    };
+
+    // 光看「Damage」这个词会把「显示回包里的伤害」也算成违规——热更侧本来就要把
+    // 服务端回的伤害摆到界面上。真正不该出现的是自己加减：Hp -= 或 damage +=。
+    // 和 check-p0-1c.sh 第 7 段的口径相同，那边查 Net 与 HotUpdate 两处。
+    static readonly System.Text.RegularExpressions.Regex[] ForbiddenPatterns =
+    {
+        // Hp -= ...、MaxHp += ... 这类。
+        new(@"\b\w*[Hh]p\s*[-+]="),
+        // 变量名到 damage 为止，后面直接就是运算符。放过 _damageAge += 这种计时器。
+        new(@"\b\w*[Dd]amage\s*[-+]="),
+    };
 
     public static void Run()
     {
@@ -92,6 +108,16 @@ public static class E7Check
                 if (text.Contains(word))
                 {
                     Debug.Log("hotupdate_forbidden=" + word + " file=" + file);
+                    return false;
+                }
+            }
+
+            foreach (var pattern in ForbiddenPatterns)
+            {
+                var match = pattern.Match(text);
+                if (match.Success)
+                {
+                    Debug.Log("hotupdate_forbidden=" + match.Value.Trim() + " file=" + file);
                     return false;
                 }
             }

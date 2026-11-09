@@ -3,7 +3,9 @@
   "rootNamespace": "HotUpdate",
   "references": [
     "Mmo.Proto",
-    "Unity.InputSystem"
+    "Mmo.Net",
+    "Unity.InputSystem",
+    "UnityEngine.UI"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

@@ -29,6 +29,16 @@ public sealed class BossConfig
 }
 
 /// <summary>
+/// 场地参数。半径管住玩家能走多远，速度管住一次走位最多跨多少。
+/// 两个都是服务端权威：客户端报的位置要按这两个夹过才算数。
+/// </summary>
+public sealed class ArenaConfig
+{
+    public int RadiusMm { get; init; }
+    public int MoveSpeedMmPerS { get; init; }
+}
+
+/// <summary>
 /// 一个技能的全部数字。这里不写死任何数值，技术架构第 7 节要求技能走配置。
 /// 前摇是施法到结算的时长，后摇是结算后不能再出手的时长，两段分开算。
 /// </summary>
@@ -124,6 +134,7 @@ public sealed class BattleConfig
     public string SkillTablePath { get; init; } = "";
     public CasterConfig Caster { get; init; } = new();
     public BossConfig Boss { get; init; } = new();
+    public ArenaConfig Arena { get; init; } = new();
     public SkillTable Skills { get; private set; } = null!;
 
     /// <summary>配置文件的绝对路径，日志里要打出来才知道跑的是哪一份。</summary>
@@ -153,6 +164,7 @@ public sealed class BattleConfig
             SkillTablePath = skillPath,
             Caster = raw.Caster,
             Boss = raw.Boss,
+            Arena = raw.Arena,
             SourcePath = full,
             Skills = SkillTable.Load(skillPath),
         };
@@ -210,6 +222,23 @@ public sealed class BattleConfig
             throw new ConfigException($"{SourcePath}：boss.id 和 caster.id 撞了");
         }
 
+        if (Arena.RadiusMm <= 0)
+        {
+            throw new ConfigException($"{SourcePath}：arena.radius_mm 必须大于 0");
+        }
+
+        if (Arena.MoveSpeedMmPerS <= 0)
+        {
+            // 速度为零等于走不动，走位这条功能就没法验，属于配置写错。
+            throw new ConfigException($"{SourcePath}：arena.move_speed_mm_per_s 必须大于 0");
+        }
+
+        if (DistanceMm(Caster.SpawnMm, Boss.SpawnMm) > Arena.RadiusMm)
+        {
+            throw new ConfigException(
+                $"{SourcePath}：出生点 {DistanceMm(Caster.SpawnMm, Boss.SpawnMm)}mm 已经出了场地半径 {Arena.RadiusMm}mm");
+        }
+
         // 技能表加载时已经校验过每一项，这里只看至少有一个技能打得到这个站位。
         // 全都打不到的话这场永远打不完，属于配置写错，早报早改。
         var distance = DistanceMm(Caster.SpawnMm, Boss.SpawnMm);
@@ -236,6 +265,7 @@ public sealed class BattleConfig
         public string SkillTable { get; init; } = "skills.json";
         public CasterConfig Caster { get; init; } = new();
         public BossConfig Boss { get; init; } = new();
+        public ArenaConfig Arena { get; init; } = new();
     }
 }
 
