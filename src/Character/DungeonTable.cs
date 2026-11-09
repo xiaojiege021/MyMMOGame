@@ -29,15 +29,23 @@ public sealed class DungeonTable
     /// <summary>一天能累计到的疲劳上限（方案写定 6000）。</summary>
     public int FatigueDailyCap { get; }
 
+    /// <summary>温泉用一次恢复多少疲劳（方案写定 1500），只补疲劳。</summary>
+    public int HotSpringRecovery { get; }
+
     public IReadOnlyCollection<DungeonDef> All => _byId.Values;
 
     public DungeonDef? Find(string id) => _byId.GetValueOrDefault(id);
 
-    DungeonTable(Dictionary<string, DungeonDef> byId, int version, int fatigueDailyCap)
+    DungeonTable(
+        Dictionary<string, DungeonDef> byId,
+        int version,
+        int fatigueDailyCap,
+        int hotSpringRecovery)
     {
         _byId = byId;
         Version = version;
         FatigueDailyCap = fatigueDailyCap;
+        HotSpringRecovery = hotSpringRecovery;
     }
 
     public static DungeonTable Load(string path)
@@ -62,6 +70,16 @@ public sealed class DungeonTable
         if (cap < 1 || cap > 1_000_000)
         {
             throw new ConfigException("fatigue_daily_cap 必须在 1 到 1000000 之间，现在是 " + cap);
+        }
+
+        // 温泉恢复量必须写在配置里，不在代码里给默认值：缺了就起不来，
+        // 免得两处各记一个数字。方案写定 1500，配置是唯一正本。
+        var recovery = wire.HotSpringRecovery
+            ?? throw new ConfigException("dungeons.json 缺 hot_spring_recovery");
+        if (recovery < 1 || recovery > cap)
+        {
+            throw new ConfigException(
+                "hot_spring_recovery 必须在 1 到 " + cap + " 之间，现在是 " + recovery);
         }
 
         var map = new Dictionary<string, DungeonDef>(StringComparer.Ordinal);
@@ -104,7 +122,7 @@ public sealed class DungeonTable
             throw new ConfigException("dungeons.json 里一个副本都没有");
         }
 
-        return new DungeonTable(map, wire.Version, cap);
+        return new DungeonTable(map, wire.Version, cap, recovery);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -120,6 +138,9 @@ public sealed class DungeonTable
 
         [JsonPropertyName("fatigue_daily_cap")]
         public int? FatigueDailyCap { get; init; }
+
+        [JsonPropertyName("hot_spring_recovery")]
+        public int? HotSpringRecovery { get; init; }
 
         [JsonPropertyName("dungeons")]
         public List<DungeonItem> Dungeons { get; init; } = [];

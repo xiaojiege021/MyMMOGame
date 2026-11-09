@@ -65,6 +65,28 @@ service CharacterService {
   // 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
   // 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
   rpc EnterDungeon(EnterDungeonRequest) returns (EnterDungeonResponse);
+
+  // 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
+  // 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
+  rpc UseHotSpring(UseHotSpringRequest) returns (UseHotSpringResponse);
+}
+
+message UseHotSpringRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message UseHotSpringResponse {
+  // 使用前的当日有效疲劳（跨天归零后按 0 算）。
+  int32 fatigue_before = 1;
+  // 实际恢复量：不超过配置值，也不超过当日已用疲劳。
+  int32 recovered = 2;
+  // 使用后的当日已用疲劳，永不为负。
+  int32 fatigue = 3;
+  int32 fatigue_daily_cap = 4;
+  // 配置里的单次恢复量，回给客户端，不让它自己另算一套。
+  int32 recovery_limit = 5;
+  int32 weekly_share = 6;
 }
 
 message EnterDungeonRequest {

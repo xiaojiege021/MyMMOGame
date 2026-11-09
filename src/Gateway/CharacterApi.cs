@@ -31,6 +31,8 @@ public static class CharacterApi
 
     public sealed record EnterDungeonBody(ulong? CharacterId, string? DungeonId, uint? PartySize);
 
+    public sealed record HotSpringBody(ulong? CharacterId);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -612,6 +614,68 @@ public static class CharacterApi
             catch (RpcException ex)
             {
                 await WriteRpcErrorAsync(context, "dungeon_enter", account, ex);
+            }
+        });
+
+        // 温泉。恢复多少由角色服按配置定，请求里只有角色编号；网关不碰库。
+        app.MapPost("/hot-spring", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "hot_spring", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            HotSpringBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<HotSpringBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var result = await client.UseHotSpringAsync(
+                    new UseHotSpringRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("hot_spring account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " before=" + result.FatigueBefore
+                    + " recovered=" + result.Recovered
+                    + " fatigue=" + result.Fatigue
+                    + " cap=" + result.FatigueDailyCap
+                    + " share=" + result.WeeklyShare);
+
+                await WriteAsync(context, 200, new
+                {
+                    fatigue_before = result.FatigueBefore,
+                    recovered = result.Recovered,
+                    fatigue = result.Fatigue,
+                    fatigue_daily_cap = result.FatigueDailyCap,
+                    recovery_limit = result.RecoveryLimit,
+                    weekly_share = result.WeeklyShare,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "hot_spring", account, ex);
             }
         });
     }

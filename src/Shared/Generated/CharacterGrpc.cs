@@ -84,6 +84,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.EnterDungeonRequest> __Marshaller_mmo_character_EnterDungeonRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EnterDungeonRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.EnterDungeonResponse> __Marshaller_mmo_character_EnterDungeonResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EnterDungeonResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseHotSpringRequest> __Marshaller_mmo_character_UseHotSpringRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseHotSpringRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseHotSpringResponse> __Marshaller_mmo_character_UseHotSpringResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseHotSpringResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -156,6 +160,14 @@ namespace Mmo.Proto.Character {
         "EnterDungeon",
         __Marshaller_mmo_character_EnterDungeonRequest,
         __Marshaller_mmo_character_EnterDungeonResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse> __Method_UseHotSpring = new grpc::Method<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "UseHotSpring",
+        __Marshaller_mmo_character_UseHotSpringRequest,
+        __Marshaller_mmo_character_UseHotSpringResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -269,6 +281,19 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.EnterDungeonResponse> EnterDungeon(global::Mmo.Proto.Character.EnterDungeonRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
+      /// 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UseHotSpringResponse> UseHotSpring(global::Mmo.Proto.Character.UseHotSpringRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -722,6 +747,58 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_EnterDungeon, null, options, request);
       }
+      /// <summary>
+      /// 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
+      /// 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseHotSpringResponse UseHotSpring(global::Mmo.Proto.Character.UseHotSpringRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseHotSpring(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
+      /// 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseHotSpringResponse UseHotSpring(global::Mmo.Proto.Character.UseHotSpringRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_UseHotSpring, null, options, request);
+      }
+      /// <summary>
+      /// 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
+      /// 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseHotSpringResponse> UseHotSpringAsync(global::Mmo.Proto.Character.UseHotSpringRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseHotSpringAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
+      /// 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseHotSpringResponse> UseHotSpringAsync(global::Mmo.Proto.Character.UseHotSpringRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_UseHotSpring, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -744,7 +821,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_AddCurrency, serviceImpl.AddCurrency)
           .AddMethod(__Method_GetCurrency, serviceImpl.GetCurrency)
           .AddMethod(__Method_ApplyGrant, serviceImpl.ApplyGrant)
-          .AddMethod(__Method_EnterDungeon, serviceImpl.EnterDungeon).Build();
+          .AddMethod(__Method_EnterDungeon, serviceImpl.EnterDungeon)
+          .AddMethod(__Method_UseHotSpring, serviceImpl.UseHotSpring).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -763,6 +841,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_GetCurrency, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.GetCurrencyRequest, global::Mmo.Proto.Character.GetCurrencyResponse>(serviceImpl.GetCurrency));
       serviceBinder.AddMethod(__Method_ApplyGrant, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ApplyGrantRequest, global::Mmo.Proto.Character.ApplyGrantResponse>(serviceImpl.ApplyGrant));
       serviceBinder.AddMethod(__Method_EnterDungeon, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnterDungeonRequest, global::Mmo.Proto.Character.EnterDungeonResponse>(serviceImpl.EnterDungeon));
+      serviceBinder.AddMethod(__Method_UseHotSpring, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse>(serviceImpl.UseHotSpring));
     }
 
   }

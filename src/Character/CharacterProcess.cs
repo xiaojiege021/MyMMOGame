@@ -49,7 +49,8 @@ public sealed class CharacterProcess(string configPath)
             + " bag_slots=" + config.BagSlots);
         Console.WriteLine("currencies=" + currencies.All.Count + " currency_table_version=" + currencies.Version);
         Console.WriteLine("dungeons=" + dungeons.All.Count + " dungeon_table_version=" + dungeons.Version
-            + " fatigue_daily_cap=" + dungeons.FatigueDailyCap);
+            + " fatigue_daily_cap=" + dungeons.FatigueDailyCap
+            + " hot_spring_recovery=" + dungeons.HotSpringRecovery);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -67,6 +68,7 @@ public sealed class CharacterProcess(string configPath)
         var currency = new CurrencyRepository(dataSource);
         var grants = new GrantRepository(dataSource, items, currencies, config);
         var dungeonEntries = new DungeonEntryRepository(dataSource);
+        var hotSpring = new HotSpringRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -92,6 +94,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(currencies);
         builder.Services.AddSingleton(dungeons);
         builder.Services.AddSingleton(dungeonEntries);
+        builder.Services.AddSingleton(hotSpring);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

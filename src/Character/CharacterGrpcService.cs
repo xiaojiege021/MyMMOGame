@@ -20,6 +20,7 @@ public sealed class CharacterGrpcService(
     CurrencyTable currencies,
     DungeonTable dungeons,
     DungeonEntryRepository dungeonEntries,
+    HotSpringRepository hotSpring,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -568,6 +569,57 @@ public sealed class CharacterGrpcService(
             EntryId = (ulong)outcome.EntryId,
             FatigueCost = outcome.FatigueCost,
             FatigueDailyCap = outcome.DailyCap,
+        };
+    }
+
+    /// <summary>
+    /// 温泉。恢复量从 config/dungeons.json 的 hot_spring_recovery 读（方案写定 1500），
+    /// 客户端请求里没有「恢复多少」这个字段，改不了包也改不了数值。
+    /// 角色服是持久数据的唯一写入方：网关只转请求，扣疲劳的进本和补疲劳的温泉
+    /// 都在这里落库，且共用同一把行锁。
+    /// </summary>
+    public override async Task<UseHotSpringResponse> UseHotSpring(
+        UseHotSpringRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await hotSpring.UseAsync(
+            characterId, account, dungeons.HotSpringRecovery, context.CancellationToken);
+        if (!outcome.Found)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "hot_spring account={Account} id={Id} before={Before} recovered={Recovered} "
+            + "fatigue={Fatigue} cap={Cap} share={Share}",
+            account, characterId, outcome.FatigueBefore, outcome.Recovered,
+            outcome.Fatigue, dungeons.FatigueDailyCap, outcome.WeeklyShare);
+
+        return new UseHotSpringResponse
+        {
+            FatigueBefore = outcome.FatigueBefore,
+            Recovered = outcome.Recovered,
+            Fatigue = outcome.Fatigue,
+            FatigueDailyCap = dungeons.FatigueDailyCap,
+            RecoveryLimit = dungeons.HotSpringRecovery,
+            WeeklyShare = outcome.WeeklyShare,
         };
     }
 
