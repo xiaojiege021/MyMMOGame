@@ -20,6 +20,7 @@ public sealed class CharacterGrpcService(
     CurrencyTable currencies,
     DungeonTable dungeons,
     DungeonEntryRepository dungeonEntries,
+    WeeklyShareRepository weeklyShares,
     HotSpringRepository hotSpring,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
@@ -461,9 +462,11 @@ public sealed class CharacterGrpcService(
 
     /// <summary>
     /// 进本。人数上限与「扣不扣疲劳、占不占份额」都来自 config/dungeons.json。
-    /// 主线 1 人、不扣不占（P1-2a 的路径）。扣疲劳的本（深渊）按人数倍增，
-    /// 到日上限就整笔拒绝；扣减与进本记录在一个事务里。
-    /// 战斗服那边还有一道同样的上限（它按 party 开本），两道都挡。
+    /// 主线 1 人、不扣不占（P1-2a 的路径）；扣疲劳的本（深渊）按人数倍增，
+    /// 到日上限就整笔拒绝；占周份额的本（巢穴）按人数扣份额、按人数记产出份数，
+    /// 到周上限整笔拒绝。两种扣减与进本记录各在一个事务里。
+    /// 战斗服那边还有一道同样的人数上限（它按 party 开本），两道都挡。
+    /// 准入只看等级，不查境界：元婴副本的境界门槛在后面的卡。
     /// </summary>
     public override async Task<EnterDungeonResponse> EnterDungeon(
         EnterDungeonRequest request,
@@ -515,6 +518,43 @@ public sealed class CharacterGrpcService(
                 "party_too_large", dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
         }
 
+        // 占周份额的本（巢穴）：与疲劳解绑，不扣疲劳，但按人数扣份额、按人数记份数。
+        // 单人 1 份，4 人一次 4 份；一周 12 份，扣完这周就不能再进。
+        if (dungeon.TakesWeeklyShare)
+        {
+            var share = await weeklyShares.EnterWithWeeklyShareAsync(
+                characterId, account, dungeon, partySize, dungeons.WeeklyShareCap,
+                context.CancellationToken);
+            if (share.Reason == "character_not_found")
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+
+            logger.LogInformation(
+                "dungeon_enter account={Account} id={Id} dungeon={Dungeon} party={Party} "
+                + "allowed={Allowed} reason={Reason} share_cost={ShareCost} used={Used} "
+                + "remaining={Remaining} reward_shares={Shares} fatigue={Fatigue} entry={Entry}",
+                account, characterId, dungeon.Id, partySize,
+                share.Allowed, share.Reason, share.Cost, share.Used,
+                share.Remaining, share.RewardShares, share.Fatigue, share.EntryId);
+
+            return new EnterDungeonResponse
+            {
+                Allowed = share.Allowed,
+                Reason = share.Reason,
+                MaxPlayers = (uint)dungeon.MaxPlayers,
+                Fatigue = share.Fatigue,
+                WeeklyShare = share.Used,
+                EntryId = (ulong)share.EntryId,
+                FatigueCost = 0,
+                FatigueDailyCap = dungeons.FatigueDailyCap,
+                WeeklyShareCost = share.Cost,
+                WeeklyShareRemaining = share.Remaining,
+                WeeklyShareCap = share.WeeklyCap,
+                RewardShares = share.RewardShares,
+            };
+        }
+
         // 不扣疲劳的本（主线）：P1-2a 的路径，一行进本记录，账完全不动。
         if (!dungeon.ChargesFatigue)
         {
@@ -537,6 +577,10 @@ public sealed class CharacterGrpcService(
                 EntryId = (ulong)entryId,
                 FatigueCost = 0,
                 FatigueDailyCap = dungeons.FatigueDailyCap,
+                WeeklyShareCost = 0,
+                WeeklyShareRemaining = dungeons.WeeklyShareCap - reserves.Value.WeeklyShare,
+                WeeklyShareCap = dungeons.WeeklyShareCap,
+                RewardShares = 0,
             };
         }
 
@@ -569,6 +613,10 @@ public sealed class CharacterGrpcService(
             EntryId = (ulong)outcome.EntryId,
             FatigueCost = outcome.FatigueCost,
             FatigueDailyCap = outcome.DailyCap,
+            WeeklyShareCost = 0,
+            WeeklyShareRemaining = dungeons.WeeklyShareCap - outcome.WeeklyShare,
+            WeeklyShareCap = dungeons.WeeklyShareCap,
+            RewardShares = 0,
         };
     }
 
@@ -633,5 +681,9 @@ public sealed class CharacterGrpcService(
             WeeklyShare = weeklyShare,
             FatigueCost = 0,
             FatigueDailyCap = dungeons.FatigueDailyCap,
+            WeeklyShareCost = 0,
+            WeeklyShareRemaining = dungeons.WeeklyShareCap - weeklyShare,
+            WeeklyShareCap = dungeons.WeeklyShareCap,
+            RewardShares = 0,
         };
 }

@@ -25,6 +25,13 @@ long setFatigueDayId = 0;
 string? setFatigueDay = null;
 long rawFatigueId = 0;
 var rawFatigueValue = 0;
+long shareStateOf = 0;
+long setWeekDayId = 0;
+string? setWeekDay = null;
+long rawShareId = 0;
+var rawShareValue = 0;
+long sharesTotalOf = 0;
+string? sharesTotalDungeon = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -93,6 +100,25 @@ for (var i = 0; i < args.Length; i++)
             long.TryParse(args[++i], out rawFatigueId);
             int.TryParse(args[++i], out rawFatigueValue);
             break;
+        // 只给核对用：读已用份额、剩余份额、周界与疲劳。
+        case "--share-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out shareStateOf);
+            break;
+        // 只给核对用：把周界改到别的周首，验跨周归零。
+        case "--set-week-day" when i + 2 < args.Length:
+            long.TryParse(args[++i], out setWeekDayId);
+            setWeekDay = args[++i];
+            break;
+        // 只给核对用：绕过接口直写已用份额，造并发现场或验库层非负 CHECK。
+        case "--raw-share-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawShareId);
+            int.TryParse(args[++i], out rawShareValue);
+            break;
+        // 只给核对用：这个角色在某个副本累计应得多少单人份。
+        case "--shares-total" when i + 2 < args.Length:
+            long.TryParse(args[++i], out sharesTotalOf);
+            sharesTotalDungeon = args[++i];
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -103,7 +129,8 @@ for (var i = 0; i < args.Length; i++)
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
-    || rawFatigueId != 0)
+    || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
+    || rawShareId != 0 || sharesTotalDungeon != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -254,6 +281,55 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     Console.WriteLine("raw_fatigue=rejected id=" + rawFatigueId
                         + " fatigue=" + rawFatigueValue + " sqlstate=" + ex.SqlState);
                 }
+            }
+        }
+
+        if (shareStateOf != 0 || setWeekDay != null || rawShareId != 0 || sharesTotalDungeon != null)
+        {
+            var weeklyShares = new WeeklyShareRepository(dataSource);
+
+            if (shareStateOf != 0)
+            {
+                // 上限从同一个副本表读，和跑着的角色服看到的是同一份。
+                var weeklyCap = DungeonTable.Load(CharacterConfig.Load(configPath).DungeonTable).WeeklyShareCap;
+                var state = await weeklyShares.ShareStateAsync(shareStateOf, weeklyCap, CancellationToken.None);
+                Console.WriteLine(state is null
+                    ? "share_state=missing id=" + shareStateOf
+                    : "share_state=ok id=" + shareStateOf
+                      + " used=" + state.Value.Used
+                      + " remaining=" + state.Value.Remaining
+                      + " fatigue=" + state.Value.Fatigue
+                      + " week=" + state.Value.Week.ToString("yyyy-MM-dd"));
+            }
+
+            if (setWeekDay != null && setWeekDayId != 0
+                && DateOnly.TryParse(setWeekDay, out var week))
+            {
+                await weeklyShares.SetWeeklyShareDayAsync(setWeekDayId, week, CancellationToken.None);
+                Console.WriteLine("week_day=set id=" + setWeekDayId + " day=" + week.ToString("yyyy-MM-dd"));
+            }
+
+            if (rawShareId != 0)
+            {
+                try
+                {
+                    await weeklyShares.RawWriteShareAsync(rawShareId, rawShareValue, CancellationToken.None);
+                    Console.WriteLine("raw_share=written id=" + rawShareId + " used=" + rawShareValue);
+                }
+                catch (PostgresException ex)
+                {
+                    // 核对要看到的就是这个：库层 CHECK 把负份额挡住了。
+                    Console.WriteLine("raw_share=rejected id=" + rawShareId
+                        + " used=" + rawShareValue + " sqlstate=" + ex.SqlState);
+                }
+            }
+
+            if (sharesTotalDungeon != null && sharesTotalOf != 0)
+            {
+                var total = await weeklyShares.SharesTotalAsync(
+                    sharesTotalOf, sharesTotalDungeon, CancellationToken.None);
+                Console.WriteLine("shares_total=" + total + " id=" + sharesTotalOf
+                    + " dungeon=" + sharesTotalDungeon);
             }
         }
 

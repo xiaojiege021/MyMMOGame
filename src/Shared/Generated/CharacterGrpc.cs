@@ -273,7 +273,8 @@ namespace Mmo.Proto.Character {
       }
 
       /// <summary>
-      /// 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
+      /// 进本。主线只允许 1 人、不扣疲劳不占周份额；深渊按人数扣疲劳；
+      /// 巢穴按人数占周份额、按人数记产出份数。
       /// 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
       /// </summary>
       /// <param name="request">The request received from the client.</param>
@@ -696,7 +697,8 @@ namespace Mmo.Proto.Character {
         return CallInvoker.AsyncUnaryCall(__Method_ApplyGrant, null, options, request);
       }
       /// <summary>
-      /// 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
+      /// 进本。主线只允许 1 人、不扣疲劳不占周份额；深渊按人数扣疲劳；
+      /// 巢穴按人数占周份额、按人数记产出份数。
       /// 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
@@ -710,7 +712,8 @@ namespace Mmo.Proto.Character {
         return EnterDungeon(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
-      /// 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
+      /// 进本。主线只允许 1 人、不扣疲劳不占周份额；深渊按人数扣疲劳；
+      /// 巢穴按人数占周份额、按人数记产出份数。
       /// 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
@@ -722,7 +725,8 @@ namespace Mmo.Proto.Character {
         return CallInvoker.BlockingUnaryCall(__Method_EnterDungeon, null, options, request);
       }
       /// <summary>
-      /// 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
+      /// 进本。主线只允许 1 人、不扣疲劳不占周份额；深渊按人数扣疲劳；
+      /// 巢穴按人数占周份额、按人数记产出份数。
       /// 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
@@ -736,7 +740,8 @@ namespace Mmo.Proto.Character {
         return EnterDungeonAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
-      /// 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
+      /// 进本。主线只允许 1 人、不扣疲劳不占周份额；深渊按人数扣疲劳；
+      /// 巢穴按人数占周份额、按人数记产出份数。
       /// 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>

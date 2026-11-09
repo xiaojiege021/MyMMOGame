@@ -62,7 +62,8 @@ service CharacterService {
   // 同一个事务号再提交不会发第二次，响应里 duplicate=true。
   rpc ApplyGrant(ApplyGrantRequest) returns (ApplyGrantResponse);
 
-  // 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
+  // 进本。主线只允许 1 人、不扣疲劳不占周份额；深渊按人数扣疲劳；
+  // 巢穴按人数占周份额、按人数记产出份数。
   // 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
   rpc EnterDungeon(EnterDungeonRequest) returns (EnterDungeonResponse);
 
@@ -106,10 +107,19 @@ message EnterDungeonResponse {
   int32 fatigue = 4;
   int32 weekly_share = 5;
   uint64 entry_id = 6;
-  // 这一次要扣多少疲劳（深渊 = 单人基础 × 进本人数，主线 = 0），被拒时为 0。
+  // 这一次要扣多少疲劳（深渊 = 单人基础 × 进本人数，主线与巢穴 = 0），被拒时为 0。
   int32 fatigue_cost = 7;
   // 当天的疲劳上限，配置来自 config/dungeons.json。
   int32 fatigue_daily_cap = 8;
+  // 这一次扣掉多少周份额（巢穴 = 进本人数，主线与深渊 = 0），被拒时为 0。
+  int32 weekly_share_cost = 9;
+  // 这一周还剩多少个单人份（方案写定每周 12 个）。
+  int32 weekly_share_remaining = 10;
+  // 一周的总份额，配置来自 config/dungeons.json。
+  int32 weekly_share_cap = 11;
+  // 本次应得的单人产出份数：单人通关产出 × 进本人数；主线与深渊为 0。
+  // 实物种类与数量属掉落表，在后面的卡发放。
+  int32 reward_shares = 12;
 }
 
 // 一条变更：加/减货币，或者往格子里放物品。一个事务里可以混着来。

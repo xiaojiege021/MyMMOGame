@@ -39,61 +39,63 @@ namespace Mmo.Proto.Character {
             "YXAYBCABKAUSFgoOcmVjb3ZlcnlfbGltaXQYBSABKAUSFAoMd2Vla2x5X3No",
             "YXJlGAYgASgFImQKE0VudGVyRHVuZ2VvblJlcXVlc3QSDwoHYWNjb3VudBgB",
             "IAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSEgoKZHVuZ2Vvbl9pZBgDIAEo",
-            "CRISCgpwYXJ0eV9zaXplGAQgASgNIrYBChRFbnRlckR1bmdlb25SZXNwb25z",
+            "CRISCgpwYXJ0eV9zaXplGAQgASgNIqICChRFbnRlckR1bmdlb25SZXNwb25z",
             "ZRIPCgdhbGxvd2VkGAEgASgIEg4KBnJlYXNvbhgCIAEoCRITCgttYXhfcGxh",
             "eWVycxgDIAEoDRIPCgdmYXRpZ3VlGAQgASgFEhQKDHdlZWtseV9zaGFyZRgF",
             "IAEoBRIQCghlbnRyeV9pZBgGIAEoBBIUCgxmYXRpZ3VlX2Nvc3QYByABKAUS",
-            "GQoRZmF0aWd1ZV9kYWlseV9jYXAYCCABKAUicAoKR3JhbnRFbnRyeRIwCghj",
-            "dXJyZW5jeRgBIAEoCzIcLm1tby5jaGFyYWN0ZXIuQ3VycmVuY3lEZWx0YUgA",
-            "EigKBGl0ZW0YAiABKAsyGC5tbW8uY2hhcmFjdGVyLkl0ZW1EZWx0YUgAQgYK",
-            "BGJvZHkiLAoNQ3VycmVuY3lEZWx0YRIMCgRraW5kGAEgASgJEg0KBWRlbHRh",
-            "GAIgASgDIjkKCUl0ZW1EZWx0YRIMCgRzbG90GAEgASgNEg8KB2l0ZW1faWQY",
-            "AiABKAkSDQoFY291bnQYAyABKAUidgoRQXBwbHlHcmFudFJlcXVlc3QSDwoH",
-            "YWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDgoGdHhuX2lk",
-            "GAMgASgJEioKB2VudHJpZXMYBCADKAsyGS5tbW8uY2hhcmFjdGVyLkdyYW50",
-            "RW50cnkihgEKEkFwcGx5R3JhbnRSZXNwb25zZRIRCglkdXBsaWNhdGUYASAB",
-            "KAgSMAoIYmFsYW5jZXMYAiADKAsyHi5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5",
-            "QmFsYW5jZRIrCgVzbG90cxgDIAMoCzIcLm1tby5jaGFyYWN0ZXIuSW52ZW50",
-            "b3J5U2xvdCJYChJBZGRDdXJyZW5jeVJlcXVlc3QSDwoHYWNjb3VudBgBIAEo",
-            "CRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDAoEa2luZBgDIAEoCRINCgVkZWx0",
-            "YRgEIAEoAyIvCg9DdXJyZW5jeUJhbGFuY2USDAoEa2luZBgBIAEoCRIOCgZh",
-            "bW91bnQYAiABKAMiOwoSR2V0Q3VycmVuY3lSZXF1ZXN0Eg8KB2FjY291bnQY",
-            "ASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEIkcKE0dldEN1cnJlbmN5UmVz",
-            "cG9uc2USMAoIYmFsYW5jZXMYASADKAsyHi5tbW8uY2hhcmFjdGVyLkN1cnJl",
-            "bmN5QmFsYW5jZSJHCg9TZXRMZXZlbFJlcXVlc3QSDwoHYWNjb3VudBgBIAEo",
-            "CRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDQoFbGV2ZWwYAyABKAUiNwoQU2V0",
-            "TGV2ZWxSZXNwb25zZRIUCgxjaGFyYWN0ZXJfaWQYASABKAQSDQoFbGV2ZWwY",
-            "AiABKAUiZQoOQWRkSXRlbVJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxj",
-            "aGFyYWN0ZXJfaWQYAiABKAQSDAoEc2xvdBgDIAEoDRIPCgdpdGVtX2lkGAQg",
-            "ASgJEg0KBWNvdW50GAUgASgFIkwKDUludmVudG9yeVNsb3QSDAoEc2xvdBgB",
-            "IAEoDRIPCgdpdGVtX2lkGAIgASgJEg0KBWNvdW50GAMgASgFEg0KBWJvdW5k",
-            "GAQgASgIIj0KFExpc3RJbnZlbnRvcnlSZXF1ZXN0Eg8KB2FjY291bnQYASAB",
-            "KAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEIlcKFUxpc3RJbnZlbnRvcnlSZXNw",
-            "b25zZRIrCgVzbG90cxgBIAMoCzIcLm1tby5jaGFyYWN0ZXIuSW52ZW50b3J5",
-            "U2xvdBIRCgliYWdfc2xvdHMYAiABKA0iRgoPQ2FuVHJhZGVSZXF1ZXN0Eg8K",
-            "B2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEgwKBHNsb3QY",
-            "AyABKA0iNAoQQ2FuVHJhZGVSZXNwb25zZRIQCgh0cmFkYWJsZRgBIAEoCBIO",
-            "CgZyZWFzb24YAiABKAky3wYKEENoYXJhY3RlclNlcnZpY2USYAoPQ3JlYXRl",
-            "Q2hhcmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXF1",
-            "ZXN0GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXNwb25zZRJL",
-            "CghTZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXF1ZXN0Gh8u",
-            "bW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYKB0FkZEl0ZW0SHS5t",
-            "bW8uY2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNoYXJhY3Rlci5J",
-            "bnZlbnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8uY2hhcmFjdGVy",
-            "Lkxpc3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5MaXN0SW52",
-            "ZW50b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hhcmFjdGVyLkNh",
-            "blRyYWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXNwb25z",
-            "ZRJQCgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRkQ3VycmVuY3lS",
-            "ZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFuY2USVAoLR2V0",
-            "Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVxdWVzdBoi",
-            "Lm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJRCgpBcHBseUdy",
-            "YW50EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVxdWVzdBohLm1tby5j",
-            "aGFyYWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVudGVyRHVuZ2VvbhIi",
-            "Lm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBojLm1tby5jaGFy",
-            "YWN0ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNlSG90U3ByaW5nEiIu",
-            "bW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMubW1vLmNoYXJh",
-            "Y3Rlci5Vc2VIb3RTcHJpbmdSZXNwb25zZUIWqgITTW1vLlByb3RvLkNoYXJh",
-            "Y3RlcmIGcHJvdG8z"));
+            "GQoRZmF0aWd1ZV9kYWlseV9jYXAYCCABKAUSGQoRd2Vla2x5X3NoYXJlX2Nv",
+            "c3QYCSABKAUSHgoWd2Vla2x5X3NoYXJlX3JlbWFpbmluZxgKIAEoBRIYChB3",
+            "ZWVrbHlfc2hhcmVfY2FwGAsgASgFEhUKDXJld2FyZF9zaGFyZXMYDCABKAUi",
+            "cAoKR3JhbnRFbnRyeRIwCghjdXJyZW5jeRgBIAEoCzIcLm1tby5jaGFyYWN0",
+            "ZXIuQ3VycmVuY3lEZWx0YUgAEigKBGl0ZW0YAiABKAsyGC5tbW8uY2hhcmFj",
+            "dGVyLkl0ZW1EZWx0YUgAQgYKBGJvZHkiLAoNQ3VycmVuY3lEZWx0YRIMCgRr",
+            "aW5kGAEgASgJEg0KBWRlbHRhGAIgASgDIjkKCUl0ZW1EZWx0YRIMCgRzbG90",
+            "GAEgASgNEg8KB2l0ZW1faWQYAiABKAkSDQoFY291bnQYAyABKAUidgoRQXBw",
+            "bHlHcmFudFJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJf",
+            "aWQYAiABKAQSDgoGdHhuX2lkGAMgASgJEioKB2VudHJpZXMYBCADKAsyGS5t",
+            "bW8uY2hhcmFjdGVyLkdyYW50RW50cnkihgEKEkFwcGx5R3JhbnRSZXNwb25z",
+            "ZRIRCglkdXBsaWNhdGUYASABKAgSMAoIYmFsYW5jZXMYAiADKAsyHi5tbW8u",
+            "Y2hhcmFjdGVyLkN1cnJlbmN5QmFsYW5jZRIrCgVzbG90cxgDIAMoCzIcLm1t",
+            "by5jaGFyYWN0ZXIuSW52ZW50b3J5U2xvdCJYChJBZGRDdXJyZW5jeVJlcXVl",
+            "c3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDAoE",
+            "a2luZBgDIAEoCRINCgVkZWx0YRgEIAEoAyIvCg9DdXJyZW5jeUJhbGFuY2US",
+            "DAoEa2luZBgBIAEoCRIOCgZhbW91bnQYAiABKAMiOwoSR2V0Q3VycmVuY3lS",
+            "ZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgE",
+            "IkcKE0dldEN1cnJlbmN5UmVzcG9uc2USMAoIYmFsYW5jZXMYASADKAsyHi5t",
+            "bW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFsYW5jZSJHCg9TZXRMZXZlbFJlcXVl",
+            "c3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDQoF",
+            "bGV2ZWwYAyABKAUiNwoQU2V0TGV2ZWxSZXNwb25zZRIUCgxjaGFyYWN0ZXJf",
+            "aWQYASABKAQSDQoFbGV2ZWwYAiABKAUiZQoOQWRkSXRlbVJlcXVlc3QSDwoH",
+            "YWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDAoEc2xvdBgD",
+            "IAEoDRIPCgdpdGVtX2lkGAQgASgJEg0KBWNvdW50GAUgASgFIkwKDUludmVu",
+            "dG9yeVNsb3QSDAoEc2xvdBgBIAEoDRIPCgdpdGVtX2lkGAIgASgJEg0KBWNv",
+            "dW50GAMgASgFEg0KBWJvdW5kGAQgASgIIj0KFExpc3RJbnZlbnRvcnlSZXF1",
+            "ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEIlcK",
+            "FUxpc3RJbnZlbnRvcnlSZXNwb25zZRIrCgVzbG90cxgBIAMoCzIcLm1tby5j",
+            "aGFyYWN0ZXIuSW52ZW50b3J5U2xvdBIRCgliYWdfc2xvdHMYAiABKA0iRgoP",
+            "Q2FuVHJhZGVSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVy",
+            "X2lkGAIgASgEEgwKBHNsb3QYAyABKA0iNAoQQ2FuVHJhZGVSZXNwb25zZRIQ",
+            "Cgh0cmFkYWJsZRgBIAEoCBIOCgZyZWFzb24YAiABKAky3wYKEENoYXJhY3Rl",
+            "clNlcnZpY2USYAoPQ3JlYXRlQ2hhcmFjdGVyEiUubW1vLmNoYXJhY3Rlci5D",
+            "cmVhdGVDaGFyYWN0ZXJSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVD",
+            "aGFyYWN0ZXJSZXNwb25zZRJLCghTZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIu",
+            "U2V0TGV2ZWxSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlc3Bv",
+            "bnNlEkYKB0FkZEl0ZW0SHS5tbW8uY2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0",
+            "GhwubW1vLmNoYXJhY3Rlci5JbnZlbnRvcnlTbG90EloKDUxpc3RJbnZlbnRv",
+            "cnkSIy5tbW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1v",
+            "LmNoYXJhY3Rlci5MaXN0SW52ZW50b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUS",
+            "Hi5tbW8uY2hhcmFjdGVyLkNhblRyYWRlUmVxdWVzdBofLm1tby5jaGFyYWN0",
+            "ZXIuQ2FuVHJhZGVSZXNwb25zZRJQCgtBZGRDdXJyZW5jeRIhLm1tby5jaGFy",
+            "YWN0ZXIuQWRkQ3VycmVuY3lSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJy",
+            "ZW5jeUJhbGFuY2USVAoLR2V0Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdl",
+            "dEN1cnJlbmN5UmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lS",
+            "ZXNwb25zZRJRCgpBcHBseUdyYW50EiAubW1vLmNoYXJhY3Rlci5BcHBseUdy",
+            "YW50UmVxdWVzdBohLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNl",
+            "ElcKDEVudGVyRHVuZ2VvbhIiLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9u",
+            "UmVxdWVzdBojLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2US",
+            "VwoMVXNlSG90U3ByaW5nEiIubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdS",
+            "ZXF1ZXN0GiMubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXNwb25zZUIW",
+            "qgITTW1vLlByb3RvLkNoYXJhY3RlcmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -102,7 +104,7 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.UseHotSpringRequest), global::Mmo.Proto.Character.UseHotSpringRequest.Parser, new[]{ "Account", "CharacterId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.UseHotSpringResponse), global::Mmo.Proto.Character.UseHotSpringResponse.Parser, new[]{ "FatigueBefore", "Recovered", "Fatigue", "FatigueDailyCap", "RecoveryLimit", "WeeklyShare" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnterDungeonRequest), global::Mmo.Proto.Character.EnterDungeonRequest.Parser, new[]{ "Account", "CharacterId", "DungeonId", "PartySize" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnterDungeonResponse), global::Mmo.Proto.Character.EnterDungeonResponse.Parser, new[]{ "Allowed", "Reason", "MaxPlayers", "Fatigue", "WeeklyShare", "EntryId", "FatigueCost", "FatigueDailyCap" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnterDungeonResponse), global::Mmo.Proto.Character.EnterDungeonResponse.Parser, new[]{ "Allowed", "Reason", "MaxPlayers", "Fatigue", "WeeklyShare", "EntryId", "FatigueCost", "FatigueDailyCap", "WeeklyShareCost", "WeeklyShareRemaining", "WeeklyShareCap", "RewardShares" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.GrantEntry), global::Mmo.Proto.Character.GrantEntry.Parser, new[]{ "Currency", "Item" }, new[]{ "Body" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CurrencyDelta), global::Mmo.Proto.Character.CurrencyDelta.Parser, new[]{ "Kind", "Delta" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ItemDelta), global::Mmo.Proto.Character.ItemDelta.Parser, new[]{ "Slot", "ItemId", "Count" }, null, null, null, null),
@@ -2045,6 +2047,10 @@ namespace Mmo.Proto.Character {
       entryId_ = other.entryId_;
       fatigueCost_ = other.fatigueCost_;
       fatigueDailyCap_ = other.fatigueDailyCap_;
+      weeklyShareCost_ = other.weeklyShareCost_;
+      weeklyShareRemaining_ = other.weeklyShareRemaining_;
+      weeklyShareCap_ = other.weeklyShareCap_;
+      rewardShares_ = other.rewardShares_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2136,7 +2142,7 @@ namespace Mmo.Proto.Character {
     public const int FatigueCostFieldNumber = 7;
     private int fatigueCost_;
     /// <summary>
-    /// 这一次要扣多少疲劳（深渊 = 单人基础 × 进本人数，主线 = 0），被拒时为 0。
+    /// 这一次要扣多少疲劳（深渊 = 单人基础 × 进本人数，主线与巢穴 = 0），被拒时为 0。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -2159,6 +2165,67 @@ namespace Mmo.Proto.Character {
       get { return fatigueDailyCap_; }
       set {
         fatigueDailyCap_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "weekly_share_cost" field.</summary>
+    public const int WeeklyShareCostFieldNumber = 9;
+    private int weeklyShareCost_;
+    /// <summary>
+    /// 这一次扣掉多少周份额（巢穴 = 进本人数，主线与深渊 = 0），被拒时为 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int WeeklyShareCost {
+      get { return weeklyShareCost_; }
+      set {
+        weeklyShareCost_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "weekly_share_remaining" field.</summary>
+    public const int WeeklyShareRemainingFieldNumber = 10;
+    private int weeklyShareRemaining_;
+    /// <summary>
+    /// 这一周还剩多少个单人份（方案写定每周 12 个）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int WeeklyShareRemaining {
+      get { return weeklyShareRemaining_; }
+      set {
+        weeklyShareRemaining_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "weekly_share_cap" field.</summary>
+    public const int WeeklyShareCapFieldNumber = 11;
+    private int weeklyShareCap_;
+    /// <summary>
+    /// 一周的总份额，配置来自 config/dungeons.json。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int WeeklyShareCap {
+      get { return weeklyShareCap_; }
+      set {
+        weeklyShareCap_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reward_shares" field.</summary>
+    public const int RewardSharesFieldNumber = 12;
+    private int rewardShares_;
+    /// <summary>
+    /// 本次应得的单人产出份数：单人通关产出 × 进本人数；主线与深渊为 0。
+    /// 实物种类与数量属掉落表，在后面的卡发放。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int RewardShares {
+      get { return rewardShares_; }
+      set {
+        rewardShares_ = value;
       }
     }
 
@@ -2185,6 +2252,10 @@ namespace Mmo.Proto.Character {
       if (EntryId != other.EntryId) return false;
       if (FatigueCost != other.FatigueCost) return false;
       if (FatigueDailyCap != other.FatigueDailyCap) return false;
+      if (WeeklyShareCost != other.WeeklyShareCost) return false;
+      if (WeeklyShareRemaining != other.WeeklyShareRemaining) return false;
+      if (WeeklyShareCap != other.WeeklyShareCap) return false;
+      if (RewardShares != other.RewardShares) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2200,6 +2271,10 @@ namespace Mmo.Proto.Character {
       if (EntryId != 0UL) hash ^= EntryId.GetHashCode();
       if (FatigueCost != 0) hash ^= FatigueCost.GetHashCode();
       if (FatigueDailyCap != 0) hash ^= FatigueDailyCap.GetHashCode();
+      if (WeeklyShareCost != 0) hash ^= WeeklyShareCost.GetHashCode();
+      if (WeeklyShareRemaining != 0) hash ^= WeeklyShareRemaining.GetHashCode();
+      if (WeeklyShareCap != 0) hash ^= WeeklyShareCap.GetHashCode();
+      if (RewardShares != 0) hash ^= RewardShares.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2250,6 +2325,22 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(64);
         output.WriteInt32(FatigueDailyCap);
       }
+      if (WeeklyShareCost != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(WeeklyShareCost);
+      }
+      if (WeeklyShareRemaining != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(WeeklyShareRemaining);
+      }
+      if (WeeklyShareCap != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(WeeklyShareCap);
+      }
+      if (RewardShares != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(RewardShares);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2292,6 +2383,22 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(64);
         output.WriteInt32(FatigueDailyCap);
       }
+      if (WeeklyShareCost != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(WeeklyShareCost);
+      }
+      if (WeeklyShareRemaining != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(WeeklyShareRemaining);
+      }
+      if (WeeklyShareCap != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(WeeklyShareCap);
+      }
+      if (RewardShares != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(RewardShares);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2325,6 +2432,18 @@ namespace Mmo.Proto.Character {
       }
       if (FatigueDailyCap != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(FatigueDailyCap);
+      }
+      if (WeeklyShareCost != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(WeeklyShareCost);
+      }
+      if (WeeklyShareRemaining != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(WeeklyShareRemaining);
+      }
+      if (WeeklyShareCap != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(WeeklyShareCap);
+      }
+      if (RewardShares != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RewardShares);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2361,6 +2480,18 @@ namespace Mmo.Proto.Character {
       }
       if (other.FatigueDailyCap != 0) {
         FatigueDailyCap = other.FatigueDailyCap;
+      }
+      if (other.WeeklyShareCost != 0) {
+        WeeklyShareCost = other.WeeklyShareCost;
+      }
+      if (other.WeeklyShareRemaining != 0) {
+        WeeklyShareRemaining = other.WeeklyShareRemaining;
+      }
+      if (other.WeeklyShareCap != 0) {
+        WeeklyShareCap = other.WeeklyShareCap;
+      }
+      if (other.RewardShares != 0) {
+        RewardShares = other.RewardShares;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2413,6 +2544,22 @@ namespace Mmo.Proto.Character {
             FatigueDailyCap = input.ReadInt32();
             break;
           }
+          case 72: {
+            WeeklyShareCost = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            WeeklyShareRemaining = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            WeeklyShareCap = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            RewardShares = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -2462,6 +2609,22 @@ namespace Mmo.Proto.Character {
           }
           case 64: {
             FatigueDailyCap = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            WeeklyShareCost = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            WeeklyShareRemaining = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            WeeklyShareCap = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            RewardShares = input.ReadInt32();
             break;
           }
         }

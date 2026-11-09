@@ -32,6 +32,15 @@ public sealed class DungeonTable
     /// <summary>温泉用一次恢复多少疲劳（方案写定 1500），只补疲劳。</summary>
     public int HotSpringRecovery { get; }
 
+    /// <summary>一周能用掉多少个单人份（方案写定 12）。</summary>
+    public int WeeklyShareCap { get; }
+
+    /// <summary>每多一名队员，怪物生命多出的倍数。方案没写定曲线，数值在配置里。</summary>
+    public double MonsterHpScalePerPlayer { get; }
+
+    /// <summary>每多一名队员，怪物伤害多出的倍数。方案没写定曲线，数值在配置里。</summary>
+    public double MonsterDamageScalePerPlayer { get; }
+
     public IReadOnlyCollection<DungeonDef> All => _byId.Values;
 
     public DungeonDef? Find(string id) => _byId.GetValueOrDefault(id);
@@ -40,12 +49,18 @@ public sealed class DungeonTable
         Dictionary<string, DungeonDef> byId,
         int version,
         int fatigueDailyCap,
-        int hotSpringRecovery)
+        int hotSpringRecovery,
+        int weeklyShareCap,
+        double monsterHpScalePerPlayer,
+        double monsterDamageScalePerPlayer)
     {
         _byId = byId;
         Version = version;
         FatigueDailyCap = fatigueDailyCap;
         HotSpringRecovery = hotSpringRecovery;
+        WeeklyShareCap = weeklyShareCap;
+        MonsterHpScalePerPlayer = monsterHpScalePerPlayer;
+        MonsterDamageScalePerPlayer = monsterDamageScalePerPlayer;
     }
 
     public static DungeonTable Load(string path)
@@ -82,6 +97,24 @@ public sealed class DungeonTable
                 "hot_spring_recovery 必须在 1 到 " + cap + " 之间，现在是 " + recovery);
         }
 
+        // 周份额上限与怪物缩放系数同样只有这一份配置，缺字段就起不来。
+        var weeklyCap = wire.WeeklyShareCap
+            ?? throw new ConfigException("dungeons.json 缺 weekly_share_cap");
+        if (weeklyCap < 1 || weeklyCap > 1_000_000)
+        {
+            throw new ConfigException("weekly_share_cap 必须在 1 到 1000000 之间，现在是 " + weeklyCap);
+        }
+
+        static double Scale(string key, double? value) =>
+            value is null
+                ? throw new ConfigException("dungeons.json 缺 " + key)
+                : double.IsFinite(value.Value) && value.Value >= 0 && value.Value <= 100
+                    ? value.Value
+                    : throw new ConfigException(key + " 必须在 0 到 100 之间，现在是 " + value.Value);
+
+        var hpScale = Scale("monster_hp_scale_per_player", wire.MonsterHpScalePerPlayer);
+        var damageScale = Scale("monster_damage_scale_per_player", wire.MonsterDamageScalePerPlayer);
+
         var map = new Dictionary<string, DungeonDef>(StringComparer.Ordinal);
         foreach (var item in wire.Dungeons)
         {
@@ -108,12 +141,18 @@ public sealed class DungeonTable
                 throw new ConfigException("副本 " + id + " 满员一次的疲劳就超过日上限，永远进不去");
             }
 
+            var takesShare = item.TakesWeeklyShare ?? false;
+            if (takesShare && item.MaxPlayers.Value > weeklyCap)
+            {
+                throw new ConfigException("副本 " + id + " 满员一次的份额就超过周上限，永远进不去");
+            }
+
             map[id] = new DungeonDef(
                 id,
                 (item.Name ?? id).Trim(),
                 item.MaxPlayers.Value,
                 charges,
-                item.TakesWeeklyShare ?? false,
+                takesShare,
                 charges ? perPlayer : 0);
         }
 
@@ -122,7 +161,7 @@ public sealed class DungeonTable
             throw new ConfigException("dungeons.json 里一个副本都没有");
         }
 
-        return new DungeonTable(map, wire.Version, cap, recovery);
+        return new DungeonTable(map, wire.Version, cap, recovery, weeklyCap, hpScale, damageScale);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -141,6 +180,15 @@ public sealed class DungeonTable
 
         [JsonPropertyName("hot_spring_recovery")]
         public int? HotSpringRecovery { get; init; }
+
+        [JsonPropertyName("weekly_share_cap")]
+        public int? WeeklyShareCap { get; init; }
+
+        [JsonPropertyName("monster_hp_scale_per_player")]
+        public double? MonsterHpScalePerPlayer { get; init; }
+
+        [JsonPropertyName("monster_damage_scale_per_player")]
+        public double? MonsterDamageScalePerPlayer { get; init; }
 
         [JsonPropertyName("dungeons")]
         public List<DungeonItem> Dungeons { get; init; } = [];

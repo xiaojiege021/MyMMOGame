@@ -15,14 +15,26 @@ public sealed class DungeonTable
 
     public int Version { get; }
 
+    /// <summary>每多一名队员，怪物生命多出的倍数（倍率 = 1 + (人数 - 1) × 系数）。</summary>
+    public double MonsterHpScalePerPlayer { get; }
+
+    /// <summary>每多一名队员，怪物伤害多出的倍数。方案没写定曲线，数值在配置里。</summary>
+    public double MonsterDamageScalePerPlayer { get; }
+
     public IReadOnlyCollection<DungeonDef> All => _byId.Values;
 
     public DungeonDef? Find(string id) => _byId.GetValueOrDefault(id);
 
-    DungeonTable(Dictionary<string, DungeonDef> byId, int version)
+    DungeonTable(
+        Dictionary<string, DungeonDef> byId,
+        int version,
+        double monsterHpScalePerPlayer,
+        double monsterDamageScalePerPlayer)
     {
         _byId = byId;
         Version = version;
+        MonsterHpScalePerPlayer = monsterHpScalePerPlayer;
+        MonsterDamageScalePerPlayer = monsterDamageScalePerPlayer;
     }
 
     public static DungeonTable Load(string path)
@@ -41,6 +53,18 @@ public sealed class DungeonTable
         {
             throw new ConfigException($"副本表不是合法 JSON：{ex.Message}");
         }
+
+        // 缩放系数与周份额表放在同一份配置里，战斗服只读自己要用的两个。
+        // 缺字段或越界直接起不来，不给代码里的兜底数字。
+        static double Scale(string key, double? value) =>
+            value is null
+                ? throw new ConfigException($"副本表缺 {key}")
+                : double.IsFinite(value.Value) && value.Value >= 0 && value.Value <= 100
+                    ? value.Value
+                    : throw new ConfigException($"{key} 必须在 0 到 100 之间，现在是 {value.Value}");
+
+        var hpScale = Scale("monster_hp_scale_per_player", wire.MonsterHpScalePerPlayer);
+        var damageScale = Scale("monster_damage_scale_per_player", wire.MonsterDamageScalePerPlayer);
 
         var map = new Dictionary<string, DungeonDef>(StringComparer.Ordinal);
         foreach (var item in wire.Dungeons)
@@ -69,13 +93,19 @@ public sealed class DungeonTable
             throw new ConfigException($"{path}：一个副本都没有");
         }
 
-        return new DungeonTable(map, wire.Version);
+        return new DungeonTable(map, wire.Version, hpScale, damageScale);
     }
 
     sealed record Wire
     {
         [JsonPropertyName("version")]
         public int Version { get; init; }
+
+        [JsonPropertyName("monster_hp_scale_per_player")]
+        public double? MonsterHpScalePerPlayer { get; init; }
+
+        [JsonPropertyName("monster_damage_scale_per_player")]
+        public double? MonsterDamageScalePerPlayer { get; init; }
 
         [JsonPropertyName("dungeons")]
         public List<Item> Dungeons { get; init; } = [];

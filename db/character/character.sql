@@ -46,3 +46,11 @@ ALTER TABLE "角色".character
     DROP CONSTRAINT IF EXISTS character_fatigue_daily_cap;
 ALTER TABLE "角色".character
     ADD CONSTRAINT character_fatigue_daily_cap CHECK (fatigue <= 6000);
+
+-- P1-2c：周份额是「这一周」的，记最后一次结算落在哪一个周首。
+-- 周界按数据库 date_trunc('week', current_date)（周一为一周之始），不另设时区配置。
+-- weekly_share 记的是「本周已经用掉的单人份」，每周上限 12 由 config/dungeons.json
+-- 的 weekly_share_cap 给，库层只守非负：数值只有一个正本，改配置不用改约束。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS weekly_share_day date
+    NOT NULL DEFAULT date_trunc('week', CURRENT_DATE::timestamp)::date;

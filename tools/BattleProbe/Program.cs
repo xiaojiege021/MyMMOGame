@@ -53,6 +53,8 @@ internal static class Program
                 "p11a2_reject" => await CaseP11a2RejectAsync(url),
                 "p11a2_expire" => await CaseP11a2ExpireAsync(url, boss, hit, waitMs),
                 "p12a_join" => await CaseP12aJoinAsync(url, Arg(args, "--expect") ?? "open", holdMs),
+                "p12c_boss_hit" => await CaseP12cBossHitAsync(url),
+                "p12c_player_damage" => await CaseP12cPlayerDamageAsync(url, boss, hit),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -731,6 +733,58 @@ internal static class Program
         }
 
         return Report(false, "case=p12a_join first=" + first.BodyCase);
+    }
+
+    /// <summary>
+    /// P1-2c：读开场里的怪物生命上限，再等 Boss 打一下量出它的伤害。
+    /// 核对脚本带不同 party_size 连两场，比对这两个数与玩家技能伤害。
+    /// 这里只读，不主动出手，玩家技能机制保持原样。
+    /// </summary>
+    static async Task<int> CaseP12cBossHitAsync(string url)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var opened = session.Opened;
+        var me = opened.CasterId;
+        var hp = opened.CasterHp;
+        long bossDamage = -1;
+        var deadline = Environment.TickCount64 + 12000;
+
+        while (Environment.TickCount64 < deadline && bossDamage < 0)
+        {
+            var message = await session.ReadAsync(500);
+            if (message?.MemberUpdated?.Member is not { } member || member.MemberId != me)
+            {
+                continue;
+            }
+
+            if (member.Hp < hp)
+            {
+                bossDamage = hp - member.Hp;
+            }
+            hp = member.Hp;
+        }
+
+        return Report(bossDamage > 0,
+            $"case=p12c_boss_hit boss_hp={opened.BossHp} boss_hp_max={opened.BossHpMax} "
+            + $"caster_hp={opened.CasterHp} boss_damage={bossDamage}");
+    }
+
+    /// <summary>
+    /// P1-2c：玩家技能伤害不随进本人数变化（缩放只作用于怪物生命与伤害）。
+    /// Boss 同时也在出手，所以要跳过广播挑自己那一发结算。
+    /// </summary>
+    static async Task<int> CaseP12cPlayerDamageAsync(string url, ulong boss, uint skill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        await session.SubmitAsync(skill, boss, Session.NowMs());
+        var message = await session.ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null, 6000);
+        var result = message?.Result;
+
+        return Report(result is { Hit: true, Damage: > 0 },
+            $"case=p12c_player_damage boss_hp_max={session.Opened.BossHpMax} "
+            + $"skill={result?.SkillId} damage={result?.Damage} "
+            + $"hp_after={result?.TargetHpAfter} reject={message?.Rejected?.Reason.ToString() ?? "none"}");
     }
 
     static int Report(bool ok, string line)

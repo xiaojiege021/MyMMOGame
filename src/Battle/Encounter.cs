@@ -70,6 +70,10 @@ public sealed class Encounter
     readonly ICharacterStore _characters;
     readonly Dictionary<ulong, Member> _members = [];
 
+    readonly long _bossHpMax;
+    readonly double _monsterDamageScale;
+    readonly int _partySize;
+
     long _bossHp;
     long _damageTotal;
     int _castCount;
@@ -81,16 +85,47 @@ public sealed class Encounter
     (ulong MemberId, long LandAtMs)? _bossPending;
     long _nextBossAttackAt;
 
-    public Encounter(BattleConfig config, SettlementStore settlements, ICharacterStore characters, ulong sessionId)
+    /// <summary>
+    /// party_size 是进本时说好的人数（与角色服扣减用的是同一个数字）。
+    /// 怪物生命与伤害按它缩放，机制不变：技能、阶段血线比例、结算经验都不跟人数改。
+    /// 缩放系数在 config/dungeons.json，方案没写定曲线，代码里不给兜底数字。
+    /// 单人（练习场与所有不带 party_size 的老连接）倍率恰好是 1，行为与 P0 完全一致。
+    /// </summary>
+    public Encounter(
+        BattleConfig config, SettlementStore settlements, ICharacterStore characters,
+        ulong sessionId, int partySize)
     {
         _config = config;
         _settlements = settlements;
         _characters = characters;
         SessionId = sessionId;
-        _bossHp = config.Boss.HpMax;
+        _partySize = partySize;
+        _bossHpMax = Scale(config.Boss.HpMax, config.Dungeons.MonsterHpScalePerPlayer, partySize);
+        _monsterDamageScale = Factor(config.Dungeons.MonsterDamageScalePerPlayer, partySize);
+        _bossHp = _bossHpMax;
     }
 
     public ulong SessionId { get; }
+
+    /// <summary>这一场的怪物生命上限（缩放后），开场回包给客户端。</summary>
+    public long BossHpMax => _bossHpMax;
+
+    public int PartySize => _partySize;
+
+    /// <summary>倍率 = 1 + (人数 - 1) × 每多一人的增量；单人固定 1，不经过浮点。</summary>
+    static double Factor(double perPlayer, int partySize) =>
+        partySize <= 1 ? 1.0 : 1.0 + (partySize - 1) * perPlayer;
+
+    static long Scale(long baseValue, double perPlayer, int partySize)
+    {
+        var factor = Factor(perPlayer, partySize);
+        return factor == 1.0
+            ? baseValue
+            : checked((long)Math.Round(baseValue * factor));
+    }
+
+    static long ScaleDamage(long baseDamage, double scale) =>
+        scale == 1.0 ? baseDamage : checked((long)Math.Round(baseDamage * scale));
 
     /// <summary>单调时钟，毫秒。冷却和前摇都用它算，不受系统时间跳变影响。</summary>
     static long NowMs() => (long)Stopwatch.GetElapsedTime(0).TotalMilliseconds;
@@ -147,7 +182,7 @@ public sealed class Encounter
                 CasterId = member.Id,
                 BossId = _config.Boss.Id,
                 BossHp = _bossHp,
-                BossHpMax = _config.Boss.HpMax,
+                BossHpMax = _bossHpMax,
                 CasterHp = member.Hp,
                 CasterHpMax = member.HpMax,
                 DistanceMm = DistanceToBossMm(member),
@@ -634,7 +669,9 @@ public sealed class Encounter
 
             if (_members.TryGetValue(pending.MemberId, out var victim) && !victim.Down)
             {
-                victim.Hp = Math.Max(0, victim.Hp - attack.Damage);
+                var damage = ScaleDamage(attack.Damage, _monsterDamageScale);
+                var after = victim.Hp - damage;
+                victim.Hp = after > 0 ? after : 0;
                 outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(victim) } });
             }
         }
@@ -682,7 +719,7 @@ public sealed class Encounter
             return 0;
         }
 
-        var pct = hp * 100.0 / Math.Max(1, _config.Boss.HpMax);
+        var pct = hp * 100.0 / Math.Max(1, _bossHpMax);
         for (var i = 0; i < phases.Count; i++)
         {
             // 每段盖 (to, from]：血量到 from 的那一刻还在上一段，掉过 to 才算下一段。

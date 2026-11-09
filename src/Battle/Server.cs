@@ -32,6 +32,9 @@ sealed class Party
     /// （P0 的老核对与老客户端都不带这个参数，不能被主线的 1 人上限挡掉）。
     /// </summary>
     public required DungeonDef? Dungeon { get; init; }
+
+    /// <summary>进本人数，与角色服扣份额/疲劳用的是同一个数字；缺省 1（单人练习场）。</summary>
+    public required int PartySize { get; init; }
 }
 
 /// <summary>
@@ -126,6 +129,28 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
             }
         }
 
+        // 进本人数决定怪物生命与伤害的缩放。不带就是单人：P0 的老客户端、
+        // 老核对与练习场都走这一条，倍率恰好 1，行为不变。
+        var partySize = 1;
+        var partySizeRaw = QueryOrNull(query, "party_size");
+        if (partySizeRaw is not null)
+        {
+            if (!int.TryParse(partySizeRaw, out partySize) || partySize < 1 || partySize > 100)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                Console.WriteLine("join_reject=party_size_invalid raw=" + partySizeRaw);
+                return;
+            }
+        }
+
+        if (dungeon is not null && partySize > dungeon.MaxPlayers)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            Console.WriteLine("join_reject=party_size_over_limit party_size=" + partySize
+                + " limit=" + dungeon.MaxPlayers + " dungeon=" + dungeon.Id);
+            return;
+        }
+
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
 
         Party party;
@@ -142,12 +167,24 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
                 party = new Party
                 {
                     Key = partyKey,
-                    Encounter = new Encounter(config, settlements, characters, NextSessionId()),
+                    Encounter = new Encounter(config, settlements, characters, NextSessionId(), partySize),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
+                    PartySize = partySize,
                 };
                 _parties[partyKey] = party;
                 created = true;
+            }
+            else if (party.PartySize != partySize)
+            {
+                // 同一场里两个人报了不同的进本人数，缩放与扣减会对不上，直接挡住。
+                rejected = new EnterRejected
+                {
+                    Reason = "party_size_mismatch",
+                    Limit = (uint)party.PartySize,
+                    Current = (uint)partySize,
+                    DungeonId = party.Dungeon?.Id ?? "",
+                };
             }
             else if (!SameDungeon(party.Dungeon, dungeon))
             {
@@ -212,7 +249,8 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
         }
 
         Console.WriteLine(
-            $"session_open={party.Encounter.SessionId} caster={charId} class={cls.Id} party={partyKey} boss={config.Boss.Id}");
+            $"session_open={party.Encounter.SessionId} caster={charId} class={cls.Id} party={partyKey} boss={config.Boss.Id}"
+            + $" party_size={party.PartySize} boss_hp_max={party.Encounter.BossHpMax}");
 
         // 新人进场说给老人听，界面上的队友名单靠这条更新。不发给本人：
         // 本人已经在 Opened 里拿到整份名单，多发一条会把它的读序顶乱。

@@ -10,5 +10,15 @@ CREATE TABLE IF NOT EXISTS "角色".dungeon_entry (
     entered_at   timestamptz NOT NULL DEFAULT now()
 );
 
+-- P1-2c：这一笔应得的单人份数 = 进本人数（方案「单人通关产出 × 进本人数」）。
+-- 主线、深渊不占份额，记 0；巢穴 4 人一次记 4。产出的实物种类与数量属掉落表，
+-- 在后面的卡发放，这一行只把份数记进账，好核对「单人 12 次 = 3 次满员」。
+ALTER TABLE "角色".dungeon_entry
+    ADD COLUMN IF NOT EXISTS reward_shares integer NOT NULL DEFAULT 0;
+ALTER TABLE "角色".dungeon_entry
+    DROP CONSTRAINT IF EXISTS dungeon_entry_reward_shares_non_negative;
+ALTER TABLE "角色".dungeon_entry
+    ADD CONSTRAINT dungeon_entry_reward_shares_non_negative CHECK (reward_shares >= 0);
+
 CREATE INDEX IF NOT EXISTS dungeon_entry_character
     ON "角色".dungeon_entry (character_id, entered_at DESC);

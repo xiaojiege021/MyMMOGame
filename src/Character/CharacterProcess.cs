@@ -50,7 +50,10 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("currencies=" + currencies.All.Count + " currency_table_version=" + currencies.Version);
         Console.WriteLine("dungeons=" + dungeons.All.Count + " dungeon_table_version=" + dungeons.Version
             + " fatigue_daily_cap=" + dungeons.FatigueDailyCap
-            + " hot_spring_recovery=" + dungeons.HotSpringRecovery);
+            + " hot_spring_recovery=" + dungeons.HotSpringRecovery
+            + " weekly_share_cap=" + dungeons.WeeklyShareCap
+            + " monster_hp_scale_per_player=" + dungeons.MonsterHpScalePerPlayer
+            + " monster_damage_scale_per_player=" + dungeons.MonsterDamageScalePerPlayer);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -68,6 +71,7 @@ public sealed class CharacterProcess(string configPath)
         var currency = new CurrencyRepository(dataSource);
         var grants = new GrantRepository(dataSource, items, currencies, config);
         var dungeonEntries = new DungeonEntryRepository(dataSource);
+        var weeklyShares = new WeeklyShareRepository(dataSource);
         var hotSpring = new HotSpringRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
@@ -94,6 +98,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(currencies);
         builder.Services.AddSingleton(dungeons);
         builder.Services.AddSingleton(dungeonEntries);
+        builder.Services.AddSingleton(weeklyShares);
         builder.Services.AddSingleton(hotSpring);
         builder.Services.AddSingleton(config);
 
