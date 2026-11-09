@@ -132,13 +132,25 @@ root, tmp = sys.argv[1], sys.argv[2]
 battle = json.load(open(os.path.join(root, "config", "battle.json"), encoding="utf-8"))
 battle["listen"] = "127.0.0.1:0"
 battle["settlement_dir"] = os.path.join(tmp, "settlements")
+battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = os.path.join(root, "config", "skills.json")
+battle["class_table"] = os.path.join(root, "config", "classes.json")
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=2)
 
-skills = json.load(open(os.path.join(root, "config", "skills.json"), encoding="utf-8"))["skills"]
-# 取够得着、前摇和冷却都好观察的那一个：射程最远的。
+# 只在默认职业的技能里挑：取够得着、前摇和冷却都好观察的那一个（射程最远的）。
+cls_id = battle["default_class"]
+skills = [s for s in json.load(open(os.path.join(root, "config", "skills.json"), encoding="utf-8"))["skills"]
+          if s["class_id"] == cls_id]
 skill = max(skills, key=lambda s: s["range_mm"])
+
+# 期望伤害不是表里的平数：这一下 = 攻击 × 倍率，攻击 = 主属性 × 职业系数 + 装备固定。
+classes = json.load(open(os.path.join(root, "config", "classes.json"), encoding="utf-8"))
+cls = next(c for c in classes["classes"] if c["id"] == cls_id)
+primary = cls["attributes"].get(cls["primary"], 0) if cls["primary"] != "none" else 0
+attack = primary * cls["attack_per_primary"] + cls["equipment_attack"]
+damage = int(round(attack * skill["damage_multiplier"]))
+
 a, b = battle["caster"]["spawn_mm"], battle["boss"]["spawn_mm"]
 dist = int(round(((a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2) ** 0.5))
 
@@ -146,7 +158,7 @@ print("BOSS_ID=%d" % battle["boss"]["id"])
 print("BOSS_HP_MAX=%d" % battle["boss"]["hp_max"])
 print("DIST=%d" % dist)
 print("SKILL_ID=%d" % skill["id"])
-print("SKILL_DAMAGE=%d" % skill["damage"])
+print("SKILL_DAMAGE=%d" % damage)
 print("SKILL_RANGE=%d" % skill["range_mm"])
 print("SKILL_FORESWING=%d" % skill["foreswing_ms"])
 print("SKILL_RECOVERY=%d" % skill["recovery_ms"])

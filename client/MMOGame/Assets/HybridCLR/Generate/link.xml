@@ -11,7 +11,11 @@
   <assembly fullname="Mmo.Proto">
     <type fullname="Mmo.Proto.Battle.BattleEnded" preserve="all" />
     <type fullname="Mmo.Proto.Battle.BattleOpened" preserve="all" />
+    <type fullname="Mmo.Proto.Battle.BossPhase" preserve="all" />
+    <type fullname="Mmo.Proto.Battle.ClassInfo" preserve="all" />
+    <type fullname="Mmo.Proto.Battle.MemberUpdated" preserve="all" />
     <type fullname="Mmo.Proto.Battle.MoveState" preserve="all" />
+    <type fullname="Mmo.Proto.Battle.PartyMember" preserve="all" />
     <type fullname="Mmo.Proto.Battle.ServerMessage" preserve="all" />
     <type fullname="Mmo.Proto.Battle.ServerMessage/BodyOneofCase" preserve="all" />
     <type fullname="Mmo.Proto.Battle.SkillCancelled" preserve="all" />
@@ -90,12 +94,15 @@
     <type fullname="System.Diagnostics.DebuggerHiddenAttribute" preserve="all" />
     <type fullname="System.Diagnostics.Stopwatch" preserve="all" />
     <type fullname="System.Exception" preserve="all" />
+    <type fullname="System.Func`2" preserve="all" />
     <type fullname="System.Int32" preserve="all" />
     <type fullname="System.Int64" preserve="all" />
+    <type fullname="System.Linq.Enumerable" preserve="all" />
     <type fullname="System.Object" preserve="all" />
     <type fullname="System.Predicate`1" preserve="all" />
     <type fullname="System.Reflection.MemberInfo" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.AsyncStateMachineAttribute" preserve="all" />
+    <type fullname="System.Runtime.CompilerServices.AsyncTaskMethodBuilder" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.AsyncVoidMethodBuilder" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.CompilationRelaxationsAttribute" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.CompilerGeneratedAttribute" preserve="all" />

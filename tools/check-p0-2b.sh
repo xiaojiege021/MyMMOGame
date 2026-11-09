@@ -204,10 +204,13 @@ src, dst, tmp = sys.argv[1], sys.argv[2], sys.argv[3]
 cfg = json.load(open(src, encoding='utf-8'))
 cfg['listen'] = '127.0.0.1:0'
 cfg['settlement_dir'] = tmp + '/settlements'
+cfg['character_dir'] = tmp + '/characters'
 cfg['skill_table'] = 'skills.json'
+cfg['class_table'] = 'classes.json'
 json.dump(cfg, open(dst, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 PY
 cp "$ROOT/config/skills.json" "$TMP/skills.json"
+cp "$ROOT/config/classes.json" "$TMP/classes.json"
 
 : > "$TMP/battle.log"
 "$DOTNET" "$BATTLE_DLL" --config "$TMP/battle.json" >>"$TMP/battle.log" 2>&1 &
@@ -324,7 +327,9 @@ src, dst, tmp, port = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 cfg = json.load(open(src, encoding='utf-8'))
 cfg['listen'] = '127.0.0.1:' + port
 cfg['settlement_dir'] = tmp + '/device-settlements'
+cfg['character_dir'] = tmp + '/device-characters'
 cfg['skill_table'] = 'skills.json'
+cfg['class_table'] = 'classes.json'
 json.dump(cfg, open(dst, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 PY
 

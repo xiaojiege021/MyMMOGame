@@ -2,10 +2,12 @@
   "schema": "battle-config/1",
   "listen": "127.0.0.1:0",
   "settlement_dir": "var/battle/settlements",
+  "character_dir": "var/battle/characters",
   "skill_table": "skills.json",
+  "class_table": "classes.json",
+  "default_class": "warrior",
   "caster": {
     "id": 1,
-    "hp_max": 1200,
     "spawn_mm": { "x": 6000, "y": 0 }
   },
   "arena": {

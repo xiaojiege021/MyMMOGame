@@ -128,11 +128,16 @@ root, tmp = sys.argv[1], sys.argv[2]
 battle = json.load(open(os.path.join(root, "config", "battle.json"), encoding="utf-8"))
 battle["listen"] = "127.0.0.1:0"
 battle["settlement_dir"] = os.path.join(tmp, "settlements")
+battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = os.path.join(root, "config", "skills.json")
+battle["class_table"] = os.path.join(root, "config", "classes.json")
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=2)
 
-skills = json.load(open(os.path.join(root, "config", "skills.json"), encoding="utf-8"))["skills"]
+# 只在默认职业的技能里挑，别挑到别的职业手上。
+cls_id = battle["default_class"]
+skills = [s for s in json.load(open(os.path.join(root, "config", "skills.json"), encoding="utf-8"))["skills"]
+          if s["class_id"] == cls_id]
 ranged = max(skills, key=lambda s: s["range_mm"])
 melee = min(skills, key=lambda s: s["range_mm"])
 a, b = battle["caster"]["spawn_mm"], battle["boss"]["spawn_mm"]

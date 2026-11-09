@@ -60,6 +60,33 @@ internal sealed class Session : IAsyncDisposable
         return message?.Rejected;
     }
 
+    /// <summary>
+    /// 一直读到符合的那条为止，中间路过的广播（别人的结算、队友状态）直接丢掉。
+    /// 组队场景里各连接都会收到全场广播，靠这个挑自己要的那条。
+    /// </summary>
+    public async Task<ServerMessage?> ReadUntilAsync(Func<ServerMessage, bool> match, int timeoutMs)
+    {
+        var deadline = Environment.TickCount64 + timeoutMs;
+        while (true)
+        {
+            var left = (int)Math.Max(1, deadline - Environment.TickCount64);
+            if (left <= 0)
+            {
+                return null;
+            }
+
+            var message = await ReadAsync(left);
+            if (message is null)
+            {
+                return null;
+            }
+            if (match(message))
+            {
+                return message;
+            }
+        }
+    }
+
     public Task SubmitAsync(uint skillId, ulong targetId, long castTimeMs) =>
         SendAsync(new ClientMessage
         {

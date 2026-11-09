@@ -20,6 +20,7 @@ namespace HotUpdate
         const int SkillButtonRight = 60;
         const int SkillButtonBottom = 60;
         const int CancelButtonHeight = 90;
+        const int ManaBarWidth = 500;
 
         BattleClient _client;
 
@@ -28,6 +29,10 @@ namespace HotUpdate
         RectTransform _hpFill;
 
         Text _hpText;
+
+        RectTransform _manaFill;
+
+        Text _manaText;
 
         RectTransform _castBar;
 
@@ -38,6 +43,12 @@ namespace HotUpdate
         readonly Image[] _skillImages = new Image[SkillButtonCount];
 
         readonly Text[] _skillLabels = new Text[SkillButtonCount];
+
+        Text _classText;
+
+        Text _classButtonLabel;
+
+        Image _classButtonImage;
 
         Text _damageText;
 
@@ -59,11 +70,18 @@ namespace HotUpdate
 
         int _seenEnded;
 
+        int _seenPhase;
+
         bool _wasPressed;
 
         /// <summary>这个屏幕点是不是落在界面的按钮上。点选那边要跳过这块。</summary>
         public static bool HitTest(Vector2 screenPoint)
         {
+            if (ClassButtonRect().Contains(screenPoint))
+            {
+                return true;
+            }
+
             for (var i = 0; i < SkillButtonCount; i++)
             {
                 if (SkillButtonRect(i).Contains(screenPoint))
@@ -86,6 +104,12 @@ namespace HotUpdate
         {
             var skill = SkillButtonRect(SkillButtonCount - 1);
             return new Rect(skill.x, skill.yMax + SkillButtonGap, SkillButtonSize, CancelButtonHeight);
+        }
+
+        /// <summary>换职业按钮：左上角，职业文本下面。坐标进日志，真机核对照它点。</summary>
+        static Rect ClassButtonRect()
+        {
+            return new Rect(40f, Screen.height - 170f, 260f, 84f);
         }
 
         public static BattleHud Create(BattleClient client)
@@ -124,8 +148,25 @@ namespace HotUpdate
             _distanceText = MakeText("DistanceText", new Rect(width - 460f, Screen.height - 150f, 400f, 44f), 26,
                 TextAnchor.MiddleRight, root);
 
-            // 玩家血量：左下角。
+            // 左上角：当前职业和 Boss 阶段。换职业后、切阶段后都立刻变。
+            _classText = MakeText("ClassText", new Rect(40f, Screen.height - 68f, 600f, 44f), 30,
+                TextAnchor.MiddleLeft, root);
+            _classText.text = "";
+
+            // 换职业按钮：点了按服务端下发的职业目录循环，重连一场。
+            var classRect = ClassButtonRect();
+            _classButtonImage = MakeRect("ClassButton", classRect, new Color(0.32f, 0.22f, 0.55f, 0.85f), root)
+                .GetComponent<Image>();
+            _classButtonLabel = MakeText("ClassButtonLabel", classRect, 30, TextAnchor.MiddleCenter, root);
+            _classButtonLabel.text = "换职业";
+
+            // 玩家血量：左下角。蓝条在它上面，颜色分开，一眼分得清。
             _tipText = MakeText("TipText", new Rect(40f, 40f, 700f, 48f), 26, TextAnchor.MiddleLeft, root);
+
+            MakeRect("ManaBack", new Rect(40f, 98f, ManaBarWidth, 24f), new Color(0f, 0f, 0f, 0.55f), root);
+            _manaFill = MakeRect("ManaFill", new Rect(40f, 98f, ManaBarWidth, 24f), new Color(0.2f, 0.45f, 0.95f, 0.95f), root);
+            _manaText = MakeText("ManaText", new Rect(40f + ManaBarWidth + 16f, 98f, 360f, 24f), 24,
+                TextAnchor.MiddleLeft, root);
 
             // 前摇进度：屏幕下方正中，填充随等待时间走。整层挂一起淡入淡出。
             var castWidth = width * 0.4f;
@@ -137,7 +178,7 @@ namespace HotUpdate
             MakeRect("CastBack", new Rect(castX, castY, castWidth, 20f), new Color(0f, 0f, 0f, 0.5f), castLayer);
             _castBar = MakeRect("CastFill", new Rect(castX, castY, 0f, 20f), new Color(0.95f, 0.78f, 0.2f, 0.95f), castLayer);
 
-            // 技能键。按钮上的字用 S1/S2/S3，具体技能号看日志。
+            // 技能键。字用服务端下发的技能名，五个职业在手机上才分得清。
             for (var i = 0; i < SkillButtonCount; i++)
             {
                 var rect = SkillButtonRect(i);
@@ -168,6 +209,11 @@ namespace HotUpdate
             _rejectText.color = new Color(1f, 0.45f, 0.4f, 1f);
 
             Debug.Log("p02b_hud=ready screen=" + Screen.width + "x" + Screen.height
+                + " skill_rect=" + SkillButtonRect(0).x + "," + SkillButtonRect(0).y
+                + " cancel_rect=" + CancelButtonRect().x + "," + CancelButtonRect().y);
+            Debug.Log("p03c_hud=ready screen=" + Screen.width + "x" + Screen.height
+                + " class_rect=" + ClassButtonRect().x + "," + ClassButtonRect().y
+                + "," + ClassButtonRect().width + "," + ClassButtonRect().height
                 + " skill_rect=" + SkillButtonRect(0).x + "," + SkillButtonRect(0).y
                 + " cancel_rect=" + CancelButtonRect().x + "," + CancelButtonRect().y);
         }
@@ -209,6 +255,22 @@ namespace HotUpdate
             // 上一条手指还没抬起来时不要重复出手，交给 _wasPressed 的边沿。
             var point = pointer.position.ReadValue();
 
+            if (ClassButtonRect().Contains(point))
+            {
+                if (_client.Classes.Count > 0)
+                {
+                    var current = _client.Classes.FindIndex(c => c.ClassId == BattleClient.ClassId);
+                    var next = _client.Classes[(current + 1) % _client.Classes.Count];
+                    _client.SwitchClass(next.ClassId);
+                }
+                else
+                {
+                    Debug.Log("p03c_switch_skip reason=no_classes");
+                }
+
+                return;
+            }
+
             if (CancelButtonRect().Contains(point))
             {
                 _client.CancelCast();
@@ -243,6 +305,34 @@ namespace HotUpdate
             _distanceText.text = "DIST " + _client.DistanceMm + " mm";
             _tipText.text = "HP " + _client.CasterHp + " / " + _client.CasterHpMax
                 + "   TARGET " + TargetSelector.Current;
+
+            // 蓝条只认服务端发回来的蓝。换职业后上限变了，也等新一场的数。
+            var manaRatio = _client.ManaMax > 0 ? Mathf.Clamp01((float)_client.Mana / _client.ManaMax) : 0f;
+            _manaFill.sizeDelta = new Vector2(ManaBarWidth * manaRatio, 24f);
+            _manaText.text = "MP " + _client.Mana + " / " + _client.ManaMax;
+
+            // 左上角职业 + 阶段。没广播过阶段就只显示职业。
+            _classText.text = _client.ClassName
+                + (_client.PhaseName.Length > 0 ? " · " + _client.PhaseName : "");
+
+            // 换职业按钮上写下一个职业的名字，按之前就知道会切到谁。
+            if (_client.Classes.Count > 0)
+            {
+                var current = _client.Classes.FindIndex(c => c.ClassId == BattleClient.ClassId);
+                var next = _client.Classes[(current + 1) % _client.Classes.Count];
+                _classButtonLabel.text = "切换 " + next.Name;
+            }
+            else
+            {
+                _classButtonLabel.text = "换职业";
+            }
+
+            // 技能键写字用技能名，跟着当前职业的技能表走。
+            for (var i = 0; i < SkillButtonCount; i++)
+            {
+                var info = i < _client.Skills.Count ? _client.Skills[i] : null;
+                _skillLabels[i].text = info != null ? info.Name : "S" + (i + 1);
+            }
 
             // 前摇：进度按服务端下发的时长走，走满就停在那儿等回包。
             if (_client.Casting)
@@ -287,6 +377,14 @@ namespace HotUpdate
                 _rejectAge = 0f;
             }
 
+            // 切阶段飘一行字。血条位置不动，阶段文本只在左上角常驻。
+            if (_seenPhase != _client.PhaseSeq)
+            {
+                _seenPhase = _client.PhaseSeq;
+                _rejectText.text = "PHASE " + _client.PhaseName;
+                _rejectAge = 0f;
+            }
+
             _damageAge += Time.unscaledDeltaTime;
             _rejectAge += Time.unscaledDeltaTime;
 
@@ -301,7 +399,7 @@ namespace HotUpdate
             var rejectColor = _rejectText.color;
             _rejectText.color = new Color(rejectColor.r, rejectColor.g, rejectColor.b, rejectAlpha);
 
-            // 结束后技能键变灰，按下去也不再发。
+            // 结束后技能键变灰，按下去也不再发。换职业按钮在重连中也没得点。
             var enabled = _client.Connected && !_client.Ended;
             for (var i = 0; i < SkillButtonCount; i++)
             {
@@ -309,6 +407,10 @@ namespace HotUpdate
                     ? new Color(0.16f, 0.36f, 0.62f, 0.85f)
                     : new Color(0.25f, 0.25f, 0.25f, 0.7f);
             }
+
+            _classButtonImage.color = enabled && _client.Classes.Count > 0
+                ? new Color(0.32f, 0.22f, 0.55f, 0.85f)
+                : new Color(0.25f, 0.25f, 0.25f, 0.7f);
         }
 
         /// <summary>一块不画东西的全屏层，只用来把几件东西一起淡入淡出。</summary>

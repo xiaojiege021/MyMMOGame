@@ -16,45 +16,78 @@ sealed class PendingCast
 
     /// <summary>接受这次施法之前的冷却到期时刻。取消要把冷却退回这里。</summary>
     public required long PrevReadyAtMs { get; init; }
+
+    /// <summary>目标。打 Boss 的技能是 Boss 编号，治疗和复活是队友编号。</summary>
+    public required ulong TargetId { get; init; }
+}
+
+/// <summary>一场里的一条命。编号就是连接进来时的角色编号。</summary>
+public sealed class Member
+{
+    public required ulong Id { get; init; }
+    public required ClassDef Class { get; init; }
+
+    public long Hp { get; internal set; }
+    public long HpMax { get; internal set; }
+    public long Mana { get; internal set; }
+    public long ManaMax { get; internal set; }
+
+    // 实时坐标。客户端报上来的位置只是「想去哪」，夹过之后才写进这两个。
+    internal double X;
+    internal double Y;
+    long _lastMoveMs;
+
+    internal readonly Dictionary<uint, long> ReadyAtMs = [];
+    internal PendingCast? Pending;
+    internal long RecoveryUntilMs = long.MinValue;
+
+    /// <summary>打出去的伤害累计。仇恨里看得见的那部分。</summary>
+    internal long DamageDealt;
+
+    public bool Down => Hp <= 0;
+
+    /// <summary>有效仇恨 = 打出的伤害 + 职业稳定值（坦克 = 体力 × 系数）。</summary>
+    public long EffectiveThreat => DamageDealt + Class.ThreatStability();
+
+    internal void TouchMoveClock(long now) => _lastMoveMs = now;
+
+    internal long MoveClockMs() => _lastMoveMs;
 }
 
 /// <summary>
-/// 一场单人 Boss。状态全在内存：进程一停这场就没了，重启不会恢复，
-/// 也不会把没写下的奖励补出来。
+/// 一场 Boss 战，可以是一个人，也可以是一队人（连接带同一个 party 参数就是一队）。
+/// 状态全在内存：进程一停这场就没了，重启不会恢复，也不会把没写下的奖励补出来。
 ///
-/// 一次只结算一个技能：前摇没走完再发算 CASTING，结算完还在后摇里算 RECOVERY。
-/// 冷却没好、距离不够、目标对不上，都在结算之前就退回去，不碰任何人的生命。
+/// 每个人独立的前摇、后摇、冷却和蓝条；Boss 的血、阶段和出手是全场共享的。
+/// 一次只结算一个技能是对单个人说的：我前摇里再发会被挡，队友的手不受影响。
+/// 冷却没好、蓝不够、距离不够、目标对不上，都在结算之前退回去，不碰任何人的生命。
 /// </summary>
 public sealed class Encounter
 {
     readonly object _gate = new();
     readonly BattleConfig _config;
     readonly SettlementStore _settlements;
-    readonly Dictionary<uint, long> _readyAtMs = [];
+    readonly ICharacterStore _characters;
+    readonly Dictionary<ulong, Member> _members = [];
 
     long _bossHp;
     long _damageTotal;
     int _castCount;
-    long _recoveryUntilMs = long.MinValue;
-    PendingCast? _pending;
     string _settlementId = "";
     bool _closed;
 
-    // 施法者的实时坐标。客户端报上来的位置只是「想去哪」，夹过之后才写进这两个。
-    // 距离判定读这里，不读出生点——否则走位就只是画面上的事，走近了照样打不中。
-    double _casterX;
-    double _casterY;
-    long _lastMoveMs;
+    // Boss 的出手与阶段
+    int _phaseIndex;
+    (ulong MemberId, long LandAtMs)? _bossPending;
+    long _nextBossAttackAt;
 
-    public Encounter(BattleConfig config, SettlementStore settlements, ulong sessionId)
+    public Encounter(BattleConfig config, SettlementStore settlements, ICharacterStore characters, ulong sessionId)
     {
         _config = config;
         _settlements = settlements;
+        _characters = characters;
         SessionId = sessionId;
         _bossHp = config.Boss.HpMax;
-        _casterX = config.Caster.SpawnMm.X;
-        _casterY = config.Caster.SpawnMm.Y;
-        _lastMoveMs = NowMs();
     }
 
     public ulong SessionId { get; }
@@ -62,47 +95,98 @@ public sealed class Encounter
     /// <summary>单调时钟，毫秒。冷却和前摇都用它算，不受系统时间跳变影响。</summary>
     static long NowMs() => (long)Stopwatch.GetElapsedTime(0).TotalMilliseconds;
 
-    public BattleOpened Open()
+    // ---- 成员 ----
+
+    /// <summary>一个人进场。编号撞了抛异常，由连接层拒绝这条连接。</summary>
+    public Member Join(ulong memberId, ClassDef cls)
+    {
+        lock (_gate)
+        {
+            if (_closed)
+            {
+                throw new InvalidOperationException("这场已经结束");
+            }
+            if (_members.ContainsKey(memberId))
+            {
+                throw new InvalidOperationException($"编号 {memberId} 已经在这场里");
+            }
+
+            var member = new Member
+            {
+                Id = memberId,
+                Class = cls,
+                HpMax = cls.HpMax(_config.Classes.HpPerVitality),
+                ManaMax = cls.ManaMax(),
+                X = _config.Caster.SpawnMm.X,
+                Y = _config.Caster.SpawnMm.Y,
+            };
+            member.Hp = member.HpMax;
+            member.Mana = member.ManaMax;
+            member.TouchMoveClock(NowMs());
+            _members[memberId] = member;
+            return member;
+        }
+    }
+
+    public void Leave(Member member)
+    {
+        lock (_gate)
+        {
+            _members.Remove(member.Id);
+            member.Pending = null;
+        }
+    }
+
+    public BattleOpened Open(Member member)
     {
         lock (_gate)
         {
             var opened = new BattleOpened
             {
                 SessionId = SessionId,
-                CasterId = _config.Caster.Id,
+                CasterId = member.Id,
                 BossId = _config.Boss.Id,
                 BossHp = _bossHp,
                 BossHpMax = _config.Boss.HpMax,
-                CasterHp = _config.Caster.HpMax,
-                CasterHpMax = _config.Caster.HpMax,
-                DistanceMm = DistanceToBossMm(),
+                CasterHp = member.Hp,
+                CasterHpMax = member.HpMax,
+                DistanceMm = DistanceToBossMm(member),
                 ArenaRadiusMm = (uint)Math.Max(0, _config.Arena.RadiusMm),
                 MoveSpeedMmPerS = (uint)Math.Max(0, _config.Arena.MoveSpeedMmPerS),
-                CasterXMm = (int)Math.Round(_casterX),
-                CasterYMm = (int)Math.Round(_casterY),
+                CasterXMm = (int)Math.Round(member.X),
+                CasterYMm = (int)Math.Round(member.Y),
+                ClassId = member.Class.Id,
+                ClassName = member.Class.Name,
+                Mana = member.Mana,
+                ManaMax = member.ManaMax,
             };
 
-            // 技能表随开场下发。客户端靠它播前摇、标名字，不自己存一份数字。
-            foreach (var skill in _config.Skills.All)
+            // 技能表随开场下发，只发这个人的职业。客户端靠它播前摇、标名字，
+            // 不自己存一份数字；伤害不下发，只认回包里的那一个数。
+            foreach (var skill in _config.Skills.ForClass(member.Class.Id))
             {
-                opened.Skills.Add(new SkillInfo
-                {
-                    SkillId = skill.Id,
-                    Name = skill.Name,
-                    RangeMm = skill.RangeMm,
-                    ForeswingMs = (uint)Math.Max(0, skill.ForeswingMs),
-                    RecoveryMs = (uint)Math.Max(0, skill.RecoveryMs),
-                    CooldownMs = (uint)Math.Max(0, skill.CooldownMs),
-                    StaggerMs = (uint)Math.Max(0, skill.StaggerMs),
-                });
+                opened.Skills.Add(ToSkillInfo(skill));
+            }
+
+            foreach (var m in _members.Values.OrderBy(m => m.Id))
+            {
+                opened.Party.Add(ToPartyMember(m));
+            }
+
+            // 职业目录也下发，换职业的按钮按这个循环。
+            foreach (var cls in _config.Classes.All)
+            {
+                opened.Classes.Add(new ClassInfo { ClassId = cls.Id, Name = cls.Name });
             }
 
             return opened;
         }
     }
 
+    // ---- 技能 ----
+
     /// <summary>接受就返回 null，拒绝就返回要回给客户端的这条。</summary>
-    public SkillRejected? TrySubmit(SkillRequest request)
+    public SkillRejected? TrySubmit(Member member, SkillRequest request)
     {
         lock (_gate)
         {
@@ -113,31 +197,35 @@ public sealed class Encounter
                 return Reject(request, SkillRejectReason.SkillRejectNotInBattle);
             }
 
+            if (member.Down)
+            {
+                return Reject(request, SkillRejectReason.SkillRejectCasterDead);
+            }
+
             if (!_config.Skills.TryGet(request.SkillId, out var skill))
             {
                 return Reject(request, SkillRejectReason.SkillRejectUnknownSkill);
             }
 
-            // 目标编号对不上本场的 Boss，就当目标已经不在了。
-            // 客户端不能靠改一个编号去打别的东西。
-            if (request.TargetId != _config.Boss.Id)
+            // 别的职业的技能当未知技能：客户端改编号也借不到别人的手。
+            if (skill.ClassId != member.Class.Id)
             {
-                return Reject(request, SkillRejectReason.SkillRejectTargetGone);
+                return Reject(request, SkillRejectReason.SkillRejectUnknownSkill);
             }
 
             // 一次只结算一个：前摇里再发一律先挡住，不看冷却。
-            if (_pending is not null)
+            if (member.Pending is not null)
             {
                 return Reject(request, SkillRejectReason.SkillRejectCasting);
             }
 
             // 后摇不走完不能接下一个，方案里写的「不取消后摇」。
-            if (now < _recoveryUntilMs)
+            if (now < member.RecoveryUntilMs)
             {
                 return Reject(request, SkillRejectReason.SkillRejectRecovery);
             }
 
-            _readyAtMs.TryGetValue(skill.Id, out var readyAt);
+            member.ReadyAtMs.TryGetValue(skill.Id, out var readyAt);
             if (now < readyAt)
             {
                 var rejected = Reject(request, SkillRejectReason.SkillRejectCooldown);
@@ -145,32 +233,65 @@ public sealed class Encounter
                 return rejected;
             }
 
-            var distance = DistanceToBossMm();
+            // 目标按技能种类分：打 Boss 的看 Boss 编号，治疗和复活看队友编号。
+            Member? target = null;
+            if (skill.Kind is SkillKind.Heal or SkillKind.Resurrect)
+            {
+                if (!_members.TryGetValue(request.TargetId, out target))
+                {
+                    return Reject(request, SkillRejectReason.SkillRejectTargetGone);
+                }
+                if (skill.Kind == SkillKind.Heal && target.Down)
+                {
+                    // 倒地只能靠复活，治疗救不起来。
+                    return Reject(request, SkillRejectReason.SkillRejectTargetGone);
+                }
+                if (skill.Kind == SkillKind.Resurrect && (target.Id == member.Id || !target.Down))
+                {
+                    // 不能拉自己；没倒地的也不用拉。
+                    return Reject(request, SkillRejectReason.SkillRejectBadTarget);
+                }
+            }
+            else if (request.TargetId != _config.Boss.Id)
+            {
+                // 目标编号对不上本场的 Boss，就当目标已经不在了。
+                return Reject(request, SkillRejectReason.SkillRejectTargetGone);
+            }
+
+            var distance = target is null ? DistanceToBossMm(member) : DistanceBetweenMm(member, target);
             if (distance > skill.RangeMm)
             {
                 return Reject(request, SkillRejectReason.SkillRejectOutOfRange);
             }
 
+            // 主动技能耗蓝，蓝不够就放不出去。放在目标检查之后：目标不对就说目标不对，
+            // 别拿蓝不够挡在前面。蓝在结算时才扣，撤掉的那次不花钱。
+            if (member.Mana < skill.ManaCost)
+            {
+                return Reject(request, SkillRejectReason.SkillRejectNoMana);
+            }
+
             // 接受：先占住冷却，再等前摇。冷却从这一次出手算起，从结算算会让
             // 高延迟的人占便宜。取消的时候整段退回去。
-            _readyAtMs[skill.Id] = now + skill.CooldownMs;
-            _pending = new PendingCast
+            member.ReadyAtMs[skill.Id] = now + skill.CooldownMs;
+            member.Pending = new PendingCast
             {
                 Skill = skill,
                 CastTimeMs = request.CastTimeMs,
                 SettleAtMs = now + skill.ForeswingMs,
                 PrevReadyAtMs = readyAt,
+                TargetId = request.TargetId,
             };
             return null;
         }
     }
 
     /// <summary>前摇里取消。撤掉了就没有伤害，冷却也退回出手前的样子。</summary>
-    public SkillCancelled Cancel(SkillCancelRequest request)
+    public SkillCancelled Cancel(Member member, SkillCancelRequest request)
     {
         lock (_gate)
         {
-            var pending = _pending;
+            var pending = member.Pending;
             if (pending is null ||
                 pending.Skill.Id != request.SkillId ||
                 pending.CastTimeMs != request.CastTimeMs)
@@ -184,8 +305,8 @@ public sealed class Encounter
                 };
             }
 
-            _pending = null;
-            _readyAtMs[pending.Skill.Id] = pending.PrevReadyAtMs;
+            member.Pending = null;
+            member.ReadyAtMs[pending.Skill.Id] = pending.PrevReadyAtMs;
             return new SkillCancelled
             {
                 SkillId = request.SkillId,
@@ -199,7 +320,7 @@ public sealed class Encounter
     /// 走位。客户端报的是「想去哪」，这里按场地半径和速度上限夹过才落位。
     /// 夹完的位置回给客户端，它照这个摆自己；技能的距离判定用的也是这份坐标。
     /// </summary>
-    public MoveState Move(MoveRequest request)
+    public MoveState Move(Member member, MoveRequest request)
     {
         lock (_gate)
         {
@@ -226,61 +347,90 @@ public sealed class Encounter
             // 单次封顶 200 毫秒，等于「一次上报最多走两步」——站着不动很久也不能
             // 攒出一次瞬移。客户端 100 毫秒报一次，留了一倍的量和抖动的余量。
             var now = NowMs();
-            var dtMs = Math.Clamp(now - _lastMoveMs, 1, 200);
-            _lastMoveMs = now;
+            var dtMs = Math.Clamp(now - member.MoveClockMs(), 1, 200);
+            member.TouchMoveClock(now);
             var maxStep = _config.Arena.MoveSpeedMmPerS * dtMs / 1000.0;
 
-            var dx = targetX - _casterX;
-            var dy = targetY - _casterY;
+            var dx = targetX - member.X;
+            var dy = targetY - member.Y;
             var len = Math.Sqrt(dx * dx + dy * dy);
             if (len > maxStep && len > 0)
             {
                 var scale = maxStep / len;
-                targetX = _casterX + dx * scale;
-                targetY = _casterY + dy * scale;
+                targetX = member.X + dx * scale;
+                targetY = member.Y + dy * scale;
                 clamped = true;
             }
 
-            _casterX = targetX;
-            _casterY = targetY;
+            member.X = targetX;
+            member.Y = targetY;
 
             return new MoveState
             {
-                XMm = (int)Math.Round(_casterX),
-                YMm = (int)Math.Round(_casterY),
-                DistanceMm = DistanceToBossMm(),
+                XMm = (int)Math.Round(member.X),
+                YMm = (int)Math.Round(member.Y),
+                DistanceMm = DistanceToBossMm(member),
                 Clamped = clamped,
             };
         }
     }
 
-    uint DistanceToBossMm()
-    {
-        var dx = _casterX - _config.Boss.SpawnMm.X;
-        var dy = _casterY - _config.Boss.SpawnMm.Y;
-        return (uint)Math.Round(Math.Sqrt(dx * dx + dy * dy));
-    }
+    // ---- 时间推进 ----
 
-    /// <summary>推进时间。前摇到点就结算，这一下可能是收尾的一下。</summary>
+    /// <summary>
+    /// 推进时间：各人前摇到点结算，Boss 按阶段出手，血线过阈就换阶段。
+    /// 返回的消息要发给这场里的所有人。
+    /// </summary>
     public List<ServerMessage> Tick()
     {
         lock (_gate)
         {
             var outbox = new List<ServerMessage>();
-            if (_closed || _pending is null)
+            if (_closed)
             {
                 return outbox;
             }
 
             var now = NowMs();
-            if (now < _pending.SettleAtMs)
+
+            foreach (var member in _members.Values)
             {
-                return outbox;
+                var pending = member.Pending;
+                if (pending is null || now < pending.SettleAtMs)
+                {
+                    continue;
+                }
+
+                member.Pending = null;
+                Settle(member, pending, now, outbox);
+
+                if (_bossHp <= 0)
+                {
+                    return outbox;
+                }
             }
 
-            var pending = _pending;
-            _pending = null;
+            TickBossAttack(now, outbox);
+            return outbox;
+        }
+    }
 
+    void Settle(Member member, PendingCast pending, long now, List<ServerMessage> outbox)
+    {
+        var skill = pending.Skill;
+
+        if (member.Down)
+        {
+            // 前摇里人倒了，这一下不结算，当没发过。
+            outbox.Add(new ServerMessage
+            {
+                Rejected = Reject(PendingRequest(pending), SkillRejectReason.SkillRejectCasterDead),
+            });
+            return;
+        }
+
+        if (skill.Kind is SkillKind.Basic or SkillKind.Active)
+        {
             if (_bossHp <= 0)
             {
                 // 前摇里目标没了，这一下不算。
@@ -288,58 +438,280 @@ public sealed class Encounter
                 {
                     Rejected = Reject(new SkillRequest
                     {
-                        SkillId = pending.Skill.Id,
+                        SkillId = skill.Id,
                         TargetId = _config.Boss.Id,
                         CastTimeMs = pending.CastTimeMs,
                     }, SkillRejectReason.SkillRejectTargetGone),
                 });
-                return outbox;
+                return;
             }
 
             // 只剩这么多血就只算这么多，不把溢出伤害记上去。
-            var applied = Math.Min(pending.Skill.Damage, _bossHp);
+            var applied = Math.Min(DamageOf(member, skill), _bossHp);
             _bossHp -= applied;
+            member.DamageDealt += applied;
             _damageTotal += applied;
             _castCount++;
-            _recoveryUntilMs = now + pending.Skill.RecoveryMs;
+            member.Mana -= skill.ManaCost;
+            member.RecoveryUntilMs = now + skill.RecoveryMs;
 
             outbox.Add(new ServerMessage
             {
                 Result = new SkillResult
                 {
-                    CasterId = _config.Caster.Id,
-                    SkillId = pending.Skill.Id,
+                    CasterId = member.Id,
+                    SkillId = skill.Id,
                     TargetId = _config.Boss.Id,
                     Hit = true,
                     Damage = applied,
                     Healing = 0,
-                    StaggerMs = (uint)Math.Max(0, pending.Skill.StaggerMs),
-                    CooldownMs = (uint)Math.Max(0, pending.Skill.CooldownMs),
+                    StaggerMs = (uint)Math.Max(0, skill.StaggerMs),
+                    CooldownMs = (uint)Math.Max(0, skill.CooldownMs),
                     TargetHpAfter = _bossHp,
+                    ManaAfter = member.Mana,
+                    ThreatAfter = member.EffectiveThreat,
                 },
             });
 
+            CheckPhase(outbox);
+
             if (_bossHp <= 0)
             {
-                outbox.Add(new ServerMessage { Ended = Close() });
+                outbox.Add(new ServerMessage { Ended = Close(member.Id) });
             }
 
-            return outbox;
+            return;
+        }
+
+        if (skill.Kind == SkillKind.Heal)
+        {
+            if (!_members.TryGetValue(pending.TargetId, out var target) || target.Down)
+            {
+                outbox.Add(new ServerMessage
+                {
+                    Rejected = Reject(PendingRequest(pending), SkillRejectReason.SkillRejectTargetGone),
+                });
+                return;
+            }
+
+            // 治疗读精神：精神 × 职业治疗系数 × 技能倍率。
+            var healing = (long)Math.Round(
+                member.Class.Attributes.Spirit * member.Class.HealPerSpirit * skill.DamageMultiplier);
+            target.Hp = Math.Min(target.HpMax, target.Hp + healing);
+            member.Mana -= skill.ManaCost;
+            _castCount++;
+            member.RecoveryUntilMs = now + skill.RecoveryMs;
+
+            outbox.Add(new ServerMessage
+            {
+                Result = new SkillResult
+                {
+                    CasterId = member.Id,
+                    SkillId = skill.Id,
+                    TargetId = target.Id,
+                    Hit = true,
+                    Damage = 0,
+                    Healing = healing,
+                    StaggerMs = 0,
+                    CooldownMs = (uint)Math.Max(0, skill.CooldownMs),
+                    TargetHpAfter = target.Hp,
+                    ManaAfter = member.Mana,
+                    ThreatAfter = member.EffectiveThreat,
+                },
+            });
+            outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(target) } });
+            return;
+        }
+
+        // 复活：拉起倒地的队友，不能拉自己（提交时已挡过，结算时再核一遍）。
+        if (!_members.TryGetValue(pending.TargetId, out var raised) || !raised.Down || raised.Id == member.Id)
+        {
+            outbox.Add(new ServerMessage
+            {
+                Rejected = Reject(PendingRequest(pending), SkillRejectReason.SkillRejectBadTarget),
+            });
+            return;
+        }
+
+        var restore = Math.Max(1L, raised.HpMax * _config.Classes.Resurrect.HpRestorePct / 100);
+        var expCost = ExpCostOf(raised.Id);
+        if (expCost is null)
+        {
+            // 角色那张表写不下就不拉，和结算不给号同一个道理。
+            outbox.Add(new ServerMessage
+            {
+                Rejected = Reject(PendingRequest(pending), SkillRejectReason.SkillRejectUnspecified),
+            });
+            return;
+        }
+
+        raised.Hp = restore;
+        member.Mana -= skill.ManaCost;
+        _castCount++;
+        member.RecoveryUntilMs = now + skill.RecoveryMs;
+
+        outbox.Add(new ServerMessage
+        {
+            Result = new SkillResult
+            {
+                CasterId = member.Id,
+                SkillId = skill.Id,
+                TargetId = raised.Id,
+                Hit = true,
+                Damage = 0,
+                Healing = restore,
+                StaggerMs = 0,
+                CooldownMs = (uint)Math.Max(0, skill.CooldownMs),
+                TargetHpAfter = raised.Hp,
+                ManaAfter = member.Mana,
+                ThreatAfter = member.EffectiveThreat,
+            },
+        });
+        outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(raised) } });
+    }
+
+    /// <summary>
+    /// 被拉起来的人只扣当前等级已有经验的一部分，不掉级；
+    /// 当前级经验是零时这次不扣。等级不动，只动经验。
+    /// 写不下去返回 null，由调用方把这次复活退回去。
+    /// </summary>
+    long? ExpCostOf(ulong characterId)
+    {
+        try
+        {
+            var state = _characters.Get(characterId);
+            var cost = state.Exp * _config.Classes.Resurrect.ExpCostPct / 100;
+            _characters.Save(characterId, state with { Exp = Math.Max(0, state.Exp - cost) });
+            return cost;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Console.WriteLine($"character_error=character={characterId} {ex.Message}");
+            return null;
         }
     }
 
-    /// <summary>断线。这场没打完就不结算，也不留记录，重进是另一场。</summary>
+    long DamageOf(Member member, SkillDef skill) =>
+        (long)Math.Round(member.Class.Attack() * skill.DamageMultiplier);
+
+    // ---- Boss 的出手与阶段 ----
+
+    void TickBossAttack(long now, List<ServerMessage> outbox)
+    {
+        if (_bossHp <= 0)
+        {
+            return;
+        }
+
+        var attack = Phase(_phaseIndex).Attack;
+        if (attack is null)
+        {
+            return;
+        }
+
+        if (_bossPending is null && now >= _nextBossAttackAt)
+        {
+            // 打仇恨最高的那个活着的人。坦克的稳定值高，Boss 就咬着坦克打；
+            // 稳定值低的时候谁输出凶 Boss 就掉头去打谁。
+            var target = _members.Values.Where(m => !m.Down)
+                .OrderByDescending(m => m.EffectiveThreat)
+                .ThenBy(m => m.Id)
+                .FirstOrDefault();
+
+            if (target is null)
+            {
+                _nextBossAttackAt = now + attack.IntervalMs;
+                return;
+            }
+
+            _bossPending = (target.Id, now + attack.ForeswingMs);
+        }
+
+        if (_bossPending is { } pending && now >= pending.LandAtMs)
+        {
+            _bossPending = null;
+            _nextBossAttackAt = now + attack.IntervalMs;
+
+            if (_members.TryGetValue(pending.MemberId, out var victim) && !victim.Down)
+            {
+                victim.Hp = Math.Max(0, victim.Hp - attack.Damage);
+                outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(victim) } });
+            }
+        }
+    }
+
+    /// <summary>血线过阈就换阶段。阶段表来自配置，切了以后 Boss 按新阶段的参数出手。</summary>
+    void CheckPhase(List<ServerMessage> outbox)
+    {
+        var index = PhaseIndexFor(_bossHp);
+        if (index == _phaseIndex)
+        {
+            return;
+        }
+
+        _phaseIndex = index;
+        _bossPending = null;
+        _nextBossAttackAt = NowMs();
+        outbox.Add(new ServerMessage
+        {
+            BossPhase = new() { PhaseIndex = index, Name = Phase(index).Name },
+        });
+    }
+
+    List<PhaseConfig> Phases() =>
+        _config.Boss.Phases is { Count: > 0 } phases
+            ? phases
+            :
+            [
+                new PhaseConfig
+                {
+                    Name = _config.Boss.Name,
+                    HpPctFrom = 100,
+                    HpPctTo = 0,
+                    Attack = _config.Boss.Attack,
+                },
+            ];
+
+    PhaseConfig Phase(int index) => Phases()[Math.Clamp(index, 0, Phases().Count - 1)];
+
+    int PhaseIndexFor(long hp)
+    {
+        var phases = Phases();
+        if (phases.Count == 1)
+        {
+            return 0;
+        }
+
+        var pct = hp * 100.0 / Math.Max(1, _config.Boss.HpMax);
+        for (var i = 0; i < phases.Count; i++)
+        {
+            // 每段盖 (to, from]：血量到 from 的那一刻还在上一段，掉过 to 才算下一段。
+            if (pct <= phases[i].HpPctFrom && pct > phases[i].HpPctTo)
+            {
+                return i;
+            }
+        }
+
+        return phases.Count - 1;
+    }
+
+    // ---- 收尾 ----
+
+    /// <summary>断线或全场没人。这场没打完就不结算，也不留记录，重进是另一场。</summary>
     public void Abandon()
     {
         lock (_gate)
         {
             _closed = true;
-            _pending = null;
+            foreach (var member in _members.Values)
+            {
+                member.Pending = null;
+            }
         }
     }
 
     /// <summary>只有通关才写记录。写失败就不给事务号，客户端拿不到号就领不了奖。</summary>
-    BattleEnded Close()
+    BattleEnded Close(ulong killerId)
     {
         _closed = true;
         try
@@ -348,7 +720,7 @@ public sealed class Encounter
             {
                 SettlementId = $"bt{SessionId:x16}",
                 SessionId = SessionId,
-                CasterId = _config.Caster.Id,
+                CasterId = killerId,
                 BossId = _config.Boss.Id,
                 SkillTableVersion = _config.Skills.Version,
                 ExpGain = _config.Boss.ExpOnClear,
@@ -374,6 +746,15 @@ public sealed class Encounter
         };
     }
 
+    // ---- 换算 ----
+
+    static SkillRequest PendingRequest(PendingCast pending) => new()
+    {
+        SkillId = pending.Skill.Id,
+        TargetId = pending.TargetId,
+        CastTimeMs = pending.CastTimeMs,
+    };
+
     static SkillRejected Reject(SkillRequest request, SkillRejectReason reason) => new()
     {
         SkillId = request.SkillId,
@@ -381,4 +762,40 @@ public sealed class Encounter
         CastTimeMs = request.CastTimeMs,
         Reason = reason,
     };
+
+    PartyMember ToPartyMember(Member member) => new()
+    {
+        MemberId = member.Id,
+        ClassId = member.Class.Id,
+        Name = member.Class.Name,
+        Hp = member.Hp,
+        HpMax = member.HpMax,
+        Down = member.Down,
+    };
+
+    SkillInfo ToSkillInfo(SkillDef skill) => new()
+    {
+        SkillId = skill.Id,
+        Name = skill.Name,
+        RangeMm = skill.RangeMm,
+        ForeswingMs = (uint)Math.Max(0, skill.ForeswingMs),
+        RecoveryMs = (uint)Math.Max(0, skill.RecoveryMs),
+        CooldownMs = (uint)Math.Max(0, skill.CooldownMs),
+        StaggerMs = (uint)Math.Max(0, skill.StaggerMs),
+        ManaCost = (uint)Math.Max(0, skill.ManaCost),
+    };
+
+    uint DistanceToBossMm(Member member)
+    {
+        var dx = member.X - _config.Boss.SpawnMm.X;
+        var dy = member.Y - _config.Boss.SpawnMm.Y;
+        return (uint)Math.Round(Math.Sqrt(dx * dx + dy * dy));
+    }
+
+    static uint DistanceBetweenMm(Member a, Member b)
+    {
+        var dx = a.X - b.X;
+        var dy = a.Y - b.Y;
+        return (uint)Math.Round(Math.Sqrt(dx * dx + dy * dy));
+    }
 }

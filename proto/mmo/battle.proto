@@ -26,6 +26,10 @@ message SkillResult {
   uint32 cooldown_ms = 8;
   // 这一下之后目标还剩多少血。客户端照着这个改血条，不自己算。
   int64 target_hp_after = 9;
+  // 这一下之后施法者还剩多少蓝。蓝也只在服务端结算。
+  int64 mana_after = 10;
+  // 施法者的累计有效仇恨（打出的伤害 + 职业稳定值）。给核对与界面用。
+  int64 threat_after = 11;
 }
 
 // 拒绝的原因。客户端按这个停掉前摇，不改画面上的血量。
@@ -47,6 +51,10 @@ enum SkillRejectReason {
   SKILL_REJECT_CASTING = 7;
   // 上一个技能已经结算，后摇还没走完
   SKILL_REJECT_RECOVERY = 8;
+  // 蓝不够。主动技能耗蓝，蓝不够就放不出去
+  SKILL_REJECT_NO_MANA = 9;
+  // 目标不对：复活选了自己，或者选的不是倒地的队友
+  SKILL_REJECT_BAD_TARGET = 10;
 }
 
 // 没有结算就退回来了。这条不改变任何人的生命。
@@ -102,6 +110,24 @@ message SkillInfo {
   uint32 recovery_ms = 5;
   uint32 cooldown_ms = 6;
   uint32 stagger_ms = 7;
+  // 这一手的蓝耗。普攻可以是 0，主动技能大于 0，数值都来自配置。
+  uint32 mana_cost = 8;
+}
+
+// 职业目录。客户端的换职业按钮按这个循环。
+message ClassInfo {
+  string class_id = 1;
+  string name = 2;
+}
+
+// 一场里的一个成员。血量和倒地状态都由服务端说了算。
+message PartyMember {
+  uint64 member_id = 1;
+  string class_id = 2;
+  string name = 3;
+  int64 hp = 4;
+  int64 hp_max = 5;
+  bool down = 6;
 }
 
 // 连上就开一场。P0 不做进本协议，网关鉴权也放到后续。
@@ -123,6 +149,15 @@ message BattleOpened {
   // 施法者出生坐标，Boss 为原点。客户端照这个摆自己，不用从距离反推
   int32 caster_x_mm = 12;
   int32 caster_y_mm = 13;
+  // 这个人的职业与蓝条。蓝量上限 = 职业基础 + 精神 × 职业系数，都在服务端算。
+  string class_id = 14;
+  string class_name = 15;
+  int64 mana = 16;
+  int64 mana_max = 17;
+  // 同一场里的所有人，含自己。血量与倒地状态照这个显示。
+  repeated PartyMember party = 18;
+  // 可选职业目录。换职业要重连一场，客户端按这个循环。
+  repeated ClassInfo classes = 19;
 }
 
 // 这场收尾。settlement_id 是写进结算记录的事务号；
@@ -132,6 +167,18 @@ message BattleEnded {
   bool cleared = 2;
   string settlement_id = 3;
   int64 exp_gain = 4;
+}
+
+// 一个成员的血量或倒地状态变了：Boss 打中了谁、谁被拉起来。
+// 谁掉的血、掉了多少，只有服务端知道，客户端照这个改画面。
+message MemberUpdated {
+  PartyMember member = 1;
+}
+
+// Boss 换阶段了。阶段来自配置，到血线就切，不设霸体条和破防窗口。
+message BossPhase {
+  int32 phase_index = 1;
+  string name = 2;
 }
 
 // 一条 WebSocket 上跑多种消息，靠这个信封分辨。
@@ -151,5 +198,7 @@ message ServerMessage {
     SkillCancelled cancelled = 4;
     BattleEnded ended = 5;
     MoveState moved = 6;
+    MemberUpdated member_updated = 7;
+    BossPhase boss_phase = 8;
   }
 }

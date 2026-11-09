@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Mmo.Net;
 using Mmo.Proto.Battle;
@@ -23,6 +24,12 @@ namespace HotUpdate
         /// <summary>真机上用 adb reverse 把这个端口映射到本机的战斗进程。</summary>
         public static string Url = "ws://127.0.0.1:60001/battle";
 
+        /// <summary>
+        /// 当前职业。作为 query 参数跟在连接地址后面，服务端按它发技能表。
+        /// 换职业就是换这个值再重连一场，客户端不自己算职业数值。
+        /// </summary>
+        public static string ClassId = "warrior";
+
         public bool Connected { get; private set; }
 
         public string Failure { get; private set; } = "";
@@ -38,6 +45,23 @@ namespace HotUpdate
         public long CasterHp { get; private set; }
 
         public long CasterHpMax { get; private set; }
+
+        /// <summary>自己的成员编号。MemberUpdated 靠它认出哪条是自己。</summary>
+        public ulong CasterId { get; private set; }
+
+        public string ClassName { get; private set; } = "";
+
+        public long Mana { get; private set; }
+
+        public long ManaMax { get; private set; }
+
+        /// <summary>当前 Boss 阶段。切阶段只认服务端广播，不自己看血线。</summary>
+        public int PhaseIndex { get; private set; }
+
+        public string PhaseName { get; private set; } = "";
+
+        /// <summary>阶段变化序号。界面靠它判断「来了一条新的」。</summary>
+        public int PhaseSeq { get; private set; }
 
         public uint DistanceMm { get; private set; }
 
@@ -74,6 +98,12 @@ namespace HotUpdate
 
         public readonly List<SkillInfo> Skills = new();
 
+        /// <summary>同一场里的人，含自己。界面照这个显示队友血条。</summary>
+        public readonly List<PartyMember> Party = new();
+
+        /// <summary>服务端下发的可选职业目录。换职业按钮按这个循环。</summary>
+        public readonly List<ClassInfo> Classes = new();
+
         BattleLink _link;
 
         double _castStartMs;
@@ -96,18 +126,90 @@ namespace HotUpdate
         async void Start()
         {
             Instance = this;
+            await ConnectAsync();
+        }
 
+        /// <summary>连接地址带上职业参数。服务端认不出职业会回 400，这里不猜、让失败浮上来。</summary>
+        static string BuildUrl()
+        {
+            return Url + (Url.Contains('?') ? "&" : "?") + "class=" + ClassId;
+        }
+
+        async Task ConnectAsync()
+        {
             try
             {
-                _link = await BattleLink.ConnectAsync(Url, TimeSpan.FromSeconds(3));
+                _link = await BattleLink.ConnectAsync(BuildUrl(), TimeSpan.FromSeconds(3));
                 Connected = true;
-                Debug.Log("p02b_connect=ok url=" + Url);
+                Debug.Log("p02b_connect=ok url=" + BuildUrl());
             }
             catch (Exception e)
             {
                 Failure = e.Message;
                 Debug.Log("p02b_connect=fail " + e.GetType().Name + " " + e.Message);
             }
+        }
+
+        /// <summary>
+        /// 换职业：断掉当前连接，换个 class 参数重连一场。
+        /// 职业的技能表、血蓝上限、出生点全部以新一场的 Opened 为准。
+        /// </summary>
+        public async void SwitchClass(string classId)
+        {
+            if (classId == ClassId)
+            {
+                Debug.Log("p03c_switch_skip reason=same_class class=" + classId);
+                return;
+            }
+
+            ClassId = classId;
+            Debug.Log("p03c_switch class=" + classId);
+
+            if (_link != null)
+            {
+                try
+                {
+                    await _link.CloseAsync();
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("p03c_close_fail " + e.GetType().Name + " " + e.Message);
+                }
+
+                _link.Dispose();
+                _link = null;
+            }
+
+            ResetState();
+            await ConnectAsync();
+        }
+
+        /// <summary>换职业前的清场。所有战斗状态都等新一场的 Opened 重发。</summary>
+        void ResetState()
+        {
+            Connected = false;
+            Failure = "";
+            Ended = false;
+            EndedSeq = 0;
+            Casting = false;
+            CastingSkill = 0;
+            CastElapsedMs = 0;
+            BossId = 0;
+            BossHp = 0;
+            BossHpMax = 0;
+            CasterHp = 0;
+            CasterHpMax = 0;
+            CasterId = 0;
+            ClassName = "";
+            Mana = 0;
+            ManaMax = 0;
+            PhaseIndex = 0;
+            PhaseName = "";
+            LastDamage = 0;
+            LastReject = "";
+            Skills.Clear();
+            Party.Clear();
+            Classes.Clear();
         }
 
         void Update()
@@ -240,11 +342,20 @@ namespace HotUpdate
                     BossId = opened.BossId;
                     BossHp = opened.BossHp;
                     BossHpMax = opened.BossHpMax;
+                    CasterId = opened.CasterId;
                     CasterHp = opened.CasterHp;
                     CasterHpMax = opened.CasterHpMax;
+                    ClassName = opened.ClassName;
+                    Mana = opened.Mana;
+                    ManaMax = opened.ManaMax;
                     DistanceMm = opened.DistanceMm;
                     ArenaRadiusMm = opened.ArenaRadiusMm;
                     MoveSpeedMmPerS = opened.MoveSpeedMmPerS;
+
+                    // 新一场从零阶段开始。有没有阶段、几时切，全听服务端广播。
+                    PhaseIndex = 0;
+                    PhaseName = "";
+                    PhaseSeq = 0;
 
                     // 出生点由服务端给。不设的话本地默认 (0,0)，一上报就把自己
                     // 报成站在 Boss 脚下，服务端还得按速度拉回去。
@@ -255,6 +366,10 @@ namespace HotUpdate
 
                     Skills.Clear();
                     Skills.AddRange(opened.Skills);
+                    Party.Clear();
+                    Party.AddRange(opened.Party);
+                    Classes.Clear();
+                    Classes.AddRange(opened.Classes);
 
                     Debug.Log("p02b_opened session=" + opened.SessionId
                         + " boss=" + opened.BossId
@@ -264,13 +379,34 @@ namespace HotUpdate
                         + " skills=" + opened.Skills.Count
                         + " arena=" + opened.ArenaRadiusMm
                         + " speed=" + opened.MoveSpeedMmPerS);
+
+                    Debug.Log("p03c_opened class=" + opened.ClassId
+                        + " class_name=" + opened.ClassName
+                        + " mana=" + opened.Mana + "/" + opened.ManaMax
+                        + " caster_hp=" + opened.CasterHp + "/" + opened.CasterHpMax
+                        + " party=" + opened.Party.Count
+                        + " classes=" + opened.Classes.Count
+                        + " skills="
+                        + string.Join(",", opened.Skills.Select(s => s.SkillId + ":" + s.Name).ToArray()));
                     break;
                 }
 
                 case ServerMessage.BodyOneofCase.Result:
                 {
                     var result = message.Result;
-                    BossHp = result.TargetHpAfter;
+
+                    // 打 Boss 的结算才动 Boss 血条；治疗打在队友身上，血量走 MemberUpdated。
+                    if (result.TargetId == BossId)
+                    {
+                        BossHp = result.TargetHpAfter;
+                    }
+
+                    // 蓝和仇恨都是施法者自己的账，别人的结算只拿来看。
+                    if (result.CasterId == CasterId)
+                    {
+                        Mana = result.ManaAfter;
+                    }
+
                     LastDamage = result.Damage;
                     DamageSeq++;
                     FinishCast("hit", "");
@@ -279,6 +415,12 @@ namespace HotUpdate
                         + " damage=" + result.Damage
                         + " hp_after=" + result.TargetHpAfter
                         + " stagger=" + result.StaggerMs);
+                    Debug.Log("p03c_cast skill=" + result.SkillId
+                        + " caster=" + result.CasterId
+                        + " damage=" + result.Damage
+                        + " healing=" + result.Healing
+                        + " mana=" + result.ManaAfter
+                        + " threat=" + result.ThreatAfter);
                     break;
                 }
 
@@ -341,6 +483,45 @@ namespace HotUpdate
                     Debug.Log("p02b_ended cleared=" + message.Ended.Cleared
                         + " settlement=" + message.Ended.SettlementId
                         + " exp=" + message.Ended.ExpGain);
+                    break;
+                }
+
+                case ServerMessage.BodyOneofCase.MemberUpdated:
+                {
+                    // 同场所有人的血量变化。自己被打、被奶、被拉起来都从这走。
+                    var member = message.MemberUpdated.Member;
+                    var index = Party.FindIndex(p => p.MemberId == member.MemberId);
+                    if (index >= 0)
+                    {
+                        Party[index] = member;
+                    }
+                    else
+                    {
+                        Party.Add(member);
+                    }
+
+                    if (member.MemberId == CasterId)
+                    {
+                        CasterHp = member.Hp;
+                        CasterHpMax = member.HpMax;
+                    }
+
+                    Debug.Log("p03c_member id=" + member.MemberId
+                        + " class=" + member.ClassId
+                        + " hp=" + member.Hp + "/" + member.HpMax
+                        + " down=" + member.Down);
+                    break;
+                }
+
+                case ServerMessage.BodyOneofCase.BossPhase:
+                {
+                    var phase = message.BossPhase;
+                    PhaseIndex = phase.PhaseIndex;
+                    PhaseName = phase.Name;
+                    PhaseSeq++;
+                    Debug.Log("p03c_phase index=" + phase.PhaseIndex
+                        + " name=" + phase.Name
+                        + " boss_hp=" + BossHp + "/" + BossHpMax);
                     break;
                 }
             }
