@@ -22,6 +22,7 @@ public sealed class GatewayProcess(string configPath)
         Console.WriteLine("listen=" + config.Listen);
         Console.WriteLine("token_ttl_s=" + config.TokenTtlSeconds);
         Console.WriteLine("pbkdf2_iterations=" + config.Pbkdf2Iterations);
+        Console.WriteLine("battle_upstream=" + config.BattleUpstream);
 
         // 连接串带密码，日志只打来源。
         var connectionString = DbEnv.Resolve();
@@ -54,6 +55,9 @@ public sealed class GatewayProcess(string configPath)
         {
             LoginApi.Map(app, accounts, tokens, config);
         }
+
+        // 战斗长连接只从网关进：握手认令牌，认过之后字节流转发给战斗服。
+        BattleProxy.Map(app, tokens, config);
 
         // 这一行是 E3 认的：进程起来了、后面还没开始接客。
         Console.WriteLine("ready name=Gateway pid=" + Environment.ProcessId);

@@ -83,7 +83,7 @@ public static class LoginApi
                 return;
             }
 
-            var (token, _) = tokens.Issue(config.TokenTtlSeconds);
+            var (token, _) = tokens.Issue(account, config.TokenTtlSeconds);
             Console.WriteLine("login account=" + account
                 + " result=ok token_len=" + token.Length
                 + " ttl_s=" + config.TokenTtlSeconds);

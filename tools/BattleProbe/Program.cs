@@ -28,6 +28,7 @@ internal static class Program
         var hit = uint.TryParse(Arg(args, "--hit"), out var h) ? h : 1002U;
         var resurrect = uint.TryParse(Arg(args, "--resurrect"), out var rs) ? rs : 1303U;
         var second = Arg(args, "--second") ?? "skip";
+        var waitMs = int.TryParse(Arg(args, "--wait-ms"), out var wm) ? wm : 0;
 
         try
         {
@@ -47,6 +48,9 @@ internal static class Program
                 "p03a_mana" => await CaseP03aManaAsync(url, boss, hit),
                 "p03a_resurrect" => await CaseP03aResurrectAsync(url, boss, party, warriorChar, priestChar, hit, resurrect, second),
                 "p03b_phase" => await CaseP03bPhaseAsync(url, boss, ranged),
+                "p11a2_connect" => await CaseP11a2ConnectAsync(url, boss, hit, waitMs),
+                "p11a2_reject" => await CaseP11a2RejectAsync(url),
+                "p11a2_expire" => await CaseP11a2ExpireAsync(url, boss, hit, waitMs),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -572,6 +576,66 @@ internal static class Program
                  && attackDamage > 0;
 
         return Report(ok, $"p03b_phase index={phase.PhaseIndex} attack={attackDamage}");
+    }
+
+    /// <summary>
+    /// P1-1a2：带令牌从网关连进去，转发链路要通——出一手，能收到战斗服的回包。
+    /// 伤害或拒绝都算通，这一条验的是「网关把字节流转过去了」，不是战斗规则。
+    /// </summary>
+    static async Task<int> CaseP11a2ConnectAsync(string url, ulong boss, uint skill, int waitMs)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        if (waitMs > 0)
+        {
+            await Task.Delay(waitMs);
+        }
+
+        await session.SubmitAsync(skill, boss, Session.NowMs());
+        var message = await session.ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null,
+            5000);
+
+        var ok = message is not null;
+        return Report(ok,
+            "case=p11a2_connect caster=" + session.Opened.CasterId
+            + " wait_ms=" + waitMs
+            + " got=" + (message?.BodyCase.ToString() ?? "none")
+            + (message?.Result is { } r ? " damage=" + r.Damage : "")
+            + (message?.Rejected is { } j ? " reason=" + j.Reason : ""));
+    }
+
+    /// <summary>P1-1a2：没令牌、伪造令牌、过期令牌，连接就该建不起来。</summary>
+    static async Task<int> CaseP11a2RejectAsync(string url)
+    {
+        try
+        {
+            await using var session = await Session.ConnectAsync(url);
+            return Report(false, "case=p11a2_reject connected session=" + session.Opened.SessionId);
+        }
+        catch (Exception ex)
+        {
+            return Report(true, "case=p11a2_reject refused=" + ex.GetType().Name);
+        }
+    }
+
+    /// <summary>
+    /// P1-1a2：连上的时候令牌还有效，等它过期再发技能，必须收不到任何回包——
+    /// 网关会在转发这一帧之前把连接按策略违规关掉。
+    /// </summary>
+    static async Task<int> CaseP11a2ExpireAsync(string url, ulong boss, uint skill, int waitMs)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        await Task.Delay(waitMs);
+
+        await session.SubmitAsync(skill, boss, Session.NowMs());
+        var message = await session.ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null,
+            3000);
+
+        var ok = message is null;
+        return Report(ok,
+            "case=p11a2_expire wait_ms=" + waitMs
+            + " got=" + (message?.BodyCase.ToString() ?? "none"));
     }
 
     static int Report(bool ok, string line)
