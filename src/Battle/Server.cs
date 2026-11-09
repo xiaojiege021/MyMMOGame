@@ -45,7 +45,9 @@ sealed class Party
 /// 连接参数（query）：class 选职业（缺省用配置里的默认职业），
 /// char 是角色编号（缺省用配置里的 caster.id），party 是队伍钥匙（缺省独享一场）。
 /// </summary>
-public sealed class BattleServer(BattleConfig config, SettlementStore settlements, ICharacterStore characters)
+public sealed class BattleServer(
+    BattleConfig config, SettlementStore settlements, ICharacterStore characters,
+    IExpSettlement expSettlement)
 {
     /// <summary>20Hz。前摇、冷却、后摇的判定精度都在这个粒度上。</summary>
     const int TickIntervalMs = 50;
@@ -167,7 +169,8 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
                 party = new Party
                 {
                     Key = partyKey,
-                    Encounter = new Encounter(config, settlements, characters, NextSessionId(), partySize),
+                    Encounter = new Encounter(
+                        config, settlements, characters, NextSessionId(), partySize, expSettlement),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
                     PartySize = partySize,

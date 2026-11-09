@@ -346,6 +346,13 @@ public sealed class BattleConfig
     public string SkillTablePath { get; init; } = "";
     public string ClassTablePath { get; init; } = "";
     public string DefaultClass { get; init; } = "";
+
+    /// <summary>
+    /// 等级经验结算要交给角色服（持久数据的唯一写入方）。留空就是 P0 的
+    /// 本机结算口径：只写本地记录，不改角色库；老核对与练习场都走这一条。
+    /// </summary>
+    public string ExpUpstream { get; init; } = "";
+
     public CasterConfig Caster { get; init; } = new();
     public BossConfig Boss { get; init; } = new();
     public ArenaConfig Arena { get; init; } = new();
@@ -383,6 +390,7 @@ public sealed class BattleConfig
             SkillTablePath = skillPath,
             ClassTablePath = classPath,
             DefaultClass = string.IsNullOrWhiteSpace(raw.DefaultClass) ? "warrior" : raw.DefaultClass,
+            ExpUpstream = (raw.ExpUpstream ?? "").Trim(),
             Caster = raw.Caster,
             Boss = raw.Boss,
             Arena = raw.Arena,
@@ -600,6 +608,7 @@ public sealed class BattleConfig
         public string ClassTable { get; init; } = "classes.json";
         public string DungeonTable { get; init; } = "dungeons.json";
         public string DefaultClass { get; init; } = "warrior";
+        public string ExpUpstream { get; init; } = "";
         public CasterConfig Caster { get; init; } = new();
         public BossConfig Boss { get; init; } = new();
         public ArenaConfig Arena { get; init; } = new();

@@ -33,6 +33,11 @@ public static class CharacterApi
 
     public sealed record HotSpringBody(ulong? CharacterId);
 
+    // 经验结算请求里只有角色、事务号、来源与人数，没有经验数值：
+    // 客户端多传一个 exp_gain 也进不了角色服的那一笔。
+    public sealed record SettleExpBody(
+        ulong? CharacterId, string? TxnId, string? Source, uint? PartySize);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -683,6 +688,82 @@ public static class CharacterApi
             catch (RpcException ex)
             {
                 await WriteRpcErrorAsync(context, "hot_spring", account, ex);
+            }
+        });
+
+        // 等级经验结算。账号从令牌取，数值全在角色服的 config/exp.json；
+        // 网关只鉴权与转发，多传的经验/加成字段不会被读进请求。
+        app.MapPost("/exp/settle", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "exp_settle", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            SettleExpBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<SettleExpBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.PartySize is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var result = await client.SettleExpAsync(
+                    new SettleExpRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        TxnId = (body.TxnId ?? "").Trim(),
+                        Source = (body.Source ?? "").Trim(),
+                        PartySize = body.PartySize.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("exp_settle account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " txn=" + (body.TxnId ?? "").Trim()
+                    + " source=" + (body.Source ?? "").Trim()
+                    + " party=" + body.PartySize.Value
+                    + " duplicate=" + result.Duplicate
+                    + " base=" + result.BaseExp
+                    + " bonus=" + result.PartyBonus
+                    + " gain=" + result.ExpGain
+                    + " level=" + result.LevelBefore + "->" + result.Level
+                    + " exp=" + result.Exp
+                    + " cap=" + result.LevelCap);
+
+                await WriteAsync(context, 200, new
+                {
+                    duplicate = result.Duplicate,
+                    base_exp = result.BaseExp,
+                    party_bonus = result.PartyBonus,
+                    exp_gain = result.ExpGain,
+                    level_before = result.LevelBefore,
+                    level = result.Level,
+                    exp = result.Exp,
+                    level_cap = result.LevelCap,
+                    at_cap = result.AtCap,
+                    party_size = result.PartySize,
+                    source = result.Source,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "exp_settle", account, ex);
             }
         });
     }

@@ -32,6 +32,9 @@ long rawShareId = 0;
 var rawShareValue = 0;
 long sharesTotalOf = 0;
 string? sharesTotalDungeon = null;
+long expStateOf = 0;
+long rawExpId = 0;
+var rawExpValue = 0L;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -119,6 +122,15 @@ for (var i = 0; i < args.Length; i++)
             long.TryParse(args[++i], out sharesTotalOf);
             sharesTotalDungeon = args[++i];
             break;
+        // 只给核对用：读等级、当前级经验、结算笔数与累计入账经验。
+        case "--exp-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out expStateOf);
+            break;
+        // 只给核对用：绕过接口直写经验，验库层的非负 CHECK。
+        case "--raw-exp-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawExpId);
+            long.TryParse(args[++i], out rawExpValue);
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -130,7 +142,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
-    || rawShareId != 0 || sharesTotalDungeon != null)
+    || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -330,6 +342,38 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     sharesTotalOf, sharesTotalDungeon, CancellationToken.None);
                 Console.WriteLine("shares_total=" + total + " id=" + sharesTotalOf
                     + " dungeon=" + sharesTotalDungeon);
+            }
+        }
+
+        if (expStateOf != 0 || rawExpId != 0)
+        {
+            var expSettlements = new ExpSettlementRepository(dataSource);
+
+            if (expStateOf != 0)
+            {
+                var state = await expSettlements.ExpStateAsync(expStateOf, CancellationToken.None);
+                Console.WriteLine(state is null
+                    ? "exp_state=missing id=" + expStateOf
+                    : "exp_state=ok id=" + expStateOf
+                      + " level=" + state.Value.Level
+                      + " exp=" + state.Value.Exp
+                      + " rows=" + state.Value.Rows
+                      + " total_gain=" + state.Value.TotalGain);
+            }
+
+            if (rawExpId != 0)
+            {
+                try
+                {
+                    await expSettlements.RawWriteExpAsync(rawExpId, rawExpValue, CancellationToken.None);
+                    Console.WriteLine("raw_exp=written id=" + rawExpId + " exp=" + rawExpValue);
+                }
+                catch (PostgresException ex)
+                {
+                    // 核对要看到的就是这个：库层 CHECK 把负经验挡住了。
+                    Console.WriteLine("raw_exp=rejected id=" + rawExpId
+                        + " exp=" + rawExpValue + " sqlstate=" + ex.SqlState);
+                }
             }
         }
 

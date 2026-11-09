@@ -19,8 +19,13 @@ public sealed class BattleProcess(string configPath)
         var settlements = new SettlementStore(config.SettlementDir);
         Directory.CreateDirectory(settlements.Dir);
         var characters = new FileCharacterStore(config.CharacterDir);
+        // 没配上游就是 P0 的本机结算口径；配了才把这一笔经验交给角色服。
+        using IExpSettlement expSettlement = string.IsNullOrEmpty(config.ExpUpstream)
+            ? new NoExpSettlement()
+            : new GrpcExpSettlement(config.ExpUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
+        Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
         Console.WriteLine("settlement_dir=" + settlements.Dir);
         Console.WriteLine("settlements=" + settlements.Count());
         Console.WriteLine("character_dir=" + characters.Dir);
@@ -34,7 +39,7 @@ public sealed class BattleProcess(string configPath)
 
         try
         {
-            await new BattleServer(config, settlements, characters).RunAsync(stopping);
+            await new BattleServer(config, settlements, characters, expSettlement).RunAsync(stopping);
         }
         catch (OperationCanceledException)
         {

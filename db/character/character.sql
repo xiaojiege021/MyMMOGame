@@ -54,3 +54,12 @@ ALTER TABLE "角色".character
 ALTER TABLE "角色".character
     ADD COLUMN IF NOT EXISTS weekly_share_day date
     NOT NULL DEFAULT date_trunc('week', CURRENT_DATE::timestamp)::date;
+
+-- P1-2d：当前等级已有经验。等级经验只由 SettleExp 这一笔写入，
+-- 到 level_cap 之后不再升级；库层仍用 CHECK (level BETWEEN 1 AND 100) 兜底。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS exp bigint NOT NULL DEFAULT 0;
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_exp_non_negative;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_exp_non_negative CHECK (exp >= 0);

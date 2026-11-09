@@ -13,6 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- 通关后的等级经验结算交给角色服，服与服走 gRPC（技术架构第 2 节）。 -->
+    <PackageReference Include="Grpc.Net.Client" Version="2.85.0" />
     <!-- 技能请求和结果的类型来自 proto 生成物，和客户端同一份。 -->
     <ProjectReference Include="../Shared/Shared.csproj" />
   </ItemGroup>

@@ -1,0 +1,11 @@
+{
+  "schema": "exp-table/1",
+  "version": 1,
+  "note": "等级经验只走这一笔结算。方案写定：活动、副本、任务、竞技场、战场、城战和世界 Boss 都结算等级经验；同一场至少两个人时，这一笔多一截少量加成，只加经验，伤害、掉落、疲劳、次数都不动；等级 1–100 封顶，到 100 不再提高。方案没写定基础经验、组队加成的幅度、每级所需经验和升级曲线，全部留在这里，数值待定，不写死在代码里：base_exp 暂与战斗服 boss.exp_on_clear 对齐，party_bonus_pct 暂取 10，exp_per_level 暂按每级固定 1000，凑够一次就升一级。这一版不按等级改阈值，也不做同宗门加成与限时经验道具。",
+  "level_cap": 100,
+  "base_exp": 120,
+  "party_bonus_pct": 10,
+  "party_min_size": 2,
+  "party_max_size": 8,
+  "exp_per_level": 1000
+}

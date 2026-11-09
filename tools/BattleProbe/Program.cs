@@ -30,6 +30,9 @@ internal static class Program
         var second = Arg(args, "--second") ?? "skip";
         var waitMs = int.TryParse(Arg(args, "--wait-ms"), out var wm) ? wm : 0;
         var holdMs = int.TryParse(Arg(args, "--hold-ms"), out var hm) ? hm : 0;
+        var aChar = ulong.TryParse(Arg(args, "--a-char"), out var ac) ? ac : 1UL;
+        var bChar = ulong.TryParse(Arg(args, "--b-char"), out var bc) ? bc : 2UL;
+        var partySize = int.TryParse(Arg(args, "--party-size"), out var ps) ? ps : 2;
 
         try
         {
@@ -55,6 +58,7 @@ internal static class Program
                 "p12a_join" => await CaseP12aJoinAsync(url, Arg(args, "--expect") ?? "open", holdMs),
                 "p12c_boss_hit" => await CaseP12cBossHitAsync(url),
                 "p12c_player_damage" => await CaseP12cPlayerDamageAsync(url, boss, hit),
+                "p12d_clear" => await CaseP12dClearAsync(url, boss, hit, aChar, bChar, partySize),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -785,6 +789,86 @@ internal static class Program
             $"case=p12c_player_damage boss_hp_max={session.Opened.BossHpMax} "
             + $"skill={result?.SkillId} damage={result?.Damage} "
             + $"hp_after={result?.TargetHpAfter} reject={message?.Rejected?.Reason.ToString() ?? "none"}");
+    }
+
+    /// <summary>
+    /// P1-2d：两个人进同一场打完 Boss。两个连接都保持在场，战斗服通关结算时
+    /// 会给每人各记一笔经验；这里只拿结算号与伤害，入账结果由核对脚本查库。
+    /// 跳过队友进场的广播，挑自己那一发的 Result 与最后的 Ended。
+    /// </summary>
+    static async Task<int> CaseP12dClearAsync(
+        string url, ulong boss, uint skill, ulong aChar, ulong bChar, int partySize)
+    {
+        var key = "p12d-" + Guid.NewGuid().ToString("N")[..8];
+        var common = $"party={key}&party_size={partySize}&class=warrior";
+        await using var a = await Session.ConnectAsync(WithQuery(url, common + "&char=" + aChar));
+        await using var b = await Session.ConnectAsync(WithQuery(url, common + "&char=" + bChar));
+
+        var hp = a.Opened.BossHp;
+        long firstDamage = 0;
+        var casts = 0;
+        BattleEnded? ended = null;
+
+        for (var attempt = 0; attempt < 80 && ended is null; attempt++)
+        {
+            await a.SubmitAsync(skill, boss, Session.NowMs());
+            var message = await a.ReadUntilAsync(
+                m => m.Result is not null || m.Ended is not null || m.Rejected is not null, 6000);
+            if (message is null)
+            {
+                break;
+            }
+
+            if (message.Ended is not null)
+            {
+                ended = message.Ended;
+                break;
+            }
+
+            if (message.Result is not null)
+            {
+                casts++;
+                if (firstDamage == 0)
+                {
+                    firstDamage = message.Result.Damage;
+                }
+
+                hp = message.Result.TargetHpAfter;
+                if (hp <= 0)
+                {
+                    // 结算要同步等角色服写完才回 Ended，留足一次建连的余量。
+                    ended = (await a.ReadUntilAsync(m => m.Ended is not null, 8000))?.Ended;
+                    break;
+                }
+
+                continue;
+            }
+
+            var rejected = message.Rejected!;
+            if (rejected.Reason == SkillRejectReason.SkillRejectCooldown)
+            {
+                await Task.Delay((int)rejected.RetryAfterMs + 40);
+                continue;
+            }
+
+            if (rejected.Reason == SkillRejectReason.SkillRejectRecovery)
+            {
+                await Task.Delay(500);
+                continue;
+            }
+
+            break;
+        }
+
+        var ok = ended is { Cleared: true }
+                 && !string.IsNullOrEmpty(ended.SettlementId)
+                 && firstDamage > 0
+                 && hp <= 0;
+
+        return Report(ok,
+            $"case=p12d_clear party_size={partySize} a={aChar} b={bChar} "
+            + $"casts={casts} damage={firstDamage} hp_left={hp} "
+            + $"settlement_id={ended?.SettlementId} exp_gain={ended?.ExpGain} cleared={ended?.Cleared}");
     }
 
     static int Report(bool ok, string line)

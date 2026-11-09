@@ -68,6 +68,7 @@ public sealed class Encounter
     readonly BattleConfig _config;
     readonly SettlementStore _settlements;
     readonly ICharacterStore _characters;
+    readonly IExpSettlement _expSettlement;
     readonly Dictionary<ulong, Member> _members = [];
 
     readonly long _bossHpMax;
@@ -93,11 +94,12 @@ public sealed class Encounter
     /// </summary>
     public Encounter(
         BattleConfig config, SettlementStore settlements, ICharacterStore characters,
-        ulong sessionId, int partySize)
+        ulong sessionId, int partySize, IExpSettlement expSettlement)
     {
         _config = config;
         _settlements = settlements;
         _characters = characters;
+        _expSettlement = expSettlement;
         SessionId = sessionId;
         _partySize = partySize;
         _bossHpMax = Scale(config.Boss.HpMax, config.Dungeons.MonsterHpScalePerPlayer, partySize);
@@ -772,6 +774,14 @@ public sealed class Encounter
             // 写不下就不发号，宁可这次没有奖励，也不发一个查不到的号。
             Console.WriteLine($"settlement_error=session={SessionId} {ex.Message}");
             _settlementId = "";
+        }
+
+        // 同一场每人一份个人经验，交给角色服的那一笔结算。事务号用本地结算号，
+        // 角色服按号幂等；没配上游时空实现什么都不做，P0 行为不变。
+        // 伤害、掉落、疲劳、次数都不在这里改，组队加成只加经验。
+        if (_settlementId.Length > 0)
+        {
+            _expSettlement.SettleParty(_settlementId, "dungeon", _partySize, _members.Keys.ToArray());
         }
 
         return new BattleEnded

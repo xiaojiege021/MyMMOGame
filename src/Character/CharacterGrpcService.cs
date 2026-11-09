@@ -22,6 +22,8 @@ public sealed class CharacterGrpcService(
     DungeonEntryRepository dungeonEntries,
     WeeklyShareRepository weeklyShares,
     HotSpringRepository hotSpring,
+    ExpSettlementRepository expSettlements,
+    ExpTable expTable,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -668,6 +670,80 @@ public sealed class CharacterGrpcService(
             FatigueDailyCap = dungeons.FatigueDailyCap,
             RecoveryLimit = dungeons.HotSpringRecovery,
             WeeklyShare = outcome.WeeklyShare,
+        };
+    }
+
+    /// <summary>
+    /// 等级经验结算。活动、副本、任务、竞技场、战场、城战和世界 Boss 只走这一笔：
+    /// 基础经验 + 同一场至少两人时的一截少量加成，只加经验。
+    /// 请求里没有经验数值，也不接受客户端算好的加成：数值全在 config/exp.json，
+    /// 角色服是唯一写入方。同一个事务号再提交不发第二次。
+    /// account 为空只用于战斗服通关后的服间直连；网关转发一定带账号并复核归属。
+    /// </summary>
+    public override async Task<SettleExpResponse> SettleExp(
+        SettleExpRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > ExpSettlementRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_id_invalid"));
+        }
+
+        var source = (request.Source ?? "").Trim();
+        if (source.Length == 0 || source.Length > ExpSettlementRepository.MaxSourceLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "source_invalid"));
+        }
+
+        var partySize = (int)request.PartySize;
+        if (partySize < 1 || partySize > expTable.PartyMaxSize)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "party_size_invalid"));
+        }
+
+        // 网关转发时先核归属，与前面各行同一个口径；服间直连没有账号，
+        // 由战斗服与角色服之间的内网调用保证，仓库里只按角色编号找。
+        if (account.Length > 0
+            && !await inventory.OwnsAsync(account, (long)request.CharacterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await expSettlements.SettleAsync(
+            (long)request.CharacterId, account.Length == 0 ? null : account,
+            txnId, source, partySize, expTable, context.CancellationToken);
+        if (!outcome.Found)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "exp_settle account={Account} id={Id} txn={Txn} source={Source} party={Party} "
+            + "duplicate={Duplicate} base={Base} bonus={Bonus} gain={Gain} "
+            + "level={LevelBefore}->{Level} exp={Exp}",
+            account.Length == 0 ? "service" : account, request.CharacterId, txnId, source, partySize,
+            outcome.Duplicate, outcome.BaseExp, outcome.PartyBonus, outcome.ExpGain,
+            outcome.LevelBefore, outcome.Level, outcome.Exp);
+
+        return new SettleExpResponse
+        {
+            Duplicate = outcome.Duplicate,
+            BaseExp = outcome.BaseExp,
+            PartyBonus = outcome.PartyBonus,
+            ExpGain = outcome.ExpGain,
+            LevelBefore = outcome.LevelBefore,
+            Level = outcome.Level,
+            Exp = outcome.Exp,
+            LevelCap = expTable.LevelCap,
+            AtCap = outcome.Level >= expTable.LevelCap,
+            PartySize = (uint)partySize,
+            Source = source,
         };
     }
 

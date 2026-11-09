@@ -88,6 +88,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseHotSpringRequest> __Marshaller_mmo_character_UseHotSpringRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseHotSpringRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseHotSpringResponse> __Marshaller_mmo_character_UseHotSpringResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseHotSpringResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleExpRequest> __Marshaller_mmo_character_SettleExpRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleExpRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleExpResponse> __Marshaller_mmo_character_SettleExpResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleExpResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -168,6 +172,14 @@ namespace Mmo.Proto.Character {
         "UseHotSpring",
         __Marshaller_mmo_character_UseHotSpringRequest,
         __Marshaller_mmo_character_UseHotSpringResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.SettleExpRequest, global::Mmo.Proto.Character.SettleExpResponse> __Method_SettleExp = new grpc::Method<global::Mmo.Proto.Character.SettleExpRequest, global::Mmo.Proto.Character.SettleExpResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SettleExp",
+        __Marshaller_mmo_character_SettleExpRequest,
+        __Marshaller_mmo_character_SettleExpResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -295,6 +307,21 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UseHotSpringResponse> UseHotSpring(global::Mmo.Proto.Character.UseHotSpringRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 等级经验结算。活动、副本、任务、竞技场、战场、城战和世界 Boss 都走这一笔；
+      /// 同一场至少两个人时这一笔多一截少量加成，只加经验。
+      /// 请求里没有经验数值，基础值、加成幅度与升级曲线全在 config/exp.json。
+      /// 同一个 txn_id 再提交不发第二次。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SettleExpResponse> SettleExp(global::Mmo.Proto.Character.SettleExpRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -804,6 +831,66 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_UseHotSpring, null, options, request);
       }
+      /// <summary>
+      /// 等级经验结算。活动、副本、任务、竞技场、战场、城战和世界 Boss 都走这一笔；
+      /// 同一场至少两个人时这一笔多一截少量加成，只加经验。
+      /// 请求里没有经验数值，基础值、加成幅度与升级曲线全在 config/exp.json。
+      /// 同一个 txn_id 再提交不发第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SettleExpResponse SettleExp(global::Mmo.Proto.Character.SettleExpRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleExp(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 等级经验结算。活动、副本、任务、竞技场、战场、城战和世界 Boss 都走这一笔；
+      /// 同一场至少两个人时这一笔多一截少量加成，只加经验。
+      /// 请求里没有经验数值，基础值、加成幅度与升级曲线全在 config/exp.json。
+      /// 同一个 txn_id 再提交不发第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SettleExpResponse SettleExp(global::Mmo.Proto.Character.SettleExpRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SettleExp, null, options, request);
+      }
+      /// <summary>
+      /// 等级经验结算。活动、副本、任务、竞技场、战场、城战和世界 Boss 都走这一笔；
+      /// 同一场至少两个人时这一笔多一截少量加成，只加经验。
+      /// 请求里没有经验数值，基础值、加成幅度与升级曲线全在 config/exp.json。
+      /// 同一个 txn_id 再提交不发第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SettleExpResponse> SettleExpAsync(global::Mmo.Proto.Character.SettleExpRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleExpAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 等级经验结算。活动、副本、任务、竞技场、战场、城战和世界 Boss 都走这一笔；
+      /// 同一场至少两个人时这一笔多一截少量加成，只加经验。
+      /// 请求里没有经验数值，基础值、加成幅度与升级曲线全在 config/exp.json。
+      /// 同一个 txn_id 再提交不发第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SettleExpResponse> SettleExpAsync(global::Mmo.Proto.Character.SettleExpRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SettleExp, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -827,7 +914,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_GetCurrency, serviceImpl.GetCurrency)
           .AddMethod(__Method_ApplyGrant, serviceImpl.ApplyGrant)
           .AddMethod(__Method_EnterDungeon, serviceImpl.EnterDungeon)
-          .AddMethod(__Method_UseHotSpring, serviceImpl.UseHotSpring).Build();
+          .AddMethod(__Method_UseHotSpring, serviceImpl.UseHotSpring)
+          .AddMethod(__Method_SettleExp, serviceImpl.SettleExp).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -847,6 +935,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_ApplyGrant, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ApplyGrantRequest, global::Mmo.Proto.Character.ApplyGrantResponse>(serviceImpl.ApplyGrant));
       serviceBinder.AddMethod(__Method_EnterDungeon, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnterDungeonRequest, global::Mmo.Proto.Character.EnterDungeonResponse>(serviceImpl.EnterDungeon));
       serviceBinder.AddMethod(__Method_UseHotSpring, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse>(serviceImpl.UseHotSpring));
+      serviceBinder.AddMethod(__Method_SettleExp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleExpRequest, global::Mmo.Proto.Character.SettleExpResponse>(serviceImpl.SettleExp));
     }
 
   }

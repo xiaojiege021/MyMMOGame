@@ -70,6 +70,43 @@ service CharacterService {
   // 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
   // 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
   rpc UseHotSpring(UseHotSpringRequest) returns (UseHotSpringResponse);
+
+  // 等级经验结算。活动、副本、任务、竞技场、战场、城战和世界 Boss 都走这一笔；
+  // 同一场至少两个人时这一笔多一截少量加成，只加经验。
+  // 请求里没有经验数值，基础值、加成幅度与升级曲线全在 config/exp.json。
+  // 同一个 txn_id 再提交不发第二次。
+  rpc SettleExp(SettleExpRequest) returns (SettleExpResponse);
+}
+
+message SettleExpRequest {
+  // 网关转发时填令牌账号，where 里再核一次归属；战斗服服间直连时为空，
+  // 只按 character_id 找角色。客户端填不了这个字段。
+  string account = 1;
+  uint64 character_id = 2;
+  // 幂等号：一场通关一个号，同一号只发一次。
+  string txn_id = 3;
+  // 只记账，不参与数值：dungeon / activity / task / arena ...
+  string source = 4;
+  // 同一场的进本人数，与战斗服连接、角色服进本用的是同一个数字。
+  uint32 party_size = 5;
+}
+
+message SettleExpResponse {
+  // true 表示这个号已经发过，本次一笔没发。
+  bool duplicate = 1;
+  // 这一笔的基础经验；只有基础经验时 party_bonus 是 0。
+  int64 base_exp = 2;
+  int64 party_bonus = 3;
+  int64 exp_gain = 4;
+  int32 level_before = 5;
+  int32 level = 6;
+  // 当前等级还剩下的经验。
+  int64 exp = 7;
+  // 方案写定 100，到此后等级不再提高。
+  int32 level_cap = 8;
+  bool at_cap = 9;
+  uint32 party_size = 10;
+  string source = 11;
 }
 
 message UseHotSpringRequest {

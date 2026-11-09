@@ -26,6 +26,7 @@ public sealed class CharacterProcess(string configPath)
         ItemTable items;
         CurrencyTable currencies;
         DungeonTable dungeons;
+        ExpTable expTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -34,6 +35,7 @@ public sealed class CharacterProcess(string configPath)
             items = ItemTable.Load("config/items.json");
             currencies = CurrencyTable.Load("config/currency.json");
             dungeons = DungeonTable.Load(config.DungeonTable);
+            expTable = ExpTable.Load(config.ExpTable);
         }
         catch (ConfigException ex)
         {
@@ -54,6 +56,12 @@ public sealed class CharacterProcess(string configPath)
             + " weekly_share_cap=" + dungeons.WeeklyShareCap
             + " monster_hp_scale_per_player=" + dungeons.MonsterHpScalePerPlayer
             + " monster_damage_scale_per_player=" + dungeons.MonsterDamageScalePerPlayer);
+        Console.WriteLine("exp_table_version=" + expTable.Version
+            + " level_cap=" + expTable.LevelCap
+            + " base_exp=" + expTable.BaseExp
+            + " party_bonus_pct=" + expTable.PartyBonusPct
+            + " party_min_size=" + expTable.PartyMinSize
+            + " exp_per_level=" + expTable.ExpPerLevel);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -73,6 +81,7 @@ public sealed class CharacterProcess(string configPath)
         var dungeonEntries = new DungeonEntryRepository(dataSource);
         var weeklyShares = new WeeklyShareRepository(dataSource);
         var hotSpring = new HotSpringRepository(dataSource);
+        var expSettlements = new ExpSettlementRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -100,6 +109,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(dungeonEntries);
         builder.Services.AddSingleton(weeklyShares);
         builder.Services.AddSingleton(hotSpring);
+        builder.Services.AddSingleton(expSettlements);
+        builder.Services.AddSingleton(expTable);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();
