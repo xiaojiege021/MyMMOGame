@@ -61,6 +61,7 @@ public sealed class CharacterProcess(string configPath)
         var characters = new CharacterRepository(dataSource);
         var inventory = new InventoryRepository(dataSource);
         var currency = new CurrencyRepository(dataSource);
+        var grants = new GrantRepository(dataSource, items, currencies, config);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -78,6 +79,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(characters);
         builder.Services.AddSingleton(inventory);
         builder.Services.AddSingleton(currency);
+        builder.Services.AddSingleton(grants);
         builder.Services.AddSingleton(races);
         builder.Services.AddSingleton(branches);
         builder.Services.AddSingleton(classes);

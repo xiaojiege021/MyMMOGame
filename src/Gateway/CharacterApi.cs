@@ -21,6 +21,14 @@ public static class CharacterApi
 
     public sealed record CurrencyBody(ulong? CharacterId, string? Kind, long? Delta);
 
+    public sealed record GrantEntryBody(CurrencyDeltaBody? Currency, ItemDeltaBody? Item);
+
+    public sealed record CurrencyDeltaBody(string? Kind, long? Delta);
+
+    public sealed record ItemDeltaBody(uint? Slot, string? ItemId, int? Count);
+
+    public sealed record GrantBody(ulong? CharacterId, string? TxnId, List<GrantEntryBody>? Entries);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -435,6 +443,104 @@ public static class CharacterApi
             catch (RpcException ex)
             {
                 await WriteRpcErrorAsync(context, "currency_get", account, ex);
+            }
+        });
+
+        // 发一笔奖。整笔在角色服的一个事务里，事务号重复就不发第二次。
+        app.MapPost("/grant", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "grant", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            GrantBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<GrantBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.Entries is null || body.Entries.Count == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            var request = new ApplyGrantRequest
+            {
+                Account = account,
+                CharacterId = body.CharacterId.Value,
+                TxnId = (body.TxnId ?? "").Trim(),
+            };
+
+            foreach (var entry in body.Entries)
+            {
+                if (entry.Currency is not null)
+                {
+                    request.Entries.Add(new Mmo.Proto.Character.GrantEntry
+                    {
+                        Currency = new CurrencyDelta
+                        {
+                            Kind = entry.Currency.Kind ?? "",
+                            Delta = entry.Currency.Delta ?? 0,
+                        },
+                    });
+                }
+                else if (entry.Item is not null && entry.Item.Slot is not null)
+                {
+                    request.Entries.Add(new Mmo.Proto.Character.GrantEntry
+                    {
+                        Item = new ItemDelta
+                        {
+                            Slot = entry.Item.Slot.Value,
+                            ItemId = entry.Item.ItemId ?? "",
+                            Count = entry.Item.Count ?? 0,
+                        },
+                    });
+                }
+                else
+                {
+                    await WriteAsync(context, 400, new { error = "entry_invalid" });
+                    return;
+                }
+            }
+
+            try
+            {
+                var result = await client.ApplyGrantAsync(
+                    request,
+                    deadline: DateTime.UtcNow.AddSeconds(10),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("grant account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " txn=" + request.TxnId
+                    + " duplicate=" + result.Duplicate
+                    + " entries=" + request.Entries.Count);
+
+                await WriteAsync(context, 200, new
+                {
+                    duplicate = result.Duplicate,
+                    balances = result.Balances.Select(b => new { kind = b.Kind, amount = b.Amount }),
+                    slots = result.Slots.Select(s => new
+                    {
+                        slot = s.Slot,
+                        item_id = s.ItemId,
+                        count = s.Count,
+                        bound = s.Bound,
+                    }),
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "grant", account, ex);
             }
         });
     }

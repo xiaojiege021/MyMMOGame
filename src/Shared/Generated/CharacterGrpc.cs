@@ -76,6 +76,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.GetCurrencyRequest> __Marshaller_mmo_character_GetCurrencyRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.GetCurrencyRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.GetCurrencyResponse> __Marshaller_mmo_character_GetCurrencyResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.GetCurrencyResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ApplyGrantRequest> __Marshaller_mmo_character_ApplyGrantRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ApplyGrantRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ApplyGrantResponse> __Marshaller_mmo_character_ApplyGrantResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ApplyGrantResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -132,6 +136,14 @@ namespace Mmo.Proto.Character {
         "GetCurrency",
         __Marshaller_mmo_character_GetCurrencyRequest,
         __Marshaller_mmo_character_GetCurrencyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ApplyGrantRequest, global::Mmo.Proto.Character.ApplyGrantResponse> __Method_ApplyGrant = new grpc::Method<global::Mmo.Proto.Character.ApplyGrantRequest, global::Mmo.Proto.Character.ApplyGrantResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ApplyGrant",
+        __Marshaller_mmo_character_ApplyGrantRequest,
+        __Marshaller_mmo_character_ApplyGrantResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -219,6 +231,19 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.GetCurrencyResponse> GetCurrency(global::Mmo.Proto.Character.GetCurrencyRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 发一笔奖：事务号 + 若干条变更，整笔在一个数据库事务里，全成或全退。
+      /// 同一个事务号再提交不会发第二次，响应里 duplicate=true。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ApplyGrantResponse> ApplyGrant(global::Mmo.Proto.Character.ApplyGrantRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -568,6 +593,58 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_GetCurrency, null, options, request);
       }
+      /// <summary>
+      /// 发一笔奖：事务号 + 若干条变更，整笔在一个数据库事务里，全成或全退。
+      /// 同一个事务号再提交不会发第二次，响应里 duplicate=true。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ApplyGrantResponse ApplyGrant(global::Mmo.Proto.Character.ApplyGrantRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ApplyGrant(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 发一笔奖：事务号 + 若干条变更，整笔在一个数据库事务里，全成或全退。
+      /// 同一个事务号再提交不会发第二次，响应里 duplicate=true。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ApplyGrantResponse ApplyGrant(global::Mmo.Proto.Character.ApplyGrantRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ApplyGrant, null, options, request);
+      }
+      /// <summary>
+      /// 发一笔奖：事务号 + 若干条变更，整笔在一个数据库事务里，全成或全退。
+      /// 同一个事务号再提交不会发第二次，响应里 duplicate=true。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ApplyGrantResponse> ApplyGrantAsync(global::Mmo.Proto.Character.ApplyGrantRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ApplyGrantAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 发一笔奖：事务号 + 若干条变更，整笔在一个数据库事务里，全成或全退。
+      /// 同一个事务号再提交不会发第二次，响应里 duplicate=true。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ApplyGrantResponse> ApplyGrantAsync(global::Mmo.Proto.Character.ApplyGrantRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ApplyGrant, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -588,7 +665,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_ListInventory, serviceImpl.ListInventory)
           .AddMethod(__Method_CanTrade, serviceImpl.CanTrade)
           .AddMethod(__Method_AddCurrency, serviceImpl.AddCurrency)
-          .AddMethod(__Method_GetCurrency, serviceImpl.GetCurrency).Build();
+          .AddMethod(__Method_GetCurrency, serviceImpl.GetCurrency)
+          .AddMethod(__Method_ApplyGrant, serviceImpl.ApplyGrant).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -605,6 +683,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_CanTrade, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanTradeRequest, global::Mmo.Proto.Character.CanTradeResponse>(serviceImpl.CanTrade));
       serviceBinder.AddMethod(__Method_AddCurrency, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AddCurrencyRequest, global::Mmo.Proto.Character.CurrencyBalance>(serviceImpl.AddCurrency));
       serviceBinder.AddMethod(__Method_GetCurrency, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.GetCurrencyRequest, global::Mmo.Proto.Character.GetCurrencyResponse>(serviceImpl.GetCurrency));
+      serviceBinder.AddMethod(__Method_ApplyGrant, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ApplyGrantRequest, global::Mmo.Proto.Character.ApplyGrantResponse>(serviceImpl.ApplyGrant));
     }
 
   }

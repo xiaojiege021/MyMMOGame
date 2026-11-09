@@ -57,6 +57,45 @@ service CharacterService {
 
   // 读回全部币种，没有记账的按 0 算。
   rpc GetCurrency(GetCurrencyRequest) returns (GetCurrencyResponse);
+
+  // 发一笔奖：事务号 + 若干条变更，整笔在一个数据库事务里，全成或全退。
+  // 同一个事务号再提交不会发第二次，响应里 duplicate=true。
+  rpc ApplyGrant(ApplyGrantRequest) returns (ApplyGrantResponse);
+}
+
+// 一条变更：加/减货币，或者往格子里放物品。一个事务里可以混着来。
+message GrantEntry {
+  oneof body {
+    CurrencyDelta currency = 1;
+    ItemDelta item = 2;
+  }
+}
+
+message CurrencyDelta {
+  string kind = 1;
+  // 可正可负；扣成负数整笔不做。
+  int64 delta = 2;
+}
+
+message ItemDelta {
+  uint32 slot = 1;
+  string item_id = 2;
+  int32 count = 3;
+}
+
+message ApplyGrantRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  // 客户端给的唯一号。同一个号只能发一次奖。
+  string txn_id = 3;
+  repeated GrantEntry entries = 4;
+}
+
+message ApplyGrantResponse {
+  // true 表示这个号已经用过了，这一笔没有执行。
+  bool duplicate = 1;
+  repeated CurrencyBalance balances = 2;
+  repeated InventorySlot slots = 3;
 }
 
 message AddCurrencyRequest {

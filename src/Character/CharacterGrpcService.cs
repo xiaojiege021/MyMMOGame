@@ -12,6 +12,7 @@ public sealed class CharacterGrpcService(
     CharacterRepository characters,
     InventoryRepository inventory,
     CurrencyRepository currency,
+    GrantRepository grants,
     RaceTable races,
     BranchTable branches,
     ClassIds classes,
@@ -366,6 +367,89 @@ public sealed class CharacterGrpcService(
             {
                 Kind = def.Id,
                 Amount = balances.GetValueOrDefault(def.Id, 0L),
+            });
+        }
+
+        return response;
+    }
+
+    /// <summary>
+    /// 发一笔奖。整笔在一个数据库事务里：事务号重复就整笔不做（duplicate），
+    /// 中间任何一条不满足条件就整笔回退，不会出现「钱扣了东西没给」。
+    /// </summary>
+    public override async Task<ApplyGrantResponse> ApplyGrant(
+        ApplyGrantRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > GrantRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_id_invalid"));
+        }
+
+        if (request.Entries.Count == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "entries_empty"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        GrantResult result;
+        try
+        {
+            result = await grants.ApplyAsync(
+                characterId, txnId, request.Entries, context.CancellationToken);
+        }
+        catch (GrantException ex)
+        {
+            logger.LogInformation(
+                "grant_reject account={Account} id={Id} txn={Txn} code={Code}",
+                account, characterId, txnId, ex.Code);
+
+            // 业务前提不满足（钱不够、格子占着）走 FailedPrecondition，与参数错分开。
+            var status = ex.Code is "insufficient" or "stack_overflow" or "slot_occupied"
+                ? StatusCode.FailedPrecondition
+                : StatusCode.InvalidArgument;
+            throw new RpcException(new Status(status, ex.Code));
+        }
+
+        logger.LogInformation(
+            "grant account={Account} id={Id} txn={Txn} duplicate={Duplicate} entries={Entries}",
+            account, characterId, txnId, result.Duplicate, request.Entries.Count);
+
+        var response = new ApplyGrantResponse { Duplicate = result.Duplicate };
+        foreach (var def in currencies.All)
+        {
+            response.Balances.Add(new CurrencyBalance
+            {
+                Kind = def.Id,
+                Amount = result.Balances.GetValueOrDefault(def.Id, 0L),
+            });
+        }
+
+        foreach (var slot in result.Slots)
+        {
+            response.Slots.Add(new InventorySlot
+            {
+                Slot = (uint)slot.Slot,
+                ItemId = slot.ItemId,
+                Count = slot.Count,
+                Bound = slot.Bound,
             });
         }
 

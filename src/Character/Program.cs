@@ -17,6 +17,7 @@ var bindingSlot = 0;
 long rawCurrencyId = 0;
 string? rawCurrencyKind = null;
 var rawCurrencyAmount = 0L;
+string? txnCount = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -59,6 +60,10 @@ for (var i = 0; i < args.Length; i++)
             rawCurrencyKind = args[++i];
             long.TryParse(args[++i], out rawCurrencyAmount);
             break;
+        // 只给核对用：这个事务号在表里有几行。
+        case "--txn-count" when i + 1 < args.Length:
+            txnCount = args[++i];
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -67,7 +72,7 @@ for (var i = 0; i < args.Length; i++)
 
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
-    || bindingOf != null || rawCurrencyId != 0)
+    || bindingOf != null || rawCurrencyId != 0 || txnCount != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -150,6 +155,16 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + " kind=" + rawCurrencyKind + " amount=" + rawCurrencyAmount
                     + " sqlstate=" + ex.SqlState);
             }
+        }
+
+        if (txnCount != null)
+        {
+            // 只数行，不经过发奖逻辑，免得核对自己去抢号。
+            await using var command = dataSource.CreateCommand(
+                "select count(*) from \"角色\".grant_txn where txn_id = $1");
+            command.Parameters.AddWithValue(txnCount);
+            var value = await command.ExecuteScalarAsync(CancellationToken.None);
+            Console.WriteLine("txn_count=" + Convert.ToInt32(value) + " txn=" + txnCount);
         }
 
         if (reportName != null)
