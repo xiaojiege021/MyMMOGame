@@ -51,7 +51,36 @@ service CharacterService {
   // 这一格的物品能不能直接交易。绑定物品返回不可交易，原因 bound_item。
   // 交易本身在 P1-5a，这里只给判定。
   rpc CanTrade(CanTradeRequest) returns (CanTradeResponse);
+
+  // 货币加减。delta 可正可负，一条语句原子完成；结果小于 0 直接拒绝（insufficient）。
+  rpc AddCurrency(AddCurrencyRequest) returns (CurrencyBalance);
+
+  // 读回全部币种，没有记账的按 0 算。
+  rpc GetCurrency(GetCurrencyRequest) returns (GetCurrencyResponse);
 }
+
+message AddCurrencyRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  // gold / stone_1..stone_5 / yuanbao
+  string kind = 3;
+  int64 delta = 4;
+}
+
+message CurrencyBalance {
+  string kind = 1;
+  int64 amount = 2;
+}
+
+message GetCurrencyRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message GetCurrencyResponse {
+  repeated CurrencyBalance balances = 1;
+}
+
 
 message SetLevelRequest {
   string account = 1;

@@ -19,6 +19,8 @@ public static class CharacterApi
 
     public sealed record CanTradeBody(ulong? CharacterId, uint? Slot);
 
+    public sealed record CurrencyBody(ulong? CharacterId, string? Kind, long? Delta);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -343,10 +345,101 @@ public static class CharacterApi
                 await WriteRpcErrorAsync(context, "inventory_trade", account, ex);
             }
         });
+
+        // 货币加减。金币、灵石五档、元宝同一个口子，扣成负数由角色服拒。
+        app.MapPost("/currency/add", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "currency_add", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            CurrencyBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<CurrencyBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.Delta is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var balance = await client.AddCurrencyAsync(
+                    new AddCurrencyRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Kind = body.Kind ?? "",
+                        Delta = body.Delta.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("currency account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " kind=" + balance.Kind
+                    + " delta=" + body.Delta.Value
+                    + " amount=" + balance.Amount);
+
+                await WriteAsync(context, 200, new
+                {
+                    kind = balance.Kind,
+                    amount = balance.Amount,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "currency_add", account, ex);
+            }
+        });
+
+        // 读回全部币种，没记过账的按 0。
+        app.MapGet("/currency", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "currency_get", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            if (!ulong.TryParse(context.Request.Query["character_id"].ToString(), out var characterId)
+                || characterId == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var balances = await client.GetCurrencyAsync(
+                    new GetCurrencyRequest { Account = account, CharacterId = characterId },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                await WriteAsync(context, 200, new
+                {
+                    balances = balances.Balances.Select(b => new { kind = b.Kind, amount = b.Amount }),
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "currency_get", account, ex);
+            }
+        });
     }
 
-    static bool TryAuthorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
+    static bool TryAuthorize(HttpContext context, TokenStore tokens, string what, out string account)    {
         var token = TokenFrom(context.Request);
         if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
         {
@@ -365,6 +458,8 @@ public static class CharacterApi
             StatusCode.InvalidArgument => 400,
             StatusCode.NotFound => 404,
             StatusCode.AlreadyExists => 409,
+            // 余额不足这类「前提不满足」走 412，与参数错分开。
+            StatusCode.FailedPrecondition => 412,
             StatusCode.Unavailable => 503,
             _ => 502,
         };

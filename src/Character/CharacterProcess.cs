@@ -24,12 +24,14 @@ public sealed class CharacterProcess(string configPath)
         BranchTable branches;
         ClassIds classes;
         ItemTable items;
+        CurrencyTable currencies;
         try
         {
             races = RaceTable.Load("config/races.json");
             branches = BranchTable.Load("config/branches.json");
             classes = new ClassIds("config/classes.json");
             items = ItemTable.Load("config/items.json");
+            currencies = CurrencyTable.Load("config/currency.json");
         }
         catch (ConfigException ex)
         {
@@ -43,6 +45,7 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("branches=" + branches.All.Count + " branch_table_version=" + branches.Version);
         Console.WriteLine("items=" + items.All.Count + " item_table_version=" + items.Version
             + " bag_slots=" + config.BagSlots);
+        Console.WriteLine("currencies=" + currencies.All.Count + " currency_table_version=" + currencies.Version);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -57,6 +60,7 @@ public sealed class CharacterProcess(string configPath)
         await using var dataSource = NpgsqlDataSource.Create(DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
         var characters = new CharacterRepository(dataSource);
         var inventory = new InventoryRepository(dataSource);
+        var currency = new CurrencyRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -73,10 +77,12 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddGrpc();
         builder.Services.AddSingleton(characters);
         builder.Services.AddSingleton(inventory);
+        builder.Services.AddSingleton(currency);
         builder.Services.AddSingleton(races);
         builder.Services.AddSingleton(branches);
         builder.Services.AddSingleton(classes);
         builder.Services.AddSingleton(items);
+        builder.Services.AddSingleton(currencies);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

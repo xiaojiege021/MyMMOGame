@@ -14,6 +14,9 @@ var rawLevelValue = 0;
 long levelOf = 0;
 string? bindingOf = null;
 var bindingSlot = 0;
+long rawCurrencyId = 0;
+string? rawCurrencyKind = null;
+var rawCurrencyAmount = 0L;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -50,6 +53,12 @@ for (var i = 0; i < args.Length; i++)
             bindingOf = args[++i];
             int.TryParse(args[++i], out bindingSlot);
             break;
+        // 只给核对用：绕过接口直写余额，验库层 CHECK 会不会挡住负数。
+        case "--raw-currency-write" when i + 3 < args.Length:
+            long.TryParse(args[++i], out rawCurrencyId);
+            rawCurrencyKind = args[++i];
+            long.TryParse(args[++i], out rawCurrencyAmount);
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -58,7 +67,7 @@ for (var i = 0; i < args.Length; i++)
 
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
-    || bindingOf != null)
+    || bindingOf != null || rawCurrencyId != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -123,6 +132,24 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 ? "binding=missing name=" + bindingOf + " slot=" + bindingSlot
                 : "binding=ok name=" + bindingOf + " slot=" + bindingSlot
                   + " bound=" + found.Value.Bound + " bound_at_present=" + found.Value.BoundAtPresent);
+        }
+
+        if (rawCurrencyId != 0 && rawCurrencyKind != null)
+        {
+            var money = new CurrencyRepository(dataSource);
+            try
+            {
+                await money.RawWriteAsync(rawCurrencyId, rawCurrencyKind, rawCurrencyAmount, CancellationToken.None);
+                Console.WriteLine("raw_currency=written id=" + rawCurrencyId
+                    + " kind=" + rawCurrencyKind + " amount=" + rawCurrencyAmount);
+            }
+            catch (PostgresException ex)
+            {
+                // 核对要看到的就是这个：库层的 CHECK 把负数挡住了。
+                Console.WriteLine("raw_currency=rejected id=" + rawCurrencyId
+                    + " kind=" + rawCurrencyKind + " amount=" + rawCurrencyAmount
+                    + " sqlstate=" + ex.SqlState);
+            }
         }
 
         if (reportName != null)

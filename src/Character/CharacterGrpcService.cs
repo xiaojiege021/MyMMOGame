@@ -11,10 +11,12 @@ namespace Character;
 public sealed class CharacterGrpcService(
     CharacterRepository characters,
     InventoryRepository inventory,
+    CurrencyRepository currency,
     RaceTable races,
     BranchTable branches,
     ClassIds classes,
     ItemTable items,
+    CurrencyTable currencies,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -283,5 +285,90 @@ public sealed class CharacterGrpcService(
         }
 
         return new CanTradeResponse { Tradable = true, Reason = "" };
+    }
+
+    /// <summary>
+    /// 货币加减。金币、灵石五档、元宝都走这里：扣成负数直接拒绝，
+    /// 不做「扣到 0 为止」那种夹取——夹住会让调用方以为扣成功了。
+    /// </summary>
+    public override async Task<CurrencyBalance> AddCurrency(
+        AddCurrencyRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var kind = (request.Kind ?? "").Trim();
+        if (currencies.Find(kind) is null)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "unknown_currency"));
+        }
+
+        if (request.Delta == 0)
+        {
+            // 0 不改变任何东西，但也别写一行「0 元宝」出来。
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "delta_zero"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var amount = await currency.AddAsync(characterId, kind, request.Delta, context.CancellationToken);
+        if (amount is null)
+        {
+            logger.LogInformation(
+                "currency_reject account={Account} id={Id} kind={Kind} delta={Delta} reason=insufficient",
+                account, characterId, kind, request.Delta);
+            throw new RpcException(new Status(StatusCode.FailedPrecondition, "insufficient"));
+        }
+
+        logger.LogInformation(
+            "currency account={Account} id={Id} kind={Kind} delta={Delta} amount={Amount}",
+            account, characterId, kind, request.Delta, amount.Value);
+
+        return new CurrencyBalance { Kind = kind, Amount = amount.Value };
+    }
+
+    public override async Task<GetCurrencyResponse> GetCurrency(
+        GetCurrencyRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var balances = await currency.AllAsync(characterId, context.CancellationToken);
+
+        // 按配置顺序全部返回，没记过账的按 0。
+        var response = new GetCurrencyResponse();
+        foreach (var def in currencies.All)
+        {
+            response.Balances.Add(new CurrencyBalance
+            {
+                Kind = def.Id,
+                Amount = balances.GetValueOrDefault(def.Id, 0L),
+            });
+        }
+
+        return response;
     }
 }
