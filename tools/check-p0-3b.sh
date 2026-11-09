@@ -89,6 +89,7 @@ battle["settlement_dir"] = os.path.join(tmp, "settlements")
 battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = "skills.json"
 battle["class_table"] = "classes.json"
+battle["dungeon_table"] = "dungeons.json"
 battle["boss"]["hp_max"] = 1000
 # 第一阶段的出手间隔放到十分钟：这一版只想看切阶段之后的出手，别让第一阶段的先搅局。
 battle["boss"]["phases"] = [
@@ -137,7 +138,7 @@ else
   bad "仓库默认配置配了阶段，老检查的口径会变"
 fi
 
-cp "$ROOT/config/skills.json" "$TMP/skills.json"
+cp "$ROOT/config/skills.json" "$ROOT/config/dungeons.json" "$TMP/"
 cp "$ROOT/config/classes.json" "$TMP/classes.json"
 mkdir -p "$TMP/settlements" "$TMP/characters"
 

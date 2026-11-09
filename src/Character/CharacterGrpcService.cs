@@ -18,6 +18,7 @@ public sealed class CharacterGrpcService(
     ClassIds classes,
     ItemTable items,
     CurrencyTable currencies,
+    DungeonTable dungeons,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -454,5 +455,88 @@ public sealed class CharacterGrpcService(
         }
 
         return response;
+    }
+
+    /// <summary>
+    /// 进本。人数上限与「扣不扣疲劳、占不占份额」都来自 config/dungeons.json。
+    /// 主线 1 人、不扣不占——这一行只把「进得去且账不变」做实。
+    /// 战斗服那边还有一道同样的上限（它按 party 开本），两道都挡。
+    /// </summary>
+    public override async Task<EnterDungeonResponse> EnterDungeon(
+        EnterDungeonRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var dungeon = dungeons.Find((request.DungeonId ?? "").Trim());
+        if (dungeon is null)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "unknown_dungeon"));
+        }
+
+        var partySize = (int)request.PartySize;
+        if (partySize < 1)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "party_size_invalid"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        var reserves = await characters.ReservesAsync(characterId, context.CancellationToken);
+        if (reserves is null)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        // 人数超上限：不是错误码能表达的「业务不允许」，回 allowed=false 让客户端提示。
+        if (partySize > dungeon.MaxPlayers)
+        {
+            logger.LogInformation(
+                "dungeon_reject account={Account} id={Id} dungeon={Dungeon} party={Party} limit={Limit}",
+                account, characterId, dungeon.Id, partySize, dungeon.MaxPlayers);
+
+            return new EnterDungeonResponse
+            {
+                Allowed = false,
+                Reason = "party_too_large",
+                MaxPlayers = (uint)dungeon.MaxPlayers,
+                Fatigue = reserves.Value.Fatigue,
+                WeeklyShare = reserves.Value.WeeklyShare,
+            };
+        }
+
+        var entryId = await characters.RecordEntryAsync(
+            characterId, dungeon.Id, partySize, context.CancellationToken);
+
+        // 主线不扣疲劳、不占份额，所以这里不写那两个列；
+        // 回的是进本之后的值，与进本前一致，客户端与核对都能直接比。
+        logger.LogInformation(
+            "dungeon_enter account={Account} id={Id} dungeon={Dungeon} party={Party} "
+            + "charges_fatigue={Fatigue} takes_share={Share} entry={Entry}",
+            account, characterId, dungeon.Id, partySize,
+            dungeon.ChargesFatigue, dungeon.TakesWeeklyShare, entryId);
+
+        return new EnterDungeonResponse
+        {
+            Allowed = true,
+            Reason = "",
+            MaxPlayers = (uint)dungeon.MaxPlayers,
+            Fatigue = reserves.Value.Fatigue,
+            WeeklyShare = reserves.Value.WeeklyShare,
+            EntryId = (ulong)entryId,
+        };
     }
 }

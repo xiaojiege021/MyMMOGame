@@ -18,6 +18,8 @@ long rawCurrencyId = 0;
 string? rawCurrencyKind = null;
 var rawCurrencyAmount = 0L;
 string? txnCount = null;
+long reservesOf = 0;
+long entryCountOf = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -64,6 +66,14 @@ for (var i = 0; i < args.Length; i++)
         case "--txn-count" when i + 1 < args.Length:
             txnCount = args[++i];
             break;
+        // 只给核对用：读一个角色的疲劳与周份额。
+        case "--reserves-of" when i + 1 < args.Length:
+            long.TryParse(args[++i], out reservesOf);
+            break;
+        // 只给核对用：这个角色进过几次本。
+        case "--entry-count" when i + 1 < args.Length:
+            long.TryParse(args[++i], out entryCountOf);
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -72,7 +82,8 @@ for (var i = 0; i < args.Length; i++)
 
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
-    || bindingOf != null || rawCurrencyId != 0 || txnCount != null)
+    || bindingOf != null || rawCurrencyId != 0 || txnCount != null
+    || reservesOf != 0 || entryCountOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -165,6 +176,25 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             command.Parameters.AddWithValue(txnCount);
             var value = await command.ExecuteScalarAsync(CancellationToken.None);
             Console.WriteLine("txn_count=" + Convert.ToInt32(value) + " txn=" + txnCount);
+        }
+
+        if (reservesOf != 0)
+        {
+            var found = await characters.ReservesAsync(reservesOf, CancellationToken.None);
+            Console.WriteLine(found is null
+                ? "reserves=missing id=" + reservesOf
+                : "reserves=ok id=" + reservesOf
+                  + " fatigue=" + found.Value.Fatigue
+                  + " weekly_share=" + found.Value.WeeklyShare);
+        }
+
+        if (entryCountOf != 0)
+        {
+            await using var command = dataSource.CreateCommand(
+                "select count(*) from \"角色\".dungeon_entry where character_id = $1");
+            command.Parameters.AddWithValue(entryCountOf);
+            var value = await command.ExecuteScalarAsync(CancellationToken.None);
+            Console.WriteLine("entry_count=" + Convert.ToInt32(value) + " id=" + entryCountOf);
         }
 
         if (reportName != null)

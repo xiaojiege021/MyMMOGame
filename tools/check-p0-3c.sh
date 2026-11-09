@@ -170,6 +170,7 @@ battle["settlement_dir"] = os.path.join(tmp, "settlements")
 battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = "skills.json"
 battle["class_table"] = "classes.json"
+battle["dungeon_table"] = "dungeons.json"
 battle["boss"]["hp_max"] = 2000
 battle["boss"]["phases"] = [
     {"name": "常态", "hp_pct_from": 100, "hp_pct_to": 50,
@@ -180,7 +181,7 @@ battle["boss"]["phases"] = [
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=2)
 PY
-cp "$ROOT/config/skills.json" "$ROOT/config/classes.json" "$TMP/"
+cp "$ROOT/config/skills.json" "$ROOT/config/classes.json" "$ROOT/config/dungeons.json" "$TMP/"
 
 : > "$TMP/battle.log"
 "$DOTNET" "$BATTLE_DLL" --config "$TMP/battle.json" >>"$TMP/battle.log" 2>&1 &

@@ -29,6 +29,7 @@ internal static class Program
         var resurrect = uint.TryParse(Arg(args, "--resurrect"), out var rs) ? rs : 1303U;
         var second = Arg(args, "--second") ?? "skip";
         var waitMs = int.TryParse(Arg(args, "--wait-ms"), out var wm) ? wm : 0;
+        var holdMs = int.TryParse(Arg(args, "--hold-ms"), out var hm) ? hm : 0;
 
         try
         {
@@ -51,6 +52,7 @@ internal static class Program
                 "p11a2_connect" => await CaseP11a2ConnectAsync(url, boss, hit, waitMs),
                 "p11a2_reject" => await CaseP11a2RejectAsync(url),
                 "p11a2_expire" => await CaseP11a2ExpireAsync(url, boss, hit, waitMs),
+                "p12a_join" => await CaseP12aJoinAsync(url, Arg(args, "--expect") ?? "open", holdMs),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -636,6 +638,99 @@ internal static class Program
         return Report(ok,
             "case=p11a2_expire wait_ms=" + waitMs
             + " got=" + (message?.BodyCase.ToString() ?? "none"));
+    }
+
+    /// <summary>
+    /// P1-2a：进本。带同一个 party 的第一个人应拿到 Opened，第二个人应拿到 EnterRejected。
+    /// --expect open|reject 说明这次期望哪一种；不符就是不过。
+    /// 这里不用 Session：它要求第一条必须是 Opened，被拒的连接根本不是那种形状。
+    /// </summary>
+    static async Task<int> CaseP12aJoinAsync(string url, string expect, int holdMs)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        using var socket = new System.Net.WebSockets.ClientWebSocket();
+
+        try
+        {
+            await socket.ConnectAsync(new Uri(url), cts.Token);
+        }
+        catch (Exception ex)
+        {
+            // 连接都建不起来：只有期望「被拒」时才算数（握手阶段就关）。
+            return expect == "reject"
+                ? Report(true, "case=p12a_join refused_at_handshake=" + ex.GetType().Name)
+                : Report(false, "case=p12a_join connect_failed=" + ex.GetType().Name);
+        }
+
+        var buffer = new byte[8192];
+        using var assembled = new MemoryStream();
+        ServerMessage? first = null;
+        try
+        {
+            while (true)
+            {
+                var received = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cts.Token);
+                if (received.MessageType == System.Net.WebSockets.WebSocketMessageType.Close)
+                {
+                    break;
+                }
+
+                assembled.Write(buffer, 0, received.Count);
+                if (received.EndOfMessage)
+                {
+                    first = ServerMessage.Parser.ParseFrom(assembled.ToArray());
+                    break;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // 对面直接关了，first 仍然为空。
+        }
+
+        if (first is null)
+        {
+            return expect == "reject"
+                ? Report(true, "case=p12a_join closed_without_message")
+                : Report(false, "case=p12a_join closed_without_opened");
+        }
+
+        if (first.EnterRejected is { } rejected)
+        {
+            var ok = expect == "reject";
+            return Report(ok,
+                "case=p12a_join result=rejected reason=" + rejected.Reason
+                + " limit=" + rejected.Limit
+                + " current=" + rejected.Current
+                + " dungeon=" + rejected.DungeonId);
+        }
+
+        if (first.Opened is { } opened)
+        {
+            // 先打一行「进来了」，再挂住连接：核对靠这一行知道第一个人已经占上场了。
+            Console.WriteLine("joined=ok session=" + opened.SessionId + " caster=" + opened.CasterId);
+
+            // 保持连接：核对要在这条连接还活着的时候让第二个人来撞上限。
+            if (holdMs > 0)
+            {
+                try
+                {
+                    await Task.Delay(holdMs, cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                }
+            }
+
+            var ok = expect == "open";
+            return Report(ok,
+                "case=p12a_join result=opened session=" + opened.SessionId
+                + " caster=" + opened.CasterId
+                + " hold_ms=" + holdMs
+                + " party_expected=" + expect);
+        }
+
+        return Report(false, "case=p12a_join first=" + first.BodyCase);
     }
 
     static int Report(bool ok, string line)

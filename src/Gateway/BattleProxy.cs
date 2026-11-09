@@ -46,9 +46,13 @@ public static class BattleProxy
         using var upstream = new ClientWebSocket();
         var abort = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted);
 
+        // 客户端带的 class / party / dungeon 这些参数要原样交给战斗服，
+        // 只把 token 摘掉——上游不需要也不该看到它。
+        var upstreamUrl = BuildUpstreamUrl(config.BattleUpstream, context.Request.Query);
+
         try
         {
-            await upstream.ConnectAsync(new Uri(config.BattleUpstream), abort.Token);
+            await upstream.ConnectAsync(new Uri(upstreamUrl), abort.Token);
         }
         catch (Exception ex) when (ex is WebSocketException or HttpRequestException or OperationCanceledException)
         {
@@ -132,6 +136,34 @@ public static class BattleProxy
                 return;
             }
         }
+    }
+
+    /// <summary>
+    /// 把客户端的 query 拼到上游地址上，token 摘掉。
+    /// 战斗服靠 class / party / dungeon 决定这一场怎么开，缺了它就只能一人一场。
+    /// </summary>
+    static string BuildUpstreamUrl(string baseUrl, IQueryCollection query)
+    {
+        var parts = new List<string>();
+        foreach (var item in query)
+        {
+            if (string.Equals(item.Key, "token", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            foreach (var value in item.Value)
+            {
+                parts.Add(Uri.EscapeDataString(item.Key) + "=" + Uri.EscapeDataString(value ?? ""));
+            }
+        }
+
+        if (parts.Count == 0)
+        {
+            return baseUrl;
+        }
+
+        return baseUrl + (baseUrl.Contains('?') ? "&" : "?") + string.Join("&", parts);
     }
 
     /// <summary>

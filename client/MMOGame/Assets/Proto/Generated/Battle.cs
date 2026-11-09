@@ -66,7 +66,7 @@ namespace Mmo.Proto.Battle {
             "c2FnZRIpCgVza2lsbBgBIAEoCzIYLm1tby5iYXR0bGUuU2tpbGxSZXF1ZXN0",
             "SAASMAoGY2FuY2VsGAIgASgLMh4ubW1vLmJhdHRsZS5Ta2lsbENhbmNlbFJl",
             "cXVlc3RIABInCgRtb3ZlGAMgASgLMhcubW1vLmJhdHRsZS5Nb3ZlUmVxdWVz",
-            "dEgAQgYKBGJvZHkiggMKDVNlcnZlck1lc3NhZ2USKgoGb3BlbmVkGAEgASgL",
+            "dEgAQgYKBGJvZHkitwMKDVNlcnZlck1lc3NhZ2USKgoGb3BlbmVkGAEgASgL",
             "MhgubW1vLmJhdHRsZS5CYXR0bGVPcGVuZWRIABIpCgZyZXN1bHQYAiABKAsy",
             "Fy5tbW8uYmF0dGxlLlNraWxsUmVzdWx0SAASLQoIcmVqZWN0ZWQYAyABKAsy",
             "GS5tbW8uYmF0dGxlLlNraWxsUmVqZWN0ZWRIABIvCgljYW5jZWxsZWQYBCAB",
@@ -74,16 +74,19 @@ namespace Mmo.Proto.Battle {
             "KAsyFy5tbW8uYmF0dGxlLkJhdHRsZUVuZGVkSAASJgoFbW92ZWQYBiABKAsy",
             "FS5tbW8uYmF0dGxlLk1vdmVTdGF0ZUgAEjMKDm1lbWJlcl91cGRhdGVkGAcg",
             "ASgLMhkubW1vLmJhdHRsZS5NZW1iZXJVcGRhdGVkSAASKwoKYm9zc19waGFz",
-            "ZRgIIAEoCzIVLm1tby5iYXR0bGUuQm9zc1BoYXNlSABCBgoEYm9keSrTAgoR",
-            "U2tpbGxSZWplY3RSZWFzb24SHAoYU0tJTExfUkVKRUNUX1VOU1BFQ0lGSUVE",
-            "EAASHgoaU0tJTExfUkVKRUNUX05PVF9JTl9CQVRUTEUQARIeChpTS0lMTF9S",
-            "RUpFQ1RfVU5LTk9XTl9TS0lMTBACEhwKGFNLSUxMX1JFSkVDVF9UQVJHRVRf",
-            "R09ORRADEhwKGFNLSUxMX1JFSkVDVF9DQVNURVJfREVBRBAEEhkKFVNLSUxM",
-            "X1JFSkVDVF9DT09MRE9XThAFEh0KGVNLSUxMX1JFSkVDVF9PVVRfT0ZfUkFO",
-            "R0UQBhIYChRTS0lMTF9SRUpFQ1RfQ0FTVElORxAHEhkKFVNLSUxMX1JFSkVD",
-            "VF9SRUNPVkVSWRAIEhgKFFNLSUxMX1JFSkVDVF9OT19NQU5BEAkSGwoXU0tJ",
-            "TExfUkVKRUNUX0JBRF9UQVJHRVQQCkITqgIQTW1vLlByb3RvLkJhdHRsZWIG",
-            "cHJvdG8z"));
+            "ZRgIIAEoCzIVLm1tby5iYXR0bGUuQm9zc1BoYXNlSAASMwoOZW50ZXJfcmVq",
+            "ZWN0ZWQYCSABKAsyGS5tbW8uYmF0dGxlLkVudGVyUmVqZWN0ZWRIAEIGCgRi",
+            "b2R5IlMKDUVudGVyUmVqZWN0ZWQSDgoGcmVhc29uGAEgASgJEg0KBWxpbWl0",
+            "GAIgASgNEg8KB2N1cnJlbnQYAyABKA0SEgoKZHVuZ2Vvbl9pZBgEIAEoCSrT",
+            "AgoRU2tpbGxSZWplY3RSZWFzb24SHAoYU0tJTExfUkVKRUNUX1VOU1BFQ0lG",
+            "SUVEEAASHgoaU0tJTExfUkVKRUNUX05PVF9JTl9CQVRUTEUQARIeChpTS0lM",
+            "TF9SRUpFQ1RfVU5LTk9XTl9TS0lMTBACEhwKGFNLSUxMX1JFSkVDVF9UQVJH",
+            "RVRfR09ORRADEhwKGFNLSUxMX1JFSkVDVF9DQVNURVJfREVBRBAEEhkKFVNL",
+            "SUxMX1JFSkVDVF9DT09MRE9XThAFEh0KGVNLSUxMX1JFSkVDVF9PVVRfT0Zf",
+            "UkFOR0UQBhIYChRTS0lMTF9SRUpFQ1RfQ0FTVElORxAHEhkKFVNLSUxMX1JF",
+            "SkVDVF9SRUNPVkVSWRAIEhgKFFNLSUxMX1JFSkVDVF9OT19NQU5BEAkSGwoX",
+            "U0tJTExfUkVKRUNUX0JBRF9UQVJHRVQQCkITqgIQTW1vLlByb3RvLkJhdHRs",
+            "ZWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Battle.SkillRejectReason), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -102,7 +105,8 @@ namespace Mmo.Proto.Battle {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.MemberUpdated), global::Mmo.Proto.Battle.MemberUpdated.Parser, new[]{ "Member" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BossPhase), global::Mmo.Proto.Battle.BossPhase.Parser, new[]{ "PhaseIndex", "Name" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ClientMessage), global::Mmo.Proto.Battle.ClientMessage.Parser, new[]{ "Skill", "Cancel", "Move" }, new[]{ "Body" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase" }, new[]{ "Body" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected" }, new[]{ "Body" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.EnterRejected), global::Mmo.Proto.Battle.EnterRejected.Parser, new[]{ "Reason", "Limit", "Current", "DungeonId" }, null, null, null, null)
           }));
     }
     #endregion
@@ -5589,6 +5593,9 @@ namespace Mmo.Proto.Battle {
         case BodyOneofCase.BossPhase:
           BossPhase = other.BossPhase.Clone();
           break;
+        case BodyOneofCase.EnterRejected:
+          EnterRejected = other.EnterRejected.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -5696,6 +5703,21 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "enter_rejected" field.</summary>
+    public const int EnterRejectedFieldNumber = 9;
+    /// <summary>
+    /// 进本被拒。这条发完就关连接，客户端据此提示「本满了/只能一个人」。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.EnterRejected EnterRejected {
+      get { return bodyCase_ == BodyOneofCase.EnterRejected ? (global::Mmo.Proto.Battle.EnterRejected) body_ : null; }
+      set {
+        body_ = value;
+        bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.EnterRejected;
+      }
+    }
+
     private object body_;
     /// <summary>Enum of possible cases for the "body" oneof.</summary>
     public enum BodyOneofCase {
@@ -5708,6 +5730,7 @@ namespace Mmo.Proto.Battle {
       Moved = 6,
       MemberUpdated = 7,
       BossPhase = 8,
+      EnterRejected = 9,
     }
     private BodyOneofCase bodyCase_ = BodyOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5746,6 +5769,7 @@ namespace Mmo.Proto.Battle {
       if (!object.Equals(Moved, other.Moved)) return false;
       if (!object.Equals(MemberUpdated, other.MemberUpdated)) return false;
       if (!object.Equals(BossPhase, other.BossPhase)) return false;
+      if (!object.Equals(EnterRejected, other.EnterRejected)) return false;
       if (BodyCase != other.BodyCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -5762,6 +5786,7 @@ namespace Mmo.Proto.Battle {
       if (bodyCase_ == BodyOneofCase.Moved) hash ^= Moved.GetHashCode();
       if (bodyCase_ == BodyOneofCase.MemberUpdated) hash ^= MemberUpdated.GetHashCode();
       if (bodyCase_ == BodyOneofCase.BossPhase) hash ^= BossPhase.GetHashCode();
+      if (bodyCase_ == BodyOneofCase.EnterRejected) hash ^= EnterRejected.GetHashCode();
       hash ^= (int) bodyCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -5813,6 +5838,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(66);
         output.WriteMessage(BossPhase);
       }
+      if (bodyCase_ == BodyOneofCase.EnterRejected) {
+        output.WriteRawTag(74);
+        output.WriteMessage(EnterRejected);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -5855,6 +5884,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(66);
         output.WriteMessage(BossPhase);
       }
+      if (bodyCase_ == BodyOneofCase.EnterRejected) {
+        output.WriteRawTag(74);
+        output.WriteMessage(EnterRejected);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -5888,6 +5921,9 @@ namespace Mmo.Proto.Battle {
       }
       if (bodyCase_ == BodyOneofCase.BossPhase) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(BossPhase);
+      }
+      if (bodyCase_ == BodyOneofCase.EnterRejected) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(EnterRejected);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -5949,6 +5985,12 @@ namespace Mmo.Proto.Battle {
             BossPhase = new global::Mmo.Proto.Battle.BossPhase();
           }
           BossPhase.MergeFrom(other.BossPhase);
+          break;
+        case BodyOneofCase.EnterRejected:
+          if (EnterRejected == null) {
+            EnterRejected = new global::Mmo.Proto.Battle.EnterRejected();
+          }
+          EnterRejected.MergeFrom(other.EnterRejected);
           break;
       }
 
@@ -6043,6 +6085,15 @@ namespace Mmo.Proto.Battle {
             BossPhase = subBuilder;
             break;
           }
+          case 74: {
+            global::Mmo.Proto.Battle.EnterRejected subBuilder = new global::Mmo.Proto.Battle.EnterRejected();
+            if (bodyCase_ == BodyOneofCase.EnterRejected) {
+              subBuilder.MergeFrom(EnterRejected);
+            }
+            input.ReadMessage(subBuilder);
+            EnterRejected = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -6132,6 +6183,332 @@ namespace Mmo.Proto.Battle {
             }
             input.ReadMessage(subBuilder);
             BossPhase = subBuilder;
+            break;
+          }
+          case 74: {
+            global::Mmo.Proto.Battle.EnterRejected subBuilder = new global::Mmo.Proto.Battle.EnterRejected();
+            if (bodyCase_ == BodyOneofCase.EnterRejected) {
+              subBuilder.MergeFrom(EnterRejected);
+            }
+            input.ReadMessage(subBuilder);
+            EnterRejected = subBuilder;
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 进本被拒的原因。上限与当前人数一起给，客户端能说清是哪种满。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class EnterRejected : pb::IMessage<EnterRejected>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<EnterRejected> _parser = new pb::MessageParser<EnterRejected>(() => new EnterRejected());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<EnterRejected> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[16]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EnterRejected() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EnterRejected(EnterRejected other) : this() {
+      reason_ = other.reason_;
+      limit_ = other.limit_;
+      current_ = other.current_;
+      dungeonId_ = other.dungeonId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EnterRejected Clone() {
+      return new EnterRejected(this);
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 1;
+    private string reason_ = "";
+    /// <summary>
+    /// party_full：这一场的人已经到上限（主线就是 1）。
+    /// dungeon_unknown：副本号不在表里。
+    /// dungeon_mismatch：同一个队伍地址被用在两个不同的本上。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "limit" field.</summary>
+    public const int LimitFieldNumber = 2;
+    private uint limit_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Limit {
+      get { return limit_; }
+      set {
+        limit_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "current" field.</summary>
+    public const int CurrentFieldNumber = 3;
+    private uint current_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Current {
+      get { return current_; }
+      set {
+        current_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dungeon_id" field.</summary>
+    public const int DungeonIdFieldNumber = 4;
+    private string dungeonId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string DungeonId {
+      get { return dungeonId_; }
+      set {
+        dungeonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as EnterRejected);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(EnterRejected other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Reason != other.Reason) return false;
+      if (Limit != other.Limit) return false;
+      if (Current != other.Current) return false;
+      if (DungeonId != other.DungeonId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (Limit != 0) hash ^= Limit.GetHashCode();
+      if (Current != 0) hash ^= Current.GetHashCode();
+      if (DungeonId.Length != 0) hash ^= DungeonId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Reason.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Reason);
+      }
+      if (Limit != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(Limit);
+      }
+      if (Current != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Current);
+      }
+      if (DungeonId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(DungeonId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Reason.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Reason);
+      }
+      if (Limit != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(Limit);
+      }
+      if (Current != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Current);
+      }
+      if (DungeonId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(DungeonId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (Limit != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Limit);
+      }
+      if (Current != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Current);
+      }
+      if (DungeonId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(DungeonId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(EnterRejected other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.Limit != 0) {
+        Limit = other.Limit;
+      }
+      if (other.Current != 0) {
+        Current = other.Current;
+      }
+      if (other.DungeonId.Length != 0) {
+        DungeonId = other.DungeonId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 16: {
+            Limit = input.ReadUInt32();
+            break;
+          }
+          case 24: {
+            Current = input.ReadUInt32();
+            break;
+          }
+          case 34: {
+            DungeonId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 16: {
+            Limit = input.ReadUInt32();
+            break;
+          }
+          case 24: {
+            Current = input.ReadUInt32();
+            break;
+          }
+          case 34: {
+            DungeonId = input.ReadString();
             break;
           }
         }

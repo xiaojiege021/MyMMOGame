@@ -29,6 +29,8 @@ public static class CharacterApi
 
     public sealed record GrantBody(ulong? CharacterId, string? TxnId, List<GrantEntryBody>? Entries);
 
+    public sealed record EnterDungeonBody(ulong? CharacterId, string? DungeonId, uint? PartySize);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -541,6 +543,71 @@ public static class CharacterApi
             catch (RpcException ex)
             {
                 await WriteRpcErrorAsync(context, "grant", account, ex);
+            }
+        });
+
+        // 进本。主线 1 人、不扣疲劳不占份额；人数与规则都在角色服的副本表里。
+        app.MapPost("/dungeon/enter", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "dungeon_enter", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            EnterDungeonBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<EnterDungeonBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.PartySize is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var result = await client.EnterDungeonAsync(
+                    new EnterDungeonRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        DungeonId = body.DungeonId ?? "main",
+                        PartySize = body.PartySize.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("dungeon_enter account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " dungeon=" + (body.DungeonId ?? "main")
+                    + " party=" + body.PartySize.Value
+                    + " allowed=" + result.Allowed
+                    + " reason=" + result.Reason
+                    + " fatigue=" + result.Fatigue
+                    + " share=" + result.WeeklyShare);
+
+                await WriteAsync(context, 200, new
+                {
+                    allowed = result.Allowed,
+                    reason = result.Reason,
+                    max_players = result.MaxPlayers,
+                    fatigue = result.Fatigue,
+                    weekly_share = result.WeeklyShare,
+                    entry_id = result.EntryId,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "dungeon_enter", account, ex);
             }
         });
     }

@@ -203,4 +203,38 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
 
         return (reader.GetString(0), reader.GetInt32(1));
     }
+
+    /// <summary>疲劳与周份额的现值。主线进本不该动这两个数。</summary>
+    public async Task<(int Fatigue, int WeeklyShare)?> ReservesAsync(
+        long characterId,
+        CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select fatigue, weekly_share from \"角色\".character where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return null;
+        }
+
+        return (reader.GetInt32(0), reader.GetInt32(1));
+    }
+
+    /// <summary>记一次进本。次数与份额的扣减不在这里，主线本来就不扣。</summary>
+    public async Task<long> RecordEntryAsync(
+        long characterId,
+        string dungeonId,
+        int partySize,
+        CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "insert into \"角色\".dungeon_entry (character_id, dungeon_id, party_size) "
+            + "values ($1, $2, $3) returning id");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(dungeonId);
+        command.Parameters.AddWithValue(partySize);
+        var value = await command.ExecuteScalarAsync(stopping);
+        return Convert.ToInt64(value);
+    }
 }

@@ -61,6 +61,29 @@ service CharacterService {
   // 发一笔奖：事务号 + 若干条变更，整笔在一个数据库事务里，全成或全退。
   // 同一个事务号再提交不会发第二次，响应里 duplicate=true。
   rpc ApplyGrant(ApplyGrantRequest) returns (ApplyGrantResponse);
+
+  // 进本。主线只允许 1 人；主线不扣疲劳、不占周份额。
+  // 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
+  rpc EnterDungeon(EnterDungeonRequest) returns (EnterDungeonResponse);
+}
+
+message EnterDungeonRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string dungeon_id = 3;
+  // 这次一起进本的人数。主线必须是 1。
+  uint32 party_size = 4;
+}
+
+message EnterDungeonResponse {
+  // true 表示允许进本，false 表示被拒（reason 里给原因）。
+  bool allowed = 1;
+  string reason = 2;
+  uint32 max_players = 3;
+  // 进本之后这个角色的疲劳与周份额。主线这两种都不动。
+  int32 fatigue = 4;
+  int32 weekly_share = 5;
+  uint64 entry_id = 6;
 }
 
 // 一条变更：加/减货币，或者往格子里放物品。一个事务里可以混着来。

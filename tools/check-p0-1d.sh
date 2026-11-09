@@ -188,6 +188,7 @@ battle["settlement_dir"] = os.path.join(tmp, "settlements")
 battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = os.path.join(root, "config", "skills.json")
 battle["class_table"] = os.path.join(root, "config", "classes.json")
+battle["dungeon_table"] = os.path.join(root, "config", "dungeons.json")
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=2)
 

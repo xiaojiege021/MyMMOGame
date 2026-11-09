@@ -21,3 +21,19 @@ CREATE TABLE IF NOT EXISTS "角色".character (
 -- 同一个账号下名字不重，换个账号可以同名。
 CREATE UNIQUE INDEX IF NOT EXISTS character_account_name
     ON "角色".character (account, name);
+
+-- P1-2a：疲劳与周份额。主线进本不改这两个值，有了可比的东西才谈得上「不变」。
+-- 深渊按人数扣疲劳、巢穴占周份额分别在 P1-2b1、P1-2c。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS fatigue integer NOT NULL DEFAULT 0;
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_fatigue_non_negative;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_fatigue_non_negative CHECK (fatigue >= 0);
+
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS weekly_share integer NOT NULL DEFAULT 0;
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_weekly_share_non_negative;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_weekly_share_non_negative CHECK (weekly_share >= 0);

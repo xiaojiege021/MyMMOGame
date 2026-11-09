@@ -159,10 +159,11 @@ cfg["settlement_dir"] = os.path.join(tmp, "settlements")
 cfg["character_dir"] = os.path.join(tmp, "characters")
 cfg["skill_table"] = "skills.json"
 cfg["class_table"] = "classes.json"
+cfg["dungeon_table"] = "dungeons.json"
 json.dump(cfg, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=2)
 PY
-cp "$ROOT/config/skills.json" "$ROOT/config/classes.json" "$TMP/"
+cp "$ROOT/config/skills.json" "$ROOT/config/classes.json" "$ROOT/config/dungeons.json" "$TMP/"
 
 cat > "$TMP/gateway.json" <<JSON
 {

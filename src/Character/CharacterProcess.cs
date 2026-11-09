@@ -25,6 +25,7 @@ public sealed class CharacterProcess(string configPath)
         ClassIds classes;
         ItemTable items;
         CurrencyTable currencies;
+        DungeonTable dungeons;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -32,6 +33,7 @@ public sealed class CharacterProcess(string configPath)
             classes = new ClassIds("config/classes.json");
             items = ItemTable.Load("config/items.json");
             currencies = CurrencyTable.Load("config/currency.json");
+            dungeons = DungeonTable.Load("config/dungeons.json");
         }
         catch (ConfigException ex)
         {
@@ -46,6 +48,7 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("items=" + items.All.Count + " item_table_version=" + items.Version
             + " bag_slots=" + config.BagSlots);
         Console.WriteLine("currencies=" + currencies.All.Count + " currency_table_version=" + currencies.Version);
+        Console.WriteLine("dungeons=" + dungeons.All.Count + " dungeon_table_version=" + dungeons.Version);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -85,6 +88,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(classes);
         builder.Services.AddSingleton(items);
         builder.Services.AddSingleton(currencies);
+        builder.Services.AddSingleton(dungeons);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

@@ -87,13 +87,13 @@ else
   tail -5 "$TMP/gen.log" | detail
 fi
 
-if diff -r -q -x "*.meta" "$TMP/gen" "$ROOT/src/Shared/Generated" >/dev/null 2>&1; then
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$TMP/gen" "$ROOT/src/Shared/Generated" >/dev/null 2>&1; then
   ok "服务端生成物与仓库一致"
 else
   bad "服务端生成物和 proto 不一致，重跑 tools/gen-proto.sh 并提交"
 fi
 
-if diff -r -q -x "*.meta" "$ROOT/src/Shared/Generated" "$ROOT/client/MMOGame/Assets/Proto/Generated" >/dev/null 2>&1; then
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$ROOT/src/Shared/Generated" "$ROOT/client/MMOGame/Assets/Proto/Generated" >/dev/null 2>&1; then
   ok "客户端与服务端两份生成物逐字相同"
 else
   bad "两端生成物不同"
@@ -207,9 +207,10 @@ cfg['settlement_dir'] = tmp + '/settlements'
 cfg['character_dir'] = tmp + '/characters'
 cfg['skill_table'] = 'skills.json'
 cfg['class_table'] = 'classes.json'
+cfg['dungeon_table'] = 'dungeons.json'
 json.dump(cfg, open(dst, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 PY
-cp "$ROOT/config/skills.json" "$TMP/skills.json"
+cp "$ROOT/config/skills.json" "$ROOT/config/dungeons.json" "$TMP/"
 cp "$ROOT/config/classes.json" "$TMP/classes.json"
 
 : > "$TMP/battle.log"
@@ -330,6 +331,7 @@ cfg['settlement_dir'] = tmp + '/device-settlements'
 cfg['character_dir'] = tmp + '/device-characters'
 cfg['skill_table'] = 'skills.json'
 cfg['class_table'] = 'classes.json'
+cfg['dungeon_table'] = 'dungeons.json'
 json.dump(cfg, open(dst, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 PY
 

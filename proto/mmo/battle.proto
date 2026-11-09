@@ -200,5 +200,18 @@ message ServerMessage {
     MoveState moved = 6;
     MemberUpdated member_updated = 7;
     BossPhase boss_phase = 8;
+    // 进本被拒。这条发完就关连接，客户端据此提示「本满了/只能一个人」。
+    EnterRejected enter_rejected = 9;
   }
+}
+
+// 进本被拒的原因。上限与当前人数一起给，客户端能说清是哪种满。
+message EnterRejected {
+  // party_full：这一场的人已经到上限（主线就是 1）。
+  // dungeon_unknown：副本号不在表里。
+  // dungeon_mismatch：同一个队伍地址被用在两个不同的本上。
+  string reason = 1;
+  uint32 limit = 2;
+  uint32 current = 3;
+  string dungeon_id = 4;
 }

@@ -1,0 +1,14 @@
+{
+  "schema": "dungeon-table/1",
+  "version": 1,
+  "note": "副本表。主线只允许 1 人，不扣疲劳、不占周份额（技术架构第 5 节「进入副本」第一条）。深渊、巢穴的条目在 P1-2b/2c 再加。战斗服与角色服读同一份，不各存一套。",
+  "dungeons": [
+    {
+      "id": "main",
+      "name": "主线",
+      "max_players": 1,
+      "charges_fatigue": false,
+      "takes_weekly_share": false
+    }
+  ]
+}

@@ -26,6 +26,12 @@ sealed class Party
     public required Encounter Encounter { get; init; }
     public readonly List<PartyConn> Connections = [];
     public required CancellationTokenSource Ticker { get; init; }
+
+    /// <summary>
+    /// 这一场是哪个副本。没指定副本的连接是练习场，不套人数上限
+    /// （P0 的老核对与老客户端都不带这个参数，不能被主线的 1 人上限挡掉）。
+    /// </summary>
+    public required DungeonDef? Dungeon { get; init; }
 }
 
 /// <summary>
@@ -105,12 +111,30 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
         // 不带 party 就独享一场，老客户端一个连接一场的行为不变。
         var partyKey = QueryOrNull(query, "party") ?? "solo-" + Guid.NewGuid().ToString("N");
 
+        // 副本：不指定就是练习场，不套人数上限（老核对与老客户端都不带这个参数）。
+        // 指定了才按 config/dungeons.json 校验，规则与角色服读同一份。
+        var dungeonRaw = QueryOrNull(query, "dungeon");
+        DungeonDef? dungeon = null;
+        if (dungeonRaw is not null)
+        {
+            dungeon = config.Dungeons.Find(dungeonRaw);
+            if (dungeon is null)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                Console.WriteLine("join_reject=dungeon_unknown id=" + dungeonRaw);
+                return;
+            }
+        }
+
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
 
         Party party;
         var send = new SemaphoreSlim(1, 1);
         Member member;
         var created = false;
+
+        // 满员与换本要先把原因发回去再关，不能无声断开——客户端与核对都靠这条。
+        EnterRejected? rejected = null;
         lock (_gate)
         {
             if (!_parties.TryGetValue(partyKey, out party!))
@@ -120,24 +144,65 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
                     Key = partyKey,
                     Encounter = new Encounter(config, settlements, characters, NextSessionId()),
                     Ticker = new CancellationTokenSource(),
+                    Dungeon = dungeon,
                 };
                 _parties[partyKey] = party;
                 created = true;
             }
-
-            try
+            else if (!SameDungeon(party.Dungeon, dungeon))
             {
-                member = party.Encounter.Join(charId, cls);
+                rejected = new EnterRejected
+                {
+                    Reason = "dungeon_mismatch",
+                    Limit = (uint)(party.Dungeon?.MaxPlayers ?? 0),
+                    Current = (uint)party.Connections.Count,
+                    DungeonId = party.Dungeon?.Id ?? "",
+                };
             }
-            catch (InvalidOperationException ex)
+            else if (dungeon is not null && party.Connections.Count >= dungeon.MaxPlayers)
             {
-                // 编号撞了：同一场里已经有人用这个角色编号。
-                Console.WriteLine($"join_reject=character={charId} reason={ex.Message}");
-                socket.Abort();
-                return;
+                // 主线这里就是 1：第二个人进不来。
+                rejected = new EnterRejected
+                {
+                    Reason = "party_full",
+                    Limit = (uint)dungeon.MaxPlayers,
+                    Current = (uint)party.Connections.Count,
+                    DungeonId = dungeon.Id,
+                };
             }
 
-            party.Connections.Add(new PartyConn { Socket = socket, Send = send, Member = member });
+            if (rejected is not null)
+            {
+                member = null!;
+            }
+            else
+            {
+                try
+                {
+                    member = party.Encounter.Join(charId, cls);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // 编号撞了：同一场里已经有人用这个角色编号。
+                    Console.WriteLine($"join_reject=character={charId} reason={ex.Message}");
+                    socket.Abort();
+                    return;
+                }
+
+                party.Connections.Add(new PartyConn { Socket = socket, Send = send, Member = member });
+            }
+        }
+
+        if (rejected is not null)
+        {
+            // 先把原因发出去，再正常关。客户端据此提示「本满了」。
+            Console.WriteLine(
+                $"join_reject=party={partyKey} dungeon={dungeon?.Id ?? "none"} reason={rejected.Reason} "
+                + $"current={rejected.Current} limit={rejected.Limit}");
+            await SendAsync(socket, send, new ServerMessage { EnterRejected = rejected },
+                context.RequestAborted);
+            await CloseAsync(socket, "enter_rejected");
+            return;
         }
 
         // tick 一场只有一个循环，第二个人进来不另起。
@@ -367,6 +432,29 @@ public sealed class BattleServer(BattleConfig config, SettlementStore settlement
 
     static string? QueryOrNull(IQueryCollection query, string key) =>
         query.TryGetValue(key, out var values) && values.Count > 0 ? values[0] : null;
+
+    /// <summary>同一个队伍钥匙只能待在一个副本里。空表示练习场。</summary>
+    static bool SameDungeon(DungeonDef? left, DungeonDef? right) =>
+        string.Equals(left?.Id ?? "", right?.Id ?? "", StringComparison.Ordinal);
+
+    /// <summary>正常关一条连接。进本被拒时先说原因，再走这里。</summary>
+    static async Task CloseAsync(WebSocket socket, string reason)
+    {
+        if (socket.State is not (WebSocketState.Open or WebSocketState.CloseReceived))
+        {
+            return;
+        }
+
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, reason, timeout.Token);
+        }
+        catch (Exception)
+        {
+            // 对面已经断了就算了。
+        }
+    }
 
     /// <summary>时间戳加进程内序号。重启后也不会和上一轮的场次撞号。</summary>
     static ulong NextSessionId()

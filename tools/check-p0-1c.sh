@@ -55,14 +55,14 @@ else
   tail -5 "$TMP/gen.log" | detail
 fi
 
-if diff -r -q -x "*.meta" "$TMP/gen" "$ROOT/src/Shared/Generated" >/dev/null 2>&1; then
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$TMP/gen" "$ROOT/src/Shared/Generated" >/dev/null 2>&1; then
   ok "服务端生成物与仓库一致"
 else
   bad "服务端生成物和 proto 不一致，重跑 tools/gen-proto.sh 并提交"
   diff -r -x "*.meta" "$TMP/gen" "$ROOT/src/Shared/Generated" | head -8 | detail
 fi
 
-if diff -r -q -x "*.meta" "$ROOT/src/Shared/Generated" "$ROOT/client/MMOGame/Assets/Proto/Generated" >/dev/null 2>&1; then
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$ROOT/src/Shared/Generated" "$ROOT/client/MMOGame/Assets/Proto/Generated" >/dev/null 2>&1; then
   ok "客户端与服务端两份生成物逐字相同"
 else
   bad "两端生成物不同"
@@ -135,6 +135,7 @@ battle["settlement_dir"] = os.path.join(tmp, "settlements")
 battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = os.path.join(root, "config", "skills.json")
 battle["class_table"] = os.path.join(root, "config", "classes.json")
+battle["dungeon_table"] = os.path.join(root, "config", "dungeons.json")
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=2)
 

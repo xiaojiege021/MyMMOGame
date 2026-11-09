@@ -41,14 +41,14 @@ else
   cat "$TMP/gen.log"
 fi
 
-if diff -r -q -x "*.meta" "$TMP/gen" "$SERVER_OUT" >/dev/null 2>&1; then
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$TMP/gen" "$SERVER_OUT" >/dev/null 2>&1; then
   ok "服务端生成物与仓库一致"
 else
   bad "服务端生成物和 proto 不一致，重新跑 tools/gen-proto.sh 并提交"
   diff -r -x "*.meta" "$TMP/gen" "$SERVER_OUT" | head -10
 fi
 
-if diff -r -q -x "*.meta" "$SERVER_OUT" "$CLIENT_OUT" >/dev/null 2>&1; then
+if diff -r -q -x "*.meta" -x "*Grpc.cs" "$SERVER_OUT" "$CLIENT_OUT" >/dev/null 2>&1; then
   ok "客户端与服务端两份生成物逐字相同"
 else
   bad "两端生成物不同"

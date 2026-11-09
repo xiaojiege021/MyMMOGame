@@ -186,6 +186,7 @@ battle["settlement_dir"] = os.path.join(tmp, "settlements")
 battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = "skills.json"
 battle["class_table"] = "classes.json"
+battle["dungeon_table"] = os.path.join(root, "config", "dungeons.json")
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 PY
 mkdir -p "$TMP/characters"
@@ -340,6 +341,7 @@ battle["settlement_dir"] = os.path.join(tmp, "settlements")
 battle["character_dir"] = os.path.join(tmp, "characters")
 battle["skill_table"] = "skills.json"
 battle["class_table"] = "classes.json"
+battle["dungeon_table"] = os.path.join(root, "config", "dungeons.json")
 battle["boss"]["hp_max"] = 3000
 battle["boss"]["attack"] = {"damage": 600, "interval_ms": 1500, "foreswing_ms": 1000}
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)

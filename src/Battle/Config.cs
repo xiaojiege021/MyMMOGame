@@ -352,6 +352,9 @@ public sealed class BattleConfig
     public SkillTable Skills { get; private set; } = null!;
     public ClassTable Classes { get; private set; } = null!;
 
+    /// <summary>副本表：人数上限与进本时的扣减规则。与角色服读同一份配置。</summary>
+    public DungeonTable Dungeons { get; private set; } = null!;
+
     /// <summary>配置文件的绝对路径，日志里要打出来才知道跑的是哪一份。</summary>
     public string SourcePath { get; private set; } = "";
 
@@ -368,6 +371,7 @@ public sealed class BattleConfig
 
         var skillPath = Resolve(dir, raw.SkillTable, "skills.json");
         var classPath = Resolve(dir, raw.ClassTable, "classes.json");
+        var dungeonPath = Resolve(dir, raw.DungeonTable, "dungeons.json");
 
         var config = new BattleConfig
         {
@@ -385,6 +389,7 @@ public sealed class BattleConfig
             SourcePath = full,
             Skills = SkillTable.Load(skillPath),
             Classes = ClassTable.Load(classPath),
+            Dungeons = DungeonTable.Load(dungeonPath),
         };
 
         config.Validate();
@@ -593,6 +598,7 @@ public sealed class BattleConfig
         public string CharacterDir { get; init; } = "var/battle/characters";
         public string SkillTable { get; init; } = "skills.json";
         public string ClassTable { get; init; } = "classes.json";
+        public string DungeonTable { get; init; } = "dungeons.json";
         public string DefaultClass { get; init; } = "warrior";
         public CasterConfig Caster { get; init; } = new();
         public BossConfig Boss { get; init; } = new();
