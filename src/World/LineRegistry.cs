@@ -14,10 +14,18 @@ public sealed record LeaveResult(bool Left, string LineId, int LineSize);
 
 public sealed record LineSnapshot(string LineId, string RegionId, int LineNo, int LineSize, int Capacity);
 
+/// <summary>一条分线里某个人的当前坐标、朝向与上报序号。</summary>
+public sealed record AvatarState(ulong CharacterId, float X, float Y, float Z, float Facing, ulong Seq);
+
+public sealed record PositionReportResult(bool Accepted, string Reason, AvatarState? Corrected);
+
+public sealed record LineMembers(string LineId, string RegionId, IReadOnlyList<AvatarState> Members);
+
 /// <summary>
-/// 分线的唯一写入方。在线状态按技术架构第 3 / 开发架构第 2 节放进程内存，
+/// 分线与位置的唯一写入方。在线状态按技术架构第 3 / 开发架构第 2 节放进程内存，
 /// 不写角色库。同一账号的同一角色重复进同一区域回同一条线，不另占名额；
-/// 一条线满了才开下一条，最多几条线由配置定。离开只释放这个人的名额。
+/// 一条线满了才开下一条，最多几条线由配置定。离开只释放这个人的名额与位置。
+/// 上报的位移在这里做服务端校验，不通过就保留上一次的合法位置。
 /// </summary>
 public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
 {
@@ -74,7 +82,7 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
                 lines[oldLineId].Members.Remove(key);
             }
 
-            candidate.Members.Add(key);
+            candidate.Members.Add(key, new Member(Spawn(characterId), DateTimeOffset.UtcNow));
             seats[key] = candidate.Id;
             return Accepted(candidate, regionId, duplicate: false);
         }
@@ -108,6 +116,72 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
         }
     }
 
+    /// <summary>这个人当前在哪条分线。位置流用它决定推给谁，客户端不参与选择。</summary>
+    public string? LineOf(string account, ulong characterId)
+    {
+        lock (gate)
+        {
+            return seats.TryGetValue(SeatKey(account, characterId), out var lineId) ? lineId : null;
+        }
+    }
+
+    /// <summary>一次性取全部分线成员的位置，供广播节拍组装快照。</summary>
+    public IReadOnlyList<LineMembers> MemberSnapshot()
+    {
+        lock (gate)
+        {
+            return lines.Values
+                .Select(l => new LineMembers(l.Id, l.RegionId, l.Members.Values.Select(m => m.State).ToArray()))
+                .ToArray();
+        }
+    }
+
+    /// <summary>
+    /// 客户端只上报自己的坐标与朝向。非有限值、瞬时超过配置速度上限都不通过，
+    /// 回上一次合法位置，别人看到的仍是那一份；不做境界、飞行与技能判定。
+    /// </summary>
+    public PositionReportResult Report(
+        string account, ulong characterId,
+        float x, float y, float z, float facing, ulong seq, DateTimeOffset now)
+    {
+        lock (gate)
+        {
+            var key = SeatKey(account, characterId);
+            if (!seats.TryGetValue(key, out var lineId) || !lines[lineId].Members.TryGetValue(key, out var member))
+            {
+                return new PositionReportResult(false, "not_in_line", null);
+            }
+
+            if (!float.IsFinite(x) || !float.IsFinite(y) || !float.IsFinite(z) || !float.IsFinite(facing))
+            {
+                return new PositionReportResult(false, "invalid_position", member.State);
+            }
+
+            // 连续两帧挤在同一毫秒时，按一个广播周期给位移额度，不误伤正常上报。
+            var elapsed = (now - member.UpdatedAt).TotalSeconds;
+            var window = Math.Max(elapsed, 1.0 / config.SyncHz);
+            var allowed = config.MaxMoveSpeed * window;
+            var previous = member.State;
+            var dx = x - previous.X;
+            var dy = y - previous.Y;
+            var dz = z - previous.Z;
+            var distance = Math.Sqrt((double)dx * dx + (double)dy * dy + (double)dz * dz);
+            if (distance > allowed)
+            {
+                return new PositionReportResult(false, "speed_limit", previous);
+            }
+
+            member.State = new AvatarState(characterId, x, y, z, facing, seq);
+            member.UpdatedAt = now;
+            return new PositionReportResult(true, "", member.State);
+        }
+    }
+
+    AvatarState Spawn(ulong characterId) => new(
+        characterId,
+        (float)config.SpawnX, (float)config.SpawnY, (float)config.SpawnZ,
+        (float)config.SpawnFacing, 0);
+
     EnterResult Accepted(Line line, string regionId, bool duplicate) =>
         new(true, "", line.Id, regionId, line.LineNo, line.Members.Count, config.LineCapacity, duplicate);
 
@@ -120,6 +194,12 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
         public string Id { get; } = id;
         public string RegionId { get; } = regionId;
         public int LineNo { get; } = lineNo;
-        public HashSet<string> Members { get; } = new(StringComparer.Ordinal);
+        public Dictionary<string, Member> Members { get; } = new(StringComparer.Ordinal);
+    }
+
+    sealed class Member(AvatarState state, DateTimeOffset updatedAt)
+    {
+        public AvatarState State { get; set; } = state;
+        public DateTimeOffset UpdatedAt { get; set; } = updatedAt;
     }
 }

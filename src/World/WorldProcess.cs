@@ -35,12 +35,17 @@ public sealed class WorldProcess(string configPath)
             + " factions=" + catalog.Factions.Count);
         Console.WriteLine("line_capacity=" + config.LineCapacity
             + " max_lines_per_region=" + config.MaxLinesPerRegion);
+        Console.WriteLine("position_config=ok sync_hz=" + config.SyncHz
+            + " max_move_speed=" + config.MaxMoveSpeed
+            + " spawn=" + config.SpawnX + "," + config.SpawnY + "," + config.SpawnZ
+            + "," + config.SpawnFacing);
         Console.WriteLine("regions=" + string.Join(",", catalog.Regions.Select(r => r.Id)));
         Console.WriteLine("speakers=" + string.Join(",", catalog.Speakers));
         Console.WriteLine("locked=" + string.Join(",", catalog.Regions.Where(r => !r.Open).Select(r => r.Id)));
 
-        // 分线是在线状态，放进程内存；不连角色库，也不在这里结算技能。
+        // 分线与位置都是在线状态，放进程内存；不连角色库，也不在这里结算技能。
         var registry = new LineRegistry(config, catalog);
+        var hub = new PositionHub(registry, config);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2。
@@ -54,8 +59,11 @@ public sealed class WorldProcess(string configPath)
         builder.WebHost.ConfigureKestrel(kestrel =>
             kestrel.Listen(listenAddress, listenUri.Port, options => options.Protocols = HttpProtocols.Http2));
         builder.Services.AddGrpc();
+        builder.Services.AddSingleton(config);
         builder.Services.AddSingleton(registry);
         builder.Services.AddSingleton(catalog);
+        builder.Services.AddSingleton(hub);
+        builder.Services.AddHostedService<PositionBroadcaster>();
 
         var app = builder.Build();
         app.MapGrpcService<WorldGrpcService>();

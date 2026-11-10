@@ -67,6 +67,9 @@ public sealed class GatewayProcess(string configPath)
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
         WorldApi.Map(app, tokens, config);
 
+        // 表世界位置流：同一套令牌与归属复核，WebSocket 帧转 gRPC 双向流。
+        WorldStreamProxy.Map(app, tokens, config);
+
         // 这一行是 E3 认的：进程起来了、后面还没开始接客。
         Console.WriteLine("ready name=Gateway pid=" + Environment.ProcessId);
 

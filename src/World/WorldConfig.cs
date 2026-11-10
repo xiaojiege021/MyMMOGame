@@ -6,7 +6,8 @@ namespace World;
 /// <summary>
 /// 世界服启动配置。地点、开口的人与势力的编号正本都在这里，
 /// 名字一律照方案正文 2.5 到 2.7 原文；区域与对话内容分目录放。
-/// 分线容量与每区最多几条线方案没写定数值，留在这里注明待定，代码里不给兜底。
+/// 分线容量、每区最多几条线、同步频率取 5–10Hz 里的哪一个值、移动速度上限
+/// 与初始站位，方案都没写定数值，留在这里注明待定，代码里不给兜底。
 /// </summary>
 public sealed record WorldConfig(
     string Listen,
@@ -15,6 +16,12 @@ public sealed record WorldConfig(
     string DialogueDir,
     int LineCapacity,
     int MaxLinesPerRegion,
+    int SyncHz,
+    double MaxMoveSpeed,
+    double SpawnX,
+    double SpawnY,
+    double SpawnZ,
+    double SpawnFacing,
     IReadOnlyList<string> Regions,
     IReadOnlyList<string> Speakers,
     IReadOnlyList<string> Factions)
@@ -74,11 +81,40 @@ public sealed record WorldConfig(
             throw new ConfigException("max_lines_per_region 必须在 1 到 1000 之间，现在是 " + maxLines);
         }
 
+        // 方案写定大世界同步频率是 5–10Hz，具体取哪个值没写定，留在配置里。
+        var syncHz = wire.SyncHz ?? throw new ConfigException("world.json 缺 sync_hz");
+        if (syncHz < 5 || syncHz > 10)
+        {
+            throw new ConfigException("sync_hz 必须在方案写定的 5 到 10 之间，现在是 " + syncHz);
+        }
+
+        var maxSpeed = Coord(wire.MaxMoveSpeed, "max_move_speed");
+        if (maxSpeed <= 0)
+        {
+            throw new ConfigException("max_move_speed 必须大于 0，现在是 " + maxSpeed);
+        }
+
         return new WorldConfig(
             listen, version, regionDir, dialogueDir, capacity, maxLines,
+            syncHz, maxSpeed,
+            Coord(wire.SpawnX, "spawn_x"),
+            Coord(wire.SpawnY, "spawn_y"),
+            Coord(wire.SpawnZ, "spawn_z"),
+            Coord(wire.SpawnFacing, "spawn_facing"),
             Names(wire.Regions, "regions"),
             Names(wire.Speakers, "speakers"),
             Names(wire.Factions, "factions"));
+    }
+
+    static double Coord(double? value, string key)
+    {
+        var number = value ?? throw new ConfigException("world.json 缺 " + key);
+        if (!double.IsFinite(number))
+        {
+            throw new ConfigException(key + " 必须是有限数，现在是 " + number);
+        }
+
+        return number;
     }
 
     // 编号名单一个都不能少，也不能重名；缺了就起不来，不带着半截表跑。
@@ -120,6 +156,12 @@ public sealed record WorldConfig(
         [JsonPropertyName("dialogue_dir")] public string? DialogueDir { get; init; }
         [JsonPropertyName("line_capacity")] public int? LineCapacity { get; init; }
         [JsonPropertyName("max_lines_per_region")] public int? MaxLinesPerRegion { get; init; }
+        [JsonPropertyName("sync_hz")] public int? SyncHz { get; init; }
+        [JsonPropertyName("max_move_speed")] public double? MaxMoveSpeed { get; init; }
+        [JsonPropertyName("spawn_x")] public double? SpawnX { get; init; }
+        [JsonPropertyName("spawn_y")] public double? SpawnY { get; init; }
+        [JsonPropertyName("spawn_z")] public double? SpawnZ { get; init; }
+        [JsonPropertyName("spawn_facing")] public double? SpawnFacing { get; init; }
         [JsonPropertyName("regions")] public List<string>? Regions { get; init; }
         [JsonPropertyName("speakers")] public List<string>? Speakers { get; init; }
         [JsonPropertyName("factions")] public List<string>? Factions { get; init; }

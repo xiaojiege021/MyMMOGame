@@ -4,6 +4,7 @@ using World;
 // 配置路径可以指到别处，核对脚本用临时配置跑，不碰仓库里那份。
 var configPath = "config/world.json";
 var regionState = false;
+var positionState = false;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -16,10 +17,39 @@ for (var i = 0; i < args.Length; i++)
         case "--region-state":
             regionState = true;
             break;
+        // 只给核对用：把位置同步的配置读出来，不启动进程。
+        case "--position-state":
+            positionState = true;
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
     }
+}
+
+if (positionState)
+{
+    WorldConfig config;
+    try
+    {
+        config = WorldConfig.Load(configPath);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    Console.WriteLine("position_state=ok sync_hz=" + config.SyncHz
+        + " max_move_speed=" + config.MaxMoveSpeed
+        + " spawn=" + config.SpawnX + "," + config.SpawnY + "," + config.SpawnZ
+        + "," + config.SpawnFacing);
+    return 0;
 }
 
 if (regionState)

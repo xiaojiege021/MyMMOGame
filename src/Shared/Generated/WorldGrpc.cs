@@ -9,8 +9,8 @@ using grpc = global::Grpc.Core;
 
 namespace Mmo.Proto.World {
   /// <summary>
-  /// 表世界的分线。世界服是分线的唯一写入方；在线状态在进程内存，不落库。
-  /// 位置同步（P1-3a2）与同屏档位（P1-3a3）不在这里。
+  /// 表世界的分线（P1-3a1）与位置流（P1-3a2）。世界服是分线与位置的唯一写入方；
+  /// 在线状态与坐标都在进程内存，不落库。同屏档位（P1-3a3）与采集、飞行状态不在这里。
   /// </summary>
   public static partial class WorldService
   {
@@ -61,6 +61,10 @@ namespace Mmo.Proto.World {
     static readonly grpc::Marshaller<global::Mmo.Proto.World.ListRegionsRequest> __Marshaller_mmo_world_ListRegionsRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ListRegionsRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.ListRegionsResponse> __Marshaller_mmo_world_ListRegionsResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ListRegionsResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldClientFrame> __Marshaller_mmo_world_WorldClientFrame = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldClientFrame.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldServerFrame> __Marshaller_mmo_world_WorldServerFrame = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldServerFrame.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse> __Method_EnterLine = new grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse>(
@@ -86,6 +90,14 @@ namespace Mmo.Proto.World {
         __Marshaller_mmo_world_ListRegionsRequest,
         __Marshaller_mmo_world_ListRegionsResponse);
 
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame> __Method_PositionStream = new grpc::Method<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame>(
+        grpc::MethodType.DuplexStreaming,
+        __ServiceName,
+        "PositionStream",
+        __Marshaller_mmo_world_WorldClientFrame,
+        __Marshaller_mmo_world_WorldServerFrame);
+
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
     {
@@ -110,6 +122,20 @@ namespace Mmo.Proto.World {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.ListRegionsResponse> ListRegions(global::Mmo.Proto.World.ListRegionsRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 手机到网关一条 WebSocket，网关到世界服一条 gRPC 双向流。
+      /// 账号与角色编号由网关放进请求头，客户端帧里带不进身份、分线号或别人的坐标。
+      /// </summary>
+      /// <param name="requestStream">Used for reading requests from the client.</param>
+      /// <param name="responseStream">Used for sending responses back to the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>A task indicating completion of the handler.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task PositionStream(grpc::IAsyncStreamReader<global::Mmo.Proto.World.WorldClientFrame> requestStream, grpc::IServerStreamWriter<global::Mmo.Proto.World.WorldServerFrame> responseStream, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -203,6 +229,30 @@ namespace Mmo.Proto.World {
       {
         return CallInvoker.AsyncUnaryCall(__Method_ListRegions, null, options, request);
       }
+      /// <summary>
+      /// 手机到网关一条 WebSocket，网关到世界服一条 gRPC 双向流。
+      /// 账号与角色编号由网关放进请求头，客户端帧里带不进身份、分线号或别人的坐标。
+      /// </summary>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncDuplexStreamingCall<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame> PositionStream(grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return PositionStream(new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 手机到网关一条 WebSocket，网关到世界服一条 gRPC 双向流。
+      /// 账号与角色编号由网关放进请求头，客户端帧里带不进身份、分线号或别人的坐标。
+      /// </summary>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncDuplexStreamingCall<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame> PositionStream(grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncDuplexStreamingCall(__Method_PositionStream, null, options);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override WorldServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -219,7 +269,8 @@ namespace Mmo.Proto.World {
       return grpc::ServerServiceDefinition.CreateBuilder()
           .AddMethod(__Method_EnterLine, serviceImpl.EnterLine)
           .AddMethod(__Method_LeaveLine, serviceImpl.LeaveLine)
-          .AddMethod(__Method_ListRegions, serviceImpl.ListRegions).Build();
+          .AddMethod(__Method_ListRegions, serviceImpl.ListRegions)
+          .AddMethod(__Method_PositionStream, serviceImpl.PositionStream).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -232,6 +283,7 @@ namespace Mmo.Proto.World {
       serviceBinder.AddMethod(__Method_EnterLine, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse>(serviceImpl.EnterLine));
       serviceBinder.AddMethod(__Method_LeaveLine, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.LeaveLineRequest, global::Mmo.Proto.World.LeaveLineResponse>(serviceImpl.LeaveLine));
       serviceBinder.AddMethod(__Method_ListRegions, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.ListRegionsRequest, global::Mmo.Proto.World.ListRegionsResponse>(serviceImpl.ListRegions));
+      serviceBinder.AddMethod(__Method_PositionStream, serviceImpl == null ? null : new grpc::DuplexStreamingServerMethod<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame>(serviceImpl.PositionStream));
     }
 
   }

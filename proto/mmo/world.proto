@@ -3,12 +3,16 @@ syntax = "proto3";
 package mmo.world;
 option csharp_namespace = "Mmo.Proto.World";
 
-// 表世界的分线。世界服是分线的唯一写入方；在线状态在进程内存，不落库。
-// 位置同步（P1-3a2）与同屏档位（P1-3a3）不在这里。
+// 表世界的分线（P1-3a1）与位置流（P1-3a2）。世界服是分线与位置的唯一写入方；
+// 在线状态与坐标都在进程内存，不落库。同屏档位（P1-3a3）与采集、飞行状态不在这里。
 service WorldService {
   rpc EnterLine(EnterLineRequest) returns (EnterLineResponse);
   rpc LeaveLine(LeaveLineRequest) returns (LeaveLineResponse);
   rpc ListRegions(ListRegionsRequest) returns (ListRegionsResponse);
+
+  // 手机到网关一条 WebSocket，网关到世界服一条 gRPC 双向流。
+  // 账号与角色编号由网关放进请求头，客户端帧里带不进身份、分线号或别人的坐标。
+  rpc PositionStream(stream WorldClientFrame) returns (stream WorldServerFrame);
 }
 
 // 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
@@ -59,4 +63,52 @@ message ListRegionsResponse {
   repeated RegionInfo regions = 2;
   repeated string speakers = 3;
   repeated string factions = 4;
+}
+
+// 一条 WebSocket 上跑位置帧，靠信封分辨。客户端只上报自己的坐标与朝向，
+// 没有 account / character_id / line_id / line_size / 别人的位置这些字段。
+message WorldClientFrame {
+  oneof body {
+    PositionReport position = 1;
+  }
+}
+
+message PositionReport {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float facing = 4;
+  uint64 seq = 5;
+}
+
+message WorldServerFrame {
+  oneof body {
+    PositionSnapshot snapshot = 1;
+    PositionRejected rejected = 2;
+  }
+}
+
+// 周围的人：同一条分线里的其他成员。这一行不做 AOI、距离裁剪和同屏档位。
+message AvatarPosition {
+  uint64 character_id = 1;
+  float x = 2;
+  float y = 3;
+  float z = 4;
+  float facing = 5;
+  uint64 seq = 6;
+}
+
+message PositionSnapshot {
+  string line_id = 1;
+  string region_id = 2;
+  uint64 server_time_ms = 3;
+  uint32 sync_hz = 4;
+  repeated AvatarPosition avatars = 5;
+  uint64 self_character_id = 6;
+}
+
+// 服务端校验不通过时把上一次合法位置回给自己，别人看到的仍是那一份。
+message PositionRejected {
+  string reason = 1;
+  AvatarPosition corrected = 2;
 }
