@@ -151,6 +151,18 @@ cat <<'STEPS'
   - Windows 上 E7 的核对脚本按 macOS 路径写死，走编辑器菜单跑 E7Check
 STEPS
 
+echo "== 8. 前置闸门（防返工） =="
+# GUID / 静态断言 / state 入口 三道闸；软性提示，不阻断主体检（有些机器没 Unity）。
+if [ -f "$ROOT/tools/check/preflight.sh" ]; then
+  if bash "$ROOT/tools/check/preflight.sh"; then
+    :
+  else
+    warn "前置闸门有硬性失败（GUID 非法），改完再提交：bash tools/check/preflight.sh"
+  fi
+else
+  warn "缺 tools/check/preflight.sh"
+fi
+
 echo
 if [ "$FAIL" = "0" ]; then
   echo "体检：$WARN 项要注意，0 项失败"
