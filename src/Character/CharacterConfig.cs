@@ -8,10 +8,12 @@ namespace Character;
 /// 连接串不在这里，从环境或 /srv/mmo/gamedb.env 读。
 /// </summary>
 public sealed record CharacterConfig(
-    string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable)
+    string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
+    string EnhanceTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
+    public const string DefaultEnhanceTable = "config/enhance.json";
 
     public static CharacterConfig Load(string path)
     {
@@ -65,7 +67,15 @@ public sealed record CharacterConfig(
             throw new ConfigException("exp_table 不能为空");
         }
 
-        return new CharacterConfig(listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable);
+        // 强化概率与三档消耗也走同一份配置正本；核对脚本可以指到临时表改数值做隔离测试。
+        var enhanceTable = (wire.EnhanceTable ?? DefaultEnhanceTable).Trim();
+        if (enhanceTable.Length == 0)
+        {
+            throw new ConfigException("enhance_table 不能为空");
+        }
+
+        return new CharacterConfig(
+            listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -90,6 +100,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("exp_table")]
         public string? ExpTable { get; init; }
+
+        [JsonPropertyName("enhance_table")]
+        public string? EnhanceTable { get; init; }
     }
 }
 

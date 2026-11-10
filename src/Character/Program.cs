@@ -35,6 +35,14 @@ string? sharesTotalDungeon = null;
 long expStateOf = 0;
 long rawExpId = 0;
 var rawExpValue = 0L;
+var enhanceState = false;
+string? enhanceConfigPath = null;
+long enhanceLevelOf = 0;
+var enhanceSlotOf = 0;
+string? enhanceTxnCount = null;
+long rawEnhanceId = 0;
+var rawEnhanceSlot = 0;
+var rawEnhanceLevel = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -131,10 +139,70 @@ for (var i = 0; i < args.Length; i++)
             long.TryParse(args[++i], out rawExpId);
             long.TryParse(args[++i], out rawExpValue);
             break;
+        // 只给核对用：把强化表读出来，不连库、不启动进程。坏配置也走这里。
+        case "--enhance-state":
+            enhanceState = true;
+            break;
+        case "--enhance-config" when i + 1 < args.Length:
+            enhanceConfigPath = args[++i];
+            break;
+        // 只给核对用：不看回包，从库里独立读回强化等级、金币与三档石头余量。
+        case "--enhance-level" when i + 2 < args.Length:
+            long.TryParse(args[++i], out enhanceLevelOf);
+            int.TryParse(args[++i], out enhanceSlotOf);
+            break;
+        // 只给核对用：这个强化事务号在表里有几行。
+        case "--enhance-txn-count" when i + 1 < args.Length:
+            enhanceTxnCount = args[++i];
+            break;
+        // 只给核对用：绕过业务层直写强化等级，验库层 CHECK 挡住越界。
+        case "--raw-enhance-write" when i + 3 < args.Length:
+            long.TryParse(args[++i], out rawEnhanceId);
+            int.TryParse(args[++i], out rawEnhanceSlot);
+            int.TryParse(args[++i], out rawEnhanceLevel);
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
     }
+}
+
+// 强化表只读核对：与启动共用同一套校验（三档材料要在物品表里、金币要在币种表里），
+// 不连库也不启动进程，坏配置能在这一步直接看出来。
+if (enhanceState)
+{
+    try
+    {
+        var characterConfig = CharacterConfig.Load(configPath);
+        var items = ItemTable.Load("config/items.json");
+        var currencies = CurrencyTable.Load("config/currency.json");
+        var table = EnhanceTable.Load(enhanceConfigPath ?? characterConfig.EnhanceTable, items, currencies);
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
+        Console.WriteLine("enhance_table_state=ok version=" + table.Version
+            + " max_level=" + table.MaxLevel
+            + " gold_kind=" + table.GoldKind
+            + " tiers=" + string.Join(",", table.Tiers.Select(
+                t => t.Id + ":" + t.FromLevel + "-" + t.ToLevel + ":" + t.StoneId))
+            + " rates=" + string.Join(",", table.Tiers.Select(
+                t => t.SuccessRate.ToString("0.##", culture)))
+            + " gold=" + string.Join(",", table.Tiers.Select(t => t.GoldCost))
+            + " stones=" + string.Join(",", table.Tiers.Select(t => t.StoneCost)));
+        Console.WriteLine("enhance_gate=ok target=7 tier=" + table.TierFor(7).Id
+            + " stone=" + table.TierFor(7).StoneId
+            + " target=12 tier=" + table.TierFor(12).Id);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
 }
 
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
@@ -142,7 +210,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
-    || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0)
+    || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
+    || enhanceLevelOf != 0 || enhanceTxnCount != null || rawEnhanceId != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -374,6 +443,52 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     Console.WriteLine("raw_exp=rejected id=" + rawExpId
                         + " exp=" + rawExpValue + " sqlstate=" + ex.SqlState);
                 }
+            }
+        }
+
+        if (enhanceLevelOf != 0 || enhanceTxnCount != null || rawEnhanceId != 0)
+        {
+            var characterConfig = CharacterConfig.Load(configPath);
+            var items = ItemTable.Load("config/items.json");
+            var enhanceTable = EnhanceTable.Load(
+                enhanceConfigPath ?? characterConfig.EnhanceTable,
+                items, CurrencyTable.Load("config/currency.json"));
+            var enhances = new EnhanceRepository(dataSource, enhanceTable, items);
+
+            if (rawEnhanceId != 0)
+            {
+                try
+                {
+                    await enhances.RawWriteLevelAsync(
+                        rawEnhanceId, rawEnhanceSlot, rawEnhanceLevel, CancellationToken.None);
+                    Console.WriteLine("raw_enhance=written id=" + rawEnhanceId
+                        + " slot=" + rawEnhanceSlot + " level=" + rawEnhanceLevel);
+                }
+                catch (PostgresException ex)
+                {
+                    // 核对要看到的就是这个：库层 CHECK 把越界的强化等级挡住了。
+                    Console.WriteLine("raw_enhance=rejected id=" + rawEnhanceId
+                        + " level=" + rawEnhanceLevel + " sqlstate=" + ex.SqlState);
+                }
+            }
+
+            if (enhanceLevelOf != 0)
+            {
+                var state = await enhances.StateAsync(enhanceLevelOf, enhanceSlotOf, CancellationToken.None);
+                Console.WriteLine("enhance_state=ok id=" + enhanceLevelOf
+                    + " slot=" + enhanceSlotOf
+                    + " level=" + state.Level
+                    + " gold=" + state.Gold
+                    + " low=" + state.Low
+                    + " mid=" + state.Mid
+                    + " high=" + state.High);
+            }
+
+            if (enhanceTxnCount != null)
+            {
+                Console.WriteLine("enhance_txn_count="
+                    + await enhances.TxnCountAsync(enhanceTxnCount, CancellationToken.None)
+                    + " txn=" + enhanceTxnCount);
             }
         }
 

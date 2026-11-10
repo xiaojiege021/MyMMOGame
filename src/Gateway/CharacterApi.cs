@@ -38,6 +38,10 @@ public static class CharacterApi
     public sealed record SettleExpBody(
         ulong? CharacterId, string? TxnId, string? Source, uint? PartySize);
 
+    // 强化请求里只有角色、格子和用哪种石头：等级、成功率、消耗、结果与事务号
+    // 都读不进来（事务号由网关生成），多传这些字段也不会被反序列化到请求里。
+    public sealed record EnhanceBody(ulong? CharacterId, uint? Slot, string? StoneId);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -766,6 +770,113 @@ public static class CharacterApi
                 await WriteRpcErrorAsync(context, "exp_settle", account, ex);
             }
         });
+
+        // 强化。三档材料、成功率与金币消耗全在角色服的 config/enhance.json；
+        // 网关只认令牌、复核归属、生成一个事务号，再把请求转过去。
+        // 业务拒绝（材料不对、到顶、材料或金币不够）也是 200 + ok=false。
+        app.MapPost("/character/enhance", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "enhance", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            EnhanceBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<EnhanceBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.Slot is null || body.Slot == 0
+                || string.IsNullOrWhiteSpace(body.StoneId))
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                // 一次点击一个号：客户端带不进来，也不能靠重放扣两次材料。
+                var txnId = "enhance:" + Guid.NewGuid().ToString("N");
+                var result = await client.EnhanceAsync(
+                    new EnhanceRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Slot = body.Slot.Value,
+                        StoneId = body.StoneId!.Trim(),
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("enhance account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " slot=" + body.Slot.Value
+                    + " stone=" + body.StoneId!.Trim()
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " level=" + result.LevelBefore + "->" + result.Level
+                    + " success=" + result.Success
+                    + " tier=" + result.Tier
+                    + " duplicate=" + result.Duplicate);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = result.Ok,
+                    reason = result.Reason,
+                    level_before = result.LevelBefore,
+                    level = result.Level,
+                    max_level = result.MaxLevel,
+                    success = result.Success,
+                    tier = result.Tier,
+                    required_stone = result.RequiredStone,
+                    stone_cost = result.StoneCost,
+                    gold_cost = result.GoldCost,
+                    gold = result.Gold,
+                    stone_left = result.StoneLeft,
+                    duplicate = result.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "enhance", account, ex);
+            }
+        });
+    }
+
+    // 复用角色服已有的只读背包口复核归属，不为强化另起一套身份数据。
+    static async Task<bool> OwnsAsync(
+        CharacterService.CharacterServiceClient client,
+        string account, ulong characterId, HttpContext context)
+    {
+        try
+        {
+            await client.ListInventoryAsync(
+                new ListInventoryRequest { Account = account, CharacterId = characterId },
+                deadline: DateTime.UtcNow.AddSeconds(5),
+                cancellationToken: context.RequestAborted);
+            return true;
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+        {
+            return false;
+        }
     }
 
     static bool TryAuthorize(HttpContext context, TokenStore tokens, string what, out string account)    {

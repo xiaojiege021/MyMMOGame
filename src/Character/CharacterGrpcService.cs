@@ -24,6 +24,8 @@ public sealed class CharacterGrpcService(
     HotSpringRepository hotSpring,
     ExpSettlementRepository expSettlements,
     ExpTable expTable,
+    EnhanceRepository enhances,
+    EnhanceTable enhanceTable,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -753,6 +755,103 @@ public sealed class CharacterGrpcService(
             AtCap = outcome.Level >= expTable.LevelCap,
             PartySize = (uint)partySize,
             Source = source,
+        };
+    }
+
+    /// <summary>
+    /// 强化一次装备。目标等级由角色服从库里读出的当前等级 +1 算，档位、材料、
+    /// 消耗、成功率全在 config/enhance.json；请求里带不进等级、成功率与结果。
+    /// 扣石头 / 扣金币 / 改等级在 EnhanceRepository 的一笔事务里，失败只掉 1 级。
+    /// 身份与参数错走 gRPC 错误码，业务前提不满足回正常包里的 ok=false + reason。
+    /// </summary>
+    public override async Task<EnhanceResponse> Enhance(EnhanceRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        if (request.Slot < 1 || request.Slot > config.BagSlots)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        var stoneId = (request.StoneId ?? "").Trim();
+        if (stoneId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "stone_missing"));
+        }
+
+        if (!await inventory.OwnsAsync(account, (long)request.CharacterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        EnhanceOutcome outcome;
+        try
+        {
+            outcome = await enhances.ApplyAsync(
+                (long)request.CharacterId, (int)request.Slot, stoneId, txnId, context.CancellationToken);
+        }
+        catch (EnhanceException ex)
+        {
+            logger.LogInformation(
+                "enhance_reject account={Account} id={Id} slot={Slot} stone={Stone} txn={Txn} reason={Reason}",
+                account, request.CharacterId, request.Slot, stoneId, txnId, ex.Code);
+            // 未生效的数值字段一律留 0，客户端不能拿拒绝回包当成一次强化结果。
+            return new EnhanceResponse
+            {
+                Ok = false,
+                Reason = ex.Code,
+                MaxLevel = enhanceTable.MaxLevel,
+            };
+        }
+
+        logger.LogInformation(
+            "enhance account={Account} id={Id} slot={Slot} stone={Stone} txn={Txn} "
+            + "duplicate={Duplicate} level={LevelBefore}->{Level} success={Success} "
+            + "tier={Tier} gold={Gold} stone_left={StoneLeft}",
+            account, request.CharacterId, request.Slot, stoneId, txnId, outcome.Duplicate,
+            outcome.LevelBefore, outcome.Level, outcome.Success,
+            outcome.Tier?.Id ?? "", outcome.Gold, outcome.StoneLeft);
+
+        if (outcome.Duplicate)
+        {
+            return new EnhanceResponse
+            {
+                Ok = false,
+                Reason = "duplicate",
+                Duplicate = true,
+                MaxLevel = enhanceTable.MaxLevel,
+            };
+        }
+
+        return new EnhanceResponse
+        {
+            Ok = true,
+            Reason = "",
+            LevelBefore = outcome.LevelBefore,
+            Level = outcome.Level,
+            MaxLevel = enhanceTable.MaxLevel,
+            Success = outcome.Success,
+            Tier = outcome.Tier!.Id,
+            RequiredStone = outcome.Tier.StoneId,
+            StoneCost = outcome.Tier.StoneCost,
+            GoldCost = outcome.Tier.GoldCost,
+            Gold = outcome.Gold,
+            StoneLeft = outcome.StoneLeft,
         };
     }
 

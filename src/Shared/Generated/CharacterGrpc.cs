@@ -92,6 +92,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleExpRequest> __Marshaller_mmo_character_SettleExpRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleExpRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleExpResponse> __Marshaller_mmo_character_SettleExpResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleExpResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.EnhanceRequest> __Marshaller_mmo_character_EnhanceRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EnhanceRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.EnhanceResponse> __Marshaller_mmo_character_EnhanceResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EnhanceResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -180,6 +184,14 @@ namespace Mmo.Proto.Character {
         "SettleExp",
         __Marshaller_mmo_character_SettleExpRequest,
         __Marshaller_mmo_character_SettleExpResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.EnhanceRequest, global::Mmo.Proto.Character.EnhanceResponse> __Method_Enhance = new grpc::Method<global::Mmo.Proto.Character.EnhanceRequest, global::Mmo.Proto.Character.EnhanceResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Enhance",
+        __Marshaller_mmo_character_EnhanceRequest,
+        __Marshaller_mmo_character_EnhanceResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -322,6 +334,20 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SettleExpResponse> SettleExp(global::Mmo.Proto.Character.SettleExpRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
+      /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
+      /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.EnhanceResponse> Enhance(global::Mmo.Proto.Character.EnhanceRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -891,6 +917,62 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_SettleExp, null, options, request);
       }
+      /// <summary>
+      /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
+      /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
+      /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.EnhanceResponse Enhance(global::Mmo.Proto.Character.EnhanceRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return Enhance(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
+      /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
+      /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.EnhanceResponse Enhance(global::Mmo.Proto.Character.EnhanceRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_Enhance, null, options, request);
+      }
+      /// <summary>
+      /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
+      /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
+      /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.EnhanceResponse> EnhanceAsync(global::Mmo.Proto.Character.EnhanceRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return EnhanceAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
+      /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
+      /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.EnhanceResponse> EnhanceAsync(global::Mmo.Proto.Character.EnhanceRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_Enhance, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -915,7 +997,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_ApplyGrant, serviceImpl.ApplyGrant)
           .AddMethod(__Method_EnterDungeon, serviceImpl.EnterDungeon)
           .AddMethod(__Method_UseHotSpring, serviceImpl.UseHotSpring)
-          .AddMethod(__Method_SettleExp, serviceImpl.SettleExp).Build();
+          .AddMethod(__Method_SettleExp, serviceImpl.SettleExp)
+          .AddMethod(__Method_Enhance, serviceImpl.Enhance).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -936,6 +1019,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_EnterDungeon, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnterDungeonRequest, global::Mmo.Proto.Character.EnterDungeonResponse>(serviceImpl.EnterDungeon));
       serviceBinder.AddMethod(__Method_UseHotSpring, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse>(serviceImpl.UseHotSpring));
       serviceBinder.AddMethod(__Method_SettleExp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleExpRequest, global::Mmo.Proto.Character.SettleExpResponse>(serviceImpl.SettleExp));
+      serviceBinder.AddMethod(__Method_Enhance, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnhanceRequest, global::Mmo.Proto.Character.EnhanceResponse>(serviceImpl.Enhance));
     }
 
   }

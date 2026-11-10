@@ -37,6 +37,27 @@
       "kind": "voucher",
       "stack_max": 20,
       "bind": "always"
+    },
+    {
+      "id": "stone_enhance_low",
+      "name": "低级强化石",
+      "kind": "material",
+      "stack_max": 999,
+      "bind": "none"
+    },
+    {
+      "id": "stone_enhance_mid",
+      "name": "中级强化石",
+      "kind": "material",
+      "stack_max": 999,
+      "bind": "none"
+    },
+    {
+      "id": "stone_enhance_high",
+      "name": "高级强化石",
+      "kind": "material",
+      "stack_max": 999,
+      "bind": "none"
     }
   ]
 }

@@ -1,0 +1,36 @@
+{
+  "schema": "enhance-table/1",
+  "version": 1,
+  "note": "方案 9.2 写定：强化最高 +12，+1 到 +6 只用低级强化石，+7 到 +9 只用中级石，+10 到 +12 只用高级石，低级石不能代替高一级的石；失败只掉 1 级，不碎、不清零、没有失败累计必成。三档分界与 +12 是写定规则，服务端加载时逐条校验，不是待定数值。成功率、每档石头数量、金币消耗方案都没写定：数值待定，改这份配置重启生效，代码里不写第二套数字。方案只给了「+10 以上金币和石头消耗再抬一档」这个相对关系，这里按低 / 中 / 高递增给出待定值。",
+  "max_level": 12,
+  "gold_kind": "gold",
+  "tiers": [
+    {
+      "id": "low",
+      "from_level": 1,
+      "to_level": 6,
+      "stone_id": "stone_enhance_low",
+      "stone_cost": 1,
+      "gold_cost": 100,
+      "success_rate": 0.8
+    },
+    {
+      "id": "mid",
+      "from_level": 7,
+      "to_level": 9,
+      "stone_id": "stone_enhance_mid",
+      "stone_cost": 1,
+      "gold_cost": 200,
+      "success_rate": 0.5
+    },
+    {
+      "id": "high",
+      "from_level": 10,
+      "to_level": 12,
+      "stone_id": "stone_enhance_high",
+      "stone_cost": 2,
+      "gold_cost": 400,
+      "success_rate": 0.2
+    }
+  ]
+}

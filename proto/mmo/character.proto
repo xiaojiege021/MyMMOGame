@@ -76,6 +76,11 @@ service CharacterService {
   // 请求里没有经验数值，基础值、加成幅度与升级曲线全在 config/exp.json。
   // 同一个 txn_id 再提交不发第二次。
   rpc SettleExp(SettleExpRequest) returns (SettleExpResponse);
+
+  // 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
+  // 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
+  // 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+  rpc Enhance(EnhanceRequest) returns (EnhanceResponse);
 }
 
 message SettleExpRequest {
@@ -269,4 +274,37 @@ message CanTradeResponse {
   bool tradable = 1;
   // tradable=false 时给原因：bound_item / slot_empty
   string reason = 2;
+}
+
+// 强化一次装备。只带要强化的格子和用哪种石头；目标等级由角色服从库里读出的
+// 当前等级 +1 算，档位、材料、消耗与成功率都由角色服按配置决定。
+// txn_id 由网关生成（客户端填不进来），同一笔不会扣两次材料。
+message EnhanceRequest {
+  // 网关转发时填令牌账号，角色服再核一次归属。
+  string account = 1;
+  uint64 character_id = 2;
+  uint32 slot = 3;
+  string stone_id = 4;
+  string txn_id = 5;
+}
+
+message EnhanceResponse {
+  // 业务前提不满足（wrong_stone / at_cap / insufficient ...）是正常回包里的
+  // ok=false + reason，不是 gRPC 错误码；身份与参数错才走错误码。
+  bool ok = 1;
+  string reason = 2;
+  int32 level_before = 3;
+  int32 level = 4;
+  // 配置里的上限，回给客户端，不让它自己另算一套。
+  int32 max_level = 5;
+  bool success = 6;
+  // 只作展示：low / mid / high，客户端不拿它算数值。
+  string tier = 7;
+  string required_stone = 8;
+  int32 stone_cost = 9;
+  int64 gold_cost = 10;
+  int64 gold = 11;
+  int32 stone_left = 12;
+  // 同一个事务号再提交：一笔没做。
+  bool duplicate = 13;
 }

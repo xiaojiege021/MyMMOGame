@@ -27,6 +27,7 @@ public sealed class CharacterProcess(string configPath)
         CurrencyTable currencies;
         DungeonTable dungeons;
         ExpTable expTable;
+        EnhanceTable enhanceTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -36,6 +37,9 @@ public sealed class CharacterProcess(string configPath)
             currencies = CurrencyTable.Load("config/currency.json");
             dungeons = DungeonTable.Load(config.DungeonTable);
             expTable = ExpTable.Load(config.ExpTable);
+            // 开发架构第 7 节：强化概率由角色服读。三档材料要在物品表里存在，
+            // 扣的金币要在币种表里存在，缺一样就起不来。
+            enhanceTable = EnhanceTable.Load(config.EnhanceTable, items, currencies);
         }
         catch (ConfigException ex)
         {
@@ -62,6 +66,15 @@ public sealed class CharacterProcess(string configPath)
             + " party_bonus_pct=" + expTable.PartyBonusPct
             + " party_min_size=" + expTable.PartyMinSize
             + " exp_per_level=" + expTable.ExpPerLevel);
+        Console.WriteLine("enhance_table_version=" + enhanceTable.Version
+            + " max_level=" + enhanceTable.MaxLevel
+            + " gold_kind=" + enhanceTable.GoldKind
+            + " tiers=" + string.Join(",",
+                enhanceTable.Tiers.Select(t => t.Id + ":" + t.FromLevel + "-" + t.ToLevel
+                    + ":" + t.StoneId + ":rate=" + t.SuccessRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)
+                    + ":gold=" + t.GoldCost + ":stone=" + t.StoneCost))
+            + " rates=" + string.Join(",", enhanceTable.Tiers.Select(
+                t => t.SuccessRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))));
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -82,6 +95,7 @@ public sealed class CharacterProcess(string configPath)
         var weeklyShares = new WeeklyShareRepository(dataSource);
         var hotSpring = new HotSpringRepository(dataSource);
         var expSettlements = new ExpSettlementRepository(dataSource);
+        var enhances = new EnhanceRepository(dataSource, enhanceTable, items);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -111,6 +125,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(hotSpring);
         builder.Services.AddSingleton(expSettlements);
         builder.Services.AddSingleton(expTable);
+        builder.Services.AddSingleton(enhanceTable);
+        builder.Services.AddSingleton(enhances);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();
