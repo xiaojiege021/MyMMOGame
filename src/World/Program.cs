@@ -3,9 +3,11 @@ using World;
 
 // 配置路径可以指到别处，核对脚本用临时配置跑，不碰仓库里那份。
 var configPath = "config/world.json";
+var gatherConfigPath = "config/gather.json";
 var regionState = false;
 var positionState = false;
 var tierState = false;
+var gatherState = false;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -13,6 +15,14 @@ for (var i = 0; i < args.Length; i++)
     {
         case "--config" when i + 1 < args.Length:
             configPath = args[++i];
+            break;
+        // 采集表单独一份，核对脚本用临时配置跑，不碰仓库里那份。
+        case "--gather-config" when i + 1 < args.Length:
+            gatherConfigPath = args[++i];
+            break;
+        // 只给核对用：把读表后的节点与产物打出来，不启动进程。
+        case "--gather-state":
+            gatherState = true;
             break;
         // 只给核对用：把读表后的地点与人物编号打出来，不启动进程。
         case "--region-state":
@@ -30,6 +40,34 @@ for (var i = 0; i < args.Length; i++)
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
     }
+}
+
+if (gatherState)
+{
+    GatherTable table;
+    try
+    {
+        table = GatherTable.Load(gatherConfigPath);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    var ore = table.Nodes.First(n => n.Kind == GatherTable.Ore);
+    var herb = table.Nodes.First(n => n.Kind == GatherTable.Herb);
+    Console.WriteLine("gather_state=ok nodes=" + table.Nodes.Count
+        + " ore=" + ore.ItemId + ":" + ore.Count
+        + " herb=" + herb.ItemId + ":" + herb.Count
+        + " respawn_s=" + ore.RespawnSeconds
+        + " forbidden=" + table.Nodes.Count(n => n.Kind == GatherTable.SpiritStone));
+    return 0;
 }
 
 if (tierState)
@@ -136,4 +174,4 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
     stop.Cancel();
 });
 
-return await new WorldProcess(configPath).RunAsync(stop.Token);
+return await new WorldProcess(configPath, gatherConfigPath).RunAsync(stop.Token);

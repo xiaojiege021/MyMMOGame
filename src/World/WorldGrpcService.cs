@@ -5,11 +5,13 @@ using Mmo.Proto.World;
 namespace World;
 
 /// <summary>
-/// 表世界分线的 gRPC 入口。区域与人物编号全从配置读，请求里带不进分线号、
-/// 人数或容量：客户端改包改不了自己被分到哪条线。
-/// 这里不结算技能、不发奖励，也不写角色库（P1-3b 与战斗服各自负责）。
+/// 表世界分线、位置、采集的 gRPC 入口。区域与人物编号全从配置读，请求里带不进
+/// 分线号、人数、容量或采集产物：客户端改包改不了自己被分到哪条线，也改不了产物。
+/// 这里不结算技能，也不写角色库；采集成功的产物由角色服的 ApplyGrant 落库。
 /// </summary>
-public sealed class WorldGrpcService(LineRegistry registry, WorldCatalog catalog, PositionHub hub)
+public sealed class WorldGrpcService(
+    LineRegistry registry, WorldCatalog catalog, PositionHub hub,
+    GatherTable gather, GatherNodeRegistry nodes, IGatherGrant grants)
     : global::Mmo.Proto.World.WorldService.WorldServiceBase
 {
     public override Task<EnterLineResponse> EnterLine(
@@ -104,6 +106,96 @@ public sealed class WorldGrpcService(LineRegistry registry, WorldCatalog catalog
         response.Speakers.AddRange(catalog.Speakers);
         response.Factions.AddRange(catalog.Factions);
         return Task.FromResult(response);
+    }
+
+    /// <summary>
+    /// 采矿与采药。方案 9.5：矿脉给矿石、药草给药材，采集不耗疲劳；
+    /// 灵石矿脉归主城辖区，不开放给玩家个人去挖，对它的请求一律拒绝。
+    /// 成功与否、节点占用与刷新都在这里判，产物交给角色服的 ApplyGrant 写背包。
+    /// 请求里只有节点编号，产物、数量、背包格、事务号与身份都带不进来。
+    /// </summary>
+    public override async Task<GatherResponse> Gather(
+        GatherRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var nodeId = (request.NodeId ?? "").Trim();
+        if (account.Length == 0 || request.CharacterId == 0 || nodeId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "bad_request"));
+        }
+
+        var node = gather.Find(nodeId);
+        if (node is null)
+        {
+            return Reject(account, request.CharacterId, nodeId, "unknown_node");
+        }
+
+        // 灵石矿脉先判：不管人在哪、节点是否被占，个人采集都不成立，
+        // 也不会走到角色服那笔发奖。灵石仍走主城任务，不进采集背包。
+        if (string.Equals(node.Kind, GatherTable.SpiritStone, StringComparison.Ordinal))
+        {
+            return Reject(account, request.CharacterId, nodeId, "spirit_stone_forbidden");
+        }
+
+        var region = registry.RegionOf(account, request.CharacterId);
+        if (region is null)
+        {
+            return Reject(account, request.CharacterId, nodeId, "not_in_line");
+        }
+
+        if (!string.Equals(region, node.RegionId, StringComparison.Ordinal))
+        {
+            return Reject(account, request.CharacterId, nodeId, "wrong_region");
+        }
+
+        if (!nodes.TryClaim(nodeId, node.RespawnSeconds, DateTimeOffset.UtcNow))
+        {
+            return Reject(account, request.CharacterId, nodeId, "node_busy");
+        }
+
+        // 每笔一个号，角色服的 grant_txn 主键挡住重放；号只由世界服生成。
+        var txnId = "gather:" + Guid.NewGuid().ToString("N");
+        var result = await grants.GrantAsync(
+            account, request.CharacterId, txnId, node, context.CancellationToken);
+        if (!result.Ok)
+        {
+            // 角色服没写成：把占用还回去，不回一个假的成功。
+            nodes.Release(nodeId);
+            return Reject(account, request.CharacterId, nodeId, result.Reason);
+        }
+
+        Console.WriteLine("gather account=" + account
+            + " character=" + request.CharacterId
+            + " node=" + nodeId
+            + " kind=" + node.Kind
+            + " item=" + node.ItemId
+            + " count=" + node.Count
+            + " slot=" + node.BagSlot
+            + " txn=" + txnId
+            + " duplicate=" + result.Duplicate);
+
+        return new GatherResponse
+        {
+            Ok = true,
+            NodeId = nodeId,
+            Kind = node.Kind,
+            ItemId = node.ItemId,
+            Count = node.Count,
+            BagSlot = (uint)node.BagSlot,
+            TxnId = txnId,
+            Duplicate = result.Duplicate,
+            RespawnS = node.RespawnSeconds,
+        };
+    }
+
+    static GatherResponse Reject(string account, ulong characterId, string nodeId, string reason)
+    {
+        Console.WriteLine("gather_reject account=" + account
+            + " character=" + characterId
+            + " node=" + nodeId
+            + " reason=" + reason);
+        // 被拒时未生效的产物字段一律是 0 / 空，不给客户端留一份「看起来发了」的回包。
+        return new GatherResponse { Ok = false, Reason = reason, NodeId = nodeId };
     }
 
     /// <summary>

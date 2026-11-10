@@ -3,9 +3,9 @@ syntax = "proto3";
 package mmo.world;
 option csharp_namespace = "Mmo.Proto.World";
 
-// 表世界的分线（P1-3a1）、位置流（P1-3a2）与同屏档位（P1-3a3）。
-// 世界服是分线、位置与档位的唯一写入方；在线状态、坐标与档位都在进程内存，不落库。
-// 采集、飞行状态与 AOI 不在这里。
+// 表世界的分线（P1-3a1）、位置流（P1-3a2）、同屏档位（P1-3a3）与采集（P1-3b）。
+// 世界服是分线、位置、档位与采集节点占用的唯一写入方；在线状态、坐标、档位与
+// 节点占用都在进程内存，不落库。飞行状态与 AOI 不在这里。
 service WorldService {
   rpc EnterLine(EnterLineRequest) returns (EnterLineResponse);
   rpc LeaveLine(LeaveLineRequest) returns (LeaveLineResponse);
@@ -14,6 +14,10 @@ service WorldService {
   // 手机到网关一条 WebSocket，网关到世界服一条 gRPC 双向流。
   // 账号与角色编号由网关放进请求头，客户端帧里带不进身份、分线号或别人的坐标。
   rpc PositionStream(stream WorldClientFrame) returns (stream WorldServerFrame);
+
+  // 采矿与采药。成功与否、节点占用与刷新都由世界服判；产物交给角色服写背包。
+  // 灵石矿脉不是个人采集点，对它的请求一律拒绝（方案 9.5）。
+  rpc Gather(GatherRequest) returns (GatherResponse);
 }
 
 // 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
@@ -127,4 +131,27 @@ message PositionSnapshot {
 message PositionRejected {
   string reason = 1;
   AvatarPosition corrected = 2;
+}
+
+// 采集请求走网关的一条 HTTP，网关认令牌并复核归属后填 account / character_id。
+// 客户端只给节点编号：产物、数量、背包格、事务号、身份、分线号都带不进请求。
+message GatherRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string node_id = 3;
+}
+
+// 被拒绝时 ok=false，未生效的 item_id / count / bag_slot / txn_id 一律是 0 或空。
+// 世界服不直接写角色库：成功的一笔由角色服的 ApplyGrant 落库，txn_id 用过就不能再用。
+message GatherResponse {
+  bool ok = 1;
+  string reason = 2;
+  string node_id = 3;
+  string kind = 4;
+  string item_id = 5;
+  int32 count = 6;
+  uint32 bag_slot = 7;
+  string txn_id = 8;
+  bool duplicate = 9;
+  int32 respawn_s = 10;
 }

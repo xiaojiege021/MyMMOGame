@@ -1,0 +1,40 @@
+{
+  "schema": "gather-table/1",
+  "version": 1,
+  "note": "方案 9.5 写定：挖矿采矿脉给矿石、采药采药草给药材，谁都能学、可以同时学，采集不耗疲劳；灵石矿脉归主城辖区，不开放给玩家个人去挖，灵石不进采集背包。方案没写定每次产量、刷新秒数、产物入哪一格、节点编号和首发铺几个点：这些只在这份配置里记一次，数值待定，代码里不给兜底。节点铺满地表按境界区域刷新留给 C2，这一行只放够核对的四个点。灵石矿脉节点只登记归属，不许配 item_id / count / bag_slot。",
+  "character_upstream": "http://127.0.0.1:62000",
+  "nodes": [
+    {
+      "id": "ore_kulan_1",
+      "kind": "ore",
+      "region_id": "枯岚道",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 1,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_kulan_2",
+      "kind": "ore",
+      "region_id": "枯岚道",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 1,
+      "respawn_s": 2
+    },
+    {
+      "id": "herb_tingyao_1",
+      "kind": "herb",
+      "region_id": "听谣镇",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 2,
+      "respawn_s": 2
+    },
+    {
+      "id": "spirit_qiyun_1",
+      "kind": "spirit_stone",
+      "region_id": "栖云城"
+    }
+  ]
+}

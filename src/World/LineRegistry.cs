@@ -130,6 +130,21 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
         }
     }
 
+    /// <summary>
+    /// 这个人当前在哪块地表。采集用它核对「节点确实长在玩家所在的分线上」，
+    /// 区域编号由分线注册表给，客户端请求里带不进来。
+    /// </summary>
+    public string? RegionOf(string account, ulong characterId)
+    {
+        lock (gate)
+        {
+            return seats.TryGetValue(SeatKey(account, characterId), out var lineId)
+                   && lines.TryGetValue(lineId, out var line)
+                ? line.RegionId
+                : null;
+        }
+    }
+
     /// <summary>一次性取全部分线成员的位置，供广播节拍组装快照。</summary>
     public IReadOnlyList<LineMembers> MemberSnapshot()
     {
