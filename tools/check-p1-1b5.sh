@@ -433,8 +433,12 @@ GOLD="$(balance_of "$TOKEN" "$CHAR_ID" gold)"
 printf '       并发前金币 %s\n' "$GOLD"
 
 ( grant "$TOKEN" "$CHAR_ID" "p11b5-race-a" '[{"currency":{"kind":"gold","delta":-2000}}]' > "$TMP/race-a.txt" 2>&1 ) &
+RACE_A=$!
 ( grant "$TOKEN" "$CHAR_ID" "p11b5-race-b" '[{"currency":{"kind":"gold","delta":-2000}}]' > "$TMP/race-b.txt" 2>&1 ) &
-wait
+RACE_B=$!
+# 只等这两笔，不要裸 wait：角色服和网关也是本 shell 的后台作业，
+# 裸 wait 会一直等它们退出（它们要到脚本收尾才停），在 Windows 上表现为整个核对卡死。
+wait "$RACE_A" "$RACE_B"
 
 CODE_A="$(tail -1 "$TMP/race-a.txt")"
 CODE_B="$(tail -1 "$TMP/race-b.txt")"

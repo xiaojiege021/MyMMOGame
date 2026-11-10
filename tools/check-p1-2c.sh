@@ -362,13 +362,16 @@ json.dump(cfg, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
 PY
 cp "$ROOT/config/skills.json" "$ROOT/config/classes.json" "$ROOT/config/dungeons.json" "$TMP/"
 
+# Windows 上 mktemp 回的是 C:\Users\...\Temp/tmp.xxx，反斜杠直接拼进 JSON 会被当成转义
+# （\U 非法，配置解析报错、角色服起不来）。写进 JSON 的路径一律换成正斜杠。
+TMP_JSON="$(printf '%s' "$TMP" | tr '\\' '/')"
 cat > "$TMP/character.json" <<JSON
 {
   "schema": "character-config/1",
   "listen": "http://127.0.0.1:${CHAR_PORT}",
   "db_pool_max": 6,
   "bag_slots": 40,
-  "dungeon_table": "${TMP}/dungeons.json"
+  "dungeon_table": "${TMP_JSON}/dungeons.json"
 }
 JSON
 
