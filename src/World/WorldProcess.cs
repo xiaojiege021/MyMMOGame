@@ -3,21 +3,23 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace World;
 
-public sealed class WorldProcess(string configPath, string gatherConfigPath)
+public sealed class WorldProcess(string configPath, string gatherConfigPath, string flightConfigPath)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
         WorldConfig config;
         WorldCatalog catalog;
         GatherTable gather;
+        FlightTable flights;
         try
         {
             config = WorldConfig.Load(configPath);
             catalog = WorldCatalog.Load(config);
+            var regionIds = catalog.Regions.Select(r => r.Id).ToHashSet(StringComparer.Ordinal);
             // 节点必须长在已经配置的地表上；采集表坏掉同样不带半截配置跑。
-            gather = GatherTable.Load(
-                gatherConfigPath,
-                catalog.Regions.Select(r => r.Id).ToHashSet(StringComparer.Ordinal));
+            gather = GatherTable.Load(gatherConfigPath, regionIds);
+            // 每块已配置地表都必须有境界门槛，漏一块就等于给它开零门槛。
+            flights = FlightTable.Load(flightConfigPath, regionIds);
         }
         catch (ConfigException ex)
         {
@@ -49,6 +51,11 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath)
         Console.WriteLine("gather_config=ok nodes=" + gather.Nodes.Count
             + " kinds=" + string.Join(",", gather.Nodes.Select(n => n.Kind).Distinct())
             + " forbidden=" + gather.Nodes.Count(n => n.Kind == GatherTable.SpiritStone));
+        Console.WriteLine("flight_config=ok realms=" + string.Join(",", flights.Realms)
+            + " flight_realm=" + flights.FlightRealm
+            + " region_realms=" + string.Join(",", catalog.Regions.Select(
+                r => r.Id + ":" + flights.RequiredFor(r.Id)))
+            + " ground_y=" + config.SpawnY);
         Console.WriteLine("regions=" + string.Join(",", catalog.Regions.Select(r => r.Id)));
         Console.WriteLine("speakers=" + string.Join(",", catalog.Speakers));
         Console.WriteLine("locked=" + string.Join(",", catalog.Regions.Where(r => !r.Open).Select(r => r.Id)));
@@ -60,6 +67,9 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath)
         var hub = new PositionHub(registry, config, tiers);
         var gatherNodes = new GatherNodeRegistry();
         using var gatherGrants = new GrpcGatherGrant(gather.CharacterUpstream);
+        // 境界只在角色服：世界服每次判飞行/跨区都去问，不连角色库，也不自己存境界。
+        using var realmReader = new GrpcRealmReader(flights.CharacterUpstream);
+        var flightGate = new FlightGate(flights, realmReader, registry, catalog);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2。
@@ -81,6 +91,8 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath)
         builder.Services.AddSingleton(gather);
         builder.Services.AddSingleton(gatherNodes);
         builder.Services.AddSingleton<IGatherGrant>(gatherGrants);
+        builder.Services.AddSingleton(flights);
+        builder.Services.AddSingleton(flightGate);
         builder.Services.AddHostedService<PositionBroadcaster>();
 
         var app = builder.Build();

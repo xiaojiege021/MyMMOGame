@@ -3,9 +3,10 @@ syntax = "proto3";
 package mmo.world;
 option csharp_namespace = "Mmo.Proto.World";
 
-// 表世界的分线（P1-3a1）、位置流（P1-3a2）、同屏档位（P1-3a3）与采集（P1-3b）。
-// 世界服是分线、位置、档位与采集节点占用的唯一写入方；在线状态、坐标、档位与
-// 节点占用都在进程内存，不落库。飞行状态与 AOI 不在这里。
+// 表世界的分线（P1-3a1）、位置流（P1-3a2）、同屏档位（P1-3a3）、采集（P1-3b）
+// 与飞行跨区（P1-3c）。世界服是分线、位置、档位、飞行状态与采集节点占用的唯一
+// 写入方；这些都是在线状态，放进程内存，不落库。境界本身在角色服，世界服只读不写。
+// AOI、表世界技能结算与境界突破不在这里。
 service WorldService {
   rpc EnterLine(EnterLineRequest) returns (EnterLineResponse);
   rpc LeaveLine(LeaveLineRequest) returns (LeaveLineResponse);
@@ -18,6 +19,11 @@ service WorldService {
   // 采矿与采药。成功与否、节点占用与刷新都由世界服判；产物交给角色服写背包。
   // 灵石矿脉不是个人采集点，对它的请求一律拒绝（方案 9.5）。
   rpc Gather(GatherRequest) returns (GatherResponse);
+
+  // 飞行与跨区。世界服先问角色服的境界，再按 config/flight.json 的门槛判定；
+  // 权限不够就把人拉回地面 / 留在原区域，不在客户端上改权限。
+  rpc Fly(FlyRequest) returns (FlyResponse);
+  rpc CrossRegion(CrossRegionRequest) returns (CrossRegionResponse);
 }
 
 // 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
@@ -116,6 +122,10 @@ message AvatarPosition {
   uint64 seq = 6;
   AppearanceTier appearance_tier = 7;
   string display_name = 8;
+  // 技术架构第 4 节写定的少量状态。由世界服判完后随快照下发，
+  // 客户端上报帧里没有这两个字段，改包也改不了别人看到的状态。
+  bool flying = 9;
+  bool can_fly = 10;
 }
 
 message PositionSnapshot {
@@ -125,6 +135,8 @@ message PositionSnapshot {
   uint32 sync_hz = 4;
   repeated AvatarPosition avatars = 5;
   uint64 self_character_id = 6;
+  bool self_flying = 7;
+  bool self_can_fly = 8;
 }
 
 // 服务端校验不通过时把上一次合法位置回给自己，别人看到的仍是那一份。
@@ -154,4 +166,43 @@ message GatherResponse {
   string txn_id = 8;
   bool duplicate = 9;
   int32 respawn_s = 10;
+}
+
+// 客户端只给「想不想飞」。账号由网关从令牌取，境界由世界服问角色服，
+// 两个值都不在这个请求里；塞 can_fly / realm / account 也不会被读。
+message FlyRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  bool want_fly = 3;
+}
+
+// 权限不够时 ok=false，flying=false，y 是拉回后的地面高度（沿用 world.json 的 spawn_y）。
+// realm / required_realm 是只读展示，客户端不能提交，也不是判定依据。
+message FlyResponse {
+  bool ok = 1;
+  string reason = 2;
+  bool flying = 3;
+  bool can_fly = 4;
+  string realm = 5;
+  string required_realm = 6;
+  float y = 7;
+}
+
+// 跨区只给目标地点编号。当前区域由 LineRegistry 的分线注册表给，
+// 相连关系、是否开放与境界门槛都由世界服从配置读，客户端带不进。
+message CrossRegionRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string target_region = 3;
+}
+
+// 被拉回时 region_id 是原来那块地表，line_id 是原来那条分线，都没变。
+message CrossRegionResponse {
+  bool ok = 1;
+  string reason = 2;
+  string region_id = 3;
+  string line_id = 4;
+  uint32 line_no = 5;
+  string realm = 6;
+  string required_realm = 7;
 }

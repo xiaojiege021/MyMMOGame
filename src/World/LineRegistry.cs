@@ -15,13 +15,20 @@ public sealed record LeaveResult(bool Left, string LineId, int LineSize);
 public sealed record LineSnapshot(string LineId, string RegionId, int LineNo, int LineSize, int Capacity);
 
 /// <summary>
-/// 一条分线里某个人的当前坐标、朝向、上报序号，以及名字牌文本。
-/// 名字由网关复核归属后从角色服取，服间传入，客户端帧里带不进。
+/// 一条分线里某个人的当前坐标、朝向、上报序号、名字牌文本，以及飞行状态。
+/// 名字由网关复核归属后从角色服取；flying / can_fly 由世界服按角色服境界判，
+/// 都是服间或服务端状态，客户端上报帧里带不进。
 /// </summary>
 public sealed record AvatarState(
-    ulong CharacterId, float X, float Y, float Z, float Facing, ulong Seq, string DisplayName);
+    ulong CharacterId, float X, float Y, float Z, float Facing, ulong Seq,
+    string DisplayName, bool Flying, bool CanFly);
 
 public sealed record PositionReportResult(bool Accepted, string Reason, AvatarState? Corrected);
+
+public sealed record FlightChangeResult(bool Found, bool Flying, bool CanFly, AvatarState? State);
+
+/// <summary>跨区被拉回时，回包要说清人仍在原来哪块地表、哪条分线。</summary>
+public sealed record LineState(string LineId, string RegionId, int LineNo);
 
 public sealed record LineMembers(string LineId, string RegionId, IReadOnlyList<AvatarState> Members);
 
@@ -157,8 +164,9 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
     }
 
     /// <summary>
-    /// 客户端只上报自己的坐标与朝向。非有限值、瞬时超过配置速度上限都不通过，
-    /// 回上一次合法位置，别人看到的仍是那一份；不做境界、飞行与技能判定。
+    /// 客户端只上报自己的坐标与朝向。非有限值、瞬时超过配置速度上限、
+    /// 或没有飞行权限却报了高于地面的 y，都不通过，回上一次合法位置；
+    /// 飞行权限本身由 FlightGate 问角色服后写进这里，本表不判境界，也不结算技能。
     /// </summary>
     public PositionReportResult Report(
         string account, ulong characterId,
@@ -177,11 +185,18 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
                 return new PositionReportResult(false, "invalid_position", member.State);
             }
 
+            var previous = member.State;
+            // 没飞行权限的人不能靠上报一个高 y 把自己抬起来：飞行只由世界服按境界判，
+            // 地面高度沿用 world.json 的 spawn_y，不在代码里另写一套数字。
+            if (!previous.Flying && y > GroundY)
+            {
+                return new PositionReportResult(false, "flight_forbidden", previous);
+            }
+
             // 连续两帧挤在同一毫秒时，按一个广播周期给位移额度，不误伤正常上报。
             var elapsed = (now - member.UpdatedAt).TotalSeconds;
             var window = Math.Max(elapsed, 1.0 / config.SyncHz);
             var allowed = config.MaxMoveSpeed * window;
-            var previous = member.State;
             var dx = x - previous.X;
             var dy = y - previous.Y;
             var dz = z - previous.Z;
@@ -192,16 +207,76 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
             }
 
             member.State = new AvatarState(
-                characterId, x, y, z, facing, seq, previous.DisplayName);
+                characterId, x, y, z, facing, seq,
+                previous.DisplayName, previous.Flying, previous.CanFly);
             member.UpdatedAt = now;
             return new PositionReportResult(true, "", member.State);
         }
     }
 
+    /// <summary>
+    /// 飞行状态的唯一写入点。can_fly 由世界服问过角色服境界后给出，客户端带不进；
+    /// 想飞但没权限、或主动落地，都把 y 拉回 spawn_y 那个地面高度并回纠正后的状态。
+    /// 状态只在进程内存里，离开分线或换区时随 Member 一起重建。
+    /// </summary>
+    public FlightChangeResult SetFlight(
+        string account, ulong characterId,
+        bool wantFly, bool canFly, DateTimeOffset now)
+    {
+        lock (gate)
+        {
+            var key = SeatKey(account, characterId);
+            if (!seats.TryGetValue(key, out var lineId)
+                || !lines[lineId].Members.TryGetValue(key, out var member))
+            {
+                return new FlightChangeResult(false, false, false, null);
+            }
+
+            var previous = member.State;
+            var flying = wantFly && canFly;
+            var y = flying ? previous.Y : GroundY;
+            member.State = new AvatarState(
+                previous.CharacterId, previous.X, y, previous.Z,
+                previous.Facing, previous.Seq, previous.DisplayName, flying, canFly);
+            // 拉回地面是一次服务端纠正，不能让下一帧的速度校验拿它当客户端瞬移。
+            member.UpdatedAt = now;
+            return new FlightChangeResult(true, flying, canFly, member.State);
+        }
+    }
+
+    public AvatarState? StateOf(string account, ulong characterId)
+    {
+        lock (gate)
+        {
+            var key = SeatKey(account, characterId);
+            return seats.TryGetValue(key, out var lineId)
+                   && lines[lineId].Members.TryGetValue(key, out var member)
+                ? member.State
+                : null;
+        }
+    }
+
+    public LineState? LineStateOf(string account, ulong characterId)
+    {
+        lock (gate)
+        {
+            var key = SeatKey(account, characterId);
+            if (!seats.TryGetValue(key, out var lineId) || !lines.TryGetValue(lineId, out var line))
+            {
+                return null;
+            }
+
+            return new LineState(line.Id, line.RegionId, line.LineNo);
+        }
+    }
+
+    /// <summary>地面高度就是 world.json 的初始站位高度，飞行拉回也用它，不另写一套数字。</summary>
+    public float GroundY => (float)config.SpawnY;
+
     AvatarState Spawn(ulong characterId, string displayName) => new(
         characterId,
         (float)config.SpawnX, (float)config.SpawnY, (float)config.SpawnZ,
-        (float)config.SpawnFacing, 0, displayName);
+        (float)config.SpawnFacing, 0, displayName, false, false);
 
     EnterResult Accepted(Line line, string regionId, bool duplicate) =>
         new(true, "", line.Id, regionId, line.LineNo, line.Members.Count, config.LineCapacity, duplicate);

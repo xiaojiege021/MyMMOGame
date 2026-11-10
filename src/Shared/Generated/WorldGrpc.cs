@@ -9,9 +9,10 @@ using grpc = global::Grpc.Core;
 
 namespace Mmo.Proto.World {
   /// <summary>
-  /// 表世界的分线（P1-3a1）、位置流（P1-3a2）、同屏档位（P1-3a3）与采集（P1-3b）。
-  /// 世界服是分线、位置、档位与采集节点占用的唯一写入方；在线状态、坐标、档位与
-  /// 节点占用都在进程内存，不落库。飞行状态与 AOI 不在这里。
+  /// 表世界的分线（P1-3a1）、位置流（P1-3a2）、同屏档位（P1-3a3）、采集（P1-3b）
+  /// 与飞行跨区（P1-3c）。世界服是分线、位置、档位、飞行状态与采集节点占用的唯一
+  /// 写入方；这些都是在线状态，放进程内存，不落库。境界本身在角色服，世界服只读不写。
+  /// AOI、表世界技能结算与境界突破不在这里。
   /// </summary>
   public static partial class WorldService
   {
@@ -70,6 +71,14 @@ namespace Mmo.Proto.World {
     static readonly grpc::Marshaller<global::Mmo.Proto.World.GatherRequest> __Marshaller_mmo_world_GatherRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.GatherRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.GatherResponse> __Marshaller_mmo_world_GatherResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.GatherResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.FlyRequest> __Marshaller_mmo_world_FlyRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.FlyRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.FlyResponse> __Marshaller_mmo_world_FlyResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.FlyResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.CrossRegionRequest> __Marshaller_mmo_world_CrossRegionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.CrossRegionRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.CrossRegionResponse> __Marshaller_mmo_world_CrossRegionResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.CrossRegionResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse> __Method_EnterLine = new grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse>(
@@ -110,6 +119,22 @@ namespace Mmo.Proto.World {
         "Gather",
         __Marshaller_mmo_world_GatherRequest,
         __Marshaller_mmo_world_GatherResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.FlyRequest, global::Mmo.Proto.World.FlyResponse> __Method_Fly = new grpc::Method<global::Mmo.Proto.World.FlyRequest, global::Mmo.Proto.World.FlyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Fly",
+        __Marshaller_mmo_world_FlyRequest,
+        __Marshaller_mmo_world_FlyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.CrossRegionRequest, global::Mmo.Proto.World.CrossRegionResponse> __Method_CrossRegion = new grpc::Method<global::Mmo.Proto.World.CrossRegionRequest, global::Mmo.Proto.World.CrossRegionResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CrossRegion",
+        __Marshaller_mmo_world_CrossRegionRequest,
+        __Marshaller_mmo_world_CrossRegionResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -162,6 +187,25 @@ namespace Mmo.Proto.World {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.GatherResponse> Gather(global::Mmo.Proto.World.GatherRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 飞行与跨区。世界服先问角色服的境界，再按 config/flight.json 的门槛判定；
+      /// 权限不够就把人拉回地面 / 留在原区域，不在客户端上改权限。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.FlyResponse> Fly(global::Mmo.Proto.World.FlyRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.CrossRegionResponse> CrossRegion(global::Mmo.Proto.World.CrossRegionRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -331,6 +375,78 @@ namespace Mmo.Proto.World {
       {
         return CallInvoker.AsyncUnaryCall(__Method_Gather, null, options, request);
       }
+      /// <summary>
+      /// 飞行与跨区。世界服先问角色服的境界，再按 config/flight.json 的门槛判定；
+      /// 权限不够就把人拉回地面 / 留在原区域，不在客户端上改权限。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.FlyResponse Fly(global::Mmo.Proto.World.FlyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return Fly(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 飞行与跨区。世界服先问角色服的境界，再按 config/flight.json 的门槛判定；
+      /// 权限不够就把人拉回地面 / 留在原区域，不在客户端上改权限。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.FlyResponse Fly(global::Mmo.Proto.World.FlyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_Fly, null, options, request);
+      }
+      /// <summary>
+      /// 飞行与跨区。世界服先问角色服的境界，再按 config/flight.json 的门槛判定；
+      /// 权限不够就把人拉回地面 / 留在原区域，不在客户端上改权限。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.FlyResponse> FlyAsync(global::Mmo.Proto.World.FlyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return FlyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 飞行与跨区。世界服先问角色服的境界，再按 config/flight.json 的门槛判定；
+      /// 权限不够就把人拉回地面 / 留在原区域，不在客户端上改权限。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.FlyResponse> FlyAsync(global::Mmo.Proto.World.FlyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_Fly, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.CrossRegionResponse CrossRegion(global::Mmo.Proto.World.CrossRegionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CrossRegion(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.CrossRegionResponse CrossRegion(global::Mmo.Proto.World.CrossRegionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CrossRegion, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.CrossRegionResponse> CrossRegionAsync(global::Mmo.Proto.World.CrossRegionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CrossRegionAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.CrossRegionResponse> CrossRegionAsync(global::Mmo.Proto.World.CrossRegionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CrossRegion, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override WorldServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -349,7 +465,9 @@ namespace Mmo.Proto.World {
           .AddMethod(__Method_LeaveLine, serviceImpl.LeaveLine)
           .AddMethod(__Method_ListRegions, serviceImpl.ListRegions)
           .AddMethod(__Method_PositionStream, serviceImpl.PositionStream)
-          .AddMethod(__Method_Gather, serviceImpl.Gather).Build();
+          .AddMethod(__Method_Gather, serviceImpl.Gather)
+          .AddMethod(__Method_Fly, serviceImpl.Fly)
+          .AddMethod(__Method_CrossRegion, serviceImpl.CrossRegion).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -364,6 +482,8 @@ namespace Mmo.Proto.World {
       serviceBinder.AddMethod(__Method_ListRegions, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.ListRegionsRequest, global::Mmo.Proto.World.ListRegionsResponse>(serviceImpl.ListRegions));
       serviceBinder.AddMethod(__Method_PositionStream, serviceImpl == null ? null : new grpc::DuplexStreamingServerMethod<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame>(serviceImpl.PositionStream));
       serviceBinder.AddMethod(__Method_Gather, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.GatherRequest, global::Mmo.Proto.World.GatherResponse>(serviceImpl.Gather));
+      serviceBinder.AddMethod(__Method_Fly, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.FlyRequest, global::Mmo.Proto.World.FlyResponse>(serviceImpl.Fly));
+      serviceBinder.AddMethod(__Method_CrossRegion, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.CrossRegionRequest, global::Mmo.Proto.World.CrossRegionResponse>(serviceImpl.CrossRegion));
     }
 
   }

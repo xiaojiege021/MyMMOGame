@@ -36,6 +36,21 @@ public sealed class InventoryRepository(NpgsqlDataSource dataSource)
         return await reader.ReadAsync(stopping) ? reader.GetString(0) : null;
     }
 
+    /// <summary>
+    /// 复核归属的同时读出当前境界，只给表世界的飞行与跨区判定用。和 DisplayNameAsync
+    /// 同一套归属条件，不是这个账号的角色回 null。这里只读，不写境界；
+    /// 突破与版本开关在后面的卡，角色服仍是境界唯一写入方。
+    /// </summary>
+    public async Task<string?> RealmAsync(string account, long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select realm from \"角色\".character where id = $1 and account = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(account);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        return await reader.ReadAsync(stopping) ? reader.GetString(0) : null;
+    }
+
     public async Task<BagSlot?> GetSlotAsync(long characterId, int slot, CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(

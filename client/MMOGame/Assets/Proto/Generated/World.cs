@@ -46,34 +46,48 @@ namespace Mmo.Proto.World {
             "GAQgASgCEgsKA3NlcRgFIAEoBCJ8ChBXb3JsZFNlcnZlckZyYW1lEi8KCHNu",
             "YXBzaG90GAEgASgLMhsubW1vLndvcmxkLlBvc2l0aW9uU25hcHNob3RIABIv",
             "CghyZWplY3RlZBgCIAEoCzIbLm1tby53b3JsZC5Qb3NpdGlvblJlamVjdGVk",
-            "SABCBgoEYm9keSKuAQoOQXZhdGFyUG9zaXRpb24SFAoMY2hhcmFjdGVyX2lk",
+            "SABCBgoEYm9keSLPAQoOQXZhdGFyUG9zaXRpb24SFAoMY2hhcmFjdGVyX2lk",
             "GAEgASgEEgkKAXgYAiABKAISCQoBeRgDIAEoAhIJCgF6GAQgASgCEg4KBmZh",
             "Y2luZxgFIAEoAhILCgNzZXEYBiABKAQSMgoPYXBwZWFyYW5jZV90aWVyGAcg",
             "ASgOMhkubW1vLndvcmxkLkFwcGVhcmFuY2VUaWVyEhQKDGRpc3BsYXlfbmFt",
-            "ZRgIIAEoCSKmAQoQUG9zaXRpb25TbmFwc2hvdBIPCgdsaW5lX2lkGAEgASgJ",
-            "EhEKCXJlZ2lvbl9pZBgCIAEoCRIWCg5zZXJ2ZXJfdGltZV9tcxgDIAEoBBIP",
-            "CgdzeW5jX2h6GAQgASgNEioKB2F2YXRhcnMYBSADKAsyGS5tbW8ud29ybGQu",
-            "QXZhdGFyUG9zaXRpb24SGQoRc2VsZl9jaGFyYWN0ZXJfaWQYBiABKAQiUAoQ",
-            "UG9zaXRpb25SZWplY3RlZBIOCgZyZWFzb24YASABKAkSLAoJY29ycmVjdGVk",
-            "GAIgASgLMhkubW1vLndvcmxkLkF2YXRhclBvc2l0aW9uIkcKDUdhdGhlclJl",
-            "cXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQS",
-            "DwoHbm9kZV9pZBgDIAEoCSKzAQoOR2F0aGVyUmVzcG9uc2USCgoCb2sYASAB",
-            "KAgSDgoGcmVhc29uGAIgASgJEg8KB25vZGVfaWQYAyABKAkSDAoEa2luZBgE",
-            "IAEoCRIPCgdpdGVtX2lkGAUgASgJEg0KBWNvdW50GAYgASgFEhAKCGJhZ19z",
-            "bG90GAcgASgNEg4KBnR4bl9pZBgIIAEoCRIRCglkdXBsaWNhdGUYCSABKAgS",
-            "EQoJcmVzcGF3bl9zGAogASgFKoEBCg5BcHBlYXJhbmNlVGllchIfChtBUFBF",
-            "QVJBTkNFX1RJRVJfVU5TUEVDSUZJRUQQABIYChRBUFBFQVJBTkNFX1RJRVJf",
-            "RlVMTBABEhoKFkFQUEVBUkFOQ0VfVElFUl9TSU1QTEUQAhIYChRBUFBFQVJB",
-            "TkNFX1RJRVJfTkFNRRADMvsCCgxXb3JsZFNlcnZpY2USRgoJRW50ZXJMaW5l",
-            "EhsubW1vLndvcmxkLkVudGVyTGluZVJlcXVlc3QaHC5tbW8ud29ybGQuRW50",
-            "ZXJMaW5lUmVzcG9uc2USRgoJTGVhdmVMaW5lEhsubW1vLndvcmxkLkxlYXZl",
-            "TGluZVJlcXVlc3QaHC5tbW8ud29ybGQuTGVhdmVMaW5lUmVzcG9uc2USTAoL",
-            "TGlzdFJlZ2lvbnMSHS5tbW8ud29ybGQuTGlzdFJlZ2lvbnNSZXF1ZXN0Gh4u",
-            "bW1vLndvcmxkLkxpc3RSZWdpb25zUmVzcG9uc2USTgoOUG9zaXRpb25TdHJl",
-            "YW0SGy5tbW8ud29ybGQuV29ybGRDbGllbnRGcmFtZRobLm1tby53b3JsZC5X",
-            "b3JsZFNlcnZlckZyYW1lKAEwARI9CgZHYXRoZXISGC5tbW8ud29ybGQuR2F0",
-            "aGVyUmVxdWVzdBoZLm1tby53b3JsZC5HYXRoZXJSZXNwb25zZUISqgIPTW1v",
-            "LlByb3RvLldvcmxkYgZwcm90bzM="));
+            "ZRgIIAEoCRIOCgZmbHlpbmcYCSABKAgSDwoHY2FuX2ZseRgKIAEoCCLRAQoQ",
+            "UG9zaXRpb25TbmFwc2hvdBIPCgdsaW5lX2lkGAEgASgJEhEKCXJlZ2lvbl9p",
+            "ZBgCIAEoCRIWCg5zZXJ2ZXJfdGltZV9tcxgDIAEoBBIPCgdzeW5jX2h6GAQg",
+            "ASgNEioKB2F2YXRhcnMYBSADKAsyGS5tbW8ud29ybGQuQXZhdGFyUG9zaXRp",
+            "b24SGQoRc2VsZl9jaGFyYWN0ZXJfaWQYBiABKAQSEwoLc2VsZl9mbHlpbmcY",
+            "ByABKAgSFAoMc2VsZl9jYW5fZmx5GAggASgIIlAKEFBvc2l0aW9uUmVqZWN0",
+            "ZWQSDgoGcmVhc29uGAEgASgJEiwKCWNvcnJlY3RlZBgCIAEoCzIZLm1tby53",
+            "b3JsZC5BdmF0YXJQb3NpdGlvbiJHCg1HYXRoZXJSZXF1ZXN0Eg8KB2FjY291",
+            "bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEg8KB25vZGVfaWQYAyAB",
+            "KAkiswEKDkdhdGhlclJlc3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgC",
+            "IAEoCRIPCgdub2RlX2lkGAMgASgJEgwKBGtpbmQYBCABKAkSDwoHaXRlbV9p",
+            "ZBgFIAEoCRINCgVjb3VudBgGIAEoBRIQCghiYWdfc2xvdBgHIAEoDRIOCgZ0",
+            "eG5faWQYCCABKAkSEQoJZHVwbGljYXRlGAkgASgIEhEKCXJlc3Bhd25fcxgK",
+            "IAEoBSJFCgpGbHlSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFj",
+            "dGVyX2lkGAIgASgEEhAKCHdhbnRfZmx5GAMgASgIInwKC0ZseVJlc3BvbnNl",
+            "EgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIOCgZmbHlpbmcYAyABKAgS",
+            "DwoHY2FuX2ZseRgEIAEoCBINCgVyZWFsbRgFIAEoCRIWCg5yZXF1aXJlZF9y",
+            "ZWFsbRgGIAEoCRIJCgF5GAcgASgCIlIKEkNyb3NzUmVnaW9uUmVxdWVzdBIP",
+            "CgdhY2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIVCg10YXJn",
+            "ZXRfcmVnaW9uGAMgASgJIo0BChNDcm9zc1JlZ2lvblJlc3BvbnNlEgoKAm9r",
+            "GAEgASgIEg4KBnJlYXNvbhgCIAEoCRIRCglyZWdpb25faWQYAyABKAkSDwoH",
+            "bGluZV9pZBgEIAEoCRIPCgdsaW5lX25vGAUgASgNEg0KBXJlYWxtGAYgASgJ",
+            "EhYKDnJlcXVpcmVkX3JlYWxtGAcgASgJKoEBCg5BcHBlYXJhbmNlVGllchIf",
+            "ChtBUFBFQVJBTkNFX1RJRVJfVU5TUEVDSUZJRUQQABIYChRBUFBFQVJBTkNF",
+            "X1RJRVJfRlVMTBABEhoKFkFQUEVBUkFOQ0VfVElFUl9TSU1QTEUQAhIYChRB",
+            "UFBFQVJBTkNFX1RJRVJfTkFNRRADMv8DCgxXb3JsZFNlcnZpY2USRgoJRW50",
+            "ZXJMaW5lEhsubW1vLndvcmxkLkVudGVyTGluZVJlcXVlc3QaHC5tbW8ud29y",
+            "bGQuRW50ZXJMaW5lUmVzcG9uc2USRgoJTGVhdmVMaW5lEhsubW1vLndvcmxk",
+            "LkxlYXZlTGluZVJlcXVlc3QaHC5tbW8ud29ybGQuTGVhdmVMaW5lUmVzcG9u",
+            "c2USTAoLTGlzdFJlZ2lvbnMSHS5tbW8ud29ybGQuTGlzdFJlZ2lvbnNSZXF1",
+            "ZXN0Gh4ubW1vLndvcmxkLkxpc3RSZWdpb25zUmVzcG9uc2USTgoOUG9zaXRp",
+            "b25TdHJlYW0SGy5tbW8ud29ybGQuV29ybGRDbGllbnRGcmFtZRobLm1tby53",
+            "b3JsZC5Xb3JsZFNlcnZlckZyYW1lKAEwARI9CgZHYXRoZXISGC5tbW8ud29y",
+            "bGQuR2F0aGVyUmVxdWVzdBoZLm1tby53b3JsZC5HYXRoZXJSZXNwb25zZRI0",
+            "CgNGbHkSFS5tbW8ud29ybGQuRmx5UmVxdWVzdBoWLm1tby53b3JsZC5GbHlS",
+            "ZXNwb25zZRJMCgtDcm9zc1JlZ2lvbhIdLm1tby53b3JsZC5Dcm9zc1JlZ2lv",
+            "blJlcXVlc3QaHi5tbW8ud29ybGQuQ3Jvc3NSZWdpb25SZXNwb25zZUISqgIP",
+            "TW1vLlByb3RvLldvcmxkYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.World.AppearanceTier), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -87,11 +101,15 @@ namespace Mmo.Proto.World {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.WorldClientFrame), global::Mmo.Proto.World.WorldClientFrame.Parser, new[]{ "Position" }, new[]{ "Body" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.PositionReport), global::Mmo.Proto.World.PositionReport.Parser, new[]{ "X", "Y", "Z", "Facing", "Seq" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.WorldServerFrame), global::Mmo.Proto.World.WorldServerFrame.Parser, new[]{ "Snapshot", "Rejected" }, new[]{ "Body" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.AvatarPosition), global::Mmo.Proto.World.AvatarPosition.Parser, new[]{ "CharacterId", "X", "Y", "Z", "Facing", "Seq", "AppearanceTier", "DisplayName" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.PositionSnapshot), global::Mmo.Proto.World.PositionSnapshot.Parser, new[]{ "LineId", "RegionId", "ServerTimeMs", "SyncHz", "Avatars", "SelfCharacterId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.AvatarPosition), global::Mmo.Proto.World.AvatarPosition.Parser, new[]{ "CharacterId", "X", "Y", "Z", "Facing", "Seq", "AppearanceTier", "DisplayName", "Flying", "CanFly" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.PositionSnapshot), global::Mmo.Proto.World.PositionSnapshot.Parser, new[]{ "LineId", "RegionId", "ServerTimeMs", "SyncHz", "Avatars", "SelfCharacterId", "SelfFlying", "SelfCanFly" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.PositionRejected), global::Mmo.Proto.World.PositionRejected.Parser, new[]{ "Reason", "Corrected" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.GatherRequest), global::Mmo.Proto.World.GatherRequest.Parser, new[]{ "Account", "CharacterId", "NodeId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.GatherResponse), global::Mmo.Proto.World.GatherResponse.Parser, new[]{ "Ok", "Reason", "NodeId", "Kind", "ItemId", "Count", "BagSlot", "TxnId", "Duplicate", "RespawnS" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.GatherResponse), global::Mmo.Proto.World.GatherResponse.Parser, new[]{ "Ok", "Reason", "NodeId", "Kind", "ItemId", "Count", "BagSlot", "TxnId", "Duplicate", "RespawnS" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.FlyRequest), global::Mmo.Proto.World.FlyRequest.Parser, new[]{ "Account", "CharacterId", "WantFly" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.FlyResponse), global::Mmo.Proto.World.FlyResponse.Parser, new[]{ "Ok", "Reason", "Flying", "CanFly", "Realm", "RequiredRealm", "Y" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.CrossRegionRequest), global::Mmo.Proto.World.CrossRegionRequest.Parser, new[]{ "Account", "CharacterId", "TargetRegion" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.World.CrossRegionResponse), global::Mmo.Proto.World.CrossRegionResponse.Parser, new[]{ "Ok", "Reason", "RegionId", "LineId", "LineNo", "Realm", "RequiredRealm" }, null, null, null, null)
           }));
     }
     #endregion
@@ -3166,6 +3184,8 @@ namespace Mmo.Proto.World {
       seq_ = other.seq_;
       appearanceTier_ = other.appearanceTier_;
       displayName_ = other.displayName_;
+      flying_ = other.flying_;
+      canFly_ = other.canFly_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3271,6 +3291,34 @@ namespace Mmo.Proto.World {
       }
     }
 
+    /// <summary>Field number for the "flying" field.</summary>
+    public const int FlyingFieldNumber = 9;
+    private bool flying_;
+    /// <summary>
+    /// 技术架构第 4 节写定的少量状态。由世界服判完后随快照下发，
+    /// 客户端上报帧里没有这两个字段，改包也改不了别人看到的状态。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Flying {
+      get { return flying_; }
+      set {
+        flying_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "can_fly" field.</summary>
+    public const int CanFlyFieldNumber = 10;
+    private bool canFly_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool CanFly {
+      get { return canFly_; }
+      set {
+        canFly_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -3294,6 +3342,8 @@ namespace Mmo.Proto.World {
       if (Seq != other.Seq) return false;
       if (AppearanceTier != other.AppearanceTier) return false;
       if (DisplayName != other.DisplayName) return false;
+      if (Flying != other.Flying) return false;
+      if (CanFly != other.CanFly) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3309,6 +3359,8 @@ namespace Mmo.Proto.World {
       if (Seq != 0UL) hash ^= Seq.GetHashCode();
       if (AppearanceTier != global::Mmo.Proto.World.AppearanceTier.Unspecified) hash ^= AppearanceTier.GetHashCode();
       if (DisplayName.Length != 0) hash ^= DisplayName.GetHashCode();
+      if (Flying != false) hash ^= Flying.GetHashCode();
+      if (CanFly != false) hash ^= CanFly.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3359,6 +3411,14 @@ namespace Mmo.Proto.World {
         output.WriteRawTag(66);
         output.WriteString(DisplayName);
       }
+      if (Flying != false) {
+        output.WriteRawTag(72);
+        output.WriteBool(Flying);
+      }
+      if (CanFly != false) {
+        output.WriteRawTag(80);
+        output.WriteBool(CanFly);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -3401,6 +3461,14 @@ namespace Mmo.Proto.World {
         output.WriteRawTag(66);
         output.WriteString(DisplayName);
       }
+      if (Flying != false) {
+        output.WriteRawTag(72);
+        output.WriteBool(Flying);
+      }
+      if (CanFly != false) {
+        output.WriteRawTag(80);
+        output.WriteBool(CanFly);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3434,6 +3502,12 @@ namespace Mmo.Proto.World {
       }
       if (DisplayName.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(DisplayName);
+      }
+      if (Flying != false) {
+        size += 1 + 1;
+      }
+      if (CanFly != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -3470,6 +3544,12 @@ namespace Mmo.Proto.World {
       }
       if (other.DisplayName.Length != 0) {
         DisplayName = other.DisplayName;
+      }
+      if (other.Flying != false) {
+        Flying = other.Flying;
+      }
+      if (other.CanFly != false) {
+        CanFly = other.CanFly;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -3520,6 +3600,14 @@ namespace Mmo.Proto.World {
           }
           case 66: {
             DisplayName = input.ReadString();
+            break;
+          }
+          case 72: {
+            Flying = input.ReadBool();
+            break;
+          }
+          case 80: {
+            CanFly = input.ReadBool();
             break;
           }
         }
@@ -3573,6 +3661,14 @@ namespace Mmo.Proto.World {
             DisplayName = input.ReadString();
             break;
           }
+          case 72: {
+            Flying = input.ReadBool();
+            break;
+          }
+          case 80: {
+            CanFly = input.ReadBool();
+            break;
+          }
         }
       }
     }
@@ -3621,6 +3717,8 @@ namespace Mmo.Proto.World {
       syncHz_ = other.syncHz_;
       avatars_ = other.avatars_.Clone();
       selfCharacterId_ = other.selfCharacterId_;
+      selfFlying_ = other.selfFlying_;
+      selfCanFly_ = other.selfCanFly_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3701,6 +3799,30 @@ namespace Mmo.Proto.World {
       }
     }
 
+    /// <summary>Field number for the "self_flying" field.</summary>
+    public const int SelfFlyingFieldNumber = 7;
+    private bool selfFlying_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool SelfFlying {
+      get { return selfFlying_; }
+      set {
+        selfFlying_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "self_can_fly" field.</summary>
+    public const int SelfCanFlyFieldNumber = 8;
+    private bool selfCanFly_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool SelfCanFly {
+      get { return selfCanFly_; }
+      set {
+        selfCanFly_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -3722,6 +3844,8 @@ namespace Mmo.Proto.World {
       if (SyncHz != other.SyncHz) return false;
       if(!avatars_.Equals(other.avatars_)) return false;
       if (SelfCharacterId != other.SelfCharacterId) return false;
+      if (SelfFlying != other.SelfFlying) return false;
+      if (SelfCanFly != other.SelfCanFly) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3735,6 +3859,8 @@ namespace Mmo.Proto.World {
       if (SyncHz != 0) hash ^= SyncHz.GetHashCode();
       hash ^= avatars_.GetHashCode();
       if (SelfCharacterId != 0UL) hash ^= SelfCharacterId.GetHashCode();
+      if (SelfFlying != false) hash ^= SelfFlying.GetHashCode();
+      if (SelfCanFly != false) hash ^= SelfCanFly.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3774,6 +3900,14 @@ namespace Mmo.Proto.World {
         output.WriteRawTag(48);
         output.WriteUInt64(SelfCharacterId);
       }
+      if (SelfFlying != false) {
+        output.WriteRawTag(56);
+        output.WriteBool(SelfFlying);
+      }
+      if (SelfCanFly != false) {
+        output.WriteRawTag(64);
+        output.WriteBool(SelfCanFly);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -3805,6 +3939,14 @@ namespace Mmo.Proto.World {
         output.WriteRawTag(48);
         output.WriteUInt64(SelfCharacterId);
       }
+      if (SelfFlying != false) {
+        output.WriteRawTag(56);
+        output.WriteBool(SelfFlying);
+      }
+      if (SelfCanFly != false) {
+        output.WriteRawTag(64);
+        output.WriteBool(SelfCanFly);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3830,6 +3972,12 @@ namespace Mmo.Proto.World {
       size += avatars_.CalculateSize(_repeated_avatars_codec);
       if (SelfCharacterId != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(SelfCharacterId);
+      }
+      if (SelfFlying != false) {
+        size += 1 + 1;
+      }
+      if (SelfCanFly != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -3858,6 +4006,12 @@ namespace Mmo.Proto.World {
       avatars_.Add(other.avatars_);
       if (other.SelfCharacterId != 0UL) {
         SelfCharacterId = other.SelfCharacterId;
+      }
+      if (other.SelfFlying != false) {
+        SelfFlying = other.SelfFlying;
+      }
+      if (other.SelfCanFly != false) {
+        SelfCanFly = other.SelfCanFly;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -3902,6 +4056,14 @@ namespace Mmo.Proto.World {
             SelfCharacterId = input.ReadUInt64();
             break;
           }
+          case 56: {
+            SelfFlying = input.ReadBool();
+            break;
+          }
+          case 64: {
+            SelfCanFly = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -3943,6 +4105,14 @@ namespace Mmo.Proto.World {
           }
           case 48: {
             SelfCharacterId = input.ReadUInt64();
+            break;
+          }
+          case 56: {
+            SelfFlying = input.ReadBool();
+            break;
+          }
+          case 64: {
+            SelfCanFly = input.ReadBool();
             break;
           }
         }
@@ -5001,6 +5171,1405 @@ namespace Mmo.Proto.World {
           }
           case 80: {
             RespawnS = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 客户端只给「想不想飞」。账号由网关从令牌取，境界由世界服问角色服，
+  /// 两个值都不在这个请求里；塞 can_fly / realm / account 也不会被读。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class FlyRequest : pb::IMessage<FlyRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<FlyRequest> _parser = new pb::MessageParser<FlyRequest>(() => new FlyRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<FlyRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.World.WorldReflection.Descriptor.MessageTypes[15]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FlyRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FlyRequest(FlyRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      wantFly_ = other.wantFly_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FlyRequest Clone() {
+      return new FlyRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "want_fly" field.</summary>
+    public const int WantFlyFieldNumber = 3;
+    private bool wantFly_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool WantFly {
+      get { return wantFly_; }
+      set {
+        wantFly_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as FlyRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(FlyRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (WantFly != other.WantFly) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (WantFly != false) hash ^= WantFly.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (WantFly != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(WantFly);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (WantFly != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(WantFly);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (WantFly != false) {
+        size += 1 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(FlyRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.WantFly != false) {
+        WantFly = other.WantFly;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            WantFly = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            WantFly = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 权限不够时 ok=false，flying=false，y 是拉回后的地面高度（沿用 world.json 的 spawn_y）。
+  /// realm / required_realm 是只读展示，客户端不能提交，也不是判定依据。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class FlyResponse : pb::IMessage<FlyResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<FlyResponse> _parser = new pb::MessageParser<FlyResponse>(() => new FlyResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<FlyResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.World.WorldReflection.Descriptor.MessageTypes[16]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FlyResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FlyResponse(FlyResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      flying_ = other.flying_;
+      canFly_ = other.canFly_;
+      realm_ = other.realm_;
+      requiredRealm_ = other.requiredRealm_;
+      y_ = other.y_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FlyResponse Clone() {
+      return new FlyResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "flying" field.</summary>
+    public const int FlyingFieldNumber = 3;
+    private bool flying_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Flying {
+      get { return flying_; }
+      set {
+        flying_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "can_fly" field.</summary>
+    public const int CanFlyFieldNumber = 4;
+    private bool canFly_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool CanFly {
+      get { return canFly_; }
+      set {
+        canFly_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "realm" field.</summary>
+    public const int RealmFieldNumber = 5;
+    private string realm_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Realm {
+      get { return realm_; }
+      set {
+        realm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "required_realm" field.</summary>
+    public const int RequiredRealmFieldNumber = 6;
+    private string requiredRealm_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string RequiredRealm {
+      get { return requiredRealm_; }
+      set {
+        requiredRealm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "y" field.</summary>
+    public const int YFieldNumber = 7;
+    private float y_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Y {
+      get { return y_; }
+      set {
+        y_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as FlyResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(FlyResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (Flying != other.Flying) return false;
+      if (CanFly != other.CanFly) return false;
+      if (Realm != other.Realm) return false;
+      if (RequiredRealm != other.RequiredRealm) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (Flying != false) hash ^= Flying.GetHashCode();
+      if (CanFly != false) hash ^= CanFly.GetHashCode();
+      if (Realm.Length != 0) hash ^= Realm.GetHashCode();
+      if (RequiredRealm.Length != 0) hash ^= RequiredRealm.GetHashCode();
+      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Flying != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Flying);
+      }
+      if (CanFly != false) {
+        output.WriteRawTag(32);
+        output.WriteBool(CanFly);
+      }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(Realm);
+      }
+      if (RequiredRealm.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(RequiredRealm);
+      }
+      if (Y != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(Y);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Flying != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Flying);
+      }
+      if (CanFly != false) {
+        output.WriteRawTag(32);
+        output.WriteBool(CanFly);
+      }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(Realm);
+      }
+      if (RequiredRealm.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(RequiredRealm);
+      }
+      if (Y != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(Y);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (Flying != false) {
+        size += 1 + 1;
+      }
+      if (CanFly != false) {
+        size += 1 + 1;
+      }
+      if (Realm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Realm);
+      }
+      if (RequiredRealm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(RequiredRealm);
+      }
+      if (Y != 0F) {
+        size += 1 + 4;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(FlyResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.Flying != false) {
+        Flying = other.Flying;
+      }
+      if (other.CanFly != false) {
+        CanFly = other.CanFly;
+      }
+      if (other.Realm.Length != 0) {
+        Realm = other.Realm;
+      }
+      if (other.RequiredRealm.Length != 0) {
+        RequiredRealm = other.RequiredRealm;
+      }
+      if (other.Y != 0F) {
+        Y = other.Y;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Flying = input.ReadBool();
+            break;
+          }
+          case 32: {
+            CanFly = input.ReadBool();
+            break;
+          }
+          case 42: {
+            Realm = input.ReadString();
+            break;
+          }
+          case 50: {
+            RequiredRealm = input.ReadString();
+            break;
+          }
+          case 61: {
+            Y = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Flying = input.ReadBool();
+            break;
+          }
+          case 32: {
+            CanFly = input.ReadBool();
+            break;
+          }
+          case 42: {
+            Realm = input.ReadString();
+            break;
+          }
+          case 50: {
+            RequiredRealm = input.ReadString();
+            break;
+          }
+          case 61: {
+            Y = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 跨区只给目标地点编号。当前区域由 LineRegistry 的分线注册表给，
+  /// 相连关系、是否开放与境界门槛都由世界服从配置读，客户端带不进。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class CrossRegionRequest : pb::IMessage<CrossRegionRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CrossRegionRequest> _parser = new pb::MessageParser<CrossRegionRequest>(() => new CrossRegionRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CrossRegionRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.World.WorldReflection.Descriptor.MessageTypes[17]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrossRegionRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrossRegionRequest(CrossRegionRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      targetRegion_ = other.targetRegion_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrossRegionRequest Clone() {
+      return new CrossRegionRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "target_region" field.</summary>
+    public const int TargetRegionFieldNumber = 3;
+    private string targetRegion_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TargetRegion {
+      get { return targetRegion_; }
+      set {
+        targetRegion_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CrossRegionRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CrossRegionRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (TargetRegion != other.TargetRegion) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (TargetRegion.Length != 0) hash ^= TargetRegion.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (TargetRegion.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TargetRegion);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (TargetRegion.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TargetRegion);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (TargetRegion.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TargetRegion);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CrossRegionRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.TargetRegion.Length != 0) {
+        TargetRegion = other.TargetRegion;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            TargetRegion = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            TargetRegion = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 被拉回时 region_id 是原来那块地表，line_id 是原来那条分线，都没变。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class CrossRegionResponse : pb::IMessage<CrossRegionResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CrossRegionResponse> _parser = new pb::MessageParser<CrossRegionResponse>(() => new CrossRegionResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CrossRegionResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.World.WorldReflection.Descriptor.MessageTypes[18]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrossRegionResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrossRegionResponse(CrossRegionResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      regionId_ = other.regionId_;
+      lineId_ = other.lineId_;
+      lineNo_ = other.lineNo_;
+      realm_ = other.realm_;
+      requiredRealm_ = other.requiredRealm_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrossRegionResponse Clone() {
+      return new CrossRegionResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "region_id" field.</summary>
+    public const int RegionIdFieldNumber = 3;
+    private string regionId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string RegionId {
+      get { return regionId_; }
+      set {
+        regionId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "line_id" field.</summary>
+    public const int LineIdFieldNumber = 4;
+    private string lineId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string LineId {
+      get { return lineId_; }
+      set {
+        lineId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "line_no" field.</summary>
+    public const int LineNoFieldNumber = 5;
+    private uint lineNo_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint LineNo {
+      get { return lineNo_; }
+      set {
+        lineNo_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "realm" field.</summary>
+    public const int RealmFieldNumber = 6;
+    private string realm_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Realm {
+      get { return realm_; }
+      set {
+        realm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "required_realm" field.</summary>
+    public const int RequiredRealmFieldNumber = 7;
+    private string requiredRealm_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string RequiredRealm {
+      get { return requiredRealm_; }
+      set {
+        requiredRealm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CrossRegionResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CrossRegionResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (RegionId != other.RegionId) return false;
+      if (LineId != other.LineId) return false;
+      if (LineNo != other.LineNo) return false;
+      if (Realm != other.Realm) return false;
+      if (RequiredRealm != other.RequiredRealm) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (RegionId.Length != 0) hash ^= RegionId.GetHashCode();
+      if (LineId.Length != 0) hash ^= LineId.GetHashCode();
+      if (LineNo != 0) hash ^= LineNo.GetHashCode();
+      if (Realm.Length != 0) hash ^= Realm.GetHashCode();
+      if (RequiredRealm.Length != 0) hash ^= RequiredRealm.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (RegionId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(RegionId);
+      }
+      if (LineId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(LineId);
+      }
+      if (LineNo != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(LineNo);
+      }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Realm);
+      }
+      if (RequiredRealm.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(RequiredRealm);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (RegionId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(RegionId);
+      }
+      if (LineId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(LineId);
+      }
+      if (LineNo != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(LineNo);
+      }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Realm);
+      }
+      if (RequiredRealm.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(RequiredRealm);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (RegionId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(RegionId);
+      }
+      if (LineId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(LineId);
+      }
+      if (LineNo != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(LineNo);
+      }
+      if (Realm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Realm);
+      }
+      if (RequiredRealm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(RequiredRealm);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CrossRegionResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.RegionId.Length != 0) {
+        RegionId = other.RegionId;
+      }
+      if (other.LineId.Length != 0) {
+        LineId = other.LineId;
+      }
+      if (other.LineNo != 0) {
+        LineNo = other.LineNo;
+      }
+      if (other.Realm.Length != 0) {
+        Realm = other.Realm;
+      }
+      if (other.RequiredRealm.Length != 0) {
+        RequiredRealm = other.RequiredRealm;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            RegionId = input.ReadString();
+            break;
+          }
+          case 34: {
+            LineId = input.ReadString();
+            break;
+          }
+          case 40: {
+            LineNo = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            Realm = input.ReadString();
+            break;
+          }
+          case 58: {
+            RequiredRealm = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            RegionId = input.ReadString();
+            break;
+          }
+          case 34: {
+            LineId = input.ReadString();
+            break;
+          }
+          case 40: {
+            LineNo = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            Realm = input.ReadString();
+            break;
+          }
+          case 58: {
+            RequiredRealm = input.ReadString();
             break;
           }
         }

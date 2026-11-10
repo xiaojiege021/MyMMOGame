@@ -4,10 +4,12 @@ using World;
 // 配置路径可以指到别处，核对脚本用临时配置跑，不碰仓库里那份。
 var configPath = "config/world.json";
 var gatherConfigPath = "config/gather.json";
+var flightConfigPath = "config/flight.json";
 var regionState = false;
 var positionState = false;
 var tierState = false;
 var gatherState = false;
+var flightState = false;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -23,6 +25,14 @@ for (var i = 0; i < args.Length; i++)
         // 只给核对用：把读表后的节点与产物打出来，不启动进程。
         case "--gather-state":
             gatherState = true;
+            break;
+        // 飞行与跨区门槛单独一份，核对脚本用临时配置跑，不碰仓库里那份。
+        case "--flight-config" when i + 1 < args.Length:
+            flightConfigPath = args[++i];
+            break;
+        // 只给核对用：把读表后的境界顺序与门槛打出来，不启动进程。
+        case "--flight-state":
+            flightState = true;
             break;
         // 只给核对用：把读表后的地点与人物编号打出来，不启动进程。
         case "--region-state":
@@ -67,6 +77,42 @@ if (gatherState)
         + " herb=" + herb.ItemId + ":" + herb.Count
         + " respawn_s=" + ore.RespawnSeconds
         + " forbidden=" + table.Nodes.Count(n => n.Kind == GatherTable.SpiritStone));
+    return 0;
+}
+
+if (flightState)
+{
+    FlightTable table;
+    try
+    {
+        // 与启动同一套校验：门槛表必须覆盖 world.json 的每一块地表，
+        // 漏一块就等于给它开零门槛，只读入口也要挡住。
+        var worldConfig = WorldConfig.Load(configPath);
+        var catalog = WorldCatalog.Load(worldConfig);
+        table = FlightTable.Load(
+            flightConfigPath,
+            catalog.Regions.Select(r => r.Id).ToHashSet(StringComparer.Ordinal));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    Console.WriteLine("flight_state=ok realms=" + string.Join(",", table.Realms)
+        + " flight_realm=" + table.FlightRealm
+        + " gates=" + table.Gates.Count);
+    // 门槛逐块打出来，核对脚本按「地点 + 境界」比对，不在代码里写第二套数字。
+    foreach (var gate in table.Gates.OrderBy(g => g.Key, StringComparer.Ordinal))
+    {
+        Console.WriteLine("flight_gate=ok region=" + gate.Key + " realm=" + gate.Value);
+    }
+
     return 0;
 }
 
@@ -174,4 +220,4 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
     stop.Cancel();
 });
 
-return await new WorldProcess(configPath, gatherConfigPath).RunAsync(stop.Token);
+return await new WorldProcess(configPath, gatherConfigPath, flightConfigPath).RunAsync(stop.Token);

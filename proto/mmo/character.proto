@@ -254,6 +254,9 @@ message ListInventoryResponse {
   // 只读：角色服从角色表读出的名字，供表世界「再远只留名字」的名字牌使用。
   // 网关复核归属时取，客户端不能通过请求体改它。
   string character_name = 3;
+  // 只读：角色表当前的境界。世界服判飞行与跨区时来问，只在这一段服与服之间传，
+  // 客户端请求体带不进，也没有任何写入接口（突破在后面的卡）。
+  string realm = 4;
 }
 
 message CanTradeRequest {

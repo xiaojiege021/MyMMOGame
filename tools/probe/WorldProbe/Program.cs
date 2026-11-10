@@ -39,6 +39,7 @@ internal static class Program
                 "tier_stages" => await CaseTierStagesAsync(),
                 "tier_spoof" => await CaseTierSpoofAsync(),
                 "tier_isolate" => await CaseTierIsolateAsync(),
+                "flight_frame" => await CaseFlightFrameAsync(),
                 _ => Fail("unknown_case=" + name),
             };
         }
@@ -53,6 +54,65 @@ internal static class Program
 
     static async Task<WorldSession> ConnectAsync(string label, string token, ulong characterId) =>
         await WorldSession.ConnectAsync(Url(token, characterId), label);
+
+    /// <summary>
+    /// P1-3c：没飞行权限的人不能靠改包在上报帧里塞一个高 y 把自己抬起来。
+    /// 服务端按 flight_forbidden 拉回，别人看到的仍是地面坐标与 flying=false；
+    /// 顺带核对技术架构第 4 节写定的 flying / can_fly 少量状态确实随快照下发。
+    /// </summary>
+    static async Task<int> CaseFlightFrameAsync()
+    {
+        var a = ArgUlong("--char-a");
+        var b = ArgUlong("--char-b");
+        await using var sessionA = await ConnectAsync("a", Arg("--token-a"), a);
+        await using var sessionB = await ConnectAsync("b", Arg("--token-b"), b);
+        if (await sessionA.SnapshotAsync(_ => true, 4000) is null
+            || await sessionB.SnapshotAsync(_ => true, 4000) is null)
+        {
+            return Fail("flight_frame=fail stream_open");
+        }
+
+        // 绕开 /world/fly，直接在上报帧里报一个高 y。
+        await sessionA.SendAsync(0, 5f, 0, 0, 41);
+        var rejected = await sessionA.RejectedAsync("flight_forbidden", 4000);
+
+        // B 这一秒里的快照都得是地面：不许出现「自己飞起来了别人也看到」。
+        var peerY = -1f;
+        var peerFlying = false;
+        var peerCanFly = false;
+        var seen = 0;
+        var end = Environment.TickCount64 + 700;
+        while (Environment.TickCount64 < end)
+        {
+            var frame = await sessionB.ReadAsync((int)Math.Max(1, end - Environment.TickCount64));
+            if (frame?.Snapshot is not { } snapshot)
+            {
+                continue;
+            }
+
+            foreach (var avatar in snapshot.Avatars)
+            {
+                if (avatar.CharacterId != a)
+                {
+                    continue;
+                }
+
+                peerY = Math.Max(peerY, avatar.Y);
+                peerFlying |= avatar.Flying;
+                peerCanFly |= avatar.CanFly;
+                seen++;
+            }
+        }
+
+        var ok = rejected is not null && seen > 0 && peerY == 0f
+                 && !peerFlying && !peerCanFly;
+        return ok
+            ? Ok("flight_frame=ok rejected=1 peer_y=" + peerY
+                 + " flying=false can_fly=false samples=" + seen)
+            : Fail("flight_frame=fail rejected=" + (rejected is not null)
+                   + " peer_y=" + peerY + " flying=" + peerFlying
+                   + " can_fly=" + peerCanFly + " samples=" + seen);
+    }
 
     static async Task<int> CaseStreamAsync()
     {

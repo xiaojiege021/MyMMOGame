@@ -248,11 +248,14 @@ public sealed class CharacterGrpcService(
         }
 
         // 名字牌文本也在这里读：同一份归属条件下取角色名，网关拿不到别人的名字。
+        // 境界同样是只读的，世界服判飞行与跨区时来问；客户端提交不了这个值。
         var displayName = await inventory.DisplayNameAsync(account, characterId, context.CancellationToken);
+        var realm = await inventory.RealmAsync(account, characterId, context.CancellationToken);
         var response = new ListInventoryResponse
         {
             BagSlots = (uint)config.BagSlots,
             CharacterName = displayName ?? "",
+            Realm = realm ?? "",
         };
         foreach (var slot in await inventory.ListAsync(characterId, context.CancellationToken))
         {

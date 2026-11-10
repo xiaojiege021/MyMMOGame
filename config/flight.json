@@ -1,0 +1,46 @@
+{
+  "schema": "world-flight/1",
+  "version": 1,
+  "note": "方案 02 与 8.1 写定：境界决定能去地表的哪些地方，飞行只由境界打开，没有飞行权限时拖尾也不让人飞；首发三段大境界是炼体、筑基、结丹，顺序照方案 8.1，不另起名字。方案没写定「哪一段能飞」和「每块地表要哪一段境界」，flight_realm 与 region_realms 的数值待定，只在这份配置里记一次，代码里不给兜底。地面高度不另写一套数字，沿用 config/world.json 的 spawn_y；移动速度上限也仍是 world.json 的 max_move_speed，飞行不另开速度。旧天城区与焦原的 open=false 是方案 2.5「第 11 场才开」的主线开放，由 config/region/ 管，本表只加境界门槛，不改剧情进度与立仙/立魔分路。缺字段、门槛境界不在顺序表里、区域编号不存在或漏配区域，世界服都起不来。",
+  "character_upstream": "http://127.0.0.1:62000",
+  "realms": [
+    "炼体",
+    "筑基",
+    "结丹"
+  ],
+  "flight_realm": "筑基",
+  "region_realms": [
+    {
+      "region_id": "枯岚道",
+      "realm": "炼体"
+    },
+    {
+      "region_id": "承露门",
+      "realm": "炼体"
+    },
+    {
+      "region_id": "听谣镇",
+      "realm": "炼体"
+    },
+    {
+      "region_id": "外环隙",
+      "realm": "炼体"
+    },
+    {
+      "region_id": "栖云城",
+      "realm": "炼体"
+    },
+    {
+      "region_id": "旧天城区",
+      "realm": "结丹"
+    },
+    {
+      "region_id": "焦原",
+      "realm": "结丹"
+    },
+    {
+      "region_id": "龙巢门口",
+      "realm": "结丹"
+    }
+  ]
+}

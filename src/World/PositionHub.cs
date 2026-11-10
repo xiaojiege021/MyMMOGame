@@ -109,6 +109,9 @@ public sealed class PositionHub(LineRegistry registry, WorldConfig config, Appea
                 // 名单仍是同一分线的全量，不按距离删人（AOI 不在这张卡）。
                 var self = line.Members.FirstOrDefault(
                     m => m.CharacterId == subscription.CharacterId);
+                // 自己这份飞行状态也随快照回，客户端不自行猜权限。
+                snapshot.SelfFlying = self?.Flying ?? false;
+                snapshot.SelfCanFly = self?.CanFly ?? false;
                 foreach (var avatar in line.Members)
                 {
                     if (avatar.CharacterId == subscription.CharacterId)
@@ -137,5 +140,7 @@ public sealed class PositionHub(LineRegistry registry, WorldConfig config, Appea
         Seq = state.Seq,
         AppearanceTier = tier,
         DisplayName = state.DisplayName,
+        Flying = state.Flying,
+        CanFly = state.CanFly,
     };
 }

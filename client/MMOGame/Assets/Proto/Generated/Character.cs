@@ -78,34 +78,34 @@ namespace Mmo.Proto.Character {
             "GAUgASgFIkwKDUludmVudG9yeVNsb3QSDAoEc2xvdBgBIAEoDRIPCgdpdGVt",
             "X2lkGAIgASgJEg0KBWNvdW50GAMgASgFEg0KBWJvdW5kGAQgASgIIj0KFExp",
             "c3RJbnZlbnRvcnlSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFj",
-            "dGVyX2lkGAIgASgEIm8KFUxpc3RJbnZlbnRvcnlSZXNwb25zZRIrCgVzbG90",
+            "dGVyX2lkGAIgASgEIn4KFUxpc3RJbnZlbnRvcnlSZXNwb25zZRIrCgVzbG90",
             "cxgBIAMoCzIcLm1tby5jaGFyYWN0ZXIuSW52ZW50b3J5U2xvdBIRCgliYWdf",
-            "c2xvdHMYAiABKA0SFgoOY2hhcmFjdGVyX25hbWUYAyABKAkiRgoPQ2FuVHJh",
-            "ZGVSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIg",
-            "ASgEEgwKBHNsb3QYAyABKA0iNAoQQ2FuVHJhZGVSZXNwb25zZRIQCgh0cmFk",
-            "YWJsZRgBIAEoCBIOCgZyZWFzb24YAiABKAkyrwcKEENoYXJhY3RlclNlcnZp",
-            "Y2USYAoPQ3JlYXRlQ2hhcmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVD",
-            "aGFyYWN0ZXJSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0",
-            "ZXJSZXNwb25zZRJLCghTZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2",
-            "ZWxSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYK",
-            "B0FkZEl0ZW0SHS5tbW8uY2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1v",
-            "LmNoYXJhY3Rlci5JbnZlbnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5t",
-            "bW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJh",
-            "Y3Rlci5MaXN0SW52ZW50b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8u",
-            "Y2hhcmFjdGVyLkNhblRyYWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2Fu",
-            "VHJhZGVSZXNwb25zZRJQCgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIu",
-            "QWRkQ3VycmVuY3lSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJh",
-            "bGFuY2USVAoLR2V0Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJl",
-            "bmN5UmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25z",
-            "ZRJRCgpBcHBseUdyYW50EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVx",
-            "dWVzdBohLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVu",
-            "dGVyRHVuZ2VvbhIiLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVz",
-            "dBojLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNl",
-            "SG90U3ByaW5nEiIubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0",
-            "GiMubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0",
-            "bGVFeHASHy5tbW8uY2hhcmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8u",
-            "Y2hhcmFjdGVyLlNldHRsZUV4cFJlc3BvbnNlQhaqAhNNbW8uUHJvdG8uQ2hh",
-            "cmFjdGVyYgZwcm90bzM="));
+            "c2xvdHMYAiABKA0SFgoOY2hhcmFjdGVyX25hbWUYAyABKAkSDQoFcmVhbG0Y",
+            "BCABKAkiRgoPQ2FuVHJhZGVSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoM",
+            "Y2hhcmFjdGVyX2lkGAIgASgEEgwKBHNsb3QYAyABKA0iNAoQQ2FuVHJhZGVS",
+            "ZXNwb25zZRIQCgh0cmFkYWJsZRgBIAEoCBIOCgZyZWFzb24YAiABKAkyrwcK",
+            "EENoYXJhY3RlclNlcnZpY2USYAoPQ3JlYXRlQ2hhcmFjdGVyEiUubW1vLmNo",
+            "YXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXF1ZXN0GiYubW1vLmNoYXJhY3Rl",
+            "ci5DcmVhdGVDaGFyYWN0ZXJSZXNwb25zZRJLCghTZXRMZXZlbBIeLm1tby5j",
+            "aGFyYWN0ZXIuU2V0TGV2ZWxSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5TZXRM",
+            "ZXZlbFJlc3BvbnNlEkYKB0FkZEl0ZW0SHS5tbW8uY2hhcmFjdGVyLkFkZEl0",
+            "ZW1SZXF1ZXN0GhwubW1vLmNoYXJhY3Rlci5JbnZlbnRvcnlTbG90EloKDUxp",
+            "c3RJbnZlbnRvcnkSIy5tbW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXF1",
+            "ZXN0GiQubW1vLmNoYXJhY3Rlci5MaXN0SW52ZW50b3J5UmVzcG9uc2USSwoI",
+            "Q2FuVHJhZGUSHi5tbW8uY2hhcmFjdGVyLkNhblRyYWRlUmVxdWVzdBofLm1t",
+            "by5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXNwb25zZRJQCgtBZGRDdXJyZW5jeRIh",
+            "Lm1tby5jaGFyYWN0ZXIuQWRkQ3VycmVuY3lSZXF1ZXN0Gh4ubW1vLmNoYXJh",
+            "Y3Rlci5DdXJyZW5jeUJhbGFuY2USVAoLR2V0Q3VycmVuY3kSIS5tbW8uY2hh",
+            "cmFjdGVyLkdldEN1cnJlbmN5UmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuR2V0",
+            "Q3VycmVuY3lSZXNwb25zZRJRCgpBcHBseUdyYW50EiAubW1vLmNoYXJhY3Rl",
+            "ci5BcHBseUdyYW50UmVxdWVzdBohLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFu",
+            "dFJlc3BvbnNlElcKDEVudGVyRHVuZ2VvbhIiLm1tby5jaGFyYWN0ZXIuRW50",
+            "ZXJEdW5nZW9uUmVxdWVzdBojLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9u",
+            "UmVzcG9uc2USVwoMVXNlSG90U3ByaW5nEiIubW1vLmNoYXJhY3Rlci5Vc2VI",
+            "b3RTcHJpbmdSZXF1ZXN0GiMubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdS",
+            "ZXNwb25zZRJOCglTZXR0bGVFeHASHy5tbW8uY2hhcmFjdGVyLlNldHRsZUV4",
+            "cFJlcXVlc3QaIC5tbW8uY2hhcmFjdGVyLlNldHRsZUV4cFJlc3BvbnNlQhaq",
+            "AhNNbW8uUHJvdG8uQ2hhcmFjdGVyYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -131,7 +131,7 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AddItemRequest), global::Mmo.Proto.Character.AddItemRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "ItemId", "Count" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.InventorySlot), global::Mmo.Proto.Character.InventorySlot.Parser, new[]{ "Slot", "ItemId", "Count", "Bound" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ListInventoryRequest), global::Mmo.Proto.Character.ListInventoryRequest.Parser, new[]{ "Account", "CharacterId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ListInventoryResponse), global::Mmo.Proto.Character.ListInventoryResponse.Parser, new[]{ "Slots", "BagSlots", "CharacterName" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ListInventoryResponse), global::Mmo.Proto.Character.ListInventoryResponse.Parser, new[]{ "Slots", "BagSlots", "CharacterName", "Realm" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanTradeRequest), global::Mmo.Proto.Character.CanTradeRequest.Parser, new[]{ "Account", "CharacterId", "Slot" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanTradeResponse), global::Mmo.Proto.Character.CanTradeResponse.Parser, new[]{ "Tradable", "Reason" }, null, null, null, null)
           }));
@@ -7350,6 +7350,7 @@ namespace Mmo.Proto.Character {
       slots_ = other.slots_.Clone();
       bagSlots_ = other.bagSlots_;
       characterName_ = other.characterName_;
+      realm_ = other.realm_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -7398,6 +7399,22 @@ namespace Mmo.Proto.Character {
       }
     }
 
+    /// <summary>Field number for the "realm" field.</summary>
+    public const int RealmFieldNumber = 4;
+    private string realm_ = "";
+    /// <summary>
+    /// 只读：角色表当前的境界。世界服判飞行与跨区时来问，只在这一段服与服之间传，
+    /// 客户端请求体带不进，也没有任何写入接口（突破在后面的卡）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Realm {
+      get { return realm_; }
+      set {
+        realm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -7416,6 +7433,7 @@ namespace Mmo.Proto.Character {
       if(!slots_.Equals(other.slots_)) return false;
       if (BagSlots != other.BagSlots) return false;
       if (CharacterName != other.CharacterName) return false;
+      if (Realm != other.Realm) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -7426,6 +7444,7 @@ namespace Mmo.Proto.Character {
       hash ^= slots_.GetHashCode();
       if (BagSlots != 0) hash ^= BagSlots.GetHashCode();
       if (CharacterName.Length != 0) hash ^= CharacterName.GetHashCode();
+      if (Realm.Length != 0) hash ^= Realm.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -7453,6 +7472,10 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(26);
         output.WriteString(CharacterName);
       }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Realm);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -7472,6 +7495,10 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(26);
         output.WriteString(CharacterName);
       }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Realm);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -7488,6 +7515,9 @@ namespace Mmo.Proto.Character {
       }
       if (CharacterName.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterName);
+      }
+      if (Realm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Realm);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -7507,6 +7537,9 @@ namespace Mmo.Proto.Character {
       }
       if (other.CharacterName.Length != 0) {
         CharacterName = other.CharacterName;
+      }
+      if (other.Realm.Length != 0) {
+        Realm = other.Realm;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -7539,6 +7572,10 @@ namespace Mmo.Proto.Character {
             CharacterName = input.ReadString();
             break;
           }
+          case 34: {
+            Realm = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -7568,6 +7605,10 @@ namespace Mmo.Proto.Character {
           }
           case 26: {
             CharacterName = input.ReadString();
+            break;
+          }
+          case 34: {
+            Realm = input.ReadString();
             break;
           }
         }
