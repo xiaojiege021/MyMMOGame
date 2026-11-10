@@ -7,7 +7,7 @@ namespace World;
 /// 客户端上报多快都不改推送频率；同一条分线里的人才互相出现在快照里。
 /// 位置只活在这张表和 LineRegistry 的进程内存里，不落库。
 /// </summary>
-public sealed class PositionHub(LineRegistry registry, WorldConfig config)
+public sealed class PositionHub(LineRegistry registry, WorldConfig config, AppearanceTierTable tiers)
 {
     readonly object gate = new();
     readonly Dictionary<long, PositionSubscription> subscriptions = new();
@@ -56,7 +56,7 @@ public sealed class PositionHub(LineRegistry registry, WorldConfig config)
             };
             if (result.Corrected is { } corrected)
             {
-                frame.Rejected.Corrected = ToProto(corrected);
+                frame.Rejected.Corrected = ToProto(corrected, AppearanceTier.Unspecified);
             }
 
             subscription.Frames.Writer.TryWrite(frame);
@@ -105,12 +105,21 @@ public sealed class PositionHub(LineRegistry registry, WorldConfig config)
 
             if (line is not null)
             {
+                // 档位按「看的人」到「被看的人」的距离算，同一帧里每个人可能不一样。
+                // 名单仍是同一分线的全量，不按距离删人（AOI 不在这张卡）。
+                var self = line.Members.FirstOrDefault(
+                    m => m.CharacterId == subscription.CharacterId);
                 foreach (var avatar in line.Members)
                 {
-                    if (avatar.CharacterId != subscription.CharacterId)
+                    if (avatar.CharacterId == subscription.CharacterId)
                     {
-                        snapshot.Avatars.Add(ToProto(avatar));
+                        continue;
                     }
+
+                    var tier = self is null
+                        ? AppearanceTier.Full
+                        : tiers.For(self, avatar);
+                    snapshot.Avatars.Add(ToProto(avatar, tier));
                 }
             }
 
@@ -118,7 +127,7 @@ public sealed class PositionHub(LineRegistry registry, WorldConfig config)
         }
     }
 
-    public static AvatarPosition ToProto(AvatarState state) => new()
+    public static AvatarPosition ToProto(AvatarState state, AppearanceTier tier) => new()
     {
         CharacterId = state.CharacterId,
         X = state.X,
@@ -126,5 +135,7 @@ public sealed class PositionHub(LineRegistry registry, WorldConfig config)
         Z = state.Z,
         Facing = state.Facing,
         Seq = state.Seq,
+        AppearanceTier = tier,
+        DisplayName = state.DisplayName,
     };
 }

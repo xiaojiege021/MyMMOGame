@@ -22,7 +22,8 @@ public sealed class WorldGrpcService(LineRegistry registry, WorldCatalog catalog
             throw new RpcException(new Status(StatusCode.InvalidArgument, "bad_request"));
         }
 
-        var result = registry.Enter(account, request.CharacterId, regionId);
+        // 名字是网关复核归属后从角色服取的只读文本，客户端请求体里没有这个字段。
+        var result = registry.Enter(account, request.CharacterId, regionId, request.DisplayName);
         Console.WriteLine("world_enter account=" + account
             + " character=" + request.CharacterId
             + " region=" + regionId

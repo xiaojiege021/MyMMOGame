@@ -36,6 +36,9 @@ internal static class Program
                 "speed" => await CaseSpeedAsync(),
                 "leave" => await CaseLeaveAsync(),
                 "no_line" => await CaseNoLineAsync(),
+                "tier_stages" => await CaseTierStagesAsync(),
+                "tier_spoof" => await CaseTierSpoofAsync(),
+                "tier_isolate" => await CaseTierIsolateAsync(),
                 _ => Fail("unknown_case=" + name),
             };
         }
@@ -280,6 +283,165 @@ internal static class Program
             : Fail("no_line=fail snapshot=" + (snapshot is not null) + " completed=" + session.Completed);
     }
 
+    /// <summary>
+    /// 同屏三档：A 从 B 身边按固定坐标走远，B 每个阶段看到的档位应与期望一致。
+    /// 阶段坐标由核对脚本给定，改配置重启后同一段距离的档位会变。
+    /// </summary>
+    static async Task<int> CaseTierStagesAsync()
+    {
+        var a = ArgUlong("--char-a");
+        var b = ArgUlong("--char-b");
+        var expectedName = Arg("--name-a", "");
+        var stages = Arg("--stage-x", "0,3.5,6").Split(',')
+            .Select(v => float.Parse(v, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+        var expect = Arg("--expect", "1,2,3").Split(',').Select(int.Parse).ToArray();
+        if (stages.Length != expect.Length)
+        {
+            return Fail("tier_stages=fail stages_and_expect_mismatch");
+        }
+
+        await using var sessionA = await ConnectAsync("a", Arg("--token-a"), a);
+        await using var sessionB = await ConnectAsync("b", Arg("--token-b"), b);
+        if (await sessionA.SnapshotAsync(_ => true, 4000) is null
+            || await sessionB.SnapshotAsync(_ => true, 4000) is null)
+        {
+            return Fail("tier_stages=fail stream_open");
+        }
+
+        // 前面的用例可能把 A 留在别处：先小步走回原点，让三档阈值只由配置决定。
+        var first = await sessionB.SnapshotAsync(_ => true, 4000);
+        var from = first?.Avatars.FirstOrDefault(v => v.CharacterId == a)?.X ?? 0f;
+        var seen = new List<int>();
+        var namesOk = true;
+        var current = 0f;
+        ulong seq = 1;
+        while (Math.Abs(from) > 0.001f)
+        {
+            var back = (float)Math.Min(0.5, Math.Abs(from));
+            from -= Math.Sign(from) * back;
+            await sessionA.SendAsync(from, 0, 0, 0, seq++);
+            await Task.Delay(180);
+        }
+
+        foreach (var target in stages)
+        {
+            // 服务端按 5–10Hz 判瞬时速度，这里小步慢走，别撞上 speed_limit。
+            while (current < target - 0.001f)
+            {
+                current += Math.Min(0.5f, target - current);
+                await sessionA.SendAsync(current, 0, 0, 0, seq++);
+                await Task.Delay(180);
+            }
+
+            var snapshot = await sessionB.SnapshotAsync(s =>
+            {
+                var peer = s.Avatars.FirstOrDefault(v => v.CharacterId == a);
+                return peer is not null && peer.X >= target - 0.01f;
+            }, 6000);
+            var avatar = snapshot?.Avatars.FirstOrDefault(v => v.CharacterId == a);
+            if (avatar is null)
+            {
+                return Fail("tier_stages=fail no_avatar_at=" + target);
+            }
+
+            seen.Add((int)avatar.AppearanceTier);
+            if (expectedName.Length > 0 && avatar.DisplayName != expectedName)
+            {
+                namesOk = false;
+            }
+
+            // 仍推同分线全量名单，不按距离删人；自己不出现在自己的快照里。
+            if (snapshot!.Avatars.Any(v => v.CharacterId == b))
+            {
+                return Fail("tier_stages=fail self_in_snapshot");
+            }
+        }
+
+        var ok = seen.SequenceEqual(expect) && namesOk;
+        return ok
+            ? Ok("tier_stages=ok seen=" + string.Join(",", seen)
+                 + " expect=" + string.Join(",", expect) + " name=" + namesOk)
+            : Fail("tier_stages=fail seen=" + string.Join(",", seen)
+                   + " expect=" + string.Join(",", expect) + " name=" + namesOk);
+    }
+
+    /// <summary>
+    /// 改包：在上报帧里塞一个伪造的档位字段与名字字段（proto 未定义的未知字段）。
+    /// 网关与世界服只认 PositionReport 的五个字段，别人看到的档位仍按距离算、
+    /// 名字仍是角色服给的那一份。
+    /// </summary>
+    static async Task<int> CaseTierSpoofAsync()
+    {
+        var a = ArgUlong("--char-a");
+        var b = ArgUlong("--char-b");
+        var expectedName = Arg("--name-a", "");
+        await using var sessionA = await ConnectAsync("a", Arg("--token-a"), a);
+        await using var sessionB = await ConnectAsync("b", Arg("--token-b"), b);
+        if (await sessionA.SnapshotAsync(_ => true, 4000) is null
+            || await sessionB.SnapshotAsync(_ => true, 4000) is null)
+        {
+            return Fail("tier_spoof=fail stream_open");
+        }
+
+        // WorldClientFrame { PositionReport { ... } }，内层尾部追加两个未知字段：
+        // field 9 varint 3（伪装成 NAME 档）、field 10 string "hacked"（伪装名字）。
+        var inner = new PositionReport { X = 0, Y = 0, Z = 0, Facing = 0, Seq = 99 }
+            .ToByteArray().ToList();
+        inner.Add(0x48);
+        inner.Add(0x03);
+        var forged = Encoding.UTF8.GetBytes("hacked");
+        inner.Add(0x52);
+        inner.Add((byte)forged.Length);
+        inner.AddRange(forged);
+        var outer = new List<byte> { 0x0A, (byte)inner.Count };
+        outer.AddRange(inner);
+        await sessionA.SendRawAsync(outer.ToArray());
+
+        var snapshot = await sessionB.SnapshotAsync(
+            s => s.Avatars.Any(v => v.CharacterId == a && v.Seq >= 99), 6000);
+        var avatar = snapshot?.Avatars.FirstOrDefault(v => v.CharacterId == a);
+        var tierOk = avatar is not null && avatar.AppearanceTier == AppearanceTier.Full;
+        var nameOk = avatar is not null && avatar.DisplayName == expectedName
+                     && snapshot!.Avatars.All(v => v.DisplayName != "hacked");
+        return tierOk && nameOk
+            ? Ok("tier_spoof=ok tier=" + (avatar?.AppearanceTier.ToString() ?? "?")
+                 + " name=" + (avatar?.DisplayName ?? ""))
+            : Fail("tier_spoof=fail tier=" + (avatar?.AppearanceTier.ToString() ?? "?")
+                   + " name=" + (avatar?.DisplayName ?? "") + " want=" + expectedName);
+    }
+
+    /// <summary>分线隔离：另一条线的人收不到这条线的快照，本线名单仍是全量。</summary>
+    static async Task<int> CaseTierIsolateAsync()
+    {
+        var a = ArgUlong("--char-a");
+        var b = ArgUlong("--char-b");
+        var c = ArgUlong("--char-c");
+        await using var sessionA = await ConnectAsync("a", Arg("--token-a"), a);
+        await using var sessionB = await ConnectAsync("b", Arg("--token-b"), b);
+        await using var sessionC = await ConnectAsync("c", Arg("--token-c"), c);
+
+        var sb = await sessionB.SnapshotAsync(_ => true, 4000);
+        var sc = await sessionC.SnapshotAsync(_ => true, 4000);
+        if (sb is null || sc is null)
+        {
+            return Fail("tier_isolate=fail stream_open");
+        }
+
+        var peerA = sb.Avatars.FirstOrDefault(v => v.CharacterId == a);
+        var fullList = sb.Avatars.Count == 1 && sb.Avatars.All(v => v.CharacterId != b);
+        var tiered = peerA is not null
+                     && peerA.AppearanceTier != AppearanceTier.Unspecified
+                     && peerA.DisplayName.Length > 0;
+        var isolated = sc.Avatars.All(v => v.CharacterId != a && v.CharacterId != b)
+                       && sb.Avatars.All(v => v.CharacterId != c);
+        return fullList && tiered && isolated
+            ? Ok("tier_isolate=ok peers_b=" + sb.Avatars.Count
+                 + " tier=" + (peerA?.AppearanceTier.ToString() ?? "?")
+                 + " peers_c=" + sc.Avatars.Count)
+            : Fail("tier_isolate=fail full=" + fullList + " tiered=" + tiered
+                   + " isolated=" + isolated);
+    }
+
     static int Ok(string detail)
     {
         Console.WriteLine(detail);
@@ -347,6 +509,11 @@ internal sealed class WorldSession : IAsyncDisposable
             new ArraySegment<byte>(frame.ToByteArray()),
             WebSocketMessageType.Binary, true, _cts.Token);
     }
+
+    /// <summary>改包用例用：原样发一段二进制帧，绕过生成的消息类。</summary>
+    public Task SendRawAsync(byte[] payload) =>
+        _socket.SendAsync(
+            new ArraySegment<byte>(payload), WebSocketMessageType.Binary, true, _cts.Token);
 
     public async Task<WorldServerFrame?> ReadAsync(int timeoutMs)
     {

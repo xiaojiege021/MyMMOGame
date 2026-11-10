@@ -6,8 +6,8 @@ namespace World;
 /// <summary>
 /// 世界服启动配置。地点、开口的人与势力的编号正本都在这里，
 /// 名字一律照方案正文 2.5 到 2.7 原文；区域与对话内容分目录放。
-/// 分线容量、每区最多几条线、同步频率取 5–10Hz 里的哪一个值、移动速度上限
-/// 与初始站位，方案都没写定数值，留在这里注明待定，代码里不给兜底。
+/// 分线容量、每区最多几条线、同步频率取 5–10Hz 里的哪一个值、移动速度上限、
+/// 初始站位与同屏三档的两档距离，方案都没写定数值，留在这里注明待定，代码里不给兜底。
 /// </summary>
 public sealed record WorldConfig(
     string Listen,
@@ -22,6 +22,8 @@ public sealed record WorldConfig(
     double SpawnY,
     double SpawnZ,
     double SpawnFacing,
+    double TierNearDistance,
+    double TierFarDistance,
     IReadOnlyList<string> Regions,
     IReadOnlyList<string> Speakers,
     IReadOnlyList<string> Factions)
@@ -94,6 +96,16 @@ public sealed record WorldConfig(
             throw new ConfigException("max_move_speed 必须大于 0，现在是 " + maxSpeed);
         }
 
+        // 方案只写定三档的顺序（近处完整、远处简模、再远只留名字），
+        // 没写定两档距离；缺字段、非正数或近档不小于远档都不给跑。
+        var near = Distance(wire.TierNearDistance, "tier_near_distance");
+        var far = Distance(wire.TierFarDistance, "tier_far_distance");
+        if (near >= far)
+        {
+            throw new ConfigException("tier_near_distance 必须小于 tier_far_distance，现在是 "
+                + near + " / " + far);
+        }
+
         return new WorldConfig(
             listen, version, regionDir, dialogueDir, capacity, maxLines,
             syncHz, maxSpeed,
@@ -101,9 +113,21 @@ public sealed record WorldConfig(
             Coord(wire.SpawnY, "spawn_y"),
             Coord(wire.SpawnZ, "spawn_z"),
             Coord(wire.SpawnFacing, "spawn_facing"),
+            near, far,
             Names(wire.Regions, "regions"),
             Names(wire.Speakers, "speakers"),
             Names(wire.Factions, "factions"));
+    }
+
+    static double Distance(double? value, string key)
+    {
+        var number = value ?? throw new ConfigException("world.json 缺 " + key);
+        if (!double.IsFinite(number) || number <= 0)
+        {
+            throw new ConfigException(key + " 必须是正的有限数，现在是 " + number);
+        }
+
+        return number;
     }
 
     static double Coord(double? value, string key)
@@ -162,6 +186,8 @@ public sealed record WorldConfig(
         [JsonPropertyName("spawn_y")] public double? SpawnY { get; init; }
         [JsonPropertyName("spawn_z")] public double? SpawnZ { get; init; }
         [JsonPropertyName("spawn_facing")] public double? SpawnFacing { get; init; }
+        [JsonPropertyName("tier_near_distance")] public double? TierNearDistance { get; init; }
+        [JsonPropertyName("tier_far_distance")] public double? TierFarDistance { get; init; }
         [JsonPropertyName("regions")] public List<string>? Regions { get; init; }
         [JsonPropertyName("speakers")] public List<string>? Speakers { get; init; }
         [JsonPropertyName("factions")] public List<string>? Factions { get; init; }

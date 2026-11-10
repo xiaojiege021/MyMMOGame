@@ -63,7 +63,9 @@ public static class WorldApi
             try
             {
                 // 与前面各行同口径：账号取自令牌，角色服复核这个角色确实属于这个账号。
-                if (!await OwnsAsync(characters, account, body.CharacterId.Value, context))
+                // 名字牌文本也由角色服给，客户端请求体里带不进 display_name。
+                var displayName = await ResolveAsync(characters, account, body.CharacterId.Value, context);
+                if (displayName is null)
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -75,6 +77,7 @@ public static class WorldApi
                         Account = account,
                         CharacterId = body.CharacterId.Value,
                         RegionId = body.RegionId.Trim(),
+                        DisplayName = displayName,
                     },
                     deadline: DateTime.UtcNow.AddSeconds(5),
                     cancellationToken: context.RequestAborted);
@@ -203,6 +206,24 @@ public static class WorldApi
                 await WriteRpcErrorAsync(context, "world_regions", account, ex);
             }
         });
+    }
+
+    // 复核归属的同时取回名字，只走服与服这一段；请求体里没有这个名字字段。
+    static async Task<string?> ResolveAsync(
+        CharacterClient characters, string account, ulong characterId, HttpContext context)
+    {
+        try
+        {
+            var reply = await characters.ListInventoryAsync(
+                new ListInventoryRequest { Account = account, CharacterId = characterId },
+                deadline: DateTime.UtcNow.AddSeconds(5),
+                cancellationToken: context.RequestAborted);
+            return reply.CharacterName;
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+        {
+            return null;
+        }
     }
 
     // 复用角色服已有的只读方法来复核归属，不为分线另起一套身份数据。

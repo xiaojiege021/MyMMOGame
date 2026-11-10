@@ -78,33 +78,34 @@ namespace Mmo.Proto.Character {
             "GAUgASgFIkwKDUludmVudG9yeVNsb3QSDAoEc2xvdBgBIAEoDRIPCgdpdGVt",
             "X2lkGAIgASgJEg0KBWNvdW50GAMgASgFEg0KBWJvdW5kGAQgASgIIj0KFExp",
             "c3RJbnZlbnRvcnlSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFj",
-            "dGVyX2lkGAIgASgEIlcKFUxpc3RJbnZlbnRvcnlSZXNwb25zZRIrCgVzbG90",
+            "dGVyX2lkGAIgASgEIm8KFUxpc3RJbnZlbnRvcnlSZXNwb25zZRIrCgVzbG90",
             "cxgBIAMoCzIcLm1tby5jaGFyYWN0ZXIuSW52ZW50b3J5U2xvdBIRCgliYWdf",
-            "c2xvdHMYAiABKA0iRgoPQ2FuVHJhZGVSZXF1ZXN0Eg8KB2FjY291bnQYASAB",
-            "KAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEgwKBHNsb3QYAyABKA0iNAoQQ2Fu",
-            "VHJhZGVSZXNwb25zZRIQCgh0cmFkYWJsZRgBIAEoCBIOCgZyZWFzb24YAiAB",
-            "KAkyrwcKEENoYXJhY3RlclNlcnZpY2USYAoPQ3JlYXRlQ2hhcmFjdGVyEiUu",
-            "bW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXF1ZXN0GiYubW1vLmNo",
-            "YXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXNwb25zZRJLCghTZXRMZXZlbBIe",
-            "Lm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rl",
-            "ci5TZXRMZXZlbFJlc3BvbnNlEkYKB0FkZEl0ZW0SHS5tbW8uY2hhcmFjdGVy",
-            "LkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNoYXJhY3Rlci5JbnZlbnRvcnlTbG90",
-            "EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRv",
-            "cnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5MaXN0SW52ZW50b3J5UmVzcG9u",
-            "c2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hhcmFjdGVyLkNhblRyYWRlUmVxdWVz",
-            "dBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXNwb25zZRJQCgtBZGRDdXJy",
-            "ZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRkQ3VycmVuY3lSZXF1ZXN0Gh4ubW1v",
-            "LmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFuY2USVAoLR2V0Q3VycmVuY3kSIS5t",
-            "bW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVxdWVzdBoiLm1tby5jaGFyYWN0",
-            "ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJRCgpBcHBseUdyYW50EiAubW1vLmNo",
-            "YXJhY3Rlci5BcHBseUdyYW50UmVxdWVzdBohLm1tby5jaGFyYWN0ZXIuQXBw",
-            "bHlHcmFudFJlc3BvbnNlElcKDEVudGVyRHVuZ2VvbhIiLm1tby5jaGFyYWN0",
-            "ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBojLm1tby5jaGFyYWN0ZXIuRW50ZXJE",
-            "dW5nZW9uUmVzcG9uc2USVwoMVXNlSG90U3ByaW5nEiIubW1vLmNoYXJhY3Rl",
-            "ci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMubW1vLmNoYXJhY3Rlci5Vc2VIb3RT",
-            "cHJpbmdSZXNwb25zZRJOCglTZXR0bGVFeHASHy5tbW8uY2hhcmFjdGVyLlNl",
-            "dHRsZUV4cFJlcXVlc3QaIC5tbW8uY2hhcmFjdGVyLlNldHRsZUV4cFJlc3Bv",
-            "bnNlQhaqAhNNbW8uUHJvdG8uQ2hhcmFjdGVyYgZwcm90bzM="));
+            "c2xvdHMYAiABKA0SFgoOY2hhcmFjdGVyX25hbWUYAyABKAkiRgoPQ2FuVHJh",
+            "ZGVSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIg",
+            "ASgEEgwKBHNsb3QYAyABKA0iNAoQQ2FuVHJhZGVSZXNwb25zZRIQCgh0cmFk",
+            "YWJsZRgBIAEoCBIOCgZyZWFzb24YAiABKAkyrwcKEENoYXJhY3RlclNlcnZp",
+            "Y2USYAoPQ3JlYXRlQ2hhcmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVD",
+            "aGFyYWN0ZXJSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0",
+            "ZXJSZXNwb25zZRJLCghTZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2",
+            "ZWxSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYK",
+            "B0FkZEl0ZW0SHS5tbW8uY2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1v",
+            "LmNoYXJhY3Rlci5JbnZlbnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5t",
+            "bW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJh",
+            "Y3Rlci5MaXN0SW52ZW50b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8u",
+            "Y2hhcmFjdGVyLkNhblRyYWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2Fu",
+            "VHJhZGVSZXNwb25zZRJQCgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIu",
+            "QWRkQ3VycmVuY3lSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJh",
+            "bGFuY2USVAoLR2V0Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJl",
+            "bmN5UmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25z",
+            "ZRJRCgpBcHBseUdyYW50EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVx",
+            "dWVzdBohLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVu",
+            "dGVyRHVuZ2VvbhIiLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVz",
+            "dBojLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNl",
+            "SG90U3ByaW5nEiIubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0",
+            "GiMubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0",
+            "bGVFeHASHy5tbW8uY2hhcmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8u",
+            "Y2hhcmFjdGVyLlNldHRsZUV4cFJlc3BvbnNlQhaqAhNNbW8uUHJvdG8uQ2hh",
+            "cmFjdGVyYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -130,7 +131,7 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AddItemRequest), global::Mmo.Proto.Character.AddItemRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "ItemId", "Count" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.InventorySlot), global::Mmo.Proto.Character.InventorySlot.Parser, new[]{ "Slot", "ItemId", "Count", "Bound" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ListInventoryRequest), global::Mmo.Proto.Character.ListInventoryRequest.Parser, new[]{ "Account", "CharacterId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ListInventoryResponse), global::Mmo.Proto.Character.ListInventoryResponse.Parser, new[]{ "Slots", "BagSlots" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ListInventoryResponse), global::Mmo.Proto.Character.ListInventoryResponse.Parser, new[]{ "Slots", "BagSlots", "CharacterName" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanTradeRequest), global::Mmo.Proto.Character.CanTradeRequest.Parser, new[]{ "Account", "CharacterId", "Slot" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanTradeResponse), global::Mmo.Proto.Character.CanTradeResponse.Parser, new[]{ "Tradable", "Reason" }, null, null, null, null)
           }));
@@ -7348,6 +7349,7 @@ namespace Mmo.Proto.Character {
     public ListInventoryResponse(ListInventoryResponse other) : this() {
       slots_ = other.slots_.Clone();
       bagSlots_ = other.bagSlots_;
+      characterName_ = other.characterName_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -7380,6 +7382,22 @@ namespace Mmo.Proto.Character {
       }
     }
 
+    /// <summary>Field number for the "character_name" field.</summary>
+    public const int CharacterNameFieldNumber = 3;
+    private string characterName_ = "";
+    /// <summary>
+    /// 只读：角色服从角色表读出的名字，供表世界「再远只留名字」的名字牌使用。
+    /// 网关复核归属时取，客户端不能通过请求体改它。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string CharacterName {
+      get { return characterName_; }
+      set {
+        characterName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -7397,6 +7415,7 @@ namespace Mmo.Proto.Character {
       }
       if(!slots_.Equals(other.slots_)) return false;
       if (BagSlots != other.BagSlots) return false;
+      if (CharacterName != other.CharacterName) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -7406,6 +7425,7 @@ namespace Mmo.Proto.Character {
       int hash = 1;
       hash ^= slots_.GetHashCode();
       if (BagSlots != 0) hash ^= BagSlots.GetHashCode();
+      if (CharacterName.Length != 0) hash ^= CharacterName.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -7429,6 +7449,10 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(16);
         output.WriteUInt32(BagSlots);
       }
+      if (CharacterName.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(CharacterName);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -7444,6 +7468,10 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(16);
         output.WriteUInt32(BagSlots);
       }
+      if (CharacterName.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(CharacterName);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -7457,6 +7485,9 @@ namespace Mmo.Proto.Character {
       size += slots_.CalculateSize(_repeated_slots_codec);
       if (BagSlots != 0) {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(BagSlots);
+      }
+      if (CharacterName.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterName);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -7473,6 +7504,9 @@ namespace Mmo.Proto.Character {
       slots_.Add(other.slots_);
       if (other.BagSlots != 0) {
         BagSlots = other.BagSlots;
+      }
+      if (other.CharacterName.Length != 0) {
+        CharacterName = other.CharacterName;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -7501,6 +7535,10 @@ namespace Mmo.Proto.Character {
             BagSlots = input.ReadUInt32();
             break;
           }
+          case 26: {
+            CharacterName = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -7526,6 +7564,10 @@ namespace Mmo.Proto.Character {
           }
           case 16: {
             BagSlots = input.ReadUInt32();
+            break;
+          }
+          case 26: {
+            CharacterName = input.ReadString();
             break;
           }
         }

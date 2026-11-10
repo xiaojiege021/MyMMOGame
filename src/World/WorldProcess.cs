@@ -39,13 +39,16 @@ public sealed class WorldProcess(string configPath)
             + " max_move_speed=" + config.MaxMoveSpeed
             + " spawn=" + config.SpawnX + "," + config.SpawnY + "," + config.SpawnZ
             + "," + config.SpawnFacing);
+        Console.WriteLine("tier_config=ok near=" + config.TierNearDistance
+            + " far=" + config.TierFarDistance);
         Console.WriteLine("regions=" + string.Join(",", catalog.Regions.Select(r => r.Id)));
         Console.WriteLine("speakers=" + string.Join(",", catalog.Speakers));
         Console.WriteLine("locked=" + string.Join(",", catalog.Regions.Where(r => !r.Open).Select(r => r.Id)));
 
-        // 分线与位置都是在线状态，放进程内存；不连角色库，也不在这里结算技能。
+        // 分线、位置与同屏档位都是在线状态，放进程内存；不连角色库，也不在这里结算技能。
         var registry = new LineRegistry(config, catalog);
-        var hub = new PositionHub(registry, config);
+        var tiers = new AppearanceTierTable(config);
+        var hub = new PositionHub(registry, config, tiers);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2。
@@ -62,6 +65,7 @@ public sealed class WorldProcess(string configPath)
         builder.Services.AddSingleton(config);
         builder.Services.AddSingleton(registry);
         builder.Services.AddSingleton(catalog);
+        builder.Services.AddSingleton(tiers);
         builder.Services.AddSingleton(hub);
         builder.Services.AddHostedService<PositionBroadcaster>();
 

@@ -3,7 +3,10 @@ using Mmo.Proto.World;
 
 namespace Mmo.Net
 {
-    /// <summary>快照里一个人的最新坐标与朝向。表现层拿它去插值，不在这里算移动。</summary>
+    /// <summary>
+    /// 快照里一个人的最新坐标、朝向、服务端给的外观档位与名字牌文本。
+    /// 表现层拿它去插值与分档，不在这里算移动，也不在手机上算距离定档。
+    /// </summary>
     public struct PeerPosition
     {
         public ulong CharacterId;
@@ -12,8 +15,17 @@ namespace Mmo.Net
         public float Z;
         public float Facing;
         public ulong Seq;
+        public AppearanceTier Tier;
+        public string DisplayName;
 
         public PeerPosition(ulong characterId, float x, float y, float z, float facing, ulong seq)
+            : this(characterId, x, y, z, facing, seq, AppearanceTier.Unspecified, string.Empty)
+        {
+        }
+
+        public PeerPosition(
+            ulong characterId, float x, float y, float z, float facing, ulong seq,
+            AppearanceTier tier, string displayName)
         {
             CharacterId = characterId;
             X = x;
@@ -21,12 +33,14 @@ namespace Mmo.Net
             Z = z;
             Facing = facing;
             Seq = seq;
+            Tier = tier;
+            DisplayName = displayName;
         }
     }
 
     /// <summary>
-    /// 周围的人：按角色编号留下最新一份快照。同屏三档、模型与 UI 都还在后面的卡，
-    /// 这一行只负责让「另一个人在动」这件事在客户端有据可查。
+    /// 周围的人：按角色编号留下最新一份快照。真实模型、场景与 UI 还在后面的卡，
+    /// 这里只让「另一个人在动、被服务端分到哪一档」在客户端有据可查。
     /// </summary>
     public sealed class WorldPeerPositions
     {
@@ -60,7 +74,8 @@ namespace Mmo.Net
                 }
 
                 peers[avatar.CharacterId] = new PeerPosition(
-                    avatar.CharacterId, avatar.X, avatar.Y, avatar.Z, avatar.Facing, avatar.Seq);
+                    avatar.CharacterId, avatar.X, avatar.Y, avatar.Z, avatar.Facing, avatar.Seq,
+                    avatar.AppearanceTier, avatar.DisplayName);
                 seen.Add(avatar.CharacterId);
             }
 

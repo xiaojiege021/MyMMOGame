@@ -5,6 +5,7 @@ using World;
 var configPath = "config/world.json";
 var regionState = false;
 var positionState = false;
+var tierState = false;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -21,10 +22,41 @@ for (var i = 0; i < args.Length; i++)
         case "--position-state":
             positionState = true;
             break;
+        // 只给核对用：把同屏三档的阈值与分档结果读出来，不启动进程。
+        case "--tier-state":
+            tierState = true;
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
     }
+}
+
+if (tierState)
+{
+    WorldConfig config;
+    try
+    {
+        config = WorldConfig.Load(configPath);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    var tiers = new AppearanceTierTable(config);
+    Console.WriteLine("tier_state=ok near=" + config.TierNearDistance
+        + " far=" + config.TierFarDistance
+        + " at_0=" + (int)tiers.ForDistance(0)
+        + " at_mid=" + (int)tiers.ForDistance((config.TierNearDistance + config.TierFarDistance) / 2)
+        + " at_far=" + (int)tiers.ForDistance(config.TierFarDistance + 1));
+    return 0;
 }
 
 if (positionState)

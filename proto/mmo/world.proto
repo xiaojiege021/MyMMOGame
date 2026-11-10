@@ -3,8 +3,9 @@ syntax = "proto3";
 package mmo.world;
 option csharp_namespace = "Mmo.Proto.World";
 
-// 表世界的分线（P1-3a1）与位置流（P1-3a2）。世界服是分线与位置的唯一写入方；
-// 在线状态与坐标都在进程内存，不落库。同屏档位（P1-3a3）与采集、飞行状态不在这里。
+// 表世界的分线（P1-3a1）、位置流（P1-3a2）与同屏档位（P1-3a3）。
+// 世界服是分线、位置与档位的唯一写入方；在线状态、坐标与档位都在进程内存，不落库。
+// 采集、飞行状态与 AOI 不在这里。
 service WorldService {
   rpc EnterLine(EnterLineRequest) returns (EnterLineResponse);
   rpc LeaveLine(LeaveLineRequest) returns (LeaveLineResponse);
@@ -16,10 +17,13 @@ service WorldService {
 }
 
 // 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
+// display_name 是网关复核归属后从角色服取的只读名字，只走服与服这一段，
+// 客户端的 HTTP 请求体不带这个字段。
 message EnterLineRequest {
   string account = 1;
   uint64 character_id = 2;
   string region_id = 3;
+  string display_name = 4;
 }
 
 message EnterLineResponse {
@@ -66,7 +70,7 @@ message ListRegionsResponse {
 }
 
 // 一条 WebSocket 上跑位置帧，靠信封分辨。客户端只上报自己的坐标与朝向，
-// 没有 account / character_id / line_id / line_size / 别人的位置这些字段。
+// 没有 account / character_id / line_id / line_size / 别人的位置 / 档位 / 名字这些字段。
 message WorldClientFrame {
   oneof body {
     PositionReport position = 1;
@@ -88,7 +92,17 @@ message WorldServerFrame {
   }
 }
 
-// 周围的人：同一条分线里的其他成员。这一行不做 AOI、距离裁剪和同屏档位。
+// 方案写定的同屏三档。档位由世界服按距离算，客户端只按它决定画什么，
+// 不在手机上自行决定远处的人该不该画全。两档距离在 config/world.json。
+enum AppearanceTier {
+  APPEARANCE_TIER_UNSPECIFIED = 0;
+  APPEARANCE_TIER_FULL = 1;
+  APPEARANCE_TIER_SIMPLE = 2;
+  APPEARANCE_TIER_NAME = 3;
+}
+
+// 周围的人：同一条分线里的其他成员。这一行不做 AOI、距离裁剪和按档位删人，
+// 全量名单照推，只是每个人多带一个服务端算出的档位与名字牌文本。
 message AvatarPosition {
   uint64 character_id = 1;
   float x = 2;
@@ -96,6 +110,8 @@ message AvatarPosition {
   float z = 4;
   float facing = 5;
   uint64 seq = 6;
+  AppearanceTier appearance_tier = 7;
+  string display_name = 8;
 }
 
 message PositionSnapshot {

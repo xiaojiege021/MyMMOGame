@@ -9,8 +9,9 @@ using grpc = global::Grpc.Core;
 
 namespace Mmo.Proto.World {
   /// <summary>
-  /// 表世界的分线（P1-3a1）与位置流（P1-3a2）。世界服是分线与位置的唯一写入方；
-  /// 在线状态与坐标都在进程内存，不落库。同屏档位（P1-3a3）与采集、飞行状态不在这里。
+  /// 表世界的分线（P1-3a1）、位置流（P1-3a2）与同屏档位（P1-3a3）。
+  /// 世界服是分线、位置与档位的唯一写入方；在线状态、坐标与档位都在进程内存，不落库。
+  /// 采集、飞行状态与 AOI 不在这里。
   /// </summary>
   public static partial class WorldService
   {

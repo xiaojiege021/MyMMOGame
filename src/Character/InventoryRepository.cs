@@ -22,6 +22,20 @@ public sealed class InventoryRepository(NpgsqlDataSource dataSource)
         return await reader.ReadAsync(stopping);
     }
 
+    /// <summary>
+    /// 复核归属的同时读出角色名，只给表世界的名字牌用。不是这个账号的角色回 null，
+    /// 和 OwnsAsync 一样按不存在处理，不泄漏别人的名字。
+    /// </summary>
+    public async Task<string?> DisplayNameAsync(string account, long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select name from \"角色\".character where id = $1 and account = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(account);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        return await reader.ReadAsync(stopping) ? reader.GetString(0) : null;
+    }
+
     public async Task<BagSlot?> GetSlotAsync(long characterId, int slot, CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(

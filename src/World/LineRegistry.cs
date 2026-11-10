@@ -14,8 +14,12 @@ public sealed record LeaveResult(bool Left, string LineId, int LineSize);
 
 public sealed record LineSnapshot(string LineId, string RegionId, int LineNo, int LineSize, int Capacity);
 
-/// <summary>一条分线里某个人的当前坐标、朝向与上报序号。</summary>
-public sealed record AvatarState(ulong CharacterId, float X, float Y, float Z, float Facing, ulong Seq);
+/// <summary>
+/// 一条分线里某个人的当前坐标、朝向、上报序号，以及名字牌文本。
+/// 名字由网关复核归属后从角色服取，服间传入，客户端帧里带不进。
+/// </summary>
+public sealed record AvatarState(
+    ulong CharacterId, float X, float Y, float Z, float Facing, ulong Seq, string DisplayName);
 
 public sealed record PositionReportResult(bool Accepted, string Reason, AvatarState? Corrected);
 
@@ -33,7 +37,7 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
     readonly Dictionary<string, Line> lines = new(StringComparer.Ordinal);
     readonly Dictionary<string, string> seats = new(StringComparer.Ordinal);
 
-    public EnterResult Enter(string account, ulong characterId, string regionId)
+    public EnterResult Enter(string account, ulong characterId, string regionId, string displayName)
     {
         var region = catalog.Find(regionId);
         if (region is null)
@@ -82,7 +86,8 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
                 lines[oldLineId].Members.Remove(key);
             }
 
-            candidate.Members.Add(key, new Member(Spawn(characterId), DateTimeOffset.UtcNow));
+            candidate.Members.Add(key, new Member(
+                Spawn(characterId, (displayName ?? "").Trim()), DateTimeOffset.UtcNow));
             seats[key] = candidate.Id;
             return Accepted(candidate, regionId, duplicate: false);
         }
@@ -171,16 +176,17 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
                 return new PositionReportResult(false, "speed_limit", previous);
             }
 
-            member.State = new AvatarState(characterId, x, y, z, facing, seq);
+            member.State = new AvatarState(
+                characterId, x, y, z, facing, seq, previous.DisplayName);
             member.UpdatedAt = now;
             return new PositionReportResult(true, "", member.State);
         }
     }
 
-    AvatarState Spawn(ulong characterId) => new(
+    AvatarState Spawn(ulong characterId, string displayName) => new(
         characterId,
         (float)config.SpawnX, (float)config.SpawnY, (float)config.SpawnZ,
-        (float)config.SpawnFacing, 0);
+        (float)config.SpawnFacing, 0, displayName);
 
     EnterResult Accepted(Line line, string regionId, bool duplicate) =>
         new(true, "", line.Id, regionId, line.LineNo, line.Members.Count, config.LineCapacity, duplicate);
