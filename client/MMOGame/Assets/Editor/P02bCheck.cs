@@ -11,7 +11,7 @@ using Debug = UnityEngine.Debug;
 // P0-2b 核对（编辑器这一侧）：真的连一场战斗，按「远处打不到 → 走近 → 打中 →
 // 前摇里撤掉 → 超界被拉回」走一遍，看服务端认不认走位、认不认打断。
 // 界面怎么摆不在这一层验，真机段看 logcat。
-// 打印格式：p02b_check_ 开头的 kv 行，由 tools/check-p0-2b.sh 逐项断言。
+// 打印格式：p02b_check_ 开头的 kv 行，由 tools/check/check-p0-2b.sh 逐项断言。
 public static class P02bCheck
 {
     static int _pass;

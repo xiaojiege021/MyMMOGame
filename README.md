@@ -78,7 +78,7 @@ Unity 客户端加六个 .NET 进程的 2.5D 双世界 MMO。P0 原型已收口�
 
 ```bash
 git pull --rebase
-tools/bootstrap.sh
+tools/env/bootstrap.sh
 ```
 
 多机怎么同步、各机差在哪、四个真踩过的坑，见 [开发架构第 16 节](docs/开发架构.md#16-多机同步)。

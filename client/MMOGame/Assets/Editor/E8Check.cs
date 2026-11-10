@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 // E8 核对用：客户端把同一份空消息序列化一遍。
-// 打印格式要和 tools/ProtoProbe/Program.cs 完全一致，脚本才好逐行比对。
+// 打印格式要和 tools/probe/ProtoProbe/Program.cs 完全一致，脚本才好逐行比对。
 public static class E8Check
 {
     public static void Run()

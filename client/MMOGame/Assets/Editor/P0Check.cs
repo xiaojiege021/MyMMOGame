@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 
 // P0-1a 核对用：客户端把技能请求和技能结果各走一次往返，打印字段清单。
-// 打印格式要和 tools/ProtoProbe/Program.cs 的 --p0-1a 分支完全一致，脚本才好逐行比对。
+// 打印格式要和 tools/probe/ProtoProbe/Program.cs 的 --p0-1a 分支完全一致，脚本才好逐行比对。
 public static class P0Check
 {
     public static void Run()

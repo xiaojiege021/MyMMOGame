@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 
 // P0-1c 核对用：Unity 这一侧真的连上战斗进程，把请求发出去，把结果收回来。
 // 地址从环境变量给，脚本起进程后把端口塞进来，客户端不写死端口。
-// 打印格式：p01c_ 开头的 kv 行，由 tools/check-p0-1c.sh 逐项断言。
+// 打印格式：p01c_ 开头的 kv 行，由 tools/check/check-p0-1c.sh 逐项断言。
 public static class P01cCheck
 {
     public static void Run()

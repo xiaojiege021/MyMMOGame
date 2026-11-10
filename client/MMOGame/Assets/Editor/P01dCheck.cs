@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 
 // P0-1d 核对用：从前摇里打断这次施法，以及进程重启后新开一场是不是干净。
 // 三个模式由 MMO_P01D_MODE 给：cancel / clear / reopen，各自跑一段就退出。
-// 打印格式：p01d_ 开头的 kv 行，由 tools/check-p0-1d.sh 逐项断言。
+// 打印格式：p01d_ 开头的 kv 行，由 tools/check/check-p0-1d.sh 逐项断言。
 public static class P01dCheck
 {
     public static void Run()
