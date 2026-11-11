@@ -92,13 +92,17 @@ echo ">> 提取到的私人 IP（将改写为 YOUR_SERVER_IP）： ${PRIV_IP:-�
 MAP="$(mktemp)"
 REP="$(mktemp)"
 : > "$MAP"; : > "$REP"
+# 转义 BRE 特殊字符，用于生成“历史中可能以 grep 模式形式（如 YOUR_SERVER_IP）出现的变体”
+esc() { printf '%s' "$1" | sed 's/[.[\*^$]/\\&/g'; }
 for e in "${PRIV_EMAILS[@]:-}"; do
   [ -z "$e" ] && continue
   echo "xiaojiege <$GH_USER_EMAIL> <$e>" >> "$MAP"
   echo "$e==>$GH_USER_EMAIL" >> "$REP"
+  echo "$(esc "$e")==>$GH_USER_EMAIL" >> "$REP"
 done
 if [ -n "$PRIV_IP" ]; then
   echo "$PRIV_IP==>YOUR_SERVER_IP" >> "$REP"
+  echo "$(esc "$PRIV_IP")==>YOUR_SERVER_IP" >> "$REP"
 fi
 
 # ---------- 步骤 1：克隆主仓库到镜像（独立副本，不碰主仓库） ----------
@@ -220,7 +224,19 @@ elif echo "$ALL_EMAILS_NOW" | grep -qv "$GH_USER_EMAIL"; then
   echo "   !! 仍存在非 noreply 的作者邮箱："; echo "$ALL_EMAILS_NOW"
   FAIL=1
 fi
-PRIV_HITS="$(git grep -n 'YOUR_SERVER_IP\|xiaojiege@users.noreply.github.com\|local-host' $(git rev-list --all) 2>/dev/null || true)"
+# 动态构建私人串清单（含转义变体），用固定串匹配；脚本源码本身不含任何明文私人串
+SCAN=()
+for e in "${PRIV_EMAILS[@]:-}"; do
+  [ -z "$e" ] && continue
+  SCAN+=("$e"); SCAN+=("$(esc "$e")")
+done
+[ -n "$PRIV_IP" ] && { SCAN+=("$PRIV_IP"); SCAN+=("$(esc "$PRIV_IP")"); }
+PRIV_HITS=""
+if [ "${#SCAN[@]}" -gt 0 ]; then
+  GARGS=()
+  for x in "${SCAN[@]}"; do [ -z "$x" ] && continue; GARGS+=(-e "$x"); done
+  PRIV_HITS="$(git grep -nF "${GARGS[@]}" $(git rev-list --all) 2>/dev/null || true)"
+fi
 if [ -n "$PRIV_HITS" ]; then
   echo "   !! 历史中仍含私人串："; echo "$PRIV_HITS" | head
   FAIL=1
