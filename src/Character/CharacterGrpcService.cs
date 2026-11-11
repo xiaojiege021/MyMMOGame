@@ -26,6 +26,8 @@ public sealed class CharacterGrpcService(
     ExpTable expTable,
     EnhanceRepository enhances,
     EnhanceTable enhanceTable,
+    TransferRepository transfers,
+    TransferTable transferTable,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -858,6 +860,103 @@ public sealed class CharacterGrpcService(
             ProtectedLevel = outcome.ProtectedLevel,
             CouponUsed = outcome.CouponUsed,
             CouponLeft = outcome.CouponLeft,
+        };
+    }
+
+    /// <summary>
+    /// 强化转移（方案 9.3）。请求里只有两个格子：两格等级、绑定、转移石与金币费用
+    /// 都在角色服读。来源不高于目标、格子空、不是装备、石头或金币不够，
+    /// 都回 200 + ok=false + reason，未生效的数值字段一律留 0。
+    /// </summary>
+    public override async Task<TransferEnhanceResponse> TransferEnhance(
+        TransferEnhanceRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        if (request.FromSlot < 1 || request.FromSlot > config.BagSlots
+            || request.ToSlot < 1 || request.ToSlot > config.BagSlots)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        if (!await inventory.OwnsAsync(account, (long)request.CharacterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        TransferOutcome outcome;
+        try
+        {
+            outcome = await transfers.ApplyAsync(
+                (long)request.CharacterId, (int)request.FromSlot, (int)request.ToSlot,
+                txnId, context.CancellationToken);
+        }
+        catch (EnhanceException ex)
+        {
+            logger.LogInformation(
+                "transfer_reject account={Account} id={Id} from={From} to={To} txn={Txn} reason={Reason}",
+                account, request.CharacterId, request.FromSlot, request.ToSlot, txnId, ex.Code);
+            // 未生效的数值字段一律留 0，客户端不能拿拒绝回包当成一次转移结果。
+            return new TransferEnhanceResponse
+            {
+                Ok = false,
+                Reason = ex.Code,
+                MaxLevel = transferTable.MaxLevel,
+            };
+        }
+
+        logger.LogInformation(
+            "transfer account={Account} id={Id} from={From} to={To} txn={Txn} "
+            + "duplicate={Duplicate} level={FromLevelBefore}:{ToLevelBefore}->{FromLevel}:{ToLevel} "
+            + "gold={GoldCost} target_bound={TargetBoundBefore}->{TargetBound}",
+            account, request.CharacterId, request.FromSlot, request.ToSlot, txnId,
+            outcome.Duplicate, outcome.FromLevelBefore, outcome.ToLevelBefore,
+            outcome.FromLevel, outcome.ToLevel, outcome.GoldCost,
+            outcome.TargetBoundBefore, outcome.TargetBound);
+
+        if (outcome.Duplicate)
+        {
+            return new TransferEnhanceResponse
+            {
+                Ok = false,
+                Reason = "duplicate",
+                Duplicate = true,
+                MaxLevel = transferTable.MaxLevel,
+            };
+        }
+
+        return new TransferEnhanceResponse
+        {
+            Ok = true,
+            Reason = "",
+            FromLevelBefore = outcome.FromLevelBefore,
+            ToLevelBefore = outcome.ToLevelBefore,
+            FromLevel = outcome.FromLevel,
+            ToLevel = outcome.ToLevel,
+            MaxLevel = transferTable.MaxLevel,
+            GoldCost = outcome.GoldCost,
+            Gold = outcome.Gold,
+            // 只作展示：转移石编号与这一手扣的枚数，客户端不拿它们算结果。
+            StoneItem = transferTable.StoneItemId,
+            StoneCost = transferTable.StoneCost,
+            StoneLeft = outcome.StoneLeft,
+            TargetBoundBefore = outcome.TargetBoundBefore,
+            TargetBound = outcome.TargetBound,
         };
     }
 

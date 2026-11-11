@@ -83,6 +83,13 @@ service CharacterService {
   // P1-4b：use_coupon 只表示「这一手要不要用背包里的保护券」，券只挡掉级，
   // 不改这一档的成功率；券的编号、数量、来源都不在请求里。
   rpc Enhance(EnhanceRequest) returns (EnhanceResponse);
+
+  // 强化转移（方案 9.3）。请求里只有两个格子：两格强化等级、绑定状态、
+  // 转移石编号与张数、金币费用都从角色服的库与 config/transfer.json 读。
+  // 来源必须高于目标，成功后来源 +0、目标覆盖为来源原来的等级，
+  // 来源绑定时目标在同一笔事务里改为绑定。转移必定成功，不掷点。
+  // txn_id 由网关生成，客户端填不进来。
+  rpc TransferEnhance(TransferEnhanceRequest) returns (TransferEnhanceResponse);
 }
 
 message SettleExpRequest {
@@ -321,4 +328,40 @@ message EnhanceResponse {
   int32 coupon_used = 16;
   // 只作展示：背包里还剩几张这种券。
   int32 coupon_left = 17;
+}
+
+// 把强化等级从来源格转到目标格。只带两个格子：
+// 两格等级、绑定、转移石编号 / 张数、金币费用、结果与事务号都带不进来。
+message TransferEnhanceRequest {
+  // 网关转发时填令牌账号，角色服再核一次归属。
+  string account = 1;
+  uint64 character_id = 2;
+  uint32 from_slot = 3;
+  uint32 to_slot = 4;
+  string txn_id = 5;
+}
+
+message TransferEnhanceResponse {
+  // 业务前提不满足（source_not_higher / slot_empty / not_equipment /
+  // stone_insufficient / gold_insufficient ...）是正常回包里的 ok=false + reason，
+  // 不是 gRPC 错误码；身份与参数错才走错误码。未生效的数值字段一律留 0。
+  bool ok = 1;
+  string reason = 2;
+  int32 from_level_before = 3;
+  int32 to_level_before = 4;
+  int32 from_level = 5;
+  int32 to_level = 6;
+  // 配置里的强化上限，回给客户端，不让它自己另算一套。
+  int32 max_level = 7;
+  // 只作展示：这一手实际扣的金币与转移石。客户端不拿它们算结果。
+  int64 gold_cost = 8;
+  int64 gold = 9;
+  string stone_item = 10;
+  int32 stone_cost = 11;
+  int32 stone_left = 12;
+  // 只作展示：目标格转移前后的绑定状态。来源绑定时目标会变成绑定。
+  bool target_bound_before = 13;
+  bool target_bound = 14;
+  // 同一个事务号再提交：一笔没做。
+  bool duplicate = 15;
 }

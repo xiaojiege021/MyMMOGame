@@ -9,11 +9,12 @@ namespace Character;
 /// </summary>
 public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
-    string EnhanceTable)
+    string EnhanceTable, string TransferTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
     public const string DefaultEnhanceTable = "config/enhance.json";
+    public const string DefaultTransferTable = "config/transfer.json";
 
     public static CharacterConfig Load(string path)
     {
@@ -74,8 +75,16 @@ public sealed record CharacterConfig(
             throw new ConfigException("enhance_table 不能为空");
         }
 
+        // 转移费用也走同一份配置正本；核对脚本可以指到临时表改数值做隔离测试。
+        var transferTable = (wire.TransferTable ?? DefaultTransferTable).Trim();
+        if (transferTable.Length == 0)
+        {
+            throw new ConfigException("transfer_table 不能为空");
+        }
+
         return new CharacterConfig(
-            listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable);
+            listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
+            transferTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -103,6 +112,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("enhance_table")]
         public string? EnhanceTable { get; init; }
+
+        [JsonPropertyName("transfer_table")]
+        public string? TransferTable { get; init; }
     }
 }
 

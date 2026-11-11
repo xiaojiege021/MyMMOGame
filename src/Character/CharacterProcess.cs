@@ -28,6 +28,7 @@ public sealed class CharacterProcess(string configPath)
         DungeonTable dungeons;
         ExpTable expTable;
         EnhanceTable enhanceTable;
+        TransferTable transferTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -40,6 +41,9 @@ public sealed class CharacterProcess(string configPath)
             // 开发架构第 7 节：强化概率由角色服读。三档材料要在物品表里存在，
             // 扣的金币要在币种表里存在，缺一样就起不来。
             enhanceTable = EnhanceTable.Load(config.EnhanceTable, items, currencies);
+            // 方案 9.3：转移石要在物品表里、费用表要照写定的上限与递增关系，
+            // 缺一样就起不来。和强化表一样只读一次，改配置重启生效。
+            transferTable = TransferTable.Load(config.TransferTable, items, currencies, enhanceTable);
         }
         catch (ConfigException ex)
         {
@@ -77,6 +81,12 @@ public sealed class CharacterProcess(string configPath)
                 t => t.SuccessRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)))
             + " coupon=" + enhanceTable.ProtectItemId
             + " coupon_bind=always");
+        // 与 --transfer-state 只读入口同形，改金币费用重启后能直接核对到。
+        Console.WriteLine("transfer_table_version=" + transferTable.Version
+            + " transfer_stone=" + transferTable.StoneItemId
+            + " transfer_stone_cost=" + transferTable.StoneCost
+            + " transfer_gold_kind=" + transferTable.GoldKind
+            + " transfer_gold=" + string.Join(",", transferTable.GoldCosts));
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -98,6 +108,7 @@ public sealed class CharacterProcess(string configPath)
         var hotSpring = new HotSpringRepository(dataSource);
         var expSettlements = new ExpSettlementRepository(dataSource);
         var enhances = new EnhanceRepository(dataSource, enhanceTable, items);
+        var transfers = new TransferRepository(dataSource, transferTable, items);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -129,6 +140,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(expTable);
         builder.Services.AddSingleton(enhanceTable);
         builder.Services.AddSingleton(enhances);
+        builder.Services.AddSingleton(transferTable);
+        builder.Services.AddSingleton(transfers);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

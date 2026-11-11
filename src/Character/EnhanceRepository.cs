@@ -2,7 +2,10 @@ using Npgsql;
 
 namespace Character;
 
-/// <summary>强化被业务规则挡下。Code 原样回到 EnhanceResponse.reason，不抛 gRPC 错误码。</summary>
+/// <summary>
+/// 强化（P1-4a）/ 保护券（P1-4b）/ 强化转移（P1-4c）被业务规则挡下。
+/// Code 原样回到回包的 reason，不抛 gRPC 错误码；角色服里不另起第二套拒绝类型。
+/// </summary>
 public sealed class EnhanceException(string code) : Exception(code)
 {
     public string Code { get; } = code;

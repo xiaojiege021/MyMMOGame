@@ -44,6 +44,10 @@ public static class CharacterApi
     public sealed record EnhanceBody(
         ulong? CharacterId, uint? Slot, string? StoneId, bool? UseCoupon);
 
+    // 转移请求里只有角色和两个格子：两格等级、绑定状态、转移石编号 / 张数、
+    // 金币费用、结果与事务号都读不进来（事务号由网关生成）。
+    public sealed record TransferBody(ulong? CharacterId, uint? FromSlot, uint? ToSlot);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -868,6 +872,96 @@ public static class CharacterApi
             catch (RpcException ex)
             {
                 await WriteRpcErrorAsync(context, "enhance", account, ex);
+            }
+        });
+
+        // 强化转移（方案 9.3）。转移石、费用、两格等级与绑定规则全在角色服；
+        // 网关只认令牌、复核归属、生成一个事务号，再把两个格子转过去。
+        // 业务拒绝（来源不高于目标、格子空、不是装备、石头或金币不够）也是 200 + ok=false。
+        app.MapPost("/character/transfer", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "transfer", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            TransferBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<TransferBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.FromSlot is null || body.FromSlot == 0
+                || body.ToSlot is null || body.ToSlot == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                // 一次点击一个号：客户端带不进来，也不能靠重放扣两次材料。
+                var txnId = "transfer:" + Guid.NewGuid().ToString("N");
+                var result = await client.TransferEnhanceAsync(
+                    new TransferEnhanceRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        FromSlot = body.FromSlot.Value,
+                        ToSlot = body.ToSlot.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("transfer account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " from=" + body.FromSlot.Value
+                    + " to=" + body.ToSlot.Value
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " level=" + result.FromLevelBefore + ":" + result.ToLevelBefore
+                    + "->" + result.FromLevel + ":" + result.ToLevel
+                    + " bound=" + result.TargetBoundBefore + "->" + result.TargetBound
+                    + " duplicate=" + result.Duplicate);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = result.Ok,
+                    reason = result.Reason,
+                    from_level_before = result.FromLevelBefore,
+                    to_level_before = result.ToLevelBefore,
+                    from_level = result.FromLevel,
+                    to_level = result.ToLevel,
+                    max_level = result.MaxLevel,
+                    gold_cost = result.GoldCost,
+                    gold = result.Gold,
+                    stone_item = result.StoneItem,
+                    stone_cost = result.StoneCost,
+                    stone_left = result.StoneLeft,
+                    target_bound_before = result.TargetBoundBefore,
+                    target_bound = result.TargetBound,
+                    duplicate = result.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "transfer", account, ex);
             }
         });
     }

@@ -163,6 +163,21 @@ else
   warn "缺 tools/check/preflight.sh"
 fi
 
+echo "== 9. 提交作者身份 =="
+# 换机器开工时 git 会用系统默认名加主机名邮箱（例如 yewenkeji@*.local），
+# Gitea 按邮箱认账号，认不出就只在作者列显示一个陌生名字。只在仓库级没配时补，
+# 不覆盖别人机器上已经选定的身份。
+CUR_MAIL="$(git -C "$ROOT" config --local user.email 2>/dev/null || true)"
+if [ -z "$CUR_MAIL" ]; then
+  git -C "$ROOT" config --local user.name "xiaojiege"
+  git -C "$ROOT" config --local user.email "xiaojiege@users.noreply.github.com"
+  ok "已补上仓库级提交身份：xiaojiege <xiaojiege@users.noreply.github.com>"
+elif [ "$CUR_MAIL" = "xiaojiege@users.noreply.github.com" ]; then
+  ok "提交身份与 Gitea 账号一致"
+else
+  warn "仓库级提交邮箱是 $CUR_MAIL，与 Gitea 账号不一致；要改就跑 git config --local user.email xiaojiege@users.noreply.github.com"
+fi
+
 echo
 if [ "$FAIL" = "0" ]; then
   echo "体检：$WARN 项要注意，0 项失败"

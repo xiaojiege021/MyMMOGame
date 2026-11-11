@@ -44,6 +44,12 @@ long couponCountOf = 0;
 long rawEnhanceId = 0;
 var rawEnhanceSlot = 0;
 var rawEnhanceLevel = 0;
+var transferState = false;
+string? transferConfigPath = null;
+long transferStateOf = 0;
+var transferFromSlot = 0;
+var transferToSlot = 0;
+string? transferTxnCount = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -166,6 +172,23 @@ for (var i = 0; i < args.Length; i++)
             int.TryParse(args[++i], out rawEnhanceSlot);
             int.TryParse(args[++i], out rawEnhanceLevel);
             break;
+        // 只给核对用：把转移表读出来，不连库、不启动进程。坏配置也走这里。
+        case "--transfer-state":
+            transferState = true;
+            break;
+        case "--transfer-config" when i + 1 < args.Length:
+            transferConfigPath = args[++i];
+            break;
+        // 只给核对用：不看回包，从库里独立读回两格等级、绑定、金币与转移石余量。
+        case "--transfer-level" when i + 3 < args.Length:
+            long.TryParse(args[++i], out transferStateOf);
+            int.TryParse(args[++i], out transferFromSlot);
+            int.TryParse(args[++i], out transferToSlot);
+            break;
+        // 只给核对用：这个转移事务号在表里有几行。
+        case "--transfer-txn-count" when i + 1 < args.Length:
+            transferTxnCount = args[++i];
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -212,13 +235,50 @@ if (enhanceState)
     return 0;
 }
 
+// 转移表只读核对：与启动共用同一套校验（转移石要在物品表里、费用表要照
+// 强化上限与递增关系），不连库也不启动进程，坏配置能在这一步直接看出来。
+if (transferState)
+{
+    try
+    {
+        var characterConfig = CharacterConfig.Load(configPath);
+        var items = ItemTable.Load("config/items.json");
+        var currencies = CurrencyTable.Load("config/currency.json");
+        var enhanceTable = EnhanceTable.Load(
+            enhanceConfigPath ?? characterConfig.EnhanceTable, items, currencies);
+        var table = TransferTable.Load(
+            transferConfigPath ?? characterConfig.TransferTable, items, currencies, enhanceTable);
+        Console.WriteLine("transfer_table_state=ok version=" + table.Version
+            + " max_level=" + table.MaxLevel
+            + " transfer_stone=" + table.StoneItemId
+            + " transfer_stone_cost=" + table.StoneCost
+            + " transfer_gold_kind=" + table.GoldKind
+            + " transfer_gold=" + string.Join(",", table.GoldCosts));
+        Console.WriteLine("transfer_gate=ok level=1 gold=" + table.GoldCostFor(1)
+            + " level=" + table.MaxLevel + " gold=" + table.GoldCostFor(table.MaxLevel));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
-    || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0)
+    || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
+    || transferStateOf != 0 || transferTxnCount != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -505,6 +565,41 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + await enhances.CouponCountAsync(couponCountOf, CancellationToken.None)
                     + " id=" + couponCountOf
                     + " item=" + enhanceTable.ProtectItemId);
+            }
+        }
+
+        if (transferStateOf != 0 || transferTxnCount != null)
+        {
+            var characterConfig = CharacterConfig.Load(configPath);
+            var items = ItemTable.Load("config/items.json");
+            var currencies = CurrencyTable.Load("config/currency.json");
+            var enhanceTable = EnhanceTable.Load(
+                enhanceConfigPath ?? characterConfig.EnhanceTable, items, currencies);
+            var transferTable = TransferTable.Load(
+                transferConfigPath ?? characterConfig.TransferTable,
+                items, currencies, enhanceTable);
+            var transfers = new TransferRepository(dataSource, transferTable, items);
+
+            if (transferStateOf != 0)
+            {
+                var state = await transfers.StateAsync(
+                    transferStateOf, transferFromSlot, transferToSlot, CancellationToken.None);
+                Console.WriteLine("transfer_state=ok id=" + transferStateOf
+                    + " from=" + transferFromSlot + " to=" + transferToSlot
+                    + " from_level=" + state.FromLevel
+                    + " to_level=" + state.ToLevel
+                    // 显式输出小写，和网关回包以及核对脚本读到的布尔形状一致。
+                    + " from_bound=" + (state.FromBound ? "true" : "false")
+                    + " to_bound=" + (state.ToBound ? "true" : "false")
+                    + " gold=" + state.Gold
+                    + " stone=" + state.StoneLeft);
+            }
+
+            if (transferTxnCount != null)
+            {
+                Console.WriteLine("transfer_txn_count="
+                    + await transfers.TxnCountAsync(transferTxnCount, CancellationToken.None)
+                    + " txn=" + transferTxnCount);
             }
         }
 

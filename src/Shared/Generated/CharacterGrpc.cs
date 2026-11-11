@@ -96,6 +96,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.EnhanceRequest> __Marshaller_mmo_character_EnhanceRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EnhanceRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.EnhanceResponse> __Marshaller_mmo_character_EnhanceResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EnhanceResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.TransferEnhanceRequest> __Marshaller_mmo_character_TransferEnhanceRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TransferEnhanceRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.TransferEnhanceResponse> __Marshaller_mmo_character_TransferEnhanceResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TransferEnhanceResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -192,6 +196,14 @@ namespace Mmo.Proto.Character {
         "Enhance",
         __Marshaller_mmo_character_EnhanceRequest,
         __Marshaller_mmo_character_EnhanceResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.TransferEnhanceRequest, global::Mmo.Proto.Character.TransferEnhanceResponse> __Method_TransferEnhance = new grpc::Method<global::Mmo.Proto.Character.TransferEnhanceRequest, global::Mmo.Proto.Character.TransferEnhanceResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "TransferEnhance",
+        __Marshaller_mmo_character_TransferEnhanceRequest,
+        __Marshaller_mmo_character_TransferEnhanceResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -350,6 +362,22 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.EnhanceResponse> Enhance(global::Mmo.Proto.Character.EnhanceRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 强化转移（方案 9.3）。请求里只有两个格子：两格强化等级、绑定状态、
+      /// 转移石编号与张数、金币费用都从角色服的库与 config/transfer.json 读。
+      /// 来源必须高于目标，成功后来源 +0、目标覆盖为来源原来的等级，
+      /// 来源绑定时目标在同一笔事务里改为绑定。转移必定成功，不掷点。
+      /// txn_id 由网关生成，客户端填不进来。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.TransferEnhanceResponse> TransferEnhance(global::Mmo.Proto.Character.TransferEnhanceRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -983,6 +1011,70 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_Enhance, null, options, request);
       }
+      /// <summary>
+      /// 强化转移（方案 9.3）。请求里只有两个格子：两格强化等级、绑定状态、
+      /// 转移石编号与张数、金币费用都从角色服的库与 config/transfer.json 读。
+      /// 来源必须高于目标，成功后来源 +0、目标覆盖为来源原来的等级，
+      /// 来源绑定时目标在同一笔事务里改为绑定。转移必定成功，不掷点。
+      /// txn_id 由网关生成，客户端填不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.TransferEnhanceResponse TransferEnhance(global::Mmo.Proto.Character.TransferEnhanceRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return TransferEnhance(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 强化转移（方案 9.3）。请求里只有两个格子：两格强化等级、绑定状态、
+      /// 转移石编号与张数、金币费用都从角色服的库与 config/transfer.json 读。
+      /// 来源必须高于目标，成功后来源 +0、目标覆盖为来源原来的等级，
+      /// 来源绑定时目标在同一笔事务里改为绑定。转移必定成功，不掷点。
+      /// txn_id 由网关生成，客户端填不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.TransferEnhanceResponse TransferEnhance(global::Mmo.Proto.Character.TransferEnhanceRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_TransferEnhance, null, options, request);
+      }
+      /// <summary>
+      /// 强化转移（方案 9.3）。请求里只有两个格子：两格强化等级、绑定状态、
+      /// 转移石编号与张数、金币费用都从角色服的库与 config/transfer.json 读。
+      /// 来源必须高于目标，成功后来源 +0、目标覆盖为来源原来的等级，
+      /// 来源绑定时目标在同一笔事务里改为绑定。转移必定成功，不掷点。
+      /// txn_id 由网关生成，客户端填不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.TransferEnhanceResponse> TransferEnhanceAsync(global::Mmo.Proto.Character.TransferEnhanceRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return TransferEnhanceAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 强化转移（方案 9.3）。请求里只有两个格子：两格强化等级、绑定状态、
+      /// 转移石编号与张数、金币费用都从角色服的库与 config/transfer.json 读。
+      /// 来源必须高于目标，成功后来源 +0、目标覆盖为来源原来的等级，
+      /// 来源绑定时目标在同一笔事务里改为绑定。转移必定成功，不掷点。
+      /// txn_id 由网关生成，客户端填不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.TransferEnhanceResponse> TransferEnhanceAsync(global::Mmo.Proto.Character.TransferEnhanceRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_TransferEnhance, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1008,7 +1100,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_EnterDungeon, serviceImpl.EnterDungeon)
           .AddMethod(__Method_UseHotSpring, serviceImpl.UseHotSpring)
           .AddMethod(__Method_SettleExp, serviceImpl.SettleExp)
-          .AddMethod(__Method_Enhance, serviceImpl.Enhance).Build();
+          .AddMethod(__Method_Enhance, serviceImpl.Enhance)
+          .AddMethod(__Method_TransferEnhance, serviceImpl.TransferEnhance).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1030,6 +1123,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_UseHotSpring, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse>(serviceImpl.UseHotSpring));
       serviceBinder.AddMethod(__Method_SettleExp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleExpRequest, global::Mmo.Proto.Character.SettleExpResponse>(serviceImpl.SettleExp));
       serviceBinder.AddMethod(__Method_Enhance, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnhanceRequest, global::Mmo.Proto.Character.EnhanceResponse>(serviceImpl.Enhance));
+      serviceBinder.AddMethod(__Method_TransferEnhance, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.TransferEnhanceRequest, global::Mmo.Proto.Character.TransferEnhanceResponse>(serviceImpl.TransferEnhance));
     }
 
   }
