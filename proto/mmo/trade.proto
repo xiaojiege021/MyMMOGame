@@ -10,6 +10,9 @@ option csharp_namespace = "Mmo.Proto.Trade";
 service TradeService {
   rpc ListAuction(ListAuctionRequest) returns (ListAuctionResponse);
   rpc BuyAuction(BuyAuctionRequest) returns (BuyAuctionResponse);
+  // P1-5b：元宝寄售。元宝可以换成金币，商城不直接卖金币。
+  rpc ListIngot(ListIngotRequest) returns (ListIngotResponse);
+  rpc BuyIngot(BuyIngotRequest) returns (BuyIngotResponse);
 }
 
 // 挂单只带卖方角色、要挂的格位、数量与金币标价。
@@ -59,4 +62,52 @@ message BuyAuctionResponse {
   uint32 count = 11;
   string state = 12;
   bool duplicate = 13;
+}
+
+// 元宝寄售挂单：只带卖方角色、要挂的元宝数量与金币总价。
+// 元宝币种、挂单状态与到账都由服务端按 config/auction.json 与库里判定。
+message ListIngotRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  int64 ingot_amount = 3;
+  int64 price_gold = 4;
+  string txn_id = 5;
+}
+
+message ListIngotResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  uint64 seller_id = 4;
+  int64 ingot_amount = 5;
+  int64 price_gold = 6;
+  string state = 7;
+  bool duplicate = 8;
+}
+
+// 买元宝只带买方角色与挂单号。标价、卖方、税率、税额与事务号都带不进来。
+message BuyIngotRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint64 listing_id = 3;
+  string txn_id = 4;
+}
+
+message BuyIngotResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  int64 ingot_amount = 4;
+  int64 price_gold = 5;
+  // 这笔税直接销毁：不进任何角色的货币或背包，也不做成商品。
+  int64 tax_gold = 6;
+  int64 net_gold = 7;
+  int64 buyer_gold = 8;
+  int64 seller_gold = 9;
+  // 元宝等量转移：卖方 -ingot_amount、买方 +ingot_amount，全库总量不变。
+  int64 buyer_ingot = 10;
+  int64 seller_ingot = 11;
+  int32 tax_rate_pct = 12;
+  string state = 13;
+  bool duplicate = 14;
 }

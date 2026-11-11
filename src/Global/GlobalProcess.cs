@@ -36,6 +36,7 @@ public sealed class GlobalProcess(string configPath)
         await using var dataSource = NpgsqlDataSource.Create(
             DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
         var listings = new AuctionListingRepository(dataSource);
+        var ingots = new IngotListingRepository(dataSource);
 
         // 成交要转给角色服：货币、物品与成交状态都在那一笔角色服事务里。
         var channel = GrpcChannel.ForAddress(config.CharacterUpstream);
@@ -53,6 +54,7 @@ public sealed class GlobalProcess(string configPath)
             kestrel.Listen(listenAddress, listenUri.Port, options => options.Protocols = HttpProtocols.Http2));
         builder.Services.AddGrpc();
         builder.Services.AddSingleton(listings);
+        builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(character);
         builder.Services.AddSingleton(config);
 

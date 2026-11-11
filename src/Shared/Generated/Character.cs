@@ -124,38 +124,49 @@ namespace Mmo.Proto.Character {
             "EAoIbmV0X2dvbGQYBiABKAMSEgoKYnV5ZXJfZ29sZBgHIAEoAxITCgtzZWxs",
             "ZXJfZ29sZBgIIAEoAxIUCgx0YXhfcmF0ZV9wY3QYCSABKAUSDwoHaXRlbV9p",
             "ZBgKIAEoCRINCgVjb3VudBgLIAEoDRINCgVzdGF0ZRgMIAEoCRIRCglkdXBs",
-            "aWNhdGUYDSABKAgy5QoKEENoYXJhY3RlclNlcnZpY2USYAoPQ3JlYXRlQ2hh",
-            "cmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXF1ZXN0",
-            "GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXNwb25zZRJLCghT",
-            "ZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXF1ZXN0Gh8ubW1v",
-            "LmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYKB0FkZEl0ZW0SHS5tbW8u",
-            "Y2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNoYXJhY3Rlci5JbnZl",
-            "bnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8uY2hhcmFjdGVyLkxp",
-            "c3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5MaXN0SW52ZW50",
-            "b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hhcmFjdGVyLkNhblRy",
-            "YWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXNwb25zZRJQ",
-            "CgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRkQ3VycmVuY3lSZXF1",
-            "ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFuY2USVAoLR2V0Q3Vy",
-            "cmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVxdWVzdBoiLm1t",
-            "by5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJRCgpBcHBseUdyYW50",
-            "EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVxdWVzdBohLm1tby5jaGFy",
-            "YWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVudGVyRHVuZ2VvbhIiLm1t",
-            "by5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBojLm1tby5jaGFyYWN0",
-            "ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNlSG90U3ByaW5nEiIubW1v",
-            "LmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMubW1vLmNoYXJhY3Rl",
-            "ci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0bGVFeHASHy5tbW8uY2hh",
-            "cmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8uY2hhcmFjdGVyLlNldHRs",
-            "ZUV4cFJlc3BvbnNlEkgKB0VuaGFuY2USHS5tbW8uY2hhcmFjdGVyLkVuaGFu",
-            "Y2VSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5FbmhhbmNlUmVzcG9uc2USYAoP",
-            "VHJhbnNmZXJFbmhhbmNlEiUubW1vLmNoYXJhY3Rlci5UcmFuc2ZlckVuaGFu",
-            "Y2VSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5UcmFuc2ZlckVuaGFuY2VSZXNw",
-            "b25zZRJWCg5JbnN0YWxsQ3J5c3RhbBIkLm1tby5jaGFyYWN0ZXIuSW5zdGFs",
-            "bENyeXN0YWxSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DcnlzdGFsUmVzcG9u",
-            "c2USVAoNUmVtb3ZlQ3J5c3RhbBIjLm1tby5jaGFyYWN0ZXIuUmVtb3ZlQ3J5",
-            "c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0YWxSZXNwb25zZRJa",
-            "Cg1TZXR0bGVBdWN0aW9uEiMubW1vLmNoYXJhY3Rlci5BdWN0aW9uU2V0dGxl",
-            "UmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuQXVjdGlvblNldHRsZVJlc3BvbnNl",
-            "QhaqAhNNbW8uUHJvdG8uQ2hhcmFjdGVyYgZwcm90bzM="));
+            "aWNhdGUYDSABKAgiZgoZQXVjdGlvbkluZ290U2V0dGxlUmVxdWVzdBIPCgdh",
+            "Y2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBISCgpsaXN0aW5n",
+            "X2lkGAMgASgEEg4KBnR4bl9pZBgEIAEoCSKmAgoaQXVjdGlvbkluZ290U2V0",
+            "dGxlUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJEhIKCmxp",
+            "c3RpbmdfaWQYAyABKAQSFAoMaW5nb3RfYW1vdW50GAQgASgDEhIKCnByaWNl",
+            "X2dvbGQYBSABKAMSEAoIdGF4X2dvbGQYBiABKAMSEAoIbmV0X2dvbGQYByAB",
+            "KAMSEgoKYnV5ZXJfZ29sZBgIIAEoAxITCgtzZWxsZXJfZ29sZBgJIAEoAxIT",
+            "CgtidXllcl9pbmdvdBgKIAEoAxIUCgxzZWxsZXJfaW5nb3QYCyABKAMSFAoM",
+            "dGF4X3JhdGVfcGN0GAwgASgFEg0KBXN0YXRlGA0gASgJEhEKCWR1cGxpY2F0",
+            "ZRgOIAEoCDLJCwoQQ2hhcmFjdGVyU2VydmljZRJgCg9DcmVhdGVDaGFyYWN0",
+            "ZXISJS5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlcXVlc3QaJi5t",
+            "bW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlc3BvbnNlEksKCFNldExl",
+            "dmVsEh4ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlcXVlc3QaHy5tbW8uY2hh",
+            "cmFjdGVyLlNldExldmVsUmVzcG9uc2USRgoHQWRkSXRlbRIdLm1tby5jaGFy",
+            "YWN0ZXIuQWRkSXRlbVJlcXVlc3QaHC5tbW8uY2hhcmFjdGVyLkludmVudG9y",
+            "eVNsb3QSWgoNTGlzdEludmVudG9yeRIjLm1tby5jaGFyYWN0ZXIuTGlzdElu",
+            "dmVudG9yeVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlS",
+            "ZXNwb25zZRJLCghDYW5UcmFkZRIeLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVS",
+            "ZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5UcmFkZVJlc3BvbnNlElAKC0Fk",
+            "ZEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5BZGRDdXJyZW5jeVJlcXVlc3Qa",
+            "Hi5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFsYW5jZRJUCgtHZXRDdXJyZW5j",
+            "eRIhLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXF1ZXN0GiIubW1vLmNo",
+            "YXJhY3Rlci5HZXRDdXJyZW5jeVJlc3BvbnNlElEKCkFwcGx5R3JhbnQSIC5t",
+            "bW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXF1ZXN0GiEubW1vLmNoYXJhY3Rl",
+            "ci5BcHBseUdyYW50UmVzcG9uc2USVwoMRW50ZXJEdW5nZW9uEiIubW1vLmNo",
+            "YXJhY3Rlci5FbnRlckR1bmdlb25SZXF1ZXN0GiMubW1vLmNoYXJhY3Rlci5F",
+            "bnRlckR1bmdlb25SZXNwb25zZRJXCgxVc2VIb3RTcHJpbmcSIi5tbW8uY2hh",
+            "cmFjdGVyLlVzZUhvdFNwcmluZ1JlcXVlc3QaIy5tbW8uY2hhcmFjdGVyLlVz",
+            "ZUhvdFNwcmluZ1Jlc3BvbnNlEk4KCVNldHRsZUV4cBIfLm1tby5jaGFyYWN0",
+            "ZXIuU2V0dGxlRXhwUmVxdWVzdBogLm1tby5jaGFyYWN0ZXIuU2V0dGxlRXhw",
+            "UmVzcG9uc2USSAoHRW5oYW5jZRIdLm1tby5jaGFyYWN0ZXIuRW5oYW5jZVJl",
+            "cXVlc3QaHi5tbW8uY2hhcmFjdGVyLkVuaGFuY2VSZXNwb25zZRJgCg9UcmFu",
+            "c2ZlckVuaGFuY2USJS5tbW8uY2hhcmFjdGVyLlRyYW5zZmVyRW5oYW5jZVJl",
+            "cXVlc3QaJi5tbW8uY2hhcmFjdGVyLlRyYW5zZmVyRW5oYW5jZVJlc3BvbnNl",
+            "ElYKDkluc3RhbGxDcnlzdGFsEiQubW1vLmNoYXJhY3Rlci5JbnN0YWxsQ3J5",
+            "c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0YWxSZXNwb25zZRJU",
+            "Cg1SZW1vdmVDcnlzdGFsEiMubW1vLmNoYXJhY3Rlci5SZW1vdmVDcnlzdGFs",
+            "UmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3J5c3RhbFJlc3BvbnNlEloKDVNl",
+            "dHRsZUF1Y3Rpb24SIy5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25TZXR0bGVSZXF1",
+            "ZXN0GiQubW1vLmNoYXJhY3Rlci5BdWN0aW9uU2V0dGxlUmVzcG9uc2USYgoL",
+            "U2V0dGxlSW5nb3QSKC5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25JbmdvdFNldHRs",
+            "ZVJlcXVlc3QaKS5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25JbmdvdFNldHRsZVJl",
+            "c3BvbnNlQhaqAhNNbW8uUHJvdG8uQ2hhcmFjdGVyYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -192,7 +203,9 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.RemoveCrystalRequest), global::Mmo.Proto.Character.RemoveCrystalRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "Socket", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CrystalResponse), global::Mmo.Proto.Character.CrystalResponse.Parser, new[]{ "Ok", "Reason", "Installed", "Slot", "Socket", "CrystalItem", "Category", "Part", "SocketCount", "FilledBefore", "Filled", "CrystalLeft", "Gold", "EnhanceLevel", "Bound", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionSettleRequest), global::Mmo.Proto.Character.AuctionSettleRequest.Parser, new[]{ "Account", "CharacterId", "ListingId", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionSettleResponse), global::Mmo.Proto.Character.AuctionSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "TaxRatePct", "ItemId", "Count", "State", "Duplicate" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionSettleResponse), global::Mmo.Proto.Character.AuctionSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "TaxRatePct", "ItemId", "Count", "State", "Duplicate" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionIngotSettleRequest), global::Mmo.Proto.Character.AuctionIngotSettleRequest.Parser, new[]{ "Account", "CharacterId", "ListingId", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionIngotSettleResponse), global::Mmo.Proto.Character.AuctionIngotSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "IngotAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerIngot", "SellerIngot", "TaxRatePct", "State", "Duplicate" }, null, null, null, null)
           }));
     }
     #endregion
@@ -12959,6 +12972,1010 @@ namespace Mmo.Proto.Character {
             break;
           }
           case 104: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 元宝寄售成交结算。全局服务转发时只带买方角色、挂单号与事务号：
+  /// 标价、卖方、元宝币种、税率、税额、到账与结果都由角色服从库和
+  /// config/auction.json 读，多传这些字段也不会被反序列化进请求。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class AuctionIngotSettleRequest : pb::IMessage<AuctionIngotSettleRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<AuctionIngotSettleRequest> _parser = new pb::MessageParser<AuctionIngotSettleRequest>(() => new AuctionIngotSettleRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<AuctionIngotSettleRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[34]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AuctionIngotSettleRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AuctionIngotSettleRequest(AuctionIngotSettleRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      listingId_ = other.listingId_;
+      txnId_ = other.txnId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AuctionIngotSettleRequest Clone() {
+      return new AuctionIngotSettleRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "listing_id" field.</summary>
+    public const int ListingIdFieldNumber = 3;
+    private ulong listingId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong ListingId {
+      get { return listingId_; }
+      set {
+        listingId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 4;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as AuctionIngotSettleRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(AuctionIngotSettleRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (ListingId != other.ListingId) return false;
+      if (TxnId != other.TxnId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (ListingId != 0UL) hash ^= ListingId.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (ListingId != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(ListingId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (ListingId != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(ListingId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (ListingId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(ListingId);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(AuctionIngotSettleRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.ListingId != 0UL) {
+        ListingId = other.ListingId;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            ListingId = input.ReadUInt64();
+            break;
+          }
+          case 34: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            ListingId = input.ReadUInt64();
+            break;
+          }
+          case 34: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class AuctionIngotSettleResponse : pb::IMessage<AuctionIngotSettleResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<AuctionIngotSettleResponse> _parser = new pb::MessageParser<AuctionIngotSettleResponse>(() => new AuctionIngotSettleResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<AuctionIngotSettleResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[35]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AuctionIngotSettleResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AuctionIngotSettleResponse(AuctionIngotSettleResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      listingId_ = other.listingId_;
+      ingotAmount_ = other.ingotAmount_;
+      priceGold_ = other.priceGold_;
+      taxGold_ = other.taxGold_;
+      netGold_ = other.netGold_;
+      buyerGold_ = other.buyerGold_;
+      sellerGold_ = other.sellerGold_;
+      buyerIngot_ = other.buyerIngot_;
+      sellerIngot_ = other.sellerIngot_;
+      taxRatePct_ = other.taxRatePct_;
+      state_ = other.state_;
+      duplicate_ = other.duplicate_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AuctionIngotSettleResponse Clone() {
+      return new AuctionIngotSettleResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    /// <summary>
+    /// listing_not_found / listing_sold / same_character / gold_insufficient /
+    /// ingot_insufficient 等业务前提是 ok=false + reason，不是 gRPC 错误码；
+    /// 未生效的数值字段一律留 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "listing_id" field.</summary>
+    public const int ListingIdFieldNumber = 3;
+    private ulong listingId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong ListingId {
+      get { return listingId_; }
+      set {
+        listingId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "ingot_amount" field.</summary>
+    public const int IngotAmountFieldNumber = 4;
+    private long ingotAmount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long IngotAmount {
+      get { return ingotAmount_; }
+      set {
+        ingotAmount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "price_gold" field.</summary>
+    public const int PriceGoldFieldNumber = 5;
+    private long priceGold_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long PriceGold {
+      get { return priceGold_; }
+      set {
+        priceGold_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "tax_gold" field.</summary>
+    public const int TaxGoldFieldNumber = 6;
+    private long taxGold_;
+    /// <summary>
+    /// 从买方标价里销毁的那一部分，不写进任何角色或系统账户。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long TaxGold {
+      get { return taxGold_; }
+      set {
+        taxGold_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "net_gold" field.</summary>
+    public const int NetGoldFieldNumber = 7;
+    private long netGold_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long NetGold {
+      get { return netGold_; }
+      set {
+        netGold_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "buyer_gold" field.</summary>
+    public const int BuyerGoldFieldNumber = 8;
+    private long buyerGold_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long BuyerGold {
+      get { return buyerGold_; }
+      set {
+        buyerGold_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "seller_gold" field.</summary>
+    public const int SellerGoldFieldNumber = 9;
+    private long sellerGold_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long SellerGold {
+      get { return sellerGold_; }
+      set {
+        sellerGold_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "buyer_ingot" field.</summary>
+    public const int BuyerIngotFieldNumber = 10;
+    private long buyerIngot_;
+    /// <summary>
+    /// 元宝等量转移：卖方 -ingot_amount、买方 +ingot_amount，全库总量不变。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long BuyerIngot {
+      get { return buyerIngot_; }
+      set {
+        buyerIngot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "seller_ingot" field.</summary>
+    public const int SellerIngotFieldNumber = 11;
+    private long sellerIngot_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long SellerIngot {
+      get { return sellerIngot_; }
+      set {
+        sellerIngot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "tax_rate_pct" field.</summary>
+    public const int TaxRatePctFieldNumber = 12;
+    private int taxRatePct_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int TaxRatePct {
+      get { return taxRatePct_; }
+      set {
+        taxRatePct_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "state" field.</summary>
+    public const int StateFieldNumber = 13;
+    private string state_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string State {
+      get { return state_; }
+      set {
+        state_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "duplicate" field.</summary>
+    public const int DuplicateFieldNumber = 14;
+    private bool duplicate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Duplicate {
+      get { return duplicate_; }
+      set {
+        duplicate_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as AuctionIngotSettleResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(AuctionIngotSettleResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (ListingId != other.ListingId) return false;
+      if (IngotAmount != other.IngotAmount) return false;
+      if (PriceGold != other.PriceGold) return false;
+      if (TaxGold != other.TaxGold) return false;
+      if (NetGold != other.NetGold) return false;
+      if (BuyerGold != other.BuyerGold) return false;
+      if (SellerGold != other.SellerGold) return false;
+      if (BuyerIngot != other.BuyerIngot) return false;
+      if (SellerIngot != other.SellerIngot) return false;
+      if (TaxRatePct != other.TaxRatePct) return false;
+      if (State != other.State) return false;
+      if (Duplicate != other.Duplicate) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (ListingId != 0UL) hash ^= ListingId.GetHashCode();
+      if (IngotAmount != 0L) hash ^= IngotAmount.GetHashCode();
+      if (PriceGold != 0L) hash ^= PriceGold.GetHashCode();
+      if (TaxGold != 0L) hash ^= TaxGold.GetHashCode();
+      if (NetGold != 0L) hash ^= NetGold.GetHashCode();
+      if (BuyerGold != 0L) hash ^= BuyerGold.GetHashCode();
+      if (SellerGold != 0L) hash ^= SellerGold.GetHashCode();
+      if (BuyerIngot != 0L) hash ^= BuyerIngot.GetHashCode();
+      if (SellerIngot != 0L) hash ^= SellerIngot.GetHashCode();
+      if (TaxRatePct != 0) hash ^= TaxRatePct.GetHashCode();
+      if (State.Length != 0) hash ^= State.GetHashCode();
+      if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (ListingId != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(ListingId);
+      }
+      if (IngotAmount != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(IngotAmount);
+      }
+      if (PriceGold != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(PriceGold);
+      }
+      if (TaxGold != 0L) {
+        output.WriteRawTag(48);
+        output.WriteInt64(TaxGold);
+      }
+      if (NetGold != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(NetGold);
+      }
+      if (BuyerGold != 0L) {
+        output.WriteRawTag(64);
+        output.WriteInt64(BuyerGold);
+      }
+      if (SellerGold != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(SellerGold);
+      }
+      if (BuyerIngot != 0L) {
+        output.WriteRawTag(80);
+        output.WriteInt64(BuyerIngot);
+      }
+      if (SellerIngot != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(SellerIngot);
+      }
+      if (TaxRatePct != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(TaxRatePct);
+      }
+      if (State.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(State);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(112);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (ListingId != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(ListingId);
+      }
+      if (IngotAmount != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(IngotAmount);
+      }
+      if (PriceGold != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(PriceGold);
+      }
+      if (TaxGold != 0L) {
+        output.WriteRawTag(48);
+        output.WriteInt64(TaxGold);
+      }
+      if (NetGold != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(NetGold);
+      }
+      if (BuyerGold != 0L) {
+        output.WriteRawTag(64);
+        output.WriteInt64(BuyerGold);
+      }
+      if (SellerGold != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(SellerGold);
+      }
+      if (BuyerIngot != 0L) {
+        output.WriteRawTag(80);
+        output.WriteInt64(BuyerIngot);
+      }
+      if (SellerIngot != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(SellerIngot);
+      }
+      if (TaxRatePct != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(TaxRatePct);
+      }
+      if (State.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(State);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(112);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (ListingId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(ListingId);
+      }
+      if (IngotAmount != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(IngotAmount);
+      }
+      if (PriceGold != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(PriceGold);
+      }
+      if (TaxGold != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(TaxGold);
+      }
+      if (NetGold != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(NetGold);
+      }
+      if (BuyerGold != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(BuyerGold);
+      }
+      if (SellerGold != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(SellerGold);
+      }
+      if (BuyerIngot != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(BuyerIngot);
+      }
+      if (SellerIngot != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(SellerIngot);
+      }
+      if (TaxRatePct != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(TaxRatePct);
+      }
+      if (State.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(State);
+      }
+      if (Duplicate != false) {
+        size += 1 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(AuctionIngotSettleResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.ListingId != 0UL) {
+        ListingId = other.ListingId;
+      }
+      if (other.IngotAmount != 0L) {
+        IngotAmount = other.IngotAmount;
+      }
+      if (other.PriceGold != 0L) {
+        PriceGold = other.PriceGold;
+      }
+      if (other.TaxGold != 0L) {
+        TaxGold = other.TaxGold;
+      }
+      if (other.NetGold != 0L) {
+        NetGold = other.NetGold;
+      }
+      if (other.BuyerGold != 0L) {
+        BuyerGold = other.BuyerGold;
+      }
+      if (other.SellerGold != 0L) {
+        SellerGold = other.SellerGold;
+      }
+      if (other.BuyerIngot != 0L) {
+        BuyerIngot = other.BuyerIngot;
+      }
+      if (other.SellerIngot != 0L) {
+        SellerIngot = other.SellerIngot;
+      }
+      if (other.TaxRatePct != 0) {
+        TaxRatePct = other.TaxRatePct;
+      }
+      if (other.State.Length != 0) {
+        State = other.State;
+      }
+      if (other.Duplicate != false) {
+        Duplicate = other.Duplicate;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            ListingId = input.ReadUInt64();
+            break;
+          }
+          case 32: {
+            IngotAmount = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            PriceGold = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            TaxGold = input.ReadInt64();
+            break;
+          }
+          case 56: {
+            NetGold = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            BuyerGold = input.ReadInt64();
+            break;
+          }
+          case 72: {
+            SellerGold = input.ReadInt64();
+            break;
+          }
+          case 80: {
+            BuyerIngot = input.ReadInt64();
+            break;
+          }
+          case 88: {
+            SellerIngot = input.ReadInt64();
+            break;
+          }
+          case 96: {
+            TaxRatePct = input.ReadInt32();
+            break;
+          }
+          case 106: {
+            State = input.ReadString();
+            break;
+          }
+          case 112: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            ListingId = input.ReadUInt64();
+            break;
+          }
+          case 32: {
+            IngotAmount = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            PriceGold = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            TaxGold = input.ReadInt64();
+            break;
+          }
+          case 56: {
+            NetGold = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            BuyerGold = input.ReadInt64();
+            break;
+          }
+          case 72: {
+            SellerGold = input.ReadInt64();
+            break;
+          }
+          case 80: {
+            BuyerIngot = input.ReadInt64();
+            break;
+          }
+          case 88: {
+            SellerIngot = input.ReadInt64();
+            break;
+          }
+          case 96: {
+            TaxRatePct = input.ReadInt32();
+            break;
+          }
+          case 106: {
+            State = input.ReadString();
+            break;
+          }
+          case 112: {
             Duplicate = input.ReadBool();
             break;
           }

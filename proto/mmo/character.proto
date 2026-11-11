@@ -98,6 +98,11 @@ service CharacterService {
   // 角色服在一笔事务里写买方金币、卖方净额、物品交付与成交状态；
   // 标价、卖方、物品、税率与税额全在服务端读，客户端一个都带不进来。
   rpc SettleAuction(AuctionSettleRequest) returns (AuctionSettleResponse);
+
+  // 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
+  // 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
+  // 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
+  rpc SettleIngot(AuctionIngotSettleRequest) returns (AuctionIngotSettleResponse);
 }
 
 message SettleExpRequest {
@@ -453,4 +458,36 @@ message AuctionSettleResponse {
   uint32 count = 11;
   string state = 12;
   bool duplicate = 13;
+}
+
+// 元宝寄售成交结算。全局服务转发时只带买方角色、挂单号与事务号：
+// 标价、卖方、元宝币种、税率、税额、到账与结果都由角色服从库和
+// config/auction.json 读，多传这些字段也不会被反序列化进请求。
+message AuctionIngotSettleRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint64 listing_id = 3;
+  string txn_id = 4;
+}
+
+message AuctionIngotSettleResponse {
+  // listing_not_found / listing_sold / same_character / gold_insufficient /
+  // ingot_insufficient 等业务前提是 ok=false + reason，不是 gRPC 错误码；
+  // 未生效的数值字段一律留 0。
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  int64 ingot_amount = 4;
+  int64 price_gold = 5;
+  // 从买方标价里销毁的那一部分，不写进任何角色或系统账户。
+  int64 tax_gold = 6;
+  int64 net_gold = 7;
+  int64 buyer_gold = 8;
+  int64 seller_gold = 9;
+  // 元宝等量转移：卖方 -ingot_amount、买方 +ingot_amount，全库总量不变。
+  int64 buyer_ingot = 10;
+  int64 seller_ingot = 11;
+  int32 tax_rate_pct = 12;
+  string state = 13;
+  bool duplicate = 14;
 }

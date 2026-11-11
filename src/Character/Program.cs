@@ -62,6 +62,10 @@ long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
 string? auctionTxnOf = null;
+long ingotBuyerOf = 0;
+long ingotSellerOf = 0;
+long ingotListingOf = 0;
+string? ingotTxnOf = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -236,6 +240,15 @@ for (var i = 0; i < args.Length; i++)
             auctionTxnOf = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
                 ? args[++i] : "";
             break;
+        // 只给核对用：元宝寄售前后双方元宝、金币与全库总量，用来证元宝等量转移、
+        // 金币只少一笔税。
+        case "--ingot-ledger" when i + 3 < args.Length:
+            long.TryParse(args[++i], out ingotBuyerOf);
+            long.TryParse(args[++i], out ingotSellerOf);
+            long.TryParse(args[++i], out ingotListingOf);
+            ingotTxnOf = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
+                ? args[++i] : "";
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -366,7 +379,8 @@ if (auctionState)
             + " tax_min=" + AuctionTable.WrittenMinRatePct
             + " tax_max=" + AuctionTable.WrittenMaxRatePct
             + " gold_kind=" + table.GoldKind
-            + " rounding=" + table.Rounding);
+            + " rounding=" + table.Rounding
+            + " ingot_kind=" + table.IngotKind);
     }
     catch (ConfigException ex)
     {
@@ -390,7 +404,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
     || transferStateOf != 0 || transferTxnCount != null
-    || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0)
+    || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
+    || ingotBuyerOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -773,6 +788,34 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " buyer_items=" + ledger.BuyerItems
                 + " seller_items=" + ledger.SellerItems
                 + " total_items=" + ledger.TotalItems
+                + " accounts=" + ledger.Accounts);
+        }
+
+        if (ingotBuyerOf != 0)
+        {
+            var characterConfig = CharacterConfig.Load(configPath);
+            var ingotCurrencies = CurrencyTable.Load("config/currency.json");
+            var ingotTable = AuctionTable.Load(
+                auctionConfigPath ?? characterConfig.AuctionTable, ingotCurrencies);
+            var ingots = new IngotRepository(dataSource, ingotTable);
+            var ledger = await ingots.StateAsync(
+                ingotBuyerOf, ingotSellerOf, ingotListingOf,
+                ingotTxnOf ?? "", CancellationToken.None);
+            Console.WriteLine("ingot_state=ok buyer=" + ingotBuyerOf
+                + " buyer_gold=" + ledger.BuyerGold
+                + " seller=" + ingotSellerOf
+                + " seller_gold=" + ledger.SellerGold
+                + " total_gold=" + ledger.TotalGold
+                + " buyer_ingot=" + ledger.BuyerIngot
+                + " seller_ingot=" + ledger.SellerIngot
+                + " total_ingot=" + ledger.TotalIngot
+                + " listing=" + ingotListingOf
+                + " state=" + ledger.ListingState
+                + " price=" + ledger.Price
+                + " tax=" + ledger.Tax
+                + " net=" + ledger.Net
+                + " settlements=" + ledger.Settlements
+                + " txn=" + ledger.Txns
                 + " accounts=" + ledger.Accounts);
         }
 

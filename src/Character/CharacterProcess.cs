@@ -111,7 +111,8 @@ public sealed class CharacterProcess(string configPath)
             + " tax_min=" + AuctionTable.WrittenMinRatePct
             + " tax_max=" + AuctionTable.WrittenMaxRatePct
             + " gold_kind=" + auctionTable.GoldKind
-            + " rounding=" + auctionTable.Rounding);
+            + " rounding=" + auctionTable.Rounding
+            + " ingot_kind=" + auctionTable.IngotKind);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -136,6 +137,7 @@ public sealed class CharacterProcess(string configPath)
         var transfers = new TransferRepository(dataSource, transferTable, items);
         var crystals = new CrystalRepository(dataSource, crystalTable, items, config);
         var auctions = new AuctionRepository(dataSource, auctionTable, items, config);
+        var ingots = new IngotRepository(dataSource, auctionTable);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -173,6 +175,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(crystals);
         builder.Services.AddSingleton(auctionTable);
         builder.Services.AddSingleton(auctions);
+        builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

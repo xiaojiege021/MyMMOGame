@@ -17,6 +17,10 @@ public static class AuctionApi
 
     public sealed record BuyBody(ulong? CharacterId, ulong? ListingId);
 
+    public sealed record IngotListBody(ulong? CharacterId, long? IngotAmount, long? PriceGold);
+
+    public sealed record IngotBuyBody(ulong? CharacterId, ulong? ListingId);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -189,6 +193,169 @@ public static class AuctionApi
             catch (RpcException ex)
             {
                 Console.WriteLine("auction_buy_error account=" + account + " detail=" + ex.Status.Detail);
+                await WriteAsync(context, 502, new { error = ex.Status.Detail });
+            }
+        });
+
+        // P1-5b：元宝寄售挂单。元宝没有格位，请求只带角色、元宝数量与金币总价。
+        app.MapPost("/auction/ingot/list", async context =>
+        {
+            if (!Authorize(context, tokens, "auction_ingot_list", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            IngotListBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<IngotListBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.IngotAmount is null || body.IngotAmount < 1
+                || body.PriceGold is null || body.PriceGold < 1)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "auction_ingot_list:" + Guid.NewGuid().ToString("N");
+                var result = await trade.ListIngotAsync(
+                    new ListIngotRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        IngotAmount = body.IngotAmount.Value,
+                        PriceGold = body.PriceGold.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("auction_ingot_list account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " ingot=" + body.IngotAmount.Value
+                    + " price=" + body.PriceGold.Value
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " listing=" + result.ListingId);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = result.Ok,
+                    reason = result.Reason,
+                    listing_id = result.ListingId,
+                    seller_id = result.SellerId,
+                    ingot_amount = result.IngotAmount,
+                    price_gold = result.PriceGold,
+                    state = result.State,
+                    duplicate = result.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                Console.WriteLine("auction_ingot_list_error account=" + account + " detail=" + ex.Status.Detail);
+                await WriteAsync(context, 502, new { error = ex.Status.Detail });
+            }
+        });
+
+        // P1-5b：买元宝。只带买方角色与挂单号；标价、元宝、税率与到账都带不进来。
+        app.MapPost("/auction/ingot/buy", async context =>
+        {
+            if (!Authorize(context, tokens, "auction_ingot_buy", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            IngotBuyBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<IngotBuyBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.ListingId is null || body.ListingId == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "auction_ingot_buy:" + Guid.NewGuid().ToString("N");
+                var result = await trade.BuyIngotAsync(
+                    new BuyIngotRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        ListingId = body.ListingId.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("auction_ingot_buy account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " listing=" + body.ListingId.Value
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " ingot=" + result.IngotAmount
+                    + " price=" + result.PriceGold
+                    + " tax=" + result.TaxGold
+                    + " net=" + result.NetGold
+                    + " duplicate=" + result.Duplicate);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = result.Ok,
+                    reason = result.Reason,
+                    listing_id = result.ListingId,
+                    ingot_amount = result.IngotAmount,
+                    price_gold = result.PriceGold,
+                    tax_gold = result.TaxGold,
+                    net_gold = result.NetGold,
+                    buyer_gold = result.BuyerGold,
+                    seller_gold = result.SellerGold,
+                    buyer_ingot = result.BuyerIngot,
+                    seller_ingot = result.SellerIngot,
+                    tax_rate_pct = result.TaxRatePct,
+                    state = result.State,
+                    duplicate = result.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                Console.WriteLine("auction_ingot_buy_error account=" + account + " detail=" + ex.Status.Detail);
                 await WriteAsync(context, 502, new { error = ex.Status.Detail });
             }
         });

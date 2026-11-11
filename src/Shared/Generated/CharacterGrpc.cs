@@ -110,6 +110,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionSettleRequest> __Marshaller_mmo_character_AuctionSettleRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionSettleRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionSettleResponse> __Marshaller_mmo_character_AuctionSettleResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionSettleResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionIngotSettleRequest> __Marshaller_mmo_character_AuctionIngotSettleRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionIngotSettleRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionIngotSettleResponse> __Marshaller_mmo_character_AuctionIngotSettleResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionIngotSettleResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -238,6 +242,14 @@ namespace Mmo.Proto.Character {
         "SettleAuction",
         __Marshaller_mmo_character_AuctionSettleRequest,
         __Marshaller_mmo_character_AuctionSettleResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse> __Method_SettleIngot = new grpc::Method<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SettleIngot",
+        __Marshaller_mmo_character_AuctionIngotSettleRequest,
+        __Marshaller_mmo_character_AuctionIngotSettleResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -444,6 +456,20 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AuctionSettleResponse> SettleAuction(global::Mmo.Proto.Character.AuctionSettleRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
+      /// 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
+      /// 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AuctionIngotSettleResponse> SettleIngot(global::Mmo.Proto.Character.AuctionIngotSettleRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1265,6 +1291,62 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_SettleAuction, null, options, request);
       }
+      /// <summary>
+      /// 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
+      /// 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
+      /// 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AuctionIngotSettleResponse SettleIngot(global::Mmo.Proto.Character.AuctionIngotSettleRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleIngot(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
+      /// 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
+      /// 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AuctionIngotSettleResponse SettleIngot(global::Mmo.Proto.Character.AuctionIngotSettleRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SettleIngot, null, options, request);
+      }
+      /// <summary>
+      /// 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
+      /// 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
+      /// 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AuctionIngotSettleResponse> SettleIngotAsync(global::Mmo.Proto.Character.AuctionIngotSettleRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleIngotAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
+      /// 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
+      /// 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AuctionIngotSettleResponse> SettleIngotAsync(global::Mmo.Proto.Character.AuctionIngotSettleRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SettleIngot, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1294,7 +1376,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_TransferEnhance, serviceImpl.TransferEnhance)
           .AddMethod(__Method_InstallCrystal, serviceImpl.InstallCrystal)
           .AddMethod(__Method_RemoveCrystal, serviceImpl.RemoveCrystal)
-          .AddMethod(__Method_SettleAuction, serviceImpl.SettleAuction).Build();
+          .AddMethod(__Method_SettleAuction, serviceImpl.SettleAuction)
+          .AddMethod(__Method_SettleIngot, serviceImpl.SettleIngot).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1320,6 +1403,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_InstallCrystal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.InstallCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(serviceImpl.InstallCrystal));
       serviceBinder.AddMethod(__Method_RemoveCrystal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RemoveCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(serviceImpl.RemoveCrystal));
       serviceBinder.AddMethod(__Method_SettleAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionSettleRequest, global::Mmo.Proto.Character.AuctionSettleResponse>(serviceImpl.SettleAuction));
+      serviceBinder.AddMethod(__Method_SettleIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse>(serviceImpl.SettleIngot));
     }
 
   }

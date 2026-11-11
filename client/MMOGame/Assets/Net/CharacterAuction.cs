@@ -3,6 +3,26 @@ using System.Globalization;
 
 namespace Mmo.Net
 {
+    /// <summary>元宝寄售的展示结果。元宝数量、标价、税与到账都是服务端回包里的值。</summary>
+    public struct IngotOutcome
+    {
+        public bool Ok;
+        public string Reason;
+        public ulong ListingId;
+        public long IngotAmount;
+        public long PriceGold;
+        public long TaxGold;
+        public long NetGold;
+        public long BuyerGold;
+        public long SellerGold;
+        public long BuyerIngot;
+        public long SellerIngot;
+        public int TaxRatePct;
+        public string State;
+        public bool Duplicate;
+        public string DisplayText;
+    }
+
     /// <summary>给界面用的展示结果。税额与到账就是服务端回包里的值，不在本地改。</summary>
     public struct AuctionOutcome
     {
@@ -44,6 +64,21 @@ namespace Mmo.Net
                 + ",\"listing_id\":" + listingId.ToString(CultureInfo.InvariantCulture) + "}";
         }
 
+        /// <summary>元宝寄售挂单：只发角色、元宝数量与金币总价。</summary>
+        public static string IngotListBody(ulong characterId, long ingotAmount, long priceGold)
+        {
+            return "{\"character_id\":" + characterId.ToString(CultureInfo.InvariantCulture)
+                + ",\"ingot_amount\":" + ingotAmount.ToString(CultureInfo.InvariantCulture)
+                + ",\"price_gold\":" + priceGold.ToString(CultureInfo.InvariantCulture) + "}";
+        }
+
+        /// <summary>买元宝：只发角色与挂单号。</summary>
+        public static string IngotBuyBody(ulong characterId, ulong listingId)
+        {
+            return "{\"character_id\":" + characterId.ToString(CultureInfo.InvariantCulture)
+                + ",\"listing_id\":" + listingId.ToString(CultureInfo.InvariantCulture) + "}";
+        }
+
         public static AuctionOutcome Parse(string json)
         {
             if (string.IsNullOrEmpty(json) || Raw(json, "ok").Length == 0)
@@ -80,6 +115,50 @@ namespace Mmo.Net
                 TaxRatePct = ReadInt(json, "tax_rate_pct"),
                 ItemId = Raw(json, "item_id"),
                 Count = (uint)Math.Max(0, ReadInt(json, "count")),
+                State = Raw(json, "state"),
+                Duplicate = duplicate,
+                DisplayText = text,
+            };
+        }
+
+        /// <summary>元宝寄售回包拆装。元宝与金币都只翻译服务端给的数，不在本地算。</summary>
+        public static IngotOutcome ParseIngot(string json)
+        {
+            if (string.IsNullOrEmpty(json) || Raw(json, "ok").Length == 0)
+            {
+                return new IngotOutcome { Ok = false, Reason = "bad_reply", DisplayText = "回包读不出来" };
+            }
+
+            var ok = ReadBool(json, "ok");
+            var reason = Raw(json, "reason");
+            var duplicate = ReadBool(json, "duplicate");
+            string text;
+            if (!ok)
+            {
+                text = duplicate ? "重复提交，未生效" : "寄售未完成：" + reason;
+            }
+            else
+            {
+                text = "成交：挂 " + ReadLong(json, "ingot_amount").ToString(CultureInfo.InvariantCulture)
+                    + " 元宝，标价 " + ReadLong(json, "price_gold").ToString(CultureInfo.InvariantCulture)
+                    + "，销毁 " + ReadLong(json, "tax_gold").ToString(CultureInfo.InvariantCulture)
+                    + "，卖方到账 " + ReadLong(json, "net_gold").ToString(CultureInfo.InvariantCulture);
+            }
+
+            return new IngotOutcome
+            {
+                Ok = ok,
+                Reason = reason,
+                ListingId = (ulong)Math.Max(0, ReadLong(json, "listing_id")),
+                IngotAmount = ReadLong(json, "ingot_amount"),
+                PriceGold = ReadLong(json, "price_gold"),
+                TaxGold = ReadLong(json, "tax_gold"),
+                NetGold = ReadLong(json, "net_gold"),
+                BuyerGold = ReadLong(json, "buyer_gold"),
+                SellerGold = ReadLong(json, "seller_gold"),
+                BuyerIngot = ReadLong(json, "buyer_ingot"),
+                SellerIngot = ReadLong(json, "seller_ingot"),
+                TaxRatePct = ReadInt(json, "tax_rate_pct"),
                 State = Raw(json, "state"),
                 Duplicate = duplicate,
                 DisplayText = text,

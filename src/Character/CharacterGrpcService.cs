@@ -32,6 +32,7 @@ public sealed class CharacterGrpcService(
     CrystalTable crystalTable,
     AuctionRepository auctions,
     AuctionTable auctionTable,
+    IngotRepository ingots,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -1163,6 +1164,77 @@ public sealed class CharacterGrpcService(
             TaxRatePct = auctionTable.TaxRatePct,
             ItemId = outcome.ItemId,
             Count = (uint)outcome.Count,
+            State = outcome.State,
+        };
+    }
+
+    /// <summary>
+    /// 元宝寄售成交结算（P1-5b）。全局服务转过来时只带买方角色、挂单号与事务号；
+    /// 元宝数量、标价、卖方、税率与到账全由 IngotRepository 从库和配置读。
+    /// 业务前提不满足是 ok=false + reason，不是 gRPC 错误码。
+    /// </summary>
+    public override async Task<AuctionIngotSettleResponse> SettleIngot(
+        AuctionIngotSettleRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0 || request.ListingId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        if (!await inventory.OwnsAsync(account, (long)request.CharacterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await ingots.SettleAsync(
+            (long)request.CharacterId, (long)request.ListingId, txnId, context.CancellationToken);
+
+        logger.LogInformation(
+            "ingot_settle account={Account} buyer={Buyer} listing={Listing} txn={Txn} "
+            + "ok={Ok} reason={Reason} ingot={Ingot} price={Price} tax={Tax} net={Net} duplicate={Duplicate}",
+            account, request.CharacterId, request.ListingId, txnId, outcome.Ok,
+            outcome.Reason, outcome.IngotAmount, outcome.PriceGold, outcome.TaxGold,
+            outcome.NetGold, outcome.Duplicate);
+
+        if (!outcome.Ok)
+        {
+            // 拒绝与重放都不带「这一手生效了」的数值；税率只是配置里的展示值。
+            return new AuctionIngotSettleResponse
+            {
+                Ok = false,
+                Reason = outcome.Reason,
+                ListingId = (ulong)outcome.ListingId,
+                TaxRatePct = auctionTable.TaxRatePct,
+                Duplicate = outcome.Duplicate,
+            };
+        }
+
+        return new AuctionIngotSettleResponse
+        {
+            Ok = true,
+            Reason = "",
+            ListingId = (ulong)outcome.ListingId,
+            IngotAmount = outcome.IngotAmount,
+            PriceGold = outcome.PriceGold,
+            TaxGold = outcome.TaxGold,
+            NetGold = outcome.NetGold,
+            BuyerGold = outcome.BuyerGold,
+            SellerGold = outcome.SellerGold,
+            BuyerIngot = outcome.BuyerIngot,
+            SellerIngot = outcome.SellerIngot,
+            TaxRatePct = auctionTable.TaxRatePct,
             State = outcome.State,
         };
     }

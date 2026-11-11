@@ -15,20 +15,26 @@ public sealed class AuctionTable
     public const int WrittenMinRatePct = 5;
     public const int WrittenMaxRatePct = 8;
     public const string WrittenGoldKind = "gold";
+    // 开发架构第 13 节 P1-5b 写定：寄售的是元宝，换的是金币，商城不直接卖金币。
+    // 币种编号在 currency.json 里是 yuanbao，这里写成常量，配置改了起不来。
+    public const string WrittenIngotKind = "yuanbao";
     public const string WrittenSchema = "auction-table/1";
 
     public int Version { get; }
     public int TaxRatePct { get; }
     public string Rounding { get; }
     public string GoldKind { get; }
+    public string IngotKind { get; }
     public string Note { get; }
 
-    AuctionTable(int version, int taxRatePct, string rounding, string goldKind, string note)
+    AuctionTable(int version, int taxRatePct, string rounding, string goldKind,
+        string ingotKind, string note)
     {
         Version = version;
         TaxRatePct = taxRatePct;
         Rounding = rounding;
         GoldKind = goldKind;
+        IngotKind = ingotKind;
         Note = note;
     }
 
@@ -102,13 +108,31 @@ public sealed class AuctionTable
             throw new ConfigException("auction.json 的 gold_kind 不在 currency.json 里：" + gold);
         }
 
+        // P1-5b：寄售的是元宝、换的是金币。两种币种不能是同一个，
+        // 否则就成了「用金币买金币」，违背「元宝只经寄售换成金币」的写定。
+        var ingot = (wire.IngotKind ?? "").Trim();
+        if (!string.Equals(ingot, WrittenIngotKind, StringComparison.Ordinal))
+        {
+            throw new ConfigException("auction.json 的 ingot_kind 必须是 " + WrittenIngotKind);
+        }
+
+        if (currencies.Find(ingot) is null)
+        {
+            throw new ConfigException("auction.json 的 ingot_kind 不在 currency.json 里：" + ingot);
+        }
+
+        if (string.Equals(ingot, gold, StringComparison.Ordinal))
+        {
+            throw new ConfigException("auction.json 的 ingot_kind 不能和 gold_kind 相同");
+        }
+
         var note = (wire.Note ?? "").Trim();
         if (!note.Contains("待定", StringComparison.Ordinal))
         {
             throw new ConfigException("auction.json 的 note 要写明哪些数值待定");
         }
 
-        return new AuctionTable(wire.Version ?? 1, rate, rounding, gold, note);
+        return new AuctionTable(wire.Version ?? 1, rate, rounding, gold, ingot, note);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -136,5 +160,8 @@ public sealed class AuctionTable
 
         [JsonPropertyName("gold_kind")]
         public string? GoldKind { get; init; }
+
+        [JsonPropertyName("ingot_kind")]
+        public string? IngotKind { get; init; }
     }
 }
