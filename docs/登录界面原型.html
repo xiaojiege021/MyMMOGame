@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>长生隙 · 登录界面原型</title>
+<style>
+  :root {
+    --ink-0: #08121c;
+    --ink-1: #0d1b2a;
+    --ink-2: #local-host42f;
+    --violet: #241d38;
+    --jade: #9fd8cf;
+    --jade-bright: #cfe9e4;
+    --warm: #e8c98a;
+    --text: #e6eef0;
+    --muted: #8fa3ad;
+    --faint: #5d7280;
+    --seal: #8c3b3b;
+    --danger: #d98a76;
+    --serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "STSong", serif;
+    --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #eef0f1;
+    color: #243038;
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1240px; margin: 0 auto; padding: 28px 24px 64px; }
+
+  /* 原型工具条：不属于游戏界面 */
+  .proto-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding: 12px 16px;
+    background: #fff; border: 1px solid #dcdfe2; border-radius: 10px;
+    font-size: 13px;
+  }
+  .proto-bar .label { color: #6b777f; margin-right: 4px; }
+  .proto-bar button {
+    font: inherit; font-size: 13px; padding: 6px 14px; cursor: pointer;
+    color: #33464f; background: #f4f6f7; border: 1px solid #d7dcdf; border-radius: 6px;
+  }
+  .proto-bar button.on { background: #local-host42f; border-color: #local-host42f; color: #e6eef0; }
+  .proto-bar select {
+    font: inherit; font-size: 13px; padding: 6px 8px;
+    border: 1px solid #d7dcdf; border-radius: 6px; background: #fff; color: #33464f;
+  }
+  .proto-bar .note { margin-left: auto; color: #87939a; font-size: 12px; }
+
+  /* 舞台：按 Android 平板横屏 16:9 */
+  .stage-wrap {
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 18px 50px rgba(16, 32, 40, .18);
+  }
+  .stage {
+    position: relative; width: 100%; aspect-ratio: 16 / 9;
+    min-height: 520px; overflow: hidden;
+    background: var(--ink-0); color: var(--text);
+  }
+  .bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 78% 72% at 46% 42%, transparent 38%, rgba(4, 10, 16, .72) 100%);
+  }
+  .grain {
+    position: absolute; inset: 0; pointer-events: none; opacity: .22;
+    background-image: radial-gradient(rgba(207, 233, 228, .12) .5px, transparent .5px);
+    background-size: 5px 5px;
+  }
+  .cloud-drift { animation: drift 46s linear infinite; }
+  @keyframes drift { from { transform: translateX(-60px); } to { transform: translateX(60px); } }
+  @media (prefers-reduced-motion: reduce) { .cloud-drift { animation: none; } }
+
+  .screen { position: absolute; inset: 0; display: none; }
+  .screen.on { display: block; }
+
+  /* 品牌区 */
+  .brand {
+    position: absolute; left: 6.2%; top: 12%; bottom: 13%;
+    display: flex; align-items: flex-start; gap: 22px;
+  }
+  .brand-title {
+    writing-mode: vertical-rl; text-orientation: upright;
+    font-family: var(--serif); font-size: clamp(46px, 6.2vw, 92px);
+    letter-spacing: .22em; line-height: 1; color: var(--jade-bright);
+    text-shadow: 0 0 28px rgba(159, 216, 207, .28);
+  }
+  .brand-side { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; padding-top: 6px; }
+  .brand-sub {
+    writing-mode: vertical-rl; font-family: var(--serif);
+    font-size: clamp(12px, 1.15vw, 16px); letter-spacing: .38em;
+    color: var(--muted); line-height: 1.9;
+  }
+  .seal {
+    width: 34px; height: 34px; border: 1px solid var(--seal); border-radius: 3px;
+    color: #d9a09a; font-family: var(--serif); font-size: 12px;
+    display: grid; place-items: center; line-height: 1.05; letter-spacing: 0;
+    writing-mode: vertical-rl; padding: 3px;
+  }
+  .brand-foot {
+    position: absolute; left: 6.2%; bottom: 7%;
+    font-size: clamp(10px, .95vw, 13px); color: var(--faint); letter-spacing: .18em;
+  }
+  .brand-foot .dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--jade); margin-right: 8px; vertical-align: 1px;
+    box-shadow: 0 0 8px rgba(159, 216, 207, .7);
+  }
+
+  /* 登录卡片 */
+  .panel {
+    position: absolute; right: 7%; top: 50%; transform: translateY(-50%);
+    width: min(360px, 33%); padding: 34px 32px 28px;
+    background: rgba(8, 19, 29, .78);
+    border: 1px solid rgba(159, 216, 207, .22);
+    border-radius: 4px;
+    backdrop-filter: blur(7px);
+  }
+  .panel::before, .panel::after {
+    content: ""; position: absolute; width: 18px; height: 18px; pointer-events: none;
+    border-color: rgba(207, 233, 228, .5); border-style: solid;
+  }
+  .panel::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+  .panel::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+  .panel-lead {
+    font-family: var(--serif); font-size: clamp(15px, 1.5vw, 19px);
+    letter-spacing: .16em; color: var(--text); margin: 0 0 4px;
+  }
+  .panel-rule { height: 1px; background: linear-gradient(90deg, rgba(159,216,207,.55), transparent); margin: 16px 0 24px; }
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block; font-size: 11px; letter-spacing: .24em;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .field input {
+    width: 100%; padding: 10px 2px; font: inherit; font-size: 15px;
+    color: var(--text); background: transparent;
+    border: 0; border-bottom: 1px solid rgba(143, local-host, 173, .38);
+    border-radius: 0; outline: none; transition: border-color .2s;
+  }
+  .field input::placeholder { color: #4e626d; }
+  .field input:focus { border-bottom-color: var(--jade); }
+  .btn-main {
+    width: 100%; margin-top: 12px; padding: 13px 0;
+    font-family: var(--serif); font-size: 16px; letter-spacing: .5em;
+    text-indent: .5em; color: var(--jade-bright); cursor: pointer;
+    background: rgba(22, 52, 47, .55);
+    border: 1px solid rgba(159, 216, 207, .55); border-radius: 2px;
+    transition: background .2s, border-color .2s;
+  }
+  .btn-main:hover:not(:disabled) { background: rgba(31, 74, 66, .85); border-color: var(--jade-bright); }
+  .btn-main:disabled { opacity: .38; cursor: not-allowed; }
+  .hint { min-height: 18px; margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--danger); }
+  .hint.ok { color: var(--jade); }
+  .panel-meta {
+    margin-top: 22px; padding-top: 14px; border-top: 1px solid rgba(143,local-host,173,.14);
+    font-size: 11px; color: var(--faint); letter-spacing: .1em;
+    display: flex; justify-content: space-between;
+  }
+
+  /* 创角屏 */
+  .create { position: absolute; inset: 0; padding: 5.5% 7%; display: flex; flex-direction: column; }
+  .create-head { display: flex; align-items: baseline; gap: 18px; }
+  .create-head h2 {
+    margin: 0; font-family: var(--serif); font-weight: 400;
+    font-size: clamp(24px, 2.7vw, 38px); letter-spacing: .3em; color: var(--jade-bright);
+  }
+  .create-head span { font-size: 12px; color: var(--muted); letter-spacing: .12em; }
+  .create-body { display: flex; gap: 4.5%; flex: 1; min-height: 0; margin-top: 3%; }
+  .create-col { flex: 1; min-width: 0; }
+  .sec-label { font-size: 11px; letter-spacing: .26em; color: var(--muted); margin-bottom: 12px; }
+  .race-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .opt {
+    text-align: left; padding: 12px 14px; cursor: pointer; font: inherit;
+    color: var(--text); background: rgba(8, 19, 29, .62);
+    border: 1px solid rgba(143, local-host, 173, .24); border-radius: 3px;
+    transition: border-color .18s, background .18s;
+  }
+  .opt:hover { border-color: rgba(159, 216, 207, .55); }
+  .opt.sel { border-color: var(--jade); background: rgba(22, 52, 47, .6); }
+  .opt b { display: block; font-family: var(--serif); font-weight: 400; font-size: 17px; letter-spacing: .18em; margin-bottom: 5px; }
+  .opt small { display: block; font-size: 11px; line-height: 1.55; color: var(--muted); }
+  .class-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 9px 16px; cursor: pointer; font: inherit; font-size: 13px; letter-spacing: .16em;
+    color: var(--text); background: rgba(8, 19, 29, .62);
+    border: 1px solid rgba(143, local-host, 173, .24); border-radius: 2px;
+  }
+  .chip.sel { border-color: var(--jade); background: rgba(22, 52, 47, .6); color: var(--jade-bright); }
+  .name-field { margin-top: 22px; }
+  .name-field input {
+    width: 100%; padding: 10px 2px; font: inherit; font-size: 15px; color: var(--text);
+    background: transparent; border: 0; border-bottom: 1px solid rgba(143,local-host,173,.38); outline: none;
+  }
+  .name-field input:focus { border-bottom-color: var(--jade); }
+  .rule-note {
+    margin-top: 18px; padding: 12px 14px; font-size: 11.5px; line-height: 1.8;
+    color: var(--muted); background: rgba(8, 19, 29, .5);
+    border-left: 2px solid rgba(232, 201, 138, .6);
+  }
+  .create-foot { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 2%; }
+  .create-foot .btn-main { width: 190px; margin: 0; }
+  .link-btn {
+    font: inherit; font-size: 12px; letter-spacing: .16em; cursor: pointer;
+    color: var(--muted); background: none; border: 0; padding: 8px 0;
+  }
+  .link-btn:hover { color: var(--jade); }
+
+  /* 载入屏 */
+  .loading { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .loading .act { font-family: var(--serif); font-size: clamp(20px, 2.4vw, 32px); letter-spacing: .42em; color: var(--jade-bright); }
+  .loading .sub { margin-top: 14px; font-size: 12px; letter-spacing: .26em; color: var(--muted); }
+  .bar { width: min(360px, 46vw); height: 2px; margin: 34px auto 0; background: rgba(159,216,207,.16); }
+  .bar i { display: block; height: 100%; width: 0; background: var(--jade); transition: width .25s linear; }
+  .loading .tip { margin-top: 18px; font-size: 11px; color: var(--faint); letter-spacing: .12em; }
+
+  /* 规格区 */
+  .spec { margin-top: 30px; }
+  .spec h2 { font-size: 17px; font-weight: 500; margin: 0 0 6px; color: #243038; }
+  .spec .intro { font-size: 13px; color: #6b777f; margin: 0 0 18px; line-height: 1.7; }
+  .spec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .card { background: #fff; border: 1px solid #dcdfe2; border-radius: 10px; padding: 18px 20px; }
+  .card h3 { font-size: 14px; font-weight: 500; margin: 0 0 14px; color: #243038; }
+  .card table { width: 100%; border-collapse: collapse; font-size: 12px; color: #46555d; }
+  .card td { padding: 6px 0; border-bottom: 1px solid #eef0f1; vertical-align: top; }
+  .card tr:last-child td { border-bottom: 0; }
+  .card td:first-child { width: 42%; color: #6b777f; }
+  .card code, .spec code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px;
+    background: #f2f4f5; padding: 1px 5px; border-radius: 3px; color: #2b4a43;
+  }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 7px; vertical-align: -2px; border: 1px solid rgba(0,0,0,.08); }
+  .card ul { margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.9; color: #46555d; }
+  .card li::marker { color: #9fb0b8; }
+  .foot-note { margin-top: 18px; font-size: 12px; color: #6b777f; line-height: 1.8; }
+  @media (max-width: 820px) {
+    .spec-grid { grid-template-columns: 1fr; }
+    .create-body { flex-direction: column; gap: 16px; overflow-y: auto; }
+    .stage { min-height: 640px; aspect-ratio: auto; }
+    .panel { width: min(360px, 86%); right: 7%; }
+    .brand-title { font-size: 44px; }
+    .brand-sub { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="proto-bar">
+    <span class="label">原型切换</span>
+    <button data-go="login" class="on">01 登入</button>
+    <button data-go="create">02 创角</button>
+    <button data-go="loading">03 载入</button>
+    <span class="label" style="margin-left:12px">演示返回</span>
+    <select id="mockCode">
+      <option value="200">200 成功</option>
+      <option value="401">401 口令不对</option>
+      <option value="503">503 库连不上</option>
+      <option value="400">400 请求为空</option>
+      <option value="net">网络不可达</option>
+    </select>
+    <span class="note">切换器与返回码仅原型演示，不属于游戏界面</span>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="stage">
+
+      <!-- 背景：五层，可分别切图 -->
+      <svg class="bg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#070f19"/>
+            <stop offset="0.46" stop-color="#101f30"/>
+            <stop offset="0.76" stop-color="#local-host42f"/>
+            <stop offset="1" stop-color="#0a1620"/>
+          </linearGradient>
+          <radialGradient id="halo">
+            <stop offset="0" stop-color="#cfe9e4" stop-opacity=".38"/>
+            <stop offset="0.45" stop-color="#9fd8cf" stop-opacity=".12"/>
+            <stop offset="1" stop-color="#9fd8cf" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="beamH" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#cfe9e4" stop-opacity="0"/>
+            <stop offset="0.5" stop-color="#cfe9e4" stop-opacity=".5"/>
+            <stop offset="1" stop-color="#cfe9e4" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="beamFade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#cfe9e4" stop-opacity=".55"/>
+            <stop offset="0.62" stop-color="#cfe9e4" stop-opacity=".22"/>
+            <stop offset="1" stop-color="#cfe9e4" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 1 夜空 -->
+        <rect width="1600" height="900" fill="url(#sky)"/>
+        <ellipse cx="790" cy="150" rx="330" ry="250" fill="url(#halo)"/>
+
+        <!-- 2 光柱 -->
+        <rect x="650" y="0" width="290" height="900" fill="url(#beamH)" opacity=".5"/>
+        <rect x="742" y="0" width="106" height="900" fill="url(#beamFade)" opacity=".32"/>
+
+        <!-- 3 远山 -->
+        <path d="M0 618 L170 508 L318 566 L470 436 L622 522 L784 402 L958 502 L1124 424 L1318 544 L1450 492 L1600 528 L1600 900 L0 900 Z"
+              fill="#152b3d" opacity=".72"/>
+        <!-- 4 中山 -->
+        <path d="M0 706 L216 612 L398 664 L582 562 L758 646 L942 574 L1162 664 L1398 592 L1600 654 L1600 900 L0 900 Z"
+              fill="#0e2130" opacity=".92"/>
+
+        <!-- 云海 -->
+        <g class="cloud-drift" fill="#cfe9e4" opacity=".075">
+          <ellipse cx="520" cy="628" rx="300" ry="17"/>
+          <ellipse cx="980" cy="668" rx="340" ry="20"/>
+          <ellipse cx="300" cy="700" rx="250" ry="14"/>
+          <ellipse cx="1260" cy="616" rx="260" ry="15"/>
+        </g>
+
+        <!-- 5 近崖 · 楼阁 · 修士 -->
+        <path d="M0 900 L0 782 Q140 758 268 778 L392 766 Q466 762 520 800 L572 900 Z" fill="#06111b"/>
+        <g fill="#050e17">
+          <path d="M356 646 Q456 610 556 646 L544 652 Q456 624 368 652 Z"/>
+          <rect x="382" y="652" width="148" height="82"/>
+          <path d="M392 600 Q456 574 520 600 L510 606 Q456 586 402 606 Z"/>
+          <rect x="410" y="606" width="92" height="46"/>
+        </g>
+        <g fill="#e8c98a" opacity=".72">
+          <rect x="404" y="670" width="15" height="21"/>
+          <rect x="446" y="670" width="15" height="21"/>
+          <rect x="492" y="670" width="15" height="21"/>
+          <rect x="434" y="618" width="12" height="16"/>
+          <rect x="466" y="618" width="12" height="16"/>
+        </g>
+        <g fill="#040c14">
+          <circle cx="304" cy="716" r="7"/>
+          <path d="M297 724 L311 724 L318 766 Q304 774 290 766 Z"/>
+          <path d="M292 762 Q272 770 264 784 L306 778 Z"/>
+        </g>
+
+        <rect x="0" y="840" width="1600" height="60" fill="#050d15" opacity=".8"/>
+      </svg>
+      <div class="vignette"></div>
+      <div class="grain"></div>
+
+      <!-- 01 登入 -->
+      <section class="screen on" id="s-login">
+        <div class="brand">
+          <div class="brand-title">长生隙</div>
+          <div class="brand-side">
+            <div class="brand-sub">表里两界之间那道缝</div>
+            <div class="seal">云锦</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <p class="panel-lead">旧路已断，仍要往前。</p>
+          <div class="panel-rule"></div>
+          <div class="field">
+            <label for="acct">账 号</label>
+            <input id="acct" type="text" autocomplete="off" placeholder="请输入账号" />
+          </div>
+          <div class="field">
+            <label for="pwd">口 令</label>
+            <input id="pwd" type="password" autocomplete="off" placeholder="请输入口令" />
+          </div>
+          <button class="btn-main" id="btnLogin" disabled>登 入</button>
+          <p class="hint" id="loginHint"></p>
+          <div class="panel-meta">
+            <span>云锦繁星</span><span>v1.77</span>
+          </div>
+        </div>
+
+        <div class="brand-foot"><span class="dot"></span>网关已连通 · 首发 Android</div>
+      </section>
+
+      <!-- 02 创角 -->
+      <section class="screen" id="s-create">
+        <div class="create">
+          <div class="create-head">
+            <h2>立 身</h2>
+            <span>选定出身与职责，走进枯岚道</span>
+          </div>
+          <div class="create-body">
+            <div class="create-col">
+              <div class="sec-label">出 身 · 四 选 一</div>
+              <div class="race-grid" id="raceGrid"></div>
+              <div class="name-field">
+                <div class="sec-label">名 号</div>
+                <input id="charName" type="text" maxlength="12" placeholder="给这名修士起个名字" />
+              </div>
+            </div>
+            <div class="create-col">
+              <div class="sec-label">职 责 · 五 选 一</div>
+              <div class="class-row" id="classRow"></div>
+              <div class="rule-note">
+                出身只改外观与出身对白，不决定阵营、不产生属性差、也不锁职业。<br />
+                15 级一转时才选分支，45 级二转只把这一条往前推。创建时分支留空。
+              </div>
+            </div>
+          </div>
+          <div class="create-foot">
+            <button class="link-btn" id="btnBack">← 返回登入</button>
+            <button class="btn-main" id="btnCreate" disabled>入 世</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 载入 -->
+      <section class="screen" id="s-loading">
+        <div class="loading">
+          <div class="act">仙路已断</div>
+          <div class="sub">正在进入表世界</div>
+          <div class="bar"><i id="barFill"></i></div>
+          <div class="tip" id="loadTip">表里两界之间那道缝</div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <section class="spec">
+    <h2>实现规格</h2>
+    <p class="intro">这一套是给 Unity 客户端对照实现的视觉稿，不是正式美术资源。背景用代码绘制，方便按层切图；所有文案与字段取自仓库正本，没有引入方案里不存在的入口。</p>
+    <div class="spec-grid">
+      <div class="card">
+        <h3>色板（取自已定稿的 app-icon）</h3>
+        <table>
+          <tr><td><span class="sw" style="background:#08121c"></span>墨底</td><td><code>#08121c</code> 面板 / 近景</td></tr>
+          <tr><td><span class="sw" style="background:#0d1b2a"></span>深蓝</td><td><code>#0d1b2a</code> 夜空</td></tr>
+          <tr><td><span class="sw" style="background:#local-host42f"></span>墨绿</td><td><code>#local-host42f</code> 按钮底 / 选中态</td></tr>
+          <tr><td><span class="sw" style="background:#cfe9e4"></span>青白</td><td><code>#cfe9e4</code> 标题 / 光柱 / 主文字</td></tr>
+          <tr><td><span class="sw" style="background:#9fd8cf"></span>青</td><td><code>#9fd8cf</code> 描边 / 焦点 / 进度</td></tr>
+          <tr><td><span class="sw" style="background:#e8c98a"></span>暖黄</td><td><code>#e8c98a</code> 窗灯 / 规则提示，仅点缀</td></tr>
+          <tr><td><span class="sw" style="background:#8c3b3b"></span>印红</td><td><code>#8c3b3b</code> 工作室印章</td></tr>
+          <tr><td><span class="sw" style="background:#d98a76"></span>警示</td><td><code>#d98a76</code> 错误提示</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>版式与控件（横屏平板）</h3>
+        <table>
+          <tr><td>画布</td><td>16:9，安全区左右各 6%–7%</td></tr>
+          <tr><td>主标题</td><td>衬线竖排，约 72–92px，字距 .22em</td></tr>
+          <tr><td>卡片</td><td>宽 360px，圆角 4px，四角 L 形云纹</td></tr>
+          <tr><td>输入框</td><td>高约 40px，仅下边框，聚焦转青</td></tr>
+          <tr><td>主按钮</td><td>高约 46px，字距 .5em，1px 青边</td></tr>
+          <tr><td>层级</td><td>品牌区在左，面板在右，中景留白给光柱</td></tr>
+          <tr><td>字体</td><td>标题宋体，正文黑体，全系统字体回退</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>接口映射（照抄 LoginApi.cs）</h3>
+        <table>
+          <tr><td>请求</td><td><code>POST /login</code></td></tr>
+          <tr><td>入参</td><td><code>account</code> / <code>password</code></td></tr>
+          <tr><td>成功</td><td>200 <code>token</code> / <code>expires_in_s</code></td></tr>
+          <tr><td>400</td><td>请求没发出去，重试一次</td></tr>
+          <tr><td>401</td><td>账号或口令不对（不区分是哪个）</td></tr>
+          <tr><td>503</td><td>暂时连不上，稍后再试</td></tr>
+          <tr><td>网络失败</td><td>连不上网关</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>状态清单</h3>
+        <ul>
+          <li>空账号或空口令：按钮禁用，不发请求（对应 400 的前端拦截）</li>
+          <li>输入中 / 聚焦：下边框转青，提示清空</li>
+          <li>提交中：按钮置灰并显示「正在校验」，防重复点</li>
+          <li>失败：卡片内一行提示，输入框保留，不清口令</li>
+          <li>成功：存令牌后进创角；创角未选出身/职业/名字时「入世」禁用</li>
+          <li>载入：进度只作表现，能否进世界以服务端回包为准</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>背景切图分层</h3>
+        <ul>
+          <li>第 1 层 夜空 + 光晕（可纯色 + 一张软光晕）</li>
+          <li>第 2 层 青白光柱（带透明通道，可轻微呼吸）</li>
+          <li>第 3 层 远山 / 第 4 层 中山（各一张，静态）</li>
+          <li>云海：一条横向循环飘动的半透明带</li>
+          <li>第 5 层 近崖 + 楼阁 + 修士剪影（一张，含暖黄窗光）</li>
+          <li>暗角与纸纹用全屏叠加，不切图</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>刻意不做（方案与网关都没有）</h3>
+        <ul>
+          <li>记住口令、自动登录、第三方登录、游客登录</li>
+          <li>选服 / 分线选择（分线由世界服给）</li>
+          <li>忘记口令、注册账号（账号表由服务端 seed）</li>
+          <li>公告位、活动弹窗、捏脸、性别、模型预览</li>
+          <li>创角页列分支（15 级一转才选）</li>
+          <li>任何写死的概率、次数、TTL 数值</li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">
+      与第 17 节的关系：这一套属于 17.3 里「技能与职业图标、界面与 HUD 皮肤」，不进逻辑、不进库，可以整批后置或整批替换；落地时只要守住不发权威判定、不把令牌写进 UI 之外的地方。原型里的三屏切换和返回码下拉是演示工具，不进客户端。
+    </p>
+  </section>
+</div>
+
+<script>
+  const RACES = [
+    { name: "尘民", desc: "灵气稀薄之后最常见的凡人" },
+    { name: "脉裔", desc: "住在还没干涸的灵脉旁边" },
+    { name: "岚民", desc: "从前走高空航路的人，航路断了以后住在崖上" },
+    { name: "渊户", desc: "世代守在秘境入口旁边的人家" }
+  ];
+  const CLASSES = ["坦克", "战士", "法师", "射手", "牧师"];
+  const HINTS = {
+    "400": "请求没发出去，重试一次",
+    "401": "账号或口令不对",
+    "503": "暂时连不上，稍后再试",
+    "net": "连不上网关"
+  };
+
+  const screens = { login: "s-login", create: "s-create", loading: "s-loading" };
+  function show(key) {
+    Object.entries(screens).forEach(([k, id]) => document.getElementById(id).classList.toggle("on", k === key));
+    document.querySelectorAll("[data-go]").forEach(b => b.classList.toggle("on", b.dataset.go === key));
+    if (key === "loading") runLoading();
+  }
+  document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => show(b.dataset.go)));
+
+  const acct = document.getElementById("acct");
+  const pwd = document.getElementById("pwd");
+  const btnLogin = document.getElementById("btnLogin");
+  const hint = document.getElementById("loginHint");
+
+  function syncLogin() {
+    btnLogin.disabled = !acct.value.trim() || !pwd.value.length;
+    if (!btnLogin.disabled) { hint.textContent = ""; hint.classList.remove("ok"); }
+  }
+  acct.addEventListener("input", syncLogin);
+  pwd.addEventListener("input", syncLogin);
+
+  btnLogin.addEventListener("click", () => {
+    const code = document.getElementById("mockCode").value;
+    btnLogin.disabled = true;
+    btnLogin.textContent = "正在校验";
+    hint.textContent = "";
+    setTimeout(() => {
+      btnLogin.textContent = "登 入";
+      syncLogin();
+      if (code === "200") {
+        hint.textContent = "已取得会话令牌";
+        hint.classList.add("ok");
+        setTimeout(() => show("create"), 550);
+      } else {
+        hint.textContent = HINTS[code];
+        hint.classList.remove("ok");
+      }
+    }, 850);
+  });
+
+  let race = -1, klass = -1;
+  const raceGrid = document.getElementById("raceGrid");
+  RACES.forEach((r, i) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = "<b>" + r.name + "</b><small>" + r.desc + "</small>";
+    b.addEventListener("click", () => {
+      race = i;
+      [...raceGrid.children].forEach((c, j) => c.classList.toggle("sel", j === i));
+      syncCreate();
+    });
+    raceGrid.appendChild(b);
+  });
+  const classRow = document.getElementById("classRow");
+  CLASSES.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = c;
+    b.addEventListener("click", () => {
+      klass = i;
+      [...classRow.children].forEach((x, j) => x.classList.toggle("sel", j === i));
+      syncCreate();
+    });
+    classRow.appendChild(b);
+  });
+  const charName = document.getElementById("charName");
+  const btnCreate = document.getElementById("btnCreate");
+  function syncCreate() {
+    btnCreate.disabled = race < 0 || klass < 0 || !charName.value.trim();
+  }
+  charName.addEventListener("input", syncCreate);
+  btnCreate.addEventListener("click", () => show("loading"));
+  document.getElementById("btnBack").addEventListener("click", () => show("login"));
+
+  let loadTimer = null;
+  function runLoading() {
+    const fill = document.getElementById("barFill");
+    const tip = document.getElementById("loadTip");
+    fill.style.width = "0";
+    tip.textContent = "表里两界之间那道缝";
+    clearInterval(loadTimer);
+    let p = 0;
+    loadTimer = setInterval(() => {
+      p = Math.min(100, p + 4);
+      fill.style.width = p + "%";
+      if (p >= 100) {
+        clearInterval(loadTimer);
+        tip.textContent = "已进入表世界 · 能否进入仍以服务端回包为准";
+      }
+    }, 70);
+  }
+</script>
+</body>
+</html>
