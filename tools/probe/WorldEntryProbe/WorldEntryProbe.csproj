@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    U4 的拆装探针：直接编客户端那一份 WorldEntry.cs，
+    验的是「随包发出去的那份代码」怎么拆真网关的回包，不是另抄一份解析器。
+    与 P1-3 的 WorldProbe（走 WebSocket 验位置流）分开：那个引 Shared，这个只编一个文件。
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>WorldEntryProbe</AssemblyName>
+    <RootNamespace>WorldEntryProbe</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../../../client/MMOGame/Assets/Net/WorldEntry.cs" />
+  </ItemGroup>
+
+</Project>
