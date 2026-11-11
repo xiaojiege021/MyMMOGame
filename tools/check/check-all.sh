@@ -99,6 +99,7 @@ deps_of() {
     p3-5a) echo "p1-3a1 p2-1a1 p0-3a" ;;
     # U（界面线，第 14 节表尾 71–77 行；依赖列见 14.1，不与第 70 行构成先后）
     u1) echo "e6 e7 p0-3c" ;;
+    u2) echo "u1 p1-1a1 p1-1b1" ;;
     *) echo "__UNKNOWN__" ;;
   esac
 }
@@ -112,7 +113,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1"
+u1 u2"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {
@@ -148,7 +149,7 @@ closure() {
 # 报成回归失败，也别假装跑过；它们在本机 Mac 上单独跑。
 client_card_needs_unity() {
   case "$1" in
-    e7|e8|p0-1a|p0-1b|p0-1c|p0-1d|p0-2a|p0-2b|p0-3c|u1) return 0 ;;
+    e7|e8|p0-1a|p0-1b|p0-1c|p0-1d|p0-2a|p0-2b|p0-3c|u1|u2) return 0 ;;
     *) return 1 ;;
   esac
 }

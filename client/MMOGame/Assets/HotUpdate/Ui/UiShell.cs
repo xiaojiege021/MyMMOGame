@@ -223,8 +223,10 @@ namespace HotUpdate.Ui
                 _buildingPage = false;
             }
 
-            Debug.Log(PageLog + "title=" + title + " widgets=" + _page.Count + " buttons=" + _pageButtons.Count);
-        }
+            // 新屏一建好就按当前色板上色。少了这一步，刚开的屏要等下一次切皮肤才有颜色。
+            ApplySkin();
+
+            Debug.Log(PageLog + "title=" + title + " widgets=" + _page.Count + " buttons=" + _pageButtons.Count);        }
 
         /// <summary>关掉当前屏，只留骨架。</summary>
         public void ClosePage()
@@ -372,6 +374,15 @@ namespace HotUpdate.Ui
             {
                 _chrome.Add(themed);
             }
+        }
+
+        /// <summary>
+        /// 把屏自己搭的控件登记进当前层：切皮肤时统一重刷颜色，清屏时一起失效。
+        /// 控件只许在 <see cref="Apply"/> 里换颜色，不许动布局与文案。
+        /// </summary>
+        public void Register(IUiThemed themed)
+        {
+            Track(themed);
         }
 
         // ------------------------------------------------------------------ Toast 与弹窗

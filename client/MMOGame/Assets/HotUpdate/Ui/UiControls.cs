@@ -271,4 +271,26 @@ namespace HotUpdate.Ui
             _line.color = palette.LineSoft;
         }
     }
+
+    /// <summary>
+    /// 只按一个文字角色取色的色块。进度条、遮罩这类没有自己状态的填充用它，
+    /// 免得在屏里写色值或者另开一套颜色表。
+    /// </summary>
+    public sealed class UiTint : IUiThemed
+    {
+        readonly Image _image;
+
+        readonly UiTextRole _role;
+
+        public UiTint(Image image, UiTextRole role)
+        {
+            _image = image;
+            _role = role;
+        }
+
+        public void Apply(UiPalette palette)
+        {
+            _image.color = UiText.ColorOf(_role, palette);
+        }
+    }
 }
