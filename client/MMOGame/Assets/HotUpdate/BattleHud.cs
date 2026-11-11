@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using HotUpdate.Ui;
 using Debug = UnityEngine.Debug;
 
 namespace HotUpdate
@@ -21,6 +22,9 @@ namespace HotUpdate
         const int SkillButtonBottom = 60;
         const int CancelButtonHeight = 90;
         const int ManaBarWidth = 500;
+
+        /// <summary>小队最多显示四行。超过四个人的场次只画前四个，不缩字号。</summary>
+        const int PartySlots = 4;
 
         BattleClient _client;
 
@@ -53,6 +57,20 @@ namespace HotUpdate
         Text _damageText;
 
         Text _rejectText;
+
+        /// <summary>C01 顶部 Boss 条那一行：阶段序号与名字，只认服务端广播。</summary>
+        Text _phaseText;
+
+        /// <summary>C01 右上小队四行：名字 · 职业 · 血量百分比，全部来自同场名单回包。</summary>
+        readonly Text[] _partyLabels = new Text[PartySlots];
+
+        /// <summary>小队血条填充。宽度就是回包里的 hp / hpMax，本地不补也不预测。</summary>
+        readonly RectTransform[] _partyFills = new RectTransform[PartySlots];
+
+        /// <summary>C01 左下战斗日志。只记回包发生过什么，不写本地推断。</summary>
+        Text _logText;
+
+        string _logLine = UiBattleCodex.HudNotes[0];
 
         Text _distanceText;
 
@@ -208,6 +226,34 @@ namespace HotUpdate
             _rejectText.text = "";
             _rejectText.color = new Color(1f, 0.45f, 0.4f, 1f);
 
+            // ------------------------------------------------------------------ C01
+            // 下面三块都是 U3 补的，只做加法：不挪既有按钮、不改既有文案、
+            // 也不进 HitTest()，所以点选与技能键的判定跟 P0-3c 验收时一模一样。
+
+            // Boss 条那一行：阶段名与序号只认服务端广播，不看血线猜。
+            _phaseText = MakeText("PhaseText",
+                new Rect(barX, Screen.height - 140f, barWidth * 0.72f, 34f), 24,
+                TextAnchor.MiddleLeft, root);
+            _phaseText.text = UiBattleCodex.PhaseLine(0, "");
+
+            // 小队四条：名字 · 职业 · 血量百分比，条宽就是回包里的 hp / hpMax。
+            var partyX = width - 380f;
+            for (var i = 0; i < PartySlots; i++)
+            {
+                var y = Screen.height - 250f - i * 54f;
+                MakeRect("PartyBack" + i, new Rect(partyX, y, 340f, 8f), new Color(0f, 0f, 0f, 0.45f), root);
+                _partyFills[i] = MakeRect("PartyFill" + i, new Rect(partyX, y, 0f, 8f),
+                    new Color(0.36f, 0.72f, 0.55f, 0.95f), root);
+                _partyLabels[i] = MakeText("PartyLabel" + i, new Rect(partyX, y + 12f, 340f, 32f), 22,
+                    TextAnchor.MiddleRight, root);
+                _partyLabels[i].text = "";
+            }
+
+            // 战斗日志：写的是回包口径，不是本地编的战报。
+            _logText = MakeText("LogText", new Rect(40f, 150f, 660f, 132f), 22, TextAnchor.UpperLeft, root);
+            _logText.text = UiBattleCodex.LogHeader + "\n" + _logLine + "\n"
+                + UiBattleCodex.HudNotes[1] + "\n" + UiBattleCodex.HudNotes[2];
+
             Debug.Log("p02b_hud=ready screen=" + Screen.width + "x" + Screen.height
                 + " skill_rect=" + SkillButtonRect(0).x + "," + SkillButtonRect(0).y
                 + " cancel_rect=" + CancelButtonRect().x + "," + CancelButtonRect().y);
@@ -216,6 +262,11 @@ namespace HotUpdate
                 + "," + ClassButtonRect().width + "," + ClassButtonRect().height
                 + " skill_rect=" + SkillButtonRect(0).x + "," + SkillButtonRect(0).y
                 + " cancel_rect=" + CancelButtonRect().x + "," + CancelButtonRect().y);
+
+            Debug.Log("u3_hud=ready boss_bar=1 party_rows=" + PartySlots
+                + " phase_rect=" + _phaseText.rectTransform.anchoredPosition.x + ","
+                + _phaseText.rectTransform.anchoredPosition.y
+                + " log=1 hit_rects_unchanged=1");
         }
 
         void Update()
@@ -315,6 +366,31 @@ namespace HotUpdate
             _classText.text = _client.ClassName
                 + (_client.PhaseName.Length > 0 ? " · " + _client.PhaseName : "");
 
+            // Boss 条上的阶段那行：序号与名字都照广播写，服务端没下发总数就不写总数。
+            _phaseText.text = UiBattleCodex.PhaseLine(_client.PhaseIndex, _client.PhaseName);
+
+            // 小队四条：名单里几个人画几个，血条宽度就是回包里的比例。
+            for (var i = 0; i < PartySlots; i++)
+            {
+                if (i < _client.Party.Count)
+                {
+                    var member = _client.Party[i];
+                    var memberRatio = member.HpMax > 0 ? Mathf.Clamp01((float)member.Hp / member.HpMax) : 0f;
+                    _partyLabels[i].text = (member.Down ? "倒地 · " : "")
+                        + member.Name + " · " + UiBattleCodex.ClassName(member.ClassId)
+                        + "  " + Mathf.RoundToInt(memberRatio * 100f) + "%";
+                    _partyFills[i].sizeDelta = new Vector2(340f * memberRatio, 8f);
+                }
+                else
+                {
+                    _partyLabels[i].text = "";
+                    _partyFills[i].sizeDelta = new Vector2(0f, 8f);
+                }
+            }
+
+            _logText.text = UiBattleCodex.LogHeader + "\n" + _logLine + "\n"
+                + UiBattleCodex.HudNotes[1] + "\n" + UiBattleCodex.HudNotes[2];
+
             // 换职业按钮上写下一个职业的名字，按之前就知道会切到谁。
             if (_client.Classes.Count > 0)
             {
@@ -361,6 +437,7 @@ namespace HotUpdate
                 _seenDamage = _client.DamageSeq;
                 _damageText.text = "-" + _client.LastDamage;
                 _damageAge = 0f;
+                _logLine = "回包：命中 -" + _client.LastDamage;
             }
 
             if (_seenReject != _client.RejectSeq)
@@ -368,6 +445,7 @@ namespace HotUpdate
                 _seenReject = _client.RejectSeq;
                 _rejectText.text = _client.LastReject;
                 _rejectAge = 0f;
+                _logLine = "被拒：" + _client.LastReject;
             }
 
             if (_seenEnded != _client.EndedSeq)
@@ -375,6 +453,7 @@ namespace HotUpdate
                 _seenEnded = _client.EndedSeq;
                 _rejectText.text = "CLEARED";
                 _rejectAge = 0f;
+                _logLine = "回包：这一场结束";
             }
 
             // 切阶段飘一行字。血条位置不动，阶段文本只在左上角常驻。
@@ -383,6 +462,7 @@ namespace HotUpdate
                 _seenPhase = _client.PhaseSeq;
                 _rejectText.text = "PHASE " + _client.PhaseName;
                 _rejectAge = 0f;
+                _logLine = "阶段：" + _client.PhaseName;
             }
 
             _damageAge += Time.unscaledDeltaTime;

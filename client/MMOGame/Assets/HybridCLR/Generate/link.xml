@@ -9,6 +9,9 @@
     <type fullname="Mmo.Net.AccountEntry" preserve="all" />
     <type fullname="Mmo.Net.BattleLink" preserve="all" />
     <type fullname="Mmo.Net.CreateOutcome" preserve="all" />
+    <type fullname="Mmo.Net.DungeonEntry" preserve="all" />
+    <type fullname="Mmo.Net.EnterKind" preserve="all" />
+    <type fullname="Mmo.Net.EnterOutcome" preserve="all" />
     <type fullname="Mmo.Net.EntryKind" preserve="all" />
     <type fullname="Mmo.Net.LoginOutcome" preserve="all" />
   </assembly>

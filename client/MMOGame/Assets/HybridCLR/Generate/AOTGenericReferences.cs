@@ -28,6 +28,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // Google.Protobuf.IDeepCloneable<object>
     // Google.Protobuf.ValueReader<object>
     // Google.Protobuf.ValueWriter<object>
+    // System.Action<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Action<int,object>
     // System.Action<int>
     // System.Action<object,object>
@@ -35,31 +36,43 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Action<ushort>
     // System.ByReference<byte>
     // System.ByReference<object>
+    // System.Collections.Generic.ArraySortHelper<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.ArraySortHelper<int>
     // System.Collections.Generic.ArraySortHelper<object>
+    // System.Collections.Generic.Comparer<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.Comparer<int>
     // System.Collections.Generic.Comparer<object>
     // System.Collections.Generic.EqualityComparer<object>
+    // System.Collections.Generic.ICollection<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.ICollection<int>
     // System.Collections.Generic.ICollection<object>
+    // System.Collections.Generic.IComparer<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IComparer<int>
     // System.Collections.Generic.IComparer<object>
+    // System.Collections.Generic.IEnumerable<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IEnumerable<int>
     // System.Collections.Generic.IEnumerable<object>
+    // System.Collections.Generic.IEnumerator<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IEnumerator<int>
     // System.Collections.Generic.IEnumerator<object>
     // System.Collections.Generic.IEqualityComparer<object>
+    // System.Collections.Generic.IList<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IList<int>
     // System.Collections.Generic.IList<object>
+    // System.Collections.Generic.List.Enumerator<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.List.Enumerator<int>
     // System.Collections.Generic.List.Enumerator<object>
+    // System.Collections.Generic.List<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.List<int>
     // System.Collections.Generic.List<object>
+    // System.Collections.Generic.ObjectComparer<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.ObjectComparer<int>
     // System.Collections.Generic.ObjectComparer<object>
     // System.Collections.Generic.ObjectEqualityComparer<object>
+    // System.Collections.ObjectModel.ReadOnlyCollection<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.ObjectModel.ReadOnlyCollection<int>
     // System.Collections.ObjectModel.ReadOnlyCollection<object>
+    // System.Comparison<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Comparison<int>
     // System.Comparison<object>
     // System.Func<System.Threading.Tasks.VoidTaskResult>
@@ -77,6 +90,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Linq.Enumerable.WhereSelectListIterator<object,object>
     // System.Nullable<HotUpdate.Ui.UiEntryCodex.Race>
     // System.Nullable<HotUpdate.Ui.UiEntryCodex.Role>
+    // System.Predicate<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Predicate<int>
     // System.Predicate<object>
     // System.ReadOnlySpan<byte>
