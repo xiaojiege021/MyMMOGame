@@ -25,6 +25,7 @@ public sealed class GatewayProcess(string configPath)
         Console.WriteLine("battle_upstream=" + config.BattleUpstream);
         Console.WriteLine("character_upstream=" + config.CharacterUpstream);
         Console.WriteLine("world_upstream=" + config.WorldUpstream);
+        Console.WriteLine("global_upstream=" + config.GlobalUpstream);
 
         // 连接串带密码，日志只打来源。
         var connectionString = DbEnv.Resolve();
@@ -63,6 +64,9 @@ public sealed class GatewayProcess(string configPath)
 
         // 建角色同样只从网关进：认令牌，再 gRPC 转给角色服。
         CharacterApi.Map(app, tokens, config);
+
+        // 拍卖行：认令牌、复核归属，再 gRPC 转给全局服务。
+        AuctionApi.Map(app, tokens, config);
 
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
         WorldApi.Map(app, tokens, config);

@@ -1,5 +1,14 @@
 using System.Runtime.InteropServices;
 
+var configPath = "config/global.json";
+for (var i = 0; i < args.Length; i++)
+{
+    if (args[i] == "--config" && i + 1 < args.Length)
+    {
+        configPath = args[++i];
+    }
+}
+
 if (args.Length == 1 && args[0] == "--self-check")
 {
     var code = await new Global.ConfigSelfCheck().RunAsync();
@@ -19,5 +28,4 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
     stop.Cancel();
 });
 
-await new Global.GlobalProcess().RunAsync(stop.Token);
-return 0;
+return await new Global.GlobalProcess(configPath).RunAsync(stop.Token);

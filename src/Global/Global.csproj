@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -6,4 +6,11 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Global</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- 全局服务对外开拍卖行的 gRPC；挂单落在 gamedb 的「交易」schema。 -->
+    <PackageReference Include="Grpc.AspNetCore" Version="2.85.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.85.0" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <ProjectReference Include="../Shared/Shared.csproj" />
+  </ItemGroup>
 </Project>

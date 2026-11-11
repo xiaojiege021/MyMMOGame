@@ -30,6 +30,7 @@ public sealed class CharacterProcess(string configPath)
         EnhanceTable enhanceTable;
         TransferTable transferTable;
         CrystalTable crystalTable;
+        AuctionTable auctionTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -48,6 +49,9 @@ public sealed class CharacterProcess(string configPath)
             // 方案第 9 章：三类、部位限定与可拆卸复用由配置校验；装备部位漏配、
             // 类别被改、结晶不在物品表里，缺一样就起不来。改配置重启生效。
             crystalTable = CrystalTable.Load(config.CrystalTable, items);
+            // 方案第 12 章写定的 5%–8% 抽税区间由 AuctionTable 硬校验，
+            // 具体税率与取整方式在 config/auction.json，改配置重启生效。
+            auctionTable = AuctionTable.Load(config.AuctionTable, currencies);
         }
         catch (ConfigException ex)
         {
@@ -101,6 +105,13 @@ public sealed class CharacterProcess(string configPath)
                 .Select(c => c + ":" + string.Join("+", crystalTable.CategoryParts[c])))
             + " crystal_items=" + string.Join(",", crystalTable.Crystals
                 .OrderBy(c => c.Id).Select(c => c.Id + ":" + c.Category + ":" + c.FixedValue)));
+        // 与 --auction-state 只读入口同形，改税率重启后能直接核对到。
+        Console.WriteLine("auction_table_version=" + auctionTable.Version
+            + " tax_rate_pct=" + auctionTable.TaxRatePct
+            + " tax_min=" + AuctionTable.WrittenMinRatePct
+            + " tax_max=" + AuctionTable.WrittenMaxRatePct
+            + " gold_kind=" + auctionTable.GoldKind
+            + " rounding=" + auctionTable.Rounding);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -124,6 +135,7 @@ public sealed class CharacterProcess(string configPath)
         var enhances = new EnhanceRepository(dataSource, enhanceTable, items);
         var transfers = new TransferRepository(dataSource, transferTable, items);
         var crystals = new CrystalRepository(dataSource, crystalTable, items, config);
+        var auctions = new AuctionRepository(dataSource, auctionTable, items, config);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -159,6 +171,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(transfers);
         builder.Services.AddSingleton(crystalTable);
         builder.Services.AddSingleton(crystals);
+        builder.Services.AddSingleton(auctionTable);
+        builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

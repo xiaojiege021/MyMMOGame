@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package mmo.trade;
+
+option csharp_namespace = "Mmo.Proto.Trade";
+
+// 全局服务对外开的拍卖行。挂单与成交撮合在这里，货币、物品与成交状态
+// 由角色服在同一笔事务里落库（技术架构第 3、5、6 节）。
+// 网关只认令牌、复核归属、生成事务号；客户端带不进税率、税额、到账和结果。
+service TradeService {
+  rpc ListAuction(ListAuctionRequest) returns (ListAuctionResponse);
+  rpc BuyAuction(BuyAuctionRequest) returns (BuyAuctionResponse);
+}
+
+// 挂单只带卖方角色、要挂的格位、数量与金币标价。
+// 物品编号由角色服从卖方背包读，绑定规则与能不能上架也由角色服判定。
+message ListAuctionRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint32 slot = 3;
+  uint32 count = 4;
+  int64 price_gold = 5;
+  string txn_id = 6;
+}
+
+message ListAuctionResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  uint64 seller_id = 4;
+  uint32 slot = 5;
+  uint32 count = 6;
+  int64 price_gold = 7;
+  string state = 8;
+  bool duplicate = 9;
+}
+
+// 买只带买方角色与挂单号。标价、卖方、物品、税率、税额与事务号都带不进来。
+message BuyAuctionRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint64 listing_id = 3;
+  string txn_id = 4;
+}
+
+message BuyAuctionResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  int64 price_gold = 4;
+  // 这笔税直接销毁：不进任何角色的货币或背包，也不做成商品。
+  int64 tax_gold = 5;
+  int64 net_gold = 6;
+  int64 buyer_gold = 7;
+  int64 seller_gold = 8;
+  // 只作展示：从 config/auction.json 读出的写定区间内的税率。
+  int32 tax_rate_pct = 9;
+  string item_id = 10;
+  uint32 count = 11;
+  string state = 12;
+  bool duplicate = 13;
+}

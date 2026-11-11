@@ -1,0 +1,6 @@
+{
+  "schema": "global-config/1",
+  "listen": "http://127.0.0.1:64000",
+  "db_pool_max": 8,
+  "character_upstream": "http://127.0.0.1:62000"
+}

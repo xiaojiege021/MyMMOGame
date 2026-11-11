@@ -13,7 +13,8 @@ public sealed record GatewayConfig(
     int Pbkdf2Iterations,
     string BattleUpstream,
     string CharacterUpstream,
-    string WorldUpstream)
+    string WorldUpstream,
+    string GlobalUpstream)
 {
     public const int DefaultTokenTtlSeconds = 7200;
 
@@ -24,6 +25,8 @@ public sealed record GatewayConfig(
     public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
 
     public const string DefaultWorldUpstream = "http://127.0.0.1:63000";
+
+    public const string DefaultGlobalUpstream = "http://127.0.0.1:64000";
 
     public static GatewayConfig Load(string path)
     {
@@ -88,7 +91,15 @@ public sealed record GatewayConfig(
             throw new ConfigException("world_upstream 必须是 http:// 或 https:// 地址：" + world);
         }
 
-        return new GatewayConfig(listen, ttl, iterations, upstream, character, world);
+        // 拍卖行在全局服务。老卡的配置没写这项也照常起：缺省指向本机默认端口。
+        var global = (wire.GlobalUpstream ?? DefaultGlobalUpstream).Trim().TrimEnd('/');
+        if (!Uri.TryCreate(global, UriKind.Absolute, out var globalUri)
+            || (globalUri.Scheme != "http" && globalUri.Scheme != "https"))
+        {
+            throw new ConfigException("global_upstream 必须是 http:// 或 https:// 地址：" + global);
+        }
+
+        return new GatewayConfig(listen, ttl, iterations, upstream, character, world, global);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -118,6 +129,9 @@ public sealed record GatewayConfig(
 
         [JsonPropertyName("world_upstream")]
         public string? WorldUpstream { get; init; }
+
+        [JsonPropertyName("global_upstream")]
+        public string? GlobalUpstream { get; init; }
     }
 }
 

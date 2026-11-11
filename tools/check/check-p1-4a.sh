@@ -536,7 +536,19 @@ PY
   stop_pid "$CHARACTER_PID"
   CHARACTER_LOG="$log"
   "$DOTNET" "$CHARACTER_DLL" --config "$TMP/character.json" >"$CHARACTER_LOG" 2>&1 & CHARACTER_PID=$!
-  wait_ready "$CHARACTER_LOG" '^ready name=Character' "角色服（重启）"
+  wait_ready "$CHARACTER_LOG" '^ready name=Character' "角色服（重启）" || return 1
+  # ready 只说明进程在听，网关手里的旧 gRPC 子通道还没换掉；紧随其后的请求
+  # 会撞 "Error connecting to subchannel"。用一个只读请求等链路真的通再跑用例。
+  local probe
+  for _ in $(seq 1 40); do
+    probe="$(curl -s -m 3 -o /dev/null -w '%{http_code}' -X POST \
+      "http://127.0.0.1:${GATEWAY_PORT}/inventory/can-trade?token=${TOKEN}" \
+      -H 'Content-Type: application/json' \
+      -d "{\"character_id\":${ID},\"slot\":1}")"
+    [ "$probe" = "200" ] && return 0
+    sleep 0.25
+  done
+  return 1
 }
 if restart_character "0,0,0" "$TMP/character2.log" && wait_line "$CHARACTER_LOG" 'rates=0,0,0'; then
   ok "改概率后重启角色服即生效：三档全 0（只改配置，没改代码）"

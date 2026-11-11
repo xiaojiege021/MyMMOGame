@@ -30,6 +30,8 @@ public sealed class CharacterGrpcService(
     TransferTable transferTable,
     CrystalRepository crystals,
     CrystalTable crystalTable,
+    AuctionRepository auctions,
+    AuctionTable auctionTable,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -1093,6 +1095,76 @@ public sealed class CharacterGrpcService(
         }
 
         return CrystalReply(outcome);
+    }
+
+    /// <summary>
+    /// 拍卖成交结算（P1-5a）。全局服务转过来时只带买方角色、挂单号与事务号；
+    /// 标价、卖方、物品、税率与到账全由 AuctionRepository 从库和配置读。
+    /// 业务前提不满足是 ok=false + reason，不是 gRPC 错误码。
+    /// </summary>
+    public override async Task<AuctionSettleResponse> SettleAuction(
+        AuctionSettleRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0 || request.ListingId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        if (!await inventory.OwnsAsync(account, (long)request.CharacterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await auctions.SettleAsync(
+            (long)request.CharacterId, (long)request.ListingId, txnId, context.CancellationToken);
+
+        logger.LogInformation(
+            "auction_settle account={Account} buyer={Buyer} listing={Listing} txn={Txn} "
+            + "ok={Ok} reason={Reason} price={Price} tax={Tax} net={Net} duplicate={Duplicate}",
+            account, request.CharacterId, request.ListingId, txnId, outcome.Ok,
+            outcome.Reason, outcome.PriceGold, outcome.TaxGold, outcome.NetGold,
+            outcome.Duplicate);
+
+        if (!outcome.Ok)
+        {
+            // 拒绝与重放都不带「这一手生效了」的数值；税率只是配置里的展示值。
+            return new AuctionSettleResponse
+            {
+                Ok = false,
+                Reason = outcome.Reason,
+                ListingId = (ulong)outcome.ListingId,
+                TaxRatePct = auctionTable.TaxRatePct,
+                Duplicate = outcome.Duplicate,
+            };
+        }
+
+        return new AuctionSettleResponse
+        {
+            Ok = true,
+            Reason = "",
+            ListingId = (ulong)outcome.ListingId,
+            PriceGold = outcome.PriceGold,
+            TaxGold = outcome.TaxGold,
+            NetGold = outcome.NetGold,
+            BuyerGold = outcome.BuyerGold,
+            SellerGold = outcome.SellerGold,
+            TaxRatePct = auctionTable.TaxRatePct,
+            ItemId = outcome.ItemId,
+            Count = (uint)outcome.Count,
+            State = outcome.State,
+        };
     }
 
     // 拒绝与重放都不带「这一手生效了」的数值：只有配置里的镶嵌位数作展示。

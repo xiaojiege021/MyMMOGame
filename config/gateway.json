@@ -5,5 +5,6 @@
   "pbkdf2_iterations": 210000,
   "battle_upstream": "ws://127.0.0.1:60001/battle",
   "character_upstream": "http://127.0.0.1:62000",
-  "world_upstream": "http://127.0.0.1:63000"
+  "world_upstream": "http://127.0.0.1:63000",
+  "global_upstream": "http://127.0.0.1:64000"
 }

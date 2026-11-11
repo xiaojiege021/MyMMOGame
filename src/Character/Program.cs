@@ -56,6 +56,12 @@ long crystalStateOf = 0;
 var crystalSlotOf = 0;
 string? crystalItemOf = null;
 string? crystalTxnCount = null;
+var auctionState = false;
+string? auctionConfigPath = null;
+long auctionBuyerOf = 0;
+long auctionSellerOf = 0;
+long auctionListingOf = 0;
+string? auctionTxnOf = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -214,6 +220,22 @@ for (var i = 0; i < args.Length; i++)
         case "--crystal-txn-count" when i + 1 < args.Length:
             crystalTxnCount = args[++i];
             break;
+        // 只给核对用：把拍卖税率读出来，不连库、不启动进程。坏配置也走这里。
+        case "--auction-state":
+            auctionState = true;
+            break;
+        case "--auction-config" when i + 1 < args.Length:
+            auctionConfigPath = args[++i];
+            break;
+        // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
+        // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
+        case "--auction-ledger" when i + 3 < args.Length:
+            long.TryParse(args[++i], out auctionBuyerOf);
+            long.TryParse(args[++i], out auctionSellerOf);
+            long.TryParse(args[++i], out auctionListingOf);
+            auctionTxnOf = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
+                ? args[++i] : "";
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -331,6 +353,35 @@ if (crystalState)
     return 0;
 }
 
+// 拍卖税率只读核对：与启动共用同一套 5%–8% 写定区间校验，不连库也不启动进程。
+if (auctionState)
+{
+    try
+    {
+        var characterConfig = CharacterConfig.Load(configPath);
+        var currencies = CurrencyTable.Load("config/currency.json");
+        var table = AuctionTable.Load(auctionConfigPath ?? characterConfig.AuctionTable, currencies);
+        Console.WriteLine("auction_table_state=ok version=" + table.Version
+            + " tax_rate_pct=" + table.TaxRatePct
+            + " tax_min=" + AuctionTable.WrittenMinRatePct
+            + " tax_max=" + AuctionTable.WrittenMaxRatePct
+            + " gold_kind=" + table.GoldKind
+            + " rounding=" + table.Rounding);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
@@ -339,7 +390,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
     || transferStateOf != 0 || transferTxnCount != null
-    || crystalStateOf != 0 || crystalTxnCount != null)
+    || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -693,6 +744,36 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + await crystals.TxnCountAsync(crystalTxnCount, CancellationToken.None)
                     + " txn=" + crystalTxnCount);
             }
+        }
+
+        if (auctionBuyerOf != 0)
+        {
+            var characterConfig = CharacterConfig.Load(configPath);
+            var auctionItems = ItemTable.Load("config/items.json");
+            var auctionCurrencies = CurrencyTable.Load("config/currency.json");
+            var auctionTable = AuctionTable.Load(
+                auctionConfigPath ?? characterConfig.AuctionTable, auctionCurrencies);
+            var auctions = new AuctionRepository(
+                dataSource, auctionTable, auctionItems, characterConfig);
+            var ledger = await auctions.StateAsync(
+                auctionBuyerOf, auctionSellerOf, auctionListingOf,
+                auctionTxnOf ?? "", CancellationToken.None);
+            Console.WriteLine("auction_state=ok buyer=" + auctionBuyerOf
+                + " buyer_gold=" + ledger.BuyerGold
+                + " seller=" + auctionSellerOf
+                + " seller_gold=" + ledger.SellerGold
+                + " total_gold=" + ledger.TotalGold
+                + " listing=" + auctionListingOf
+                + " state=" + ledger.ListingState
+                + " price=" + ledger.Price
+                + " tax=" + ledger.Tax
+                + " net=" + ledger.Net
+                + " settlements=" + ledger.Settlements
+                + " txn=" + ledger.Txns
+                + " buyer_items=" + ledger.BuyerItems
+                + " seller_items=" + ledger.SellerItems
+                + " total_items=" + ledger.TotalItems
+                + " accounts=" + ledger.Accounts);
         }
 
         if (reportName != null)

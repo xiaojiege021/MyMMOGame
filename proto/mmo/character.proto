@@ -93,6 +93,11 @@ service CharacterService {
   // 能量结晶（方案第 9 章第 3 层）：装上与拆下各一次角色服事务，共用同一种回包。
   rpc InstallCrystal(InstallCrystalRequest) returns (CrystalResponse);
   rpc RemoveCrystal(RemoveCrystalRequest) returns (CrystalResponse);
+
+  // 拍卖成交结算（方案第 12 章、开发架构第 14 节第 39 行）。全局服务转过来，
+  // 角色服在一笔事务里写买方金币、卖方净额、物品交付与成交状态；
+  // 标价、卖方、物品、税率与税额全在服务端读，客户端一个都带不进来。
+  rpc SettleAuction(AuctionSettleRequest) returns (AuctionSettleResponse);
 }
 
 message SettleExpRequest {
@@ -418,4 +423,34 @@ message CrystalResponse {
   bool bound = 15;
   // 同一个事务号再提交：一笔没做。
   bool duplicate = 16;
+}
+
+// 拍卖成交结算。全局服务转发时只带买方角色、挂单号与事务号：
+// 标价、卖方、物品编号、绑定、税率、税额、到账与结果都由角色服从库和
+// config/auction.json 读，多传这些字段也不会被反序列化进请求。
+message AuctionSettleRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint64 listing_id = 3;
+  string txn_id = 4;
+}
+
+message AuctionSettleResponse {
+  // listing_not_found / listing_sold / same_character / bound_item /
+  // item_missing / bag_full / gold_insufficient 等业务前提是 ok=false + reason，
+  // 不是 gRPC 错误码；未生效的数值字段一律留 0。
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  int64 price_gold = 4;
+  // 从买方标价里销毁的那一部分，不写进任何角色或系统账户。
+  int64 tax_gold = 5;
+  int64 net_gold = 6;
+  int64 buyer_gold = 7;
+  int64 seller_gold = 8;
+  int32 tax_rate_pct = 9;
+  string item_id = 10;
+  uint32 count = 11;
+  string state = 12;
+  bool duplicate = 13;
 }
