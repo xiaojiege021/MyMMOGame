@@ -1,7 +1,7 @@
 {
   "schema": "item-table/1",
   "version": 1,
-  "note": "bind 决定到账时是否绑定：none 不绑，on_pickup 拾取即绑（副本装备），always 到账即绑（商城买的符、券、卷轴）。绑定物品不能直接交易，解绑道具只解装备（P1-5c8）。ticket_protect 是方案 9.2 / 12.1 里唯一一种保护券：商城与通行证付费轨以后发的都是这一个编号，到账即绑、不能上架，副本和任务不产出；它只挡一次强化掉级，不加属性、不提高成功率，用的时候按物品编号认，不记来源。P1-4c：stone_transfer 是方案 9.3 与 10 章写定的转移石（巢穴产出、商城不卖），本卡只定物品与用法，掉落发货在后面的卡；sword_trade 是「不绑装备」的样本——方案 9.3 写了非绑来源转非绑目标时目标仍可交易，需要有一件到账不绑的装备可核对，制作与玩家交易在后面的卡。",
+  "note": "bind 决定到账时是否绑定：none 不绑，on_pickup 拾取即绑（副本装备），always 到账即绑（商城买的符、券、卷轴）。绑定物品不能直接交易，解绑道具只解装备（P1-5c8）。ticket_protect 是方案 9.2 / 12.1 里唯一一种保护券：商城与通行证付费轨以后发的都是这一个编号，到账即绑、不能上架，副本和任务不产出；它只挡一次强化掉级，不加属性、不提高成功率，用的时候按物品编号认，不记来源。P1-4c：stone_transfer 是方案 9.3 与 10 章写定的转移石（巢穴产出、商城不卖），本卡只定物品与用法，掉落发货在后面的卡；sword_trade 是「不绑装备」的样本——方案 9.3 写了非绑来源转非绑目标时目标仍可交易，需要有一件到账不绑的装备可核对，制作与玩家交易在后面的卡。P1-4d：三种 crystal_* 是方案第 9 章第 3 层的攻击 / 防御 / 功能结晶，从副本掉落、商城与宗门 NPC 不卖，发货在后面的卡；robe_trial 与 ring_trial 是护甲、饰品部位的装备样本，用来核对「部位不对的结晶被拒绝」。装备部位归属与结晶类别 / 固定值在 config/crystal.json，不在本表另写一套。",
   "items": [
     {
       "id": "ore_iron",
@@ -71,6 +71,41 @@
       "name": "行商长剑",
       "kind": "equipment",
       "stack_max": 1,
+      "bind": "none"
+    },
+    {
+      "id": "robe_trial",
+      "name": "试炼法袍",
+      "kind": "equipment",
+      "stack_max": 1,
+      "bind": "on_pickup"
+    },
+    {
+      "id": "ring_trial",
+      "name": "试炼指环",
+      "kind": "equipment",
+      "stack_max": 1,
+      "bind": "none"
+    },
+    {
+      "id": "crystal_attack",
+      "name": "攻击结晶",
+      "kind": "crystal",
+      "stack_max": 999,
+      "bind": "none"
+    },
+    {
+      "id": "crystal_defense",
+      "name": "防御结晶",
+      "kind": "crystal",
+      "stack_max": 999,
+      "bind": "none"
+    },
+    {
+      "id": "crystal_utility",
+      "name": "功能结晶",
+      "kind": "crystal",
+      "stack_max": 999,
       "bind": "none"
     }
   ]

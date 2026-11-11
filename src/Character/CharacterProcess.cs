@@ -29,6 +29,7 @@ public sealed class CharacterProcess(string configPath)
         ExpTable expTable;
         EnhanceTable enhanceTable;
         TransferTable transferTable;
+        CrystalTable crystalTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -44,6 +45,9 @@ public sealed class CharacterProcess(string configPath)
             // 方案 9.3：转移石要在物品表里、费用表要照写定的上限与递增关系，
             // 缺一样就起不来。和强化表一样只读一次，改配置重启生效。
             transferTable = TransferTable.Load(config.TransferTable, items, currencies, enhanceTable);
+            // 方案第 9 章：三类、部位限定与可拆卸复用由配置校验；装备部位漏配、
+            // 类别被改、结晶不在物品表里，缺一样就起不来。改配置重启生效。
+            crystalTable = CrystalTable.Load(config.CrystalTable, items);
         }
         catch (ConfigException ex)
         {
@@ -87,6 +91,16 @@ public sealed class CharacterProcess(string configPath)
             + " transfer_stone_cost=" + transferTable.StoneCost
             + " transfer_gold_kind=" + transferTable.GoldKind
             + " transfer_gold=" + string.Join(",", transferTable.GoldCosts));
+        // 与 --crystal-state 只读入口同形，改部位映射或镶嵌位数量重启后能直接核对到。
+        Console.WriteLine("crystal_table_version=" + crystalTable.Version
+            + " crystal_sockets=" + crystalTable.SocketCount
+            + " crystal_categories=" + string.Join(",", CrystalTable.WrittenCategories)
+            + " crystal_parts=" + string.Join(",", crystalTable.EquipmentParts
+                .OrderBy(p => p.Key).Select(p => p.Key + ":" + p.Value))
+            + " crystal_allowed=" + string.Join(",", CrystalTable.WrittenCategories
+                .Select(c => c + ":" + string.Join("+", crystalTable.CategoryParts[c])))
+            + " crystal_items=" + string.Join(",", crystalTable.Crystals
+                .OrderBy(c => c.Id).Select(c => c.Id + ":" + c.Category + ":" + c.FixedValue)));
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -109,6 +123,7 @@ public sealed class CharacterProcess(string configPath)
         var expSettlements = new ExpSettlementRepository(dataSource);
         var enhances = new EnhanceRepository(dataSource, enhanceTable, items);
         var transfers = new TransferRepository(dataSource, transferTable, items);
+        var crystals = new CrystalRepository(dataSource, crystalTable, items, config);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -142,6 +157,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(enhances);
         builder.Services.AddSingleton(transferTable);
         builder.Services.AddSingleton(transfers);
+        builder.Services.AddSingleton(crystalTable);
+        builder.Services.AddSingleton(crystals);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

@@ -100,6 +100,12 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.TransferEnhanceRequest> __Marshaller_mmo_character_TransferEnhanceRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TransferEnhanceRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.TransferEnhanceResponse> __Marshaller_mmo_character_TransferEnhanceResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TransferEnhanceResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.InstallCrystalRequest> __Marshaller_mmo_character_InstallCrystalRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.InstallCrystalRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CrystalResponse> __Marshaller_mmo_character_CrystalResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CrystalResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.RemoveCrystalRequest> __Marshaller_mmo_character_RemoveCrystalRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.RemoveCrystalRequest.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -204,6 +210,22 @@ namespace Mmo.Proto.Character {
         "TransferEnhance",
         __Marshaller_mmo_character_TransferEnhanceRequest,
         __Marshaller_mmo_character_TransferEnhanceResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.InstallCrystalRequest, global::Mmo.Proto.Character.CrystalResponse> __Method_InstallCrystal = new grpc::Method<global::Mmo.Proto.Character.InstallCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "InstallCrystal",
+        __Marshaller_mmo_character_InstallCrystalRequest,
+        __Marshaller_mmo_character_CrystalResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.RemoveCrystalRequest, global::Mmo.Proto.Character.CrystalResponse> __Method_RemoveCrystal = new grpc::Method<global::Mmo.Proto.Character.RemoveCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RemoveCrystal",
+        __Marshaller_mmo_character_RemoveCrystalRequest,
+        __Marshaller_mmo_character_CrystalResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -378,6 +400,24 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.TransferEnhanceResponse> TransferEnhance(global::Mmo.Proto.Character.TransferEnhanceRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 能量结晶（方案第 9 章第 3 层）：装上与拆下各一次角色服事务，共用同一种回包。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CrystalResponse> InstallCrystal(global::Mmo.Proto.Character.InstallCrystalRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CrystalResponse> RemoveCrystal(global::Mmo.Proto.Character.RemoveCrystalRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1075,6 +1115,74 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_TransferEnhance, null, options, request);
       }
+      /// <summary>
+      /// 能量结晶（方案第 9 章第 3 层）：装上与拆下各一次角色服事务，共用同一种回包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CrystalResponse InstallCrystal(global::Mmo.Proto.Character.InstallCrystalRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return InstallCrystal(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 能量结晶（方案第 9 章第 3 层）：装上与拆下各一次角色服事务，共用同一种回包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CrystalResponse InstallCrystal(global::Mmo.Proto.Character.InstallCrystalRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_InstallCrystal, null, options, request);
+      }
+      /// <summary>
+      /// 能量结晶（方案第 9 章第 3 层）：装上与拆下各一次角色服事务，共用同一种回包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CrystalResponse> InstallCrystalAsync(global::Mmo.Proto.Character.InstallCrystalRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return InstallCrystalAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 能量结晶（方案第 9 章第 3 层）：装上与拆下各一次角色服事务，共用同一种回包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CrystalResponse> InstallCrystalAsync(global::Mmo.Proto.Character.InstallCrystalRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_InstallCrystal, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CrystalResponse RemoveCrystal(global::Mmo.Proto.Character.RemoveCrystalRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RemoveCrystal(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CrystalResponse RemoveCrystal(global::Mmo.Proto.Character.RemoveCrystalRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RemoveCrystal, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CrystalResponse> RemoveCrystalAsync(global::Mmo.Proto.Character.RemoveCrystalRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RemoveCrystalAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CrystalResponse> RemoveCrystalAsync(global::Mmo.Proto.Character.RemoveCrystalRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RemoveCrystal, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1101,7 +1209,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_UseHotSpring, serviceImpl.UseHotSpring)
           .AddMethod(__Method_SettleExp, serviceImpl.SettleExp)
           .AddMethod(__Method_Enhance, serviceImpl.Enhance)
-          .AddMethod(__Method_TransferEnhance, serviceImpl.TransferEnhance).Build();
+          .AddMethod(__Method_TransferEnhance, serviceImpl.TransferEnhance)
+          .AddMethod(__Method_InstallCrystal, serviceImpl.InstallCrystal)
+          .AddMethod(__Method_RemoveCrystal, serviceImpl.RemoveCrystal).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1124,6 +1234,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_SettleExp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleExpRequest, global::Mmo.Proto.Character.SettleExpResponse>(serviceImpl.SettleExp));
       serviceBinder.AddMethod(__Method_Enhance, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnhanceRequest, global::Mmo.Proto.Character.EnhanceResponse>(serviceImpl.Enhance));
       serviceBinder.AddMethod(__Method_TransferEnhance, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.TransferEnhanceRequest, global::Mmo.Proto.Character.TransferEnhanceResponse>(serviceImpl.TransferEnhance));
+      serviceBinder.AddMethod(__Method_InstallCrystal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.InstallCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(serviceImpl.InstallCrystal));
+      serviceBinder.AddMethod(__Method_RemoveCrystal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RemoveCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(serviceImpl.RemoveCrystal));
     }
 
   }

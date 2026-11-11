@@ -9,12 +9,13 @@ namespace Character;
 /// </summary>
 public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
-    string EnhanceTable, string TransferTable)
+    string EnhanceTable, string TransferTable, string CrystalTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
     public const string DefaultEnhanceTable = "config/enhance.json";
     public const string DefaultTransferTable = "config/transfer.json";
+    public const string DefaultCrystalTable = "config/crystal.json";
 
     public static CharacterConfig Load(string path)
     {
@@ -82,9 +83,17 @@ public sealed record CharacterConfig(
             throw new ConfigException("transfer_table 不能为空");
         }
 
+        // 结晶的三类、部位映射与镶嵌位也走同一份配置正本；核对脚本可以指到临时表
+        // 改部位或改镶嵌位数量做隔离测试。
+        var crystalTable = (wire.CrystalTable ?? DefaultCrystalTable).Trim();
+        if (crystalTable.Length == 0)
+        {
+            throw new ConfigException("crystal_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
-            transferTable);
+            transferTable, crystalTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -115,6 +124,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("transfer_table")]
         public string? TransferTable { get; init; }
+
+        [JsonPropertyName("crystal_table")]
+        public string? CrystalTable { get; init; }
     }
 }
 

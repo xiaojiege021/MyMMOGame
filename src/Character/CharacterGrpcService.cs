@@ -28,6 +28,8 @@ public sealed class CharacterGrpcService(
     EnhanceTable enhanceTable,
     TransferRepository transfers,
     TransferTable transferTable,
+    CrystalRepository crystals,
+    CrystalTable crystalTable,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -959,6 +961,171 @@ public sealed class CharacterGrpcService(
             TargetBound = outcome.TargetBound,
         };
     }
+
+    /// <summary>
+    /// 能量结晶装上（方案第 9 章第 3 层）。请求只有装备格、结晶背包格与镶嵌位号；
+    /// 类别、部位、能不能装、固定值与结果都在角色服读。部位不对回 wrong_part，
+    /// 装备与背包一格不动；业务拒绝 200 + ok=false，未生效数值字段一律留 0。
+    /// </summary>
+    public override async Task<CrystalResponse> InstallCrystal(
+        InstallCrystalRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        if (request.Slot < 1 || request.Slot > config.BagSlots
+            || request.CrystalSlot < 1 || request.CrystalSlot > config.BagSlots
+            || request.Socket < 1)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        if (!await inventory.OwnsAsync(account, (long)request.CharacterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        CrystalOutcome outcome;
+        try
+        {
+            outcome = await crystals.InstallAsync(
+                (long)request.CharacterId, (int)request.Slot, (int)request.CrystalSlot,
+                (int)request.Socket, txnId, context.CancellationToken);
+        }
+        catch (EnhanceException ex)
+        {
+            logger.LogInformation(
+                "crystal_install_reject account={Account} id={Id} slot={Slot} crystal={CrystalSlot} "
+                + "socket={Socket} txn={Txn} reason={Reason}",
+                account, request.CharacterId, request.Slot, request.CrystalSlot,
+                request.Socket, txnId, ex.Code);
+            return CrystalRejected(ex.Code, true, false);
+        }
+
+        logger.LogInformation(
+            "crystal_install account={Account} id={Id} slot={Slot} socket={Socket} txn={Txn} "
+            + "duplicate={Duplicate} item={Item} category={Category} part={Part} filled={Before}->{After}",
+            account, request.CharacterId, request.Slot, request.Socket, txnId,
+            outcome.Duplicate, outcome.CrystalItem, outcome.Category, outcome.Part,
+            outcome.FilledBefore, outcome.Filled);
+
+        if (outcome.Duplicate)
+        {
+            return CrystalRejected("duplicate", true, true);
+        }
+
+        return CrystalReply(outcome);
+    }
+
+    /// <summary>
+    /// 能量结晶拆下。只带装备格与镶嵌位；拆下来的结晶由角色服放回背包，
+    /// 不改强化等级、绑定与金币，也不消耗结晶本身（方案「可拆卸复用」）。
+    /// </summary>
+    public override async Task<CrystalResponse> RemoveCrystal(
+        RemoveCrystalRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        if (request.Slot < 1 || request.Slot > config.BagSlots || request.Socket < 1)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        if (!await inventory.OwnsAsync(account, (long)request.CharacterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        CrystalOutcome outcome;
+        try
+        {
+            outcome = await crystals.RemoveAsync(
+                (long)request.CharacterId, (int)request.Slot, (int)request.Socket,
+                txnId, context.CancellationToken);
+        }
+        catch (EnhanceException ex)
+        {
+            logger.LogInformation(
+                "crystal_remove_reject account={Account} id={Id} slot={Slot} socket={Socket} "
+                + "txn={Txn} reason={Reason}",
+                account, request.CharacterId, request.Slot, request.Socket, txnId, ex.Code);
+            return CrystalRejected(ex.Code, false, false);
+        }
+
+        logger.LogInformation(
+            "crystal_remove account={Account} id={Id} slot={Slot} socket={Socket} txn={Txn} "
+            + "duplicate={Duplicate} item={Item} filled={Before}->{After}",
+            account, request.CharacterId, request.Slot, request.Socket, txnId,
+            outcome.Duplicate, outcome.CrystalItem, outcome.FilledBefore, outcome.Filled);
+
+        if (outcome.Duplicate)
+        {
+            return CrystalRejected("duplicate", false, true);
+        }
+
+        return CrystalReply(outcome);
+    }
+
+    // 拒绝与重放都不带「这一手生效了」的数值：只有配置里的镶嵌位数作展示。
+    CrystalResponse CrystalRejected(string reason, bool installed, bool duplicate) =>
+        new()
+        {
+            Ok = false,
+            Reason = reason,
+            Installed = installed,
+            SocketCount = crystalTable.SocketCount,
+            Duplicate = duplicate,
+        };
+
+    CrystalResponse CrystalReply(CrystalOutcome outcome) =>
+        new()
+        {
+            Ok = true,
+            Reason = "",
+            Installed = outcome.Installed,
+            Slot = (uint)outcome.Slot,
+            Socket = (uint)outcome.Socket,
+            CrystalItem = outcome.CrystalItem,
+            // 只作展示：类别与部位只在服务端从配置读，客户端不拿它们算结果。
+            Category = outcome.Category,
+            Part = outcome.Part,
+            SocketCount = crystalTable.SocketCount,
+            FilledBefore = outcome.FilledBefore,
+            Filled = outcome.Filled,
+            CrystalLeft = outcome.CrystalLeft,
+            Gold = outcome.Gold,
+            EnhanceLevel = outcome.EnhanceLevel,
+            Bound = outcome.Bound,
+        };
 
     EnterDungeonResponse Rejected(string reason, DungeonDef dungeon, int fatigue, int weeklyShare) =>
         new()

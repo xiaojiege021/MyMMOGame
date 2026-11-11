@@ -104,32 +104,48 @@ namespace Mmo.Proto.Character {
             "BGdvbGQYCSABKAMSEgoKc3RvbmVfaXRlbRgKIAEoCRISCgpzdG9uZV9jb3N0",
             "GAsgASgFEhIKCnN0b25lX2xlZnQYDCABKAUSGwoTdGFyZ2V0X2JvdW5kX2Jl",
             "Zm9yZRgNIAEoCBIUCgx0YXJnZXRfYm91bmQYDiABKAgSEQoJZHVwbGljYXRl",
-            "GA8gASgIMtsIChBDaGFyYWN0ZXJTZXJ2aWNlEmAKD0NyZWF0ZUNoYXJhY3Rl",
-            "chIlLm1tby5jaGFyYWN0ZXIuQ3JlYXRlQ2hhcmFjdGVyUmVxdWVzdBomLm1t",
-            "by5jaGFyYWN0ZXIuQ3JlYXRlQ2hhcmFjdGVyUmVzcG9uc2USSwoIU2V0TGV2",
-            "ZWwSHi5tbW8uY2hhcmFjdGVyLlNldExldmVsUmVxdWVzdBofLm1tby5jaGFy",
-            "YWN0ZXIuU2V0TGV2ZWxSZXNwb25zZRJGCgdBZGRJdGVtEh0ubW1vLmNoYXJh",
-            "Y3Rlci5BZGRJdGVtUmVxdWVzdBocLm1tby5jaGFyYWN0ZXIuSW52ZW50b3J5",
-            "U2xvdBJaCg1MaXN0SW52ZW50b3J5EiMubW1vLmNoYXJhY3Rlci5MaXN0SW52",
-            "ZW50b3J5UmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuTGlzdEludmVudG9yeVJl",
-            "c3BvbnNlEksKCENhblRyYWRlEh4ubW1vLmNoYXJhY3Rlci5DYW5UcmFkZVJl",
-            "cXVlc3QaHy5tbW8uY2hhcmFjdGVyLkNhblRyYWRlUmVzcG9uc2USUAoLQWRk",
-            "Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkFkZEN1cnJlbmN5UmVxdWVzdBoe",
-            "Lm1tby5jaGFyYWN0ZXIuQ3VycmVuY3lCYWxhbmNlElQKC0dldEN1cnJlbmN5",
-            "EiEubW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5jeVJlcXVlc3QaIi5tbW8uY2hh",
-            "cmFjdGVyLkdldEN1cnJlbmN5UmVzcG9uc2USUQoKQXBwbHlHcmFudBIgLm1t",
-            "by5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlcXVlc3QaIS5tbW8uY2hhcmFjdGVy",
-            "LkFwcGx5R3JhbnRSZXNwb25zZRJXCgxFbnRlckR1bmdlb24SIi5tbW8uY2hh",
-            "cmFjdGVyLkVudGVyRHVuZ2VvblJlcXVlc3QaIy5tbW8uY2hhcmFjdGVyLkVu",
-            "dGVyRHVuZ2VvblJlc3BvbnNlElcKDFVzZUhvdFNwcmluZxIiLm1tby5jaGFy",
-            "YWN0ZXIuVXNlSG90U3ByaW5nUmVxdWVzdBojLm1tby5jaGFyYWN0ZXIuVXNl",
-            "SG90U3ByaW5nUmVzcG9uc2USTgoJU2V0dGxlRXhwEh8ubW1vLmNoYXJhY3Rl",
-            "ci5TZXR0bGVFeHBSZXF1ZXN0GiAubW1vLmNoYXJhY3Rlci5TZXR0bGVFeHBS",
-            "ZXNwb25zZRJICgdFbmhhbmNlEh0ubW1vLmNoYXJhY3Rlci5FbmhhbmNlUmVx",
-            "dWVzdBoeLm1tby5jaGFyYWN0ZXIuRW5oYW5jZVJlc3BvbnNlEmAKD1RyYW5z",
-            "ZmVyRW5oYW5jZRIlLm1tby5jaGFyYWN0ZXIuVHJhbnNmZXJFbmhhbmNlUmVx",
-            "dWVzdBomLm1tby5jaGFyYWN0ZXIuVHJhbnNmZXJFbmhhbmNlUmVzcG9uc2VC",
-            "FqoCE01tby5Qcm90by5DaGFyYWN0ZXJiBnByb3RvMw=="));
+            "GA8gASgIIoIBChVJbnN0YWxsQ3J5c3RhbFJlcXVlc3QSDwoHYWNjb3VudBgB",
+            "IAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDAoEc2xvdBgDIAEoDRIUCgxj",
+            "cnlzdGFsX3Nsb3QYBCABKA0SDgoGc29ja2V0GAUgASgNEg4KBnR4bl9pZBgG",
+            "IAEoCSJrChRSZW1vdmVDcnlzdGFsUmVxdWVzdBIPCgdhY2NvdW50GAEgASgJ",
+            "EhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIMCgRzbG90GAMgASgNEg4KBnNvY2tl",
+            "dBgEIAEoDRIOCgZ0eG5faWQYBSABKAkirgIKD0NyeXN0YWxSZXNwb25zZRIK",
+            "CgJvaxgBIAEoCBIOCgZyZWFzb24YAiABKAkSEQoJaW5zdGFsbGVkGAMgASgI",
+            "EgwKBHNsb3QYBCABKA0SDgoGc29ja2V0GAUgASgNEhQKDGNyeXN0YWxfaXRl",
+            "bRgGIAEoCRIQCghjYXRlZ29yeRgHIAEoCRIMCgRwYXJ0GAggASgJEhQKDHNv",
+            "Y2tldF9jb3VudBgJIAEoBRIVCg1maWxsZWRfYmVmb3JlGAogASgFEg4KBmZp",
+            "bGxlZBgLIAEoBRIUCgxjcnlzdGFsX2xlZnQYDCABKAUSDAoEZ29sZBgNIAEo",
+            "AxIVCg1lbmhhbmNlX2xldmVsGA4gASgFEg0KBWJvdW5kGA8gASgIEhEKCWR1",
+            "cGxpY2F0ZRgQIAEoCDKJCgoQQ2hhcmFjdGVyU2VydmljZRJgCg9DcmVhdGVD",
+            "aGFyYWN0ZXISJS5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlcXVl",
+            "c3QaJi5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlc3BvbnNlEksK",
+            "CFNldExldmVsEh4ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlcXVlc3QaHy5t",
+            "bW8uY2hhcmFjdGVyLlNldExldmVsUmVzcG9uc2USRgoHQWRkSXRlbRIdLm1t",
+            "by5jaGFyYWN0ZXIuQWRkSXRlbVJlcXVlc3QaHC5tbW8uY2hhcmFjdGVyLklu",
+            "dmVudG9yeVNsb3QSWgoNTGlzdEludmVudG9yeRIjLm1tby5jaGFyYWN0ZXIu",
+            "TGlzdEludmVudG9yeVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkxpc3RJbnZl",
+            "bnRvcnlSZXNwb25zZRJLCghDYW5UcmFkZRIeLm1tby5jaGFyYWN0ZXIuQ2Fu",
+            "VHJhZGVSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5UcmFkZVJlc3BvbnNl",
+            "ElAKC0FkZEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5BZGRDdXJyZW5jeVJl",
+            "cXVlc3QaHi5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFsYW5jZRJUCgtHZXRD",
+            "dXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXF1ZXN0GiIu",
+            "bW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5jeVJlc3BvbnNlElEKCkFwcGx5R3Jh",
+            "bnQSIC5tbW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXF1ZXN0GiEubW1vLmNo",
+            "YXJhY3Rlci5BcHBseUdyYW50UmVzcG9uc2USVwoMRW50ZXJEdW5nZW9uEiIu",
+            "bW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXF1ZXN0GiMubW1vLmNoYXJh",
+            "Y3Rlci5FbnRlckR1bmdlb25SZXNwb25zZRJXCgxVc2VIb3RTcHJpbmcSIi5t",
+            "bW8uY2hhcmFjdGVyLlVzZUhvdFNwcmluZ1JlcXVlc3QaIy5tbW8uY2hhcmFj",
+            "dGVyLlVzZUhvdFNwcmluZ1Jlc3BvbnNlEk4KCVNldHRsZUV4cBIfLm1tby5j",
+            "aGFyYWN0ZXIuU2V0dGxlRXhwUmVxdWVzdBogLm1tby5jaGFyYWN0ZXIuU2V0",
+            "dGxlRXhwUmVzcG9uc2USSAoHRW5oYW5jZRIdLm1tby5jaGFyYWN0ZXIuRW5o",
+            "YW5jZVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkVuaGFuY2VSZXNwb25zZRJg",
+            "Cg9UcmFuc2ZlckVuaGFuY2USJS5tbW8uY2hhcmFjdGVyLlRyYW5zZmVyRW5o",
+            "YW5jZVJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLlRyYW5zZmVyRW5oYW5jZVJl",
+            "c3BvbnNlElYKDkluc3RhbGxDcnlzdGFsEiQubW1vLmNoYXJhY3Rlci5JbnN0",
+            "YWxsQ3J5c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0YWxSZXNw",
+            "b25zZRJUCg1SZW1vdmVDcnlzdGFsEiMubW1vLmNoYXJhY3Rlci5SZW1vdmVD",
+            "cnlzdGFsUmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3J5c3RhbFJlc3BvbnNl",
+            "QhaqAhNNbW8uUHJvdG8uQ2hhcmFjdGVyYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -161,7 +177,10 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnhanceRequest), global::Mmo.Proto.Character.EnhanceRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "StoneId", "TxnId", "UseCoupon" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnhanceResponse), global::Mmo.Proto.Character.EnhanceResponse.Parser, new[]{ "Ok", "Reason", "LevelBefore", "Level", "MaxLevel", "Success", "Tier", "RequiredStone", "StoneCost", "GoldCost", "Gold", "StoneLeft", "Duplicate", "SuccessRate", "ProtectedLevel", "CouponUsed", "CouponLeft" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.TransferEnhanceRequest), global::Mmo.Proto.Character.TransferEnhanceRequest.Parser, new[]{ "Account", "CharacterId", "FromSlot", "ToSlot", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.TransferEnhanceResponse), global::Mmo.Proto.Character.TransferEnhanceResponse.Parser, new[]{ "Ok", "Reason", "FromLevelBefore", "ToLevelBefore", "FromLevel", "ToLevel", "MaxLevel", "GoldCost", "Gold", "StoneItem", "StoneCost", "StoneLeft", "TargetBoundBefore", "TargetBound", "Duplicate" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.TransferEnhanceResponse), global::Mmo.Proto.Character.TransferEnhanceResponse.Parser, new[]{ "Ok", "Reason", "FromLevelBefore", "ToLevelBefore", "FromLevel", "ToLevel", "MaxLevel", "GoldCost", "Gold", "StoneItem", "StoneCost", "StoneLeft", "TargetBoundBefore", "TargetBound", "Duplicate" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.InstallCrystalRequest), global::Mmo.Proto.Character.InstallCrystalRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "CrystalSlot", "Socket", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.RemoveCrystalRequest), global::Mmo.Proto.Character.RemoveCrystalRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "Socket", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CrystalResponse), global::Mmo.Proto.Character.CrystalResponse.Parser, new[]{ "Ok", "Reason", "Installed", "Slot", "Socket", "CrystalItem", "Category", "Part", "SocketCount", "FilledBefore", "Filled", "CrystalLeft", "Gold", "EnhanceLevel", "Bound", "Duplicate" }, null, null, null, null)
           }));
     }
     #endregion
@@ -10443,6 +10462,1527 @@ namespace Mmo.Proto.Character {
             break;
           }
           case 120: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 能量结晶装上（方案第 9 章第 3 层）。只带三个格位编号：
+  /// 结晶类别、装备部位、固定值、能不能装、结果和事务号都带不进来。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class InstallCrystalRequest : pb::IMessage<InstallCrystalRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<InstallCrystalRequest> _parser = new pb::MessageParser<InstallCrystalRequest>(() => new InstallCrystalRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<InstallCrystalRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[29]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public InstallCrystalRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public InstallCrystalRequest(InstallCrystalRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      slot_ = other.slot_;
+      crystalSlot_ = other.crystalSlot_;
+      socket_ = other.socket_;
+      txnId_ = other.txnId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public InstallCrystalRequest Clone() {
+      return new InstallCrystalRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    /// <summary>
+    /// 网关转发时填令牌账号，角色服再核一次归属。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "slot" field.</summary>
+    public const int SlotFieldNumber = 3;
+    private uint slot_;
+    /// <summary>
+    /// 要装结晶的装备格。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Slot {
+      get { return slot_; }
+      set {
+        slot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "crystal_slot" field.</summary>
+    public const int CrystalSlotFieldNumber = 4;
+    private uint crystalSlot_;
+    /// <summary>
+    /// 结晶现在放在背包的哪一格。服务端自己读这一格的物品编号。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint CrystalSlot {
+      get { return crystalSlot_; }
+      set {
+        crystalSlot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "socket" field.</summary>
+    public const int SocketFieldNumber = 5;
+    private uint socket_;
+    /// <summary>
+    /// 装到第几个镶嵌位。位数与合法范围由配置决定。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Socket {
+      get { return socket_; }
+      set {
+        socket_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 6;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as InstallCrystalRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(InstallCrystalRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (Slot != other.Slot) return false;
+      if (CrystalSlot != other.CrystalSlot) return false;
+      if (Socket != other.Socket) return false;
+      if (TxnId != other.TxnId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (Slot != 0) hash ^= Slot.GetHashCode();
+      if (CrystalSlot != 0) hash ^= CrystalSlot.GetHashCode();
+      if (Socket != 0) hash ^= Socket.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (Slot != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Slot);
+      }
+      if (CrystalSlot != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(CrystalSlot);
+      }
+      if (Socket != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(Socket);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (Slot != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Slot);
+      }
+      if (CrystalSlot != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(CrystalSlot);
+      }
+      if (Socket != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(Socket);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (Slot != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Slot);
+      }
+      if (CrystalSlot != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(CrystalSlot);
+      }
+      if (Socket != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Socket);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(InstallCrystalRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.Slot != 0) {
+        Slot = other.Slot;
+      }
+      if (other.CrystalSlot != 0) {
+        CrystalSlot = other.CrystalSlot;
+      }
+      if (other.Socket != 0) {
+        Socket = other.Socket;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            Slot = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            CrystalSlot = input.ReadUInt32();
+            break;
+          }
+          case 40: {
+            Socket = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            Slot = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            CrystalSlot = input.ReadUInt32();
+            break;
+          }
+          case 40: {
+            Socket = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 拆下：只带装备格与镶嵌位，拆下来的结晶由角色服放回背包。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class RemoveCrystalRequest : pb::IMessage<RemoveCrystalRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<RemoveCrystalRequest> _parser = new pb::MessageParser<RemoveCrystalRequest>(() => new RemoveCrystalRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<RemoveCrystalRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[30]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RemoveCrystalRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RemoveCrystalRequest(RemoveCrystalRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      slot_ = other.slot_;
+      socket_ = other.socket_;
+      txnId_ = other.txnId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RemoveCrystalRequest Clone() {
+      return new RemoveCrystalRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "slot" field.</summary>
+    public const int SlotFieldNumber = 3;
+    private uint slot_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Slot {
+      get { return slot_; }
+      set {
+        slot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "socket" field.</summary>
+    public const int SocketFieldNumber = 4;
+    private uint socket_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Socket {
+      get { return socket_; }
+      set {
+        socket_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 5;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as RemoveCrystalRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(RemoveCrystalRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (Slot != other.Slot) return false;
+      if (Socket != other.Socket) return false;
+      if (TxnId != other.TxnId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (Slot != 0) hash ^= Slot.GetHashCode();
+      if (Socket != 0) hash ^= Socket.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (Slot != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Slot);
+      }
+      if (Socket != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Socket);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (Slot != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(Slot);
+      }
+      if (Socket != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Socket);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (Slot != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Slot);
+      }
+      if (Socket != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Socket);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(RemoveCrystalRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.Slot != 0) {
+        Slot = other.Slot;
+      }
+      if (other.Socket != 0) {
+        Socket = other.Socket;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            Slot = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            Socket = input.ReadUInt32();
+            break;
+          }
+          case 42: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            Slot = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            Socket = input.ReadUInt32();
+            break;
+          }
+          case 42: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class CrystalResponse : pb::IMessage<CrystalResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CrystalResponse> _parser = new pb::MessageParser<CrystalResponse>(() => new CrystalResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CrystalResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[31]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrystalResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrystalResponse(CrystalResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      installed_ = other.installed_;
+      slot_ = other.slot_;
+      socket_ = other.socket_;
+      crystalItem_ = other.crystalItem_;
+      category_ = other.category_;
+      part_ = other.part_;
+      socketCount_ = other.socketCount_;
+      filledBefore_ = other.filledBefore_;
+      filled_ = other.filled_;
+      crystalLeft_ = other.crystalLeft_;
+      gold_ = other.gold_;
+      enhanceLevel_ = other.enhanceLevel_;
+      bound_ = other.bound_;
+      duplicate_ = other.duplicate_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CrystalResponse Clone() {
+      return new CrystalResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    /// <summary>
+    /// 业务前提不满足（wrong_part / not_crystal / socket_occupied / socket_empty ...）
+    /// 是正常回包里的 ok=false + reason，不是 gRPC 错误码；身份与参数错才走错误码。
+    /// 未生效的数值字段一律留 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "installed" field.</summary>
+    public const int InstalledFieldNumber = 3;
+    private bool installed_;
+    /// <summary>
+    /// 结果态：true 装上了、false 拆下了。客户端不拿它算数值。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Installed {
+      get { return installed_; }
+      set {
+        installed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "slot" field.</summary>
+    public const int SlotFieldNumber = 4;
+    private uint slot_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Slot {
+      get { return slot_; }
+      set {
+        slot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "socket" field.</summary>
+    public const int SocketFieldNumber = 5;
+    private uint socket_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Socket {
+      get { return socket_; }
+      set {
+        socket_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "crystal_item" field.</summary>
+    public const int CrystalItemFieldNumber = 6;
+    private string crystalItem_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string CrystalItem {
+      get { return crystalItem_; }
+      set {
+        crystalItem_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "category" field.</summary>
+    public const int CategoryFieldNumber = 7;
+    private string category_ = "";
+    /// <summary>
+    /// 只作展示：类别与部位只在服务端从配置读，客户端不另算一套。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Category {
+      get { return category_; }
+      set {
+        category_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "part" field.</summary>
+    public const int PartFieldNumber = 8;
+    private string part_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Part {
+      get { return part_; }
+      set {
+        part_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "socket_count" field.</summary>
+    public const int SocketCountFieldNumber = 9;
+    private int socketCount_;
+    /// <summary>
+    /// 配置里的镶嵌位数量，回给客户端，不让它自己另算。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int SocketCount {
+      get { return socketCount_; }
+      set {
+        socketCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "filled_before" field.</summary>
+    public const int FilledBeforeFieldNumber = 10;
+    private int filledBefore_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FilledBefore {
+      get { return filledBefore_; }
+      set {
+        filledBefore_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "filled" field.</summary>
+    public const int FilledFieldNumber = 11;
+    private int filled_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Filled {
+      get { return filled_; }
+      set {
+        filled_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "crystal_left" field.</summary>
+    public const int CrystalLeftFieldNumber = 12;
+    private int crystalLeft_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CrystalLeft {
+      get { return crystalLeft_; }
+      set {
+        crystalLeft_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "gold" field.</summary>
+    public const int GoldFieldNumber = 13;
+    private long gold_;
+    /// <summary>
+    /// 只作展示：装上 / 拆下都不改金币、强化等级和绑定，回出来给核对看。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Gold {
+      get { return gold_; }
+      set {
+        gold_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "enhance_level" field.</summary>
+    public const int EnhanceLevelFieldNumber = 14;
+    private int enhanceLevel_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int EnhanceLevel {
+      get { return enhanceLevel_; }
+      set {
+        enhanceLevel_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "bound" field.</summary>
+    public const int BoundFieldNumber = 15;
+    private bool bound_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Bound {
+      get { return bound_; }
+      set {
+        bound_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duplicate" field.</summary>
+    public const int DuplicateFieldNumber = 16;
+    private bool duplicate_;
+    /// <summary>
+    /// 同一个事务号再提交：一笔没做。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Duplicate {
+      get { return duplicate_; }
+      set {
+        duplicate_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CrystalResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CrystalResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (Installed != other.Installed) return false;
+      if (Slot != other.Slot) return false;
+      if (Socket != other.Socket) return false;
+      if (CrystalItem != other.CrystalItem) return false;
+      if (Category != other.Category) return false;
+      if (Part != other.Part) return false;
+      if (SocketCount != other.SocketCount) return false;
+      if (FilledBefore != other.FilledBefore) return false;
+      if (Filled != other.Filled) return false;
+      if (CrystalLeft != other.CrystalLeft) return false;
+      if (Gold != other.Gold) return false;
+      if (EnhanceLevel != other.EnhanceLevel) return false;
+      if (Bound != other.Bound) return false;
+      if (Duplicate != other.Duplicate) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (Installed != false) hash ^= Installed.GetHashCode();
+      if (Slot != 0) hash ^= Slot.GetHashCode();
+      if (Socket != 0) hash ^= Socket.GetHashCode();
+      if (CrystalItem.Length != 0) hash ^= CrystalItem.GetHashCode();
+      if (Category.Length != 0) hash ^= Category.GetHashCode();
+      if (Part.Length != 0) hash ^= Part.GetHashCode();
+      if (SocketCount != 0) hash ^= SocketCount.GetHashCode();
+      if (FilledBefore != 0) hash ^= FilledBefore.GetHashCode();
+      if (Filled != 0) hash ^= Filled.GetHashCode();
+      if (CrystalLeft != 0) hash ^= CrystalLeft.GetHashCode();
+      if (Gold != 0L) hash ^= Gold.GetHashCode();
+      if (EnhanceLevel != 0) hash ^= EnhanceLevel.GetHashCode();
+      if (Bound != false) hash ^= Bound.GetHashCode();
+      if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Installed != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Installed);
+      }
+      if (Slot != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Slot);
+      }
+      if (Socket != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(Socket);
+      }
+      if (CrystalItem.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(CrystalItem);
+      }
+      if (Category.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(Category);
+      }
+      if (Part.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(Part);
+      }
+      if (SocketCount != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(SocketCount);
+      }
+      if (FilledBefore != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(FilledBefore);
+      }
+      if (Filled != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(Filled);
+      }
+      if (CrystalLeft != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(CrystalLeft);
+      }
+      if (Gold != 0L) {
+        output.WriteRawTag(104);
+        output.WriteInt64(Gold);
+      }
+      if (EnhanceLevel != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(EnhanceLevel);
+      }
+      if (Bound != false) {
+        output.WriteRawTag(120);
+        output.WriteBool(Bound);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(128, 1);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Installed != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Installed);
+      }
+      if (Slot != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Slot);
+      }
+      if (Socket != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(Socket);
+      }
+      if (CrystalItem.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(CrystalItem);
+      }
+      if (Category.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(Category);
+      }
+      if (Part.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(Part);
+      }
+      if (SocketCount != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(SocketCount);
+      }
+      if (FilledBefore != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(FilledBefore);
+      }
+      if (Filled != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(Filled);
+      }
+      if (CrystalLeft != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(CrystalLeft);
+      }
+      if (Gold != 0L) {
+        output.WriteRawTag(104);
+        output.WriteInt64(Gold);
+      }
+      if (EnhanceLevel != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(EnhanceLevel);
+      }
+      if (Bound != false) {
+        output.WriteRawTag(120);
+        output.WriteBool(Bound);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(128, 1);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (Installed != false) {
+        size += 1 + 1;
+      }
+      if (Slot != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Slot);
+      }
+      if (Socket != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Socket);
+      }
+      if (CrystalItem.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(CrystalItem);
+      }
+      if (Category.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Category);
+      }
+      if (Part.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Part);
+      }
+      if (SocketCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(SocketCount);
+      }
+      if (FilledBefore != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilledBefore);
+      }
+      if (Filled != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Filled);
+      }
+      if (CrystalLeft != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(CrystalLeft);
+      }
+      if (Gold != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Gold);
+      }
+      if (EnhanceLevel != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(EnhanceLevel);
+      }
+      if (Bound != false) {
+        size += 1 + 1;
+      }
+      if (Duplicate != false) {
+        size += 2 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CrystalResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.Installed != false) {
+        Installed = other.Installed;
+      }
+      if (other.Slot != 0) {
+        Slot = other.Slot;
+      }
+      if (other.Socket != 0) {
+        Socket = other.Socket;
+      }
+      if (other.CrystalItem.Length != 0) {
+        CrystalItem = other.CrystalItem;
+      }
+      if (other.Category.Length != 0) {
+        Category = other.Category;
+      }
+      if (other.Part.Length != 0) {
+        Part = other.Part;
+      }
+      if (other.SocketCount != 0) {
+        SocketCount = other.SocketCount;
+      }
+      if (other.FilledBefore != 0) {
+        FilledBefore = other.FilledBefore;
+      }
+      if (other.Filled != 0) {
+        Filled = other.Filled;
+      }
+      if (other.CrystalLeft != 0) {
+        CrystalLeft = other.CrystalLeft;
+      }
+      if (other.Gold != 0L) {
+        Gold = other.Gold;
+      }
+      if (other.EnhanceLevel != 0) {
+        EnhanceLevel = other.EnhanceLevel;
+      }
+      if (other.Bound != false) {
+        Bound = other.Bound;
+      }
+      if (other.Duplicate != false) {
+        Duplicate = other.Duplicate;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Installed = input.ReadBool();
+            break;
+          }
+          case 32: {
+            Slot = input.ReadUInt32();
+            break;
+          }
+          case 40: {
+            Socket = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            CrystalItem = input.ReadString();
+            break;
+          }
+          case 58: {
+            Category = input.ReadString();
+            break;
+          }
+          case 66: {
+            Part = input.ReadString();
+            break;
+          }
+          case 72: {
+            SocketCount = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            FilledBefore = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            Filled = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            CrystalLeft = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            Gold = input.ReadInt64();
+            break;
+          }
+          case 112: {
+            EnhanceLevel = input.ReadInt32();
+            break;
+          }
+          case 120: {
+            Bound = input.ReadBool();
+            break;
+          }
+          case 128: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Installed = input.ReadBool();
+            break;
+          }
+          case 32: {
+            Slot = input.ReadUInt32();
+            break;
+          }
+          case 40: {
+            Socket = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            CrystalItem = input.ReadString();
+            break;
+          }
+          case 58: {
+            Category = input.ReadString();
+            break;
+          }
+          case 66: {
+            Part = input.ReadString();
+            break;
+          }
+          case 72: {
+            SocketCount = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            FilledBefore = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            Filled = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            CrystalLeft = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            Gold = input.ReadInt64();
+            break;
+          }
+          case 112: {
+            EnhanceLevel = input.ReadInt32();
+            break;
+          }
+          case 120: {
+            Bound = input.ReadBool();
+            break;
+          }
+          case 128: {
             Duplicate = input.ReadBool();
             break;
           }

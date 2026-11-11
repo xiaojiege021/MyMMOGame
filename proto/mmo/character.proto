@@ -90,6 +90,9 @@ service CharacterService {
   // 来源绑定时目标在同一笔事务里改为绑定。转移必定成功，不掷点。
   // txn_id 由网关生成，客户端填不进来。
   rpc TransferEnhance(TransferEnhanceRequest) returns (TransferEnhanceResponse);
+  // 能量结晶（方案第 9 章第 3 层）：装上与拆下各一次角色服事务，共用同一种回包。
+  rpc InstallCrystal(InstallCrystalRequest) returns (CrystalResponse);
+  rpc RemoveCrystal(RemoveCrystalRequest) returns (CrystalResponse);
 }
 
 message SettleExpRequest {
@@ -364,4 +367,55 @@ message TransferEnhanceResponse {
   bool target_bound = 14;
   // 同一个事务号再提交：一笔没做。
   bool duplicate = 15;
+}
+
+// 能量结晶装上（方案第 9 章第 3 层）。只带三个格位编号：
+// 结晶类别、装备部位、固定值、能不能装、结果和事务号都带不进来。
+message InstallCrystalRequest {
+  // 网关转发时填令牌账号，角色服再核一次归属。
+  string account = 1;
+  uint64 character_id = 2;
+  // 要装结晶的装备格。
+  uint32 slot = 3;
+  // 结晶现在放在背包的哪一格。服务端自己读这一格的物品编号。
+  uint32 crystal_slot = 4;
+  // 装到第几个镶嵌位。位数与合法范围由配置决定。
+  uint32 socket = 5;
+  string txn_id = 6;
+}
+
+// 拆下：只带装备格与镶嵌位，拆下来的结晶由角色服放回背包。
+message RemoveCrystalRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint32 slot = 3;
+  uint32 socket = 4;
+  string txn_id = 5;
+}
+
+message CrystalResponse {
+  // 业务前提不满足（wrong_part / not_crystal / socket_occupied / socket_empty ...）
+  // 是正常回包里的 ok=false + reason，不是 gRPC 错误码；身份与参数错才走错误码。
+  // 未生效的数值字段一律留 0。
+  bool ok = 1;
+  string reason = 2;
+  // 结果态：true 装上了、false 拆下了。客户端不拿它算数值。
+  bool installed = 3;
+  uint32 slot = 4;
+  uint32 socket = 5;
+  string crystal_item = 6;
+  // 只作展示：类别与部位只在服务端从配置读，客户端不另算一套。
+  string category = 7;
+  string part = 8;
+  // 配置里的镶嵌位数量，回给客户端，不让它自己另算。
+  int32 socket_count = 9;
+  int32 filled_before = 10;
+  int32 filled = 11;
+  int32 crystal_left = 12;
+  // 只作展示：装上 / 拆下都不改金币、强化等级和绑定，回出来给核对看。
+  int64 gold = 13;
+  int32 enhance_level = 14;
+  bool bound = 15;
+  // 同一个事务号再提交：一笔没做。
+  bool duplicate = 16;
 }

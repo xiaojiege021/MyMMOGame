@@ -48,6 +48,14 @@ public static class CharacterApi
     // 金币费用、结果与事务号都读不进来（事务号由网关生成）。
     public sealed record TransferBody(ulong? CharacterId, uint? FromSlot, uint? ToSlot);
 
+    // 装上结晶只带装备格、结晶所在背包格与镶嵌位号：类别、部位、固定值、
+    // 能不能装、结果与事务号都读不进来（事务号由网关生成）。
+    public sealed record InstallCrystalBody(
+        ulong? CharacterId, uint? Slot, uint? CrystalSlot, uint? Socket);
+
+    // 拆下只带装备格与镶嵌位号，拆下来的结晶由角色服放回背包。
+    public sealed record RemoveCrystalBody(ulong? CharacterId, uint? Slot, uint? Socket);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -964,7 +972,171 @@ public static class CharacterApi
                 await WriteRpcErrorAsync(context, "transfer", account, ex);
             }
         });
+
+        // 能量结晶装上（方案第 9 章第 3 层）。类别、部位与判定全在角色服；
+        // 网关只认令牌、复核归属、生成事务号，再把三个格位编号转过去。
+        // 部位不对、位号越界、位已占用等业务拒绝也是 200 + ok=false。
+        app.MapPost("/character/crystal/install", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "crystal_install", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            InstallCrystalBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<InstallCrystalBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.Slot is null || body.Slot == 0
+                || body.CrystalSlot is null || body.CrystalSlot == 0
+                || body.Socket is null || body.Socket == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "crystal_install:" + Guid.NewGuid().ToString("N");
+                var result = await client.InstallCrystalAsync(
+                    new InstallCrystalRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Slot = body.Slot.Value,
+                        CrystalSlot = body.CrystalSlot.Value,
+                        Socket = body.Socket.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("crystal_install account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " slot=" + body.Slot.Value
+                    + " crystal_slot=" + body.CrystalSlot.Value
+                    + " socket=" + body.Socket.Value
+                    + " txn=" + txnId
+                    + " ok=" + (result.Ok ? "true" : "false")
+                    + " reason=" + result.Reason
+                    + " item=" + result.CrystalItem
+                    + " part=" + result.Part
+                    + " duplicate=" + (result.Duplicate ? "true" : "false"));
+
+                await WriteCrystalAsync(context, result);
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "crystal_install", account, ex);
+            }
+        });
+
+        // 拆下：结晶回背包复用，不扣金币、不消耗、不改强化与绑定。
+        app.MapPost("/character/crystal/remove", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "crystal_remove", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            RemoveCrystalBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<RemoveCrystalBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.Slot is null || body.Slot == 0
+                || body.Socket is null || body.Socket == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "crystal_remove:" + Guid.NewGuid().ToString("N");
+                var result = await client.RemoveCrystalAsync(
+                    new RemoveCrystalRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Slot = body.Slot.Value,
+                        Socket = body.Socket.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("crystal_remove account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " slot=" + body.Slot.Value
+                    + " socket=" + body.Socket.Value
+                    + " txn=" + txnId
+                    + " ok=" + (result.Ok ? "true" : "false")
+                    + " reason=" + result.Reason
+                    + " item=" + result.CrystalItem
+                    + " left=" + result.CrystalLeft
+                    + " duplicate=" + (result.Duplicate ? "true" : "false"));
+
+                await WriteCrystalAsync(context, result);
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "crystal_remove", account, ex);
+            }
+        });
     }
+
+    static Task WriteCrystalAsync(HttpContext context, CrystalResponse result) =>
+        WriteAsync(context, 200, new
+        {
+            ok = result.Ok,
+            reason = result.Reason,
+            installed = result.Installed,
+            slot = result.Slot,
+            socket = result.Socket,
+            crystal_item = result.CrystalItem,
+            category = result.Category,
+            part = result.Part,
+            socket_count = result.SocketCount,
+            filled_before = result.FilledBefore,
+            filled = result.Filled,
+            crystal_left = result.CrystalLeft,
+            gold = result.Gold,
+            enhance_level = result.EnhanceLevel,
+            bound = result.Bound,
+            duplicate = result.Duplicate,
+        });
 
     // 复用角色服已有的只读背包口复核归属，不为强化另起一套身份数据。
     static async Task<bool> OwnsAsync(

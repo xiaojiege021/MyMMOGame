@@ -50,6 +50,12 @@ long transferStateOf = 0;
 var transferFromSlot = 0;
 var transferToSlot = 0;
 string? transferTxnCount = null;
+var crystalState = false;
+string? crystalConfigPath = null;
+long crystalStateOf = 0;
+var crystalSlotOf = 0;
+string? crystalItemOf = null;
+string? crystalTxnCount = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -189,6 +195,25 @@ for (var i = 0; i < args.Length; i++)
         case "--transfer-txn-count" when i + 1 < args.Length:
             transferTxnCount = args[++i];
             break;
+        // 只给核对用：把结晶表读出来，不连库、不启动进程。坏配置也走这里。
+        case "--crystal-state":
+            crystalState = true;
+            break;
+        case "--crystal-config" when i + 1 < args.Length:
+            crystalConfigPath = args[++i];
+            break;
+        // 只给核对用：不看回包，从库里独立读回镶嵌状态与几个不该被改动的字段。
+        // 第三个参数（结晶编号）可选，给了才顺带读背包余量。
+        case "--crystal-sockets" when i + 2 < args.Length:
+            long.TryParse(args[++i], out crystalStateOf);
+            int.TryParse(args[++i], out crystalSlotOf);
+            crystalItemOf = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
+                ? args[++i] : "";
+            break;
+        // 只给核对用：这个结晶事务号在表里有几行。
+        case "--crystal-txn-count" when i + 1 < args.Length:
+            crystalTxnCount = args[++i];
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -271,6 +296,41 @@ if (transferState)
     return 0;
 }
 
+// 结晶表只读核对：与启动共用同一套校验（三类写定、装备部位不能漏配、
+// 结晶要在物品表里），不连库也不启动进程，坏配置能在这一步直接看出来。
+if (crystalState)
+{
+    try
+    {
+        var characterConfig = CharacterConfig.Load(configPath);
+        var items = ItemTable.Load("config/items.json");
+        var table = CrystalTable.Load(crystalConfigPath ?? characterConfig.CrystalTable, items);
+        Console.WriteLine("crystal_table_state=ok version=" + table.Version
+            + " crystal_sockets=" + table.SocketCount
+            + " crystal_categories=" + string.Join(",", CrystalTable.WrittenCategories)
+            + " crystal_parts=" + string.Join(",", table.EquipmentParts
+                .OrderBy(p => p.Key).Select(p => p.Key + ":" + p.Value))
+            + " crystal_allowed=" + string.Join(",", CrystalTable.WrittenCategories
+                .Select(c => c + ":" + string.Join("+", table.CategoryParts[c])))
+            + " crystal_items=" + string.Join(",", table.Crystals
+                .OrderBy(c => c.Id).Select(c => c.Id + ":" + c.Category + ":" + c.FixedValue)));
+        Console.WriteLine("crystal_gate=ok " + string.Join(" ", CrystalTable.WrittenCategories
+            .Select(c => c + "=" + string.Join("+", table.CategoryParts[c]))));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
@@ -278,7 +338,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
-    || transferStateOf != 0 || transferTxnCount != null)
+    || transferStateOf != 0 || transferTxnCount != null
+    || crystalStateOf != 0 || crystalTxnCount != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -600,6 +661,37 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 Console.WriteLine("transfer_txn_count="
                     + await transfers.TxnCountAsync(transferTxnCount, CancellationToken.None)
                     + " txn=" + transferTxnCount);
+            }
+        }
+
+        if (crystalStateOf != 0 || crystalTxnCount != null)
+        {
+            var characterConfig = CharacterConfig.Load(configPath);
+            var items = ItemTable.Load("config/items.json");
+            var crystalTable = CrystalTable.Load(
+                crystalConfigPath ?? characterConfig.CrystalTable, items);
+            var crystals = new CrystalRepository(dataSource, crystalTable, items, characterConfig);
+
+            if (crystalStateOf != 0)
+            {
+                var state = await crystals.StateAsync(
+                    crystalStateOf, crystalSlotOf, crystalItemOf ?? "", CancellationToken.None);
+                Console.WriteLine("crystal_state=ok id=" + crystalStateOf
+                    + " slot=" + crystalSlotOf
+                    + " filled=" + state.Filled
+                    + " installed=" + state.Installed
+                    + " left=" + state.CrystalLeft
+                    + " gold=" + state.Gold
+                    + " enhance=" + state.EnhanceLevel
+                    // 显式输出小写，和网关回包以及核对脚本读到的布尔形状一致。
+                    + " bound=" + (state.Bound ? "true" : "false"));
+            }
+
+            if (crystalTxnCount != null)
+            {
+                Console.WriteLine("crystal_txn_count="
+                    + await crystals.TxnCountAsync(crystalTxnCount, CancellationToken.None)
+                    + " txn=" + crystalTxnCount);
             }
         }
 
