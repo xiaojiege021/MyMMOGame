@@ -101,6 +101,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
         // object UnityEngine.Component.GetComponent<object>()
         // object UnityEngine.GameObject.AddComponent<object>()
         // object UnityEngine.GameObject.GetComponent<object>()
+        // object UnityEngine.Object.FindObjectOfType<object>()
         // object[] UnityEngine.Object.FindObjectsOfType<object>()
         // object[] UnityEngine.Resources.ConvertObjects<object>(UnityEngine.Object[])
         // object UnityEngine.Resources.GetBuiltinResource<object>(string)
