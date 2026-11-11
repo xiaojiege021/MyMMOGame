@@ -99,6 +99,12 @@ for e in "${PRIV_EMAILS[@]:-}"; do
   echo "xiaojiege <$GH_USER_EMAIL> <$e>" >> "$MAP"
   echo "$e==>$GH_USER_EMAIL" >> "$REP"
   echo "$(esc "$e")==>$GH_USER_EMAIL" >> "$REP"
+  # 主机名片段（如 local-host）：历史上曾以裸串出现在脚本的 grep 模式里，一并改写
+  host_frag="$(printf '%s' "$e" | sed 's/.*@//; s/\..*//')"
+  if [ -n "$host_frag" ]; then
+    echo "$host_frag==>local-host" >> "$REP"
+    echo "$(esc "$host_frag")==>local-host" >> "$REP"
+  fi
 done
 if [ -n "$PRIV_IP" ]; then
   echo "$PRIV_IP==>YOUR_SERVER_IP" >> "$REP"
@@ -229,6 +235,10 @@ SCAN=()
 for e in "${PRIV_EMAILS[@]:-}"; do
   [ -z "$e" ] && continue
   SCAN+=("$e"); SCAN+=("$(esc "$e")")
+  host_frag="$(printf '%s' "$e" | sed 's/.*@//; s/\..*//')"
+  if [ -n "$host_frag" ]; then
+    SCAN+=("$host_frag"); SCAN+=("$(esc "$host_frag")")
+  fi
 done
 [ -n "$PRIV_IP" ] && { SCAN+=("$PRIV_IP"); SCAN+=("$(esc "$PRIV_IP")"); }
 PRIV_HITS=""
