@@ -101,6 +101,22 @@
     display: grid; place-items: center; line-height: 1.05; letter-spacing: 0;
     writing-mode: vertical-rl; padding: 3px;
   }
+  /* 幕一题字 · 听谣镇旧谣（纯表现层，可整批替换） */
+  .verse{position:absolute;left:34%;top:11%;display:flex;flex-direction:row-reverse;align-items:flex-start;gap:12px;
+    pointer-events:none;font-family:var(--serif);color:var(--jade-bright);
+    text-shadow:0 1px 0 rgba(255,255,255,.72),0 0 12px rgba(255,253,246,.7)}
+  .verse .ln{writing-mode:vertical-rl;text-orientation:upright;font-size:clamp(15px,1.5vw,21px);
+    letter-spacing:.30em;line-height:1}
+  .verse .ln.l2{opacity:.78}
+  .verse.long .ln{font-size:clamp(12px,1.15vw,16px);letter-spacing:.20em}
+  .verse .sign{writing-mode:vertical-rl;align-self:flex-end;font-size:clamp(9px,.8vw,11px);
+    letter-spacing:.18em;color:var(--muted);margin-bottom:4px}
+  .verse-h{margin-top:15px;max-width:min(660px,74%);margin-left:auto;margin-right:auto;
+    font-family:var(--serif);font-size:clamp(11px,1.1vw,14px);line-height:1.85;
+    letter-spacing:.12em;color:var(--jade-bright);
+    text-shadow:0 1px 0 rgba(255,255,255,.9),0 0 10px rgba(255,253,246,.85)}
+  .verse-h b{font-weight:400;color:var(--jade-bright)}
+  .verse-h .vsign{display:block;margin-top:3px;font-style:normal;font-size:.84em;letter-spacing:.10em;color:var(--muted)}
   .brand-foot {
     position: absolute; left: 6.2%; bottom: 7%;
     font-size: clamp(10px, .95vw, 13px); color: var(--faint); letter-spacing: .18em;
@@ -264,6 +280,41 @@
       <option value="400">400 请求为空</option>
       <option value="net">网络不可达</option>
     </select>
+    <span class="label" style="margin-left:12px">题字</span>
+    <select id="verseMode">
+      <optgroup label="默认">
+        <option value="random">载入随机（默认）</option>
+      </optgroup>
+      <optgroup label="定稿">
+        <option value="adapt">01 定稿 · 化用版</option>
+        <option value="origin">原句 · 仅对照</option>
+      </optgroup>
+      <optgroup label="幕一 · 仙路已断">
+        <option value="m02">02 灵气一年薄一寸</option>
+        <option value="m03">03 天地玄黄四个字</option>
+        <option value="m04">04 崖上的人不抬头</option>
+        <option value="m05">05 传闻越传越真</option>
+      </optgroup>
+      <optgroup label="幕二 · 结伴寻境">
+        <option value="m06">06 隙里灵气满</option>
+        <option value="m07">07 独去与结伴</option>
+        <option value="m08">08 带得回的石</option>
+        <option value="m09">09 渊户守门</option>
+      </optgroup>
+      <optgroup label="幕三 · 秘境成局">
+        <option value="m10">10 仙魔两路</option>
+        <option value="m11">11 不生灵气</option>
+        <option value="m12">12 仙榜与账房</option>
+      </optgroup>
+      <optgroup label="幕四 · 逆行不止">
+        <option value="m13">13 龙巢的门</option>
+        <option value="m14">14 局是假的</option>
+      </optgroup>
+      <optgroup label="通用 · 载入题记">
+        <option value="m15">15 云海与光柱</option>
+      </optgroup>
+      <optgroup label="显示"><option value="none">不显示</option></optgroup>
+    </select>
     <span class="note">切换器与返回码仅原型演示，不属于游戏界面</span>
   </div>
 
@@ -356,6 +407,10 @@
           </div>
         </div>
 
+        <div class="verse">
+          <span class="ln l1" data-v1>仙路尽头谁为峰</span><span class="ln l2" data-v2>一见隙开道成空</span><span class="sign" data-vsign>听谣镇旧谣</span>
+        </div>
+
         <div class="panel">
           <p class="panel-lead">旧路已断，仍要往前。</p>
           <div class="panel-rule"></div>
@@ -414,6 +469,7 @@
         <div class="loading">
           <div class="act">仙路已断</div>
           <div class="sub">正在进入表世界</div>
+          <div class="verse-h"><b data-v1>仙路尽头谁为峰</b>　<span data-v2>一见隙开道成空</span><span class="vsign" data-vsign>听谣镇旧谣</span></div>
           <div class="bar"><i id="barFill"></i></div>
           <div class="tip" id="loadTip">表里两界之间那道缝</div>
         </div>
@@ -466,6 +522,37 @@
         </table>
       </div>
 
+      <div class="card">
+        <h3>幕一题字 · 听谣镇旧谣</h3>
+        <ul>
+          <li>默认「<b>仙路尽头谁为峰，一见隙开道成空</b>」：上句照用，下句把「无始」换成「隙开」，「隙」即表里两界之间那道缝。</li>
+          <li>原句「一见无始道成空」出自辰东《遮天》（无始大帝评价诗），「无始」是他人作品角色专名，且与本项目「仙路已断、旧路尽头是骗局」的调性相反，<b>不作交付文案</b>；工具条仅供对照。</li>
+          <li>题字身份是听谣镇流传的旧谣，只作登入 / 载入题记；静态文字，不接接口、不进库，按第 17 节可整批替换。</li>
+        </ul>
+      </div>
+
+                  <div class="card">
+        <h3>听谣镇旧谣集 · 15 首 + 1 条原句对照</h3>
+        <p class="intro" style="margin:0 0 10px">全部按方案正本的世界观写：灵气稀薄、成仙旧路走到尽头是一场骗局、秘境即里世界、听谣镇靠传闻过活、满级后宗门掌管入口。每首挂一处地名与一条写定设定，不发明新专名、不写待定数值。<b>默认「载入随机」</b>：登入屏固定显示 01 定稿，每次进入载入屏从洗牌袋里抽一首，15 首轮完一遍才会重复；手动选定某首时两屏都显示该首，方便逐首对照。原句对照档不进随机池，也不作交付文案。</p>
+        <ul>
+          <li><b>01</b> 仙路尽头谁为峰，一见隙开道成空。<br><small>听谣镇 · 幕一题记 · 上句照用，下句「隙开」＝表里两界那道缝；旧路尽头是骗局</small></li>
+          <li><b>对照</b> 仙路尽头谁为峰，一见无始道成空。<br><small>旧谣原句 · 仅对照 · 辰东《遮天》无始大帝评价诗，不作交付文案</small></li>
+          <li><b>02</b> 灵气一年薄一寸，功法一代厚一函。<br><small>承露门 · 幕一 · 灵气稀薄，修士卡在瓶颈；功法一代代往下传</small></li>
+          <li><b>03</b> 天地玄黄传了一代又一代，门外旧路断了一年又一年。<br><small>承露门 · 幕一 · 承露门只教「天地玄黄」低阶技能；成仙旧路已断</small></li>
+          <li><b>04</b> 崖上的人不抬头，说天上从前有航路。<br><small>枯岚道 · 幕一 · 岚民出身：从前走高空航路，航路断了以后住在崖上</small></li>
+          <li><b>05</b> 从前走到头的说路还在，后来没走到的说路本来就在。<br><small>听谣镇 · 幕一 · 听谣镇靠传闻过活；传闻怎么越传越像真的</small></li>
+          <li><b>06</b> 听说隙里灵气满，进去的没一个回来改口。<br><small>听谣镇 → 外环隙 · 幕二 · 苏晚织转述「秘境灵气无尽」；进去才知不是灵气之地</small></li>
+          <li><b>07</b> 独去的人数日子，结伴的人数名字。<br><small>枯岚道 → 外环隙 · 幕二 · 结伴寻境、孟七受续仙盟之雇截杀；人到齐一次抵多次</small></li>
+          <li><b>08</b> 带得回山里的石，带不回身上的境。<br><small>路上 · 幕二 · 阮青带出材料却没突破</small></li>
+          <li><b>09</b> 渊户世代守着门，先等来的却是收税的人。<br><small>渊户 → 秘境入口 · 幕二 · 渊户世代守在秘境入口旁；周晚棠把守护与税收包给宗门</small></li>
+          <li><b>10</b> 立仙走旧天城，立魔过焦原，两路尽头，同是一道门。<br><small>栖云城 · 幕三 · 仙魔分途走旧天城区／焦原，金仙／散仙，极境会合</small></li>
+          <li><b>11</b> 秘境不生灵气，只生收税的人。<br><small>栖云城 · 幕三 · 周晚棠把秘境的守护和税收包给宗门</small></li>
+          <li><b>12</b> 城里挂的是仙榜，榜下站的是账房。<br><small>栖云城 · 幕三 · 满级后的秩序归宗门、领地与赛季</small></li>
+          <li><b>13</b> 龙巢的门一直开着，没人问里面，只问谁守门。<br><small>龙巢门口 · 幕四 · 龙巢是最深处；满级后争的是秘境入口，赛季更换目标</small></li>
+          <li><b>14</b> 局是假的，脚底下的路是真的。<br><small>龙巢门口 · 幕四 · 骗局揭开以后，修仙没有停</small></li>
+          <li><b>15</b> 云海年年白，光柱年年落，仰望的人换了几代，没人问它照着什么。<br><small>无定处 · 载入题记 · 登录背景那道贯穿天地的光柱（app-icon 构图）</small></li>
+        </ul>
+      </div>
       <div class="card">
         <h3>状态清单</h3>
         <ul>
@@ -527,7 +614,8 @@
   function show(key) {
     Object.entries(screens).forEach(([k, id]) => document.getElementById(id).classList.toggle("on", k === key));
     document.querySelectorAll("[data-go]").forEach(b => b.classList.toggle("on", b.dataset.go === key));
-    if (key === "loading") runLoading();
+    if (key === "loading") { runLoading(); rerollBallad(); }
+    applyVerse();
   }
   document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => show(b.dataset.go)));
 
@@ -613,6 +701,56 @@
       }
     }, 70);
   }
+/* ---------- 听谣镇旧谣集：载入随机 / 手动指定 / 原句对照 ---------- */
+const VERSE = {
+  adapt: {a:'仙路尽头谁为峰', b:'一见隙开道成空', s:'听谣镇 · 幕一题记'},
+  origin: {a:'仙路尽头谁为峰', b:'一见无始道成空', s:'旧谣原句 · 仅对照'},
+  m02: {a:'灵气一年薄一寸', b:'功法一代厚一函', s:'承露门 · 幕一'},
+  m03: {a:'天地玄黄传了一代又一代', b:'门外旧路断了一年又一年', s:'承露门 · 幕一'},
+  m04: {a:'崖上的人不抬头', b:'说天上从前有航路', s:'枯岚道 · 幕一'},
+  m05: {a:'从前走到头的说路还在', b:'后来没走到的说路本来就在', s:'听谣镇 · 幕一'},
+  m06: {a:'听说隙里灵气满', b:'进去的没一个回来改口', s:'听谣镇 → 外环隙 · 幕二'},
+  m07: {a:'独去的人数日子', b:'结伴的人数名字', s:'枯岚道 → 外环隙 · 幕二'},
+  m08: {a:'带得回山里的石', b:'带不回身上的境', s:'路上 · 幕二'},
+  m09: {a:'渊户世代守着门', b:'先等来的却是收税的人', s:'渊户 → 秘境入口 · 幕二'},
+  m10: {a:'立仙走旧天城，立魔过焦原', b:'两路尽头，同是一道门', s:'栖云城 · 幕三'},
+  m11: {a:'秘境不生灵气', b:'只生收税的人', s:'栖云城 · 幕三'},
+  m12: {a:'城里挂的是仙榜', b:'榜下站的是账房', s:'栖云城 · 幕三'},
+  m13: {a:'龙巢的门一直开着', b:'没人问里面，只问谁守门', s:'龙巢门口 · 幕四'},
+  m14: {a:'局是假的', b:'脚底下的路是真的', s:'龙巢门口 · 幕四'},
+  m15: {a:'云海年年白，光柱年年落', b:'仰望的人换了几代，没人问它照着什么', s:'无定处 · 载入题记'},
+};
+const BALLAD_KEYS = ["adapt", "m02", "m03", "m04", "m05", "m06", "m07", "m08", "m09", "m10", "m11", "m12", "m13", "m14", "m15"];
+let randomKey = '', balladBag = [];
+function rerollBallad() {
+  if (!balladBag.length) {
+    balladBag = BALLAD_KEYS.slice();
+    for (let i = balladBag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = balladBag[i]; balladBag[i] = balladBag[j]; balladBag[j] = t;
+    }
+    if (balladBag.length > 1 && balladBag[balladBag.length - 1] === randomKey) {
+      const t = balladBag[0]; balladBag[0] = balladBag[balladBag.length - 1]; balladBag[balladBag.length - 1] = t;
+    }
+  }
+  randomKey = balladBag.pop();
+}
+function isLoadingScreen() { const e = document.getElementById("s-loading"); return !!e && e.classList.contains("on") }
+function applyVerse() {
+  const sel = document.getElementById('verseMode');
+  const val = sel ? sel.value : 'random';
+  const key = val === 'random'
+    ? (isLoadingScreen() ? (randomKey || (randomKey = BALLAD_KEYS[0])) : 'adapt')
+    : val;
+  const v = VERSE[key] || VERSE.adapt;
+  document.querySelectorAll('[data-v1]').forEach(el => el.textContent = v.a);
+  document.querySelectorAll('[data-v2]').forEach(el => el.textContent = v.b);
+  document.querySelectorAll('[data-vsign]').forEach(el => el.textContent = v.s);
+  document.querySelectorAll('.verse, .verse-h').forEach(el => { el.style.display = val === 'none' ? 'none' : ''; });
+  document.querySelectorAll('.verse').forEach(el => el.classList.toggle('long', Math.max(v.a.length, v.b.length) > 11));
+}
+document.getElementById("verseMode").addEventListener("change", applyVerse);
+  applyVerse();
 </script>
 </body>
 </html>
