@@ -80,6 +80,8 @@ service CharacterService {
   // 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
   // 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
   // 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+  // P1-4b：use_coupon 只表示「这一手要不要用背包里的保护券」，券只挡掉级，
+  // 不改这一档的成功率；券的编号、数量、来源都不在请求里。
   rpc Enhance(EnhanceRequest) returns (EnhanceResponse);
 }
 
@@ -286,6 +288,9 @@ message EnhanceRequest {
   uint32 slot = 3;
   string stone_id = 4;
   string txn_id = 5;
+  // 这一手用不用保护券。只带这个开关：券编号、数量、来源、成功率、等级、
+  // 结果与余额都带不进来，也不存在「必成券」这种东西。
+  bool use_coupon = 6;
 }
 
 message EnhanceResponse {
@@ -307,4 +312,13 @@ message EnhanceResponse {
   int32 stone_left = 12;
   // 同一个事务号再提交：一笔没做。
   bool duplicate = 13;
+  // 只作展示：这一档从 config/enhance.json 读出的成功率。带券与不带券是同一个数，
+  // 券不提高成功率；客户端不拿它算数值，也不参与请求。
+  double success_rate = 14;
+  // 这一手失败，但掉级被保护券挡住了（等级 = level_before）。
+  bool protected_level = 15;
+  // 这一手实际用掉几张券：只在「真的挡下一次掉级」时是 1，成功或没用券都是 0。
+  int32 coupon_used = 16;
+  // 只作展示：背包里还剩几张这种券。
+  int32 coupon_left = 17;
 }

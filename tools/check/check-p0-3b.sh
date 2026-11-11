@@ -121,7 +121,10 @@ fi
 
 echo "== 2. 静态断言 =="
 # 阶段名、血线、两段出手参数只能出现在配置里；服务端代码里出现这些字就说明写死了。
-if grep -rn "狂暴\|常态" "$ROOT/src" --include="*.cs" >/dev/null 2>&1; then
+# 只扫非注释的代码行：注释里「断开在收尾时是常态」是普通词，不是阶段名；
+# 顺带统一 BSD / GNU grep 的语义（"a\|b" 在 BSD grep 里不是「或」），用 -E 写。
+if grep -rnE '狂暴|常态' "$ROOT/src" --include='*.cs' \
+    | grep -vE '^[^:]+:[0-9]+:[[:space:]]*//' >/dev/null 2>&1; then
   bad "服务端代码里出现了阶段名，阶段应当只走配置"
 else
   ok "阶段名和参数不在服务端代码里"

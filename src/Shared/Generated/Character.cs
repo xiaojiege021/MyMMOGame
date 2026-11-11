@@ -83,39 +83,41 @@ namespace Mmo.Proto.Character {
             "c2xvdHMYAiABKA0SFgoOY2hhcmFjdGVyX25hbWUYAyABKAkSDQoFcmVhbG0Y",
             "BCABKAkiRgoPQ2FuVHJhZGVSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoM",
             "Y2hhcmFjdGVyX2lkGAIgASgEEgwKBHNsb3QYAyABKA0iNAoQQ2FuVHJhZGVS",
-            "ZXNwb25zZRIQCgh0cmFkYWJsZRgBIAEoCBIOCgZyZWFzb24YAiABKAkiZwoO",
+            "ZXNwb25zZRIQCgh0cmFkYWJsZRgBIAEoCBIOCgZyZWFzb24YAiABKAkiewoO",
             "RW5oYW5jZVJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJf",
             "aWQYAiABKAQSDAoEc2xvdBgDIAEoDRIQCghzdG9uZV9pZBgEIAEoCRIOCgZ0",
-            "eG5faWQYBSABKAki+AEKD0VuaGFuY2VSZXNwb25zZRIKCgJvaxgBIAEoCBIO",
-            "CgZyZWFzb24YAiABKAkSFAoMbGV2ZWxfYmVmb3JlGAMgASgFEg0KBWxldmVs",
-            "GAQgASgFEhEKCW1heF9sZXZlbBgFIAEoBRIPCgdzdWNjZXNzGAYgASgIEgwK",
-            "BHRpZXIYByABKAkSFgoOcmVxdWlyZWRfc3RvbmUYCCABKAkSEgoKc3RvbmVf",
-            "Y29zdBgJIAEoBRIRCglnb2xkX2Nvc3QYCiABKAMSDAoEZ29sZBgLIAEoAxIS",
-            "CgpzdG9uZV9sZWZ0GAwgASgFEhEKCWR1cGxpY2F0ZRgNIAEoCDL5BwoQQ2hh",
-            "cmFjdGVyU2VydmljZRJgCg9DcmVhdGVDaGFyYWN0ZXISJS5tbW8uY2hhcmFj",
-            "dGVyLkNyZWF0ZUNoYXJhY3RlclJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLkNy",
-            "ZWF0ZUNoYXJhY3RlclJlc3BvbnNlEksKCFNldExldmVsEh4ubW1vLmNoYXJh",
-            "Y3Rlci5TZXRMZXZlbFJlcXVlc3QaHy5tbW8uY2hhcmFjdGVyLlNldExldmVs",
-            "UmVzcG9uc2USRgoHQWRkSXRlbRIdLm1tby5jaGFyYWN0ZXIuQWRkSXRlbVJl",
-            "cXVlc3QaHC5tbW8uY2hhcmFjdGVyLkludmVudG9yeVNsb3QSWgoNTGlzdElu",
-            "dmVudG9yeRIjLm1tby5jaGFyYWN0ZXIuTGlzdEludmVudG9yeVJlcXVlc3Qa",
-            "JC5tbW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXNwb25zZRJLCghDYW5U",
-            "cmFkZRIeLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXF1ZXN0Gh8ubW1vLmNo",
-            "YXJhY3Rlci5DYW5UcmFkZVJlc3BvbnNlElAKC0FkZEN1cnJlbmN5EiEubW1v",
-            "LmNoYXJhY3Rlci5BZGRDdXJyZW5jeVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVy",
-            "LkN1cnJlbmN5QmFsYW5jZRJUCgtHZXRDdXJyZW5jeRIhLm1tby5jaGFyYWN0",
-            "ZXIuR2V0Q3VycmVuY3lSZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5HZXRDdXJy",
-            "ZW5jeVJlc3BvbnNlElEKCkFwcGx5R3JhbnQSIC5tbW8uY2hhcmFjdGVyLkFw",
-            "cGx5R3JhbnRSZXF1ZXN0GiEubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVz",
-            "cG9uc2USVwoMRW50ZXJEdW5nZW9uEiIubW1vLmNoYXJhY3Rlci5FbnRlckR1",
-            "bmdlb25SZXF1ZXN0GiMubW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXNw",
-            "b25zZRJXCgxVc2VIb3RTcHJpbmcSIi5tbW8uY2hhcmFjdGVyLlVzZUhvdFNw",
-            "cmluZ1JlcXVlc3QaIy5tbW8uY2hhcmFjdGVyLlVzZUhvdFNwcmluZ1Jlc3Bv",
-            "bnNlEk4KCVNldHRsZUV4cBIfLm1tby5jaGFyYWN0ZXIuU2V0dGxlRXhwUmVx",
-            "dWVzdBogLm1tby5jaGFyYWN0ZXIuU2V0dGxlRXhwUmVzcG9uc2USSAoHRW5o",
-            "YW5jZRIdLm1tby5jaGFyYWN0ZXIuRW5oYW5jZVJlcXVlc3QaHi5tbW8uY2hh",
-            "cmFjdGVyLkVuaGFuY2VSZXNwb25zZUIWqgITTW1vLlByb3RvLkNoYXJhY3Rl",
-            "cmIGcHJvdG8z"));
+            "eG5faWQYBSABKAkSEgoKdXNlX2NvdXBvbhgGIAEoCCLRAgoPRW5oYW5jZVJl",
+            "c3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIUCgxsZXZlbF9i",
+            "ZWZvcmUYAyABKAUSDQoFbGV2ZWwYBCABKAUSEQoJbWF4X2xldmVsGAUgASgF",
+            "Eg8KB3N1Y2Nlc3MYBiABKAgSDAoEdGllchgHIAEoCRIWCg5yZXF1aXJlZF9z",
+            "dG9uZRgIIAEoCRISCgpzdG9uZV9jb3N0GAkgASgFEhEKCWdvbGRfY29zdBgK",
+            "IAEoAxIMCgRnb2xkGAsgASgDEhIKCnN0b25lX2xlZnQYDCABKAUSEQoJZHVw",
+            "bGljYXRlGA0gASgIEhQKDHN1Y2Nlc3NfcmF0ZRgOIAEoARIXCg9wcm90ZWN0",
+            "ZWRfbGV2ZWwYDyABKAgSEwoLY291cG9uX3VzZWQYECABKAUSEwoLY291cG9u",
+            "X2xlZnQYESABKAUy+QcKEENoYXJhY3RlclNlcnZpY2USYAoPQ3JlYXRlQ2hh",
+            "cmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXF1ZXN0",
+            "GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXNwb25zZRJLCghT",
+            "ZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXF1ZXN0Gh8ubW1v",
+            "LmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYKB0FkZEl0ZW0SHS5tbW8u",
+            "Y2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNoYXJhY3Rlci5JbnZl",
+            "bnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8uY2hhcmFjdGVyLkxp",
+            "c3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5MaXN0SW52ZW50",
+            "b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hhcmFjdGVyLkNhblRy",
+            "YWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXNwb25zZRJQ",
+            "CgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRkQ3VycmVuY3lSZXF1",
+            "ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFuY2USVAoLR2V0Q3Vy",
+            "cmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVxdWVzdBoiLm1t",
+            "by5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJRCgpBcHBseUdyYW50",
+            "EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVxdWVzdBohLm1tby5jaGFy",
+            "YWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVudGVyRHVuZ2VvbhIiLm1t",
+            "by5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBojLm1tby5jaGFyYWN0",
+            "ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNlSG90U3ByaW5nEiIubW1v",
+            "LmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMubW1vLmNoYXJhY3Rl",
+            "ci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0bGVFeHASHy5tbW8uY2hh",
+            "cmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8uY2hhcmFjdGVyLlNldHRs",
+            "ZUV4cFJlc3BvbnNlEkgKB0VuaGFuY2USHS5tbW8uY2hhcmFjdGVyLkVuaGFu",
+            "Y2VSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5FbmhhbmNlUmVzcG9uc2VCFqoC",
+            "E01tby5Qcm90by5DaGFyYWN0ZXJiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -144,8 +146,8 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ListInventoryResponse), global::Mmo.Proto.Character.ListInventoryResponse.Parser, new[]{ "Slots", "BagSlots", "CharacterName", "Realm" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanTradeRequest), global::Mmo.Proto.Character.CanTradeRequest.Parser, new[]{ "Account", "CharacterId", "Slot" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanTradeResponse), global::Mmo.Proto.Character.CanTradeResponse.Parser, new[]{ "Tradable", "Reason" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnhanceRequest), global::Mmo.Proto.Character.EnhanceRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "StoneId", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnhanceResponse), global::Mmo.Proto.Character.EnhanceResponse.Parser, new[]{ "Ok", "Reason", "LevelBefore", "Level", "MaxLevel", "Success", "Tier", "RequiredStone", "StoneCost", "GoldCost", "Gold", "StoneLeft", "Duplicate" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnhanceRequest), global::Mmo.Proto.Character.EnhanceRequest.Parser, new[]{ "Account", "CharacterId", "Slot", "StoneId", "TxnId", "UseCoupon" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.EnhanceResponse), global::Mmo.Proto.Character.EnhanceResponse.Parser, new[]{ "Ok", "Reason", "LevelBefore", "Level", "MaxLevel", "Success", "Tier", "RequiredStone", "StoneCost", "GoldCost", "Gold", "StoneLeft", "Duplicate", "SuccessRate", "ProtectedLevel", "CouponUsed", "CouponLeft" }, null, null, null, null)
           }));
     }
     #endregion
@@ -8185,6 +8187,7 @@ namespace Mmo.Proto.Character {
       slot_ = other.slot_;
       stoneId_ = other.stoneId_;
       txnId_ = other.txnId_;
+      useCoupon_ = other.useCoupon_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -8257,6 +8260,22 @@ namespace Mmo.Proto.Character {
       }
     }
 
+    /// <summary>Field number for the "use_coupon" field.</summary>
+    public const int UseCouponFieldNumber = 6;
+    private bool useCoupon_;
+    /// <summary>
+    /// 这一手用不用保护券。只带这个开关：券编号、数量、来源、成功率、等级、
+    /// 结果与余额都带不进来，也不存在「必成券」这种东西。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool UseCoupon {
+      get { return useCoupon_; }
+      set {
+        useCoupon_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -8277,6 +8296,7 @@ namespace Mmo.Proto.Character {
       if (Slot != other.Slot) return false;
       if (StoneId != other.StoneId) return false;
       if (TxnId != other.TxnId) return false;
+      if (UseCoupon != other.UseCoupon) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -8289,6 +8309,7 @@ namespace Mmo.Proto.Character {
       if (Slot != 0) hash ^= Slot.GetHashCode();
       if (StoneId.Length != 0) hash ^= StoneId.GetHashCode();
       if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (UseCoupon != false) hash ^= UseCoupon.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -8327,6 +8348,10 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(42);
         output.WriteString(TxnId);
       }
+      if (UseCoupon != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(UseCoupon);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -8357,6 +8382,10 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(42);
         output.WriteString(TxnId);
       }
+      if (UseCoupon != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(UseCoupon);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -8381,6 +8410,9 @@ namespace Mmo.Proto.Character {
       }
       if (TxnId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (UseCoupon != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -8408,6 +8440,9 @@ namespace Mmo.Proto.Character {
       }
       if (other.TxnId.Length != 0) {
         TxnId = other.TxnId;
+      }
+      if (other.UseCoupon != false) {
+        UseCoupon = other.UseCoupon;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -8448,6 +8483,10 @@ namespace Mmo.Proto.Character {
             TxnId = input.ReadString();
             break;
           }
+          case 48: {
+            UseCoupon = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -8485,6 +8524,10 @@ namespace Mmo.Proto.Character {
           }
           case 42: {
             TxnId = input.ReadString();
+            break;
+          }
+          case 48: {
+            UseCoupon = input.ReadBool();
             break;
           }
         }
@@ -8542,6 +8585,10 @@ namespace Mmo.Proto.Character {
       gold_ = other.gold_;
       stoneLeft_ = other.stoneLeft_;
       duplicate_ = other.duplicate_;
+      successRate_ = other.successRate_;
+      protectedLevel_ = other.protectedLevel_;
+      couponUsed_ = other.couponUsed_;
+      couponLeft_ = other.couponLeft_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -8720,6 +8767,67 @@ namespace Mmo.Proto.Character {
       }
     }
 
+    /// <summary>Field number for the "success_rate" field.</summary>
+    public const int SuccessRateFieldNumber = 14;
+    private double successRate_;
+    /// <summary>
+    /// 只作展示：这一档从 config/enhance.json 读出的成功率。带券与不带券是同一个数，
+    /// 券不提高成功率；客户端不拿它算数值，也不参与请求。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public double SuccessRate {
+      get { return successRate_; }
+      set {
+        successRate_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "protected_level" field.</summary>
+    public const int ProtectedLevelFieldNumber = 15;
+    private bool protectedLevel_;
+    /// <summary>
+    /// 这一手失败，但掉级被保护券挡住了（等级 = level_before）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool ProtectedLevel {
+      get { return protectedLevel_; }
+      set {
+        protectedLevel_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "coupon_used" field.</summary>
+    public const int CouponUsedFieldNumber = 16;
+    private int couponUsed_;
+    /// <summary>
+    /// 这一手实际用掉几张券：只在「真的挡下一次掉级」时是 1，成功或没用券都是 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CouponUsed {
+      get { return couponUsed_; }
+      set {
+        couponUsed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "coupon_left" field.</summary>
+    public const int CouponLeftFieldNumber = 17;
+    private int couponLeft_;
+    /// <summary>
+    /// 只作展示：背包里还剩几张这种券。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CouponLeft {
+      get { return couponLeft_; }
+      set {
+        couponLeft_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -8748,6 +8856,10 @@ namespace Mmo.Proto.Character {
       if (Gold != other.Gold) return false;
       if (StoneLeft != other.StoneLeft) return false;
       if (Duplicate != other.Duplicate) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(SuccessRate, other.SuccessRate)) return false;
+      if (ProtectedLevel != other.ProtectedLevel) return false;
+      if (CouponUsed != other.CouponUsed) return false;
+      if (CouponLeft != other.CouponLeft) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -8768,6 +8880,10 @@ namespace Mmo.Proto.Character {
       if (Gold != 0L) hash ^= Gold.GetHashCode();
       if (StoneLeft != 0) hash ^= StoneLeft.GetHashCode();
       if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (SuccessRate != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(SuccessRate);
+      if (ProtectedLevel != false) hash ^= ProtectedLevel.GetHashCode();
+      if (CouponUsed != 0) hash ^= CouponUsed.GetHashCode();
+      if (CouponLeft != 0) hash ^= CouponLeft.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -8838,6 +8954,22 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(104);
         output.WriteBool(Duplicate);
       }
+      if (SuccessRate != 0D) {
+        output.WriteRawTag(113);
+        output.WriteDouble(SuccessRate);
+      }
+      if (ProtectedLevel != false) {
+        output.WriteRawTag(120);
+        output.WriteBool(ProtectedLevel);
+      }
+      if (CouponUsed != 0) {
+        output.WriteRawTag(128, 1);
+        output.WriteInt32(CouponUsed);
+      }
+      if (CouponLeft != 0) {
+        output.WriteRawTag(136, 1);
+        output.WriteInt32(CouponLeft);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -8900,6 +9032,22 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(104);
         output.WriteBool(Duplicate);
       }
+      if (SuccessRate != 0D) {
+        output.WriteRawTag(113);
+        output.WriteDouble(SuccessRate);
+      }
+      if (ProtectedLevel != false) {
+        output.WriteRawTag(120);
+        output.WriteBool(ProtectedLevel);
+      }
+      if (CouponUsed != 0) {
+        output.WriteRawTag(128, 1);
+        output.WriteInt32(CouponUsed);
+      }
+      if (CouponLeft != 0) {
+        output.WriteRawTag(136, 1);
+        output.WriteInt32(CouponLeft);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -8948,6 +9096,18 @@ namespace Mmo.Proto.Character {
       }
       if (Duplicate != false) {
         size += 1 + 1;
+      }
+      if (SuccessRate != 0D) {
+        size += 1 + 8;
+      }
+      if (ProtectedLevel != false) {
+        size += 1 + 1;
+      }
+      if (CouponUsed != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeInt32Size(CouponUsed);
+      }
+      if (CouponLeft != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeInt32Size(CouponLeft);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -8999,6 +9159,18 @@ namespace Mmo.Proto.Character {
       }
       if (other.Duplicate != false) {
         Duplicate = other.Duplicate;
+      }
+      if (other.SuccessRate != 0D) {
+        SuccessRate = other.SuccessRate;
+      }
+      if (other.ProtectedLevel != false) {
+        ProtectedLevel = other.ProtectedLevel;
+      }
+      if (other.CouponUsed != 0) {
+        CouponUsed = other.CouponUsed;
+      }
+      if (other.CouponLeft != 0) {
+        CouponLeft = other.CouponLeft;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -9071,6 +9243,22 @@ namespace Mmo.Proto.Character {
             Duplicate = input.ReadBool();
             break;
           }
+          case 113: {
+            SuccessRate = input.ReadDouble();
+            break;
+          }
+          case 120: {
+            ProtectedLevel = input.ReadBool();
+            break;
+          }
+          case 128: {
+            CouponUsed = input.ReadInt32();
+            break;
+          }
+          case 136: {
+            CouponLeft = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -9140,6 +9328,22 @@ namespace Mmo.Proto.Character {
           }
           case 104: {
             Duplicate = input.ReadBool();
+            break;
+          }
+          case 113: {
+            SuccessRate = input.ReadDouble();
+            break;
+          }
+          case 120: {
+            ProtectedLevel = input.ReadBool();
+            break;
+          }
+          case 128: {
+            CouponUsed = input.ReadInt32();
+            break;
+          }
+          case 136: {
+            CouponLeft = input.ReadInt32();
             break;
           }
         }

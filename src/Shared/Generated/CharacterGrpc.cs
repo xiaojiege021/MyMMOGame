@@ -342,6 +342,8 @@ namespace Mmo.Proto.Character {
       /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
       /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
       /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// P1-4b：use_coupon 只表示「这一手要不要用背包里的保护券」，券只挡掉级，
+      /// 不改这一档的成功率；券的编号、数量、来源都不在请求里。
       /// </summary>
       /// <param name="request">The request received from the client.</param>
       /// <param name="context">The context of the server-side call handler being invoked.</param>
@@ -921,6 +923,8 @@ namespace Mmo.Proto.Character {
       /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
       /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
       /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// P1-4b：use_coupon 只表示「这一手要不要用背包里的保护券」，券只挡掉级，
+      /// 不改这一档的成功率；券的编号、数量、来源都不在请求里。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -936,6 +940,8 @@ namespace Mmo.Proto.Character {
       /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
       /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
       /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// P1-4b：use_coupon 只表示「这一手要不要用背包里的保护券」，券只挡掉级，
+      /// 不改这一档的成功率；券的编号、数量、来源都不在请求里。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>
@@ -949,6 +955,8 @@ namespace Mmo.Proto.Character {
       /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
       /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
       /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// P1-4b：use_coupon 只表示「这一手要不要用背包里的保护券」，券只挡掉级，
+      /// 不改这一档的成功率；券的编号、数量、来源都不在请求里。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -964,6 +972,8 @@ namespace Mmo.Proto.Character {
       /// 强化。三档材料、成功率、金币与石头消耗全在 config/enhance.json，只在角色服判定。
       /// 请求里没有等级、成功率、结果和账号余额，客户端说了不算；
       /// 扣石头、扣金币、改强化等级在同一笔数据库事务里，失败只掉 1 级。
+      /// P1-4b：use_coupon 只表示「这一手要不要用背包里的保护券」，券只挡掉级，
+      /// 不改这一档的成功率；券的编号、数量、来源都不在请求里。
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>

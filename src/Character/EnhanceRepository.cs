@@ -20,15 +20,20 @@ public sealed record EnhanceOutcome(
     bool Success,
     EnhanceTier? Tier,
     long Gold,
-    int StoneLeft);
+    int StoneLeft,
+    bool ProtectedLevel,
+    int CouponUsed,
+    int CouponLeft);
 
 /// <summary>只给核对用：从库里独立读回强化等级、金币与三档石头余量。</summary>
 public sealed record EnhanceState(int Level, long Gold, int Low, int Mid, int High);
 
 /// <summary>
-/// 强化是角色服的一笔数据库事务：扣石头、扣金币、改强化等级，全成或全退。
+/// 强化是角色服的一笔数据库事务：扣石头、扣金币、必要时扣保护券、改强化等级，全成或全退。
 /// 当前等级、档位、材料、消耗与成功率都只在服务端算，请求里带不进来。
 /// 失败只掉 1 级（最低 0），不删装备、不清零、也不记「失败几次下次必成」。
+/// P1-4b：券只挡掉级。掷点只用同一个 tier.SuccessRate，带券不另开一套概率；
+/// 券只在真的挡下一次掉级时被扣掉，成功那一手不消耗。券按物品编号认，不看来源。
 /// </summary>
 public sealed class EnhanceRepository(
     NpgsqlDataSource dataSource,
@@ -40,6 +45,7 @@ public sealed class EnhanceRepository(
         int slot,
         string stoneId,
         string txnId,
+        bool useCoupon,
         CancellationToken stopping)
     {
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
@@ -59,7 +65,7 @@ public sealed class EnhanceRepository(
                 await transaction.RollbackAsync(stopping);
                 var state = await StateAsync(characterId, slot, CancellationToken.None);
                 return new EnhanceOutcome(true, "duplicate", state.Level, state.Level,
-                    false, null, state.Gold, 0);
+                    false, null, state.Gold, 0, false, 0, 0);
             }
         }
 
@@ -108,10 +114,40 @@ public sealed class EnhanceRepository(
             throw new EnhanceException("wrong_stone");
         }
 
-        // 3. 扣石头。找一格够扣的锁住；扣到 0 就删行（count 有 CHECK > 0）。
+        // 3. 用券：先按唯一物品编号锁住一格券，确认这一手有得用。券只在失败时真的扣，
+        //    这里不扣，免得成功那一手白掉一张。券的「来源」在库里根本不存在，
+        //    商城和通行证以后发的是同一个 item_id，用的时候不看来源。
+        int? couponSlot = null;
+        var couponCount = 0;
+        if (useCoupon)
+        {
+            await using (var findCoupon = new NpgsqlCommand(
+                "select slot, count from \"角色\".inventory "
+                + "where character_id = $1 and item_id = $2 and count >= 1 "
+                + "order by slot limit 1 for update",
+                connection, transaction))
+            {
+                findCoupon.Parameters.AddWithValue(characterId);
+                findCoupon.Parameters.AddWithValue(table.ProtectItemId);
+                await using var reader = await findCoupon.ExecuteReaderAsync(stopping);
+                if (await reader.ReadAsync(stopping))
+                {
+                    couponSlot = reader.GetInt16(0);
+                    couponCount = reader.GetInt32(1);
+                }
+            }
+
+            if (couponSlot is null)
+            {
+                throw new EnhanceException("coupon_insufficient");
+            }
+        }
+
+        // 4. 扣石头。找一格够扣的锁住；扣到 0 就删行（count 有 CHECK > 0）。
         int? stoneSlot = null;
+        var stoneCount = 0;
         await using (var findStone = new NpgsqlCommand(
-            "select slot from \"角色\".inventory "
+            "select slot, count from \"角色\".inventory "
             + "where character_id = $1 and item_id = $2 and count >= $3 "
             + "order by slot limit 1 for update",
             connection, transaction))
@@ -123,6 +159,7 @@ public sealed class EnhanceRepository(
             if (await reader.ReadAsync(stopping))
             {
                 stoneSlot = reader.GetInt16(0);
+                stoneCount = reader.GetInt32(1);
             }
         }
 
@@ -131,19 +168,9 @@ public sealed class EnhanceRepository(
             throw new EnhanceException("stone_insufficient");
         }
 
-        int leftInSlot;
-        await using (var consume = new NpgsqlCommand(
-            "update \"角色\".inventory set count = count - $3 "
-            + "where character_id = $1 and slot = $2 returning count",
-            connection, transaction))
-        {
-            consume.Parameters.AddWithValue(characterId);
-            consume.Parameters.AddWithValue((short)stoneSlot.Value);
-            consume.Parameters.AddWithValue(tier.StoneCost);
-            leftInSlot = Convert.ToInt32(await consume.ExecuteScalarAsync(stopping));
-        }
-
-        if (leftInSlot == 0)
+        // inventory.count 有 CHECK (count > 0)：扣到 0 必须先删行，不能先 update 成 0
+        // 再删（PostgreSQL 在 UPDATE 当下就检查约束，会整笔抛异常回滚）。
+        if (stoneCount == tier.StoneCost)
         {
             await using var remove = new NpgsqlCommand(
                 "delete from \"角色\".inventory where character_id = $1 and slot = $2",
@@ -152,8 +179,19 @@ public sealed class EnhanceRepository(
             remove.Parameters.AddWithValue((short)stoneSlot.Value);
             await remove.ExecuteNonQueryAsync(stopping);
         }
+        else
+        {
+            await using var consume = new NpgsqlCommand(
+                "update \"角色\".inventory set count = count - $3 "
+                + "where character_id = $1 and slot = $2",
+                connection, transaction);
+            consume.Parameters.AddWithValue(characterId);
+            consume.Parameters.AddWithValue((short)stoneSlot.Value);
+            consume.Parameters.AddWithValue(tier.StoneCost);
+            await consume.ExecuteNonQueryAsync(stopping);
+        }
 
-        // 4. 扣金币。带余额条件的 update，钱不够整笔回滚，石头也跟着退回去。
+        // 5. 扣金币。带余额条件的 update，钱不够整笔回滚，石头也跟着退回去。
         long gold;
         await using (var pay = new NpgsqlCommand(
             "update \"角色\".currency set amount = amount - $3, updated_at = now() "
@@ -172,10 +210,41 @@ public sealed class EnhanceRepository(
             gold = Convert.ToInt64(paid);
         }
 
-        // 5. 掷点只在服务端。失败掉 1 级，最低 0；没有失败累计必成。
+        // 6. 掷点只在服务端，带券与不带券共用这一行、同一个 tier.SuccessRate：
+        //    券不提高成功率，也没有「必成券」。失败时若用了券，只把掉级挡住，等级不变。
         var success = Random.Shared.NextDouble() < tier.SuccessRate;
-        var level = success ? target : Math.Max(0, levelBefore - 1);
+        var protectedLevel = !success && useCoupon;
+        var level = success ? target
+            : protectedLevel ? levelBefore
+            : Math.Max(0, levelBefore - 1);
 
+        if (protectedLevel)
+        {
+            // 券只在真的挡下一次掉级时用掉一张；成功那一手不消耗。
+            // 和扣石头、扣金币、写等级在同一笔事务里，任何一步失败整笔回滚。
+            // 最后一张直接删行：inventory.count 有 CHECK (count > 0)，update 成 0 会被库层挡下。
+            if (couponCount == 1)
+            {
+                await using var removeCoupon = new NpgsqlCommand(
+                    "delete from \"角色\".inventory where character_id = $1 and slot = $2",
+                    connection, transaction);
+                removeCoupon.Parameters.AddWithValue(characterId);
+                removeCoupon.Parameters.AddWithValue((short)couponSlot!.Value);
+                await removeCoupon.ExecuteNonQueryAsync(stopping);
+            }
+            else
+            {
+                await using var consumeCoupon = new NpgsqlCommand(
+                    "update \"角色\".inventory set count = count - 1 "
+                    + "where character_id = $1 and slot = $2",
+                    connection, transaction);
+                consumeCoupon.Parameters.AddWithValue(characterId);
+                consumeCoupon.Parameters.AddWithValue((short)couponSlot!.Value);
+                await consumeCoupon.ExecuteNonQueryAsync(stopping);
+            }
+        }
+
+        // 7. 写等级。没有失败累计必成，券不写进任何「下次必成」的计数里。
         await using (var write = new NpgsqlCommand(
             "insert into \"角色\".enhance (character_id, slot, level) values ($1, $2, $3) "
             + "on conflict (character_id, slot) do update "
@@ -188,13 +257,16 @@ public sealed class EnhanceRepository(
             await write.ExecuteNonQueryAsync(stopping);
         }
 
-        var stoneLeft = await StoneCountAsync(connection, transaction, characterId, tier.StoneId, stopping);
+        var stoneLeft = await ItemCountAsync(connection, transaction, characterId, tier.StoneId, stopping);
+        var couponLeft = await ItemCountAsync(
+            connection, transaction, characterId, table.ProtectItemId, stopping);
         await transaction.CommitAsync(stopping);
 
-        return new EnhanceOutcome(false, "", levelBefore, level, success, tier, gold, stoneLeft);
+        return new EnhanceOutcome(false, "", levelBefore, level, success, tier, gold, stoneLeft,
+            protectedLevel, protectedLevel ? 1 : 0, couponLeft);
     }
 
-    async Task<int> StoneCountAsync(
+    async Task<int> ItemCountAsync(
         NpgsqlConnection connection,
         NpgsqlTransaction transaction,
         long characterId,
@@ -256,6 +328,17 @@ public sealed class EnhanceRepository(
             + "where character_id = $1 and item_id = $2", connection);
         command.Parameters.AddWithValue(characterId);
         command.Parameters.AddWithValue(itemId);
+        return Convert.ToInt32(await command.ExecuteScalarAsync(stopping));
+    }
+
+    /// <summary>只给核对用：从库里独立读回保护券张数，不看强化回包。</summary>
+    public async Task<int> CouponCountAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select coalesce(sum(count), 0) from \"角色\".inventory "
+            + "where character_id = $1 and item_id = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(table.ProtectItemId);
         return Convert.ToInt32(await command.ExecuteScalarAsync(stopping));
     }
 

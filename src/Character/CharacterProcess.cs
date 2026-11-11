@@ -74,7 +74,9 @@ public sealed class CharacterProcess(string configPath)
                     + ":" + t.StoneId + ":rate=" + t.SuccessRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)
                     + ":gold=" + t.GoldCost + ":stone=" + t.StoneCost))
             + " rates=" + string.Join(",", enhanceTable.Tiers.Select(
-                t => t.SuccessRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))));
+                t => t.SuccessRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)))
+            + " coupon=" + enhanceTable.ProtectItemId
+            + " coupon_bind=always");
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());

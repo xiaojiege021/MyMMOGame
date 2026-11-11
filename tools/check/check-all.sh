@@ -140,10 +140,29 @@ closure() {
   done
 }
 
+# 这些卡默认就要开 Unity / 连平板（第 14 节 E、P0 段），笔记本按第 16 节
+# 只同步服务端源码，没有 client/MMOGame。缺工程时明确跳过，别把「环境不具备」
+# 报成回归失败，也别假装跑过；它们在本机 Mac 上单独跑。
+client_card_needs_unity() {
+  case "$1" in
+    e7|e8|p0-1a|p0-1b|p0-1c|p0-1d|p0-2a|p0-2b|p0-3c) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 run_one() {
   local card="$1" out="$2"
   if ! exists_card "$card"; then
     echo "  (跳过：check-$card.sh 尚未建)"
+    return 2
+  fi
+  # E3 要装 /etc/systemd/system 单元，非 root 跑必然失败；手动 sudo 补跑。
+  if [ "$card" = "e3" ] && [ "$(id -u)" -ne 0 ]; then
+    echo "  (跳过：e3 要 root 装 systemd 单元；手动 sudo bash tools/check/check-e3.sh)"
+    return 2
+  fi
+  if [ ! -d "$ROOT/client/MMOGame" ] && client_card_needs_unity "$card"; then
+    echo "  (跳过：$card 要 Unity 工程 / 平板，本机没有 client/MMOGame；在 Mac 上跑)"
     return 2
   fi
   bash "$ROOT/tools/check/check-$card.sh" >"$out" 2>&1
@@ -207,7 +226,7 @@ if [ "$MODE" = "card" ]; then
   echo "依赖闭包（本卡之前）：$(closure "$CARD" | tr '\n' ' ')"
   # 客户端段提示
   if [ -f "$ROOT/tools/check/check-$CARD.sh" ]; then
-    local mvar
+    # 这里是顶层脚本，不能用 local（Linux bash 会直接报错）。
     mvar="$(grep -m1 -o 'MMO_[A-Z0-9_]*_MODE' "$ROOT/tools/check/check-$CARD.sh" || true)"
     if [ -n "$mvar" ]; then
       echo "提示：客户端段可单独跑  ${mvar}=client bash tools/check/check-$CARD.sh"
@@ -222,11 +241,14 @@ if [ "$MODE" = "card" ]; then
     summarize "$c" "$code" "$out"
     [ "$code" -ne 0 ] && fail_any=1
   done
-  # 本卡
+  # 本卡。2 表示当前环境跑不了（缺 Unity 工程 / 没 root），
+  # 这时没有日志文件，不能 summarize，也不算回归失败。
   out="$TMP/$CARD.log"
   run_one "$CARD" "$out"; code=$?
-  summarize "$CARD" "$code" "$out"
-  [ "$code" -ne 0 ] && fail_any=1
+  if [ "$code" -ne 2 ]; then
+    summarize "$CARD" "$code" "$out"
+    [ "$code" -ne 0 ] && fail_any=1
+  fi
   echo "----------------------------------------"
   if [ "$fail_any" -eq 0 ]; then
     echo "依赖闭包回归：全部通过"
@@ -242,6 +264,8 @@ else
     card="$(basename "$f" .sh | sed 's/^check-//')"
     out="$TMP/$card.log"
     run_one "$card" "$out"; code=$?
+    # 与 --card 一致：2 表示「本机跑不了 / 卡还没建」，不是回归失败。
+    [ "$code" -eq 2 ] && continue
     summarize "$card" "$code" "$out"
     [ "$code" -ne 0 ] && fail_any=1
     cnt=$((cnt + 1))

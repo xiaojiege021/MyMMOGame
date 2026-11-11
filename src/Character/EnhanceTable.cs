@@ -38,14 +38,18 @@ public sealed class EnhanceTable
 
     public string GoldKind { get; }
 
+    /// <summary>唯一一种保护券的物品编号。方案 9.2 / 12.1：商城与通行证发的是同一种，到账即绑。</summary>
+    public string ProtectItemId { get; }
+
     public IReadOnlyList<EnhanceTier> Tiers => tiers;
 
-    EnhanceTable(EnhanceTier[] tiers, int version, int maxLevel, string goldKind)
+    EnhanceTable(EnhanceTier[] tiers, int version, int maxLevel, string goldKind, string protectItemId)
     {
         this.tiers = tiers;
         Version = version;
         MaxLevel = maxLevel;
         GoldKind = goldKind;
+        ProtectItemId = protectItemId;
     }
 
     /// <summary>目标等级落在哪一档。只接受 1 到 MaxLevel，越界由调用方先挡。</summary>
@@ -156,7 +160,36 @@ public sealed class EnhanceTable
             parsed[i] = new EnhanceTier(id, from, to, stoneId, stoneCost, goldCost, rate);
         }
 
-        return new EnhanceTable(parsed, wire.Version, maxLevel, goldKind);
+        // 方案 9.2 / 12.1 写定的保护券：只有一种，到账即绑、不能上架，用的时候不看来源。
+        // 这里只校验物品定义，发货（商城 / 通行证）在 P1-5c2 / P3-4a2。
+        var protectItemId = (wire.ProtectItemId ?? "").Trim();
+        if (protectItemId.Length == 0)
+        {
+            throw new ConfigException("enhance.json 缺 protect_item_id");
+        }
+
+        var protectItem = items.Find(protectItemId);
+        if (protectItem is null)
+        {
+            throw new ConfigException("enhance.json 的 protect_item_id 不在 items.json 里：" + protectItemId);
+        }
+
+        if (!string.Equals(protectItem.Kind, "voucher", StringComparison.Ordinal))
+        {
+            throw new ConfigException("enhance.json 的 protect_item_id 必须是 voucher：" + protectItemId);
+        }
+
+        if (protectItem.Bind != BindRule.Always)
+        {
+            throw new ConfigException("enhance.json 的 protect_item_id 必须是到账即绑：" + protectItemId);
+        }
+
+        if (stoneIds.Contains(protectItemId))
+        {
+            throw new ConfigException("enhance.json 的保护券不能和强化石是同一种：" + protectItemId);
+        }
+
+        return new EnhanceTable(parsed, wire.Version, maxLevel, goldKind, protectItemId);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -175,6 +208,9 @@ public sealed class EnhanceTable
 
         [JsonPropertyName("gold_kind")]
         public string? GoldKind { get; init; }
+
+        [JsonPropertyName("protect_item_id")]
+        public string? ProtectItemId { get; init; }
 
         [JsonPropertyName("tiers")]
         public List<TierWire>? Tiers { get; init; }

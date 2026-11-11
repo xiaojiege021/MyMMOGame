@@ -803,7 +803,8 @@ public sealed class CharacterGrpcService(
         try
         {
             outcome = await enhances.ApplyAsync(
-                (long)request.CharacterId, (int)request.Slot, stoneId, txnId, context.CancellationToken);
+                (long)request.CharacterId, (int)request.Slot, stoneId, txnId,
+                request.UseCoupon, context.CancellationToken);
         }
         catch (EnhanceException ex)
         {
@@ -852,6 +853,11 @@ public sealed class CharacterGrpcService(
             GoldCost = outcome.Tier.GoldCost,
             Gold = outcome.Gold,
             StoneLeft = outcome.StoneLeft,
+            // 只作展示：带券与不带券读的是同一档 success_rate，客户端不拿它算结果。
+            SuccessRate = outcome.Tier.SuccessRate,
+            ProtectedLevel = outcome.ProtectedLevel,
+            CouponUsed = outcome.CouponUsed,
+            CouponLeft = outcome.CouponLeft,
         };
     }
 

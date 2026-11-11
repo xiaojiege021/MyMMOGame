@@ -38,9 +38,11 @@ public static class CharacterApi
     public sealed record SettleExpBody(
         ulong? CharacterId, string? TxnId, string? Source, uint? PartySize);
 
-    // 强化请求里只有角色、格子和用哪种石头：等级、成功率、消耗、结果与事务号
-    // 都读不进来（事务号由网关生成），多传这些字段也不会被反序列化到请求里。
-    public sealed record EnhanceBody(ulong? CharacterId, uint? Slot, string? StoneId);
+    // 强化请求里只有角色、格子、用哪种石头和「这一手用不用保护券」：等级、
+    // 成功率、消耗、结果、券编号 / 数量 / 来源与事务号都读不进来
+    // （事务号由网关生成），多传这些字段也不会被反序列化到请求里。
+    public sealed record EnhanceBody(
+        ulong? CharacterId, uint? Slot, string? StoneId, bool? UseCoupon);
 
     static readonly JsonSerializerOptions Json = new()
     {
@@ -773,7 +775,9 @@ public static class CharacterApi
 
         // 强化。三档材料、成功率与金币消耗全在角色服的 config/enhance.json；
         // 网关只认令牌、复核归属、生成一个事务号，再把请求转过去。
-        // 业务拒绝（材料不对、到顶、材料或金币不够）也是 200 + ok=false。
+        // P1-4b 的 use_coupon 只是一个开关：券的编号、数量、来源都不在请求里，
+        // 角色服按配置里唯一那一种券从背包扣。业务拒绝（材料不对、到顶、材料或金币
+        // 不够、券不够）也是 200 + ok=false。
         app.MapPost("/character/enhance", async context =>
         {
             if (!TryAuthorize(context, tokens, "enhance", out var account))
@@ -820,6 +824,7 @@ public static class CharacterApi
                         Slot = body.Slot.Value,
                         StoneId = body.StoneId!.Trim(),
                         TxnId = txnId,
+                        UseCoupon = body.UseCoupon ?? false,
                     },
                     deadline: DateTime.UtcNow.AddSeconds(5),
                     cancellationToken: context.RequestAborted);
@@ -829,11 +834,14 @@ public static class CharacterApi
                     + " slot=" + body.Slot.Value
                     + " stone=" + body.StoneId!.Trim()
                     + " txn=" + txnId
+                    + " coupon=" + (body.UseCoupon ?? false)
                     + " ok=" + result.Ok
                     + " reason=" + result.Reason
                     + " level=" + result.LevelBefore + "->" + result.Level
                     + " success=" + result.Success
                     + " tier=" + result.Tier
+                    + " protected=" + result.ProtectedLevel
+                    + " coupon_used=" + result.CouponUsed
                     + " duplicate=" + result.Duplicate);
 
                 await WriteAsync(context, 200, new
@@ -851,6 +859,10 @@ public static class CharacterApi
                     gold = result.Gold,
                     stone_left = result.StoneLeft,
                     duplicate = result.Duplicate,
+                    success_rate = result.SuccessRate,
+                    protected_level = result.ProtectedLevel,
+                    coupon_used = result.CouponUsed,
+                    coupon_left = result.CouponLeft,
                 });
             }
             catch (RpcException ex)

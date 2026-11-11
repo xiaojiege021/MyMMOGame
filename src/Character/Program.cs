@@ -40,6 +40,7 @@ string? enhanceConfigPath = null;
 long enhanceLevelOf = 0;
 var enhanceSlotOf = 0;
 string? enhanceTxnCount = null;
+long couponCountOf = 0;
 long rawEnhanceId = 0;
 var rawEnhanceSlot = 0;
 var rawEnhanceLevel = 0;
@@ -155,6 +156,10 @@ for (var i = 0; i < args.Length; i++)
         case "--enhance-txn-count" when i + 1 < args.Length:
             enhanceTxnCount = args[++i];
             break;
+        // 只给核对用：不看回包，从库里独立读回保护券张数。
+        case "--coupon-count" when i + 1 < args.Length:
+            long.TryParse(args[++i], out couponCountOf);
+            break;
         // 只给核对用：绕过业务层直写强化等级，验库层 CHECK 挡住越界。
         case "--raw-enhance-write" when i + 3 < args.Length:
             long.TryParse(args[++i], out rawEnhanceId);
@@ -186,7 +191,9 @@ if (enhanceState)
             + " rates=" + string.Join(",", table.Tiers.Select(
                 t => t.SuccessRate.ToString("0.##", culture)))
             + " gold=" + string.Join(",", table.Tiers.Select(t => t.GoldCost))
-            + " stones=" + string.Join(",", table.Tiers.Select(t => t.StoneCost)));
+            + " stones=" + string.Join(",", table.Tiers.Select(t => t.StoneCost))
+            + " coupon=" + table.ProtectItemId
+            + " coupon_bind=always");
         Console.WriteLine("enhance_gate=ok target=7 tier=" + table.TierFor(7).Id
             + " stone=" + table.TierFor(7).StoneId
             + " target=12 tier=" + table.TierFor(12).Id);
@@ -211,7 +218,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
-    || enhanceLevelOf != 0 || enhanceTxnCount != null || rawEnhanceId != 0)
+    || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -446,7 +453,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             }
         }
 
-        if (enhanceLevelOf != 0 || enhanceTxnCount != null || rawEnhanceId != 0)
+        if (enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0
+            || rawEnhanceId != 0)
         {
             var characterConfig = CharacterConfig.Load(configPath);
             var items = ItemTable.Load("config/items.json");
@@ -489,6 +497,14 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 Console.WriteLine("enhance_txn_count="
                     + await enhances.TxnCountAsync(enhanceTxnCount, CancellationToken.None)
                     + " txn=" + enhanceTxnCount);
+            }
+
+            if (couponCountOf != 0)
+            {
+                Console.WriteLine("coupon_count="
+                    + await enhances.CouponCountAsync(couponCountOf, CancellationToken.None)
+                    + " id=" + couponCountOf
+                    + " item=" + enhanceTable.ProtectItemId);
             }
         }
 

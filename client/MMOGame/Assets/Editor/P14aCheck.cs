@@ -43,7 +43,8 @@ public static class P14aCheck
         var requestFields = Fields(request);
         var responseFields = Fields(response);
         var protoOk = request.Length > 0
-                      && requestFields.SetEquals(new[] { "account", "character_id", "slot", "stone_id", "txn_id" })
+                      // P1-4b 起多一个 use_coupon 开关；老用例不带它，行为不变。
+                      && requestFields.SetEquals(new[] { "account", "character_id", "slot", "stone_id", "txn_id", "use_coupon" })
                       && !requestFields.Contains("level")
                       && !requestFields.Contains("success_rate")
                       && !requestFields.Contains("success")
@@ -113,7 +114,9 @@ public static class P14aCheck
                          && repo.Contains("at_cap")
                          && repo.Contains("Math.Max(0, levelBefore - 1)")
                          && repo.Contains("没有失败累计必成")
-                         && api.Contains("public sealed record EnhanceBody(ulong? CharacterId, uint? Slot, string? StoneId)")
+                         // P1-4b 起多一个用券开关，老用例不带它行为不变。
+                         && api.Contains("public sealed record EnhanceBody(")
+                         && api.Contains("bool? UseCoupon")
                          && api.Contains("MapPost(\"/character/enhance\"")
                          && api.Contains("OwnsAsync")
                          && api.Contains("Guid.NewGuid()")

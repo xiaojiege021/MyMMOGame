@@ -211,7 +211,8 @@ for t in cfg['tiers']:
 proto = open(root + '/proto/mmo/character.proto', encoding='utf-8').read()
 req = re.search(r'message EnhanceRequest \{(.*?)\}', proto, re.S).group(1)
 fields = set(re.findall(r'(?:string|uint64|uint32|int64|int32|bool)\s+(\w+)\s*=', req))
-assert fields == {'account', 'character_id', 'slot', 'stone_id', 'txn_id'}, fields
+# P1-4b 起 EnhanceRequest 多一个 use_coupon 开关；老用例不带它，行为不变。
+assert fields == {'account', 'character_id', 'slot', 'stone_id', 'txn_id', 'use_coupon'}, fields
 assert re.search(r'rpc Enhance\(EnhanceRequest\) returns \(EnhanceResponse\)', proto)
 client = open(root + '/client/MMOGame/Assets/Net/CharacterEnhance.cs', encoding='utf-8').read()
 assert 'RequestBody(ulong characterId, uint slot, string stoneId)' in client
@@ -280,7 +281,8 @@ proto = open(root + '/proto/mmo/character.proto', encoding='utf-8').read()
 req = re.search(r'message EnhanceRequest \{(.*?)\}', proto, re.S).group(1)
 resp = re.search(r'message EnhanceResponse \{(.*?)\}', proto, re.S).group(1)
 fields = set(re.findall(r'(?:string|uint64|uint32|int64|int32|bool)\s+(\w+)\s*=', req))
-assert fields == {'account', 'character_id', 'slot', 'stone_id', 'txn_id'}, fields
+# P1-4b 起 EnhanceRequest 多一个 use_coupon 开关；老用例不带它，行为不变。
+assert fields == {'account', 'character_id', 'slot', 'stone_id', 'txn_id', 'use_coupon'}, fields
 for name in ('ok', 'reason', 'level', 'max_level', 'success', 'duplicate'):
     assert re.search(r'\b' + name + r'\s*=', resp), name
 sql = open(root + '/db/character/enhance.sql', encoding='utf-8').read()
@@ -305,7 +307,7 @@ process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').re
 assert 'EnhanceTable.Load(config.EnhanceTable' in process
 assert 'AddSingleton(enhances)' in process
 api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
-assert 'public sealed record EnhanceBody(ulong? CharacterId, uint? Slot, string? StoneId)' in api
+assert 'public sealed record EnhanceBody(' in api and 'bool? UseCoupon' in api
 assert 'MapPost("/character/enhance"' in api
 assert 'OwnsAsync(client, account' in api
 assert 'Guid.NewGuid()' in api
@@ -315,7 +317,9 @@ assert 'Npgsql' not in api
 for path in ('src/Character/EnhanceTable.cs', 'src/Character/EnhanceRepository.cs',
              'src/Character/CharacterGrpcService.cs', 'src/Gateway/CharacterApi.cs'):
     body = open(root + '/' + path, encoding='utf-8').read()
-    assert '0.8' not in body and 'success_rate =' not in body, path
+    # success_rate = result.SuccessRate 只是回包字段映射，不算第二套数字；
+    # 要挡的是把概率写成常量的那种赋值。
+    assert '0.8' not in body and not re.search(r'success_rate\s*=\s*[0-9]', body), path
 print('static_code=ok tiers=3 max_level=12 gate_server_side=1')
 PY
 then ok "配置正本、契约字段、库层 CHECK、进程边界与事务链都落在指定文件里"
