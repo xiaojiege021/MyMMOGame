@@ -103,6 +103,8 @@ service CharacterService {
   // 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
   // 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
   rpc SettleIngot(AuctionIngotSettleRequest) returns (AuctionIngotSettleResponse);
+  // P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
+  rpc BuyShopItem(BuyShopItemRequest) returns (BuyShopItemResponse);
 }
 
 message SettleExpRequest {
@@ -490,4 +492,36 @@ message AuctionIngotSettleResponse {
   int32 tax_rate_pct = 12;
   string state = 13;
   bool duplicate = 14;
+}
+
+message BuyShopItemRequest {
+  // 网关转发时填令牌账号；客户端填不了这个字段。
+  string account = 1;
+  uint64 character_id = 2;
+  // 只带商品编号。标价、数量、发货种类、绑定态都由服务端按清单与配置来，
+  // 客户端一个都带不进来。
+  string item_id = 3;
+  // 网关生成的幂等号。这张卡不写库，编号只进日志与回包，便于核对同一笔请求。
+  string txn_id = 4;
+}
+
+message BuyShopItemResponse {
+  bool ok = 1;
+  // not_in_list（清单外）/ delivery_pending（清单内但还没接发货）/ 空串表示真的发出去了。
+  string reason = 2;
+  string item_id = 3;
+  string kind = 4;
+  string name = 5;
+  // 清单里的标价。清单外时为 0：未生效的数值一律给 0，不拿别的数顶。
+  int64 price_yuanbao = 6;
+  string currency = 7;
+  // 元宝余额，从角色服读出来的事实值，不是算出来的。
+  int64 balance = 8;
+  // 够不够买。清单外为 false。
+  bool enough = 9;
+  // 这张卡一分不扣，恒为 0。
+  int64 charged_yuanbao = 10;
+  // 发货有没有真的发生。这张卡恒为 false。
+  bool delivered = 11;
+  string state = 12;
 }

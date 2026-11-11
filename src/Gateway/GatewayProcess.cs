@@ -67,6 +67,8 @@ public sealed class GatewayProcess(string configPath)
 
         // 拍卖行：认令牌、复核归属，再 gRPC 转给全局服务。
         AuctionApi.Map(app, tokens, config);
+        // P1-5c1：商城只认清单，清单外拒绝且不扣元宝。
+        ShopApi.Map(app, tokens, config);
 
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
         WorldApi.Map(app, tokens, config);

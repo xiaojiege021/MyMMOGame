@@ -31,6 +31,7 @@ public sealed class CharacterProcess(string configPath)
         TransferTable transferTable;
         CrystalTable crystalTable;
         AuctionTable auctionTable;
+        ShopTable shopTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -52,6 +53,9 @@ public sealed class CharacterProcess(string configPath)
             // 方案第 12 章写定的 5%–8% 抽税区间由 AuctionTable 硬校验，
             // 具体税率与取整方式在 config/auction.json，改配置重启生效。
             auctionTable = AuctionTable.Load(config.AuctionTable, currencies);
+            // 方案 12.1 定死十八种可上架种类，商城只收元宝；清单外的编号在购买时拒绝。
+            // 这张卡不扣款也不发货，扣款与发货从 P1-5c2 起逐种接。
+            shopTable = ShopTable.Load(config.ShopTable, currencies);
         }
         catch (ConfigException ex)
         {
@@ -113,6 +117,12 @@ public sealed class CharacterProcess(string configPath)
             + " gold_kind=" + auctionTable.GoldKind
             + " rounding=" + auctionTable.Rounding
             + " ingot_kind=" + auctionTable.IngotKind);
+        // 与 --shop-list 只读入口同形：清单改一条，重启后这里能直接核对到。
+        Console.WriteLine("shop_table_version=" + shopTable.Version
+            + " currency=" + shopTable.Currency
+            + " items=" + shopTable.Items.Count
+            + " kinds=" + ShopTable.AllowedKinds.Length
+            + " delivered_kinds=0");
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -174,6 +184,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(crystalTable);
         builder.Services.AddSingleton(crystals);
         builder.Services.AddSingleton(auctionTable);
+        builder.Services.AddSingleton(shopTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(config);

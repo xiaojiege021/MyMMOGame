@@ -114,6 +114,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionIngotSettleRequest> __Marshaller_mmo_character_AuctionIngotSettleRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionIngotSettleRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionIngotSettleResponse> __Marshaller_mmo_character_AuctionIngotSettleResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionIngotSettleResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyShopItemRequest> __Marshaller_mmo_character_BuyShopItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyShopItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyShopItemResponse> __Marshaller_mmo_character_BuyShopItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyShopItemResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -250,6 +254,14 @@ namespace Mmo.Proto.Character {
         "SettleIngot",
         __Marshaller_mmo_character_AuctionIngotSettleRequest,
         __Marshaller_mmo_character_AuctionIngotSettleResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.BuyShopItemRequest, global::Mmo.Proto.Character.BuyShopItemResponse> __Method_BuyShopItem = new grpc::Method<global::Mmo.Proto.Character.BuyShopItemRequest, global::Mmo.Proto.Character.BuyShopItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "BuyShopItem",
+        __Marshaller_mmo_character_BuyShopItemRequest,
+        __Marshaller_mmo_character_BuyShopItemResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -470,6 +482,18 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AuctionIngotSettleResponse> SettleIngot(global::Mmo.Proto.Character.AuctionIngotSettleRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.BuyShopItemResponse> BuyShopItem(global::Mmo.Proto.Character.BuyShopItemRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1347,6 +1371,54 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_SettleIngot, null, options, request);
       }
+      /// <summary>
+      /// P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuyShopItemResponse BuyShopItem(global::Mmo.Proto.Character.BuyShopItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyShopItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuyShopItemResponse BuyShopItem(global::Mmo.Proto.Character.BuyShopItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_BuyShopItem, null, options, request);
+      }
+      /// <summary>
+      /// P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuyShopItemResponse> BuyShopItemAsync(global::Mmo.Proto.Character.BuyShopItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyShopItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuyShopItemResponse> BuyShopItemAsync(global::Mmo.Proto.Character.BuyShopItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_BuyShopItem, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1377,7 +1449,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_InstallCrystal, serviceImpl.InstallCrystal)
           .AddMethod(__Method_RemoveCrystal, serviceImpl.RemoveCrystal)
           .AddMethod(__Method_SettleAuction, serviceImpl.SettleAuction)
-          .AddMethod(__Method_SettleIngot, serviceImpl.SettleIngot).Build();
+          .AddMethod(__Method_SettleIngot, serviceImpl.SettleIngot)
+          .AddMethod(__Method_BuyShopItem, serviceImpl.BuyShopItem).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1404,6 +1477,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_RemoveCrystal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RemoveCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(serviceImpl.RemoveCrystal));
       serviceBinder.AddMethod(__Method_SettleAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionSettleRequest, global::Mmo.Proto.Character.AuctionSettleResponse>(serviceImpl.SettleAuction));
       serviceBinder.AddMethod(__Method_SettleIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse>(serviceImpl.SettleIngot));
+      serviceBinder.AddMethod(__Method_BuyShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyShopItemRequest, global::Mmo.Proto.Character.BuyShopItemResponse>(serviceImpl.BuyShopItem));
     }
 
   }

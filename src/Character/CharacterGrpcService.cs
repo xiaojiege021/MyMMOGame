@@ -33,6 +33,7 @@ public sealed class CharacterGrpcService(
     AuctionRepository auctions,
     AuctionTable auctionTable,
     IngotRepository ingots,
+    ShopTable shopTable,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -1236,6 +1237,81 @@ public sealed class CharacterGrpcService(
             SellerIngot = outcome.SellerIngot,
             TaxRatePct = auctionTable.TaxRatePct,
             State = outcome.State,
+        };
+    }
+
+    /// <summary>
+    /// 买一件商城商品。这张卡只做清单与拒绝：清单外回 not_in_list，清单内也还没接发货，
+    /// 回 delivery_pending。两条路都不写库、不碰任何货币行，元宝一分不动——扣款与发货
+    /// 从 P1-5c2 起逐种接上（第 14 节第 42 行起）。宁可拒绝，也不做「钱扣了东西没给」。
+    /// </summary>
+    public override async Task<BuyShopItemResponse> BuyShopItem(
+        BuyShopItemRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "item_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        // 余额是库里的事实值，只用于展示与「够不够买」，不参与扣款（这张卡不扣）。
+        var balances = await currency.AllAsync(characterId, context.CancellationToken);
+        var balance = balances.GetValueOrDefault(shopTable.Currency, 0L);
+
+        var item = shopTable.Find(itemId);
+        if (item is null)
+        {
+            logger.LogInformation(
+                "shop_buy_reject account={Account} id={Id} item={Item} reason=not_in_list balance={Balance}",
+                account, characterId, itemId, balance);
+
+            // 清单外：标价、数量这些未生效的数值一律给 0，不拿清单里的任何数顶。
+            return new BuyShopItemResponse
+            {
+                Ok = false,
+                Reason = "not_in_list",
+                ItemId = itemId,
+                Currency = shopTable.Currency,
+                Balance = balance,
+                Enough = false,
+                ChargedYuanbao = 0,
+                Delivered = false,
+                State = "not_in_list",
+            };
+        }
+
+        logger.LogInformation(
+            "shop_buy_reject account={Account} id={Id} item={Item} kind={Kind} reason=delivery_pending"
+            + " price={Price} balance={Balance}",
+            account, characterId, item.Id, item.Kind, item.PriceYuanbao, balance);
+
+        return new BuyShopItemResponse
+        {
+            Ok = false,
+            Reason = "delivery_pending",
+            ItemId = item.Id,
+            Kind = item.Kind,
+            Name = item.Name,
+            PriceYuanbao = item.PriceYuanbao,
+            Currency = shopTable.Currency,
+            Balance = balance,
+            Enough = balance >= item.PriceYuanbao,
+            ChargedYuanbao = 0,
+            Delivered = false,
+            State = "delivery_pending",
         };
     }
 

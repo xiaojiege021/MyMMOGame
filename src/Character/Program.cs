@@ -58,6 +58,9 @@ string? crystalItemOf = null;
 string? crystalTxnCount = null;
 var auctionState = false;
 string? auctionConfigPath = null;
+var shopList = false;
+string? shopConfigPath = null;
+long shopStateOf = 0;
 long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
@@ -231,6 +234,18 @@ for (var i = 0; i < args.Length; i++)
         case "--auction-config" when i + 1 < args.Length:
             auctionConfigPath = args[++i];
             break;
+        // 只给核对用：把商城清单读出来，不连库也不启动进程。坏清单也走这里。
+        case "--shop-list":
+            shopList = true;
+            break;
+        case "--shop-config" when i + 1 < args.Length:
+            shopConfigPath = args[++i];
+            break;
+        // 只给核对用：不看回包，从库里独立读回这个角色的元宝余额，
+        // 用来证「清单外被拒之后元宝一分没动」。
+        case "--shop-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out shopStateOf);
+            break;
         // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
         // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
         case "--auction-ledger" when i + 3 < args.Length:
@@ -366,6 +381,42 @@ if (crystalState)
     return 0;
 }
 
+// 商城清单只读核对：与启动共用同一套校验（十八种白名单、币种必须是元宝、
+// 标价必须是正整数），不连库也不启动进程。坏清单在这一步就能看出来。
+if (shopList)
+{
+    try
+    {
+        var characterConfig = CharacterConfig.Load(configPath);
+        var shopCurrencies = CurrencyTable.Load("config/currency.json");
+        var table = ShopTable.Load(shopConfigPath ?? characterConfig.ShopTable, shopCurrencies);
+        Console.WriteLine("shop_list_state=ok version=" + table.Version
+            + " currency=" + table.Currency
+            + " items=" + table.Items.Count
+            + " kinds=" + ShopTable.AllowedKinds.Length
+            + " delivered_kinds=0");
+        foreach (var item in table.Items)
+        {
+            Console.WriteLine("shop_item=" + item.Id
+                + " kind=" + item.Kind
+                + " price=" + item.PriceYuanbao
+                + " name=" + item.Name);
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 拍卖税率只读核对：与启动共用同一套 5%–8% 写定区间校验，不连库也不启动进程。
 if (auctionState)
 {
@@ -405,7 +456,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
     || transferStateOf != 0 || transferTxnCount != null
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
-    || ingotBuyerOf != 0)
+    || ingotBuyerOf != 0 || shopStateOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -452,6 +503,18 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 Console.WriteLine("raw_level=rejected id=" + rawLevelWrite
                     + " level=" + rawLevelValue + " sqlstate=" + ex.SqlState);
             }
+        }
+
+        if (shopStateOf != 0)
+        {
+            var shopMoney = new CurrencyRepository(dataSource);
+            var shopBalances = await shopMoney.AllAsync(shopStateOf, CancellationToken.None);
+            var shopCurrencies = CurrencyTable.Load("config/currency.json");
+            Console.WriteLine("shop_state=ok id=" + shopStateOf
+                + " currency=" + ShopTable.WrittenCurrency
+                + " balance=" + shopBalances.GetValueOrDefault(ShopTable.WrittenCurrency, 0L)
+                + " balances=" + string.Join(",", shopCurrencies.All.Select(
+                    c => c.Id + ":" + shopBalances.GetValueOrDefault(c.Id, 0L))));
         }
 
         if (levelOf != 0)

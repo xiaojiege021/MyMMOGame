@@ -9,7 +9,8 @@ namespace Character;
 /// </summary>
 public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
-    string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable)
+    string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
+    string ShopTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -17,6 +18,7 @@ public sealed record CharacterConfig(
     public const string DefaultTransferTable = "config/transfer.json";
     public const string DefaultCrystalTable = "config/crystal.json";
     public const string DefaultAuctionTable = "config/auction.json";
+    public const string DefaultShopTable = "config/shop.json";
 
     public static CharacterConfig Load(string path)
     {
@@ -99,9 +101,16 @@ public sealed record CharacterConfig(
             throw new ConfigException("auction_table 不能为空");
         }
 
+        // 商城清单也走同一份配置正本；核对脚本可以指到临时表试坏清单。
+        var shopTable = (wire.ShopTable ?? DefaultShopTable).Trim();
+        if (shopTable.Length == 0)
+        {
+            throw new ConfigException("shop_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
-            transferTable, crystalTable, auctionTable);
+            transferTable, crystalTable, auctionTable, shopTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -138,6 +147,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("auction_table")]
         public string? AuctionTable { get; init; }
+
+        [JsonPropertyName("shop_table")]
+        public string? ShopTable { get; init; }
     }
 }
 
