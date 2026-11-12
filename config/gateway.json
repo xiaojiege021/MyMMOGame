@@ -6,5 +6,6 @@
   "battle_upstream": "ws://127.0.0.1:60001/battle",
   "character_upstream": "http://127.0.0.1:62000",
   "world_upstream": "http://127.0.0.1:63000",
-  "global_upstream": "http://127.0.0.1:64000"
+  "global_upstream": "http://127.0.0.1:64000",
+  "social_upstream": "http://127.0.0.1:65000"
 }

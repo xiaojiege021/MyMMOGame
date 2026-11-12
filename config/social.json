@@ -1,0 +1,7 @@
+{
+  "schema": "social-config/1",
+  "listen": "http://127.0.0.1:65000",
+  "db_pool_max": 8,
+  "sect_table": "config/sect.json",
+  "character_upstream": "http://127.0.0.1:62000"
+}

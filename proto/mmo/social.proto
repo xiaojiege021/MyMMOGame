@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package mmo.social;
+
+option csharp_namespace = "Mmo.Proto.Social";
+
+// 社交服 gRPC（P2-1a1）。宗门五级人数上限的唯一正本在 config/sect.json，
+// 请求里带不进上限、等级、人数；回包里的 member_cap / member_count 都是只读事实值。
+// txn_id 由网关服务端生成（客户端填不进来）：同一号重放不重复扣创建金币、
+// 不重复建宗门。职位权限、传位、建设升级、秘境人数、同门经验都不在这一版。
+
+message CreateSectRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  string name = 4;
+}
+
+message JoinSectRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 sect_id = 4;
+}
+
+// 只读：按编号或按名字查一个宗门。创建前用它挡重名，不写库。
+message DescribeSectRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 sect_id = 4;
+  string name = 5;
+}
+
+message SectResponse {
+  bool ok = 1;
+  // sect_not_found / name_taken / already_member / sect_full / duplicate /
+  // request_missing / grant_failed / bad_sect_level；空串表示这一笔做成了。
+  // 业务前提不满足是正常回包里的 ok=false + reason，不是 gRPC 错误码。
+  string reason = 2;
+  uint64 sect_id = 3;
+  int32 level = 4;
+  int32 member_cap = 5;
+  int32 member_count = 6;
+  string name = 7;
+  // 只作核对：这一笔的事务号，客户端带不进来，也不参与判定。
+  string txn_id = 8;
+}
+
+service SocialService {
+  rpc CreateSect(CreateSectRequest) returns (SectResponse);
+  rpc JoinSect(JoinSectRequest) returns (SectResponse);
+  rpc DescribeSect(DescribeSectRequest) returns (SectResponse);
+}

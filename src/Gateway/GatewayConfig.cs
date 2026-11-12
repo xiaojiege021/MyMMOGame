@@ -28,6 +28,12 @@ public sealed record GatewayConfig(
 
     public const string DefaultGlobalUpstream = "http://127.0.0.1:64000";
 
+    public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
+
+    // 社交服上游。老卡手写的临时 gateway.json 不带这一项，缺省就指向本机默认端口，
+    // 不让 P2-1a1 的闭包首跑因为一个新字段而红。
+    public string SocialUpstream { get; init; } = DefaultSocialUpstream;
+
     public static GatewayConfig Load(string path)
     {
         if (!File.Exists(path))
@@ -99,7 +105,18 @@ public sealed record GatewayConfig(
             throw new ConfigException("global_upstream 必须是 http:// 或 https:// 地址：" + global);
         }
 
-        return new GatewayConfig(listen, ttl, iterations, upstream, character, world, global);
+        // 社交服上游同样可缺省：只跑主链路的老卡配置不带它也照常起。
+        var social = (wire.SocialUpstream ?? DefaultSocialUpstream).Trim().TrimEnd('/');
+        if (!Uri.TryCreate(social, UriKind.Absolute, out var socialUri)
+            || (socialUri.Scheme != "http" && socialUri.Scheme != "https"))
+        {
+            throw new ConfigException("social_upstream 必须是 http:// 或 https:// 地址：" + social);
+        }
+
+        return new GatewayConfig(listen, ttl, iterations, upstream, character, world, global)
+        {
+            SocialUpstream = social,
+        };
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -132,6 +149,9 @@ public sealed record GatewayConfig(
 
         [JsonPropertyName("global_upstream")]
         public string? GlobalUpstream { get; init; }
+
+        [JsonPropertyName("social_upstream")]
+        public string? SocialUpstream { get; init; }
     }
 }
 

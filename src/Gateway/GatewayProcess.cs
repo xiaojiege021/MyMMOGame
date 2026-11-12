@@ -26,6 +26,7 @@ public sealed class GatewayProcess(string configPath)
         Console.WriteLine("character_upstream=" + config.CharacterUpstream);
         Console.WriteLine("world_upstream=" + config.WorldUpstream);
         Console.WriteLine("global_upstream=" + config.GlobalUpstream);
+        Console.WriteLine("social_upstream=" + config.SocialUpstream);
 
         // 连接串带密码，日志只打来源。
         var connectionString = DbEnv.Resolve();
@@ -73,6 +74,8 @@ public sealed class GatewayProcess(string configPath)
         ExpBoosterApi.Map(app, tokens, config);
         UnbindApi.Map(app, tokens, config);
         RechargeApi.Map(app, tokens, config);
+        // P2-1a1：建 1 级宗门 + 收人入名册。认令牌、复核角色归属、服务端生成事务号。
+        SectApi.Map(app, tokens, config);
 
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
         WorldApi.Map(app, tokens, config);
