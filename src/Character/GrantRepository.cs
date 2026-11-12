@@ -269,4 +269,18 @@ public sealed class GrantRepository(
         var value = await command.ExecuteScalarAsync(stopping);
         return Convert.ToInt32(value);
     }
+
+    /// <summary>
+    /// 只给核对用：这个角色名下有几笔商城成交。商城事务号带 shop_buy: 前缀，
+    /// 与发奖、其它卡的写入分得开，不必为商城另建一张流水表。
+    /// </summary>
+    public async Task<int> ShopTxnCountAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select count(*) from \"角色\".grant_txn "
+            + "where character_id = $1 and txn_id like 'shop\\_buy:%'");
+        command.Parameters.AddWithValue(characterId);
+        var value = await command.ExecuteScalarAsync(stopping);
+        return Convert.ToInt32(value);
+    }
 }

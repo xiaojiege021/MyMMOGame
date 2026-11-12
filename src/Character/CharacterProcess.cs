@@ -54,8 +54,9 @@ public sealed class CharacterProcess(string configPath)
             // 具体税率与取整方式在 config/auction.json，改配置重启生效。
             auctionTable = AuctionTable.Load(config.AuctionTable, currencies);
             // 方案 12.1 定死十八种可上架种类，商城只收元宝；清单外的编号在购买时拒绝。
-            // 这张卡不扣款也不发货，扣款与发货从 P1-5c2 起逐种接。
-            shopTable = ShopTable.Load(config.ShopTable, currencies);
+            // P1-5c2 起逐种接发货：已接的种类必须指向 items.json 里的真物品，
+            // 保护券还必须就是 enhance.json 那一个编号（两处发的是同一种券）。
+            shopTable = ShopTable.Load(config.ShopTable, currencies, items, enhanceTable);
         }
         catch (ConfigException ex)
         {
@@ -122,7 +123,7 @@ public sealed class CharacterProcess(string configPath)
             + " currency=" + shopTable.Currency
             + " items=" + shopTable.Items.Count
             + " kinds=" + ShopTable.AllowedKinds.Length
-            + " delivered_kinds=0");
+            + " delivered_kinds=" + ShopTable.DeliveredKinds.Length);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());

@@ -135,47 +135,49 @@ namespace Mmo.Proto.Character {
             "dGF4X3JhdGVfcGN0GAwgASgFEg0KBXN0YXRlGA0gASgJEhEKCWR1cGxpY2F0",
             "ZRgOIAEoCCJcChJCdXlTaG9wSXRlbVJlcXVlc3QSDwoHYWNjb3VudBgBIAEo",
             "CRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDwoHaXRlbV9pZBgDIAEoCRIOCgZ0",
-            "eG5faWQYBCABKAki4wEKE0J1eVNob3BJdGVtUmVzcG9uc2USCgoCb2sYASAB",
+            "eG5faWQYBCABKAkisQIKE0J1eVNob3BJdGVtUmVzcG9uc2USCgoCb2sYASAB",
             "KAgSDgoGcmVhc29uGAIgASgJEg8KB2l0ZW1faWQYAyABKAkSDAoEa2luZBgE",
             "IAEoCRIMCgRuYW1lGAUgASgJEhUKDXByaWNlX3l1YW5iYW8YBiABKAMSEAoI",
             "Y3VycmVuY3kYByABKAkSDwoHYmFsYW5jZRgIIAEoAxIOCgZlbm91Z2gYCSAB",
             "KAgSFwoPY2hhcmdlZF95dWFuYmFvGAogASgDEhEKCWRlbGl2ZXJlZBgLIAEo",
-            "CBINCgVzdGF0ZRgMIAEoCTKfDAoQQ2hhcmFjdGVyU2VydmljZRJgCg9DcmVh",
-            "dGVDaGFyYWN0ZXISJS5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJl",
-            "cXVlc3QaJi5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlc3BvbnNl",
-            "EksKCFNldExldmVsEh4ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlcXVlc3Qa",
-            "Hy5tbW8uY2hhcmFjdGVyLlNldExldmVsUmVzcG9uc2USRgoHQWRkSXRlbRId",
-            "Lm1tby5jaGFyYWN0ZXIuQWRkSXRlbVJlcXVlc3QaHC5tbW8uY2hhcmFjdGVy",
-            "LkludmVudG9yeVNsb3QSWgoNTGlzdEludmVudG9yeRIjLm1tby5jaGFyYWN0",
-            "ZXIuTGlzdEludmVudG9yeVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkxpc3RJ",
-            "bnZlbnRvcnlSZXNwb25zZRJLCghDYW5UcmFkZRIeLm1tby5jaGFyYWN0ZXIu",
-            "Q2FuVHJhZGVSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5UcmFkZVJlc3Bv",
-            "bnNlElAKC0FkZEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5BZGRDdXJyZW5j",
-            "eVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFsYW5jZRJUCgtH",
-            "ZXRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXF1ZXN0",
-            "GiIubW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5jeVJlc3BvbnNlElEKCkFwcGx5",
-            "R3JhbnQSIC5tbW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXF1ZXN0GiEubW1v",
-            "LmNoYXJhY3Rlci5BcHBseUdyYW50UmVzcG9uc2USVwoMRW50ZXJEdW5nZW9u",
-            "EiIubW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXF1ZXN0GiMubW1vLmNo",
-            "YXJhY3Rlci5FbnRlckR1bmdlb25SZXNwb25zZRJXCgxVc2VIb3RTcHJpbmcS",
-            "Ii5tbW8uY2hhcmFjdGVyLlVzZUhvdFNwcmluZ1JlcXVlc3QaIy5tbW8uY2hh",
-            "cmFjdGVyLlVzZUhvdFNwcmluZ1Jlc3BvbnNlEk4KCVNldHRsZUV4cBIfLm1t",
-            "by5jaGFyYWN0ZXIuU2V0dGxlRXhwUmVxdWVzdBogLm1tby5jaGFyYWN0ZXIu",
-            "U2V0dGxlRXhwUmVzcG9uc2USSAoHRW5oYW5jZRIdLm1tby5jaGFyYWN0ZXIu",
-            "RW5oYW5jZVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkVuaGFuY2VSZXNwb25z",
-            "ZRJgCg9UcmFuc2ZlckVuaGFuY2USJS5tbW8uY2hhcmFjdGVyLlRyYW5zZmVy",
-            "RW5oYW5jZVJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLlRyYW5zZmVyRW5oYW5j",
-            "ZVJlc3BvbnNlElYKDkluc3RhbGxDcnlzdGFsEiQubW1vLmNoYXJhY3Rlci5J",
-            "bnN0YWxsQ3J5c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0YWxS",
-            "ZXNwb25zZRJUCg1SZW1vdmVDcnlzdGFsEiMubW1vLmNoYXJhY3Rlci5SZW1v",
-            "dmVDcnlzdGFsUmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3J5c3RhbFJlc3Bv",
-            "bnNlEloKDVNldHRsZUF1Y3Rpb24SIy5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25T",
-            "ZXR0bGVSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5BdWN0aW9uU2V0dGxlUmVz",
-            "cG9uc2USYgoLU2V0dGxlSW5nb3QSKC5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25J",
-            "bmdvdFNldHRsZVJlcXVlc3QaKS5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25Jbmdv",
-            "dFNldHRsZVJlc3BvbnNlElQKC0J1eVNob3BJdGVtEiEubW1vLmNoYXJhY3Rl",
-            "ci5CdXlTaG9wSXRlbVJlcXVlc3QaIi5tbW8uY2hhcmFjdGVyLkJ1eVNob3BJ",
-            "dGVtUmVzcG9uc2VCFqoCE01tby5Qcm90by5DaGFyYWN0ZXJiBnByb3RvMw=="));
+            "CBINCgVzdGF0ZRgMIAEoCRIYChBkZWxpdmVyeV9pdGVtX2lkGA0gASgJEhAK",
+            "CGJhZ19zbG90GA4gASgNEg0KBWJvdW5kGA8gASgIEhEKCWR1cGxpY2F0ZRgQ",
+            "IAEoCDKfDAoQQ2hhcmFjdGVyU2VydmljZRJgCg9DcmVhdGVDaGFyYWN0ZXIS",
+            "JS5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlcXVlc3QaJi5tbW8u",
+            "Y2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3RlclJlc3BvbnNlEksKCFNldExldmVs",
+            "Eh4ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlcXVlc3QaHy5tbW8uY2hhcmFj",
+            "dGVyLlNldExldmVsUmVzcG9uc2USRgoHQWRkSXRlbRIdLm1tby5jaGFyYWN0",
+            "ZXIuQWRkSXRlbVJlcXVlc3QaHC5tbW8uY2hhcmFjdGVyLkludmVudG9yeVNs",
+            "b3QSWgoNTGlzdEludmVudG9yeRIjLm1tby5jaGFyYWN0ZXIuTGlzdEludmVu",
+            "dG9yeVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXNw",
+            "b25zZRJLCghDYW5UcmFkZRIeLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXF1",
+            "ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5UcmFkZVJlc3BvbnNlElAKC0FkZEN1",
+            "cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5BZGRDdXJyZW5jeVJlcXVlc3QaHi5t",
+            "bW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFsYW5jZRJUCgtHZXRDdXJyZW5jeRIh",
+            "Lm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXF1ZXN0GiIubW1vLmNoYXJh",
+            "Y3Rlci5HZXRDdXJyZW5jeVJlc3BvbnNlElEKCkFwcGx5R3JhbnQSIC5tbW8u",
+            "Y2hhcmFjdGVyLkFwcGx5R3JhbnRSZXF1ZXN0GiEubW1vLmNoYXJhY3Rlci5B",
+            "cHBseUdyYW50UmVzcG9uc2USVwoMRW50ZXJEdW5nZW9uEiIubW1vLmNoYXJh",
+            "Y3Rlci5FbnRlckR1bmdlb25SZXF1ZXN0GiMubW1vLmNoYXJhY3Rlci5FbnRl",
+            "ckR1bmdlb25SZXNwb25zZRJXCgxVc2VIb3RTcHJpbmcSIi5tbW8uY2hhcmFj",
+            "dGVyLlVzZUhvdFNwcmluZ1JlcXVlc3QaIy5tbW8uY2hhcmFjdGVyLlVzZUhv",
+            "dFNwcmluZ1Jlc3BvbnNlEk4KCVNldHRsZUV4cBIfLm1tby5jaGFyYWN0ZXIu",
+            "U2V0dGxlRXhwUmVxdWVzdBogLm1tby5jaGFyYWN0ZXIuU2V0dGxlRXhwUmVz",
+            "cG9uc2USSAoHRW5oYW5jZRIdLm1tby5jaGFyYWN0ZXIuRW5oYW5jZVJlcXVl",
+            "c3QaHi5tbW8uY2hhcmFjdGVyLkVuaGFuY2VSZXNwb25zZRJgCg9UcmFuc2Zl",
+            "ckVuaGFuY2USJS5tbW8uY2hhcmFjdGVyLlRyYW5zZmVyRW5oYW5jZVJlcXVl",
+            "c3QaJi5tbW8uY2hhcmFjdGVyLlRyYW5zZmVyRW5oYW5jZVJlc3BvbnNlElYK",
+            "Dkluc3RhbGxDcnlzdGFsEiQubW1vLmNoYXJhY3Rlci5JbnN0YWxsQ3J5c3Rh",
+            "bFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0YWxSZXNwb25zZRJUCg1S",
+            "ZW1vdmVDcnlzdGFsEiMubW1vLmNoYXJhY3Rlci5SZW1vdmVDcnlzdGFsUmVx",
+            "dWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3J5c3RhbFJlc3BvbnNlEloKDVNldHRs",
+            "ZUF1Y3Rpb24SIy5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25TZXR0bGVSZXF1ZXN0",
+            "GiQubW1vLmNoYXJhY3Rlci5BdWN0aW9uU2V0dGxlUmVzcG9uc2USYgoLU2V0",
+            "dGxlSW5nb3QSKC5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25JbmdvdFNldHRsZVJl",
+            "cXVlc3QaKS5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25JbmdvdFNldHRsZVJlc3Bv",
+            "bnNlElQKC0J1eVNob3BJdGVtEiEubW1vLmNoYXJhY3Rlci5CdXlTaG9wSXRl",
+            "bVJlcXVlc3QaIi5tbW8uY2hhcmFjdGVyLkJ1eVNob3BJdGVtUmVzcG9uc2VC",
+            "FqoCE01tby5Qcm90by5DaGFyYWN0ZXJiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -216,7 +218,7 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionIngotSettleRequest), global::Mmo.Proto.Character.AuctionIngotSettleRequest.Parser, new[]{ "Account", "CharacterId", "ListingId", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionIngotSettleResponse), global::Mmo.Proto.Character.AuctionIngotSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "IngotAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerIngot", "SellerIngot", "TaxRatePct", "State", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemRequest), global::Mmo.Proto.Character.BuyShopItemRequest.Parser, new[]{ "Account", "CharacterId", "ItemId", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemResponse), global::Mmo.Proto.Character.BuyShopItemResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "Kind", "Name", "PriceYuanbao", "Currency", "Balance", "Enough", "ChargedYuanbao", "Delivered", "State" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemResponse), global::Mmo.Proto.Character.BuyShopItemResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "Kind", "Name", "PriceYuanbao", "Currency", "Balance", "Enough", "ChargedYuanbao", "Delivered", "State", "DeliveryItemId", "BagSlot", "Bound", "Duplicate" }, null, null, null, null)
           }));
     }
     #endregion
@@ -14363,6 +14365,10 @@ namespace Mmo.Proto.Character {
       chargedYuanbao_ = other.chargedYuanbao_;
       delivered_ = other.delivered_;
       state_ = other.state_;
+      deliveryItemId_ = other.deliveryItemId_;
+      bagSlot_ = other.bagSlot_;
+      bound_ = other.bound_;
+      duplicate_ = other.duplicate_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -14388,7 +14394,8 @@ namespace Mmo.Proto.Character {
     public const int ReasonFieldNumber = 2;
     private string reason_ = "";
     /// <summary>
-    /// not_in_list（清单外）/ delivery_pending（清单内但还没接发货）/ 空串表示真的发出去了。
+    /// not_in_list（清单外）/ delivery_pending（清单内但还没接发货）/
+    /// not_enough_yuanbao（元宝不够）/ bag_full（背包满）/ 空串表示真的发出去了。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -14466,7 +14473,7 @@ namespace Mmo.Proto.Character {
     public const int BalanceFieldNumber = 8;
     private long balance_;
     /// <summary>
-    /// 元宝余额，从角色服读出来的事实值，不是算出来的。
+    /// 元宝余额，从角色服读出来的事实值，不是算出来的。成交时是这一笔之后的余额。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -14496,7 +14503,7 @@ namespace Mmo.Proto.Character {
     public const int ChargedYuanbaoFieldNumber = 10;
     private long chargedYuanbao_;
     /// <summary>
-    /// 这张卡一分不扣，恒为 0。
+    /// 这一笔真扣掉的元宝。没成交恒为 0——未生效的数值一律给 0。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -14511,7 +14518,7 @@ namespace Mmo.Proto.Character {
     public const int DeliveredFieldNumber = 11;
     private bool delivered_;
     /// <summary>
-    /// 发货有没有真的发生。这张卡恒为 false。
+    /// 东西有没有真进背包。没成交恒为 false。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -14531,6 +14538,66 @@ namespace Mmo.Proto.Character {
       get { return state_; }
       set {
         state_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "delivery_item_id" field.</summary>
+    public const int DeliveryItemIdFieldNumber = 13;
+    private string deliveryItemId_ = "";
+    /// <summary>
+    /// 发到包里的物品编号。没接发货、没成交时为空串。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string DeliveryItemId {
+      get { return deliveryItemId_; }
+      set {
+        deliveryItemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "bag_slot" field.</summary>
+    public const int BagSlotFieldNumber = 14;
+    private uint bagSlot_;
+    /// <summary>
+    /// 落在背包第几格。没落包时为 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint BagSlot {
+      get { return bagSlot_; }
+      set {
+        bagSlot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "bound" field.</summary>
+    public const int BoundFieldNumber = 15;
+    private bool bound_;
+    /// <summary>
+    /// 到账即绑：商城卖的券与符都是绑定物，这张卡发的保护券恒为 true。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Bound {
+      get { return bound_; }
+      set {
+        bound_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duplicate" field.</summary>
+    public const int DuplicateFieldNumber = 16;
+    private bool duplicate_;
+    /// <summary>
+    /// 同一个事务号重复提交时为 true：整笔不做，余额与背包都不动。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Duplicate {
+      get { return duplicate_; }
+      set {
+        duplicate_ = value;
       }
     }
 
@@ -14561,6 +14628,10 @@ namespace Mmo.Proto.Character {
       if (ChargedYuanbao != other.ChargedYuanbao) return false;
       if (Delivered != other.Delivered) return false;
       if (State != other.State) return false;
+      if (DeliveryItemId != other.DeliveryItemId) return false;
+      if (BagSlot != other.BagSlot) return false;
+      if (Bound != other.Bound) return false;
+      if (Duplicate != other.Duplicate) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -14580,6 +14651,10 @@ namespace Mmo.Proto.Character {
       if (ChargedYuanbao != 0L) hash ^= ChargedYuanbao.GetHashCode();
       if (Delivered != false) hash ^= Delivered.GetHashCode();
       if (State.Length != 0) hash ^= State.GetHashCode();
+      if (DeliveryItemId.Length != 0) hash ^= DeliveryItemId.GetHashCode();
+      if (BagSlot != 0) hash ^= BagSlot.GetHashCode();
+      if (Bound != false) hash ^= Bound.GetHashCode();
+      if (Duplicate != false) hash ^= Duplicate.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -14646,6 +14721,22 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(98);
         output.WriteString(State);
       }
+      if (DeliveryItemId.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(DeliveryItemId);
+      }
+      if (BagSlot != 0) {
+        output.WriteRawTag(112);
+        output.WriteUInt32(BagSlot);
+      }
+      if (Bound != false) {
+        output.WriteRawTag(120);
+        output.WriteBool(Bound);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(128, 1);
+        output.WriteBool(Duplicate);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -14704,6 +14795,22 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(98);
         output.WriteString(State);
       }
+      if (DeliveryItemId.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(DeliveryItemId);
+      }
+      if (BagSlot != 0) {
+        output.WriteRawTag(112);
+        output.WriteUInt32(BagSlot);
+      }
+      if (Bound != false) {
+        output.WriteRawTag(120);
+        output.WriteBool(Bound);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(128, 1);
+        output.WriteBool(Duplicate);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -14749,6 +14856,18 @@ namespace Mmo.Proto.Character {
       }
       if (State.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(State);
+      }
+      if (DeliveryItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(DeliveryItemId);
+      }
+      if (BagSlot != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(BagSlot);
+      }
+      if (Bound != false) {
+        size += 1 + 1;
+      }
+      if (Duplicate != false) {
+        size += 2 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -14797,6 +14916,18 @@ namespace Mmo.Proto.Character {
       }
       if (other.State.Length != 0) {
         State = other.State;
+      }
+      if (other.DeliveryItemId.Length != 0) {
+        DeliveryItemId = other.DeliveryItemId;
+      }
+      if (other.BagSlot != 0) {
+        BagSlot = other.BagSlot;
+      }
+      if (other.Bound != false) {
+        Bound = other.Bound;
+      }
+      if (other.Duplicate != false) {
+        Duplicate = other.Duplicate;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -14865,6 +14996,22 @@ namespace Mmo.Proto.Character {
             State = input.ReadString();
             break;
           }
+          case 106: {
+            DeliveryItemId = input.ReadString();
+            break;
+          }
+          case 112: {
+            BagSlot = input.ReadUInt32();
+            break;
+          }
+          case 120: {
+            Bound = input.ReadBool();
+            break;
+          }
+          case 128: {
+            Duplicate = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -14930,6 +15077,22 @@ namespace Mmo.Proto.Character {
           }
           case 98: {
             State = input.ReadString();
+            break;
+          }
+          case 106: {
+            DeliveryItemId = input.ReadString();
+            break;
+          }
+          case 112: {
+            BagSlot = input.ReadUInt32();
+            break;
+          }
+          case 120: {
+            Bound = input.ReadBool();
+            break;
+          }
+          case 128: {
+            Duplicate = input.ReadBool();
             break;
           }
         }

@@ -6,10 +6,10 @@ using Mmo.Proto.Character;
 namespace Gateway;
 
 /// <summary>
-/// 商城的 HTTP 入口。第 14 节第 41 行只要求「清单外的商品拒绝，且不扣元宝」，
-/// 所以这里只做三件事：认令牌、复核角色归属、把商品编号转给角色服按清单判定。
-/// 请求体只有角色号与商品编号——标价、数量、种类、绑定态客户端一个都带不进来。
-/// 发货在 P1-5c2 起逐种接，届时按技术架构第 3 节把发货决策交给全局服务。
+/// 商城的 HTTP 入口。网关只做三件事：认令牌、复核角色归属、生成事务号后把商品编号
+/// 转给角色服判定。扣款、入包、绑定全在角色服那一笔事务里，网关不碰钱也不碰背包。
+/// 请求体只有角色号与商品编号——数量、标价、绑定态客户端一个都带不进来。
+/// 发货按种类逐张卡接：P1-5c2 起只有保护券真发，其余仍是 delivery_pending。
 /// </summary>
 public static class ShopApi
 {
@@ -84,7 +84,11 @@ public static class ShopApi
                     + " price=" + result.PriceYuanbao
                     + " balance=" + result.Balance
                     + " charged=" + result.ChargedYuanbao
-                    + " delivered=" + result.Delivered);
+                    + " delivered=" + result.Delivered
+                    + " goods=" + result.DeliveryItemId
+                    + " slot=" + result.BagSlot
+                    + " bound=" + result.Bound
+                    + " duplicate=" + result.Duplicate);
 
                 await WriteAsync(context, 200, new
                 {
@@ -100,6 +104,10 @@ public static class ShopApi
                     charged_yuanbao = result.ChargedYuanbao,
                     delivered = result.Delivered,
                     state = result.State,
+                    delivery_item_id = result.DeliveryItemId,
+                    bag_slot = result.BagSlot,
+                    bound = result.Bound,
+                    duplicate = result.Duplicate,
                 });
             }
             catch (RpcException ex)

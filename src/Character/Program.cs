@@ -61,6 +61,7 @@ string? auctionConfigPath = null;
 var shopList = false;
 string? shopConfigPath = null;
 long shopStateOf = 0;
+long shopLedgerOf = 0;
 long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
@@ -246,6 +247,10 @@ for (var i = 0; i < args.Length; i++)
         case "--shop-state" when i + 1 < args.Length:
             long.TryParse(args[++i], out shopStateOf);
             break;
+        // 只给核对用：数一数这个角色名下有几笔商城成交（事务表里 shop_buy: 前缀）。
+        case "--shop-ledger" when i + 1 < args.Length:
+            long.TryParse(args[++i], out shopLedgerOf);
+            break;
         // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
         // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
         case "--auction-ledger" when i + 3 < args.Length:
@@ -389,17 +394,24 @@ if (shopList)
     {
         var characterConfig = CharacterConfig.Load(configPath);
         var shopCurrencies = CurrencyTable.Load("config/currency.json");
-        var table = ShopTable.Load(shopConfigPath ?? characterConfig.ShopTable, shopCurrencies);
+        // 发货校验要物品表与强化表：保护券的发货物必须就是 enhance.json 那一个编号，
+        // 与启动走同一套 Load，坏清单在这里就露出来。
+        var shopItems = ItemTable.Load("config/items.json");
+        var shopEnhance = EnhanceTable.Load(characterConfig.EnhanceTable, shopItems, shopCurrencies);
+        var table = ShopTable.Load(
+            shopConfigPath ?? characterConfig.ShopTable, shopCurrencies, shopItems, shopEnhance);
         Console.WriteLine("shop_list_state=ok version=" + table.Version
             + " currency=" + table.Currency
             + " items=" + table.Items.Count
             + " kinds=" + ShopTable.AllowedKinds.Length
-            + " delivered_kinds=0");
+            + " delivered_kinds=" + ShopTable.DeliveredKinds.Length
+            + " deliverable_items=" + table.Items.Count(i => i.Deliverable));
         foreach (var item in table.Items)
         {
             Console.WriteLine("shop_item=" + item.Id
                 + " kind=" + item.Kind
                 + " price=" + item.PriceYuanbao
+                + " delivery=" + (item.Deliverable ? item.DeliveryItemId + "x" + item.DeliveryCount : "pending")
                 + " name=" + item.Name);
         }
     }
@@ -456,7 +468,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
     || transferStateOf != 0 || transferTxnCount != null
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
-    || ingotBuyerOf != 0 || shopStateOf != 0)
+    || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -510,11 +522,52 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             var shopMoney = new CurrencyRepository(dataSource);
             var shopBalances = await shopMoney.AllAsync(shopStateOf, CancellationToken.None);
             var shopCurrencies = CurrencyTable.Load("config/currency.json");
+            var shopItemsForState = ItemTable.Load("config/items.json");
+            var shopCharConfig = CharacterConfig.Load(configPath);
+            var shopEnhanceForState = EnhanceTable.Load(
+                shopCharConfig.EnhanceTable, shopItemsForState, shopCurrencies);
+            var shopTableForState = ShopTable.Load(
+                shopCharConfig.ShopTable, shopCurrencies, shopItemsForState, shopEnhanceForState);
+
+            // 券的张数与绑定态都从背包里读出来，不另算。绑定的券不能上架（P1-5a 的 bound_item）。
+            var shopInventory = new InventoryRepository(dataSource);
+            var shopSlots = await shopInventory.ListAsync(shopStateOf, CancellationToken.None);
+            var ticketItem = shopTableForState.Items
+                .FirstOrDefault(i => string.Equals(i.Kind, "protect_ticket", StringComparison.Ordinal));
+            var ticketSlots = shopSlots
+                .Where(s => ticketItem is not null
+                    && string.Equals(s.ItemId, ticketItem.DeliveryItemId, StringComparison.Ordinal))
+                .ToList();
+            var ticketCount = ticketSlots.Sum(s => s.Count);
+            var ticketAllBound = ticketSlots.Count > 0 && ticketSlots.All(s => s.Bound);
+            var ticketSlotList = ticketSlots.Count == 0
+                ? "-"
+                : string.Join(",", ticketSlots.Select(s => s.Slot + ":" + s.Count));
+
             Console.WriteLine("shop_state=ok id=" + shopStateOf
                 + " currency=" + ShopTable.WrittenCurrency
                 + " balance=" + shopBalances.GetValueOrDefault(ShopTable.WrittenCurrency, 0L)
                 + " balances=" + string.Join(",", shopCurrencies.All.Select(
-                    c => c.Id + ":" + shopBalances.GetValueOrDefault(c.Id, 0L))));
+                    c => c.Id + ":" + shopBalances.GetValueOrDefault(c.Id, 0L)))
+                + " goods=" + (ticketItem?.DeliveryItemId ?? "-")
+                + " tickets=" + ticketCount
+                + " ticket_bound=" + (ticketAllBound ? "true" : "false")
+                + " ticket_slots=" + ticketSlotList
+                + " used_slots=" + shopSlots.Count);
+        }
+
+        if (shopLedgerOf != 0)
+        {
+            // 商城买过几笔：看事务表里这个角色名下、前缀是 shop_buy: 的行。
+            var ledger = new GrantRepository(
+                dataSource,
+                ItemTable.Load("config/items.json"),
+                CurrencyTable.Load("config/currency.json"),
+                CharacterConfig.Load(configPath));
+            var rows = await ledger.ShopTxnCountAsync(shopLedgerOf, CancellationToken.None);
+            Console.WriteLine("shop_ledger=ok id=" + shopLedgerOf
+                + " txn_prefix=shop_buy:"
+                + " orders=" + rows);
         }
 
         if (levelOf != 0)

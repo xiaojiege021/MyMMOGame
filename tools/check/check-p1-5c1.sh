@@ -134,10 +134,17 @@ routes = re.findall(r'MapPost\("(/shop/[a-z/]+)"', api)
 report("single_route", routes == ["/shop/buy"], ",".join(routes))
 report("route_mapped", "ShopApi.Map(app, tokens, config)" in files[gateway_cs], "gateway")
 
-# 这张卡不发货：回包恒 delivered=false，代码里没有一处写 true。
-report("not_delivered",
-       "Delivered = false" in body and "Delivered = true" not in service,
-       "delivered_true=%d" % service.count("Delivered = true"))
+# 这张卡不发货：拒绝路径恒 delivered=false。
+# 后面的卡（P1-5c2 起）会在成交分支里写 true，所以这里只钉拒绝那一侧，
+# 不钉「全仓没有一处 true」——那种写法会把后来的卡打挂。
+sh_rej = service[service.find("BuyShopItemResponse ShopRejected("):]
+sh_rej = sh_rej[:sh_rej.find("// 拒绝与重放都不带")] if "// 拒绝与重放都不带" in sh_rej else sh_rej[:1200]
+report("reject_no_delivery",
+       "Delivered = false" in sh_rej and "ChargedYuanbao = 0" in sh_rej,
+       "rejected_helper len=%d" % len(sh_rej))
+report("charge_only_on_success",
+       body.count("ChargedYuanbao = item.PriceYuanbao") == 1,
+       "charge_true=%d" % body.count("ChargedYuanbao = item.PriceYuanbao"))
 
 # 只读入口：--shop-list 不连库，--shop-state 连库读余额。
 report("readonly_entry",
@@ -161,8 +168,13 @@ fi
 
 echo "== 3. 只读入口与坏清单 =="
 if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
-  if grep -q 'shop_list_state=ok version=1 currency=yuanbao items=18 kinds=18 delivered_kinds=0' "$TMP/list.txt"; then
-    ok "清单读得出来：18 种、只收元宝、发货一种都没接"
+  # 只钉这一张卡的事实：十八条、只收元宝。版本号与「已接发货几种」会随后面的卡往上走，
+  # 写死在这里会让老卡被新卡打挂。
+  if grep -q 'shop_list_state=ok' "$TMP/list.txt" \
+     && grep -q 'currency=yuanbao' "$TMP/list.txt" \
+     && grep -q 'items=18 ' "$TMP/list.txt" \
+     && grep -q 'kinds=18' "$TMP/list.txt"; then
+    ok "清单读得出来：18 种、只收元宝"
   else
     bad "清单头部不对：$(head -1 "$TMP/list.txt")"
   fi
@@ -256,10 +268,11 @@ else:
     bad "清单外商品没按清单拒绝：$body"
   fi
 
-  # 清单内：这张卡还没接发货，也不扣
-  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"shop_protect_ticket_1\"}")"
+  # 清单内但还没接发货：红符这一种到 P1-5c8 之前都是这条，用它验最稳
+  # （保护券从 P1-5c2 起真发货了，再拿它验 delivery_pending 会随那张卡一起变）。
+  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"shop_red_talisman_1\"}")"
   body="$(body_of "$resp")"
-  if [ "$(expect_json "$body" ok=false reason=delivery_pending kind=protect_ticket charged_yuanbao=0 delivered=false)" = "ok" ]; then
+  if [ "$(expect_json "$body" ok=false reason=delivery_pending kind=red_talisman charged_yuanbao=0 delivered=false)" = "ok" ]; then
     ok "清单内商品：还没接发货，拒绝且不扣（delivery_pending）"
   else
     bad "清单内商品回包不对：$body"

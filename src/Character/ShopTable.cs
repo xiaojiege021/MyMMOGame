@@ -35,7 +35,24 @@ public sealed class ShopTable
         "realm_speed", "guild_tech", "territory_bonus",
     };
 
-    public sealed record Item(string Id, string Kind, string Name, long PriceYuanbao, string Note);
+    // 已经接上发货的种类。P1-5c2 只接保护券这一种——方案 12.1 写定「商城按张卖」，
+    // 其余十七种的发货在后面的卡，没接的种类必须把 delivery_item_id 留空，
+    // 免得清单上看着能买、实际发不出东西。
+    public static readonly string[] DeliveredKinds = { "protect_ticket" };
+
+    /// <summary>ProtectItemId 是 enhance.json 里那唯一一种保护券的编号，本表要对得上。</summary>
+    public sealed record Item(
+        string Id,
+        string Kind,
+        string Name,
+        long PriceYuanbao,
+        string DeliveryItemId,
+        int DeliveryCount,
+        string Note)
+    {
+        /// <summary>这一种接上发货了吗。没接的走 delivery_pending，一分不扣。</summary>
+        public bool Deliverable => DeliveryItemId.Length > 0;
+    }
 
     public int Version { get; }
     public string Currency { get; }
@@ -67,7 +84,15 @@ public sealed class ShopTable
     public static bool IsAllowedKind(string kind) =>
         Array.IndexOf(AllowedKinds, kind) >= 0;
 
-    public static ShopTable Load(string path, CurrencyTable currencies)
+    /// <summary>这一种接上发货了吗。清单外的种类一律 false。</summary>
+    public static bool IsDeliveredKind(string kind) =>
+        Array.IndexOf(DeliveredKinds, kind) >= 0;
+
+    public static ShopTable Load(
+        string path,
+        CurrencyTable currencies,
+        ItemTable itemTable,
+        EnhanceTable enhance)
     {
         if (!File.Exists(path))
         {
@@ -159,7 +184,81 @@ public sealed class ShopTable
                 throw new ConfigException("shop.json 的商品 " + id + " 标价必须是正整数");
             }
 
-            result.Add(new Item(id, kind, name, item.PriceYuanbao, (item.Note ?? "").Trim()));
+            var deliveryId = (item.DeliveryItemId ?? "").Trim();
+            var deliveryCount = item.DeliveryCount;
+            var delivered = IsDeliveredKind(kind);
+
+            if (!delivered)
+            {
+                // 没接发货的种类不许留半个发货物：留着就会看着能买、实际发不出东西。
+                if (deliveryId.Length != 0 || deliveryCount != 0)
+                {
+                    throw new ConfigException("shop.json 的商品 " + id + " 种类 " + kind
+                        + " 还没接发货，delivery_item_id 必须留空、delivery_count 必须是 0");
+                }
+            }
+            else
+            {
+                if (deliveryId.Length == 0)
+                {
+                    throw new ConfigException("shop.json 的商品 " + id + " 种类 " + kind
+                        + " 已接发货，缺 delivery_item_id");
+                }
+
+                if (deliveryCount < 1)
+                {
+                    throw new ConfigException("shop.json 的商品 " + id
+                        + " 每份数量必须是正整数");
+                }
+
+                var goods = itemTable.Find(deliveryId);
+                if (goods is null)
+                {
+                    throw new ConfigException("shop.json 的商品 " + id
+                        + " 发货物品不在 items.json 里：" + deliveryId);
+                }
+
+                // 方案 9.2 / 12.1：商城与通行证发的是同一种券，到账就绑定、不能上架。
+                // 所以保护券的发货物只能指向 enhance.json 那一个编号，不许另立第二种。
+                if (string.Equals(kind, "protect_ticket", StringComparison.Ordinal))
+                {
+                    if (!string.Equals(deliveryId, enhance.ProtectItemId, StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的保护券必须发 enhance.json 的 "
+                            + "protect_item_id（" + enhance.ProtectItemId + "），不许另立："
+                            + deliveryId);
+                    }
+
+                    if (deliveryCount != 1)
+                    {
+                        throw new ConfigException("shop.json 的保护券按张卖，每份数量必须是 1："
+                            + deliveryCount);
+                    }
+
+                    if (!string.Equals(goods.Kind, "voucher", StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的保护券发货物必须是 voucher："
+                            + goods.Kind);
+                    }
+
+                    if (goods.Bind != BindRule.Always)
+                    {
+                        throw new ConfigException("shop.json 的保护券发货物必须到账即绑："
+                            + deliveryId);
+                    }
+                }
+                else if (!string.Equals(goods.Kind, "voucher", StringComparison.Ordinal)
+                    && !string.Equals(goods.Kind, "consumable", StringComparison.Ordinal))
+                {
+                    // 后面几种符、卷轴、道具都是消耗或凭证类；接发货时照这条走，
+                    // 免得把装备、材料混进商城（12.1 写定那些绝不上架）。
+                    throw new ConfigException("shop.json 的商品 " + id
+                        + " 发货物种类不是消耗或凭证：" + goods.Kind);
+                }
+            }
+
+            result.Add(new Item(
+                id, kind, name, item.PriceYuanbao, deliveryId, deliveryCount, (item.Note ?? "").Trim()));
         }
 
         return new ShopTable(wire.Version, wire.Currency!, (wire.Note ?? "").Trim(), result);
@@ -186,6 +285,8 @@ public sealed class ShopTable
         [JsonPropertyName("kind")] public string? Kind { get; set; }
         [JsonPropertyName("name")] public string? Name { get; set; }
         [JsonPropertyName("price_yuanbao")] public long PriceYuanbao { get; set; }
+        [JsonPropertyName("delivery_item_id")] public string? DeliveryItemId { get; set; }
+        [JsonPropertyName("delivery_count")] public int DeliveryCount { get; set; }
         [JsonPropertyName("note")] public string? Note { get; set; }
     }
 }

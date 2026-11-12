@@ -507,7 +507,8 @@ message BuyShopItemRequest {
 
 message BuyShopItemResponse {
   bool ok = 1;
-  // not_in_list（清单外）/ delivery_pending（清单内但还没接发货）/ 空串表示真的发出去了。
+  // not_in_list（清单外）/ delivery_pending（清单内但还没接发货）/
+  // not_enough_yuanbao（元宝不够）/ bag_full（背包满）/ 空串表示真的发出去了。
   string reason = 2;
   string item_id = 3;
   string kind = 4;
@@ -515,13 +516,21 @@ message BuyShopItemResponse {
   // 清单里的标价。清单外时为 0：未生效的数值一律给 0，不拿别的数顶。
   int64 price_yuanbao = 6;
   string currency = 7;
-  // 元宝余额，从角色服读出来的事实值，不是算出来的。
+  // 元宝余额，从角色服读出来的事实值，不是算出来的。成交时是这一笔之后的余额。
   int64 balance = 8;
   // 够不够买。清单外为 false。
   bool enough = 9;
-  // 这张卡一分不扣，恒为 0。
+  // 这一笔真扣掉的元宝。没成交恒为 0——未生效的数值一律给 0。
   int64 charged_yuanbao = 10;
-  // 发货有没有真的发生。这张卡恒为 false。
+  // 东西有没有真进背包。没成交恒为 false。
   bool delivered = 11;
   string state = 12;
+  // 发到包里的物品编号。没接发货、没成交时为空串。
+  string delivery_item_id = 13;
+  // 落在背包第几格。没落包时为 0。
+  uint32 bag_slot = 14;
+  // 到账即绑：商城卖的券与符都是绑定物，这张卡发的保护券恒为 true。
+  bool bound = 15;
+  // 同一个事务号重复提交时为 true：整笔不做，余额与背包都不动。
+  bool duplicate = 16;
 }
