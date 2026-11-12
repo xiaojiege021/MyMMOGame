@@ -35,11 +35,11 @@ public sealed class ShopTable
         "realm_speed", "guild_tech", "territory_bonus",
     };
 
-    // 已经接上发货的种类。P1-5c2 接保护券，P1-5c3 接红符；其余十六种的发货在
-    // 后面的卡，没接的种类必须把 delivery_item_id 留空，免得清单上看着能买、
-    // 实际发不出东西。
+    // 已经接上发货的种类。P1-5c2 接保护券，P1-5c3 接红符，P1-5c5 接蓝符，
+    // P1-5c6 接复活卷轴；其余种类的发货在后面的卡，没接的种类必须把
+    // delivery_item_id 留空，免得清单上看着能买、实际发不出东西。
     public static readonly string[] DeliveredKinds =
-        { "protect_ticket", "red_talisman", "blue_talisman" };
+        { "protect_ticket", "red_talisman", "blue_talisman", "revive_scroll" };
 
     /// <summary>ProtectItemId 是 enhance.json 里那唯一一种保护券的编号，本表要对得上。</summary>
     public sealed record Item(
@@ -94,7 +94,8 @@ public sealed class ShopTable
         CurrencyTable currencies,
         ItemTable itemTable,
         EnhanceTable enhance,
-        TalismanTable talismans)
+        TalismanTable talismans,
+        ReviveScrollTable scrolls)
     {
         if (!File.Exists(path))
         {
@@ -317,6 +318,36 @@ public sealed class ShopTable
                     if (goods.Bind != BindRule.Always)
                     {
                         throw new ConfigException("shop.json 的蓝符发货物必须到账即绑："
+                            + deliveryId);
+                    }
+                }
+                else if (string.Equals(kind, "revive_scroll", StringComparison.Ordinal))
+                {
+                    // 方案 12.1 写定「复活只卖复活卷轴，不另卖复活币」：
+                    // 商城只能发 revive_scroll.json 里那一种编号，别处不许另立。
+                    var scroll = scrolls.ReviveScroll;
+                    if (!string.Equals(deliveryId, scroll.ItemId, StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的复活卷轴必须发 "
+                            + "revive_scroll.json 的 scroll.item_id（" + scroll.ItemId
+                            + "），不许另立：" + deliveryId);
+                    }
+
+                    if (deliveryCount != 1)
+                    {
+                        throw new ConfigException("shop.json 的复活卷轴按张卖，每份数量必须是 1："
+                            + deliveryCount);
+                    }
+
+                    if (!string.Equals(goods.Kind, "consumable", StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的复活卷轴发货物必须是 consumable："
+                            + goods.Kind);
+                    }
+
+                    if (goods.Bind != BindRule.Always)
+                    {
+                        throw new ConfigException("shop.json 的复活卷轴发货物必须到账即绑："
                             + deliveryId);
                     }
                 }

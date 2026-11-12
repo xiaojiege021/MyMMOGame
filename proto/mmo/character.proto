@@ -111,6 +111,12 @@ service CharacterService {
   // P1-5c5：用符之前的只读查询。这个编号是哪种符、回复落在哪个池，只有角色服
   // 读配置说了算；战斗服不解析配置文件、不自己记编号映射。不扣符、不写库。
   rpc DescribeTalisman(DescribeTalismanRequest) returns (DescribeTalismanResponse);
+  // P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
+  // 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。不写库。
+  rpc DescribeReviveScroll(DescribeReviveScrollRequest) returns (DescribeReviveScrollResponse);
+  // P1-5c6：真用掉一张卷轴。战斗服发过来，角色服在一笔事务里扣一张、
+  // 只扣当前等级已有经验的一部分、写下跨场保留的冷却到期；不碰生命与蓝量。
+  rpc ConsumeReviveScroll(ConsumeReviveScrollRequest) returns (ConsumeReviveScrollResponse);
 }
 
 message SettleExpRequest {
@@ -600,4 +606,62 @@ message DescribeTalismanResponse {
   TalismanPool pool = 4;
   // 只读的背包张数，事实值；真正扣不扣由 ConsumeTalisman 那笔事务再判一次。
   int64 count_left = 5;
+}
+
+// P1-5c6：用卷轴之前的只读查询。请求里只有角色号与物品编号，没有目标、
+// 数量、回复值或冷却——「只拉起自己」在协议结构上就落死了。
+message DescribeReviveScrollRequest {
+  uint64 character_id = 1;
+  string item_id = 2;
+}
+
+message DescribeReviveScrollResponse {
+  bool ok = 1;
+  // not_scroll（编号不对）/ character_not_found / 空串表示查到了。
+  string reason = 2;
+  string item_id = 3;
+  // 背包里还有几张（只读事实值）；真正扣不扣由 ConsumeReviveScroll 的事务再判。
+  int64 count_left = 4;
+  // 配置里的冷却时长与拉起血量比例、一转基础经验比例。战斗服不写第二套数。
+  uint32 cooldown_ms = 5;
+  uint32 hp_restore_pct = 6;
+  uint32 exp_cost_pct = 7;
+  // 角色库里那个人的冷却到期时刻（Unix 毫秒），没用过给 0。跨场保留靠这一列。
+  int64 ready_at_ms = 8;
+  // 角色服当前时刻（Unix 毫秒）：战斗服拿它和 ready_at_ms 比，不用两边对表。
+  int64 now_ms = 9;
+  int64 level = 10;
+  int64 exp = 11;
+}
+
+// P1-5c6：真扣一张卷轴。请求里只有标识，没有任何服务端数值：
+// 比例、冷却、扣多少经验全由角色服按 config 与库里的当前级经验算。
+message ConsumeReviveScrollRequest {
+  // 网关转发时填令牌账号；战斗服服间直连时为空，只按角色号找角色。
+  string account = 1;
+  uint64 character_id = 2;
+  string item_id = 3;
+  // 战斗服生成的幂等号：同一个号只扣一张，重放整笔不做。
+  string txn_id = 4;
+}
+
+message ConsumeReviveScrollResponse {
+  bool ok = 1;
+  // cooldown / no_scroll / not_scroll / duplicate / character_not_found /
+  // server_error / 空串表示真扣掉了。
+  string reason = 2;
+  string item_id = 3;
+  // 扣掉之后背包里还剩几张。没扣时给的是当前张数（事实值）。
+  int64 count_left = 4;
+  // 拉起按这个比例回到一小段生命（< 100，不满血）；战斗服照着算，不自己写数。
+  uint32 hp_restore_pct = 5;
+  // 实际扣掉的当前级经验。当前级经验是零时这里是 0，等级不变、不掉级。
+  int64 exp_cost = 6;
+  int64 level = 7;
+  int64 exp_after = 8;
+  // 这一张写进角色库的冷却到期时刻（Unix 毫秒），换一场仍读得到。
+  int64 ready_at_ms = 9;
+  uint32 cooldown_ms = 10;
+  // 同一个事务号重放：整笔没执行，卷轴、经验、冷却都不动。
+  bool duplicate = 11;
 }

@@ -36,6 +36,8 @@ public sealed class CharacterGrpcService(
     ShopTable shopTable,
     TalismanTable talismanTable,
     TalismanRepository talismans,
+    ReviveScrollTable scrollTable,
+    ReviveScrollRepository scrolls,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -1639,6 +1641,168 @@ public sealed class CharacterGrpcService(
             CountLeft = left,
         };
     }
+
+    /// <summary>
+    /// P1-5c6：用卷轴之前的只读查询。是不是卷轴、冷却到没到、背包有几张，
+    /// 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。
+    /// 这里一个字都不写：冷却到期是上一张卷轴落库的那一行，不是这次查出来的。
+    /// </summary>
+    public override async Task<DescribeReviveScrollResponse> DescribeReviveScroll(
+        DescribeReviveScrollRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "item_missing"));
+        }
+
+        var spec = scrollTable.Find(itemId);
+        if (spec is null)
+        {
+            return new DescribeReviveScrollResponse
+            {
+                Ok = false,
+                Reason = "not_scroll",
+                ItemId = itemId,
+            };
+        }
+
+        var state = await scrolls.StateAsync(
+            (long)request.CharacterId, spec.ItemId, context.CancellationToken);
+        if (!state.Found)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "scroll_describe character={Id} item={Item} count={Count} cooling={Cooling}"
+            + " ready_at={ReadyAt} now={Now}",
+            request.CharacterId, spec.ItemId, state.Count,
+            state.Cooling ? "true" : "false", state.ReadyAtMs, state.NowMs);
+
+        return new DescribeReviveScrollResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = spec.ItemId,
+            CountLeft = state.Count,
+            CooldownMs = (uint)Math.Max(0, spec.CooldownMs),
+            HpRestorePct = (uint)Math.Max(0, scrollTable.HpRestorePct),
+            ExpCostPct = (uint)Math.Max(0, scrollTable.ExpCostPct),
+            ReadyAtMs = state.ReadyAtMs,
+            NowMs = state.NowMs,
+            Level = state.Level,
+            Exp = state.Exp,
+        };
+    }
+
+    /// <summary>
+    /// P1-5c6：真用掉一张卷轴。角色服是持久数据的唯一写入方，所以这一笔
+    /// 把「扣一张 + 扣当前级经验 + 写跨场冷却」放在同一个事务里；生命与蓝量
+    /// 是战斗态，角色服一个字段都不碰，拉起由战斗服按回包的比例做。
+    /// </summary>
+    public override async Task<ConsumeReviveScrollResponse> ConsumeReviveScroll(
+        ConsumeReviveScrollRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var itemId = (request.ItemId ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        if (request.CharacterId == 0 || itemId.Length == 0 || txnId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        var spec = scrollTable.Find(itemId);
+        if (spec is null)
+        {
+            // 不是卷轴：红符、蓝符、保护券、随便什么编号都走这条，一个字不写。
+            var state = await scrolls.StateAsync(
+                characterId, itemId, context.CancellationToken);
+            logger.LogInformation(
+                "scroll_consume_reject id={Id} item={Item} reason=not_scroll",
+                characterId, itemId);
+            return ScrollRejected("not_scroll", itemId, state.Count, false);
+        }
+
+        // 服间直连没有账号，照 P1-2 SettleExp / P1-5c3 ConsumeTalisman 的口径分两支：
+        // 有账号核归属，空账号只按角色号确认存在。
+        if (account.Length > 0)
+        {
+            if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+        }
+        else if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await expSettlements.UseReviveScrollAsync(
+            characterId, account, txnId, spec.ItemId,
+            scrollTable.ExpCostPct, spec.CooldownMs, context.CancellationToken);
+
+        if (outcome.Reason.Length > 0)
+        {
+            // 冷却没到、背包空、同一个号重放：一笔事务整笔没做，
+            // 卷轴、经验、冷却都不动。
+            logger.LogInformation(
+                "scroll_consume_reject id={Id} item={Item} txn={Txn} reason={Reason}"
+                + " ready_at={ReadyAt}",
+                characterId, spec.ItemId, txnId, outcome.Reason, outcome.ReadyAtMs);
+            return ScrollRejected(
+                outcome.Reason, spec.ItemId, outcome.CountLeft, outcome.Duplicate);
+        }
+
+        logger.LogInformation(
+            "scroll_consume id={Id} item={Item} txn={Txn} left={Left}"
+            + " exp_cost={Cost} level={Level} exp_after={ExpAfter}"
+            + " hp_restore_pct={HpPct} exp_cost_pct={ExpPct}"
+            + " cooldown_ms={Cooldown} ready_at={ReadyAt}",
+            characterId, spec.ItemId, txnId, outcome.CountLeft,
+            outcome.ExpCost, outcome.Level, outcome.ExpAfter,
+            scrollTable.HpRestorePct, scrollTable.ExpCostPct,
+            spec.CooldownMs, outcome.ReadyAtMs);
+
+        return new ConsumeReviveScrollResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = spec.ItemId,
+            CountLeft = outcome.CountLeft,
+            HpRestorePct = (uint)Math.Max(0, scrollTable.HpRestorePct),
+            ExpCost = outcome.ExpCost,
+            Level = outcome.Level,
+            ExpAfter = outcome.ExpAfter,
+            ReadyAtMs = outcome.ReadyAtMs,
+            CooldownMs = (uint)Math.Max(0, spec.CooldownMs),
+            Duplicate = false,
+        };
+    }
+
+    /// <summary>没扣成的回包：比例、经验变化与到期时刻一律不给生效值。</summary>
+    static ConsumeReviveScrollResponse ScrollRejected(
+        string reason, string itemId, long countLeft, bool duplicate) =>
+        new()
+        {
+            Ok = false,
+            Reason = reason,
+            ItemId = itemId,
+            CountLeft = countLeft,
+            HpRestorePct = 0,
+            ExpCost = 0,
+            Level = 0,
+            ExpAfter = 0,
+            ReadyAtMs = 0,
+            CooldownMs = 0,
+            Duplicate = duplicate,
+        };
 
     /// <summary>没扣成的回包：不带回复值与冷却——下一次真用上时才由配置给。</summary>
     ConsumeTalismanResponse TalismanRejected(

@@ -126,6 +126,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeTalismanRequest> __Marshaller_mmo_character_DescribeTalismanRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeTalismanRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeTalismanResponse> __Marshaller_mmo_character_DescribeTalismanResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeTalismanResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeReviveScrollRequest> __Marshaller_mmo_character_DescribeReviveScrollRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeReviveScrollRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeReviveScrollResponse> __Marshaller_mmo_character_DescribeReviveScrollResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeReviveScrollResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeReviveScrollRequest> __Marshaller_mmo_character_ConsumeReviveScrollRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeReviveScrollRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeReviveScrollResponse> __Marshaller_mmo_character_ConsumeReviveScrollResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeReviveScrollResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -286,6 +294,22 @@ namespace Mmo.Proto.Character {
         "DescribeTalisman",
         __Marshaller_mmo_character_DescribeTalismanRequest,
         __Marshaller_mmo_character_DescribeTalismanResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse> __Method_DescribeReviveScroll = new grpc::Method<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeReviveScroll",
+        __Marshaller_mmo_character_DescribeReviveScrollRequest,
+        __Marshaller_mmo_character_DescribeReviveScrollResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ConsumeReviveScrollRequest, global::Mmo.Proto.Character.ConsumeReviveScrollResponse> __Method_ConsumeReviveScroll = new grpc::Method<global::Mmo.Proto.Character.ConsumeReviveScrollRequest, global::Mmo.Proto.Character.ConsumeReviveScrollResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ConsumeReviveScroll",
+        __Marshaller_mmo_character_ConsumeReviveScrollRequest,
+        __Marshaller_mmo_character_ConsumeReviveScrollResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -544,6 +568,32 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeTalismanResponse> DescribeTalisman(global::Mmo.Proto.Character.DescribeTalismanRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
+      /// 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。不写库。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeReviveScrollResponse> DescribeReviveScroll(global::Mmo.Proto.Character.DescribeReviveScrollRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P1-5c6：真用掉一张卷轴。战斗服发过来，角色服在一笔事务里扣一张、
+      /// 只扣当前等级已有经验的一部分、写下跨场保留的冷却到期；不碰生命与蓝量。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ConsumeReviveScrollResponse> ConsumeReviveScroll(global::Mmo.Proto.Character.ConsumeReviveScrollRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1573,6 +1623,110 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeTalisman, null, options, request);
       }
+      /// <summary>
+      /// P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
+      /// 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeReviveScrollResponse DescribeReviveScroll(global::Mmo.Proto.Character.DescribeReviveScrollRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeReviveScroll(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
+      /// 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeReviveScrollResponse DescribeReviveScroll(global::Mmo.Proto.Character.DescribeReviveScrollRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeReviveScroll, null, options, request);
+      }
+      /// <summary>
+      /// P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
+      /// 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeReviveScrollResponse> DescribeReviveScrollAsync(global::Mmo.Proto.Character.DescribeReviveScrollRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeReviveScrollAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
+      /// 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeReviveScrollResponse> DescribeReviveScrollAsync(global::Mmo.Proto.Character.DescribeReviveScrollRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeReviveScroll, null, options, request);
+      }
+      /// <summary>
+      /// P1-5c6：真用掉一张卷轴。战斗服发过来，角色服在一笔事务里扣一张、
+      /// 只扣当前等级已有经验的一部分、写下跨场保留的冷却到期；不碰生命与蓝量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ConsumeReviveScrollResponse ConsumeReviveScroll(global::Mmo.Proto.Character.ConsumeReviveScrollRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ConsumeReviveScroll(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c6：真用掉一张卷轴。战斗服发过来，角色服在一笔事务里扣一张、
+      /// 只扣当前等级已有经验的一部分、写下跨场保留的冷却到期；不碰生命与蓝量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ConsumeReviveScrollResponse ConsumeReviveScroll(global::Mmo.Proto.Character.ConsumeReviveScrollRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ConsumeReviveScroll, null, options, request);
+      }
+      /// <summary>
+      /// P1-5c6：真用掉一张卷轴。战斗服发过来，角色服在一笔事务里扣一张、
+      /// 只扣当前等级已有经验的一部分、写下跨场保留的冷却到期；不碰生命与蓝量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ConsumeReviveScrollResponse> ConsumeReviveScrollAsync(global::Mmo.Proto.Character.ConsumeReviveScrollRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ConsumeReviveScrollAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c6：真用掉一张卷轴。战斗服发过来，角色服在一笔事务里扣一张、
+      /// 只扣当前等级已有经验的一部分、写下跨场保留的冷却到期；不碰生命与蓝量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ConsumeReviveScrollResponse> ConsumeReviveScrollAsync(global::Mmo.Proto.Character.ConsumeReviveScrollRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ConsumeReviveScroll, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1606,7 +1760,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_SettleIngot, serviceImpl.SettleIngot)
           .AddMethod(__Method_BuyShopItem, serviceImpl.BuyShopItem)
           .AddMethod(__Method_ConsumeTalisman, serviceImpl.ConsumeTalisman)
-          .AddMethod(__Method_DescribeTalisman, serviceImpl.DescribeTalisman).Build();
+          .AddMethod(__Method_DescribeTalisman, serviceImpl.DescribeTalisman)
+          .AddMethod(__Method_DescribeReviveScroll, serviceImpl.DescribeReviveScroll)
+          .AddMethod(__Method_ConsumeReviveScroll, serviceImpl.ConsumeReviveScroll).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1636,6 +1792,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_BuyShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyShopItemRequest, global::Mmo.Proto.Character.BuyShopItemResponse>(serviceImpl.BuyShopItem));
       serviceBinder.AddMethod(__Method_ConsumeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse>(serviceImpl.ConsumeTalisman));
       serviceBinder.AddMethod(__Method_DescribeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeTalismanRequest, global::Mmo.Proto.Character.DescribeTalismanResponse>(serviceImpl.DescribeTalisman));
+      serviceBinder.AddMethod(__Method_DescribeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse>(serviceImpl.DescribeReviveScroll));
+      serviceBinder.AddMethod(__Method_ConsumeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeReviveScrollRequest, global::Mmo.Proto.Character.ConsumeReviveScrollResponse>(serviceImpl.ConsumeReviveScroll));
     }
 
   }

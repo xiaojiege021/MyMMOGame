@@ -38,6 +38,10 @@ internal static class Program
         var healSkill = uint.TryParse(Arg(args, "--heal"), out var hs) ? hs : 1302U;
         var blue = Arg(args, "--blue") ?? "talisman_blue";
         var manaSkill = uint.TryParse(Arg(args, "--skill"), out var ms) ? ms : 1002U;
+        var scroll = Arg(args, "--scroll") ?? "scroll_revive";
+        var expBefore = long.TryParse(Arg(args, "--exp-before"), out var eb) ? eb : 1000L;
+        var expCost = long.TryParse(Arg(args, "--exp-cost"), out var ec) ? ec : 100L;
+        var expectLevel = long.TryParse(Arg(args, "--expect-level"), out var lv) ? lv : 1L;
 
         try
         {
@@ -79,6 +83,19 @@ internal static class Program
                 "p15c5_blue_other" => await CaseP15c5OtherAsync(url, otherItem),
                 "p15c5_blue_down" => await CaseP15c5DownAsync(url, blue),
                 "p15c5_blue_none" => await CaseP15c5NoneAsync(url, blue, manaSkill),
+                "p15c6_scroll" => await CaseP15c6ScrollAsync(
+                    url, scroll, expBefore, expCost, expectLevel, "p15c6_scroll"),
+                "p15c6_scroll_exp_zero" => await CaseP15c6ScrollAsync(
+                    url, scroll, expBefore, expCost, expectLevel, "p15c6_scroll_exp_zero"),
+                "p15c6_scroll_cooldown" => await CaseP15c6CooldownAsync(
+                    url, scroll, "p15c6_scroll_cooldown"),
+                "p15c6_scroll_cross" => await CaseP15c6CooldownAsync(
+                    url, scroll, "p15c6_scroll_cross"),
+                "p15c6_scroll_groups" => await CaseP15c6GroupsAsync(url, scroll, item),
+                "p15c6_scroll_not_down" => await CaseP15c6NotDownAsync(url, scroll),
+                "p15c6_scroll_other" => await CaseP15c6OtherAsync(url, otherItem),
+                "p15c6_scroll_none" => await CaseP15c6NoneAsync(url, scroll),
+                "p15c6_scroll_off" => await CaseP15c6OffAsync(url, scroll),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -1315,6 +1332,167 @@ internal static class Program
             $"case=p15c5_blue_none reason={reject?.Reason} "
             + $"mana_before={manaBefore} mana_after={reject?.ManaAfter} "
             + $"hp_after={reject?.HpAfter}");
+    }
+
+    // P1-5c6：读一条卷轴回包，要么用掉了，要么被拒了。
+    static Task<ServerMessage?> ReadScrollAsync(Session session, int timeoutMs) =>
+        session.ReadUntilAsync(
+            m => m.ScrollUsed is not null || m.ScrollRejected is not null, timeoutMs);
+
+    /// <summary>
+    /// 倒地之后用一张卷轴：只回到一小段生命（不满血），蓝量与用之前相同，
+    /// 只扣当前等级已有经验的一部分、等级不变；回包里带角色库写下的冷却到期。
+    /// exp_before / exp_cost / expect_level 由核对脚本按库里的事实值传进来。
+    /// </summary>
+    static async Task<int> CaseP15c6ScrollAsync(
+        string url, string scroll, long expBefore, long expCost, long expectLevel, string caseName)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var opened = session.Opened;
+        var down = await WaitDamagedAsync(session, 15000, wantDown: true);
+        if (down is null)
+        {
+            return Fail($"case={caseName} 没等到自己倒地");
+        }
+
+        await session.UseReviveScrollAsync(scroll);
+        var message = await ReadScrollAsync(session, 8000);
+        var used = message?.ScrollUsed;
+        var ok = used is not null
+                 && message!.ScrollRejected is null
+                 && used.HpAfter > 0
+                 && used.HpAfter < opened.CasterHpMax
+                 && used.ManaAfter == opened.Mana
+                 && used.ExpCost == expCost
+                 && used.ExpAfter == expBefore - expCost
+                 && used.Level == expectLevel
+                 && used.CooldownMs > 0
+                 && used.ReadyAtMs > 0;
+        return Report(ok,
+            $"case={caseName} hp_after={used?.HpAfter} hp_max={opened.CasterHpMax} "
+            + $"mana_before={opened.Mana} mana_after={used?.ManaAfter} "
+            + $"exp_before={expBefore} exp_cost={used?.ExpCost} exp_after={used?.ExpAfter} "
+            + $"level={used?.Level} cooldown_ms={used?.CooldownMs} "
+            + $"ready_at={used?.ReadyAtMs} left={used?.CountLeft}");
+    }
+
+    /// <summary>
+    /// 全局冷却没到时再用：换一场（脚本换的是另一套战斗进程）或同一场再次倒地，
+    /// 都应该被 cooldown 挡下，而且卷轴不扣、人不起来。冷却到期是角色库那一行，
+    /// 不是这场战斗进程里的计时器。
+    /// </summary>
+    static async Task<int> CaseP15c6CooldownAsync(string url, string scroll, string caseName)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var down = await WaitDamagedAsync(session, 15000, wantDown: true);
+        if (down is null)
+        {
+            return Fail($"case={caseName} 没等到自己倒地");
+        }
+
+        await session.UseReviveScrollAsync(scroll);
+        var message = await ReadScrollAsync(session, 8000);
+        var reject = message?.ScrollRejected;
+        var ok = reject?.Reason == "cooldown"
+                 && reject.RetryAfterMs > 0
+                 && message!.ScrollUsed is null
+                 && reject.HpAfter <= 0;
+        return Report(ok,
+            $"case={caseName} reason={reject?.Reason} retry={reject?.RetryAfterMs} "
+            + $"hp_after={reject?.HpAfter}");
+    }
+
+    /// <summary>
+    /// 卷轴拉起之后立刻用红符：治疗组没被卷轴占用，红符仍然加得出血。
+    /// 方案 8.3 写定「不开始生息技能的冷却，也不占用治疗、红符、蓝符的冷却」。
+    /// </summary>
+    static async Task<int> CaseP15c6GroupsAsync(string url, string scroll, string red)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var down = await WaitDamagedAsync(session, 15000, wantDown: true);
+        if (down is null)
+        {
+            return Fail("case=p15c6_scroll_groups 没等到自己倒地");
+        }
+
+        await session.UseReviveScrollAsync(scroll);
+        var scrollMessage = await ReadScrollAsync(session, 8000);
+        var used = scrollMessage?.ScrollUsed;
+        if (used is null)
+        {
+            return Report(false,
+                "case=p15c6_scroll_groups 卷轴没用成："
+                + scrollMessage?.ScrollRejected?.Reason);
+        }
+
+        await session.UseTalismanAsync(red);
+        var talismanMessage = await ReadTalismanAsync(session, 8000);
+        var redUsed = talismanMessage?.TalismanUsed;
+        var ok = redUsed is not null
+                 && redUsed.Healed > 0
+                 && redUsed.CooldownGroup == "heal"
+                 && used.ManaAfter == session.Opened.Mana;
+        return Report(ok,
+            $"case=p15c6_scroll_groups hp_after={used.HpAfter} mana_after={used.ManaAfter} "
+            + $"red_healed={redUsed?.Healed} red_group={redUsed?.CooldownGroup} "
+            + $"red_reject={talismanMessage?.TalismanRejected?.Reason}");
+    }
+
+    /// <summary>还活着点不了自救卷轴；拉队友只能走牧师的生息。</summary>
+    static async Task<int> CaseP15c6NotDownAsync(string url, string scroll)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        await session.UseReviveScrollAsync(scroll);
+        var message = await ReadScrollAsync(session, 8000);
+        var reject = message?.ScrollRejected;
+        return Report(reject?.Reason == "not_down" && message!.ScrollUsed is null,
+            $"case=p15c6_scroll_not_down reason={reject?.Reason} hp_after={reject?.HpAfter}");
+    }
+
+    /// <summary>拿保护券当卷轴用：只读查询就挡下，不扣不写。</summary>
+    static async Task<int> CaseP15c6OtherAsync(string url, string otherItem)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        await session.UseReviveScrollAsync(otherItem);
+        var message = await ReadScrollAsync(session, 8000);
+        var reject = message?.ScrollRejected;
+        return Report(reject?.Reason == "not_scroll" && message!.ScrollUsed is null,
+            $"case=p15c6_scroll_other item={otherItem} reason={reject?.Reason}");
+    }
+
+    /// <summary>背包一张不剩：no_scroll，人不起来、经验不动。</summary>
+    static async Task<int> CaseP15c6NoneAsync(string url, string scroll)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var down = await WaitDamagedAsync(session, 15000, wantDown: true);
+        if (down is null)
+        {
+            return Fail("case=p15c6_scroll_none 没等到自己倒地");
+        }
+
+        await session.UseReviveScrollAsync(scroll);
+        var message = await ReadScrollAsync(session, 8000);
+        var reject = message?.ScrollRejected;
+        return Report(reject?.Reason == "no_scroll" && message!.ScrollUsed is null
+                      && reject.HpAfter <= 0,
+            $"case=p15c6_scroll_none reason={reject?.Reason} hp_after={reject?.HpAfter}");
+    }
+
+    /// <summary>这一场没配角色服：upstream_off，不在本地凭空变一张卷轴。</summary>
+    static async Task<int> CaseP15c6OffAsync(string url, string scroll)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var down = await WaitDamagedAsync(session, 15000, wantDown: true);
+        if (down is null)
+        {
+            return Fail("case=p15c6_scroll_off 没等到自己倒地");
+        }
+
+        await session.UseReviveScrollAsync(scroll);
+        var message = await ReadScrollAsync(session, 8000);
+        var reject = message?.ScrollRejected;
+        return Report(reject?.Reason == "upstream_off" && message!.ScrollUsed is null,
+            $"case=p15c6_scroll_off reason={reject?.Reason} hp_after={reject?.HpAfter}");
     }
 
     static int Report(bool ok, string line)

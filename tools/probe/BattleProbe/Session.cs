@@ -113,6 +113,16 @@ internal sealed class Session : IAsyncDisposable
             Talisman = new UseTalismanRequest { ItemId = itemId, ClientTimeMs = NowMs() },
         });
 
+    /// <summary>
+    /// 用一张复活卷轴。请求里也没有目标编号——方案 12.1 写定只拉起自己，
+    /// 客户端连「想拉谁」都表达不了。
+    /// </summary>
+    public Task UseReviveScrollAsync(string itemId) =>
+        SendAsync(new ClientMessage
+        {
+            Scroll = new UseReviveScrollRequest { ItemId = itemId, ClientTimeMs = NowMs() },
+        });
+
     public static long NowMs() => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
     async Task SendAsync(ClientMessage message)

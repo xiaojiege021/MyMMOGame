@@ -62,43 +62,56 @@ namespace Mmo.Proto.Battle {
             "KAQSDwoHY2xlYXJlZBgCIAEoCBIVCg1zZXR0bGVtZW50X2lkGAMgASgJEhAK",
             "CGV4cF9nYWluGAQgASgDIjgKDU1lbWJlclVwZGF0ZWQSJwoGbWVtYmVyGAEg",
             "ASgLMhcubW1vLmJhdHRsZS5QYXJ0eU1lbWJlciIuCglCb3NzUGhhc2USEwoL",
-            "cGhhc2VfaW5kZXgYASABKAUSDAoEbmFtZRgCIAEoCSLRAQoNQ2xpZW50TWVz",
+            "cGhhc2VfaW5kZXgYASABKAUSDAoEbmFtZRgCIAEoCSKHAgoNQ2xpZW50TWVz",
             "c2FnZRIpCgVza2lsbBgBIAEoCzIYLm1tby5iYXR0bGUuU2tpbGxSZXF1ZXN0",
             "SAASMAoGY2FuY2VsGAIgASgLMh4ubW1vLmJhdHRsZS5Ta2lsbENhbmNlbFJl",
             "cXVlc3RIABInCgRtb3ZlGAMgASgLMhcubW1vLmJhdHRsZS5Nb3ZlUmVxdWVz",
             "dEgAEjIKCHRhbGlzbWFuGAQgASgLMh4ubW1vLmJhdHRsZS5Vc2VUYWxpc21h",
-            "blJlcXVlc3RIAEIGCgRib2R5IqUECg1TZXJ2ZXJNZXNzYWdlEioKBm9wZW5l",
-            "ZBgBIAEoCzIYLm1tby5iYXR0bGUuQmF0dGxlT3BlbmVkSAASKQoGcmVzdWx0",
-            "GAIgASgLMhcubW1vLmJhdHRsZS5Ta2lsbFJlc3VsdEgAEi0KCHJlamVjdGVk",
-            "GAMgASgLMhkubW1vLmJhdHRsZS5Ta2lsbFJlamVjdGVkSAASLwoJY2FuY2Vs",
-            "bGVkGAQgASgLMhoubW1vLmJhdHRsZS5Ta2lsbENhbmNlbGxlZEgAEigKBWVu",
-            "ZGVkGAUgASgLMhcubW1vLmJhdHRsZS5CYXR0bGVFbmRlZEgAEiYKBW1vdmVk",
-            "GAYgASgLMhUubW1vLmJhdHRsZS5Nb3ZlU3RhdGVIABIzCg5tZW1iZXJfdXBk",
-            "YXRlZBgHIAEoCzIZLm1tby5iYXR0bGUuTWVtYmVyVXBkYXRlZEgAEisKCmJv",
-            "c3NfcGhhc2UYCCABKAsyFS5tbW8uYmF0dGxlLkJvc3NQaGFzZUgAEjMKDmVu",
-            "dGVyX3JlamVjdGVkGAkgASgLMhkubW1vLmJhdHRsZS5FbnRlclJlamVjdGVk",
-            "SAASMQoNdGFsaXNtYW5fdXNlZBgKIAEoCzIYLm1tby5iYXR0bGUuVGFsaXNt",
-            "YW5Vc2VkSAASOQoRdGFsaXNtYW5fcmVqZWN0ZWQYCyABKAsyHC5tbW8uYmF0",
-            "dGxlLlRhbGlzbWFuUmVqZWN0ZWRIAEIGCgRib2R5IlMKDUVudGVyUmVqZWN0",
-            "ZWQSDgoGcmVhc29uGAEgASgJEg0KBWxpbWl0GAIgASgNEg8KB2N1cnJlbnQY",
-            "AyABKA0SEgoKZHVuZ2Vvbl9pZBgEIAEoCSI9ChJVc2VUYWxpc21hblJlcXVl",
-            "c3QSDwoHaXRlbV9pZBgBIAEoCRIWCg5jbGllbnRfdGltZV9tcxgCIAEoAyLg",
-            "AQoMVGFsaXNtYW5Vc2VkEhEKCWNhc3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lk",
-            "GAIgASgJEg4KBmhlYWxlZBgDIAEoAxIQCghocF9hZnRlchgEIAEoAxITCgtj",
-            "b29sZG93bl9tcxgFIAEoDRIWCg5jb29sZG93bl9ncm91cBgGIAEoCRISCgpj",
-            "b3VudF9sZWZ0GAcgASgDEgwKBHBvb2wYCCABKAkSEAoIcmVzdG9yZWQYCSAB",
-            "KAMSEgoKbWFuYV9hZnRlchgKIAEoAxIVCg1tYW5hX3Jlc3RvcmVkGAsgASgD",
-            "InEKEFRhbGlzbWFuUmVqZWN0ZWQSDwoHaXRlbV9pZBgBIAEoCRIOCgZyZWFz",
-            "b24YAiABKAkSFgoOcmV0cnlfYWZ0ZXJfbXMYAyABKA0SEAoIaHBfYWZ0ZXIY",
-            "BCABKAMSEgoKbWFuYV9hZnRlchgFIAEoAyrTAgoRU2tpbGxSZWplY3RSZWFz",
-            "b24SHAoYU0tJTExfUkVKRUNUX1VOU1BFQ0lGSUVEEAASHgoaU0tJTExfUkVK",
-            "RUNUX05PVF9JTl9CQVRUTEUQARIeChpTS0lMTF9SRUpFQ1RfVU5LTk9XTl9T",
-            "S0lMTBACEhwKGFNLSUxMX1JFSkVDVF9UQVJHRVRfR09ORRADEhwKGFNLSUxM",
-            "X1JFSkVDVF9DQVNURVJfREVBRBAEEhkKFVNLSUxMX1JFSkVDVF9DT09MRE9X",
-            "ThAFEh0KGVNLSUxMX1JFSkVDVF9PVVRfT0ZfUkFOR0UQBhIYChRTS0lMTF9S",
-            "RUpFQ1RfQ0FTVElORxAHEhkKFVNLSUxMX1JFSkVDVF9SRUNPVkVSWRAIEhgK",
-            "FFNLSUxMX1JFSkVDVF9OT19NQU5BEAkSGwoXU0tJTExfUkVKRUNUX0JBRF9U",
-            "QVJHRVQQCkITqgIQTW1vLlByb3RvLkJhdHRsZWIGcHJvdG8z"));
+            "blJlcXVlc3RIABI0CgZzY3JvbGwYBSABKAsyIi5tbW8uYmF0dGxlLlVzZVJl",
+            "dml2ZVNjcm9sbFJlcXVlc3RIAEIGCgRib2R5IpcFCg1TZXJ2ZXJNZXNzYWdl",
+            "EioKBm9wZW5lZBgBIAEoCzIYLm1tby5iYXR0bGUuQmF0dGxlT3BlbmVkSAAS",
+            "KQoGcmVzdWx0GAIgASgLMhcubW1vLmJhdHRsZS5Ta2lsbFJlc3VsdEgAEi0K",
+            "CHJlamVjdGVkGAMgASgLMhkubW1vLmJhdHRsZS5Ta2lsbFJlamVjdGVkSAAS",
+            "LwoJY2FuY2VsbGVkGAQgASgLMhoubW1vLmJhdHRsZS5Ta2lsbENhbmNlbGxl",
+            "ZEgAEigKBWVuZGVkGAUgASgLMhcubW1vLmJhdHRsZS5CYXR0bGVFbmRlZEgA",
+            "EiYKBW1vdmVkGAYgASgLMhUubW1vLmJhdHRsZS5Nb3ZlU3RhdGVIABIzCg5t",
+            "ZW1iZXJfdXBkYXRlZBgHIAEoCzIZLm1tby5iYXR0bGUuTWVtYmVyVXBkYXRl",
+            "ZEgAEisKCmJvc3NfcGhhc2UYCCABKAsyFS5tbW8uYmF0dGxlLkJvc3NQaGFz",
+            "ZUgAEjMKDmVudGVyX3JlamVjdGVkGAkgASgLMhkubW1vLmJhdHRsZS5FbnRl",
+            "clJlamVjdGVkSAASMQoNdGFsaXNtYW5fdXNlZBgKIAEoCzIYLm1tby5iYXR0",
+            "bGUuVGFsaXNtYW5Vc2VkSAASOQoRdGFsaXNtYW5fcmVqZWN0ZWQYCyABKAsy",
+            "HC5tbW8uYmF0dGxlLlRhbGlzbWFuUmVqZWN0ZWRIABIzCgtzY3JvbGxfdXNl",
+            "ZBgMIAEoCzIcLm1tby5iYXR0bGUuUmV2aXZlU2Nyb2xsVXNlZEgAEjsKD3Nj",
+            "cm9sbF9yZWplY3RlZBgNIAEoCzIgLm1tby5iYXR0bGUuUmV2aXZlU2Nyb2xs",
+            "UmVqZWN0ZWRIAEIGCgRib2R5IlMKDUVudGVyUmVqZWN0ZWQSDgoGcmVhc29u",
+            "GAEgASgJEg0KBWxpbWl0GAIgASgNEg8KB2N1cnJlbnQYAyABKA0SEgoKZHVu",
+            "Z2Vvbl9pZBgEIAEoCSI9ChJVc2VUYWxpc21hblJlcXVlc3QSDwoHaXRlbV9p",
+            "ZBgBIAEoCRIWCg5jbGllbnRfdGltZV9tcxgCIAEoAyLgAQoMVGFsaXNtYW5V",
+            "c2VkEhEKCWNhc3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJEg4KBmhl",
+            "YWxlZBgDIAEoAxIQCghocF9hZnRlchgEIAEoAxITCgtjb29sZG93bl9tcxgF",
+            "IAEoDRIWCg5jb29sZG93bl9ncm91cBgGIAEoCRISCgpjb3VudF9sZWZ0GAcg",
+            "ASgDEgwKBHBvb2wYCCABKAkSEAoIcmVzdG9yZWQYCSABKAMSEgoKbWFuYV9h",
+            "ZnRlchgKIAEoAxIVCg1tYW5hX3Jlc3RvcmVkGAsgASgDInEKEFRhbGlzbWFu",
+            "UmVqZWN0ZWQSDwoHaXRlbV9pZBgBIAEoCRIOCgZyZWFzb24YAiABKAkSFgoO",
+            "cmV0cnlfYWZ0ZXJfbXMYAyABKA0SEAoIaHBfYWZ0ZXIYBCABKAMSEgoKbWFu",
+            "YV9hZnRlchgFIAEoAyJBChZVc2VSZXZpdmVTY3JvbGxSZXF1ZXN0Eg8KB2l0",
+            "ZW1faWQYASABKAkSFgoOY2xpZW50X3RpbWVfbXMYAiABKAMizgEKEFJldml2",
+            "ZVNjcm9sbFVzZWQSEQoJY2FzdGVyX2lkGAEgASgEEg8KB2l0ZW1faWQYAiAB",
+            "KAkSEAoIaHBfYWZ0ZXIYAyABKAMSEgoKbWFuYV9hZnRlchgEIAEoAxIQCghl",
+            "eHBfY29zdBgFIAEoAxINCgVsZXZlbBgGIAEoAxIRCglleHBfYWZ0ZXIYByAB",
+            "KAMSEwoLY29vbGRvd25fbXMYCCABKA0SEwoLcmVhZHlfYXRfbXMYCSABKAMS",
+            "EgoKY291bnRfbGVmdBgKIAEoAyJ1ChRSZXZpdmVTY3JvbGxSZWplY3RlZBIP",
+            "CgdpdGVtX2lkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIWCg5yZXRyeV9hZnRl",
+            "cl9tcxgDIAEoDRIQCghocF9hZnRlchgEIAEoAxISCgptYW5hX2FmdGVyGAUg",
+            "ASgDKtMCChFTa2lsbFJlamVjdFJlYXNvbhIcChhTS0lMTF9SRUpFQ1RfVU5T",
+            "UEVDSUZJRUQQABIeChpTS0lMTF9SRUpFQ1RfTk9UX0lOX0JBVFRMRRABEh4K",
+            "GlNLSUxMX1JFSkVDVF9VTktOT1dOX1NLSUxMEAISHAoYU0tJTExfUkVKRUNU",
+            "X1RBUkdFVF9HT05FEAMSHAoYU0tJTExfUkVKRUNUX0NBU1RFUl9ERUFEEAQS",
+            "GQoVU0tJTExfUkVKRUNUX0NPT0xET1dOEAUSHQoZU0tJTExfUkVKRUNUX09V",
+            "VF9PRl9SQU5HRRAGEhgKFFNLSUxMX1JFSkVDVF9DQVNUSU5HEAcSGQoVU0tJ",
+            "TExfUkVKRUNUX1JFQ09WRVJZEAgSGAoUU0tJTExfUkVKRUNUX05PX01BTkEQ",
+            "CRIbChdTS0lMTF9SRUpFQ1RfQkFEX1RBUkdFVBAKQhOqAhBNbW8uUHJvdG8u",
+            "QmF0dGxlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Battle.SkillRejectReason), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -116,12 +129,15 @@ namespace Mmo.Proto.Battle {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BattleEnded), global::Mmo.Proto.Battle.BattleEnded.Parser, new[]{ "SessionId", "Cleared", "SettlementId", "ExpGain" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.MemberUpdated), global::Mmo.Proto.Battle.MemberUpdated.Parser, new[]{ "Member" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BossPhase), global::Mmo.Proto.Battle.BossPhase.Parser, new[]{ "PhaseIndex", "Name" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ClientMessage), global::Mmo.Proto.Battle.ClientMessage.Parser, new[]{ "Skill", "Cancel", "Move", "Talisman" }, new[]{ "Body" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected", "TalismanUsed", "TalismanRejected" }, new[]{ "Body" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ClientMessage), global::Mmo.Proto.Battle.ClientMessage.Parser, new[]{ "Skill", "Cancel", "Move", "Talisman", "Scroll" }, new[]{ "Body" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected", "TalismanUsed", "TalismanRejected", "ScrollUsed", "ScrollRejected" }, new[]{ "Body" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.EnterRejected), global::Mmo.Proto.Battle.EnterRejected.Parser, new[]{ "Reason", "Limit", "Current", "DungeonId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.UseTalismanRequest), global::Mmo.Proto.Battle.UseTalismanRequest.Parser, new[]{ "ItemId", "ClientTimeMs" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanUsed), global::Mmo.Proto.Battle.TalismanUsed.Parser, new[]{ "CasterId", "ItemId", "Healed", "HpAfter", "CooldownMs", "CooldownGroup", "CountLeft", "Pool", "Restored", "ManaAfter", "ManaRestored" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanRejected), global::Mmo.Proto.Battle.TalismanRejected.Parser, new[]{ "ItemId", "Reason", "RetryAfterMs", "HpAfter", "ManaAfter" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanRejected), global::Mmo.Proto.Battle.TalismanRejected.Parser, new[]{ "ItemId", "Reason", "RetryAfterMs", "HpAfter", "ManaAfter" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.UseReviveScrollRequest), global::Mmo.Proto.Battle.UseReviveScrollRequest.Parser, new[]{ "ItemId", "ClientTimeMs" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ReviveScrollUsed), global::Mmo.Proto.Battle.ReviveScrollUsed.Parser, new[]{ "CasterId", "ItemId", "HpAfter", "ManaAfter", "ExpCost", "Level", "ExpAfter", "CooldownMs", "ReadyAtMs", "CountLeft" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ReviveScrollRejected), global::Mmo.Proto.Battle.ReviveScrollRejected.Parser, new[]{ "ItemId", "Reason", "RetryAfterMs", "HpAfter", "ManaAfter" }, null, null, null, null)
           }));
     }
     #endregion
@@ -5249,6 +5265,9 @@ namespace Mmo.Proto.Battle {
         case BodyOneofCase.Talisman:
           Talisman = other.Talisman.Clone();
           break;
+        case BodyOneofCase.Scroll:
+          Scroll = other.Scroll.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -5312,6 +5331,22 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "scroll" field.</summary>
+    public const int ScrollFieldNumber = 5;
+    /// <summary>
+    /// P1-5c6：用一张复活卷轴。同样没有目标编号——方案 12.1 写定「只拉起自己，
+    /// 不能拉队友」，这条协议表达不出「拉别人」；拉队友只能走牧师的生息。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.UseReviveScrollRequest Scroll {
+      get { return bodyCase_ == BodyOneofCase.Scroll ? (global::Mmo.Proto.Battle.UseReviveScrollRequest) body_ : null; }
+      set {
+        body_ = value;
+        bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.Scroll;
+      }
+    }
+
     private object body_;
     /// <summary>Enum of possible cases for the "body" oneof.</summary>
     public enum BodyOneofCase {
@@ -5320,6 +5355,7 @@ namespace Mmo.Proto.Battle {
       Cancel = 2,
       Move = 3,
       Talisman = 4,
+      Scroll = 5,
     }
     private BodyOneofCase bodyCase_ = BodyOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5354,6 +5390,7 @@ namespace Mmo.Proto.Battle {
       if (!object.Equals(Cancel, other.Cancel)) return false;
       if (!object.Equals(Move, other.Move)) return false;
       if (!object.Equals(Talisman, other.Talisman)) return false;
+      if (!object.Equals(Scroll, other.Scroll)) return false;
       if (BodyCase != other.BodyCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -5366,6 +5403,7 @@ namespace Mmo.Proto.Battle {
       if (bodyCase_ == BodyOneofCase.Cancel) hash ^= Cancel.GetHashCode();
       if (bodyCase_ == BodyOneofCase.Move) hash ^= Move.GetHashCode();
       if (bodyCase_ == BodyOneofCase.Talisman) hash ^= Talisman.GetHashCode();
+      if (bodyCase_ == BodyOneofCase.Scroll) hash ^= Scroll.GetHashCode();
       hash ^= (int) bodyCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -5401,6 +5439,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(34);
         output.WriteMessage(Talisman);
       }
+      if (bodyCase_ == BodyOneofCase.Scroll) {
+        output.WriteRawTag(42);
+        output.WriteMessage(Scroll);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -5427,6 +5469,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(34);
         output.WriteMessage(Talisman);
       }
+      if (bodyCase_ == BodyOneofCase.Scroll) {
+        output.WriteRawTag(42);
+        output.WriteMessage(Scroll);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -5448,6 +5494,9 @@ namespace Mmo.Proto.Battle {
       }
       if (bodyCase_ == BodyOneofCase.Talisman) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Talisman);
+      }
+      if (bodyCase_ == BodyOneofCase.Scroll) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Scroll);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -5485,6 +5534,12 @@ namespace Mmo.Proto.Battle {
             Talisman = new global::Mmo.Proto.Battle.UseTalismanRequest();
           }
           Talisman.MergeFrom(other.Talisman);
+          break;
+        case BodyOneofCase.Scroll:
+          if (Scroll == null) {
+            Scroll = new global::Mmo.Proto.Battle.UseReviveScrollRequest();
+          }
+          Scroll.MergeFrom(other.Scroll);
           break;
       }
 
@@ -5543,6 +5598,15 @@ namespace Mmo.Proto.Battle {
             Talisman = subBuilder;
             break;
           }
+          case 42: {
+            global::Mmo.Proto.Battle.UseReviveScrollRequest subBuilder = new global::Mmo.Proto.Battle.UseReviveScrollRequest();
+            if (bodyCase_ == BodyOneofCase.Scroll) {
+              subBuilder.MergeFrom(Scroll);
+            }
+            input.ReadMessage(subBuilder);
+            Scroll = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -5596,6 +5660,15 @@ namespace Mmo.Proto.Battle {
             }
             input.ReadMessage(subBuilder);
             Talisman = subBuilder;
+            break;
+          }
+          case 42: {
+            global::Mmo.Proto.Battle.UseReviveScrollRequest subBuilder = new global::Mmo.Proto.Battle.UseReviveScrollRequest();
+            if (bodyCase_ == BodyOneofCase.Scroll) {
+              subBuilder.MergeFrom(Scroll);
+            }
+            input.ReadMessage(subBuilder);
+            Scroll = subBuilder;
             break;
           }
         }
@@ -5673,6 +5746,12 @@ namespace Mmo.Proto.Battle {
           break;
         case BodyOneofCase.TalismanRejected:
           TalismanRejected = other.TalismanRejected.Clone();
+          break;
+        case BodyOneofCase.ScrollUsed:
+          ScrollUsed = other.ScrollUsed.Clone();
+          break;
+        case BodyOneofCase.ScrollRejected:
+          ScrollRejected = other.ScrollRejected.Clone();
           break;
       }
 
@@ -5826,6 +5905,36 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "scroll_used" field.</summary>
+    public const int ScrollUsedFieldNumber = 12;
+    /// <summary>
+    /// P1-5c6：用掉了一张复活卷轴。只回给本人，不广播。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.ReviveScrollUsed ScrollUsed {
+      get { return bodyCase_ == BodyOneofCase.ScrollUsed ? (global::Mmo.Proto.Battle.ReviveScrollUsed) body_ : null; }
+      set {
+        body_ = value;
+        bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.ScrollUsed;
+      }
+    }
+
+    /// <summary>Field number for the "scroll_rejected" field.</summary>
+    public const int ScrollRejectedFieldNumber = 13;
+    /// <summary>
+    /// 卷轴没用成。不扣卷轴、不扣经验、不写冷却，也不改生命与蓝量。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.ReviveScrollRejected ScrollRejected {
+      get { return bodyCase_ == BodyOneofCase.ScrollRejected ? (global::Mmo.Proto.Battle.ReviveScrollRejected) body_ : null; }
+      set {
+        body_ = value;
+        bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.ScrollRejected;
+      }
+    }
+
     private object body_;
     /// <summary>Enum of possible cases for the "body" oneof.</summary>
     public enum BodyOneofCase {
@@ -5841,6 +5950,8 @@ namespace Mmo.Proto.Battle {
       EnterRejected = 9,
       TalismanUsed = 10,
       TalismanRejected = 11,
+      ScrollUsed = 12,
+      ScrollRejected = 13,
     }
     private BodyOneofCase bodyCase_ = BodyOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5882,6 +5993,8 @@ namespace Mmo.Proto.Battle {
       if (!object.Equals(EnterRejected, other.EnterRejected)) return false;
       if (!object.Equals(TalismanUsed, other.TalismanUsed)) return false;
       if (!object.Equals(TalismanRejected, other.TalismanRejected)) return false;
+      if (!object.Equals(ScrollUsed, other.ScrollUsed)) return false;
+      if (!object.Equals(ScrollRejected, other.ScrollRejected)) return false;
       if (BodyCase != other.BodyCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -5901,6 +6014,8 @@ namespace Mmo.Proto.Battle {
       if (bodyCase_ == BodyOneofCase.EnterRejected) hash ^= EnterRejected.GetHashCode();
       if (bodyCase_ == BodyOneofCase.TalismanUsed) hash ^= TalismanUsed.GetHashCode();
       if (bodyCase_ == BodyOneofCase.TalismanRejected) hash ^= TalismanRejected.GetHashCode();
+      if (bodyCase_ == BodyOneofCase.ScrollUsed) hash ^= ScrollUsed.GetHashCode();
+      if (bodyCase_ == BodyOneofCase.ScrollRejected) hash ^= ScrollRejected.GetHashCode();
       hash ^= (int) bodyCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -5964,6 +6079,14 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(90);
         output.WriteMessage(TalismanRejected);
       }
+      if (bodyCase_ == BodyOneofCase.ScrollUsed) {
+        output.WriteRawTag(98);
+        output.WriteMessage(ScrollUsed);
+      }
+      if (bodyCase_ == BodyOneofCase.ScrollRejected) {
+        output.WriteRawTag(106);
+        output.WriteMessage(ScrollRejected);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -6018,6 +6141,14 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(90);
         output.WriteMessage(TalismanRejected);
       }
+      if (bodyCase_ == BodyOneofCase.ScrollUsed) {
+        output.WriteRawTag(98);
+        output.WriteMessage(ScrollUsed);
+      }
+      if (bodyCase_ == BodyOneofCase.ScrollRejected) {
+        output.WriteRawTag(106);
+        output.WriteMessage(ScrollRejected);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -6060,6 +6191,12 @@ namespace Mmo.Proto.Battle {
       }
       if (bodyCase_ == BodyOneofCase.TalismanRejected) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(TalismanRejected);
+      }
+      if (bodyCase_ == BodyOneofCase.ScrollUsed) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ScrollUsed);
+      }
+      if (bodyCase_ == BodyOneofCase.ScrollRejected) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ScrollRejected);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -6139,6 +6276,18 @@ namespace Mmo.Proto.Battle {
             TalismanRejected = new global::Mmo.Proto.Battle.TalismanRejected();
           }
           TalismanRejected.MergeFrom(other.TalismanRejected);
+          break;
+        case BodyOneofCase.ScrollUsed:
+          if (ScrollUsed == null) {
+            ScrollUsed = new global::Mmo.Proto.Battle.ReviveScrollUsed();
+          }
+          ScrollUsed.MergeFrom(other.ScrollUsed);
+          break;
+        case BodyOneofCase.ScrollRejected:
+          if (ScrollRejected == null) {
+            ScrollRejected = new global::Mmo.Proto.Battle.ReviveScrollRejected();
+          }
+          ScrollRejected.MergeFrom(other.ScrollRejected);
           break;
       }
 
@@ -6260,6 +6409,24 @@ namespace Mmo.Proto.Battle {
             TalismanRejected = subBuilder;
             break;
           }
+          case 98: {
+            global::Mmo.Proto.Battle.ReviveScrollUsed subBuilder = new global::Mmo.Proto.Battle.ReviveScrollUsed();
+            if (bodyCase_ == BodyOneofCase.ScrollUsed) {
+              subBuilder.MergeFrom(ScrollUsed);
+            }
+            input.ReadMessage(subBuilder);
+            ScrollUsed = subBuilder;
+            break;
+          }
+          case 106: {
+            global::Mmo.Proto.Battle.ReviveScrollRejected subBuilder = new global::Mmo.Proto.Battle.ReviveScrollRejected();
+            if (bodyCase_ == BodyOneofCase.ScrollRejected) {
+              subBuilder.MergeFrom(ScrollRejected);
+            }
+            input.ReadMessage(subBuilder);
+            ScrollRejected = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -6376,6 +6543,24 @@ namespace Mmo.Proto.Battle {
             }
             input.ReadMessage(subBuilder);
             TalismanRejected = subBuilder;
+            break;
+          }
+          case 98: {
+            global::Mmo.Proto.Battle.ReviveScrollUsed subBuilder = new global::Mmo.Proto.Battle.ReviveScrollUsed();
+            if (bodyCase_ == BodyOneofCase.ScrollUsed) {
+              subBuilder.MergeFrom(ScrollUsed);
+            }
+            input.ReadMessage(subBuilder);
+            ScrollUsed = subBuilder;
+            break;
+          }
+          case 106: {
+            global::Mmo.Proto.Battle.ReviveScrollRejected subBuilder = new global::Mmo.Proto.Battle.ReviveScrollRejected();
+            if (bodyCase_ == BodyOneofCase.ScrollRejected) {
+              subBuilder.MergeFrom(ScrollRejected);
+            }
+            input.ReadMessage(subBuilder);
+            ScrollRejected = subBuilder;
             break;
           }
         }
@@ -7793,6 +7978,1143 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(TalismanRejected other) {
+      if (other == null) {
+        return;
+      }
+      if (other.ItemId.Length != 0) {
+        ItemId = other.ItemId;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.RetryAfterMs != 0) {
+        RetryAfterMs = other.RetryAfterMs;
+      }
+      if (other.HpAfter != 0L) {
+        HpAfter = other.HpAfter;
+      }
+      if (other.ManaAfter != 0L) {
+        ManaAfter = other.ManaAfter;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            RetryAfterMs = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            HpAfter = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            ManaAfter = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            RetryAfterMs = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            HpAfter = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            ManaAfter = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// P1-5c6：在战斗里用掉一张复活卷轴。请求里只有物品编号与客户端时刻：
+  /// 目标恒是发起者自己（方案 12.1「只拉起自己，不能拉队友」），
+  /// 回复比例、经验比例与冷却都由角色服按配置给，请求里一个服务端数值都没有。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class UseReviveScrollRequest : pb::IMessage<UseReviveScrollRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<UseReviveScrollRequest> _parser = new pb::MessageParser<UseReviveScrollRequest>(() => new UseReviveScrollRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<UseReviveScrollRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[20]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public UseReviveScrollRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public UseReviveScrollRequest(UseReviveScrollRequest other) : this() {
+      itemId_ = other.itemId_;
+      clientTimeMs_ = other.clientTimeMs_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public UseReviveScrollRequest Clone() {
+      return new UseReviveScrollRequest(this);
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 1;
+    private string itemId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "client_time_ms" field.</summary>
+    public const int ClientTimeMsFieldNumber = 2;
+    private long clientTimeMs_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ClientTimeMs {
+      get { return clientTimeMs_; }
+      set {
+        clientTimeMs_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as UseReviveScrollRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(UseReviveScrollRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (ItemId != other.ItemId) return false;
+      if (ClientTimeMs != other.ClientTimeMs) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
+      if (ClientTimeMs != 0L) hash ^= ClientTimeMs.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ItemId);
+      }
+      if (ClientTimeMs != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(ClientTimeMs);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ItemId);
+      }
+      if (ClientTimeMs != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(ClientTimeMs);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (ItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
+      }
+      if (ClientTimeMs != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ClientTimeMs);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(UseReviveScrollRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.ItemId.Length != 0) {
+        ItemId = other.ItemId;
+      }
+      if (other.ClientTimeMs != 0L) {
+        ClientTimeMs = other.ClientTimeMs;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 16: {
+            ClientTimeMs = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 16: {
+            ClientTimeMs = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 用掉了。hp_after 是一小段生命（不满血），mana_after 与用之前一模一样（不回蓝）。
+  /// exp_cost 是这次扣掉的当前级经验，当前级经验是零时为 0，level 不变。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ReviveScrollUsed : pb::IMessage<ReviveScrollUsed>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ReviveScrollUsed> _parser = new pb::MessageParser<ReviveScrollUsed>(() => new ReviveScrollUsed());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ReviveScrollUsed> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[21]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ReviveScrollUsed() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ReviveScrollUsed(ReviveScrollUsed other) : this() {
+      casterId_ = other.casterId_;
+      itemId_ = other.itemId_;
+      hpAfter_ = other.hpAfter_;
+      manaAfter_ = other.manaAfter_;
+      expCost_ = other.expCost_;
+      level_ = other.level_;
+      expAfter_ = other.expAfter_;
+      cooldownMs_ = other.cooldownMs_;
+      readyAtMs_ = other.readyAtMs_;
+      countLeft_ = other.countLeft_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ReviveScrollUsed Clone() {
+      return new ReviveScrollUsed(this);
+    }
+
+    /// <summary>Field number for the "caster_id" field.</summary>
+    public const int CasterIdFieldNumber = 1;
+    private ulong casterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CasterId {
+      get { return casterId_; }
+      set {
+        casterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 2;
+    private string itemId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "hp_after" field.</summary>
+    public const int HpAfterFieldNumber = 3;
+    private long hpAfter_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long HpAfter {
+      get { return hpAfter_; }
+      set {
+        hpAfter_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "mana_after" field.</summary>
+    public const int ManaAfterFieldNumber = 4;
+    private long manaAfter_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ManaAfter {
+      get { return manaAfter_; }
+      set {
+        manaAfter_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "exp_cost" field.</summary>
+    public const int ExpCostFieldNumber = 5;
+    private long expCost_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ExpCost {
+      get { return expCost_; }
+      set {
+        expCost_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "level" field.</summary>
+    public const int LevelFieldNumber = 6;
+    private long level_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Level {
+      get { return level_; }
+      set {
+        level_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "exp_after" field.</summary>
+    public const int ExpAfterFieldNumber = 7;
+    private long expAfter_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ExpAfter {
+      get { return expAfter_; }
+      set {
+        expAfter_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "cooldown_ms" field.</summary>
+    public const int CooldownMsFieldNumber = 8;
+    private uint cooldownMs_;
+    /// <summary>
+    /// 配置里的冷却时长与角色服写进库的到期时刻，给界面回显；跨场保留在角色库。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint CooldownMs {
+      get { return cooldownMs_; }
+      set {
+        cooldownMs_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "ready_at_ms" field.</summary>
+    public const int ReadyAtMsFieldNumber = 9;
+    private long readyAtMs_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ReadyAtMs {
+      get { return readyAtMs_; }
+      set {
+        readyAtMs_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "count_left" field.</summary>
+    public const int CountLeftFieldNumber = 10;
+    private long countLeft_;
+    /// <summary>
+    /// 扣掉之后背包里还剩几张。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long CountLeft {
+      get { return countLeft_; }
+      set {
+        countLeft_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ReviveScrollUsed);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ReviveScrollUsed other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (CasterId != other.CasterId) return false;
+      if (ItemId != other.ItemId) return false;
+      if (HpAfter != other.HpAfter) return false;
+      if (ManaAfter != other.ManaAfter) return false;
+      if (ExpCost != other.ExpCost) return false;
+      if (Level != other.Level) return false;
+      if (ExpAfter != other.ExpAfter) return false;
+      if (CooldownMs != other.CooldownMs) return false;
+      if (ReadyAtMs != other.ReadyAtMs) return false;
+      if (CountLeft != other.CountLeft) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (CasterId != 0UL) hash ^= CasterId.GetHashCode();
+      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
+      if (HpAfter != 0L) hash ^= HpAfter.GetHashCode();
+      if (ManaAfter != 0L) hash ^= ManaAfter.GetHashCode();
+      if (ExpCost != 0L) hash ^= ExpCost.GetHashCode();
+      if (Level != 0L) hash ^= Level.GetHashCode();
+      if (ExpAfter != 0L) hash ^= ExpAfter.GetHashCode();
+      if (CooldownMs != 0) hash ^= CooldownMs.GetHashCode();
+      if (ReadyAtMs != 0L) hash ^= ReadyAtMs.GetHashCode();
+      if (CountLeft != 0L) hash ^= CountLeft.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (CasterId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(CasterId);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(ItemId);
+      }
+      if (HpAfter != 0L) {
+        output.WriteRawTag(24);
+        output.WriteInt64(HpAfter);
+      }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(ManaAfter);
+      }
+      if (ExpCost != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(ExpCost);
+      }
+      if (Level != 0L) {
+        output.WriteRawTag(48);
+        output.WriteInt64(Level);
+      }
+      if (ExpAfter != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(ExpAfter);
+      }
+      if (CooldownMs != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(CooldownMs);
+      }
+      if (ReadyAtMs != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(ReadyAtMs);
+      }
+      if (CountLeft != 0L) {
+        output.WriteRawTag(80);
+        output.WriteInt64(CountLeft);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (CasterId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(CasterId);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(ItemId);
+      }
+      if (HpAfter != 0L) {
+        output.WriteRawTag(24);
+        output.WriteInt64(HpAfter);
+      }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(ManaAfter);
+      }
+      if (ExpCost != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(ExpCost);
+      }
+      if (Level != 0L) {
+        output.WriteRawTag(48);
+        output.WriteInt64(Level);
+      }
+      if (ExpAfter != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(ExpAfter);
+      }
+      if (CooldownMs != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(CooldownMs);
+      }
+      if (ReadyAtMs != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(ReadyAtMs);
+      }
+      if (CountLeft != 0L) {
+        output.WriteRawTag(80);
+        output.WriteInt64(CountLeft);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (CasterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CasterId);
+      }
+      if (ItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
+      }
+      if (HpAfter != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(HpAfter);
+      }
+      if (ManaAfter != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ManaAfter);
+      }
+      if (ExpCost != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ExpCost);
+      }
+      if (Level != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Level);
+      }
+      if (ExpAfter != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ExpAfter);
+      }
+      if (CooldownMs != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(CooldownMs);
+      }
+      if (ReadyAtMs != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ReadyAtMs);
+      }
+      if (CountLeft != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(CountLeft);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ReviveScrollUsed other) {
+      if (other == null) {
+        return;
+      }
+      if (other.CasterId != 0UL) {
+        CasterId = other.CasterId;
+      }
+      if (other.ItemId.Length != 0) {
+        ItemId = other.ItemId;
+      }
+      if (other.HpAfter != 0L) {
+        HpAfter = other.HpAfter;
+      }
+      if (other.ManaAfter != 0L) {
+        ManaAfter = other.ManaAfter;
+      }
+      if (other.ExpCost != 0L) {
+        ExpCost = other.ExpCost;
+      }
+      if (other.Level != 0L) {
+        Level = other.Level;
+      }
+      if (other.ExpAfter != 0L) {
+        ExpAfter = other.ExpAfter;
+      }
+      if (other.CooldownMs != 0) {
+        CooldownMs = other.CooldownMs;
+      }
+      if (other.ReadyAtMs != 0L) {
+        ReadyAtMs = other.ReadyAtMs;
+      }
+      if (other.CountLeft != 0L) {
+        CountLeft = other.CountLeft;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            CasterId = input.ReadUInt64();
+            break;
+          }
+          case 18: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 24: {
+            HpAfter = input.ReadInt64();
+            break;
+          }
+          case 32: {
+            ManaAfter = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            ExpCost = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            Level = input.ReadInt64();
+            break;
+          }
+          case 56: {
+            ExpAfter = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            CooldownMs = input.ReadUInt32();
+            break;
+          }
+          case 72: {
+            ReadyAtMs = input.ReadInt64();
+            break;
+          }
+          case 80: {
+            CountLeft = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            CasterId = input.ReadUInt64();
+            break;
+          }
+          case 18: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 24: {
+            HpAfter = input.ReadInt64();
+            break;
+          }
+          case 32: {
+            ManaAfter = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            ExpCost = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            Level = input.ReadInt64();
+            break;
+          }
+          case 56: {
+            ExpAfter = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            CooldownMs = input.ReadUInt32();
+            break;
+          }
+          case 72: {
+            ReadyAtMs = input.ReadInt64();
+            break;
+          }
+          case 80: {
+            CountLeft = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 卷轴没用成。不改任何人的生命与蓝量，不扣卷轴、不扣经验、不写冷却。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ReviveScrollRejected : pb::IMessage<ReviveScrollRejected>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ReviveScrollRejected> _parser = new pb::MessageParser<ReviveScrollRejected>(() => new ReviveScrollRejected());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ReviveScrollRejected> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[22]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ReviveScrollRejected() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ReviveScrollRejected(ReviveScrollRejected other) : this() {
+      itemId_ = other.itemId_;
+      reason_ = other.reason_;
+      retryAfterMs_ = other.retryAfterMs_;
+      hpAfter_ = other.hpAfter_;
+      manaAfter_ = other.manaAfter_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ReviveScrollRejected Clone() {
+      return new ReviveScrollRejected(this);
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 1;
+    private string itemId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    /// <summary>
+    /// not_in_battle（本场已结算）/ left_battle（人已离开）/ not_down（还活着）/
+    /// cooldown（全局冷却没到）/ not_scroll / no_scroll / upstream_off / server_error
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "retry_after_ms" field.</summary>
+    public const int RetryAfterMsFieldNumber = 3;
+    private uint retryAfterMs_;
+    /// <summary>
+    /// 只有 cooldown 才有意义，其它原因填 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint RetryAfterMs {
+      get { return retryAfterMs_; }
+      set {
+        retryAfterMs_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "hp_after" field.</summary>
+    public const int HpAfterFieldNumber = 4;
+    private long hpAfter_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long HpAfter {
+      get { return hpAfter_; }
+      set {
+        hpAfter_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "mana_after" field.</summary>
+    public const int ManaAfterFieldNumber = 5;
+    private long manaAfter_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ManaAfter {
+      get { return manaAfter_; }
+      set {
+        manaAfter_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ReviveScrollRejected);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ReviveScrollRejected other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (ItemId != other.ItemId) return false;
+      if (Reason != other.Reason) return false;
+      if (RetryAfterMs != other.RetryAfterMs) return false;
+      if (HpAfter != other.HpAfter) return false;
+      if (ManaAfter != other.ManaAfter) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (RetryAfterMs != 0) hash ^= RetryAfterMs.GetHashCode();
+      if (HpAfter != 0L) hash ^= HpAfter.GetHashCode();
+      if (ManaAfter != 0L) hash ^= ManaAfter.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ItemId);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (RetryAfterMs != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(RetryAfterMs);
+      }
+      if (HpAfter != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(HpAfter);
+      }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(ManaAfter);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ItemId);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (RetryAfterMs != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(RetryAfterMs);
+      }
+      if (HpAfter != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(HpAfter);
+      }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(ManaAfter);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (ItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (RetryAfterMs != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(RetryAfterMs);
+      }
+      if (HpAfter != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(HpAfter);
+      }
+      if (ManaAfter != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ManaAfter);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ReviveScrollRejected other) {
       if (other == null) {
         return;
       }

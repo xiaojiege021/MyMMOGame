@@ -28,11 +28,18 @@ public sealed class BattleProcess(string configPath)
         using ITalismanSpend talismans = string.IsNullOrEmpty(config.CharacterUpstream)
             ? new NoTalismanSpend()
             : new GrpcTalismanSpend(config.CharacterUpstream);
+        // P1-5c6：卷轴的背包、当前级经验与全局冷却都在角色服；没配上游就一律拒绝，
+        // 不在本进程里造一张卷轴或记一份「这个人的冷却」。
+        using IReviveScrollUse scrolls = string.IsNullOrEmpty(config.CharacterUpstream)
+            ? new NoReviveScrollUse()
+            : new GrpcReviveScrollUse(config.CharacterUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
         Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
         Console.WriteLine("character_upstream="
             + (config.CharacterUpstream.Length == 0 ? "off" : config.CharacterUpstream));
+        Console.WriteLine("revive_scroll_upstream="
+            + (config.CharacterUpstream.Length == 0 ? "off" : "on"));
         Console.WriteLine("settlement_dir=" + settlements.Dir);
         Console.WriteLine("settlements=" + settlements.Count());
         Console.WriteLine("character_dir=" + characters.Dir);
@@ -46,7 +53,7 @@ public sealed class BattleProcess(string configPath)
 
         try
         {
-            await new BattleServer(config, settlements, characters, expSettlement, talismans)
+            await new BattleServer(config, settlements, characters, expSettlement, talismans, scrolls)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

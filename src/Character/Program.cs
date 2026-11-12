@@ -66,6 +66,15 @@ long shopLedgerOf = 0;
 var talismanList = false;
 string? talismanConfigPath = null;
 long talismanStateOf = 0;
+// P1-5c6 复活卷轴：清单读配置，state 连库读冷却到期、当前级经验与背包张数。
+var scrollList = false;
+string? scrollConfigPath = null;
+// 只给核对用：把职业表指到临时副本，验「拉起血量比例 / 经验比例」的坏配置。
+string? scrollClassesPath = null;
+long scrollStateOf = 0;
+// 只给核对用：把角色库里的卷轴冷却清掉，让一张核对能连着验几个成功场景。
+// 玩法代码不碰这个入口，冷却到期只由 ConsumeReviveScroll 那一笔事务写。
+long scrollResetOf = 0;
 long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
@@ -268,6 +277,25 @@ for (var i = 0; i < args.Length; i++)
         case "--talisman-state" when i + 1 < args.Length:
             long.TryParse(args[++i], out talismanStateOf);
             break;
+        // 只给核对用：把复活卷轴表读出来，不连库也不启动进程。坏表也走这里。
+        case "--revive-scroll-list":
+            scrollList = true;
+            break;
+        case "--revive-scroll-config" when i + 1 < args.Length:
+            scrollConfigPath = args[++i];
+            break;
+        case "--revive-scroll-classes" when i + 1 < args.Length:
+            scrollClassesPath = args[++i];
+            break;
+        // 只给核对用：从库里独立读回冷却到期、当前级经验、等级与背包张数，
+        // 用来证「冷却跨场保留」「当前级经验是零时不扣、不掉级」。
+        case "--revive-scroll-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out scrollStateOf);
+            break;
+        // 只给核对用：清掉这个角色的全局冷却。写库，不进玩法路径。
+        case "--scroll-cooldown-reset" when i + 1 < args.Length:
+            long.TryParse(args[++i], out scrollResetOf);
+            break;
         // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
         // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
         case "--auction-ledger" when i + 3 < args.Length:
@@ -417,9 +445,14 @@ if (shopList)
         var shopEnhance = EnhanceTable.Load(characterConfig.EnhanceTable, shopItems, shopCurrencies);
         // 红符的发货物必须就是 talisman.json 那一个编号，与启动走同一套 Load。
         var shopTalismans = TalismanTable.Load(characterConfig.TalismanTable, shopItems);
+        // P1-5c6：复活卷轴的发货物必须就是 revive_scroll.json 那一个编号，
+        // 同样与启动走同一套 Load（比例从 classes.json 读，不另写一份）。
+        var shopScrolls = ReviveScrollTable.Load(
+            characterConfig.ReviveScrollTable, "config/classes.json",
+            shopItems, shopTalismans);
         var table = ShopTable.Load(
             shopConfigPath ?? characterConfig.ShopTable, shopCurrencies, shopItems, shopEnhance,
-            shopTalismans);
+            shopTalismans, shopScrolls);
         Console.WriteLine("shop_list_state=ok version=" + table.Version
             + " currency=" + table.Currency
             + " items=" + table.Items.Count
@@ -517,6 +550,40 @@ if (talismanList)
     return 0;
 }
 
+// P1-5c6 卷轴表只读核对：与启动共用同一套校验（物品在 items.json 里、是消耗品、
+// 到账即绑、不能和符同编号、冷却为正、两个基础比例合法），不连库也不启动进程。
+// 坏表在这一步就能看出来；临时表用 --revive-scroll-config 指过去。
+if (scrollList)
+{
+    try
+    {
+        var scrollConfig = CharacterConfig.Load(configPath);
+        var scrollItems = ItemTable.Load("config/items.json");
+        var scrollTalismans = TalismanTable.Load(scrollConfig.TalismanTable, scrollItems);
+        var table = ReviveScrollTable.Load(
+            scrollConfigPath ?? scrollConfig.ReviveScrollTable,
+            scrollClassesPath ?? "config/classes.json", scrollItems, scrollTalismans);
+        Console.WriteLine("revive_scroll_list_state=ok version=" + table.Version
+            + " item=" + table.ReviveScroll.ItemId
+            + " name=" + table.ReviveScroll.Name
+            + " cooldown_ms=" + table.ReviveScroll.CooldownMs
+            + " hp_restore_pct=" + table.HpRestorePct
+            + " exp_cost_pct=" + table.ExpCostPct);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
@@ -526,7 +593,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
     || transferStateOf != 0 || transferTxnCount != null
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
-    || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0)
+    || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0
+    || scrollStateOf != 0 || scrollResetOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -547,6 +615,16 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             await using var command = dataSource.CreateCommand(sql);
             await command.ExecuteNonQueryAsync(CancellationToken.None);
             Console.WriteLine("migrate=ok sql=" + sqlPath);
+        }
+
+        if (scrollResetOf != 0)
+        {
+            // 只给核对用：清掉全局冷却，让同一轮能连着验「用掉」「经验为零」等场景。
+            await using var reset = dataSource.CreateCommand(
+                "delete from \"角色\".revive_scroll_cooldown where character_id = $1");
+            reset.Parameters.AddWithValue(scrollResetOf);
+            var rows = await reset.ExecuteNonQueryAsync(CancellationToken.None);
+            Console.WriteLine("scroll_cooldown_reset=ok id=" + scrollResetOf + " rows=" + rows);
         }
 
         if (deleteName != null)
@@ -586,9 +664,13 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 shopCharConfig.EnhanceTable, shopItemsForState, shopCurrencies);
             var shopTalismansForState = TalismanTable.Load(
                 shopCharConfig.TalismanTable, shopItemsForState);
+            // 与启动、--shop-list 走同一套 Load：卷轴发货物必须就是那一个编号。
+            var shopScrollsForState = ReviveScrollTable.Load(
+                shopCharConfig.ReviveScrollTable, "config/classes.json",
+                shopItemsForState, shopTalismansForState);
             var shopTableForState = ShopTable.Load(
                 shopCharConfig.ShopTable, shopCurrencies, shopItemsForState, shopEnhanceForState,
-                shopTalismansForState);
+                shopTalismansForState, shopScrollsForState);
 
             // 券的张数与绑定态都从背包里读出来，不另算。绑定的券不能上架（P1-5a 的 bound_item）。
             var shopInventory = new InventoryRepository(dataSource);
@@ -680,6 +762,35 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " potion_mana_restore=" + (blueForState?.PotionManaRestore ?? 0)
                 + " blue_group=" + (blueForState?.CooldownGroup ?? "-")
                 + " blue_cooldown_ms=" + (blueForState?.CooldownMs ?? 0));
+        }
+
+        if (scrollStateOf != 0)
+        {
+            // P1-5c6：从库里独立读回冷却到期、当前级经验、等级与卷轴张数。
+            // 冷却到期是角色库那一行，不在任何进程内存里；换一场后读到的还是它。
+            var scrollConfigForState = CharacterConfig.Load(configPath);
+            var scrollItemsForState = ItemTable.Load("config/items.json");
+            var scrollTalismansForState = TalismanTable.Load(
+                scrollConfigForState.TalismanTable, scrollItemsForState);
+            var scrollTableForState = ReviveScrollTable.Load(
+                scrollConfigForState.ReviveScrollTable, "config/classes.json",
+                scrollItemsForState, scrollTalismansForState);
+            var scrollRepo = new ReviveScrollRepository(dataSource);
+            var scrollState = await scrollRepo.StateAsync(
+                scrollStateOf, scrollTableForState.ReviveScroll.ItemId, CancellationToken.None);
+            Console.WriteLine("revive_scroll_state=ok id=" + scrollStateOf
+                + " found=" + (scrollState.Found ? "true" : "false")
+                + " item=" + scrollTableForState.ReviveScroll.ItemId
+                + " count=" + scrollState.Count
+                + " bound=" + (scrollState.AllBound ? "true" : "false")
+                + " level=" + scrollState.Level
+                + " exp=" + scrollState.Exp
+                + " cooldown_ms=" + scrollTableForState.ReviveScroll.CooldownMs
+                + " hp_restore_pct=" + scrollTableForState.HpRestorePct
+                + " exp_cost_pct=" + scrollTableForState.ExpCostPct
+                + " ready_at_ms=" + scrollState.ReadyAtMs
+                + " now_ms=" + scrollState.NowMs
+                + " cooling=" + (scrollState.Cooling ? "true" : "false"));
         }
 
         if (levelOf != 0)

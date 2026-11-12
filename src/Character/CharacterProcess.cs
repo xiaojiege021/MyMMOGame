@@ -33,6 +33,7 @@ public sealed class CharacterProcess(string configPath)
         AuctionTable auctionTable;
         ShopTable shopTable;
         TalismanTable talismanTable;
+        ReviveScrollTable scrollTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -58,11 +59,17 @@ public sealed class CharacterProcess(string configPath)
             // 和红药、牧师治疗共用冷却。回复值与上限都在 config/talisman.json，
             // 超了、物品不在表里、没到账即绑，缺一样就起不来。
             talismanTable = TalismanTable.Load(config.TalismanTable, items);
+            // 方案 12.1：复活卷轴只拉起自己，冷却跨场保留。编号与冷却时长在
+            // revive_scroll.json；拉起血量比例与经验比例读同一份 classes.json
+            // （一转基础，生息与卷轴同源，二转减免只给生息），不在这里抄数。
+            scrollTable = ReviveScrollTable.Load(
+                config.ReviveScrollTable, "config/classes.json", items, talismanTable);
             // 方案 12.1 定死十八种可上架种类，商城只收元宝；清单外的编号在购买时拒绝。
             // P1-5c2 起逐种接发货：已接的种类必须指向 items.json 里的真物品，
             // 保护券还必须就是 enhance.json 那一个编号（两处发的是同一种券），
             // 红符必须就是 talisman.json 那一个编号（红符不是红药）。
-            shopTable = ShopTable.Load(config.ShopTable, currencies, items, enhanceTable, talismanTable);
+            shopTable = ShopTable.Load(
+                config.ShopTable, currencies, items, enhanceTable, talismanTable, scrollTable);
         }
         catch (ConfigException ex)
         {
@@ -142,6 +149,13 @@ public sealed class CharacterProcess(string configPath)
             + " potion_mana_restore=" + (talismanTable.BlueTalisman?.PotionManaRestore ?? 0)
             + " blue_group=" + (talismanTable.BlueTalisman?.CooldownGroup ?? "")
             + " blue_cooldown_ms=" + (talismanTable.BlueTalisman?.CooldownMs ?? 0));
+        // 与 --revive-scroll-list 只读入口同形：冷却时长、两个比例改一条，
+        // 重启后这里能直接核对到；冷却到期时刻不在这里，在角色库那一行。
+        Console.WriteLine("revive_scroll_table_version=" + scrollTable.Version
+            + " item=" + scrollTable.ReviveScroll.ItemId
+            + " cooldown_ms=" + scrollTable.ReviveScroll.CooldownMs
+            + " hp_restore_pct=" + scrollTable.HpRestorePct
+            + " exp_cost_pct=" + scrollTable.ExpCostPct);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -169,6 +183,9 @@ public sealed class CharacterProcess(string configPath)
         var ingots = new IngotRepository(dataSource, auctionTable);
         // 红符的扣减：只动背包这一张，生命在战斗进程里，不在这里。
         var talismans = new TalismanRepository(dataSource);
+        // 卷轴的冷却到期、背包张数、当前级经验都从角色库读；写那一笔复用
+        // ExpSettlementRepository（等级经验只从那里写，不另开一条路）。
+        var scrolls = new ReviveScrollRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -188,6 +205,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(currency);
         builder.Services.AddSingleton(grants);
         builder.Services.AddSingleton(talismans);
+        builder.Services.AddSingleton(scrolls);
         builder.Services.AddSingleton(races);
         builder.Services.AddSingleton(branches);
         builder.Services.AddSingleton(classes);
@@ -208,6 +226,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(auctionTable);
         builder.Services.AddSingleton(shopTable);
         builder.Services.AddSingleton(talismanTable);
+        builder.Services.AddSingleton(scrollTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(config);

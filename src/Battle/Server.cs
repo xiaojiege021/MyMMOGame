@@ -47,7 +47,7 @@ sealed class Party
 /// </summary>
 public sealed class BattleServer(
     BattleConfig config, SettlementStore settlements, ICharacterStore characters,
-    IExpSettlement expSettlement, ITalismanSpend talismans)
+    IExpSettlement expSettlement, ITalismanSpend talismans, IReviveScrollUse scrolls)
 {
     /// <summary>20Hz。前摇、冷却、后摇的判定精度都在这个粒度上。</summary>
     const int TickIntervalMs = 50;
@@ -171,7 +171,7 @@ public sealed class BattleServer(
                     Key = partyKey,
                     Encounter = new Encounter(
                         config, settlements, characters, NextSessionId(), partySize,
-                        expSettlement, talismans),
+                        expSettlement, talismans, scrolls),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
                     PartySize = partySize,
@@ -434,6 +434,15 @@ public sealed class BattleServer(
                         socket,
                         send,
                         party.Encounter.UseTalisman(member, inbound.Talisman),
+                        token);
+                    break;
+
+                case ClientMessage.BodyOneofCase.Scroll:
+                    // 卷轴只拉起自己：结果或拒绝都只回给这个人，不广播。
+                    await SendAsync(
+                        socket,
+                        send,
+                        party.Encounter.UseReviveScroll(member, inbound.Scroll),
                         token);
                     break;
             }
