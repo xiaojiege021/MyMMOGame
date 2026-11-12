@@ -83,6 +83,18 @@ string? boosterConfigPath = null;
 long boosterStateOf = 0;
 long boosterResetOf = 0;
 long boosterExpireOf = 0;
+// P1-5c8 解绑道具：list 读配置，quote / state 连库读这一格的绑定年龄与张数。
+// raw-bound-at 只给核对用：把 bound_at 挪到 N 小时前，验「绑定越久张数越少」。
+// 玩法代码不碰这个入口，绑定态只由购买与 UseUnbindItem 改。
+var unbindList = false;
+string? unbindConfigPath = null;
+long unbindQuoteOf = 0;
+int unbindQuoteSlot = 0;
+long unbindStateOf = 0;
+int unbindStateSlot = 0;
+long rawBoundAtOf = 0;
+int rawBoundAtSlot = 0;
+int rawBoundAtHours = 0;
 long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
@@ -324,6 +336,30 @@ for (var i = 0; i < args.Length; i++)
         case "--exp-booster-expire" when i + 1 < args.Length:
             long.TryParse(args[++i], out boosterExpireOf);
             break;
+        // 只给核对用：把解绑道具表读出来，不连库也不启动进程。坏表也走这里。
+        case "--unbind-list":
+            unbindList = true;
+            break;
+        case "--unbind-config" when i + 1 < args.Length:
+            unbindConfigPath = args[++i];
+            break;
+        // 只给核对用：按这一格的绑定时长报「要几张」，不写库。
+        case "--unbind-quote" when i + 2 < args.Length:
+            long.TryParse(args[++i], out unbindQuoteOf);
+            int.TryParse(args[++i], out unbindQuoteSlot);
+            break;
+        // 只给核对用：从库里独立读回这一格的绑定态、绑定时长与解绑道具张数。
+        case "--unbind-state" when i + 2 < args.Length:
+            long.TryParse(args[++i], out unbindStateOf);
+            int.TryParse(args[++i], out unbindStateSlot);
+            break;
+        // 只给核对用：把 bound_at 挪到 N 小时前，验「绑定越久张数越少」。
+        // 只动 bound_at（并保证 bound=true），不动数量与物品编号，不进玩法路径。
+        case "--raw-bound-at" when i + 3 < args.Length:
+            long.TryParse(args[++i], out rawBoundAtOf);
+            int.TryParse(args[++i], out rawBoundAtSlot);
+            int.TryParse(args[++i], out rawBoundAtHours);
+            break;
         // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
         // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
         case "--auction-ledger" when i + 3 < args.Length:
@@ -482,9 +518,12 @@ if (shopList)
         // 同样与启动走同一套 Load。
         var shopBoosters = ExpBoosterTable.Load(
             characterConfig.ExpBoosterTable, shopItems, shopTalismans, shopScrolls);
+        // P1-5c8：解绑道具的发货物必须就是 unbind_item.json 那一个编号。
+        var shopUnbinds = UnbindTable.Load(
+            characterConfig.UnbindTable, shopItems, shopTalismans, shopScrolls, shopBoosters);
         var table = ShopTable.Load(
             shopConfigPath ?? characterConfig.ShopTable, shopCurrencies, shopItems, shopEnhance,
-            shopTalismans, shopScrolls, shopBoosters);
+            shopTalismans, shopScrolls, shopBoosters, shopUnbinds);
         Console.WriteLine("shop_list_state=ok version=" + table.Version
             + " currency=" + table.Currency
             + " items=" + table.Items.Count
@@ -652,6 +691,46 @@ if (boosterList)
     return 0;
 }
 
+// P1-5c8 解绑道具表只读核对：与启动共用同一套校验（物品在 items.json 里、
+// 是消耗品、到账即绑、不与符 / 卷轴 / 经验道具同编号、档位覆盖 0 小时、
+// 张数随时长不增）。不连库也不启动进程；临时表用 --unbind-config 指过去。
+if (unbindList)
+{
+    try
+    {
+        var unbindConfig = CharacterConfig.Load(configPath);
+        var unbindItems = ItemTable.Load("config/items.json");
+        var unbindTalismans = TalismanTable.Load(unbindConfig.TalismanTable, unbindItems);
+        var unbindScrolls = ReviveScrollTable.Load(
+            unbindConfig.ReviveScrollTable, "config/classes.json",
+            unbindItems, unbindTalismans);
+        var unbindBoosters = ExpBoosterTable.Load(
+            unbindConfig.ExpBoosterTable, unbindItems, unbindTalismans, unbindScrolls);
+        var table = UnbindTable.Load(
+            unbindConfigPath ?? unbindConfig.UnbindTable, unbindItems,
+            unbindTalismans, unbindScrolls, unbindBoosters);
+        Console.WriteLine("unbind_list_state=ok version=" + table.Version
+            + " item=" + table.Unbind.ItemId
+            + " name=" + table.Unbind.Name
+            + " tiers=" + table.Unbind.Tiers.Count
+            + " floor=" + table.FloorCost
+            + " tier=" + string.Join(",", table.Unbind.Tiers
+                .Select(t => t.MinBoundHours + "h:" + t.Cost)));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
@@ -663,7 +742,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
     || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0
     || scrollStateOf != 0 || scrollResetOf != 0
-    || boosterStateOf != 0 || boosterResetOf != 0 || boosterExpireOf != 0)
+    || boosterStateOf != 0 || boosterResetOf != 0 || boosterExpireOf != 0
+    || unbindQuoteOf != 0 || unbindStateOf != 0 || rawBoundAtOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -763,9 +843,14 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             var shopBoostersForState = ExpBoosterTable.Load(
                 shopCharConfig.ExpBoosterTable, shopItemsForState,
                 shopTalismansForState, shopScrollsForState);
+            // 与启动、--shop-list 走同一套 Load：解绑道具发货物必须就是那一个编号。
+            var shopUnbindsForState = UnbindTable.Load(
+                shopCharConfig.UnbindTable, shopItemsForState,
+                shopTalismansForState, shopScrollsForState, shopBoostersForState);
             var shopTableForState = ShopTable.Load(
                 shopCharConfig.ShopTable, shopCurrencies, shopItemsForState, shopEnhanceForState,
-                shopTalismansForState, shopScrollsForState, shopBoostersForState);
+                shopTalismansForState, shopScrollsForState, shopBoostersForState,
+                shopUnbindsForState);
 
             // 券的张数与绑定态都从背包里读出来，不另算。绑定的券不能上架（P1-5a 的 bound_item）。
             var shopInventory = new InventoryRepository(dataSource);
@@ -927,6 +1012,75 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " now_ms=" + boosterState.NowMs
                 + " remaining_ms=" + boosterState.RemainingMs
                 + " active=" + (boosterState.Active ? "true" : "false"));
+        }
+
+        if (rawBoundAtOf != 0)
+        {
+            // 只给核对用：把 bound_at 挪到 N 小时前（并保证 bound=true），验年龄档位。
+            // 只动这两列，不动数量与物品编号；玩法代码不调用这个入口。
+            await using var write = dataSource.CreateCommand(
+                "update \"角色\".inventory set bound = true, "
+                + "bound_at = now() - ($3::double precision * interval '1 hour') "
+                + "where character_id = $1 and slot = $2");
+            write.Parameters.AddWithValue(rawBoundAtOf);
+            write.Parameters.AddWithValue((short)rawBoundAtSlot);
+            write.Parameters.AddWithValue(rawBoundAtHours);
+            var rows = await write.ExecuteNonQueryAsync(CancellationToken.None);
+            Console.WriteLine("raw_bound_at=written id=" + rawBoundAtOf
+                + " slot=" + rawBoundAtSlot + " hours=" + rawBoundAtHours + " rows=" + rows);
+        }
+
+        if (unbindQuoteOf != 0 || unbindStateOf != 0)
+        {
+            var unbindConfigForRead = CharacterConfig.Load(configPath);
+            var unbindItemsForRead = ItemTable.Load("config/items.json");
+            var unbindTalismansForRead = TalismanTable.Load(
+                unbindConfigForRead.TalismanTable, unbindItemsForRead);
+            var unbindScrollsForRead = ReviveScrollTable.Load(
+                unbindConfigForRead.ReviveScrollTable, "config/classes.json",
+                unbindItemsForRead, unbindTalismansForRead);
+            var unbindBoostersForRead = ExpBoosterTable.Load(
+                unbindConfigForRead.ExpBoosterTable, unbindItemsForRead,
+                unbindTalismansForRead, unbindScrollsForRead);
+            var unbindTableForRead = UnbindTable.Load(
+                unbindConfigForRead.UnbindTable, unbindItemsForRead,
+                unbindTalismansForRead, unbindScrollsForRead, unbindBoostersForRead);
+            var unbindRepoForRead = new UnbindRepository(
+                dataSource, unbindItemsForRead, unbindTableForRead);
+
+            if (unbindQuoteOf != 0)
+            {
+                // 只读报价：这一格是什么、绑了多久、按配置要几张、背包里现有几张。
+                var quote = await unbindRepoForRead.QuoteAsync(
+                    unbindQuoteOf, unbindQuoteSlot, unbindTableForRead.Unbind.ItemId,
+                    CancellationToken.None);
+                Console.WriteLine("unbind_quote=ok id=" + unbindQuoteOf
+                    + " slot=" + unbindQuoteSlot
+                    + " target=" + quote.TargetItemId
+                    + " bound=" + (quote.Bound ? "true" : "false")
+                    + " age_hours=" + quote.AgeHours
+                    + " cost=" + quote.Cost
+                    + " floor=" + unbindTableForRead.FloorCost
+                    + " floor_hit=" + (quote.FloorHit ? "true" : "false")
+                    + " count=" + quote.UnbindCount
+                    + " reason=" + quote.Reason);
+            }
+
+            if (unbindStateOf != 0)
+            {
+                // 从库里独立读回这一格的绑定态、绑定时长与解绑道具张数。
+                var state = await unbindRepoForRead.QuoteAsync(
+                    unbindStateOf, unbindStateSlot, unbindTableForRead.Unbind.ItemId,
+                    CancellationToken.None);
+                Console.WriteLine("unbind_state=ok id=" + unbindStateOf
+                    + " slot=" + unbindStateSlot
+                    + " target=" + state.TargetItemId
+                    + " bound=" + (state.Bound ? "true" : "false")
+                    + " age_hours=" + state.AgeHours
+                    + " count=" + state.UnbindCount
+                    + " item=" + unbindTableForRead.Unbind.ItemId
+                    + " floor=" + unbindTableForRead.FloorCost);
+            }
         }
 
         if (levelOf != 0)

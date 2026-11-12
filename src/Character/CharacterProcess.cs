@@ -35,6 +35,7 @@ public sealed class CharacterProcess(string configPath)
         TalismanTable talismanTable;
         ReviveScrollTable scrollTable;
         ExpBoosterTable boosterTable;
+        UnbindTable unbindTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -70,13 +71,18 @@ public sealed class CharacterProcess(string configPath)
             // 与符、卷轴的编号不许撞（三种是三种东西）。
             boosterTable = ExpBoosterTable.Load(
                 config.ExpBoosterTable, items, talismanTable, scrollTable);
+            // 方案 12.1：解绑道具购买后绑定，只解开装备；绑定越久张数越少、下限走配置。
+            // 档位与张数在 unbind_item.json；绑定状态仍是 inventory 的 bound / bound_at，
+            // 不在这里另存一份。与符、卷轴、经验道具的编号不许撞（四种是四种东西）。
+            unbindTable = UnbindTable.Load(
+                config.UnbindTable, items, talismanTable, scrollTable, boosterTable);
             // 方案 12.1 定死十八种可上架种类，商城只收元宝；清单外的编号在购买时拒绝。
             // P1-5c2 起逐种接发货：已接的种类必须指向 items.json 里的真物品，
             // 保护券还必须就是 enhance.json 那一个编号（两处发的是同一种券），
             // 红符必须就是 talisman.json 那一个编号（红符不是红药）。
             shopTable = ShopTable.Load(
                 config.ShopTable, currencies, items, enhanceTable, talismanTable,
-                scrollTable, boosterTable);
+                scrollTable, boosterTable, unbindTable);
         }
         catch (ConfigException ex)
         {
@@ -165,6 +171,10 @@ public sealed class CharacterProcess(string configPath)
             + " exp_cost_pct=" + scrollTable.ExpCostPct);
         // 与 --exp-booster-list 只读入口同形：时长、倍率改一条，重启后这里能直接核对到。
         // 到期时刻不在这里，在角色库那一行（--exp-booster-state 读）。
+        Console.WriteLine("unbind_table_version=" + unbindTable.Version
+            + " item=" + unbindTable.Unbind.ItemId
+            + " tiers=" + unbindTable.Unbind.Tiers.Count
+            + " floor=" + unbindTable.FloorCost);
         Console.WriteLine("exp_booster_table_version=" + boosterTable.Version
             + " item=" + boosterTable.ExpBooster.ItemId
             + " duration_ms=" + boosterTable.ExpBooster.DurationMs
@@ -202,6 +212,9 @@ public sealed class CharacterProcess(string configPath)
         // 限时经验道具的到期时刻、背包余量都从角色库读；写那一笔也只在这个
         // Repository。结算那一笔只读「这一刻有没有生效」，不写这张表。
         var boosters = new ExpBoosterRepository(dataSource);
+        // 解绑只改 inventory 的 bound / bound_at，不新建表：这一笔事务也在这个
+        // Repository 里，拒绝路径在扣减之前判完。
+        var unbinds = new UnbindRepository(dataSource, items, unbindTable);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -245,6 +258,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(scrollTable);
         builder.Services.AddSingleton(boosters);
         builder.Services.AddSingleton(boosterTable);
+        builder.Services.AddSingleton(unbinds);
+        builder.Services.AddSingleton(unbindTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(config);

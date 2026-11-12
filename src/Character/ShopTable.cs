@@ -36,10 +36,11 @@ public sealed class ShopTable
     };
 
     // 已经接上发货的种类。P1-5c2 接保护券，P1-5c3 接红符，P1-5c5 接蓝符，
-    // P1-5c6 接复活卷轴，P1-5c7 接限时经验道具；其余种类的发货在后面的卡，
-    // 没接的种类必须把 delivery_item_id 留空，免得清单上看着能买、实际发不出东西。
+    // P1-5c6 接复活卷轴，P1-5c7 接限时经验道具，P1-5c8 接解绑道具；其余种类的发货
+    // 在后面的卡，没接的种类必须把 delivery_item_id 留空，免得清单上看着能买、
+    // 实际发不出东西。
     public static readonly string[] DeliveredKinds =
-        { "protect_ticket", "red_talisman", "blue_talisman", "revive_scroll", "exp_booster" };
+        { "protect_ticket", "red_talisman", "blue_talisman", "revive_scroll", "exp_booster", "unbind_item" };
 
     /// <summary>ProtectItemId 是 enhance.json 里那唯一一种保护券的编号，本表要对得上。</summary>
     public sealed record Item(
@@ -96,7 +97,8 @@ public sealed class ShopTable
         EnhanceTable enhance,
         TalismanTable talismans,
         ReviveScrollTable scrolls,
-        ExpBoosterTable boosters)
+        ExpBoosterTable boosters,
+        UnbindTable unbinds)
     {
         if (!File.Exists(path))
         {
@@ -380,6 +382,38 @@ public sealed class ShopTable
                     if (goods.Bind != BindRule.Always)
                     {
                         throw new ConfigException("shop.json 的限时经验道具发货物必须到账即绑："
+                            + deliveryId);
+                    }
+                }
+                else if (string.Equals(kind, "unbind_item", StringComparison.Ordinal))
+                {
+                    // 方案 12.1：解绑道具购买后绑定，只解开装备；副本、任务、月叠和
+                    // 通行证都不发，商城是唯一来源。发货物只能是 unbind_item.json
+                    // 里那一种编号，别处不许另立——否则「解不开符和卷轴」就靠编号
+                    // 各不相同这一点撑着，编号一混就串。
+                    var unbind = unbinds.Unbind;
+                    if (!string.Equals(deliveryId, unbind.ItemId, StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的解绑道具必须发 "
+                            + "unbind_item.json 的 unbind.item_id（" + unbind.ItemId
+                            + "），不许另立：" + deliveryId);
+                    }
+
+                    if (deliveryCount != 1)
+                    {
+                        throw new ConfigException("shop.json 的解绑道具按张卖，每份数量必须是 1："
+                            + deliveryCount);
+                    }
+
+                    if (!string.Equals(goods.Kind, "consumable", StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的解绑道具发货物必须是 consumable："
+                            + goods.Kind);
+                    }
+
+                    if (goods.Bind != BindRule.Always)
+                    {
+                        throw new ConfigException("shop.json 的解绑道具发货物必须到账即绑："
                             + deliveryId);
                     }
                 }

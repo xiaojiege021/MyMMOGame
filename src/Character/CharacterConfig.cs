@@ -10,7 +10,8 @@ namespace Character;
 public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
-    string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable)
+    string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
+    string UnbindTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -22,6 +23,7 @@ public sealed record CharacterConfig(
     public const string DefaultTalismanTable = "config/talisman.json";
     public const string DefaultReviveScrollTable = "config/revive_scroll.json";
     public const string DefaultExpBoosterTable = "config/exp_booster.json";
+    public const string DefaultUnbindTable = "config/unbind_item.json";
 
     public static CharacterConfig Load(string path)
     {
@@ -134,10 +136,18 @@ public sealed record CharacterConfig(
             throw new ConfigException("exp_booster_table 不能为空");
         }
 
+        // 解绑道具也走同一份配置正本；核对脚本可以指到临时表试坏配置。
+        // 档位与张数都在这份文件里，角色库只存 bound / bound_at，不存张数。
+        var unbindTable = (wire.UnbindTable ?? DefaultUnbindTable).Trim();
+        if (unbindTable.Length == 0)
+        {
+            throw new ConfigException("unbind_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
-            reviveScrollTable, expBoosterTable);
+            reviveScrollTable, expBoosterTable, unbindTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -186,6 +196,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("exp_booster_table")]
         public string? ExpBoosterTable { get; init; }
+
+        [JsonPropertyName("unbind_table")]
+        public string? UnbindTable { get; init; }
     }
 }
 

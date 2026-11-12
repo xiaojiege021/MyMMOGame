@@ -128,6 +128,13 @@
       "kind": "crystal",
       "stack_max": 999,
       "bind": "none"
+    },
+    {
+      "id": "unbind_stone",
+      "name": "解绑石",
+      "kind": "consumable",
+      "stack_max": 20,
+      "bind": "always"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "schema": "shop-table/1",
-  "version": 6,
+  "version": 7,
   "currency": "yuanbao",
-  "note": "商城清单唯一正本。种类只许是方案 12.1 表里的十八种；表外种类与 12.1 写定「绝不上架」的种类出现就起不来。标价一律待定：方案正文只写定「只收元宝、直接标价、不做抽卡」，没给数字，所以价格只在这个文件里，代码不写第二套。delivery_item_id / delivery_count 是「买到手变成什么」：还没接发货的种类必须留空、数量 0，不许写假值；接了发货的种类必须填，且那件物品要真在 items.json 里。P1-5c1 只做清单与拒绝；P1-5c2 起逐种接发货：v2 接保护券（方案 9.2 / 12.1 写定商城与通行证发的是同一种券，所以发货物必须就是 enhance.json 的 protect_item_id，不许另立第二种），v3 接红符（发货物必须就是 config/talisman.json 的 red.item_id——方案写定「红符不是红药」，两处不许各写一种编号），v4 接蓝符（发货物必须就是 config/talisman.json 的 blue.item_id——方案写定「蓝符不是蓝药」，凝神丹、回灵丹不从商城来），v5 接复活卷轴（发货物必须就是 config/revive_scroll.json 的 scroll.item_id——方案写定「复活只卖复活卷轴，不另卖复活币」，两处不许各写一种编号），v6 接限时经验道具（发货物必须就是 config/exp_booster.json 的 booster.item_id——方案 12.1 写定副本、任务、月叠和通行证都不发这种道具，商城是唯一来源，两处不许各写一种编号）。",
+  "note": "商城清单唯一正本。种类只许是方案 12.1 表里的十八种；表外种类与 12.1 写定「绝不上架」的种类出现就起不来。标价一律待定：方案正文只写定「只收元宝、直接标价、不做抽卡」，没给数字，所以价格只在这个文件里，代码不写第二套。delivery_item_id / delivery_count 是「买到手变成什么」：还没接发货的种类必须留空、数量 0，不许写假值；接了发货的种类必须填，且那件物品要真在 items.json 里。P1-5c1 只做清单与拒绝；P1-5c2 起逐种接发货：v2 接保护券（方案 9.2 / 12.1 写定商城与通行证发的是同一种券，所以发货物必须就是 enhance.json 的 protect_item_id，不许另立第二种），v3 接红符（发货物必须就是 config/talisman.json 的 red.item_id——方案写定「红符不是红药」，两处不许各写一种编号），v4 接蓝符（发货物必须就是 config/talisman.json 的 blue.item_id——方案写定「蓝符不是蓝药」，凝神丹、回灵丹不从商城来），v5 接复活卷轴（发货物必须就是 config/revive_scroll.json 的 scroll.item_id——方案写定「复活只卖复活卷轴，不另卖复活币」，两处不许各写一种编号），v6 接限时经验道具（发货物必须就是 config/exp_booster.json 的 booster.item_id——方案 12.1 写定副本、任务、月叠和通行证都不发这种道具，商城是唯一来源，两处不许各写一种编号），v7 接解绑道具（发货物必须就是 config/unbind_item.json 的 unbind.item_id——方案 12.1 写定解绑道具购买后绑定、只解开装备，商城是唯一来源，两处不许各写一种编号）。",
   "items": [
     { "id": "shop_outfit_1", "kind": "outfit", "name": "服饰外观", "price_yuanbao": 300, "delivery_item_id": "", "delivery_count": 0, "note": "只改样子；标价待定" },
     { "id": "shop_weapon_skin_1", "kind": "weapon_skin", "name": "武器幻形", "price_yuanbao": 300, "delivery_item_id": "", "delivery_count": 0, "note": "只改样子，不改装备数值；标价待定" },
@@ -16,7 +16,7 @@
     { "id": "shop_red_talisman_1", "kind": "red_talisman", "name": "红符", "price_yuanbao": 15, "delivery_item_id": "talisman_red", "delivery_count": 1, "note": "到账即绑，只回复自己，不复活；标价待定" },
     { "id": "shop_blue_talisman_1", "kind": "blue_talisman", "name": "蓝符", "price_yuanbao": 15, "delivery_item_id": "talisman_blue", "delivery_count": 1, "note": "到账即绑，只回复自己的蓝，不回血不加伤害；标价待定" },
     { "id": "shop_revive_scroll_1", "kind": "revive_scroll", "name": "复活卷轴", "price_yuanbao": 80, "delivery_item_id": "scroll_revive", "delivery_count": 1, "note": "绑定，只拉起自己，冷却跨场保留；标价待定" },
-    { "id": "shop_unbind_item_1", "kind": "unbind_item", "name": "解绑道具", "price_yuanbao": 120, "delivery_item_id": "", "delivery_count": 0, "note": "绑定，只解开装备；标价待定" },
+    { "id": "shop_unbind_item_1", "kind": "unbind_item", "name": "解绑道具", "price_yuanbao": 120, "delivery_item_id": "unbind_stone", "delivery_count": 1, "note": "绑定，只解开装备；标价待定" },
     { "id": "shop_exp_booster_1", "kind": "exp_booster", "name": "限时经验道具", "price_yuanbao": 60, "delivery_item_id": "exp_booster", "delivery_count": 1, "note": "绑定，到点消失，只加经验，倍率不叠；标价待定" },
     { "id": "shop_monthly_bundle_1", "kind": "monthly_bundle", "name": "月叠", "price_yuanbao": 300, "delivery_item_id": "", "delivery_count": 0, "note": "只有传送符与红符；标价待定" },
     { "id": "shop_second_slot_1", "kind": "second_slot", "name": "第二角色栏", "price_yuanbao": 800, "delivery_item_id": "", "delivery_count": 0, "note": "装备等级境界不共享；标价待定" },

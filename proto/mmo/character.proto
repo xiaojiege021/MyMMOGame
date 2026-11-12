@@ -121,6 +121,10 @@ service CharacterService {
   // 把「剩余时间」的到期时刻刷成 now() + 配置时长；库里一个角色最多一行，
   // 再用一张只刷新、不叠倍率。时长与倍率全在配置，请求里带不进来。
   rpc UseExpBooster(UseExpBoosterRequest) returns (UseExpBoosterResponse);
+  // P1-5c8：用掉几张解绑道具，把一件已绑定的装备改成可交易。网关转过来，
+  // 角色服在一笔事务里认装备 / 认已绑、按 now() - bound_at 算年龄、按配置算张数、
+  // 扣掉那几张，再把 inventory 的 bound 改回 false。不新建表、不存第二份状态。
+  rpc UseUnbindItem(UseUnbindItemRequest) returns (UseUnbindItemResponse);
 }
 
 message SettleExpRequest {
@@ -700,4 +704,36 @@ message UseExpBoosterResponse {
   int64 expires_at_ms = 7;
   int64 now_ms = 8;
   bool duplicate = 9;
+}
+
+// P1-5c8：用掉解绑道具。请求里只有标识与格子；张数、档位、绑定年龄全由角色服
+// 从配置与角色库读，客户端一个都带不进来。
+message UseUnbindItemRequest {
+  // 网关转发时填令牌账号；服间可信调用为空，只按角色编号找角色。
+  string account = 1;
+  uint64 character_id = 2;
+  // 要解绑的那一格，不是解绑道具自己那一格。
+  int32 slot = 3;
+  string item_id = 4;
+  // 网关生成的幂等号：同一个号只扣一次，重放整笔不做。
+  string txn_id = 5;
+}
+
+message UseUnbindItemResponse {
+  bool ok = 1;
+  // 空串表示真解开了；not_equipment / not_bound / slot_empty / no_unbind_item /
+  // not_enough_unbind / character_not_found / duplicate 表示整笔没做。
+  string reason = 2;
+  string item_id = 3;
+  int32 slot = 4;
+  // 被解绑的装备编号（事实值）；拒绝时也给，便于核对。
+  string target_item_id = 5;
+  // 这一次实际用掉几张（成功时等于配置算出来的数）；拒绝时为 0。
+  uint32 cost = 6;
+  // 扣掉之后解绑道具还剩几张；拒绝时给当前张数（事实值）。
+  int64 count_left = 7;
+  // 这一格绑了多久（小时，数据库时钟算），只作事实值，判定在角色服那一笔事务里。
+  int64 age_hours = 8;
+  // 是否已经到配置下限（绑得最久那一档）。
+  bool floor_hit = 9;
 }

@@ -175,6 +175,8 @@ except Exception:
 
 # harness_rsync <本地目录> <主机> <远端目录> [额外 rsync 参数...]：
 # 整目录同步到笔记本，去掉 .git/bin/obj/Library/var 这些不该传的。
+# 也去掉 .tools/：里面是按平台放的 protoc 等二进制，跨平台传过去会丢可执行位，
+# 远端 gen-proto 直接「权限不够」，还会假报「生成物和 proto 不一致」。
 harness_rsync() {
   local src="$1" host="$2" dest="$3"
   shift 3
@@ -183,6 +185,7 @@ harness_rsync() {
     --exclude 'bin/' \
     --exclude 'obj/' \
     --exclude 'client/MMOGame/Library/' \
+    --exclude '.tools/' \
     --exclude 'var/' \
     "$@" "$src" "$host:$dest"
 }

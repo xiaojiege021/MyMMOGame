@@ -138,6 +138,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseExpBoosterRequest> __Marshaller_mmo_character_UseExpBoosterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseExpBoosterRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseExpBoosterResponse> __Marshaller_mmo_character_UseExpBoosterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseExpBoosterResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseUnbindItemRequest> __Marshaller_mmo_character_UseUnbindItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseUnbindItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseUnbindItemResponse> __Marshaller_mmo_character_UseUnbindItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseUnbindItemResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -322,6 +326,14 @@ namespace Mmo.Proto.Character {
         "UseExpBooster",
         __Marshaller_mmo_character_UseExpBoosterRequest,
         __Marshaller_mmo_character_UseExpBoosterResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.UseUnbindItemRequest, global::Mmo.Proto.Character.UseUnbindItemResponse> __Method_UseUnbindItem = new grpc::Method<global::Mmo.Proto.Character.UseUnbindItemRequest, global::Mmo.Proto.Character.UseUnbindItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "UseUnbindItem",
+        __Marshaller_mmo_character_UseUnbindItemRequest,
+        __Marshaller_mmo_character_UseUnbindItemResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -620,6 +632,20 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UseExpBoosterResponse> UseExpBooster(global::Mmo.Proto.Character.UseExpBoosterRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P1-5c8：用掉几张解绑道具，把一件已绑定的装备改成可交易。网关转过来，
+      /// 角色服在一笔事务里认装备 / 认已绑、按 now() - bound_at 算年龄、按配置算张数、
+      /// 扣掉那几张，再把 inventory 的 bound 改回 false。不新建表、不存第二份状态。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UseUnbindItemResponse> UseUnbindItem(global::Mmo.Proto.Character.UseUnbindItemRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1809,6 +1835,62 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_UseExpBooster, null, options, request);
       }
+      /// <summary>
+      /// P1-5c8：用掉几张解绑道具，把一件已绑定的装备改成可交易。网关转过来，
+      /// 角色服在一笔事务里认装备 / 认已绑、按 now() - bound_at 算年龄、按配置算张数、
+      /// 扣掉那几张，再把 inventory 的 bound 改回 false。不新建表、不存第二份状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseUnbindItemResponse UseUnbindItem(global::Mmo.Proto.Character.UseUnbindItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseUnbindItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c8：用掉几张解绑道具，把一件已绑定的装备改成可交易。网关转过来，
+      /// 角色服在一笔事务里认装备 / 认已绑、按 now() - bound_at 算年龄、按配置算张数、
+      /// 扣掉那几张，再把 inventory 的 bound 改回 false。不新建表、不存第二份状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseUnbindItemResponse UseUnbindItem(global::Mmo.Proto.Character.UseUnbindItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_UseUnbindItem, null, options, request);
+      }
+      /// <summary>
+      /// P1-5c8：用掉几张解绑道具，把一件已绑定的装备改成可交易。网关转过来，
+      /// 角色服在一笔事务里认装备 / 认已绑、按 now() - bound_at 算年龄、按配置算张数、
+      /// 扣掉那几张，再把 inventory 的 bound 改回 false。不新建表、不存第二份状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseUnbindItemResponse> UseUnbindItemAsync(global::Mmo.Proto.Character.UseUnbindItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseUnbindItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c8：用掉几张解绑道具，把一件已绑定的装备改成可交易。网关转过来，
+      /// 角色服在一笔事务里认装备 / 认已绑、按 now() - bound_at 算年龄、按配置算张数、
+      /// 扣掉那几张，再把 inventory 的 bound 改回 false。不新建表、不存第二份状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseUnbindItemResponse> UseUnbindItemAsync(global::Mmo.Proto.Character.UseUnbindItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_UseUnbindItem, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1845,7 +1927,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_DescribeTalisman, serviceImpl.DescribeTalisman)
           .AddMethod(__Method_DescribeReviveScroll, serviceImpl.DescribeReviveScroll)
           .AddMethod(__Method_ConsumeReviveScroll, serviceImpl.ConsumeReviveScroll)
-          .AddMethod(__Method_UseExpBooster, serviceImpl.UseExpBooster).Build();
+          .AddMethod(__Method_UseExpBooster, serviceImpl.UseExpBooster)
+          .AddMethod(__Method_UseUnbindItem, serviceImpl.UseUnbindItem).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1878,6 +1961,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DescribeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse>(serviceImpl.DescribeReviveScroll));
       serviceBinder.AddMethod(__Method_ConsumeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeReviveScrollRequest, global::Mmo.Proto.Character.ConsumeReviveScrollResponse>(serviceImpl.ConsumeReviveScroll));
       serviceBinder.AddMethod(__Method_UseExpBooster, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseExpBoosterRequest, global::Mmo.Proto.Character.UseExpBoosterResponse>(serviceImpl.UseExpBooster));
+      serviceBinder.AddMethod(__Method_UseUnbindItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseUnbindItemRequest, global::Mmo.Proto.Character.UseUnbindItemResponse>(serviceImpl.UseUnbindItem));
     }
 
   }
