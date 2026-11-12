@@ -59,6 +59,15 @@ namespace HotUpdate.Ui
 
         UiPalette _palette;
 
+        RectTransform _canvasRect;
+
+        // 上一屏的标题与构建回调：分辨率变化要按同一份布局重排，不丢当前屏。
+        string _pageTitle;
+
+        Action<UiShell> _pageBuild;
+
+        float _builtWidth;
+
         readonly List<IUiThemed> _chrome = new List<IUiThemed>();
 
         readonly List<IUiThemed> _page = new List<IUiThemed>();
@@ -143,16 +152,22 @@ namespace HotUpdate.Ui
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             _canvas.sortingOrder = 20;
 
-            // 像素一一对应：画出来的矩形和点击矩形才是同一套坐标。
+            // 按屏高等比缩放：画布高恒为 1600 设计单位，宽跟着宽高比走。
+            // 布局只在 1600 高一档里算，任何分辨率都由这一层统一缩放；
+            // 点选那边用 ToScreen 换回屏幕像素，和 adb input tap 对得上。
             var scaler = GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            scaler.scaleFactor = 1f;
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(UiMetrics.DesignWidth, UiMetrics.DesignHeight);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 1f;
+            _canvasRect = (RectTransform)transform;
 
             _metrics = UiMetrics.Of();
             _palette = UiPalette.Of(UiSkinStore.Load());
 
             BuildChrome();
             ApplySkin();
+            _builtWidth = _metrics.Width;
 
             Debug.Log(ReadyLog + " version=" + Version
                 + " screen=" + (int)_metrics.Width + "x" + (int)_metrics.Height
@@ -212,6 +227,8 @@ namespace HotUpdate.Ui
         public void ShowPage(string title, Action<UiShell> build)
         {
             ClearPage();
+            _pageTitle = title;
+            _pageBuild = build;
             _titleText.text = title;
             _buildingPage = true;
             try
@@ -424,17 +441,39 @@ namespace HotUpdate.Ui
 
         // ------------------------------------------------------------------ 命中
 
+        /// <summary>屏幕像素 → 画布单位（左下原点）。屏幕空间叠加的画布按 scaleFactor 等比缩放。</summary>
+        public Vector2 ToCanvas(Vector2 screenPoint)
+        {
+            var scale = CanvasScale();
+            return screenPoint / scale;
+        }
+
+        /// <summary>全局缩放。编辑模式下画布可能还没渲染过，scaleFactor 还是 0，按 1 算。</summary>
+        float CanvasScale()
+        {
+            var scale = _canvas != null ? _canvas.scaleFactor : 1f;
+            return scale > 0f ? scale : 1f;
+        }
+
+        /// <summary>画布单位 → 屏幕像素。核对与 adb 点选都从这里换算。</summary>
+        public Vector2 ToScreen(Vector2 canvasPoint)
+        {
+            return canvasPoint * CanvasScale();
+        }
+
         /// <summary>这个屏幕点是不是落在界面上。点选那边要跳过这块。</summary>
         public bool HitTest(Vector2 screenPoint)
         {
+            // 点选传进来的是屏幕像素；布局是画布单位，先除全局缩放再比矩形。
+            var point = ToCanvas(screenPoint);
             if (_modalLayer != null && _modalLayer.gameObject.activeSelf)
             {
-                return _modalConfirm.HitRect.Contains(screenPoint) || _modalCancel.HitRect.Contains(screenPoint);
+                return _modalConfirm.HitRect.Contains(point) || _modalCancel.HitRect.Contains(point);
             }
 
             for (var i = 0; i < _pageButtons.Count; i++)
             {
-                if (_pageButtons[i].HitRect.Contains(screenPoint))
+                if (_pageButtons[i].HitRect.Contains(point))
                 {
                     return true;
                 }
@@ -442,7 +481,7 @@ namespace HotUpdate.Ui
 
             for (var i = 0; i < _chromeButtons.Count; i++)
             {
-                if (_chromeButtons[i].HitRect.Contains(screenPoint))
+                if (_chromeButtons[i].HitRect.Contains(point))
                 {
                     return true;
                 }
@@ -455,6 +494,57 @@ namespace HotUpdate.Ui
         {
             TickToast();
             ReadPress();
+            CheckCanvasSize();
+        }
+
+        /// <summary>
+        /// 画布宽度变了（改窗口、换分辨率、旋转）就按新宽度重排一次。
+        /// 高度由 CanvasScaler 恒定为设计基准，宽度跟着宽高比走，所以要重算的是宽度相关的部分。
+        /// </summary>
+        void CheckCanvasSize()
+        {
+            if (_canvasRect == null)
+            {
+                return;
+            }
+
+            var width = UiMetrics.Of().Width;
+            if (width < 1f || Mathf.Abs(width - _builtWidth) < 1f)
+            {
+                return;
+            }
+
+            Rebuild();
+        }
+
+        /// <summary>重建骨架与当前屏。分辨率变化时调用；输入框内容会清空，只在编辑器/旋转时发生。</summary>
+        void Rebuild()
+        {
+            for (var i = transform.childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+            }
+
+            _chrome.Clear();
+            _page.Clear();
+            _chromeButtons.Clear();
+            _pageButtons.Clear();
+
+            _metrics = UiMetrics.Of();
+            BuildChrome();
+            ApplySkin();
+
+            var title = _pageTitle;
+            var build = _pageBuild;
+            _pageBuild = null;
+            if (build != null)
+            {
+                ShowPage(title, build);
+            }
+
+            _builtWidth = UiMetrics.Of().Width;
+            Debug.Log("u1_layout=reflow width=" + (int)_builtWidth
+                + " height=" + (int)_metrics.Height + " page=" + (title ?? ""));
         }
 
         void TickToast()
@@ -489,7 +579,7 @@ namespace HotUpdate.Ui
             }
 
             _wasPressed = true;
-            var point = pointer.position.ReadValue();
+            var point = ToCanvas(pointer.position.ReadValue());
 
             // 弹窗是最上层，开着就只认它。
             if (_modalLayer.gameObject.activeSelf)

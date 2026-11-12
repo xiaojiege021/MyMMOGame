@@ -73,14 +73,15 @@ namespace HotUpdate.Ui
                     continue;
                 }
 
-                var center = rects[i].anchoredPosition + rects[i].sizeDelta * 0.5f;
+                // 布局是画布单位，点选接口吃屏幕像素：先换算再点。
+                var center = shell.ToScreen(rects[i].anchoredPosition + rects[i].sizeDelta * 0.5f);
                 if (shell.HitTest(center))
                 {
                     hitButton = true;
                 }
             }
 
-            Report("hit", hitButton && !shell.HitTest(new Vector2(2f, 2f)));
+            Report("hit", hitButton && !shell.HitTest(shell.ToScreen(new Vector2(2f, 2f))));
 
             shell.ClosePage();
             UiSkinStore.Reset();

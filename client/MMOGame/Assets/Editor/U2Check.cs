@@ -31,7 +31,13 @@ public static class U2Check
         CheckSelf();
 
         Debug.Log("u2_all=" + (failed ? "fail" : "ok"));
-        EditorApplication.Exit(failed ? 1 : 0);
+
+        // 通过就交给批处理的 -quit 收尾；显式 Exit 会卡在这套工程的关闭阶段。
+        // 失败给非 0 退出码，批处理才报红。
+        if (failed)
+        {
+            EditorApplication.Exit(1);
+        }
     }
 
     static void Report(string key, bool ok, string detail)

@@ -16,6 +16,23 @@ public static class U1Check
 
     public static void Run()
     {
+        var ok = CheckAll();
+        EditorApplication.Exit(ok ? 0 : 1);
+    }
+
+    /// <summary>编辑器菜单入口：不退出编辑器，手工核对时用。</summary>
+    [MenuItem("Tools/核对/U1 骨架自检")]
+    static void RunFromMenu()
+    {
+        CheckAll();
+    }
+
+    /// <summary>
+    /// 跑完所有检查并返回是否全过，**不退出编辑器**。
+    /// 批处理走 <see cref="Run"/>；编辑器已经开着的时候用这个，免得把人的窗口关掉。
+    /// </summary>
+    public static bool CheckAll()
+    {
         // Assets -> MMOGame -> client -> 仓库根，要退三层。
         var root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.."));
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
@@ -29,7 +46,7 @@ public static class U1Check
         CheckShell();
 
         Debug.Log("u1_all=" + (failed ? "fail" : "ok"));
-        EditorApplication.Exit(failed ? 1 : 0);
+        return !failed;
     }
 
     static void Report(string key, bool ok, string detail)
