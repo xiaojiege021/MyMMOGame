@@ -135,6 +135,13 @@
       "kind": "consumable",
       "stack_max": 20,
       "bind": "always"
+    },
+    {
+      "id": "teleport_talisman",
+      "name": "传送符",
+      "kind": "consumable",
+      "stack_max": 20,
+      "bind": "always"
     }
   ]
 }
