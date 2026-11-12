@@ -23,9 +23,16 @@ public sealed class BattleProcess(string configPath)
         using IExpSettlement expSettlement = string.IsNullOrEmpty(config.ExpUpstream)
             ? new NoExpSettlement()
             : new GrpcExpSettlement(config.ExpUpstream);
+        // 红符要从背包里扣一张，背包只有角色服能写。没配上游就是本机口径：
+        // 这一场用不了红符（回 upstream_off），不从别的地方变出一张来。
+        using ITalismanSpend talismans = string.IsNullOrEmpty(config.CharacterUpstream)
+            ? new NoTalismanSpend()
+            : new GrpcTalismanSpend(config.CharacterUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
         Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
+        Console.WriteLine("character_upstream="
+            + (config.CharacterUpstream.Length == 0 ? "off" : config.CharacterUpstream));
         Console.WriteLine("settlement_dir=" + settlements.Dir);
         Console.WriteLine("settlements=" + settlements.Count());
         Console.WriteLine("character_dir=" + characters.Dir);
@@ -39,7 +46,8 @@ public sealed class BattleProcess(string configPath)
 
         try
         {
-            await new BattleServer(config, settlements, characters, expSettlement).RunAsync(stopping);
+            await new BattleServer(config, settlements, characters, expSettlement, talismans)
+                .RunAsync(stopping);
         }
         catch (OperationCanceledException)
         {

@@ -35,10 +35,10 @@ public sealed class ShopTable
         "realm_speed", "guild_tech", "territory_bonus",
     };
 
-    // 已经接上发货的种类。P1-5c2 只接保护券这一种——方案 12.1 写定「商城按张卖」，
-    // 其余十七种的发货在后面的卡，没接的种类必须把 delivery_item_id 留空，
-    // 免得清单上看着能买、实际发不出东西。
-    public static readonly string[] DeliveredKinds = { "protect_ticket" };
+    // 已经接上发货的种类。P1-5c2 接保护券，P1-5c3 接红符；其余十六种的发货在
+    // 后面的卡，没接的种类必须把 delivery_item_id 留空，免得清单上看着能买、
+    // 实际发不出东西。
+    public static readonly string[] DeliveredKinds = { "protect_ticket", "red_talisman" };
 
     /// <summary>ProtectItemId 是 enhance.json 里那唯一一种保护券的编号，本表要对得上。</summary>
     public sealed record Item(
@@ -92,7 +92,8 @@ public sealed class ShopTable
         string path,
         CurrencyTable currencies,
         ItemTable itemTable,
-        EnhanceTable enhance)
+        EnhanceTable enhance,
+        TalismanTable talismans)
     {
         if (!File.Exists(path))
         {
@@ -244,6 +245,42 @@ public sealed class ShopTable
                     if (goods.Bind != BindRule.Always)
                     {
                         throw new ConfigException("shop.json 的保护券发货物必须到账即绑："
+                            + deliveryId);
+                    }
+                }
+                else if (string.Equals(kind, "red_talisman", StringComparison.Ordinal))
+                {
+                    // 方案 12.1 写定「红符不是红药」：商城发的是符，回春丹、气血丹
+                    // 仍从采药、炼丹、副本和特殊任务来。所以商城的红符只能发
+                    // talisman.json 里的那一个编号，不许各自写一种。
+                    var red = talismans.RedTalisman;
+                    if (red is null)
+                    {
+                        throw new ConfigException("shop.json 上架了红符，但 talisman.json 没有 red 段");
+                    }
+
+                    if (!string.Equals(deliveryId, red.ItemId, StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的红符必须发 talisman.json 的 "
+                            + "red.item_id（" + red.ItemId + "），不许另立："
+                            + deliveryId);
+                    }
+
+                    if (deliveryCount != 1)
+                    {
+                        throw new ConfigException("shop.json 的红符按张卖，每份数量必须是 1："
+                            + deliveryCount);
+                    }
+
+                    if (!string.Equals(goods.Kind, "consumable", StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的红符发货物必须是 consumable："
+                            + goods.Kind);
+                    }
+
+                    if (goods.Bind != BindRule.Always)
+                    {
+                        throw new ConfigException("shop.json 的红符发货物必须到账即绑："
                             + deliveryId);
                     }
                 }

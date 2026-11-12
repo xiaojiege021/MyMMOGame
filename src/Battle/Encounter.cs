@@ -17,6 +17,12 @@ sealed class PendingCast
     /// <summary>接受这次施法之前的冷却到期时刻。取消要把冷却退回这里。</summary>
     public required long PrevReadyAtMs { get; init; }
 
+    /// <summary>
+    /// 接受这次施法之前的治疗组冷却。只有治疗技能会用到——红符与治疗共用这一组，
+    /// 撤掉一次治疗要把这一组也退回原样，否则取消一次就白占了两千毫秒。
+    /// </summary>
+    public required long PrevHealGroupReadyAtMs { get; init; }
+
     /// <summary>目标。打 Boss 的技能是 Boss 编号，治疗和复活是队友编号。</summary>
     public required ulong TargetId { get; init; }
 }
@@ -40,6 +46,13 @@ public sealed class Member
     internal readonly Dictionary<uint, long> ReadyAtMs = [];
     internal PendingCast? Pending;
     internal long RecoveryUntilMs = long.MinValue;
+
+    /// <summary>
+    /// 治疗组的共用冷却到期时刻。方案 12.1 写定红符和红药、牧师治疗共用冷却——
+    /// 所以这几条不是各记各的：牧师的治疗技能结算会写这里，红符用掉也会写这里，
+    /// 两边提交前都查这里。蓝符是另一组（mana），不并进来。
+    /// </summary>
+    internal long HealGroupReadyAtMs = long.MinValue;
 
     /// <summary>打出去的伤害累计。仇恨里看得见的那部分。</summary>
     internal long DamageDealt;
@@ -69,6 +82,7 @@ public sealed class Encounter
     readonly SettlementStore _settlements;
     readonly ICharacterStore _characters;
     readonly IExpSettlement _expSettlement;
+    readonly ITalismanSpend _talismans;
     readonly Dictionary<ulong, Member> _members = [];
 
     readonly long _bossHpMax;
@@ -78,6 +92,8 @@ public sealed class Encounter
     long _bossHp;
     long _damageTotal;
     int _castCount;
+    // 这一场用掉了第几张符。只用来拼事务号：同一场同一个人第几张，重放不会扣两次。
+    int _talismanUses;
     string _settlementId = "";
     bool _closed;
 
@@ -94,12 +110,13 @@ public sealed class Encounter
     /// </summary>
     public Encounter(
         BattleConfig config, SettlementStore settlements, ICharacterStore characters,
-        ulong sessionId, int partySize, IExpSettlement expSettlement)
+        ulong sessionId, int partySize, IExpSettlement expSettlement, ITalismanSpend talismans)
     {
         _config = config;
         _settlements = settlements;
         _characters = characters;
         _expSettlement = expSettlement;
+        _talismans = talismans;
         SessionId = sessionId;
         _partySize = partySize;
         _bossHpMax = Scale(config.Boss.HpMax, config.Dungeons.MonsterHpScalePerPlayer, partySize);
@@ -263,6 +280,14 @@ public sealed class Encounter
             }
 
             member.ReadyAtMs.TryGetValue(skill.Id, out var readyAt);
+            // 治疗类技能和红符共用一组冷却（方案 12.1）：谁先用了，另一边都要等。
+            // 蓝符是另一组，不并进来，所以这里只看 heal。
+            var healReadyAt = member.HealGroupReadyAtMs;
+            if (skill.Kind == SkillKind.Heal)
+            {
+                readyAt = Math.Max(readyAt, healReadyAt);
+            }
+
             if (now < readyAt)
             {
                 var rejected = Reject(request, SkillRejectReason.SkillRejectCooldown);
@@ -311,12 +336,19 @@ public sealed class Encounter
             // 接受：先占住冷却，再等前摇。冷却从这一次出手算起，从结算算会让
             // 高延迟的人占便宜。取消的时候整段退回去。
             member.ReadyAtMs[skill.Id] = now + skill.CooldownMs;
+            if (skill.Kind == SkillKind.Heal)
+            {
+                // 治疗也占治疗组：红符这一段时间同样用不了。
+                member.HealGroupReadyAtMs = now + skill.CooldownMs;
+            }
+
             member.Pending = new PendingCast
             {
                 Skill = skill,
                 CastTimeMs = request.CastTimeMs,
                 SettleAtMs = now + skill.ForeswingMs,
                 PrevReadyAtMs = readyAt,
+                PrevHealGroupReadyAtMs = healReadyAt,
                 TargetId = request.TargetId,
             };
             return null;
@@ -344,6 +376,11 @@ public sealed class Encounter
 
             member.Pending = null;
             member.ReadyAtMs[pending.Skill.Id] = pending.PrevReadyAtMs;
+            if (pending.Skill.Kind == SkillKind.Heal)
+            {
+                // 撤掉的治疗不占组冷却：这一手没结算出去。
+                member.HealGroupReadyAtMs = pending.PrevHealGroupReadyAtMs;
+            }
             return new SkillCancelled
             {
                 SkillId = request.SkillId,
@@ -411,6 +448,136 @@ public sealed class Encounter
             };
         }
     }
+
+    // ---- 用符 ----
+
+    /// <summary>
+    /// 用一张红符。方案 12.1 的三条边界都落在这里：
+    ///   · 只回复自己——请求里没有目标编号，这里也恒拿 member 自己当目标，
+    ///     队友只能靠牧师的技能治，红符这条路指不过去；
+    ///   · 不复活——倒地（Hp ≤ 0）时直接拒绝，死了就点不了符，也就没有「把自己拉起来」；
+    ///   · 回复不超过同级红药——回复值由角色服按配置给，配置校验里已经卡死上限，
+    ///     这里只按血量上限截断，不自己算第二套数。
+    ///
+    /// 扣符交给角色服（背包只有它能让写），扣不掉就不回血：宁可这一手没做成，
+    /// 也不做「本地凭空变出一张符」或「回了血但符没扣」。
+    /// 和红药、牧师治疗共用治疗组冷却；蓝符是另一组，不走这里。
+    /// </summary>
+    public ServerMessage UseTalisman(Member member, UseTalismanRequest request)
+    {
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            return RejectTalisman(itemId, "not_talisman", 0, member.Hp);
+        }
+
+        string precheck;
+        long now;
+        int seq;
+        lock (_gate)
+        {
+            now = NowMs();
+            precheck = TalismanPrecheck(member, now);
+            seq = ++_talismanUses;
+        }
+
+        if (precheck.Length > 0)
+        {
+            var retry = 0u;
+            if (precheck == "cooldown")
+            {
+                lock (_gate)
+                {
+                    retry = (uint)Math.Max(0, member.HealGroupReadyAtMs - NowMs());
+                }
+            }
+
+            return RejectTalisman(itemId, precheck, retry, member.Hp);
+        }
+
+        // 事务号在这一场里唯一：同一场同一个人第几张，重放不会扣两次。
+        var txnId = "talisman:" + SessionId.ToString("x16")
+            + ":" + member.Id.ToString("x16") + ":" + seq.ToString();
+
+        // 网络调用放在锁外面：一次扣符最长等五秒，不能把整场的结算一起挂住。
+        var spend = _talismans.Spend(member.Id, itemId, txnId);
+        if (!spend.Ok)
+        {
+            return RejectTalisman(itemId, spend.Reason, 0, member.Hp);
+        }
+
+        lock (_gate)
+        {
+            // 扣符这一下里这场可能已经结束了，或者血被别人加满了：都按拒绝处理，
+            // 但符已经扣掉——所以这场结束就不再走这条路（_closed 在上面挡过）。
+            if (!member.Down && member.Hp < member.HpMax)
+            {
+                var healed = Math.Min(spend.HpRestore, member.HpMax - member.Hp);
+                member.Hp += healed;
+                if (spend.CooldownMs > 0)
+                {
+                    // 只写治疗组：和牧师治疗共用，和解药、蓝符都不共用。
+                    member.HealGroupReadyAtMs = NowMs() + spend.CooldownMs;
+                }
+
+                return new ServerMessage
+                {
+                    TalismanUsed = new TalismanUsed
+                    {
+                        CasterId = member.Id,
+                        ItemId = itemId,
+                        Healed = healed,
+                        HpAfter = member.Hp,
+                        CooldownMs = (uint)Math.Max(0, spend.CooldownMs),
+                        CooldownGroup = spend.CooldownGroup,
+                        CountLeft = spend.CountLeft,
+                    },
+                };
+            }
+
+            return RejectTalisman(itemId, "hp_full", 0, member.Hp);
+        }
+    }
+
+    /// <summary>用符的本地前置判定。返回空串表示能进下一步（去扣符）。</summary>
+    string TalismanPrecheck(Member member, long now)
+    {
+        if (_closed || _bossHp <= 0)
+        {
+            return "not_in_battle";
+        }
+
+        // 倒地不能点符：倒地只能靠复活卷轴或牧师的生息，红符不复活。
+        if (member.Down)
+        {
+            return "caster_down";
+        }
+
+        if (member.Hp >= member.HpMax)
+        {
+            // 满血用了也是白烧一张，直接挡下，别让玩家白扣。
+            return "hp_full";
+        }
+
+        if (now < member.HealGroupReadyAtMs)
+        {
+            return "cooldown";
+        }
+
+        return "";
+    }
+
+    static ServerMessage RejectTalisman(string itemId, string reason, uint retryAfterMs, long hpAfter) =>
+        new()
+        {
+            TalismanRejected = new TalismanRejected
+            {
+                ItemId = itemId,
+                Reason = reason,
+                RetryAfterMs = retryAfterMs,
+                HpAfter = hpAfter,
+            },
+        };
 
     // ---- 时间推进 ----
 

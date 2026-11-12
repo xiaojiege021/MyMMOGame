@@ -34,6 +34,8 @@ public sealed class CharacterGrpcService(
     AuctionTable auctionTable,
     IngotRepository ingots,
     ShopTable shopTable,
+    TalismanTable talismanTable,
+    TalismanRepository talismans,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -1482,6 +1484,124 @@ public sealed class CharacterGrpcService(
 
         return 0;
     }
+
+    /// <summary>
+    /// 在战斗里用掉一张红符。角色服这一侧只扣背包的一张，不碰生命——
+    /// 当前血量是战斗进程里的战斗态，角色库不存。回复值与冷却随配置回包带回去。
+    ///
+    /// 方案 12.1 的三条边界在这里各落一处：
+    ///   · 只回复自己：请求里没有目标编号，也只按 character_id 找本人的背包；
+    ///     要治队友只能走牧师的技能，红符这条路结构上就指不过去。
+    ///   · 不复活：倒地由战斗服判（Hp ≤ 0 时拒绝），角色服这一侧没有「拉起」这条路径。
+    ///   · 回复不超过同级红药：配置校验里已经卡死（TalismanTable），回包只带配置值。
+    ///
+    /// 不是红符、背包里没有、同一个号重放，三种都不扣，也都不带「这一手生效了」的数。
+    /// </summary>
+    public override async Task<ConsumeTalismanResponse> ConsumeTalisman(
+        ConsumeTalismanRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "item_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > TalismanRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        // 网关转发时核归属；战斗服服间直连没有账号，只确认角色存在。
+        // 与 P1-2 的经验结算同一个口径，不新造一条。
+        if (account.Length > 0)
+        {
+            if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+        }
+        else if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var red = talismanTable.FindRed(itemId);
+        if (red is null)
+        {
+            // 不是红符：蓝符、复活卷轴、随便什么编号都走这条，不扣也不回血。
+            // 张数给的是事实值，不是 0——这个字段是「还剩几张」，不是结算数值。
+            var left = await talismans.CountAsync(characterId, itemId, context.CancellationToken);
+            logger.LogInformation(
+                "talisman_consume_reject account={Account} id={Id} item={Item}"
+                + " reason=not_talisman left={Left}",
+                account, characterId, itemId, left);
+            return TalismanRejected("not_talisman", itemId, left, false);
+        }
+
+        var spend = await talismans.SpendAsync(
+            characterId, red.ItemId, txnId, context.CancellationToken);
+
+        if (spend.Duplicate)
+        {
+            // 同一个号又来了：整笔不做，张数不动，也不带回复值。
+            logger.LogInformation(
+                "talisman_consume_replay account={Account} id={Id} item={Item} txn={Txn} left={Left}",
+                account, characterId, red.ItemId, txnId, spend.CountLeft);
+            return TalismanRejected("duplicate", red.ItemId, spend.CountLeft, true);
+        }
+
+        if (!spend.Ok)
+        {
+            logger.LogInformation(
+                "talisman_consume_reject account={Account} id={Id} item={Item} reason={Reason}",
+                account, characterId, red.ItemId, spend.Reason);
+            return TalismanRejected(spend.Reason, red.ItemId, spend.CountLeft, false);
+        }
+
+        logger.LogInformation(
+            "talisman_consume account={Account} id={Id} item={Item} txn={Txn} slot={Slot}"
+            + " left={Left} hp_restore={Restore} cooldown_ms={Cooldown} group={Group}",
+            account, characterId, red.ItemId, txnId, spend.Slot, spend.CountLeft,
+            red.HpRestore, red.CooldownMs, red.CooldownGroup);
+
+        return new ConsumeTalismanResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = red.ItemId,
+            CountLeft = spend.CountLeft,
+            Slot = (uint)Math.Max(0, spend.Slot),
+            Duplicate = false,
+            HpRestore = red.HpRestore,
+            CooldownMs = (uint)Math.Max(0, red.CooldownMs),
+            CooldownGroup = red.CooldownGroup,
+        };
+    }
+
+    /// <summary>没扣成的回包：不带回复值与冷却——下一次真用上时才由配置给。</summary>
+    ConsumeTalismanResponse TalismanRejected(
+        string reason, string itemId, long countLeft, bool duplicate) =>
+        new()
+        {
+            Ok = false,
+            Reason = reason,
+            ItemId = itemId,
+            CountLeft = countLeft,
+            Slot = 0,
+            Duplicate = duplicate,
+            HpRestore = 0,
+            CooldownMs = 0,
+            CooldownGroup = "",
+        };
 
     /// <summary>没成交的回包：扣款与发货类数值一律 0，余额给库里的事实值。</summary>
     BuyShopItemResponse ShopRejected(string reason, ShopTable.Item item, long balance) =>

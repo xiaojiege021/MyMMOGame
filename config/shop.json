@@ -1,8 +1,8 @@
 {
   "schema": "shop-table/1",
-  "version": 2,
+  "version": 3,
   "currency": "yuanbao",
-  "note": "商城清单唯一正本。种类只许是方案 12.1 表里的十八种；表外种类与 12.1 写定「绝不上架」的种类出现就起不来。标价一律待定：方案正文只写定「只收元宝、直接标价、不做抽卡」，没给数字，所以价格只在这个文件里，代码不写第二套。delivery_item_id / delivery_count 是「买到手变成什么」：还没接发货的种类必须留空、数量 0，不许写假值；接了发货的种类必须填，且那件物品要真在 items.json 里。P1-5c1 只做清单与拒绝；P1-5c2 起逐种接发货，本版只接保护券这一种——方案 9.2 / 12.1 写定商城与通行证发的是同一种券，所以它的发货物必须就是 enhance.json 的 protect_item_id，不许另立第二种。",
+  "note": "商城清单唯一正本。种类只许是方案 12.1 表里的十八种；表外种类与 12.1 写定「绝不上架」的种类出现就起不来。标价一律待定：方案正文只写定「只收元宝、直接标价、不做抽卡」，没给数字，所以价格只在这个文件里，代码不写第二套。delivery_item_id / delivery_count 是「买到手变成什么」：还没接发货的种类必须留空、数量 0，不许写假值；接了发货的种类必须填，且那件物品要真在 items.json 里。P1-5c1 只做清单与拒绝；P1-5c2 起逐种接发货：v2 接保护券（方案 9.2 / 12.1 写定商城与通行证发的是同一种券，所以发货物必须就是 enhance.json 的 protect_item_id，不许另立第二种），v3 接红符（发货物必须就是 config/talisman.json 的 red.item_id——方案写定「红符不是红药」，两处不许各写一种编号）。",
   "items": [
     { "id": "shop_outfit_1", "kind": "outfit", "name": "服饰外观", "price_yuanbao": 300, "delivery_item_id": "", "delivery_count": 0, "note": "只改样子；标价待定" },
     { "id": "shop_weapon_skin_1", "kind": "weapon_skin", "name": "武器幻形", "price_yuanbao": 300, "delivery_item_id": "", "delivery_count": 0, "note": "只改样子，不改装备数值；标价待定" },
@@ -13,7 +13,7 @@
     { "id": "shop_guild_display_1", "kind": "guild_display", "name": "宗门展示", "price_yuanbao": 600, "delivery_item_id": "", "delivery_count": 0, "note": "不卖宗门科技与领地加成；标价待定" },
     { "id": "shop_bag_expand_1", "kind": "bag_expand", "name": "背包与仓库", "price_yuanbao": 150, "delivery_item_id": "", "delivery_count": 0, "note": "只加格子；标价待定" },
     { "id": "shop_teleport_talisman_1", "kind": "teleport_talisman", "name": "传送符", "price_yuanbao": 20, "delivery_item_id": "", "delivery_count": 0, "note": "绑定，只省路程；标价待定" },
-    { "id": "shop_red_talisman_1", "kind": "red_talisman", "name": "红符", "price_yuanbao": 15, "delivery_item_id": "", "delivery_count": 0, "note": "绑定，只回复自己，不复活；标价待定" },
+    { "id": "shop_red_talisman_1", "kind": "red_talisman", "name": "红符", "price_yuanbao": 15, "delivery_item_id": "talisman_red", "delivery_count": 1, "note": "到账即绑，只回复自己，不复活；标价待定" },
     { "id": "shop_blue_talisman_1", "kind": "blue_talisman", "name": "蓝符", "price_yuanbao": 15, "delivery_item_id": "", "delivery_count": 0, "note": "绑定，只回复自己的蓝；标价待定" },
     { "id": "shop_revive_scroll_1", "kind": "revive_scroll", "name": "复活卷轴", "price_yuanbao": 80, "delivery_item_id": "", "delivery_count": 0, "note": "绑定，只拉起自己，冷却跨场保留；标价待定" },
     { "id": "shop_unbind_item_1", "kind": "unbind_item", "name": "解绑道具", "price_yuanbao": 120, "delivery_item_id": "", "delivery_count": 0, "note": "绑定，只解开装备；标价待定" },

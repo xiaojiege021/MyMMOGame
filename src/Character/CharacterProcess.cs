@@ -32,6 +32,7 @@ public sealed class CharacterProcess(string configPath)
         CrystalTable crystalTable;
         AuctionTable auctionTable;
         ShopTable shopTable;
+        TalismanTable talismanTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -53,10 +54,15 @@ public sealed class CharacterProcess(string configPath)
             // 方案第 12 章写定的 5%–8% 抽税区间由 AuctionTable 硬校验，
             // 具体税率与取整方式在 config/auction.json，改配置重启生效。
             auctionTable = AuctionTable.Load(config.AuctionTable, currencies);
+            // 方案 12.1：红符是绑定的生命回复消耗，回复不超过同级红药，
+            // 和红药、牧师治疗共用冷却。回复值与上限都在 config/talisman.json，
+            // 超了、物品不在表里、没到账即绑，缺一样就起不来。
+            talismanTable = TalismanTable.Load(config.TalismanTable, items);
             // 方案 12.1 定死十八种可上架种类，商城只收元宝；清单外的编号在购买时拒绝。
             // P1-5c2 起逐种接发货：已接的种类必须指向 items.json 里的真物品，
-            // 保护券还必须就是 enhance.json 那一个编号（两处发的是同一种券）。
-            shopTable = ShopTable.Load(config.ShopTable, currencies, items, enhanceTable);
+            // 保护券还必须就是 enhance.json 那一个编号（两处发的是同一种券），
+            // 红符必须就是 talisman.json 那一个编号（红符不是红药）。
+            shopTable = ShopTable.Load(config.ShopTable, currencies, items, enhanceTable, talismanTable);
         }
         catch (ConfigException ex)
         {
@@ -124,6 +130,13 @@ public sealed class CharacterProcess(string configPath)
             + " items=" + shopTable.Items.Count
             + " kinds=" + ShopTable.AllowedKinds.Length
             + " delivered_kinds=" + ShopTable.DeliveredKinds.Length);
+        // 与 --talisman-state 只读入口同形：回复值改一条，重启后这里能直接核对到。
+        Console.WriteLine("talisman_table_version=" + talismanTable.Version
+            + " red_item=" + (talismanTable.RedTalisman?.ItemId ?? "")
+            + " hp_restore=" + (talismanTable.RedTalisman?.HpRestore ?? 0)
+            + " potion_hp_restore=" + (talismanTable.RedTalisman?.PotionHpRestore ?? 0)
+            + " cooldown_group=" + (talismanTable.RedTalisman?.CooldownGroup ?? "")
+            + " cooldown_ms=" + (talismanTable.RedTalisman?.CooldownMs ?? 0));
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -149,6 +162,8 @@ public sealed class CharacterProcess(string configPath)
         var crystals = new CrystalRepository(dataSource, crystalTable, items, config);
         var auctions = new AuctionRepository(dataSource, auctionTable, items, config);
         var ingots = new IngotRepository(dataSource, auctionTable);
+        // 红符的扣减：只动背包这一张，生命在战斗进程里，不在这里。
+        var talismans = new TalismanRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -167,6 +182,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(inventory);
         builder.Services.AddSingleton(currency);
         builder.Services.AddSingleton(grants);
+        builder.Services.AddSingleton(talismans);
         builder.Services.AddSingleton(races);
         builder.Services.AddSingleton(branches);
         builder.Services.AddSingleton(classes);
@@ -186,6 +202,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(crystals);
         builder.Services.AddSingleton(auctionTable);
         builder.Services.AddSingleton(shopTable);
+        builder.Services.AddSingleton(talismanTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(config);

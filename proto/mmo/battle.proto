@@ -187,6 +187,9 @@ message ClientMessage {
     SkillRequest skill = 1;
     SkillCancelRequest cancel = 2;
     MoveRequest move = 3;
+    // 用一张红符。注意这条请求里没有目标编号：红符只回复自己，
+    // 结构上就指不到队友身上。要治队友只能走牧师的技能。
+    UseTalismanRequest talisman = 4;
   }
 }
 
@@ -202,6 +205,10 @@ message ServerMessage {
     BossPhase boss_phase = 8;
     // 进本被拒。这条发完就关连接，客户端据此提示「本满了/只能一个人」。
     EnterRejected enter_rejected = 9;
+    // 用掉了红符。healed 是实际回复量（会被血量上限截断）。
+    TalismanUsed talisman_used = 10;
+    // 红符没用成。这条不改任何人的生命，也不扣符。
+    TalismanRejected talisman_rejected = 11;
   }
 }
 
@@ -214,4 +221,36 @@ message EnterRejected {
   uint32 limit = 2;
   uint32 current = 3;
   string dungeon_id = 4;
+}
+
+// 在战斗里用掉一张红符。请求里只有物品编号与客户端时刻：
+// 目标恒是施法者自己（方案 12.1「只回复自己」），回复量与冷却由角色服按配置给。
+message UseTalismanRequest {
+  string item_id = 1;
+  int64 client_time_ms = 2;
+}
+
+// 用掉了。healed 是实际回复量：血量接近上限时只回差额，不按配置满额灌。
+message TalismanUsed {
+  uint64 caster_id = 1;
+  string item_id = 2;
+  int64 healed = 3;
+  // 这一下之后自己的血。
+  int64 hp_after = 4;
+  uint32 cooldown_ms = 5;
+  // 红符是 heal 组：和红药、牧师治疗共用冷却，不和蓝符共用。
+  string cooldown_group = 6;
+  // 扣掉之后背包里还剩几张。
+  int64 count_left = 7;
+}
+
+// 红符没用成。不改任何人的生命，也不扣符。
+message TalismanRejected {
+  string item_id = 1;
+  // not_in_battle / caster_down / hp_full / cooldown / not_talisman /
+  // no_talisman / upstream_off / server_error
+  string reason = 2;
+  // 只有冷却没好时才有意义，其它原因填 0。
+  uint32 retry_after_ms = 3;
+  int64 hp_after = 4;
 }

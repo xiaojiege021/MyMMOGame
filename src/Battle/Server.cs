@@ -47,7 +47,7 @@ sealed class Party
 /// </summary>
 public sealed class BattleServer(
     BattleConfig config, SettlementStore settlements, ICharacterStore characters,
-    IExpSettlement expSettlement)
+    IExpSettlement expSettlement, ITalismanSpend talismans)
 {
     /// <summary>20Hz。前摇、冷却、后摇的判定精度都在这个粒度上。</summary>
     const int TickIntervalMs = 50;
@@ -170,7 +170,8 @@ public sealed class BattleServer(
                 {
                     Key = partyKey,
                     Encounter = new Encounter(
-                        config, settlements, characters, NextSessionId(), partySize, expSettlement),
+                        config, settlements, characters, NextSessionId(), partySize,
+                        expSettlement, talismans),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
                     PartySize = partySize,
@@ -424,6 +425,15 @@ public sealed class BattleServer(
                         socket,
                         send,
                         new ServerMessage { Moved = party.Encounter.Move(member, inbound.Move) },
+                        token);
+                    break;
+
+                case ClientMessage.BodyOneofCase.Talisman:
+                    // 用符只影响自己：结果或拒绝都只回给这个人，不广播。
+                    await SendAsync(
+                        socket,
+                        send,
+                        party.Encounter.UseTalisman(member, inbound.Talisman),
                         token);
                     break;
             }

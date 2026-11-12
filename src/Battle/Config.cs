@@ -353,6 +353,13 @@ public sealed class BattleConfig
     /// </summary>
     public string ExpUpstream { get; init; } = "";
 
+    /// <summary>
+    /// 角色服的地址。红符要从背包里扣一张，背包只有角色服能写（技术架构第 3 节）。
+    /// 留空时按 exp_upstream 走——两者本来就是同一个进程；都没有就是本机口径，
+    /// 这一场用不了红符（回 upstream_off），不从别的地方变出一张来。
+    /// </summary>
+    public string CharacterUpstream { get; init; } = "";
+
     public CasterConfig Caster { get; init; } = new();
     public BossConfig Boss { get; init; } = new();
     public ArenaConfig Arena { get; init; } = new();
@@ -391,6 +398,10 @@ public sealed class BattleConfig
             ClassTablePath = classPath,
             DefaultClass = string.IsNullOrWhiteSpace(raw.DefaultClass) ? "warrior" : raw.DefaultClass,
             ExpUpstream = (raw.ExpUpstream ?? "").Trim(),
+            // 没单独配就跟经验结算走同一个角色服；两个都空才是本机口径。
+            CharacterUpstream = string.IsNullOrWhiteSpace(raw.CharacterUpstream)
+                ? (raw.ExpUpstream ?? "").Trim()
+                : raw.CharacterUpstream.Trim(),
             Caster = raw.Caster,
             Boss = raw.Boss,
             Arena = raw.Arena,
@@ -609,6 +620,9 @@ public sealed class BattleConfig
         public string DungeonTable { get; init; } = "dungeons.json";
         public string DefaultClass { get; init; } = "warrior";
         public string ExpUpstream { get; init; } = "";
+
+        /// <summary>角色服地址；留空按 exp_upstream 走。</summary>
+        public string CharacterUpstream { get; init; } = "";
         public CasterConfig Caster { get; init; } = new();
         public BossConfig Boss { get; init; } = new();
         public ArenaConfig Arena { get; init; } = new();

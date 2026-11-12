@@ -62,6 +62,10 @@ var shopList = false;
 string? shopConfigPath = null;
 long shopStateOf = 0;
 long shopLedgerOf = 0;
+// 红符：只读核对用。talismanConfigPath 指向临时表试坏配置，talismanStateOf 连库读张数。
+var talismanList = false;
+string? talismanConfigPath = null;
+long talismanStateOf = 0;
 long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
@@ -251,6 +255,19 @@ for (var i = 0; i < args.Length; i++)
         case "--shop-ledger" when i + 1 < args.Length:
             long.TryParse(args[++i], out shopLedgerOf);
             break;
+        // 只给核对用：把红符表读出来，不连库也不启动进程。坏表也走这里——
+        // 「回复超过同级红药」「发货物不是红符」都在这一步就起不来。
+        case "--talisman-list":
+            talismanList = true;
+            break;
+        case "--talisman-config" when i + 1 < args.Length:
+            talismanConfigPath = args[++i];
+            break;
+        // 只给核对用：从库里独立读回这个角色背包里有几张红符、绑没绑，
+        // 用来证「用掉一张之后只少一张」。
+        case "--talisman-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out talismanStateOf);
+            break;
         // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
         // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
         case "--auction-ledger" when i + 3 < args.Length:
@@ -398,8 +415,11 @@ if (shopList)
         // 与启动走同一套 Load，坏清单在这里就露出来。
         var shopItems = ItemTable.Load("config/items.json");
         var shopEnhance = EnhanceTable.Load(characterConfig.EnhanceTable, shopItems, shopCurrencies);
+        // 红符的发货物必须就是 talisman.json 那一个编号，与启动走同一套 Load。
+        var shopTalismans = TalismanTable.Load(characterConfig.TalismanTable, shopItems);
         var table = ShopTable.Load(
-            shopConfigPath ?? characterConfig.ShopTable, shopCurrencies, shopItems, shopEnhance);
+            shopConfigPath ?? characterConfig.ShopTable, shopCurrencies, shopItems, shopEnhance,
+            shopTalismans);
         Console.WriteLine("shop_list_state=ok version=" + table.Version
             + " currency=" + table.Currency
             + " items=" + table.Items.Count
@@ -459,6 +479,38 @@ if (auctionState)
     return 0;
 }
 
+// 红符表只读核对：与启动共用同一套校验（物品在 items.json 里、是消耗品、到账即绑、
+// 回复不超过同级红药、冷却组必须是 heal），不连库也不启动进程。坏表在这一步就能看出来。
+if (talismanList)
+{
+    try
+    {
+        var talismanConfig = CharacterConfig.Load(configPath);
+        var talismanItems = ItemTable.Load("config/items.json");
+        var table = TalismanTable.Load(
+            talismanConfigPath ?? talismanConfig.TalismanTable, talismanItems);
+        var red = table.RedTalisman;
+        Console.WriteLine("talisman_list_state=ok version=" + table.Version
+            + " red_item=" + (red?.ItemId ?? "-")
+            + " hp_restore=" + (red?.HpRestore ?? 0)
+            + " potion_hp_restore=" + (red?.PotionHpRestore ?? 0)
+            + " cooldown_group=" + (red?.CooldownGroup ?? "-")
+            + " cooldown_ms=" + (red?.CooldownMs ?? 0));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
@@ -468,7 +520,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
     || transferStateOf != 0 || transferTxnCount != null
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
-    || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0)
+    || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -526,8 +578,11 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             var shopCharConfig = CharacterConfig.Load(configPath);
             var shopEnhanceForState = EnhanceTable.Load(
                 shopCharConfig.EnhanceTable, shopItemsForState, shopCurrencies);
+            var shopTalismansForState = TalismanTable.Load(
+                shopCharConfig.TalismanTable, shopItemsForState);
             var shopTableForState = ShopTable.Load(
-                shopCharConfig.ShopTable, shopCurrencies, shopItemsForState, shopEnhanceForState);
+                shopCharConfig.ShopTable, shopCurrencies, shopItemsForState, shopEnhanceForState,
+                shopTalismansForState);
 
             // 券的张数与绑定态都从背包里读出来，不另算。绑定的券不能上架（P1-5a 的 bound_item）。
             var shopInventory = new InventoryRepository(dataSource);
@@ -568,6 +623,39 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             Console.WriteLine("shop_ledger=ok id=" + shopLedgerOf
                 + " txn_prefix=shop_buy:"
                 + " orders=" + rows);
+        }
+
+        if (talismanStateOf != 0)
+        {
+            // 红符的张数与绑定态都从背包里读出来，不另算；回复值与上限读配置。
+            // 张数是事实值——用掉一张之后这里少一张，就是这一卡的落点。
+            var talismanCharConfig = CharacterConfig.Load(configPath);
+            var talismanItemsForState = ItemTable.Load("config/items.json");
+            var talismanTableForState = TalismanTable.Load(
+                talismanCharConfig.TalismanTable, talismanItemsForState);
+            var redForState = talismanTableForState.RedTalisman;
+            var talismanInventory = new InventoryRepository(dataSource);
+            var talismanSlots = await talismanInventory.ListAsync(
+                talismanStateOf, CancellationToken.None);
+            var redSlots = redForState is null
+                ? new List<BagSlot>()
+                : talismanSlots
+                    .Where(s => string.Equals(s.ItemId, redForState.ItemId, StringComparison.Ordinal))
+                    .ToList();
+            var redCount = redSlots.Sum(s => s.Count);
+            var redAllBound = redSlots.Count > 0 && redSlots.All(s => s.Bound);
+
+            Console.WriteLine("talisman_state=ok id=" + talismanStateOf
+                + " red_item=" + (redForState?.ItemId ?? "-")
+                + " count=" + redCount
+                + " bound=" + (redAllBound ? "true" : "false")
+                + " slots=" + (redSlots.Count == 0
+                    ? "-"
+                    : string.Join(",", redSlots.Select(s => s.Slot + ":" + s.Count)))
+                + " hp_restore=" + (redForState?.HpRestore ?? 0)
+                + " potion_hp_restore=" + (redForState?.PotionHpRestore ?? 0)
+                + " cooldown_group=" + (redForState?.CooldownGroup ?? "-")
+                + " cooldown_ms=" + (redForState?.CooldownMs ?? 0));
         }
 
         if (levelOf != 0)

@@ -33,6 +33,9 @@ internal static class Program
         var aChar = ulong.TryParse(Arg(args, "--a-char"), out var ac) ? ac : 1UL;
         var bChar = ulong.TryParse(Arg(args, "--b-char"), out var bc) ? bc : 2UL;
         var partySize = int.TryParse(Arg(args, "--party-size"), out var ps) ? ps : 2;
+        var item = Arg(args, "--item") ?? "talisman_red";
+        var otherItem = Arg(args, "--other") ?? "ticket_protect";
+        var healSkill = uint.TryParse(Arg(args, "--heal"), out var hs) ? hs : 1302U;
 
         try
         {
@@ -59,6 +62,13 @@ internal static class Program
                 "p12c_boss_hit" => await CaseP12cBossHitAsync(url),
                 "p12c_player_damage" => await CaseP12cPlayerDamageAsync(url, boss, hit),
                 "p12d_clear" => await CaseP12dClearAsync(url, boss, hit, aChar, bChar, partySize),
+                "p15c3_talisman" => await CaseP15c3TalismanAsync(url, item),
+                "p15c3_talisman_full" => await CaseP15c3FullAsync(url, item),
+                "p15c3_talisman_other" => await CaseP15c3OtherAsync(url, otherItem),
+                "p15c3_talisman_down" => await CaseP15c3DownAsync(url, item),
+                "p15c3_talisman_off" => await CaseP15c3OffAsync(url, item),
+                "p15c3_talisman_heal_share" => await CaseP15c3HealShareAsync(url, item, healSkill),
+                "p15c3_talisman_none" => await CaseP15c3NoneAsync(url, item),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -869,6 +879,195 @@ internal static class Program
             $"case=p12d_clear party_size={partySize} a={aChar} b={bChar} "
             + $"casts={casts} damage={firstDamage} hp_left={hp} "
             + $"settlement_id={ended?.SettlementId} exp_gain={ended?.ExpGain} cleared={ended?.Cleared}");
+    }
+
+    // ---- P1-5c3 红符 ----
+
+    /// <summary>
+    /// 等到自己被 Boss 打掉血（wantDown 为真时等到倒地）。
+    /// 回的是这一条更新里的血量，场景代码拿它对齐用符之后的血量。
+    /// </summary>
+    static async Task<PartyMember?> WaitDamagedAsync(Session session, int timeoutMs, bool wantDown)
+    {
+        var me = session.Opened.CasterId;
+        var message = await session.ReadUntilAsync(
+            m => m.MemberUpdated is not null
+                 && m.MemberUpdated.Member.MemberId == me
+                 && (wantDown
+                     ? m.MemberUpdated.Member.Hp <= 0
+                     : m.MemberUpdated.Member.Hp < m.MemberUpdated.Member.HpMax),
+            timeoutMs);
+        return message?.MemberUpdated?.Member;
+    }
+
+    /// <summary>读一条红符回包：要么用掉了，要么被拒了。</summary>
+    static async Task<ServerMessage?> ReadTalismanAsync(Session session, int timeoutMs) =>
+        await session.ReadUntilAsync(
+            m => m.TalismanUsed is not null || m.TalismanRejected is not null, timeoutMs);
+
+    /// <summary>
+    /// 掉血之后用一张红符：回血、写 heal 组冷却；紧接着再用一次撞共用冷却。
+    /// 这是「只回复自己」的正面证据——加的血落在自己身上。
+    /// </summary>
+    static async Task<int> CaseP15c3TalismanAsync(string url, string item)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var hurt = await WaitDamagedAsync(session, 10000, wantDown: false);
+        if (hurt is null)
+        {
+            return Fail("case=p15c3_talisman 没等到 Boss 打中自己");
+        }
+
+        await session.UseTalismanAsync(item);
+        var first = await ReadTalismanAsync(session, 8000);
+        var used = first?.TalismanUsed;
+        var firstOk = used is not null
+                      && used.CasterId == session.Opened.CasterId
+                      && used.ItemId == item
+                      && used.Healed > 0
+                      && used.HpAfter == hurt.Hp + used.Healed
+                      && used.CooldownMs > 0
+                      && used.CooldownGroup == "heal";
+
+        // 紧接着再来一张：治疗组冷却还没好。红符和牧师治疗共用这一组。
+        await session.UseTalismanAsync(item);
+        var second = await ReadTalismanAsync(session, 8000);
+        var reject = second?.TalismanRejected;
+        var secondOk = reject?.Reason == "cooldown" && reject.RetryAfterMs > 0;
+
+        return Report(firstOk && secondOk,
+            $"case=p15c3_talisman hp_before={hurt.Hp} healed={used?.Healed} "
+            + $"hp_after={used?.HpAfter} cooldown_ms={used?.CooldownMs} "
+            + $"group={used?.CooldownGroup} left={used?.CountLeft} "
+            + $"second_reason={reject?.Reason} retry_ms={reject?.RetryAfterMs}");
+    }
+
+    /// <summary>满血用符：挡在本地，不去扣符——不让玩家白烧一张。</summary>
+    static async Task<int> CaseP15c3FullAsync(string url, string item)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        await session.UseTalismanAsync(item);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "hp_full" && message?.TalismanUsed is null,
+            $"case=p15c3_talisman_full hp={session.Opened.CasterHp}/{session.Opened.CasterHpMax} "
+            + $"reason={reject?.Reason}");
+    }
+
+    /// <summary>拿别的物品编号来用：角色服只认红符，别的编号一律 not_talisman。</summary>
+    static async Task<int> CaseP15c3OtherAsync(string url, string otherItem)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var hurt = await WaitDamagedAsync(session, 10000, wantDown: false);
+        if (hurt is null)
+        {
+            return Fail("case=p15c3_talisman_other 没等到 Boss 打中自己");
+        }
+
+        await session.UseTalismanAsync(otherItem);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "not_talisman" && message?.TalismanUsed is null,
+            $"case=p15c3_talisman_other item={otherItem} reason={reject?.Reason} "
+            + $"hp={reject?.HpAfter}");
+    }
+
+    /// <summary>
+    /// 倒地之后用符：拒绝。死亡只能靠复活卷轴或牧师的生息拉起，
+    /// 红符在倒地时点不了——这就是「不能复活」。
+    /// </summary>
+    static async Task<int> CaseP15c3DownAsync(string url, string item)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var down = await WaitDamagedAsync(session, 15000, wantDown: true);
+        if (down is null)
+        {
+            return Fail("case=p15c3_talisman_down 没等到自己倒地");
+        }
+
+        await session.UseTalismanAsync(item);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "caster_down"
+                      && message?.TalismanUsed is null
+                      && reject.HpAfter <= 0,
+            $"case=p15c3_talisman_down hp={down.Hp} reason={reject?.Reason} "
+            + $"hp_after={reject?.HpAfter}");
+    }
+
+    /// <summary>
+    /// 这一场没有角色服（没配 upstream）：用符拒绝。宁可说这场用不了，
+    /// 也不做「本地凭空变出一张符」。
+    /// </summary>
+    static async Task<int> CaseP15c3OffAsync(string url, string item)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var hurt = await WaitDamagedAsync(session, 10000, wantDown: false);
+        if (hurt is null)
+        {
+            return Fail("case=p15c3_talisman_off 没等到 Boss 打中自己");
+        }
+
+        await session.UseTalismanAsync(item);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "upstream_off" && message?.TalismanUsed is null,
+            $"case=p15c3_talisman_off reason={reject?.Reason} hp={reject?.HpAfter}");
+    }
+
+    /// <summary>
+    /// 用符之后立刻放牧师的治疗：撞共用冷却。方案 12.1 写定「和红药、牧师治疗共用冷却」，
+    /// 这一条不是靠注释保证的——两边读写的是同一个治疗组。
+    /// </summary>
+    static async Task<int> CaseP15c3HealShareAsync(string url, string item, uint healSkill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var hurt = await WaitDamagedAsync(session, 10000, wantDown: false);
+        if (hurt is null)
+        {
+            return Fail("case=p15c3_talisman_heal_share 没等到 Boss 打中自己");
+        }
+
+        await session.UseTalismanAsync(item);
+        var used = (await ReadTalismanAsync(session, 8000))?.TalismanUsed;
+        if (used is null)
+        {
+            return Fail("case=p15c3_talisman_heal_share 红符没成功，共用冷却无从验起");
+        }
+
+        // 紧接着放治疗：红符刚占了治疗组，这一手应该被冷却挡下。
+        await session.SubmitAsync(healSkill, session.Opened.CasterId, Session.NowMs());
+        var message = await session.ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null, 6000);
+        var reason = message?.Rejected?.Reason;
+
+        return Report(reason == SkillRejectReason.SkillRejectCooldown,
+            $"case=p15c3_talisman_heal_share heal_skill={healSkill} "
+            + $"reason={reason?.ToString() ?? "none"} "
+            + $"retry_ms={message?.Rejected?.RetryAfterMs} group={used.CooldownGroup}");
+    }
+
+    /// <summary>背包里一张都没有：角色服回 no_talisman，不回血。</summary>
+    static async Task<int> CaseP15c3NoneAsync(string url, string item)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var hurt = await WaitDamagedAsync(session, 10000, wantDown: false);
+        if (hurt is null)
+        {
+            return Fail("case=p15c3_talisman_none 没等到 Boss 打中自己");
+        }
+
+        await session.UseTalismanAsync(item);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "no_talisman" && message?.TalismanUsed is null,
+            $"case=p15c3_talisman_none reason={reject?.Reason} hp_before={hurt.Hp} "
+            + $"hp_after={reject?.HpAfter}");
     }
 
     static int Report(bool ok, string line)

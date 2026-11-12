@@ -1,0 +1,14 @@
+{
+  "schema": "talisman-table/1",
+  "version": 1,
+  "note": "符类消耗品的唯一正本。方案 12.1 写定：红符是绑定的生命回复消耗，只回复自己，回复不超过同级回春丹 / 气血丹，和红药、牧师治疗共用冷却，不复活、不治疗队友，不和蓝符共用冷却。红符不是红药——回春丹、气血丹仍从采药、炼丹、副本和特殊任务来，可以上拍卖行。所以这里只写红符本身，丹药那边一个数都不写；potion_hp_restore 是「同级红药的回复上限」，用来卡住 hp_restore 不许超过它，丹药做出来以后对齐这一个字段，不在别处另写一套。回复值与冷却都还没定，先给一组占位并标待定；蓝符段等 P1-5c5 再补。",
+  "red": {
+    "item_id": "talisman_red",
+    "name": "红符",
+    "hp_restore": 120,
+    "potion_hp_restore": 150,
+    "cooldown_group": "heal",
+    "cooldown_ms": 2000,
+    "note": "hp_restore 与 potion_hp_restore 都是待定值：方案只写定「不超过同级红药」，没给数字。cooldown_group 必须是 heal——方案写定「和红药、牧师治疗共用冷却」；蓝符用另一组 mana，两段互不占用。"
+  }
+}

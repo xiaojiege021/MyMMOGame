@@ -23,6 +23,20 @@ public sealed class InventoryRepository(NpgsqlDataSource dataSource)
     }
 
     /// <summary>
+    /// 服间直连用：没有账号可核的时候，只确认这个角色存在。
+    /// 和 OwnsAsync 的区别只在这一个条件上——有账号就必须核归属，
+    /// 没账号是战斗服内部调用，按 P1-2 经验结算那条口径走。
+    /// </summary>
+    public async Task<bool> ExistsAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select 1 from \"角色\".character where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        return await reader.ReadAsync(stopping);
+    }
+
+    /// <summary>
     /// 复核归属的同时读出角色名，只给表世界的名字牌用。不是这个账号的角色回 null，
     /// 和 OwnsAsync 一样按不存在处理，不泄漏别人的名字。
     /// </summary>

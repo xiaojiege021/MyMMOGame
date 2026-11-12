@@ -104,6 +104,15 @@ internal sealed class Session : IAsyncDisposable
             Cancel = new SkillCancelRequest { SkillId = skillId, CastTimeMs = castTimeMs },
         });
 
+    /// <summary>
+    /// 用一张符。请求里没有目标编号——红符只回复自己，客户端连「想治谁」都表达不了。
+    /// </summary>
+    public Task UseTalismanAsync(string itemId) =>
+        SendAsync(new ClientMessage
+        {
+            Talisman = new UseTalismanRequest { ItemId = itemId, ClientTimeMs = NowMs() },
+        });
+
     public static long NowMs() => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
     async Task SendAsync(ClientMessage message)
