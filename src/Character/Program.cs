@@ -95,6 +95,10 @@ int unbindStateSlot = 0;
 long rawBoundAtOf = 0;
 int rawBoundAtSlot = 0;
 int rawBoundAtHours = 0;
+// P1-5d 内部充值：list 读商品表，state 连库读一张订单的状态与余额。
+var rechargeList = false;
+string? rechargeConfigPath = null;
+string? rechargeStateOf = null;
 long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
@@ -359,6 +363,17 @@ for (var i = 0; i < args.Length; i++)
             long.TryParse(args[++i], out rawBoundAtOf);
             int.TryParse(args[++i], out rawBoundAtSlot);
             int.TryParse(args[++i], out rawBoundAtHours);
+            break;
+        // 只给核对用：把充值商品表读出来，不连库也不启动进程。坏表也走这里。
+        case "--recharge-list":
+            rechargeList = true;
+            break;
+        case "--recharge-config" when i + 1 < args.Length:
+            rechargeConfigPath = args[++i];
+            break;
+        // 只给核对用：按订单号从库里独立读回状态、金额、发放时刻与余额。
+        case "--recharge-state" when i + 1 < args.Length:
+            rechargeStateOf = args[++i];
             break;
         // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
         // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
@@ -691,6 +706,33 @@ if (boosterList)
     return 0;
 }
 
+// P1-5d 内部充值商品表只读核对：与启动共用同一套校验（schema / version /
+// 编号唯一 / 元宝与金额为正），不连库也不启动进程；临时表用 --recharge-config 指过去。
+if (rechargeList)
+{
+    try
+    {
+        var rechargeConfig = CharacterConfig.Load(configPath);
+        var table = RechargeTable.Load(rechargeConfigPath ?? rechargeConfig.RechargeTable);
+        Console.WriteLine("recharge_list_state=ok version=" + table.Version
+            + " products=" + table.Products.Count
+            + " product=" + string.Join(",", table.Products
+                .Select(p => p.Id + ":" + p.Yuanbao + ":" + p.RmbCents)));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // P1-5c8 解绑道具表只读核对：与启动共用同一套校验（物品在 items.json 里、
 // 是消耗品、到账即绑、不与符 / 卷轴 / 经验道具同编号、档位覆盖 0 小时、
 // 张数随时长不增）。不连库也不启动进程；临时表用 --unbind-config 指过去。
@@ -743,7 +785,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0
     || scrollStateOf != 0 || scrollResetOf != 0
     || boosterStateOf != 0 || boosterResetOf != 0 || boosterExpireOf != 0
-    || unbindQuoteOf != 0 || unbindStateOf != 0 || rawBoundAtOf != 0)
+    || unbindQuoteOf != 0 || unbindStateOf != 0 || rawBoundAtOf != 0
+    || rechargeStateOf != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -1081,6 +1124,24 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + " item=" + unbindTableForRead.Unbind.ItemId
                     + " floor=" + unbindTableForRead.FloorCost);
             }
+        }
+
+        if (rechargeStateOf != null)
+        {
+            // 从库里独立读回这张订单的状态、金额、发放时刻与余额。
+            var rechargeRepo = new RechargeRepository(dataSource);
+            var order = await rechargeRepo.StateAsync(rechargeStateOf, CancellationToken.None);
+            Console.WriteLine(order.Found
+                ? "recharge_state=ok order=" + order.OrderId
+                  + " id=" + order.CharacterId
+                  + " product=" + order.ProductId
+                  + " yuanbao=" + order.Yuanbao
+                  + " status=" + order.Status
+                  + " paid=" + (order.Paid ? "true" : "false")
+                  + " paid_at_ms=" + order.PaidAtMs
+                  + " now_ms=" + order.NowMs
+                  + " balance=" + order.Balance
+                : "recharge_state=missing order=" + rechargeStateOf);
         }
 
         if (levelOf != 0)

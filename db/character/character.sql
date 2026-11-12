@@ -74,3 +74,24 @@ CREATE TABLE IF NOT EXISTS "角色".exp_booster (
     used_at      timestamptz NOT NULL DEFAULT now(),
     last_txn_id  text        NOT NULL
 );
+
+-- P1-5d 的充值订单表也放进主迁移：只跑 character.sql 的一张卡里，
+-- 充值那段不会因为缺表挂掉；recharge.sql 里是同一份幂等 DDL。
+CREATE TABLE IF NOT EXISTS "角色".recharge_order (
+    order_id     text        PRIMARY KEY,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    product_id   text        NOT NULL,
+    yuanbao      bigint      NOT NULL CHECK (yuanbao > 0),
+    status       text        NOT NULL CHECK (status IN ('pending', 'paid')),
+    created_at   timestamptz NOT NULL DEFAULT now(),
+    paid_at      timestamptz
+);
+
+ALTER TABLE "角色".recharge_order
+    DROP CONSTRAINT IF EXISTS recharge_order_paid_at_matches;
+ALTER TABLE "角色".recharge_order
+    ADD CONSTRAINT recharge_order_paid_at_matches
+    CHECK ((status = 'paid' AND paid_at IS NOT NULL) OR (status = 'pending' AND paid_at IS NULL));
+
+CREATE INDEX IF NOT EXISTS recharge_order_character
+    ON "角色".recharge_order (character_id, created_at);

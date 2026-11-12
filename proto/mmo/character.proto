@@ -125,6 +125,10 @@ service CharacterService {
   // 角色服在一笔事务里认装备 / 认已绑、按 now() - bound_at 算年龄、按配置算张数、
   // 扣掉那几张，再把 inventory 的 bound 改回 false。不新建表、不存第二份状态。
   rpc UseUnbindItem(UseUnbindItemRequest) returns (UseUnbindItemResponse);
+  // P1-5d：内部充值订单。P0 不接真实支付渠道，订单与回调都在本服务；
+  // 一笔订单只发一次元宝，同一笔回调重复到达整笔不做。
+  rpc CreateRechargeOrder(CreateRechargeOrderRequest) returns (CreateRechargeOrderResponse);
+  rpc SettleRechargeOrder(SettleRechargeOrderRequest) returns (SettleRechargeOrderResponse);
 }
 
 message SettleExpRequest {
@@ -736,4 +740,44 @@ message UseUnbindItemResponse {
   int64 age_hours = 8;
   // 是否已经到配置下限（绑得最久那一档）。
   bool floor_hit = 9;
+}
+
+// P1-5d：建一张内部充值订单。客户端只带商品编号，元宝数由服务端按配置决定；
+// 订单号由服务端生成。
+message CreateRechargeOrderRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string product_id = 3;
+}
+
+message CreateRechargeOrderResponse {
+  bool ok = 1;
+  // product_not_found / character_not_found / request_missing；空串表示建好了。
+  string reason = 2;
+  string order_id = 3;
+  string product_id = 4;
+  int64 yuanbao = 5;
+  // 建单后恒为 pending。
+  string status = 6;
+}
+
+// P1-5d：结算一笔内部订单（P0 用它模拟支付渠道回调）。同一笔重复调用只发一次。
+message SettleRechargeOrderRequest {
+  // 网关转发时填令牌账号；结算会核这张订单是不是这个账号的。
+  string account = 1;
+  string order_id = 2;
+}
+
+message SettleRechargeOrderResponse {
+  bool ok = 1;
+  // order_not_found / duplicate；空串表示这一笔真发了元宝。
+  string reason = 2;
+  string order_id = 3;
+  string status = 4;
+  // 这一笔发了多少元宝（duplicate 时也给订单上的数，便于核对）。
+  int64 yuanbao = 5;
+  // 结算后的元宝余额（事实值）。
+  int64 balance = 6;
+  int64 paid_at_ms = 7;
+  bool duplicate = 8;
 }

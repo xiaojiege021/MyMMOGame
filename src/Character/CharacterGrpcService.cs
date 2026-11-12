@@ -42,6 +42,8 @@ public sealed class CharacterGrpcService(
     ExpBoosterRepository boosters,
     UnbindTable unbindTable,
     UnbindRepository unbinds,
+    RechargeTable rechargeTable,
+    RechargeRepository recharges,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -2016,6 +2018,130 @@ public sealed class CharacterGrpcService(
             AgeHours = quote.AgeHours,
             FloorHit = quote.FloorHit,
         };
+
+    /// <summary>
+    /// P1-5d：建一张内部充值订单。P0 不接真实支付渠道，订单与结算都在本服务。
+    /// 客户端只带商品编号，元宝数由配置决定；订单号由服务端生成，客户端带不进来。
+    /// </summary>
+    public override async Task<CreateRechargeOrderResponse> CreateRechargeOrder(
+        CreateRechargeOrderRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var productId = (request.ProductId ?? "").Trim();
+        if (request.CharacterId == 0 || productId.Length == 0 || account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var product = rechargeTable.Find(productId);
+        if (product is null)
+        {
+            logger.LogInformation(
+                "recharge_create_reject account={Account} id={Id} product={Product} reason=product_not_found",
+                account, characterId, productId);
+            return new CreateRechargeOrderResponse
+            {
+                Ok = false,
+                Reason = "product_not_found",
+                ProductId = productId,
+                Status = "",
+            };
+        }
+
+        // 订单号在服务端生成：回调按这个号认，客户端改不了它。
+        var orderId = "rc_" + Guid.NewGuid().ToString("N");
+        if (!await recharges.CreateAsync(
+                orderId, characterId, product.Id, product.Yuanbao, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "recharge_create account={Account} id={Id} order={Order} product={Product} yuanbao={Yuanbao}",
+            account, characterId, orderId, product.Id, product.Yuanbao);
+
+        return new CreateRechargeOrderResponse
+        {
+            Ok = true,
+            Reason = "",
+            OrderId = orderId,
+            ProductId = product.Id,
+            Yuanbao = product.Yuanbao,
+            Status = "pending",
+        };
+    }
+
+    /// <summary>
+    /// P1-5d：结算一笔内部充值订单（P0 用它模拟支付渠道回调）。同一笔重复调用只发一次；
+    /// 第二次回 duplicate，元宝余额不变。
+    /// </summary>
+    public override async Task<SettleRechargeOrderResponse> SettleRechargeOrder(
+        SettleRechargeOrderRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var orderId = (request.OrderId ?? "").Trim();
+        if (orderId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        var outcome = await recharges.SettleAsync(
+            orderId, account.Length > 0 ? account : null, context.CancellationToken);
+
+        if (!outcome.Found)
+        {
+            // 不存在与「不是你的订单」都回同一个 order_not_found，不泄露别人的订单。
+            logger.LogInformation(
+                "recharge_settle_reject account={Account} order={Order} reason=order_not_found",
+                account, orderId);
+            return new SettleRechargeOrderResponse
+            {
+                Ok = false,
+                Reason = outcome.Reason,
+                OrderId = orderId,
+                Status = "",
+            };
+        }
+
+        if (outcome.Reason.Length > 0)
+        {
+            logger.LogInformation(
+                "recharge_settle_reject account={Account} order={Order} reason={Reason}",
+                account, orderId, outcome.Reason);
+            return new SettleRechargeOrderResponse
+            {
+                Ok = false,
+                Reason = outcome.Reason,
+                OrderId = orderId,
+                Status = outcome.Status,
+                Yuanbao = outcome.Yuanbao,
+                Balance = outcome.Balance,
+                Duplicate = outcome.Duplicate,
+            };
+        }
+
+        logger.LogInformation(
+            "recharge_settle account={Account} order={Order} yuanbao={Yuanbao} balance={Balance}",
+            account, orderId, outcome.Yuanbao, outcome.Balance);
+
+        return new SettleRechargeOrderResponse
+        {
+            Ok = true,
+            Reason = "",
+            OrderId = orderId,
+            Status = "paid",
+            Yuanbao = outcome.Yuanbao,
+            Balance = outcome.Balance,
+            PaidAtMs = outcome.PaidAtMs,
+            Duplicate = false,
+        };
+    }
 
     /// <summary>没扣成的回包：比例、经验变化与到期时刻一律不给生效值。</summary>
     static ConsumeReviveScrollResponse ScrollRejected(

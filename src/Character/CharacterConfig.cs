@@ -11,7 +11,7 @@ public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
     string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
-    string UnbindTable)
+    string UnbindTable, string RechargeTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -24,6 +24,7 @@ public sealed record CharacterConfig(
     public const string DefaultReviveScrollTable = "config/revive_scroll.json";
     public const string DefaultExpBoosterTable = "config/exp_booster.json";
     public const string DefaultUnbindTable = "config/unbind_item.json";
+    public const string DefaultRechargeTable = "config/recharge.json";
 
     public static CharacterConfig Load(string path)
     {
@@ -144,10 +145,18 @@ public sealed record CharacterConfig(
             throw new ConfigException("unbind_table 不能为空");
         }
 
+        // 内部充值商品也走同一份配置正本；核对脚本可以指到临时表试坏配置。
+        // 元宝数只在这份文件里，客户端带不进来。
+        var rechargeTable = (wire.RechargeTable ?? DefaultRechargeTable).Trim();
+        if (rechargeTable.Length == 0)
+        {
+            throw new ConfigException("recharge_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
-            reviveScrollTable, expBoosterTable, unbindTable);
+            reviveScrollTable, expBoosterTable, unbindTable, rechargeTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -199,6 +208,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("unbind_table")]
         public string? UnbindTable { get; init; }
+
+        [JsonPropertyName("recharge_table")]
+        public string? RechargeTable { get; init; }
     }
 }
 

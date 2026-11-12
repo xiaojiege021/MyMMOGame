@@ -36,6 +36,7 @@ public sealed class CharacterProcess(string configPath)
         ReviveScrollTable scrollTable;
         ExpBoosterTable boosterTable;
         UnbindTable unbindTable;
+        RechargeTable rechargeTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -76,6 +77,9 @@ public sealed class CharacterProcess(string configPath)
             // 不在这里另存一份。与符、卷轴、经验道具的编号不许撞（四种是四种东西）。
             unbindTable = UnbindTable.Load(
                 config.UnbindTable, items, talismanTable, scrollTable, boosterTable);
+            // P1-5d：内部充值商品表。P0 不接真实支付渠道，订单与回调都在本服务；
+            // 元宝数只在这份配置里，一笔订单只发一次。
+            rechargeTable = RechargeTable.Load(config.RechargeTable);
             // 方案 12.1 定死十八种可上架种类，商城只收元宝；清单外的编号在购买时拒绝。
             // P1-5c2 起逐种接发货：已接的种类必须指向 items.json 里的真物品，
             // 保护券还必须就是 enhance.json 那一个编号（两处发的是同一种券），
@@ -171,6 +175,8 @@ public sealed class CharacterProcess(string configPath)
             + " exp_cost_pct=" + scrollTable.ExpCostPct);
         // 与 --exp-booster-list 只读入口同形：时长、倍率改一条，重启后这里能直接核对到。
         // 到期时刻不在这里，在角色库那一行（--exp-booster-state 读）。
+        Console.WriteLine("recharge_table_version=" + rechargeTable.Version
+            + " products=" + rechargeTable.Products.Count);
         Console.WriteLine("unbind_table_version=" + unbindTable.Version
             + " item=" + unbindTable.Unbind.ItemId
             + " tiers=" + unbindTable.Unbind.Tiers.Count
@@ -215,6 +221,9 @@ public sealed class CharacterProcess(string configPath)
         // 解绑只改 inventory 的 bound / bound_at，不新建表：这一笔事务也在这个
         // Repository 里，拒绝路径在扣减之前判完。
         var unbinds = new UnbindRepository(dataSource, items, unbindTable);
+        // 充值订单的一笔只在这里结算：锁订单行 → 认归属 → 已 paid 就不做 →
+        // 抢事务号 → 加元宝 → 订单改 paid → 读回。
+        var recharges = new RechargeRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -260,6 +269,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(boosterTable);
         builder.Services.AddSingleton(unbinds);
         builder.Services.AddSingleton(unbindTable);
+        builder.Services.AddSingleton(recharges);
+        builder.Services.AddSingleton(rechargeTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(config);
