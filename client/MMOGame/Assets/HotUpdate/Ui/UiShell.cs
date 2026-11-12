@@ -245,6 +245,15 @@ namespace HotUpdate.Ui
 
             Debug.Log(PageLog + "title=" + title + " widgets=" + _page.Count + " buttons=" + _pageButtons.Count);        }
 
+        /// <summary>按同一份构建回调重开当前屏。回包里来了新事实值时用，不换标题也不记日志。</summary>
+        public void RefreshPage()
+        {
+            if (_pageBuild != null)
+            {
+                ShowPage(_pageTitle, _pageBuild);
+            }
+        }
+
         /// <summary>关掉当前屏，只留骨架。</summary>
         public void ClosePage()
         {
