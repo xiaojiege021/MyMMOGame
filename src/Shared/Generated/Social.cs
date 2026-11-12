@@ -34,20 +34,36 @@ namespace Mmo.Proto.Social {
             "BSABKAkikgEKDFNlY3RSZXNwb25zZRIKCgJvaxgBIAEoCBIOCgZyZWFzb24Y",
             "AiABKAkSDwoHc2VjdF9pZBgDIAEoBBINCgVsZXZlbBgEIAEoBRISCgptZW1i",
             "ZXJfY2FwGAUgASgFEhQKDG1lbWJlcl9jb3VudBgGIAEoBRIMCgRuYW1lGAcg",
-            "ASgJEg4KBnR4bl9pZBgIIAEoCTLkAQoNU29jaWFsU2VydmljZRJFCgpDcmVh",
-            "dGVTZWN0Eh0ubW1vLnNvY2lhbC5DcmVhdGVTZWN0UmVxdWVzdBoYLm1tby5z",
-            "b2NpYWwuU2VjdFJlc3BvbnNlEkEKCEpvaW5TZWN0EhsubW1vLnNvY2lhbC5K",
-            "b2luU2VjdFJlcXVlc3QaGC5tbW8uc29jaWFsLlNlY3RSZXNwb25zZRJJCgxE",
-            "ZXNjcmliZVNlY3QSHy5tbW8uc29jaWFsLkRlc2NyaWJlU2VjdFJlcXVlc3Qa",
-            "GC5tbW8uc29jaWFsLlNlY3RSZXNwb25zZUITqgIQTW1vLlByb3RvLlNvY2lh",
-            "bGIGcHJvdG8z"));
+            "ASgJEg4KBnR4bl9pZBgIIAEoCSKIAQoPUG9zaXRpb25SZXF1ZXN0Eg8KB2Fj",
+            "Y291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEg4KBnR4bl9pZBgD",
+            "IAEoCRIPCgdzZWN0X2lkGAQgASgEEhsKE3RhcmdldF9jaGFyYWN0ZXJfaWQY",
+            "BSABKAQSEAoIcG9zaXRpb24YBiABKAkigQIKFVBvc2l0aW9uU3RhdGVSZXNw",
+            "b25zZRIKCgJvaxgBIAEoCBIOCgZyZWFzb24YAiABKAkSDwoHc2VjdF9pZBgD",
+            "IAEoBBIQCghwb3NpdGlvbhgEIAEoCRIQCghzZWF0X2NhcBgFIAEoBRISCgpz",
+            "ZWF0X2NvdW50GAYgASgFEg4KBnR4bl9pZBgHIAEoCRIUCgxtYXN0ZXJfY291",
+            "bnQYCCABKAUSGQoRdmljZV9tYXN0ZXJfY291bnQYCSABKAUSEwoLZWxkZXJf",
+            "Y291bnQYCiABKAUSFQoNc3Rld2FyZF9jb3VudBgLIAEoBRIWCg5kaXNjaXBs",
+            "ZV9jb3VudBgMIAEoBTLfAwoNU29jaWFsU2VydmljZRJFCgpDcmVhdGVTZWN0",
+            "Eh0ubW1vLnNvY2lhbC5DcmVhdGVTZWN0UmVxdWVzdBoYLm1tby5zb2NpYWwu",
+            "U2VjdFJlc3BvbnNlEkEKCEpvaW5TZWN0EhsubW1vLnNvY2lhbC5Kb2luU2Vj",
+            "dFJlcXVlc3QaGC5tbW8uc29jaWFsLlNlY3RSZXNwb25zZRJJCgxEZXNjcmli",
+            "ZVNlY3QSHy5tbW8uc29jaWFsLkRlc2NyaWJlU2VjdFJlcXVlc3QaGC5tbW8u",
+            "c29jaWFsLlNlY3RSZXNwb25zZRJRCg9BcHBvaW50UG9zaXRpb24SGy5tbW8u",
+            "c29jaWFsLlBvc2l0aW9uUmVxdWVzdBohLm1tby5zb2NpYWwuUG9zaXRpb25T",
+            "dGF0ZVJlc3BvbnNlElEKD0Rpc21pc3NQb3NpdGlvbhIbLm1tby5zb2NpYWwu",
+            "UG9zaXRpb25SZXF1ZXN0GiEubW1vLnNvY2lhbC5Qb3NpdGlvblN0YXRlUmVz",
+            "cG9uc2USUwoRRGVzY3JpYmVQb3NpdGlvbnMSGy5tbW8uc29jaWFsLlBvc2l0",
+            "aW9uUmVxdWVzdBohLm1tby5zb2NpYWwuUG9zaXRpb25TdGF0ZVJlc3BvbnNl",
+            "QhOqAhBNbW8uUHJvdG8uU29jaWFsYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.CreateSectRequest), global::Mmo.Proto.Social.CreateSectRequest.Parser, new[]{ "Account", "CharacterId", "TxnId", "Name" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.JoinSectRequest), global::Mmo.Proto.Social.JoinSectRequest.Parser, new[]{ "Account", "CharacterId", "TxnId", "SectId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.DescribeSectRequest), global::Mmo.Proto.Social.DescribeSectRequest.Parser, new[]{ "Account", "CharacterId", "TxnId", "SectId", "Name" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.SectResponse), global::Mmo.Proto.Social.SectResponse.Parser, new[]{ "Ok", "Reason", "SectId", "Level", "MemberCap", "MemberCount", "Name", "TxnId" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.SectResponse), global::Mmo.Proto.Social.SectResponse.Parser, new[]{ "Ok", "Reason", "SectId", "Level", "MemberCap", "MemberCount", "Name", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.PositionRequest), global::Mmo.Proto.Social.PositionRequest.Parser, new[]{ "Account", "CharacterId", "TxnId", "SectId", "TargetCharacterId", "Position" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.PositionStateResponse), global::Mmo.Proto.Social.PositionStateResponse.Parser, new[]{ "Ok", "Reason", "SectId", "Position", "SeatCap", "SeatCount", "TxnId", "MasterCount", "ViceMasterCount", "ElderCount", "StewardCount", "DiscipleCount" }, null, null, null, null)
           }));
     }
     #endregion
@@ -1477,6 +1493,1005 @@ namespace Mmo.Proto.Social {
           }
           case 66: {
             TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// P2-1a2：任命 / 免职 / 只读查席位。account + character_id 是发起者（现任掌门），
+  /// target_character_id 是名册里的被任免者；position 是职位名（master / vice_master /
+  /// elder / steward / disciple），席位数字带不进来。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class PositionRequest : pb::IMessage<PositionRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<PositionRequest> _parser = new pb::MessageParser<PositionRequest>(() => new PositionRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<PositionRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Social.SocialReflection.Descriptor.MessageTypes[4]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PositionRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PositionRequest(PositionRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      txnId_ = other.txnId_;
+      sectId_ = other.sectId_;
+      targetCharacterId_ = other.targetCharacterId_;
+      position_ = other.position_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PositionRequest Clone() {
+      return new PositionRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 3;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "sect_id" field.</summary>
+    public const int SectIdFieldNumber = 4;
+    private ulong sectId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong SectId {
+      get { return sectId_; }
+      set {
+        sectId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "target_character_id" field.</summary>
+    public const int TargetCharacterIdFieldNumber = 5;
+    private ulong targetCharacterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong TargetCharacterId {
+      get { return targetCharacterId_; }
+      set {
+        targetCharacterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "position" field.</summary>
+    public const int PositionFieldNumber = 6;
+    private string position_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Position {
+      get { return position_; }
+      set {
+        position_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as PositionRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(PositionRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (TxnId != other.TxnId) return false;
+      if (SectId != other.SectId) return false;
+      if (TargetCharacterId != other.TargetCharacterId) return false;
+      if (Position != other.Position) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (SectId != 0UL) hash ^= SectId.GetHashCode();
+      if (TargetCharacterId != 0UL) hash ^= TargetCharacterId.GetHashCode();
+      if (Position.Length != 0) hash ^= Position.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TxnId);
+      }
+      if (SectId != 0UL) {
+        output.WriteRawTag(32);
+        output.WriteUInt64(SectId);
+      }
+      if (TargetCharacterId != 0UL) {
+        output.WriteRawTag(40);
+        output.WriteUInt64(TargetCharacterId);
+      }
+      if (Position.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Position);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TxnId);
+      }
+      if (SectId != 0UL) {
+        output.WriteRawTag(32);
+        output.WriteUInt64(SectId);
+      }
+      if (TargetCharacterId != 0UL) {
+        output.WriteRawTag(40);
+        output.WriteUInt64(TargetCharacterId);
+      }
+      if (Position.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Position);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (SectId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(SectId);
+      }
+      if (TargetCharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(TargetCharacterId);
+      }
+      if (Position.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Position);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(PositionRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      if (other.SectId != 0UL) {
+        SectId = other.SectId;
+      }
+      if (other.TargetCharacterId != 0UL) {
+        TargetCharacterId = other.TargetCharacterId;
+      }
+      if (other.Position.Length != 0) {
+        Position = other.Position;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            TxnId = input.ReadString();
+            break;
+          }
+          case 32: {
+            SectId = input.ReadUInt64();
+            break;
+          }
+          case 40: {
+            TargetCharacterId = input.ReadUInt64();
+            break;
+          }
+          case 50: {
+            Position = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            TxnId = input.ReadString();
+            break;
+          }
+          case 32: {
+            SectId = input.ReadUInt64();
+            break;
+          }
+          case 40: {
+            TargetCharacterId = input.ReadUInt64();
+            break;
+          }
+          case 50: {
+            Position = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 回包前七个字段是这一笔的只读事实值；*_count 只在 DescribePositions 时填，
+  /// 是各职位在名册里的已占席位（事实值），客户端填不进来。
+  /// 业务拒绝（position_full / not_member / not_leader / position_unknown /
+  /// sect_not_found）是正常回包里的 ok=false + reason，seat_count 给 0 表示未生效。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class PositionStateResponse : pb::IMessage<PositionStateResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<PositionStateResponse> _parser = new pb::MessageParser<PositionStateResponse>(() => new PositionStateResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<PositionStateResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Social.SocialReflection.Descriptor.MessageTypes[5]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PositionStateResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PositionStateResponse(PositionStateResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      sectId_ = other.sectId_;
+      position_ = other.position_;
+      seatCap_ = other.seatCap_;
+      seatCount_ = other.seatCount_;
+      txnId_ = other.txnId_;
+      masterCount_ = other.masterCount_;
+      viceMasterCount_ = other.viceMasterCount_;
+      elderCount_ = other.elderCount_;
+      stewardCount_ = other.stewardCount_;
+      discipleCount_ = other.discipleCount_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PositionStateResponse Clone() {
+      return new PositionStateResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "sect_id" field.</summary>
+    public const int SectIdFieldNumber = 3;
+    private ulong sectId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong SectId {
+      get { return sectId_; }
+      set {
+        sectId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "position" field.</summary>
+    public const int PositionFieldNumber = 4;
+    private string position_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Position {
+      get { return position_; }
+      set {
+        position_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "seat_cap" field.</summary>
+    public const int SeatCapFieldNumber = 5;
+    private int seatCap_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int SeatCap {
+      get { return seatCap_; }
+      set {
+        seatCap_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "seat_count" field.</summary>
+    public const int SeatCountFieldNumber = 6;
+    private int seatCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int SeatCount {
+      get { return seatCount_; }
+      set {
+        seatCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 7;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "master_count" field.</summary>
+    public const int MasterCountFieldNumber = 8;
+    private int masterCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int MasterCount {
+      get { return masterCount_; }
+      set {
+        masterCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "vice_master_count" field.</summary>
+    public const int ViceMasterCountFieldNumber = 9;
+    private int viceMasterCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int ViceMasterCount {
+      get { return viceMasterCount_; }
+      set {
+        viceMasterCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "elder_count" field.</summary>
+    public const int ElderCountFieldNumber = 10;
+    private int elderCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int ElderCount {
+      get { return elderCount_; }
+      set {
+        elderCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "steward_count" field.</summary>
+    public const int StewardCountFieldNumber = 11;
+    private int stewardCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int StewardCount {
+      get { return stewardCount_; }
+      set {
+        stewardCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "disciple_count" field.</summary>
+    public const int DiscipleCountFieldNumber = 12;
+    private int discipleCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int DiscipleCount {
+      get { return discipleCount_; }
+      set {
+        discipleCount_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as PositionStateResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(PositionStateResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (SectId != other.SectId) return false;
+      if (Position != other.Position) return false;
+      if (SeatCap != other.SeatCap) return false;
+      if (SeatCount != other.SeatCount) return false;
+      if (TxnId != other.TxnId) return false;
+      if (MasterCount != other.MasterCount) return false;
+      if (ViceMasterCount != other.ViceMasterCount) return false;
+      if (ElderCount != other.ElderCount) return false;
+      if (StewardCount != other.StewardCount) return false;
+      if (DiscipleCount != other.DiscipleCount) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (SectId != 0UL) hash ^= SectId.GetHashCode();
+      if (Position.Length != 0) hash ^= Position.GetHashCode();
+      if (SeatCap != 0) hash ^= SeatCap.GetHashCode();
+      if (SeatCount != 0) hash ^= SeatCount.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (MasterCount != 0) hash ^= MasterCount.GetHashCode();
+      if (ViceMasterCount != 0) hash ^= ViceMasterCount.GetHashCode();
+      if (ElderCount != 0) hash ^= ElderCount.GetHashCode();
+      if (StewardCount != 0) hash ^= StewardCount.GetHashCode();
+      if (DiscipleCount != 0) hash ^= DiscipleCount.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (SectId != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(SectId);
+      }
+      if (Position.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Position);
+      }
+      if (SeatCap != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(SeatCap);
+      }
+      if (SeatCount != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(SeatCount);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(TxnId);
+      }
+      if (MasterCount != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(MasterCount);
+      }
+      if (ViceMasterCount != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(ViceMasterCount);
+      }
+      if (ElderCount != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(ElderCount);
+      }
+      if (StewardCount != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(StewardCount);
+      }
+      if (DiscipleCount != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(DiscipleCount);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (SectId != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(SectId);
+      }
+      if (Position.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Position);
+      }
+      if (SeatCap != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(SeatCap);
+      }
+      if (SeatCount != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(SeatCount);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(TxnId);
+      }
+      if (MasterCount != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(MasterCount);
+      }
+      if (ViceMasterCount != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(ViceMasterCount);
+      }
+      if (ElderCount != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(ElderCount);
+      }
+      if (StewardCount != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(StewardCount);
+      }
+      if (DiscipleCount != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(DiscipleCount);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (SectId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(SectId);
+      }
+      if (Position.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Position);
+      }
+      if (SeatCap != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(SeatCap);
+      }
+      if (SeatCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(SeatCount);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (MasterCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MasterCount);
+      }
+      if (ViceMasterCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ViceMasterCount);
+      }
+      if (ElderCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ElderCount);
+      }
+      if (StewardCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(StewardCount);
+      }
+      if (DiscipleCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(DiscipleCount);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(PositionStateResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.SectId != 0UL) {
+        SectId = other.SectId;
+      }
+      if (other.Position.Length != 0) {
+        Position = other.Position;
+      }
+      if (other.SeatCap != 0) {
+        SeatCap = other.SeatCap;
+      }
+      if (other.SeatCount != 0) {
+        SeatCount = other.SeatCount;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      if (other.MasterCount != 0) {
+        MasterCount = other.MasterCount;
+      }
+      if (other.ViceMasterCount != 0) {
+        ViceMasterCount = other.ViceMasterCount;
+      }
+      if (other.ElderCount != 0) {
+        ElderCount = other.ElderCount;
+      }
+      if (other.StewardCount != 0) {
+        StewardCount = other.StewardCount;
+      }
+      if (other.DiscipleCount != 0) {
+        DiscipleCount = other.DiscipleCount;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            SectId = input.ReadUInt64();
+            break;
+          }
+          case 34: {
+            Position = input.ReadString();
+            break;
+          }
+          case 40: {
+            SeatCap = input.ReadInt32();
+            break;
+          }
+          case 48: {
+            SeatCount = input.ReadInt32();
+            break;
+          }
+          case 58: {
+            TxnId = input.ReadString();
+            break;
+          }
+          case 64: {
+            MasterCount = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            ViceMasterCount = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            ElderCount = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            StewardCount = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            DiscipleCount = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            SectId = input.ReadUInt64();
+            break;
+          }
+          case 34: {
+            Position = input.ReadString();
+            break;
+          }
+          case 40: {
+            SeatCap = input.ReadInt32();
+            break;
+          }
+          case 48: {
+            SeatCount = input.ReadInt32();
+            break;
+          }
+          case 58: {
+            TxnId = input.ReadString();
+            break;
+          }
+          case 64: {
+            MasterCount = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            ViceMasterCount = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            ElderCount = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            StewardCount = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            DiscipleCount = input.ReadInt32();
             break;
           }
         }

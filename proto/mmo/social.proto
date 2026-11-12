@@ -4,10 +4,13 @@ package mmo.social;
 
 option csharp_namespace = "Mmo.Proto.Social";
 
-// 社交服 gRPC（P2-1a1）。宗门五级人数上限的唯一正本在 config/sect.json，
-// 请求里带不进上限、等级、人数；回包里的 member_cap / member_count 都是只读事实值。
+// 社交服 gRPC（P2-1a1 + P2-1a2）。宗门五级人数上限与四个职位席位的唯一正本
+// 都在 config/sect.json，请求里带不进上限、等级、人数、席位数字；回包里
+// member_cap / member_count / seat_cap / seat_count 都是只读事实值。
 // txn_id 由网关服务端生成（客户端填不进来）：同一号重放不重复扣创建金币、
-// 不重复建宗门。职位权限、传位、建设升级、秘境人数、同门经验都不在这一版。
+// 不重复建宗门；职位是状态设定，重复请求不重复改。
+// 职位权限只落「任命 / 免职由现任掌门发起」这一条最小出口；传位、退出宗门、
+// 分级任免、改宣言称号、建设升级、秘境人数、同门经验都不在这一版。
 
 message CreateSectRequest {
   string account = 1;
@@ -47,8 +50,42 @@ message SectResponse {
   string txn_id = 8;
 }
 
+// P2-1a2：任命 / 免职 / 只读查席位。account + character_id 是发起者（现任掌门），
+// target_character_id 是名册里的被任免者；position 是职位名（master / vice_master /
+// elder / steward / disciple），席位数字带不进来。
+message PositionRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 sect_id = 4;
+  uint64 target_character_id = 5;
+  string position = 6;
+}
+
+// 回包前七个字段是这一笔的只读事实值；*_count 只在 DescribePositions 时填，
+// 是各职位在名册里的已占席位（事实值），客户端填不进来。
+// 业务拒绝（position_full / not_member / not_leader / position_unknown /
+// sect_not_found）是正常回包里的 ok=false + reason，seat_count 给 0 表示未生效。
+message PositionStateResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 sect_id = 3;
+  string position = 4;
+  int32 seat_cap = 5;
+  int32 seat_count = 6;
+  string txn_id = 7;
+  int32 master_count = 8;
+  int32 vice_master_count = 9;
+  int32 elder_count = 10;
+  int32 steward_count = 11;
+  int32 disciple_count = 12;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
   rpc DescribeSect(DescribeSectRequest) returns (SectResponse);
+  rpc AppointPosition(PositionRequest) returns (PositionStateResponse);
+  rpc DismissPosition(PositionRequest) returns (PositionStateResponse);
+  rpc DescribePositions(PositionRequest) returns (PositionStateResponse);
 }

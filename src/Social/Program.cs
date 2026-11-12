@@ -13,6 +13,10 @@ long sectStateOf = 0;
 long sectMembersOf = 0;
 long sectSetLevelOf = 0;
 var sectSetLevelTo = 0;
+var sectPositionConfig = false;
+var sectPositionList = false;
+long sectPositionStateOf = 0;
+long sectPositionMembersOf = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -46,6 +50,19 @@ for (var i = 0; i < args.Length; i++)
         case "--sect-set-level" when i + 2 < args.Length:
             long.TryParse(args[++i], out sectSetLevelOf);
             int.TryParse(args[++i], out sectSetLevelTo);
+            break;
+        // P2-1a2：四个只读入口，与真实启动共用 SocialLoader.LoadAll 同一组参数。
+        case "--sect-position-config":
+            sectPositionConfig = true;
+            break;
+        case "--sect-position-list":
+            sectPositionList = true;
+            break;
+        case "--sect-position-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectPositionStateOf);
+            break;
+        case "--sect-position-members" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectPositionMembersOf);
             break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
@@ -82,9 +99,36 @@ if (sectConfig)
     return 0;
 }
 
+// --sect-position-config：不连库，逐项打印四个席位。坏配置在这一步就起不来
+// （config_error= + 非 0 退出），与真实启动共用同一份 Load + 同一组参数。
+if (sectPositionConfig)
+{
+    try
+    {
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        Console.WriteLine("sect_position_config_state=ok version=" + loaded.Sect.Version
+            + " positions=" + string.Join(",",
+                loaded.Sect.Positions.Select(p => p.Id + ":" + p.Cap)));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 连库入口：--migrate / --sect-list / --sect-state / --sect-members /
-// --sect-set-level。都先过与真实启动同一份 Load + 同一组参数。
-if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLevelOf != 0)
+// --sect-set-level / --sect-position-list / --sect-position-state /
+// --sect-position-members。都先过与真实启动同一份 Load + 同一组参数。
+if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLevelOf != 0
+    || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0)
 {
     SectTable table;
     try
@@ -156,6 +200,39 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
             var changed = await repo.SetLevelAsync(sectSetLevelOf, sectSetLevelTo, CancellationToken.None);
             Console.WriteLine("sect_set_level=" + (changed ? "ok" : "missing")
                 + " sect=" + sectSetLevelOf + " level=" + sectSetLevelTo);
+        }
+
+        if (sectPositionList)
+        {
+            var all = await repo.ListAsync(CancellationToken.None);
+            foreach (var s in all)
+            {
+                var ps = await repo.PositionStateAsync(s.SectId, CancellationToken.None);
+                Console.WriteLine("sect_position_list_state=ok sect=" + s.SectId
+                    + " master=" + ps.Master + " vice_master=" + ps.ViceMaster
+                    + " elder=" + ps.Elder + " steward=" + ps.Steward
+                    + " disciple=" + ps.Disciple);
+            }
+            Console.WriteLine("sect_position_list_state=ok rows=" + all.Count);
+        }
+
+        if (sectPositionStateOf != 0)
+        {
+            var ps = await repo.PositionStateAsync(sectPositionStateOf, CancellationToken.None);
+            Console.WriteLine(ps.Found
+                ? "sect_position_state=ok sect=" + ps.SectId
+                    + " master=" + ps.Master + " vice_master=" + ps.ViceMaster
+                    + " elder=" + ps.Elder + " steward=" + ps.Steward
+                    + " disciple=" + ps.Disciple
+                : "sect_position_state=missing sect=" + sectPositionStateOf);
+        }
+
+        if (sectPositionMembersOf != 0)
+        {
+            var rows = await repo.PositionMembersAsync(sectPositionMembersOf, CancellationToken.None);
+            Console.WriteLine("sect_position_members_state=ok sect=" + sectPositionMembersOf
+                + " rows=" + rows.Count
+                + " ids=" + string.Join(",", rows.Select(r => r.CharacterId + ":" + r.Position)));
         }
     }
     catch (Exception ex) when (ex is NpgsqlException or IOException)

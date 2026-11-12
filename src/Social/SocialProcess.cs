@@ -23,6 +23,9 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect)
             + " create_gold_kind=" + sect.Create.FounderGoldKind
             + " create_gold_cost=" + sect.Create.FounderGoldCost
             + " create_gold_pending=" + sect.Create.FounderGoldCostPending);
+        // P2-1a2：四个席位逐项打印，与 --sect-position-config 同形。
+        Console.WriteLine("positions=" + string.Join(",",
+            sect.Positions.Select(p => p.Id + ":" + p.Cap)));
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());

@@ -103,5 +103,98 @@ public sealed class SocialGrpcService(
         };
     }
 
+    // ---- P2-1a2：任命 / 免职 / 只读查席位 ----
+    // 席位数字只从 config/sect.json 读，请求里带不进来；回包都是只读事实值。
+    public override async Task<PositionStateResponse> AppointPosition(
+        PositionRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        if (!PositionFieldsOk(request, txnId))
+        {
+            return PositionFail("request_missing", request, txnId);
+        }
+
+        var outcome = await sects.AppointAsync(
+            (long)request.SectId, (long)request.CharacterId,
+            (long)request.TargetCharacterId, (request.Position ?? "").Trim(),
+            context.CancellationToken);
+        return PositionBody(outcome, (request.Position ?? "").Trim(), txnId);
+    }
+
+    public override async Task<PositionStateResponse> DismissPosition(
+        PositionRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        if (!PositionFieldsOk(request, txnId))
+        {
+            return PositionFail("request_missing", request, txnId);
+        }
+
+        var outcome = await sects.DismissAsync(
+            (long)request.SectId, (long)request.CharacterId,
+            (long)request.TargetCharacterId, (request.Position ?? "").Trim(),
+            context.CancellationToken);
+        return PositionBody(outcome, (request.Position ?? "").Trim(), txnId);
+    }
+
+    public override async Task<PositionStateResponse> DescribePositions(
+        PositionRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0 || request.CharacterId == 0
+            || txnId.Length == 0 || request.SectId == 0)
+        {
+            return new PositionStateResponse
+            {
+                Ok = false, Reason = "request_missing", SectId = request.SectId, TxnId = txnId,
+            };
+        }
+
+        var state = await sects.PositionStateAsync((long)request.SectId, context.CancellationToken);
+        if (!state.Found)
+        {
+            return new PositionStateResponse
+            {
+                Ok = false, Reason = "sect_not_found", SectId = (ulong)state.SectId, TxnId = txnId,
+            };
+        }
+
+        return new PositionStateResponse
+        {
+            Ok = true,
+            SectId = (ulong)state.SectId,
+            TxnId = txnId,
+            MasterCount = state.Master,
+            ViceMasterCount = state.ViceMaster,
+            ElderCount = state.Elder,
+            StewardCount = state.Steward,
+            DiscipleCount = state.Disciple,
+        };
+    }
+
+    static bool PositionFieldsOk(PositionRequest r, string txnId) =>
+        (r.Account ?? "").Trim().Length > 0 && r.CharacterId != 0 && txnId.Length > 0
+        && r.SectId != 0 && r.TargetCharacterId != 0 && (r.Position ?? "").Trim().Length > 0;
+
+    static PositionStateResponse PositionBody(PositionOutcome o, string requested, string txnId) =>
+        new()
+        {
+            Ok = o.Ok,
+            Reason = o.Reason,
+            SectId = (ulong)o.SectId,
+            Position = o.Ok ? o.Position : requested,
+            SeatCap = o.SeatCap,
+            SeatCount = o.SeatCount,
+            TxnId = txnId,
+        };
+
+    static PositionStateResponse PositionFail(string reason, PositionRequest r, string txnId) =>
+        new()
+        {
+            Ok = false, Reason = reason, SectId = r.SectId,
+            Position = (r.Position ?? "").Trim(), TxnId = txnId,
+        };
+
     static SectResponse Fail(string reason) => new() { Ok = false, Reason = reason };
 }

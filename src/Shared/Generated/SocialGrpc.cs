@@ -53,6 +53,10 @@ namespace Mmo.Proto.Social {
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.JoinSectRequest> __Marshaller_mmo_social_JoinSectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.JoinSectRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectRequest> __Marshaller_mmo_social_DescribeSectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.PositionRequest> __Marshaller_mmo_social_PositionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PositionRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.PositionStateResponse> __Marshaller_mmo_social_PositionStateResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PositionStateResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse> __Method_CreateSect = new grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse>(
@@ -78,6 +82,30 @@ namespace Mmo.Proto.Social {
         __Marshaller_mmo_social_DescribeSectRequest,
         __Marshaller_mmo_social_SectResponse);
 
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse> __Method_AppointPosition = new grpc::Method<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "AppointPosition",
+        __Marshaller_mmo_social_PositionRequest,
+        __Marshaller_mmo_social_PositionStateResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse> __Method_DismissPosition = new grpc::Method<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DismissPosition",
+        __Marshaller_mmo_social_PositionRequest,
+        __Marshaller_mmo_social_PositionStateResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse> __Method_DescribePositions = new grpc::Method<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribePositions",
+        __Marshaller_mmo_social_PositionRequest,
+        __Marshaller_mmo_social_PositionStateResponse);
+
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
     {
@@ -102,6 +130,24 @@ namespace Mmo.Proto.Social {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.SectResponse> DescribeSect(global::Mmo.Proto.Social.DescribeSectRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PositionStateResponse> AppointPosition(global::Mmo.Proto.Social.PositionRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PositionStateResponse> DismissPosition(global::Mmo.Proto.Social.PositionRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PositionStateResponse> DescribePositions(global::Mmo.Proto.Social.PositionRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -195,6 +241,66 @@ namespace Mmo.Proto.Social {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeSect, null, options, request);
       }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PositionStateResponse AppointPosition(global::Mmo.Proto.Social.PositionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AppointPosition(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PositionStateResponse AppointPosition(global::Mmo.Proto.Social.PositionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_AppointPosition, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PositionStateResponse> AppointPositionAsync(global::Mmo.Proto.Social.PositionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AppointPositionAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PositionStateResponse> AppointPositionAsync(global::Mmo.Proto.Social.PositionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_AppointPosition, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PositionStateResponse DismissPosition(global::Mmo.Proto.Social.PositionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DismissPosition(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PositionStateResponse DismissPosition(global::Mmo.Proto.Social.PositionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DismissPosition, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PositionStateResponse> DismissPositionAsync(global::Mmo.Proto.Social.PositionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DismissPositionAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PositionStateResponse> DismissPositionAsync(global::Mmo.Proto.Social.PositionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DismissPosition, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PositionStateResponse DescribePositions(global::Mmo.Proto.Social.PositionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribePositions(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PositionStateResponse DescribePositions(global::Mmo.Proto.Social.PositionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribePositions, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PositionStateResponse> DescribePositionsAsync(global::Mmo.Proto.Social.PositionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribePositionsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PositionStateResponse> DescribePositionsAsync(global::Mmo.Proto.Social.PositionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribePositions, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override SocialServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -211,7 +317,10 @@ namespace Mmo.Proto.Social {
       return grpc::ServerServiceDefinition.CreateBuilder()
           .AddMethod(__Method_CreateSect, serviceImpl.CreateSect)
           .AddMethod(__Method_JoinSect, serviceImpl.JoinSect)
-          .AddMethod(__Method_DescribeSect, serviceImpl.DescribeSect).Build();
+          .AddMethod(__Method_DescribeSect, serviceImpl.DescribeSect)
+          .AddMethod(__Method_AppointPosition, serviceImpl.AppointPosition)
+          .AddMethod(__Method_DismissPosition, serviceImpl.DismissPosition)
+          .AddMethod(__Method_DescribePositions, serviceImpl.DescribePositions).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -224,6 +333,9 @@ namespace Mmo.Proto.Social {
       serviceBinder.AddMethod(__Method_CreateSect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse>(serviceImpl.CreateSect));
       serviceBinder.AddMethod(__Method_JoinSect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.JoinSectRequest, global::Mmo.Proto.Social.SectResponse>(serviceImpl.JoinSect));
       serviceBinder.AddMethod(__Method_DescribeSect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeSectRequest, global::Mmo.Proto.Social.SectResponse>(serviceImpl.DescribeSect));
+      serviceBinder.AddMethod(__Method_AppointPosition, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(serviceImpl.AppointPosition));
+      serviceBinder.AddMethod(__Method_DismissPosition, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(serviceImpl.DismissPosition));
+      serviceBinder.AddMethod(__Method_DescribePositions, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(serviceImpl.DescribePositions));
     }
 
   }
