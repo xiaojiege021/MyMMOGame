@@ -36,6 +36,8 @@ internal static class Program
         var item = Arg(args, "--item") ?? "talisman_red";
         var otherItem = Arg(args, "--other") ?? "ticket_protect";
         var healSkill = uint.TryParse(Arg(args, "--heal"), out var hs) ? hs : 1302U;
+        var blue = Arg(args, "--blue") ?? "talisman_blue";
+        var manaSkill = uint.TryParse(Arg(args, "--skill"), out var ms) ? ms : 1002U;
 
         try
         {
@@ -69,6 +71,14 @@ internal static class Program
                 "p15c3_talisman_off" => await CaseP15c3OffAsync(url, item),
                 "p15c3_talisman_heal_share" => await CaseP15c3HealShareAsync(url, item, healSkill),
                 "p15c3_talisman_none" => await CaseP15c3NoneAsync(url, item),
+                "p15c5_blue" => await CaseP15c5BlueAsync(url, blue, manaSkill),
+                "p15c5_blue_full" => await CaseP15c5FullAsync(url, blue),
+                "p15c5_blue_twice" => await CaseP15c5TwiceAsync(url, blue, manaSkill),
+                "p15c5_red_blue_both" => await CaseP15c5BothAsync(url, item, blue, manaSkill),
+                "p15c5_blue_damage" => await CaseP15c5DamageAsync(url, blue, manaSkill),
+                "p15c5_blue_other" => await CaseP15c5OtherAsync(url, otherItem),
+                "p15c5_blue_down" => await CaseP15c5DownAsync(url, blue),
+                "p15c5_blue_none" => await CaseP15c5NoneAsync(url, blue, manaSkill),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -1067,6 +1077,243 @@ internal static class Program
 
         return Report(reject?.Reason == "no_talisman" && message?.TalismanUsed is null,
             $"case=p15c3_talisman_none reason={reject?.Reason} hp_before={hurt.Hp} "
+            + $"hp_after={reject?.HpAfter}");
+    }
+
+    /// <summary>
+    /// 用一次耗蓝技能把蓝打下来，返回结算后的蓝量。蓝量在结算时才扣，
+    /// 所以要等那一条 SkillResult，不能拿开场值当用符前的蓝。
+    /// </summary>
+    static async Task<long?> SpendManaAsync(Session session, uint skill)
+    {
+        await session.SubmitAsync(skill, session.Opened.BossId, Session.NowMs());
+        var message = await session.ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null, 6000);
+        return message?.Result?.ManaAfter;
+    }
+
+    /// <summary>
+    /// 完成标准一「不回血」：蓝符只回自己的蓝，Healed 恒 0、血量一格不动。
+    /// 同时验回包里的池、组、回蓝量与上限——回复值来自角色服回包，不是本地算的。
+    /// </summary>
+    static async Task<int> CaseP15c5BlueAsync(string url, string blue, uint skill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var opened = session.Opened;
+        var manaBefore = await SpendManaAsync(session, skill);
+        if (manaBefore is null || manaBefore >= opened.ManaMax)
+        {
+            return Fail("case=p15c5_blue 没能把蓝耗下来，蓝符会撞 mana_full");
+        }
+
+        await session.UseTalismanAsync(blue);
+        var message = await ReadTalismanAsync(session, 8000);
+        var used = message?.TalismanUsed;
+        var ok = used is not null
+                 && used.CasterId == opened.CasterId
+                 && used.ItemId == blue
+                 && used.Pool == "mana"
+                 && used.CooldownGroup == "mana"
+                 && used.CooldownMs > 0
+                 && used.Healed == 0
+                 && used.HpAfter <= opened.CasterHp
+                 && used.ManaRestored > 0
+                 && used.Restored == used.ManaRestored
+                 && used.ManaAfter == manaBefore + used.ManaRestored
+                 && used.ManaAfter <= opened.ManaMax;
+
+        return Report(ok,
+            $"case=p15c5_blue hp={opened.CasterHp} mana_before={manaBefore} "
+            + $"restored={used?.ManaRestored} mana_after={used?.ManaAfter} "
+            + $"healed={used?.Healed} hp_after={used?.HpAfter} "
+            + $"pool={used?.Pool} group={used?.CooldownGroup} left={used?.CountLeft}");
+    }
+
+    /// <summary>满蓝用符：本地挡住，不去扣符——不让玩家白烧一张。</summary>
+    static async Task<int> CaseP15c5FullAsync(string url, string blue)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var opened = session.Opened;
+        await session.UseTalismanAsync(blue);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "mana_full" && message?.TalismanUsed is null
+                      && reject.HpAfter == opened.CasterHp
+                      && reject.ManaAfter == opened.Mana,
+            $"case=p15c5_blue_full mana={opened.Mana}/{opened.ManaMax} "
+            + $"reason={reject?.Reason} hp_after={reject?.HpAfter} mana_after={reject?.ManaAfter}");
+    }
+
+    /// <summary>紧接着再用一张：蓝量组冷却没好，还差多久由服务端给。</summary>
+    static async Task<int> CaseP15c5TwiceAsync(string url, string blue, uint skill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var manaBefore = await SpendManaAsync(session, skill);
+        if (manaBefore is null)
+        {
+            return Fail("case=p15c5_blue_twice 没能把蓝耗下来");
+        }
+
+        await session.UseTalismanAsync(blue);
+        var used = (await ReadTalismanAsync(session, 8000))?.TalismanUsed;
+        if (used is null)
+        {
+            return Fail("case=p15c5_blue_twice 第一张蓝符没成功："
+                + (await ReadTalismanAsync(session, 500))?.TalismanRejected?.Reason);
+        }
+
+        await session.UseTalismanAsync(blue);
+        var reject = (await ReadTalismanAsync(session, 8000))?.TalismanRejected;
+
+        return Report(reject?.Reason == "cooldown" && reject.RetryAfterMs > 0
+                      && reject.ManaAfter == used.ManaAfter,
+            $"case=p15c5_blue_twice first_restored={used.ManaRestored} "
+            + $"group={used.CooldownGroup} second_reason={reject?.Reason} "
+            + $"retry_ms={reject?.RetryAfterMs} mana_after={reject?.ManaAfter}");
+    }
+
+    /// <summary>
+    /// 完成标准「和红符可以各用一次」：红符用完立刻能用蓝符、蓝符用完立刻能用红符，
+    /// 两次都成功且冷却组不同；随后各自再用第二次，分别撞自己那一组。
+    /// </summary>
+    static async Task<int> CaseP15c5BothAsync(string url, string red, string blue, uint skill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var manaBefore = await SpendManaAsync(session, skill);
+        var hurt = await WaitDamagedAsync(session, 12000, wantDown: false);
+        if (manaBefore is null || hurt is null || hurt.Hp >= hurt.HpMax)
+        {
+            return Fail("case=p15c5_red_blue_both 没造出「蓝不满 + 血不满」的起点");
+        }
+
+        await session.UseTalismanAsync(red);
+        var redUsed = (await ReadTalismanAsync(session, 8000))?.TalismanUsed;
+        await session.UseTalismanAsync(blue);
+        var blueUsed = (await ReadTalismanAsync(session, 8000))?.TalismanUsed;
+        await session.UseTalismanAsync(red);
+        var redAgain = (await ReadTalismanAsync(session, 8000))?.TalismanRejected;
+        await session.UseTalismanAsync(blue);
+        var blueAgain = (await ReadTalismanAsync(session, 8000))?.TalismanRejected;
+
+        var ok = redUsed is not null && blueUsed is not null
+                 && redUsed.Pool == "hp" && redUsed.CooldownGroup == "heal"
+                 && redUsed.Healed > 0 && redUsed.ManaRestored == 0
+                 && blueUsed.Pool == "mana" && blueUsed.CooldownGroup == "mana"
+                 && blueUsed.ManaRestored > 0 && blueUsed.Healed == 0
+                 && blueUsed.HpAfter <= redUsed.HpAfter
+                 && redAgain?.Reason == "cooldown"
+                 && blueAgain?.Reason == "cooldown";
+
+        return Report(ok,
+            $"case=p15c5_red_blue_both red_healed={redUsed?.Healed} "
+            + $"red_group={redUsed?.CooldownGroup} blue_restored={blueUsed?.ManaRestored} "
+            + $"blue_group={blueUsed?.CooldownGroup} blue_hp_after={blueUsed?.HpAfter} "
+            + $"red_2nd={redAgain?.Reason} blue_2nd={blueAgain?.Reason}");
+    }
+
+    /// <summary>
+    /// 完成标准「不提高伤害」：用符前后同一个技能打同一个 Boss，伤害必须一样。
+    /// 蓝量不进入伤害是 P0-3a 写定的，这里验的是蓝符没有偷偷开第二条路。
+    /// </summary>
+    static async Task<int> CaseP15c5DamageAsync(string url, string blue, uint skill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var opened = session.Opened;
+
+        await session.SubmitAsync(skill, opened.BossId, Session.NowMs());
+        // 前摇里 Boss 可能先推 MemberUpdated / BossPhase：ReadResultAsync 只看第一条，
+        // 这里要跳过广播一直等到这一下的 Result（或 Rejected）。
+        var firstMessage = await session.ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null, 6000);
+        var first = firstMessage?.Result;
+        if (first is null || first.Damage <= 0)
+        {
+            return Fail("case=p15c5_blue_damage 用符前那一下没打出来："
+                + (firstMessage?.Rejected?.Reason.ToString() ?? "没等到回包"));
+        }
+
+        await session.UseTalismanAsync(blue);
+        var used = (await ReadTalismanAsync(session, 8000))?.TalismanUsed;
+        if (used is null || used.ManaRestored <= 0)
+        {
+            return Fail("case=p15c5_blue_damage 蓝符没回上蓝");
+        }
+
+        // 冷却从接受那次出手算起，等过整个冷却再打第二下。
+        await Task.Delay((int)first.CooldownMs + 350);
+        await session.SubmitAsync(skill, opened.BossId, Session.NowMs());
+        var secondMessage = await session.ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null, 6000);
+        var second = secondMessage?.Result;
+
+        return Report(second is not null
+                      && second.Damage == first.Damage
+                      && used.Healed == 0
+                      && used.ManaAfter <= opened.ManaMax,
+            $"case=p15c5_blue_damage skill={skill} first={first.Damage} "
+            + $"second={second?.Damage} restored={used.ManaRestored} "
+            + $"mana_after={used.ManaAfter} mana_max={opened.ManaMax}");
+    }
+
+    /// <summary>拿保护券当符用：角色服不认这个编号，不扣不回。</summary>
+    static async Task<int> CaseP15c5OtherAsync(string url, string other)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var opened = session.Opened;
+        await session.UseTalismanAsync(other);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "not_talisman" && message?.TalismanUsed is null
+                      && reject.HpAfter == opened.CasterHp
+                      && reject.ManaAfter == opened.Mana,
+            $"case=p15c5_blue_other item={other} reason={reject?.Reason} "
+            + $"hp_after={reject?.HpAfter} mana_after={reject?.ManaAfter}");
+    }
+
+    /// <summary>倒地之后用蓝符：符不复活，倒地时点不了。</summary>
+    static async Task<int> CaseP15c5DownAsync(string url, string blue)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var down = await WaitDamagedAsync(session, 15000, wantDown: true);
+        if (down is null)
+        {
+            return Fail("case=p15c5_blue_down 没等到自己倒地");
+        }
+
+        await session.UseTalismanAsync(blue);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "caster_down"
+                      && message?.TalismanUsed is null
+                      && reject.HpAfter <= 0
+                      && reject.ManaAfter == session.Opened.Mana,
+            $"case=p15c5_blue_down hp={down.Hp} reason={reject?.Reason} "
+            + $"hp_after={reject?.HpAfter} mana_after={reject?.ManaAfter}");
+    }
+
+    /// <summary>背包里一张蓝符都不剩：角色服回 no_talisman，血与蓝都不动。</summary>
+    static async Task<int> CaseP15c5NoneAsync(string url, string blue, uint skill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var opened = session.Opened;
+        var manaBefore = await SpendManaAsync(session, skill);
+        if (manaBefore is null)
+        {
+            return Fail("case=p15c5_blue_none 没能把蓝耗下来");
+        }
+
+        await session.UseTalismanAsync(blue);
+        var message = await ReadTalismanAsync(session, 8000);
+        var reject = message?.TalismanRejected;
+
+        return Report(reject?.Reason == "no_talisman" && message?.TalismanUsed is null
+                      && reject.ManaAfter == manaBefore
+                      && reject.HpAfter <= opened.CasterHp,
+            $"case=p15c5_blue_none reason={reject?.Reason} "
+            + $"mana_before={manaBefore} mana_after={reject?.ManaAfter} "
             + $"hp_after={reject?.HpAfter}");
     }
 

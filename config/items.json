@@ -39,6 +39,13 @@
       "bind": "always"
     },
     {
+      "id": "talisman_blue",
+      "name": "蓝符",
+      "kind": "consumable",
+      "stack_max": 20,
+      "bind": "always"
+    },
+    {
       "id": "ticket_protect",
       "name": "保护券",
       "kind": "voucher",

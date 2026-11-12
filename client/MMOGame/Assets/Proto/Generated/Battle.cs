@@ -82,21 +82,23 @@ namespace Mmo.Proto.Battle {
             "dGxlLlRhbGlzbWFuUmVqZWN0ZWRIAEIGCgRib2R5IlMKDUVudGVyUmVqZWN0",
             "ZWQSDgoGcmVhc29uGAEgASgJEg0KBWxpbWl0GAIgASgNEg8KB2N1cnJlbnQY",
             "AyABKA0SEgoKZHVuZ2Vvbl9pZBgEIAEoCSI9ChJVc2VUYWxpc21hblJlcXVl",
-            "c3QSDwoHaXRlbV9pZBgBIAEoCRIWCg5jbGllbnRfdGltZV9tcxgCIAEoAyKV",
+            "c3QSDwoHaXRlbV9pZBgBIAEoCRIWCg5jbGllbnRfdGltZV9tcxgCIAEoAyLg",
             "AQoMVGFsaXNtYW5Vc2VkEhEKCWNhc3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lk",
             "GAIgASgJEg4KBmhlYWxlZBgDIAEoAxIQCghocF9hZnRlchgEIAEoAxITCgtj",
             "b29sZG93bl9tcxgFIAEoDRIWCg5jb29sZG93bl9ncm91cBgGIAEoCRISCgpj",
-            "b3VudF9sZWZ0GAcgASgDIl0KEFRhbGlzbWFuUmVqZWN0ZWQSDwoHaXRlbV9p",
-            "ZBgBIAEoCRIOCgZyZWFzb24YAiABKAkSFgoOcmV0cnlfYWZ0ZXJfbXMYAyAB",
-            "KA0SEAoIaHBfYWZ0ZXIYBCABKAMq0wIKEVNraWxsUmVqZWN0UmVhc29uEhwK",
-            "GFNLSUxMX1JFSkVDVF9VTlNQRUNJRklFRBAAEh4KGlNLSUxMX1JFSkVDVF9O",
-            "T1RfSU5fQkFUVExFEAESHgoaU0tJTExfUkVKRUNUX1VOS05PV05fU0tJTEwQ",
-            "AhIcChhTS0lMTF9SRUpFQ1RfVEFSR0VUX0dPTkUQAxIcChhTS0lMTF9SRUpF",
-            "Q1RfQ0FTVEVSX0RFQUQQBBIZChVTS0lMTF9SRUpFQ1RfQ09PTERPV04QBRId",
-            "ChlTS0lMTF9SRUpFQ1RfT1VUX09GX1JBTkdFEAYSGAoUU0tJTExfUkVKRUNU",
-            "X0NBU1RJTkcQBxIZChVTS0lMTF9SRUpFQ1RfUkVDT1ZFUlkQCBIYChRTS0lM",
-            "TF9SRUpFQ1RfTk9fTUFOQRAJEhsKF1NLSUxMX1JFSkVDVF9CQURfVEFSR0VU",
-            "EApCE6oCEE1tby5Qcm90by5CYXR0bGViBnByb3RvMw=="));
+            "b3VudF9sZWZ0GAcgASgDEgwKBHBvb2wYCCABKAkSEAoIcmVzdG9yZWQYCSAB",
+            "KAMSEgoKbWFuYV9hZnRlchgKIAEoAxIVCg1tYW5hX3Jlc3RvcmVkGAsgASgD",
+            "InEKEFRhbGlzbWFuUmVqZWN0ZWQSDwoHaXRlbV9pZBgBIAEoCRIOCgZyZWFz",
+            "b24YAiABKAkSFgoOcmV0cnlfYWZ0ZXJfbXMYAyABKA0SEAoIaHBfYWZ0ZXIY",
+            "BCABKAMSEgoKbWFuYV9hZnRlchgFIAEoAyrTAgoRU2tpbGxSZWplY3RSZWFz",
+            "b24SHAoYU0tJTExfUkVKRUNUX1VOU1BFQ0lGSUVEEAASHgoaU0tJTExfUkVK",
+            "RUNUX05PVF9JTl9CQVRUTEUQARIeChpTS0lMTF9SRUpFQ1RfVU5LTk9XTl9T",
+            "S0lMTBACEhwKGFNLSUxMX1JFSkVDVF9UQVJHRVRfR09ORRADEhwKGFNLSUxM",
+            "X1JFSkVDVF9DQVNURVJfREVBRBAEEhkKFVNLSUxMX1JFSkVDVF9DT09MRE9X",
+            "ThAFEh0KGVNLSUxMX1JFSkVDVF9PVVRfT0ZfUkFOR0UQBhIYChRTS0lMTF9S",
+            "RUpFQ1RfQ0FTVElORxAHEhkKFVNLSUxMX1JFSkVDVF9SRUNPVkVSWRAIEhgK",
+            "FFNLSUxMX1JFSkVDVF9OT19NQU5BEAkSGwoXU0tJTExfUkVKRUNUX0JBRF9U",
+            "QVJHRVQQCkITqgIQTW1vLlByb3RvLkJhdHRsZWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Battle.SkillRejectReason), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -118,8 +120,8 @@ namespace Mmo.Proto.Battle {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected", "TalismanUsed", "TalismanRejected" }, new[]{ "Body" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.EnterRejected), global::Mmo.Proto.Battle.EnterRejected.Parser, new[]{ "Reason", "Limit", "Current", "DungeonId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.UseTalismanRequest), global::Mmo.Proto.Battle.UseTalismanRequest.Parser, new[]{ "ItemId", "ClientTimeMs" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanUsed), global::Mmo.Proto.Battle.TalismanUsed.Parser, new[]{ "CasterId", "ItemId", "Healed", "HpAfter", "CooldownMs", "CooldownGroup", "CountLeft" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanRejected), global::Mmo.Proto.Battle.TalismanRejected.Parser, new[]{ "ItemId", "Reason", "RetryAfterMs", "HpAfter" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanUsed), global::Mmo.Proto.Battle.TalismanUsed.Parser, new[]{ "CasterId", "ItemId", "Healed", "HpAfter", "CooldownMs", "CooldownGroup", "CountLeft", "Pool", "Restored", "ManaAfter", "ManaRestored" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanRejected), global::Mmo.Proto.Battle.TalismanRejected.Parser, new[]{ "ItemId", "Reason", "RetryAfterMs", "HpAfter", "ManaAfter" }, null, null, null, null)
           }));
     }
     #endregion
@@ -5297,8 +5299,8 @@ namespace Mmo.Proto.Battle {
     /// <summary>Field number for the "talisman" field.</summary>
     public const int TalismanFieldNumber = 4;
     /// <summary>
-    /// 用一张红符。注意这条请求里没有目标编号：红符只回复自己，
-    /// 结构上就指不到队友身上。要治队友只能走牧师的技能。
+    /// 用一张符（红符 / 蓝符，编号由角色服配置认定）。注意这条请求里没有目标编号：
+    /// 符只回复自己，结构上就指不到队友身上。要治队友只能走牧师的技能。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -5797,7 +5799,7 @@ namespace Mmo.Proto.Battle {
     /// <summary>Field number for the "talisman_used" field.</summary>
     public const int TalismanUsedFieldNumber = 10;
     /// <summary>
-    /// 用掉了红符。healed 是实际回复量（会被血量上限截断）。
+    /// 用掉了一张符。healed / restored 是实际回复量（会被池上限截断）。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -5812,7 +5814,7 @@ namespace Mmo.Proto.Battle {
     /// <summary>Field number for the "talisman_rejected" field.</summary>
     public const int TalismanRejectedFieldNumber = 11;
     /// <summary>
-    /// 红符没用成。这条不改任何人的生命，也不扣符。
+    /// 符没用成。这条不改任何人的生命与蓝量，也不扣符。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -6701,8 +6703,9 @@ namespace Mmo.Proto.Battle {
   }
 
   /// <summary>
-  /// 在战斗里用掉一张红符。请求里只有物品编号与客户端时刻：
-  /// 目标恒是施法者自己（方案 12.1「只回复自己」），回复量与冷却由角色服按配置给。
+  /// 在战斗里用掉一张符。请求里只有物品编号与客户端时刻：
+  /// 目标恒是施法者自己（方案 12.1「只回复自己」），是哪个池、回复量与冷却
+  /// 都由角色服按配置给，请求里一个服务端数值都没有。
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class UseTalismanRequest : pb::IMessage<UseTalismanRequest>
@@ -6940,7 +6943,7 @@ namespace Mmo.Proto.Battle {
   }
 
   /// <summary>
-  /// 用掉了。healed 是实际回复量：血量接近上限时只回差额，不按配置满额灌。
+  /// 用掉了。回复只落在角色服认定的那一个池里，另一个池的数值原样回、不改动。
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class TalismanUsed : pb::IMessage<TalismanUsed>
@@ -6984,6 +6987,10 @@ namespace Mmo.Proto.Battle {
       cooldownMs_ = other.cooldownMs_;
       cooldownGroup_ = other.cooldownGroup_;
       countLeft_ = other.countLeft_;
+      pool_ = other.pool_;
+      restored_ = other.restored_;
+      manaAfter_ = other.manaAfter_;
+      manaRestored_ = other.manaRestored_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -7020,6 +7027,9 @@ namespace Mmo.Proto.Battle {
     /// <summary>Field number for the "healed" field.</summary>
     public const int HealedFieldNumber = 3;
     private long healed_;
+    /// <summary>
+    /// 实际回血量：红符是被血量上限截断后的值，蓝符恒 0（方案 12.1「不回血」）。
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public long Healed {
@@ -7033,7 +7043,7 @@ namespace Mmo.Proto.Battle {
     public const int HpAfterFieldNumber = 4;
     private long hpAfter_;
     /// <summary>
-    /// 这一下之后自己的血。
+    /// 这一下之后自己的血。蓝符时与用符前相同。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -7060,7 +7070,7 @@ namespace Mmo.Proto.Battle {
     public const int CooldownGroupFieldNumber = 6;
     private string cooldownGroup_ = "";
     /// <summary>
-    /// 红符是 heal 组：和红药、牧师治疗共用冷却，不和蓝符共用。
+    /// 红符是 heal 组（和红药、牧师治疗共用），蓝符是 mana 组（和蓝药共用）。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -7086,6 +7096,66 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "pool" field.</summary>
+    public const int PoolFieldNumber = 8;
+    private string pool_ = "";
+    /// <summary>
+    /// 角色服回包里的池，原样带给客户端展示："hp" / "mana"。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Pool {
+      get { return pool_; }
+      set {
+        pool_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "restored" field.</summary>
+    public const int RestoredFieldNumber = 9;
+    private long restored_;
+    /// <summary>
+    /// 这个池的实际回复量：红符等于 healed，蓝符等于回蓝量。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Restored {
+      get { return restored_; }
+      set {
+        restored_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "mana_after" field.</summary>
+    public const int ManaAfterFieldNumber = 10;
+    private long manaAfter_;
+    /// <summary>
+    /// 这一下之后自己的蓝。红符时与用符前相同。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ManaAfter {
+      get { return manaAfter_; }
+      set {
+        manaAfter_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "mana_restored" field.</summary>
+    public const int ManaRestoredFieldNumber = 11;
+    private long manaRestored_;
+    /// <summary>
+    /// 实际回蓝量：蓝符是被蓝量上限截断后的值，红符恒 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ManaRestored {
+      get { return manaRestored_; }
+      set {
+        manaRestored_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -7108,6 +7178,10 @@ namespace Mmo.Proto.Battle {
       if (CooldownMs != other.CooldownMs) return false;
       if (CooldownGroup != other.CooldownGroup) return false;
       if (CountLeft != other.CountLeft) return false;
+      if (Pool != other.Pool) return false;
+      if (Restored != other.Restored) return false;
+      if (ManaAfter != other.ManaAfter) return false;
+      if (ManaRestored != other.ManaRestored) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -7122,6 +7196,10 @@ namespace Mmo.Proto.Battle {
       if (CooldownMs != 0) hash ^= CooldownMs.GetHashCode();
       if (CooldownGroup.Length != 0) hash ^= CooldownGroup.GetHashCode();
       if (CountLeft != 0L) hash ^= CountLeft.GetHashCode();
+      if (Pool.Length != 0) hash ^= Pool.GetHashCode();
+      if (Restored != 0L) hash ^= Restored.GetHashCode();
+      if (ManaAfter != 0L) hash ^= ManaAfter.GetHashCode();
+      if (ManaRestored != 0L) hash ^= ManaRestored.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -7168,6 +7246,22 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(56);
         output.WriteInt64(CountLeft);
       }
+      if (Pool.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(Pool);
+      }
+      if (Restored != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(Restored);
+      }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(80);
+        output.WriteInt64(ManaAfter);
+      }
+      if (ManaRestored != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(ManaRestored);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -7206,6 +7300,22 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(56);
         output.WriteInt64(CountLeft);
       }
+      if (Pool.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(Pool);
+      }
+      if (Restored != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(Restored);
+      }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(80);
+        output.WriteInt64(ManaAfter);
+      }
+      if (ManaRestored != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(ManaRestored);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -7236,6 +7346,18 @@ namespace Mmo.Proto.Battle {
       }
       if (CountLeft != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(CountLeft);
+      }
+      if (Pool.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Pool);
+      }
+      if (Restored != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Restored);
+      }
+      if (ManaAfter != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ManaAfter);
+      }
+      if (ManaRestored != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ManaRestored);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -7269,6 +7391,18 @@ namespace Mmo.Proto.Battle {
       }
       if (other.CountLeft != 0L) {
         CountLeft = other.CountLeft;
+      }
+      if (other.Pool.Length != 0) {
+        Pool = other.Pool;
+      }
+      if (other.Restored != 0L) {
+        Restored = other.Restored;
+      }
+      if (other.ManaAfter != 0L) {
+        ManaAfter = other.ManaAfter;
+      }
+      if (other.ManaRestored != 0L) {
+        ManaRestored = other.ManaRestored;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -7315,6 +7449,22 @@ namespace Mmo.Proto.Battle {
           }
           case 56: {
             CountLeft = input.ReadInt64();
+            break;
+          }
+          case 66: {
+            Pool = input.ReadString();
+            break;
+          }
+          case 72: {
+            Restored = input.ReadInt64();
+            break;
+          }
+          case 80: {
+            ManaAfter = input.ReadInt64();
+            break;
+          }
+          case 88: {
+            ManaRestored = input.ReadInt64();
             break;
           }
         }
@@ -7364,6 +7514,22 @@ namespace Mmo.Proto.Battle {
             CountLeft = input.ReadInt64();
             break;
           }
+          case 66: {
+            Pool = input.ReadString();
+            break;
+          }
+          case 72: {
+            Restored = input.ReadInt64();
+            break;
+          }
+          case 80: {
+            ManaAfter = input.ReadInt64();
+            break;
+          }
+          case 88: {
+            ManaRestored = input.ReadInt64();
+            break;
+          }
         }
       }
     }
@@ -7372,7 +7538,7 @@ namespace Mmo.Proto.Battle {
   }
 
   /// <summary>
-  /// 红符没用成。不改任何人的生命，也不扣符。
+  /// 符没用成。不改任何人的生命与蓝量，也不扣符。
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class TalismanRejected : pb::IMessage<TalismanRejected>
@@ -7413,6 +7579,7 @@ namespace Mmo.Proto.Battle {
       reason_ = other.reason_;
       retryAfterMs_ = other.retryAfterMs_;
       hpAfter_ = other.hpAfter_;
+      manaAfter_ = other.manaAfter_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -7438,7 +7605,7 @@ namespace Mmo.Proto.Battle {
     public const int ReasonFieldNumber = 2;
     private string reason_ = "";
     /// <summary>
-    /// not_in_battle / caster_down / hp_full / cooldown / not_talisman /
+    /// not_in_battle / caster_down / hp_full / mana_full / cooldown / not_talisman /
     /// no_talisman / upstream_off / server_error
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7477,6 +7644,21 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "mana_after" field.</summary>
+    public const int ManaAfterFieldNumber = 5;
+    private long manaAfter_;
+    /// <summary>
+    /// 拒绝之后的蓝量，给界面回显：这一手没有回蓝。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ManaAfter {
+      get { return manaAfter_; }
+      set {
+        manaAfter_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -7496,6 +7678,7 @@ namespace Mmo.Proto.Battle {
       if (Reason != other.Reason) return false;
       if (RetryAfterMs != other.RetryAfterMs) return false;
       if (HpAfter != other.HpAfter) return false;
+      if (ManaAfter != other.ManaAfter) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -7507,6 +7690,7 @@ namespace Mmo.Proto.Battle {
       if (Reason.Length != 0) hash ^= Reason.GetHashCode();
       if (RetryAfterMs != 0) hash ^= RetryAfterMs.GetHashCode();
       if (HpAfter != 0L) hash ^= HpAfter.GetHashCode();
+      if (ManaAfter != 0L) hash ^= ManaAfter.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -7541,6 +7725,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(32);
         output.WriteInt64(HpAfter);
       }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(ManaAfter);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -7567,6 +7755,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(32);
         output.WriteInt64(HpAfter);
       }
+      if (ManaAfter != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(ManaAfter);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -7588,6 +7780,9 @@ namespace Mmo.Proto.Battle {
       }
       if (HpAfter != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(HpAfter);
+      }
+      if (ManaAfter != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ManaAfter);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -7612,6 +7807,9 @@ namespace Mmo.Proto.Battle {
       }
       if (other.HpAfter != 0L) {
         HpAfter = other.HpAfter;
+      }
+      if (other.ManaAfter != 0L) {
+        ManaAfter = other.ManaAfter;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -7648,6 +7846,10 @@ namespace Mmo.Proto.Battle {
             HpAfter = input.ReadInt64();
             break;
           }
+          case 40: {
+            ManaAfter = input.ReadInt64();
+            break;
+          }
         }
       }
     #endif
@@ -7681,6 +7883,10 @@ namespace Mmo.Proto.Battle {
           }
           case 32: {
             HpAfter = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            ManaAfter = input.ReadInt64();
             break;
           }
         }

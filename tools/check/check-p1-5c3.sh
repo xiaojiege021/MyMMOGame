@@ -53,7 +53,7 @@ fi
 
 echo "== 2. 静态断言 =="
 ROOT="$ROOT" python3 - "$TMP" <<'PY' > "$TMP/static.txt" 2>&1
-import json, os, sys
+import json, os, re, sys
 
 root = os.environ["ROOT"]
 def read(p):
@@ -120,9 +120,13 @@ report("table_rejects_over_potion",
        "上限校验不在配置加载里")
 
 shop_cs = read("src/Character/ShopTable.cs")
+# 只钉本卡自己的语义：白名单里接了保护券与红符。后面几张卡会继续往里加种类，
+# 不把「当时正好只有两种」写成事实——P1-5c5 接蓝符时这条不该回退。
+kinds = re.search(r"DeliveredKinds\s*=\s*(?:new\s*)?(?:string\[\]\s*)?\{([^}]*)\}", shop_cs)
+kinds_text = kinds.group(1) if kinds else ""
 report("delivered_kinds",
-       'DeliveredKinds = { "protect_ticket", "red_talisman" }' in shop_cs,
-       "白名单没接红符")
+       '"protect_ticket"' in kinds_text and '"red_talisman"' in kinds_text,
+       "白名单没接红符：" + kinds_text)
 
 # 请求里没有目标：红符只回复自己，客户端连「想治谁」都表达不了。
 battle_proto = files["proto/mmo/battle.proto"]

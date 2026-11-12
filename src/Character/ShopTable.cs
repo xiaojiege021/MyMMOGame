@@ -38,7 +38,8 @@ public sealed class ShopTable
     // 已经接上发货的种类。P1-5c2 接保护券，P1-5c3 接红符；其余十六种的发货在
     // 后面的卡，没接的种类必须把 delivery_item_id 留空，免得清单上看着能买、
     // 实际发不出东西。
-    public static readonly string[] DeliveredKinds = { "protect_ticket", "red_talisman" };
+    public static readonly string[] DeliveredKinds =
+        { "protect_ticket", "red_talisman", "blue_talisman" };
 
     /// <summary>ProtectItemId 是 enhance.json 里那唯一一种保护券的编号，本表要对得上。</summary>
     public sealed record Item(
@@ -281,6 +282,41 @@ public sealed class ShopTable
                     if (goods.Bind != BindRule.Always)
                     {
                         throw new ConfigException("shop.json 的红符发货物必须到账即绑："
+                            + deliveryId);
+                    }
+                }
+                else if (string.Equals(kind, "blue_talisman", StringComparison.Ordinal))
+                {
+                    // 方案 12.1 写定「蓝符不是蓝药」：凝神丹、回灵丹仍从采药、炼丹、
+                    // 副本和特殊任务来。商城的蓝符只能发 talisman.json 里那一个编号。
+                    var blue = talismans.BlueTalisman;
+                    if (blue is null)
+                    {
+                        throw new ConfigException("shop.json 上架了蓝符，但 talisman.json 没有 blue 段");
+                    }
+
+                    if (!string.Equals(deliveryId, blue.ItemId, StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的蓝符必须发 talisman.json 的 "
+                            + "blue.item_id（" + blue.ItemId + "），不许另立："
+                            + deliveryId);
+                    }
+
+                    if (deliveryCount != 1)
+                    {
+                        throw new ConfigException("shop.json 的蓝符按张卖，每份数量必须是 1："
+                            + deliveryCount);
+                    }
+
+                    if (!string.Equals(goods.Kind, "consumable", StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的蓝符发货物必须是 consumable："
+                            + goods.Kind);
+                    }
+
+                    if (goods.Bind != BindRule.Always)
+                    {
+                        throw new ConfigException("shop.json 的蓝符发货物必须到账即绑："
                             + deliveryId);
                     }
                 }

@@ -105,9 +105,12 @@ service CharacterService {
   rpc SettleIngot(AuctionIngotSettleRequest) returns (AuctionIngotSettleResponse);
   // P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
   rpc BuyShopItem(BuyShopItemRequest) returns (BuyShopItemResponse);
-  // P1-5c3：在战斗里用掉一张红符。战斗服发过来，只扣一张、不碰生命——
-  // 生命在战斗进程里，角色服只负责背包的这一次扣减。回复值与冷却在回包里带回去。
+  // P1-5c3：在战斗里用掉一张符。战斗服发过来，只扣一张、不碰生命与蓝量——
+  // 战斗态在战斗进程里，角色服只负责背包的这一次扣减。回复值与冷却在回包里带回去。
   rpc ConsumeTalisman(ConsumeTalismanRequest) returns (ConsumeTalismanResponse);
+  // P1-5c5：用符之前的只读查询。这个编号是哪种符、回复落在哪个池，只有角色服
+  // 读配置说了算；战斗服不解析配置文件、不自己记编号映射。不扣符、不写库。
+  rpc DescribeTalisman(DescribeTalismanRequest) returns (DescribeTalismanResponse);
 }
 
 message SettleExpRequest {
@@ -538,6 +541,14 @@ message BuyShopItemResponse {
   bool duplicate = 16;
 }
 
+// 回复落在哪个池。方案 12.1：红符只回生命、蓝符只回蓝量，两者互不越界。
+// 这是协议层的枚举，不是配置数值；具体回多少由 config/talisman.json 给。
+enum TalismanPool {
+  TALISMAN_POOL_UNSPECIFIED = 0;
+  TALISMAN_POOL_HP = 1;
+  TALISMAN_POOL_MANA = 2;
+}
+
 message ConsumeTalismanRequest {
   // 战斗服服间直连时为空，只按 character_id 找角色；客户端填不了这个字段。
   string account = 1;
@@ -551,7 +562,7 @@ message ConsumeTalismanRequest {
 
 message ConsumeTalismanResponse {
   bool ok = 1;
-  // not_talisman（不是红符）/ no_talisman（背包里没有这张）/ 空串表示真扣掉了。
+  // not_talisman（不是符）/ no_talisman（背包里没有这张）/ 空串表示真扣掉了。
   string reason = 2;
   string item_id = 3;
   // 扣掉之后背包里还剩几张。没扣时给的是当前张数（事实值，不是算出来的）。
@@ -560,9 +571,33 @@ message ConsumeTalismanResponse {
   uint32 slot = 5;
   // 同一个号重放：这一笔没执行，张数不动。
   bool duplicate = 6;
-  // 配置里的回复值。战斗服照着这个加血，不自己写第二套数。
+  // 配置里的回复值。战斗服照着这个加，不自己写第二套数。
+  // 红符只有 hp_restore，蓝符只有 mana_restore，另一个恒 0——不回血就是在这里落死的。
   int64 hp_restore = 7;
-  // 配置里的冷却与冷却组。红符是 heal 组——和红药、牧师治疗共用。
+  // 配置里的冷却与冷却组。红符是 heal 组（和红药、牧师治疗共用），
+  // 蓝符是 mana 组（和蓝药共用），两组互不占用。
   uint32 cooldown_ms = 8;
   string cooldown_group = 9;
+  // 这一张回复落在哪个池。战斗服据此决定加到血还是蓝，不按物品编号自己猜。
+  TalismanPool pool = 10;
+  // 蓝符的回复值；红符恒 0。
+  int64 mana_restore = 11;
+}
+
+// 用符之前的只读查询。请求里只有编号，没有数量、回复值或冷却——
+// 客户端/战斗服都带不进来服务端的数。
+message DescribeTalismanRequest {
+  uint64 character_id = 1;
+  string item_id = 2;
+}
+
+message DescribeTalismanResponse {
+  bool ok = 1;
+  // not_talisman（不是符）/ upstream_off（角色服没连上）/ 空串表示查到了。
+  string reason = 2;
+  string item_id = 3;
+  // 查到了才有意义：这一张回复落在哪个池。
+  TalismanPool pool = 4;
+  // 只读的背包张数，事实值；真正扣不扣由 ConsumeTalisman 那笔事务再判一次。
+  int64 count_left = 5;
 }

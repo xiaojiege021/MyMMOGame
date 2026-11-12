@@ -136,7 +136,12 @@ public sealed class CharacterProcess(string configPath)
             + " hp_restore=" + (talismanTable.RedTalisman?.HpRestore ?? 0)
             + " potion_hp_restore=" + (talismanTable.RedTalisman?.PotionHpRestore ?? 0)
             + " cooldown_group=" + (talismanTable.RedTalisman?.CooldownGroup ?? "")
-            + " cooldown_ms=" + (talismanTable.RedTalisman?.CooldownMs ?? 0));
+            + " cooldown_ms=" + (talismanTable.RedTalisman?.CooldownMs ?? 0)
+            + " blue_item=" + (talismanTable.BlueTalisman?.ItemId ?? "")
+            + " mana_restore=" + (talismanTable.BlueTalisman?.ManaRestore ?? 0)
+            + " potion_mana_restore=" + (talismanTable.BlueTalisman?.PotionManaRestore ?? 0)
+            + " blue_group=" + (talismanTable.BlueTalisman?.CooldownGroup ?? "")
+            + " blue_cooldown_ms=" + (talismanTable.BlueTalisman?.CooldownMs ?? 0));
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());

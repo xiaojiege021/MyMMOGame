@@ -1534,10 +1534,10 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
         }
 
-        var red = talismanTable.FindRed(itemId);
-        if (red is null)
+        var spec = talismanTable.Find(itemId);
+        if (spec is null)
         {
-            // 不是红符：蓝符、复活卷轴、随便什么编号都走这条，不扣也不回血。
+            // 不是符：复活卷轴、保护券、随便什么编号都走这条，不扣也不回。
             // 张数给的是事实值，不是 0——这个字段是「还剩几张」，不是结算数值。
             var left = await talismans.CountAsync(characterId, itemId, context.CancellationToken);
             logger.LogInformation(
@@ -1548,42 +1548,95 @@ public sealed class CharacterGrpcService(
         }
 
         var spend = await talismans.SpendAsync(
-            characterId, red.ItemId, txnId, context.CancellationToken);
+            characterId, spec.ItemId, txnId, context.CancellationToken);
 
         if (spend.Duplicate)
         {
             // 同一个号又来了：整笔不做，张数不动，也不带回复值。
             logger.LogInformation(
                 "talisman_consume_replay account={Account} id={Id} item={Item} txn={Txn} left={Left}",
-                account, characterId, red.ItemId, txnId, spend.CountLeft);
-            return TalismanRejected("duplicate", red.ItemId, spend.CountLeft, true);
+                account, characterId, spec.ItemId, txnId, spend.CountLeft);
+            return TalismanRejected("duplicate", spec.ItemId, spend.CountLeft, true);
         }
 
         if (!spend.Ok)
         {
             logger.LogInformation(
                 "talisman_consume_reject account={Account} id={Id} item={Item} reason={Reason}",
-                account, characterId, red.ItemId, spend.Reason);
-            return TalismanRejected(spend.Reason, red.ItemId, spend.CountLeft, false);
+                account, characterId, spec.ItemId, spend.Reason);
+            return TalismanRejected(spend.Reason, spec.ItemId, spend.CountLeft, false);
         }
 
         logger.LogInformation(
             "talisman_consume account={Account} id={Id} item={Item} txn={Txn} slot={Slot}"
-            + " left={Left} hp_restore={Restore} cooldown_ms={Cooldown} group={Group}",
-            account, characterId, red.ItemId, txnId, spend.Slot, spend.CountLeft,
-            red.HpRestore, red.CooldownMs, red.CooldownGroup);
+            + " left={Left} pool={Pool} hp_restore={Hp} mana_restore={Mana}"
+            + " cooldown_ms={Cooldown} group={Group}",
+            account, characterId, spec.ItemId, txnId, spend.Slot, spend.CountLeft,
+            spec.Pool, spec.HpRestore, spec.ManaRestore,
+            spec.CooldownMs, spec.CooldownGroup);
 
         return new ConsumeTalismanResponse
         {
             Ok = true,
             Reason = "",
-            ItemId = red.ItemId,
+            ItemId = spec.ItemId,
             CountLeft = spend.CountLeft,
             Slot = (uint)Math.Max(0, spend.Slot),
             Duplicate = false,
-            HpRestore = red.HpRestore,
-            CooldownMs = (uint)Math.Max(0, red.CooldownMs),
-            CooldownGroup = red.CooldownGroup,
+            HpRestore = spec.HpRestore,
+            CooldownMs = (uint)Math.Max(0, spec.CooldownMs),
+            CooldownGroup = spec.CooldownGroup,
+            Pool = spec.Pool,
+            ManaRestore = spec.ManaRestore,
+        };
+    }
+
+    /// <summary>
+    /// 用符之前的只读查询：这个编号是不是符、回复落在哪个池，只有角色服说了算。
+    /// 战斗服拿到池之后才能做「池是不是满了」「这一组冷却到没到」的本地预判，
+    /// 预判不过就根本不扣符。这里不写库、不扣符、不碰生命与蓝量。
+    /// </summary>
+    public override async Task<DescribeTalismanResponse> DescribeTalisman(
+        DescribeTalismanRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "item_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var spec = talismanTable.Find(itemId);
+        if (spec is null)
+        {
+            return new DescribeTalismanResponse
+            {
+                Ok = false,
+                Reason = "not_talisman",
+                ItemId = itemId,
+                Pool = TalismanPool.Unspecified,
+                CountLeft = 0,
+            };
+        }
+
+        var left = await talismans.CountAsync(characterId, spec.ItemId, context.CancellationToken);
+        return new DescribeTalismanResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = spec.ItemId,
+            Pool = spec.Pool,
+            CountLeft = left,
         };
     }
 

@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using Mmo.Proto.Battle;
+using Mmo.Proto.Character;
+using TalismanPool = Mmo.Proto.Character.TalismanPool;
 
 namespace Battle;
 
@@ -53,6 +55,13 @@ public sealed class Member
     /// 两边提交前都查这里。蓝符是另一组（mana），不并进来。
     /// </summary>
     internal long HealGroupReadyAtMs = long.MinValue;
+
+    /// <summary>
+    /// 蓝量组的共用冷却到期时刻。方案 12.1 写定蓝符「和蓝药共用冷却」，
+    /// 且红符「不和蓝符共用冷却」——所以蓝符用掉只写这里，不碰治疗组；
+    /// 蓝药以后接进战斗服时写同一个字段即可，不必另开一组。
+    /// </summary>
+    internal long ManaGroupReadyAtMs = long.MinValue;
 
     /// <summary>打出去的伤害累计。仇恨里看得见的那部分。</summary>
     internal long DamageDealt;
@@ -452,23 +461,32 @@ public sealed class Encounter
     // ---- 用符 ----
 
     /// <summary>
-    /// 用一张红符。方案 12.1 的三条边界都落在这里：
+    /// 用一张符（红符回血、蓝符回蓝）。方案 12.1 的边界都落在这里：
     ///   · 只回复自己——请求里没有目标编号，这里也恒拿 member 自己当目标，
-    ///     队友只能靠牧师的技能治，红符这条路指不过去；
+    ///     队友只能靠牧师的技能治，符这条路指不过去；
     ///   · 不复活——倒地（Hp ≤ 0）时直接拒绝，死了就点不了符，也就没有「把自己拉起来」；
-    ///   · 回复不超过同级红药——回复值由角色服按配置给，配置校验里已经卡死上限，
-    ///     这里只按血量上限截断，不自己算第二套数。
+    ///   · 回复不超过同级药——回复值由角色服按配置给，配置校验里已经卡死上限，
+    ///     这里只按池上限截断，不自己算第二套数；
+    ///   · 蓝符不回血、不提高精神、不增加伤害——只写 Mana，另一个池与属性一律不碰。
     ///
-    /// 扣符交给角色服（背包只有它能让写），扣不掉就不回血：宁可这一手没做成，
-    /// 也不做「本地凭空变出一张符」或「回了血但符没扣」。
-    /// 和红药、牧师治疗共用治疗组冷却；蓝符是另一组，不走这里。
+    /// 扣符交给角色服（背包只有它能让写），扣不掉就不回：宁可这一手没做成，
+    /// 也不做「本地凭空变出一张符」或「回了但符没扣」。
+    /// 红符与牧师治疗共用治疗组冷却，蓝符用蓝量组，两组互不占用。
     /// </summary>
     public ServerMessage UseTalisman(Member member, UseTalismanRequest request)
     {
         var itemId = (request.ItemId ?? "").Trim();
         if (itemId.Length == 0)
         {
-            return RejectTalisman(itemId, "not_talisman", 0, member.Hp);
+            return RejectTalisman(itemId, "not_talisman", 0, member.Hp, member.Mana);
+        }
+
+        // 只读查询：这个编号回血还是回蓝，只有角色服读配置说了算。不扣、不写库。
+        // 先在锁外问清楚，才能在扣符之前判「池满没满」「哪一组冷却到没到」。
+        var info = _talismans.Describe(member.Id, itemId);
+        if (!info.Ok)
+        {
+            return RejectTalisman(itemId, info.Reason, 0, member.Hp, member.Mana);
         }
 
         string precheck;
@@ -477,7 +495,7 @@ public sealed class Encounter
         lock (_gate)
         {
             now = NowMs();
-            precheck = TalismanPrecheck(member, now);
+            precheck = TalismanPrecheck(member, now, info.Pool);
             seq = ++_talismanUses;
         }
 
@@ -488,11 +506,14 @@ public sealed class Encounter
             {
                 lock (_gate)
                 {
-                    retry = (uint)Math.Max(0, member.HealGroupReadyAtMs - NowMs());
+                    var readyAt = info.Pool == TalismanPool.Mana
+                        ? member.ManaGroupReadyAtMs
+                        : member.HealGroupReadyAtMs;
+                    retry = (uint)Math.Max(0, readyAt - NowMs());
                 }
             }
 
-            return RejectTalisman(itemId, precheck, retry, member.Hp);
+            return RejectTalisman(itemId, precheck, retry, member.Hp, member.Mana);
         }
 
         // 事务号在这一场里唯一：同一场同一个人第几张，重放不会扣两次。
@@ -503,54 +524,121 @@ public sealed class Encounter
         var spend = _talismans.Spend(member.Id, itemId, txnId);
         if (!spend.Ok)
         {
-            return RejectTalisman(itemId, spend.Reason, 0, member.Hp);
+            return RejectTalisman(itemId, spend.Reason, 0, member.Hp, member.Mana);
         }
 
         lock (_gate)
         {
-            // 扣符这一下里这场可能已经结束了，或者血被别人加满了：都按拒绝处理，
-            // 但符已经扣掉——所以这场结束就不再走这条路（_closed 在上面挡过）。
-            if (!member.Down && member.Hp < member.HpMax)
+            // 扣符这一下里这场可能已经结束了、人倒了，或者池被别人加满了：
+            // 正常不会走到这里（上面预判过），真撞上就按对应原因拒绝，不回另一个池。
+            if (member.Down)
+            {
+                return RejectTalisman(itemId, "caster_down", 0, member.Hp, member.Mana);
+            }
+
+            // 回包里的池是权威：配置改了要重启才生效，两次调用之间不会变。
+            if (spend.Pool == TalismanPool.Mana && member.Mana < member.ManaMax)
+            {
+                var restored = Math.Min(spend.ManaRestore, member.ManaMax - member.Mana);
+                member.Mana += restored;
+                if (spend.CooldownMs > 0)
+                {
+                    // 只写蓝量组：和蓝药共用，和治疗组、红符都不共用。
+                    member.ManaGroupReadyAtMs = NowMs() + spend.CooldownMs;
+                }
+
+                return TalismanApplied(member, itemId, spend, 0, restored);
+            }
+
+            if (spend.Pool == TalismanPool.Hp && member.Hp < member.HpMax)
             {
                 var healed = Math.Min(spend.HpRestore, member.HpMax - member.Hp);
                 member.Hp += healed;
                 if (spend.CooldownMs > 0)
                 {
-                    // 只写治疗组：和牧师治疗共用，和解药、蓝符都不共用。
+                    // 只写治疗组：和牧师治疗共用，和蓝符不共用。
                     member.HealGroupReadyAtMs = NowMs() + spend.CooldownMs;
                 }
 
-                return new ServerMessage
-                {
-                    TalismanUsed = new TalismanUsed
-                    {
-                        CasterId = member.Id,
-                        ItemId = itemId,
-                        Healed = healed,
-                        HpAfter = member.Hp,
-                        CooldownMs = (uint)Math.Max(0, spend.CooldownMs),
-                        CooldownGroup = spend.CooldownGroup,
-                        CountLeft = spend.CountLeft,
-                    },
-                };
+                return TalismanApplied(member, itemId, spend, healed, 0);
             }
 
-            return RejectTalisman(itemId, "hp_full", 0, member.Hp);
+            return RejectTalisman(itemId,
+                spend.Pool == TalismanPool.Mana ? "mana_full" : "hp_full",
+                0, member.Hp, member.Mana);
         }
     }
 
-    /// <summary>用符的本地前置判定。返回空串表示能进下一步（去扣符）。</summary>
-    string TalismanPrecheck(Member member, long now)
+    /// <summary>
+    /// 符真扣掉了，把这一个池的增量回给本人。另一个池的数值原样回、不改动——
+    /// 「蓝符不回血」「红符不回蓝」在这里也落死：healed 与 mana_restored 只有一个非零。
+    /// 伤害、精神、职业属性一个都不碰（方案 12.1「不提高精神，不增加伤害」）。
+    /// </summary>
+    static ServerMessage TalismanApplied(
+        Member member, string itemId, TalismanSpendResult spend, long healed, long restored) =>
+        new()
+        {
+            TalismanUsed = new TalismanUsed
+            {
+                CasterId = member.Id,
+                ItemId = itemId,
+                Healed = healed,
+                HpAfter = member.Hp,
+                CooldownMs = (uint)Math.Max(0, spend.CooldownMs),
+                CooldownGroup = spend.CooldownGroup,
+                CountLeft = spend.CountLeft,
+                Pool = spend.Pool.ToString().ToLowerInvariant(),
+                Restored = healed + restored,
+                ManaAfter = member.Mana,
+                ManaRestored = restored,
+            },
+        };
+
+    /// <summary>
+    /// 用符的本地前置判定。池由角色服的只读查询给，所以满池与冷却都查对的那一个：
+    /// 红符看血与治疗组，蓝符看蓝与蓝量组。返回空串表示能进下一步（去扣符）。
+    /// 这一步在扣符之前，判不过一个字都不写库。
+    /// </summary>
+    string TalismanPrecheck(Member member, long now, TalismanPool pool)
     {
         if (_closed || _bossHp <= 0)
         {
             return "not_in_battle";
         }
 
-        // 倒地不能点符：倒地只能靠复活卷轴或牧师的生息，红符不复活。
+        // 倒地不能点符：倒地只能靠复活卷轴或牧师的生息，符不复活。
         if (member.Down)
         {
             return "caster_down";
+        }
+
+        if (pool == TalismanPool.Mana)
+        {
+            // 冷却先于池满：两张连着用时，客户端该拿到「还差多久」，
+            // 而不是「蓝满了」——后者会让人以为等蓝耗掉就能再用。
+            if (now < member.ManaGroupReadyAtMs)
+            {
+                return "cooldown";
+            }
+
+            if (member.Mana >= member.ManaMax)
+            {
+                // 满蓝用了也是白烧一张，直接挡下，别让玩家白扣。
+                return "mana_full";
+            }
+
+            return "";
+        }
+
+        if (pool != TalismanPool.Hp)
+        {
+            // 只有查得到池的符能走到这里；Unspecified 不该出现。
+            return "not_talisman";
+        }
+
+        if (now < member.HealGroupReadyAtMs)
+        {
+            return "cooldown";
         }
 
         if (member.Hp >= member.HpMax)
@@ -559,15 +647,11 @@ public sealed class Encounter
             return "hp_full";
         }
 
-        if (now < member.HealGroupReadyAtMs)
-        {
-            return "cooldown";
-        }
-
         return "";
     }
 
-    static ServerMessage RejectTalisman(string itemId, string reason, uint retryAfterMs, long hpAfter) =>
+    static ServerMessage RejectTalisman(
+        string itemId, string reason, uint retryAfterMs, long hpAfter, long manaAfter) =>
         new()
         {
             TalismanRejected = new TalismanRejected
@@ -576,6 +660,7 @@ public sealed class Encounter
                 Reason = reason,
                 RetryAfterMs = retryAfterMs,
                 HpAfter = hpAfter,
+                ManaAfter = manaAfter,
             },
         };
 

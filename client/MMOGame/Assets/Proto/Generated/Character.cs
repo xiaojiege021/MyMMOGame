@@ -144,52 +144,62 @@ namespace Mmo.Proto.Character {
             "CGJhZ19zbG90GA4gASgNEg0KBWJvdW5kGA8gASgIEhEKCWR1cGxpY2F0ZRgQ",
             "IAEoCCJgChZDb25zdW1lVGFsaXNtYW5SZXF1ZXN0Eg8KB2FjY291bnQYASAB",
             "KAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEg8KB2l0ZW1faWQYAyABKAkSDgoG",
-            "dHhuX2lkGAQgASgJIrwBChdDb25zdW1lVGFsaXNtYW5SZXNwb25zZRIKCgJv",
+            "dHhuX2lkGAQgASgJIv0BChdDb25zdW1lVGFsaXNtYW5SZXNwb25zZRIKCgJv",
             "axgBIAEoCBIOCgZyZWFzb24YAiABKAkSDwoHaXRlbV9pZBgDIAEoCRISCgpj",
             "b3VudF9sZWZ0GAQgASgDEgwKBHNsb3QYBSABKA0SEQoJZHVwbGljYXRlGAYg",
             "ASgIEhIKCmhwX3Jlc3RvcmUYByABKAMSEwoLY29vbGRvd25fbXMYCCABKA0S",
-            "FgoOY29vbGRvd25fZ3JvdXAYCSABKAkygQ0KEENoYXJhY3RlclNlcnZpY2US",
-            "YAoPQ3JlYXRlQ2hhcmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFy",
-            "YWN0ZXJSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJS",
-            "ZXNwb25zZRJLCghTZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxS",
-            "ZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYKB0Fk",
-            "ZEl0ZW0SHS5tbW8uY2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNo",
-            "YXJhY3Rlci5JbnZlbnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8u",
-            "Y2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rl",
-            "ci5MaXN0SW52ZW50b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hh",
-            "cmFjdGVyLkNhblRyYWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJh",
-            "ZGVSZXNwb25zZRJQCgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRk",
-            "Q3VycmVuY3lSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFu",
-            "Y2USVAoLR2V0Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5",
-            "UmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJR",
-            "CgpBcHBseUdyYW50EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVxdWVz",
-            "dBohLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVudGVy",
-            "RHVuZ2VvbhIiLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBoj",
-            "Lm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNlSG90",
-            "U3ByaW5nEiIubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMu",
-            "bW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0bGVF",
-            "eHASHy5tbW8uY2hhcmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8uY2hh",
-            "cmFjdGVyLlNldHRsZUV4cFJlc3BvbnNlEkgKB0VuaGFuY2USHS5tbW8uY2hh",
-            "cmFjdGVyLkVuaGFuY2VSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5FbmhhbmNl",
-            "UmVzcG9uc2USYAoPVHJhbnNmZXJFbmhhbmNlEiUubW1vLmNoYXJhY3Rlci5U",
-            "cmFuc2ZlckVuaGFuY2VSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5UcmFuc2Zl",
-            "ckVuaGFuY2VSZXNwb25zZRJWCg5JbnN0YWxsQ3J5c3RhbBIkLm1tby5jaGFy",
-            "YWN0ZXIuSW5zdGFsbENyeXN0YWxSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5D",
-            "cnlzdGFsUmVzcG9uc2USVAoNUmVtb3ZlQ3J5c3RhbBIjLm1tby5jaGFyYWN0",
-            "ZXIuUmVtb3ZlQ3J5c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0",
-            "YWxSZXNwb25zZRJaCg1TZXR0bGVBdWN0aW9uEiMubW1vLmNoYXJhY3Rlci5B",
-            "dWN0aW9uU2V0dGxlUmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuQXVjdGlvblNl",
-            "dHRsZVJlc3BvbnNlEmIKC1NldHRsZUluZ290EigubW1vLmNoYXJhY3Rlci5B",
-            "dWN0aW9uSW5nb3RTZXR0bGVSZXF1ZXN0GikubW1vLmNoYXJhY3Rlci5BdWN0",
-            "aW9uSW5nb3RTZXR0bGVSZXNwb25zZRJUCgtCdXlTaG9wSXRlbRIhLm1tby5j",
-            "aGFyYWN0ZXIuQnV5U2hvcEl0ZW1SZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5C",
-            "dXlTaG9wSXRlbVJlc3BvbnNlEmAKD0NvbnN1bWVUYWxpc21hbhIlLm1tby5j",
-            "aGFyYWN0ZXIuQ29uc3VtZVRhbGlzbWFuUmVxdWVzdBomLm1tby5jaGFyYWN0",
-            "ZXIuQ29uc3VtZVRhbGlzbWFuUmVzcG9uc2VCFqoCE01tby5Qcm90by5DaGFy",
-            "YWN0ZXJiBnByb3RvMw=="));
+            "FgoOY29vbGRvd25fZ3JvdXAYCSABKAkSKQoEcG9vbBgKIAEoDjIbLm1tby5j",
+            "aGFyYWN0ZXIuVGFsaXNtYW5Qb29sEhQKDG1hbmFfcmVzdG9yZRgLIAEoAyJA",
+            "ChdEZXNjcmliZVRhbGlzbWFuUmVxdWVzdBIUCgxjaGFyYWN0ZXJfaWQYASAB",
+            "KAQSDwoHaXRlbV9pZBgCIAEoCSKGAQoYRGVzY3JpYmVUYWxpc21hblJlc3Bv",
+            "bnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIPCgdpdGVtX2lkGAMg",
+            "ASgJEikKBHBvb2wYBCABKA4yGy5tbW8uY2hhcmFjdGVyLlRhbGlzbWFuUG9v",
+            "bBISCgpjb3VudF9sZWZ0GAUgASgDKlsKDFRhbGlzbWFuUG9vbBIdChlUQUxJ",
+            "U01BTl9QT09MX1VOU1BFQ0lGSUVEEAASFAoQVEFMSVNNQU5fUE9PTF9IUBAB",
+            "EhYKElRBTElTTUFOX1BPT0xfTUFOQRACMuYNChBDaGFyYWN0ZXJTZXJ2aWNl",
+            "EmAKD0NyZWF0ZUNoYXJhY3RlchIlLm1tby5jaGFyYWN0ZXIuQ3JlYXRlQ2hh",
+            "cmFjdGVyUmVxdWVzdBomLm1tby5jaGFyYWN0ZXIuQ3JlYXRlQ2hhcmFjdGVy",
+            "UmVzcG9uc2USSwoIU2V0TGV2ZWwSHi5tbW8uY2hhcmFjdGVyLlNldExldmVs",
+            "UmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXNwb25zZRJGCgdB",
+            "ZGRJdGVtEh0ubW1vLmNoYXJhY3Rlci5BZGRJdGVtUmVxdWVzdBocLm1tby5j",
+            "aGFyYWN0ZXIuSW52ZW50b3J5U2xvdBJaCg1MaXN0SW52ZW50b3J5EiMubW1v",
+            "LmNoYXJhY3Rlci5MaXN0SW52ZW50b3J5UmVxdWVzdBokLm1tby5jaGFyYWN0",
+            "ZXIuTGlzdEludmVudG9yeVJlc3BvbnNlEksKCENhblRyYWRlEh4ubW1vLmNo",
+            "YXJhY3Rlci5DYW5UcmFkZVJlcXVlc3QaHy5tbW8uY2hhcmFjdGVyLkNhblRy",
+            "YWRlUmVzcG9uc2USUAoLQWRkQ3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkFk",
+            "ZEN1cnJlbmN5UmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3VycmVuY3lCYWxh",
+            "bmNlElQKC0dldEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5j",
+            "eVJlcXVlc3QaIi5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVzcG9uc2US",
+            "UQoKQXBwbHlHcmFudBIgLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlcXVl",
+            "c3QaIS5tbW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXNwb25zZRJXCgxFbnRl",
+            "ckR1bmdlb24SIi5tbW8uY2hhcmFjdGVyLkVudGVyRHVuZ2VvblJlcXVlc3Qa",
+            "Iy5tbW8uY2hhcmFjdGVyLkVudGVyRHVuZ2VvblJlc3BvbnNlElcKDFVzZUhv",
+            "dFNwcmluZxIiLm1tby5jaGFyYWN0ZXIuVXNlSG90U3ByaW5nUmVxdWVzdBoj",
+            "Lm1tby5jaGFyYWN0ZXIuVXNlSG90U3ByaW5nUmVzcG9uc2USTgoJU2V0dGxl",
+            "RXhwEh8ubW1vLmNoYXJhY3Rlci5TZXR0bGVFeHBSZXF1ZXN0GiAubW1vLmNo",
+            "YXJhY3Rlci5TZXR0bGVFeHBSZXNwb25zZRJICgdFbmhhbmNlEh0ubW1vLmNo",
+            "YXJhY3Rlci5FbmhhbmNlUmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuRW5oYW5j",
+            "ZVJlc3BvbnNlEmAKD1RyYW5zZmVyRW5oYW5jZRIlLm1tby5jaGFyYWN0ZXIu",
+            "VHJhbnNmZXJFbmhhbmNlUmVxdWVzdBomLm1tby5jaGFyYWN0ZXIuVHJhbnNm",
+            "ZXJFbmhhbmNlUmVzcG9uc2USVgoOSW5zdGFsbENyeXN0YWwSJC5tbW8uY2hh",
+            "cmFjdGVyLkluc3RhbGxDcnlzdGFsUmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIu",
+            "Q3J5c3RhbFJlc3BvbnNlElQKDVJlbW92ZUNyeXN0YWwSIy5tbW8uY2hhcmFj",
+            "dGVyLlJlbW92ZUNyeXN0YWxSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5Dcnlz",
+            "dGFsUmVzcG9uc2USWgoNU2V0dGxlQXVjdGlvbhIjLm1tby5jaGFyYWN0ZXIu",
+            "QXVjdGlvblNldHRsZVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkF1Y3Rpb25T",
+            "ZXR0bGVSZXNwb25zZRJiCgtTZXR0bGVJbmdvdBIoLm1tby5jaGFyYWN0ZXIu",
+            "QXVjdGlvbkluZ290U2V0dGxlUmVxdWVzdBopLm1tby5jaGFyYWN0ZXIuQXVj",
+            "dGlvbkluZ290U2V0dGxlUmVzcG9uc2USVAoLQnV5U2hvcEl0ZW0SIS5tbW8u",
+            "Y2hhcmFjdGVyLkJ1eVNob3BJdGVtUmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIu",
+            "QnV5U2hvcEl0ZW1SZXNwb25zZRJgCg9Db25zdW1lVGFsaXNtYW4SJS5tbW8u",
+            "Y2hhcmFjdGVyLkNvbnN1bWVUYWxpc21hblJlcXVlc3QaJi5tbW8uY2hhcmFj",
+            "dGVyLkNvbnN1bWVUYWxpc21hblJlc3BvbnNlEmMKEERlc2NyaWJlVGFsaXNt",
+            "YW4SJi5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlVGFsaXNtYW5SZXF1ZXN0Gicu",
+            "bW1vLmNoYXJhY3Rlci5EZXNjcmliZVRhbGlzbWFuUmVzcG9uc2VCFqoCE01t",
+            "by5Qcm90by5DaGFyYWN0ZXJiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Character.TalismanPool), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CreateCharacterRequest), global::Mmo.Proto.Character.CreateCharacterRequest.Parser, new[]{ "Account", "Name", "Race", "Appearance", "ClassId", "Branch" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CreateCharacterResponse), global::Mmo.Proto.Character.CreateCharacterResponse.Parser, new[]{ "CharacterId", "Name", "Race", "Appearance", "ClassId", "Branch", "Level", "Realm", "MainStageEmpty", "AlignmentEmpty" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.SettleExpRequest), global::Mmo.Proto.Character.SettleExpRequest.Parser, new[]{ "Account", "CharacterId", "TxnId", "Source", "PartySize" }, null, null, null, null),
@@ -229,12 +239,27 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemRequest), global::Mmo.Proto.Character.BuyShopItemRequest.Parser, new[]{ "Account", "CharacterId", "ItemId", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemResponse), global::Mmo.Proto.Character.BuyShopItemResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "Kind", "Name", "PriceYuanbao", "Currency", "Balance", "Enough", "ChargedYuanbao", "Delivered", "State", "DeliveryItemId", "BagSlot", "Bound", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ConsumeTalismanRequest), global::Mmo.Proto.Character.ConsumeTalismanRequest.Parser, new[]{ "Account", "CharacterId", "ItemId", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ConsumeTalismanResponse), global::Mmo.Proto.Character.ConsumeTalismanResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "CountLeft", "Slot", "Duplicate", "HpRestore", "CooldownMs", "CooldownGroup" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ConsumeTalismanResponse), global::Mmo.Proto.Character.ConsumeTalismanResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "CountLeft", "Slot", "Duplicate", "HpRestore", "CooldownMs", "CooldownGroup", "Pool", "ManaRestore" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.DescribeTalismanRequest), global::Mmo.Proto.Character.DescribeTalismanRequest.Parser, new[]{ "CharacterId", "ItemId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.DescribeTalismanResponse), global::Mmo.Proto.Character.DescribeTalismanResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "Pool", "CountLeft" }, null, null, null, null)
           }));
     }
     #endregion
 
   }
+  #region Enums
+  /// <summary>
+  /// 回复落在哪个池。方案 12.1：红符只回生命、蓝符只回蓝量，两者互不越界。
+  /// 这是协议层的枚举，不是配置数值；具体回多少由 config/talisman.json 给。
+  /// </summary>
+  public enum TalismanPool {
+    [pbr::OriginalName("TALISMAN_POOL_UNSPECIFIED")] Unspecified = 0,
+    [pbr::OriginalName("TALISMAN_POOL_HP")] Hp = 1,
+    [pbr::OriginalName("TALISMAN_POOL_MANA")] Mana = 2,
+  }
+
+  #endregion
+
   #region Messages
   /// <summary>
   /// 创建一个角色。字段按技术架构第 6 节「角色主数据」：
@@ -15476,6 +15501,8 @@ namespace Mmo.Proto.Character {
       hpRestore_ = other.hpRestore_;
       cooldownMs_ = other.cooldownMs_;
       cooldownGroup_ = other.cooldownGroup_;
+      pool_ = other.pool_;
+      manaRestore_ = other.manaRestore_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -15501,7 +15528,7 @@ namespace Mmo.Proto.Character {
     public const int ReasonFieldNumber = 2;
     private string reason_ = "";
     /// <summary>
-    /// not_talisman（不是红符）/ no_talisman（背包里没有这张）/ 空串表示真扣掉了。
+    /// not_talisman（不是符）/ no_talisman（背包里没有这张）/ 空串表示真扣掉了。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -15573,7 +15600,8 @@ namespace Mmo.Proto.Character {
     public const int HpRestoreFieldNumber = 7;
     private long hpRestore_;
     /// <summary>
-    /// 配置里的回复值。战斗服照着这个加血，不自己写第二套数。
+    /// 配置里的回复值。战斗服照着这个加，不自己写第二套数。
+    /// 红符只有 hp_restore，蓝符只有 mana_restore，另一个恒 0——不回血就是在这里落死的。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -15588,7 +15616,8 @@ namespace Mmo.Proto.Character {
     public const int CooldownMsFieldNumber = 8;
     private uint cooldownMs_;
     /// <summary>
-    /// 配置里的冷却与冷却组。红符是 heal 组——和红药、牧师治疗共用。
+    /// 配置里的冷却与冷却组。红符是 heal 组（和红药、牧师治疗共用），
+    /// 蓝符是 mana 组（和蓝药共用），两组互不占用。
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -15608,6 +15637,36 @@ namespace Mmo.Proto.Character {
       get { return cooldownGroup_; }
       set {
         cooldownGroup_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "pool" field.</summary>
+    public const int PoolFieldNumber = 10;
+    private global::Mmo.Proto.Character.TalismanPool pool_ = global::Mmo.Proto.Character.TalismanPool.Unspecified;
+    /// <summary>
+    /// 这一张回复落在哪个池。战斗服据此决定加到血还是蓝，不按物品编号自己猜。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Character.TalismanPool Pool {
+      get { return pool_; }
+      set {
+        pool_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "mana_restore" field.</summary>
+    public const int ManaRestoreFieldNumber = 11;
+    private long manaRestore_;
+    /// <summary>
+    /// 蓝符的回复值；红符恒 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ManaRestore {
+      get { return manaRestore_; }
+      set {
+        manaRestore_ = value;
       }
     }
 
@@ -15635,6 +15694,8 @@ namespace Mmo.Proto.Character {
       if (HpRestore != other.HpRestore) return false;
       if (CooldownMs != other.CooldownMs) return false;
       if (CooldownGroup != other.CooldownGroup) return false;
+      if (Pool != other.Pool) return false;
+      if (ManaRestore != other.ManaRestore) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -15651,6 +15712,8 @@ namespace Mmo.Proto.Character {
       if (HpRestore != 0L) hash ^= HpRestore.GetHashCode();
       if (CooldownMs != 0) hash ^= CooldownMs.GetHashCode();
       if (CooldownGroup.Length != 0) hash ^= CooldownGroup.GetHashCode();
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) hash ^= Pool.GetHashCode();
+      if (ManaRestore != 0L) hash ^= ManaRestore.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -15705,6 +15768,14 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(74);
         output.WriteString(CooldownGroup);
       }
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) Pool);
+      }
+      if (ManaRestore != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(ManaRestore);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -15751,6 +15822,14 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(74);
         output.WriteString(CooldownGroup);
       }
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) Pool);
+      }
+      if (ManaRestore != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(ManaRestore);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -15787,6 +15866,12 @@ namespace Mmo.Proto.Character {
       }
       if (CooldownGroup.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(CooldownGroup);
+      }
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Pool);
+      }
+      if (ManaRestore != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ManaRestore);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -15826,6 +15911,12 @@ namespace Mmo.Proto.Character {
       }
       if (other.CooldownGroup.Length != 0) {
         CooldownGroup = other.CooldownGroup;
+      }
+      if (other.Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        Pool = other.Pool;
+      }
+      if (other.ManaRestore != 0L) {
+        ManaRestore = other.ManaRestore;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -15882,6 +15973,14 @@ namespace Mmo.Proto.Character {
             CooldownGroup = input.ReadString();
             break;
           }
+          case 80: {
+            Pool = (global::Mmo.Proto.Character.TalismanPool) input.ReadEnum();
+            break;
+          }
+          case 88: {
+            ManaRestore = input.ReadInt64();
+            break;
+          }
         }
       }
     #endif
@@ -15935,6 +16034,608 @@ namespace Mmo.Proto.Character {
           }
           case 74: {
             CooldownGroup = input.ReadString();
+            break;
+          }
+          case 80: {
+            Pool = (global::Mmo.Proto.Character.TalismanPool) input.ReadEnum();
+            break;
+          }
+          case 88: {
+            ManaRestore = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 用符之前的只读查询。请求里只有编号，没有数量、回复值或冷却——
+  /// 客户端/战斗服都带不进来服务端的数。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class DescribeTalismanRequest : pb::IMessage<DescribeTalismanRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<DescribeTalismanRequest> _parser = new pb::MessageParser<DescribeTalismanRequest>(() => new DescribeTalismanRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<DescribeTalismanRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[40]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeTalismanRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeTalismanRequest(DescribeTalismanRequest other) : this() {
+      characterId_ = other.characterId_;
+      itemId_ = other.itemId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeTalismanRequest Clone() {
+      return new DescribeTalismanRequest(this);
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 1;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 2;
+    private string itemId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as DescribeTalismanRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(DescribeTalismanRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (CharacterId != other.CharacterId) return false;
+      if (ItemId != other.ItemId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(CharacterId);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(ItemId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(CharacterId);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(ItemId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (ItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(DescribeTalismanRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.ItemId.Length != 0) {
+        ItemId = other.ItemId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 18: {
+            ItemId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 18: {
+            ItemId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class DescribeTalismanResponse : pb::IMessage<DescribeTalismanResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<DescribeTalismanResponse> _parser = new pb::MessageParser<DescribeTalismanResponse>(() => new DescribeTalismanResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<DescribeTalismanResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[41]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeTalismanResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeTalismanResponse(DescribeTalismanResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      itemId_ = other.itemId_;
+      pool_ = other.pool_;
+      countLeft_ = other.countLeft_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeTalismanResponse Clone() {
+      return new DescribeTalismanResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    /// <summary>
+    /// not_talisman（不是符）/ upstream_off（角色服没连上）/ 空串表示查到了。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 3;
+    private string itemId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "pool" field.</summary>
+    public const int PoolFieldNumber = 4;
+    private global::Mmo.Proto.Character.TalismanPool pool_ = global::Mmo.Proto.Character.TalismanPool.Unspecified;
+    /// <summary>
+    /// 查到了才有意义：这一张回复落在哪个池。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Character.TalismanPool Pool {
+      get { return pool_; }
+      set {
+        pool_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "count_left" field.</summary>
+    public const int CountLeftFieldNumber = 5;
+    private long countLeft_;
+    /// <summary>
+    /// 只读的背包张数，事实值；真正扣不扣由 ConsumeTalisman 那笔事务再判一次。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long CountLeft {
+      get { return countLeft_; }
+      set {
+        countLeft_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as DescribeTalismanResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(DescribeTalismanResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (ItemId != other.ItemId) return false;
+      if (Pool != other.Pool) return false;
+      if (CountLeft != other.CountLeft) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) hash ^= Pool.GetHashCode();
+      if (CountLeft != 0L) hash ^= CountLeft.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(ItemId);
+      }
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        output.WriteRawTag(32);
+        output.WriteEnum((int) Pool);
+      }
+      if (CountLeft != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(CountLeft);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(ItemId);
+      }
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        output.WriteRawTag(32);
+        output.WriteEnum((int) Pool);
+      }
+      if (CountLeft != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(CountLeft);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (ItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
+      }
+      if (Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Pool);
+      }
+      if (CountLeft != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(CountLeft);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(DescribeTalismanResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.ItemId.Length != 0) {
+        ItemId = other.ItemId;
+      }
+      if (other.Pool != global::Mmo.Proto.Character.TalismanPool.Unspecified) {
+        Pool = other.Pool;
+      }
+      if (other.CountLeft != 0L) {
+        CountLeft = other.CountLeft;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 32: {
+            Pool = (global::Mmo.Proto.Character.TalismanPool) input.ReadEnum();
+            break;
+          }
+          case 40: {
+            CountLeft = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 32: {
+            Pool = (global::Mmo.Proto.Character.TalismanPool) input.ReadEnum();
+            break;
+          }
+          case 40: {
+            CountLeft = input.ReadInt64();
             break;
           }
         }

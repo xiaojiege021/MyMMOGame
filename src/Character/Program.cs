@@ -490,12 +490,18 @@ if (talismanList)
         var table = TalismanTable.Load(
             talismanConfigPath ?? talismanConfig.TalismanTable, talismanItems);
         var red = table.RedTalisman;
+        var blue = table.BlueTalisman;
         Console.WriteLine("talisman_list_state=ok version=" + table.Version
             + " red_item=" + (red?.ItemId ?? "-")
             + " hp_restore=" + (red?.HpRestore ?? 0)
             + " potion_hp_restore=" + (red?.PotionHpRestore ?? 0)
             + " cooldown_group=" + (red?.CooldownGroup ?? "-")
-            + " cooldown_ms=" + (red?.CooldownMs ?? 0));
+            + " cooldown_ms=" + (red?.CooldownMs ?? 0)
+            + " blue_item=" + (blue?.ItemId ?? "-")
+            + " mana_restore=" + (blue?.ManaRestore ?? 0)
+            + " potion_mana_restore=" + (blue?.PotionManaRestore ?? 0)
+            + " blue_group=" + (blue?.CooldownGroup ?? "-")
+            + " blue_cooldown_ms=" + (blue?.CooldownMs ?? 0));
     }
     catch (ConfigException ex)
     {
@@ -634,6 +640,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             var talismanTableForState = TalismanTable.Load(
                 talismanCharConfig.TalismanTable, talismanItemsForState);
             var redForState = talismanTableForState.RedTalisman;
+            var blueForState = talismanTableForState.BlueTalisman;
             var talismanInventory = new InventoryRepository(dataSource);
             var talismanSlots = await talismanInventory.ListAsync(
                 talismanStateOf, CancellationToken.None);
@@ -644,6 +651,13 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     .ToList();
             var redCount = redSlots.Sum(s => s.Count);
             var redAllBound = redSlots.Count > 0 && redSlots.All(s => s.Bound);
+            var blueSlots = blueForState is null
+                ? new List<BagSlot>()
+                : talismanSlots
+                    .Where(s => string.Equals(s.ItemId, blueForState.ItemId, StringComparison.Ordinal))
+                    .ToList();
+            var blueCount = blueSlots.Sum(s => s.Count);
+            var blueAllBound = blueSlots.Count > 0 && blueSlots.All(s => s.Bound);
 
             Console.WriteLine("talisman_state=ok id=" + talismanStateOf
                 + " red_item=" + (redForState?.ItemId ?? "-")
@@ -655,7 +669,17 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " hp_restore=" + (redForState?.HpRestore ?? 0)
                 + " potion_hp_restore=" + (redForState?.PotionHpRestore ?? 0)
                 + " cooldown_group=" + (redForState?.CooldownGroup ?? "-")
-                + " cooldown_ms=" + (redForState?.CooldownMs ?? 0));
+                + " cooldown_ms=" + (redForState?.CooldownMs ?? 0)
+                + " blue_item=" + (blueForState?.ItemId ?? "-")
+                + " blue_count=" + blueCount
+                + " blue_bound=" + (blueAllBound ? "true" : "false")
+                + " blue_slots=" + (blueSlots.Count == 0
+                    ? "-"
+                    : string.Join(",", blueSlots.Select(s => s.Slot + ":" + s.Count)))
+                + " mana_restore=" + (blueForState?.ManaRestore ?? 0)
+                + " potion_mana_restore=" + (blueForState?.PotionManaRestore ?? 0)
+                + " blue_group=" + (blueForState?.CooldownGroup ?? "-")
+                + " blue_cooldown_ms=" + (blueForState?.CooldownMs ?? 0));
         }
 
         if (levelOf != 0)
