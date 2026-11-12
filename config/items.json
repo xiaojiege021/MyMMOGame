@@ -46,6 +46,13 @@
       "bind": "always"
     },
     {
+      "id": "exp_booster",
+      "name": "限时经验道具",
+      "kind": "consumable",
+      "stack_max": 20,
+      "bind": "always"
+    },
+    {
       "id": "ticket_protect",
       "name": "保护券",
       "kind": "voucher",

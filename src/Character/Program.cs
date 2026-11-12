@@ -75,6 +75,14 @@ long scrollStateOf = 0;
 // 只给核对用：把角色库里的卷轴冷却清掉，让一张核对能连着验几个成功场景。
 // 玩法代码不碰这个入口，冷却到期只由 ConsumeReviveScroll 那一笔事务写。
 long scrollResetOf = 0;
+// P1-5c7 限时经验道具：清单读配置，state 连库读到期时刻、剩余时间与背包张数。
+// reset / expire 只给核对用：清掉这一行 / 把到期时刻挪到过去，验「到点消失」。
+// 玩法代码不碰这两个入口，到期时刻只由 UseExpBooster 那一笔事务写。
+var boosterList = false;
+string? boosterConfigPath = null;
+long boosterStateOf = 0;
+long boosterResetOf = 0;
+long boosterExpireOf = 0;
 long auctionBuyerOf = 0;
 long auctionSellerOf = 0;
 long auctionListingOf = 0;
@@ -296,6 +304,26 @@ for (var i = 0; i < args.Length; i++)
         case "--scroll-cooldown-reset" when i + 1 < args.Length:
             long.TryParse(args[++i], out scrollResetOf);
             break;
+        // 只给核对用：把限时经验道具表读出来，不连库也不启动进程。坏表也走这里。
+        case "--exp-booster-list":
+            boosterList = true;
+            break;
+        case "--exp-booster-config" when i + 1 < args.Length:
+            boosterConfigPath = args[++i];
+            break;
+        // 只给核对用：从库里独立读回到期时刻、剩余时间、绑定态与背包张数。
+        case "--exp-booster-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out boosterStateOf);
+            break;
+        // 只给核对用：删掉这一行（回到「从来没用过」）。写库，不进玩法路径。
+        case "--exp-booster-reset" when i + 1 < args.Length:
+            long.TryParse(args[++i], out boosterResetOf);
+            break;
+        // 只给核对用：把到期时刻挪到过去，不必真等一段配置时长就能验「到点消失」。
+        // 只动 expires_at，不动 used_at / last_txn_id，也不碰背包与经验。
+        case "--exp-booster-expire" when i + 1 < args.Length:
+            long.TryParse(args[++i], out boosterExpireOf);
+            break;
         // 只给核对用：不看回包，从库里独立读回买方/卖方金币、全库金币分布、
         // 挂单状态与成交流水，用来证「这笔税不进任何背包」。
         case "--auction-ledger" when i + 3 < args.Length:
@@ -450,9 +478,13 @@ if (shopList)
         var shopScrolls = ReviveScrollTable.Load(
             characterConfig.ReviveScrollTable, "config/classes.json",
             shopItems, shopTalismans);
+        // P1-5c7：限时经验道具的发货物必须就是 exp_booster.json 那一个编号，
+        // 同样与启动走同一套 Load。
+        var shopBoosters = ExpBoosterTable.Load(
+            characterConfig.ExpBoosterTable, shopItems, shopTalismans, shopScrolls);
         var table = ShopTable.Load(
             shopConfigPath ?? characterConfig.ShopTable, shopCurrencies, shopItems, shopEnhance,
-            shopTalismans, shopScrolls);
+            shopTalismans, shopScrolls, shopBoosters);
         Console.WriteLine("shop_list_state=ok version=" + table.Version
             + " currency=" + table.Currency
             + " items=" + table.Items.Count
@@ -584,6 +616,42 @@ if (scrollList)
     return 0;
 }
 
+// P1-5c7 限时经验道具表只读核对：与启动共用同一套校验（物品在 items.json 里、
+// 是消耗品、到账即绑、不与符 / 卷轴同编号、时长为正、倍率必须提高经验），
+// 不连库也不启动进程。坏表在这一步就能看出来；临时表用 --exp-booster-config 指过去。
+if (boosterList)
+{
+    try
+    {
+        var boosterConfig = CharacterConfig.Load(configPath);
+        var boosterItems = ItemTable.Load("config/items.json");
+        var boosterTalismans = TalismanTable.Load(boosterConfig.TalismanTable, boosterItems);
+        var boosterScrolls = ReviveScrollTable.Load(
+            boosterConfig.ReviveScrollTable, "config/classes.json",
+            boosterItems, boosterTalismans);
+        var table = ExpBoosterTable.Load(
+            boosterConfigPath ?? boosterConfig.ExpBoosterTable,
+            boosterItems, boosterTalismans, boosterScrolls);
+        Console.WriteLine("exp_booster_list_state=ok version=" + table.Version
+            + " item=" + table.ExpBooster.ItemId
+            + " name=" + table.ExpBooster.Name
+            + " duration_ms=" + table.ExpBooster.DurationMs
+            + " gain_pct=" + table.ExpBooster.GainPct);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
@@ -594,7 +662,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || transferStateOf != 0 || transferTxnCount != null
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
     || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0
-    || scrollStateOf != 0 || scrollResetOf != 0)
+    || scrollStateOf != 0 || scrollResetOf != 0
+    || boosterStateOf != 0 || boosterResetOf != 0 || boosterExpireOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -625,6 +694,28 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             reset.Parameters.AddWithValue(scrollResetOf);
             var rows = await reset.ExecuteNonQueryAsync(CancellationToken.None);
             Console.WriteLine("scroll_cooldown_reset=ok id=" + scrollResetOf + " rows=" + rows);
+        }
+
+        if (boosterResetOf != 0)
+        {
+            // 只给核对用：删掉这一行，回到「从来没用过」，不碰背包与经验。
+            await using var reset = dataSource.CreateCommand(
+                "delete from \"角色\".exp_booster where character_id = $1");
+            reset.Parameters.AddWithValue(boosterResetOf);
+            var rows = await reset.ExecuteNonQueryAsync(CancellationToken.None);
+            Console.WriteLine("exp_booster_reset=ok id=" + boosterResetOf + " rows=" + rows);
+        }
+
+        if (boosterExpireOf != 0)
+        {
+            // 只给核对用：把到期时刻挪到过去，验「到点后经验恢复原倍率」，
+            // 不用真等配置里那一段时长。只动 expires_at，别的列一概不写。
+            await using var expire = dataSource.CreateCommand(
+                "update \"角色\".exp_booster set expires_at = now() - interval '1 second' "
+                + "where character_id = $1");
+            expire.Parameters.AddWithValue(boosterExpireOf);
+            var rows = await expire.ExecuteNonQueryAsync(CancellationToken.None);
+            Console.WriteLine("exp_booster_expire=ok id=" + boosterExpireOf + " rows=" + rows);
         }
 
         if (deleteName != null)
@@ -668,9 +759,13 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             var shopScrollsForState = ReviveScrollTable.Load(
                 shopCharConfig.ReviveScrollTable, "config/classes.json",
                 shopItemsForState, shopTalismansForState);
+            // 与启动、--shop-list 走同一套 Load：经验道具发货物必须就是那一个编号。
+            var shopBoostersForState = ExpBoosterTable.Load(
+                shopCharConfig.ExpBoosterTable, shopItemsForState,
+                shopTalismansForState, shopScrollsForState);
             var shopTableForState = ShopTable.Load(
                 shopCharConfig.ShopTable, shopCurrencies, shopItemsForState, shopEnhanceForState,
-                shopTalismansForState, shopScrollsForState);
+                shopTalismansForState, shopScrollsForState, shopBoostersForState);
 
             // 券的张数与绑定态都从背包里读出来，不另算。绑定的券不能上架（P1-5a 的 bound_item）。
             var shopInventory = new InventoryRepository(dataSource);
@@ -791,6 +886,47 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " ready_at_ms=" + scrollState.ReadyAtMs
                 + " now_ms=" + scrollState.NowMs
                 + " cooling=" + (scrollState.Cooling ? "true" : "false"));
+        }
+
+        if (boosterStateOf != 0)
+        {
+            // P1-5c7：从库里独立读回到期时刻、剩余时间、绑定态与背包张数。
+            // 到期时刻是角色库那一行，不在任何进程内存里；换进程后读到的还是它。
+            var boosterConfigForState = CharacterConfig.Load(configPath);
+            var boosterItemsForState = ItemTable.Load("config/items.json");
+            var boosterTalismansForState = TalismanTable.Load(
+                boosterConfigForState.TalismanTable, boosterItemsForState);
+            var boosterScrollsForState = ReviveScrollTable.Load(
+                boosterConfigForState.ReviveScrollTable, "config/classes.json",
+                boosterItemsForState, boosterTalismansForState);
+            var boosterTableForState = ExpBoosterTable.Load(
+                boosterConfigForState.ExpBoosterTable, boosterItemsForState,
+                boosterTalismansForState, boosterScrollsForState);
+            var boosterRepo = new ExpBoosterRepository(dataSource);
+            var boosterState = await boosterRepo.StateAsync(
+                boosterStateOf, boosterTableForState.ExpBooster.ItemId, CancellationToken.None);
+            // 「同时只生效一个」要能从库里数出来：用了两张之后仍只有一行。
+            long boosterRows = 0;
+            await using (var rowCount = dataSource.CreateCommand(
+                "select count(*) from \"角色\".exp_booster where character_id = $1"))
+            {
+                rowCount.Parameters.AddWithValue(boosterStateOf);
+                boosterRows = Convert.ToInt64(
+                    await rowCount.ExecuteScalarAsync(CancellationToken.None));
+            }
+            Console.WriteLine("exp_booster_state=ok id=" + boosterStateOf
+                + " rows=" + boosterRows
+                + " found=" + (boosterState.Found ? "true" : "false")
+                + " item=" + boosterTableForState.ExpBooster.ItemId
+                + " count=" + boosterState.Count
+                + " bound=" + (boosterState.AllBound ? "true" : "false")
+                + " duration_ms=" + boosterTableForState.ExpBooster.DurationMs
+                + " gain_pct=" + boosterTableForState.ExpBooster.GainPct
+                + " expires_at_ms=" + boosterState.ExpiresAtMs
+                + " used_at_ms=" + boosterState.UsedAtMs
+                + " now_ms=" + boosterState.NowMs
+                + " remaining_ms=" + boosterState.RemainingMs
+                + " active=" + (boosterState.Active ? "true" : "false"));
         }
 
         if (levelOf != 0)

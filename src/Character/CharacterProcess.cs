@@ -34,6 +34,7 @@ public sealed class CharacterProcess(string configPath)
         ShopTable shopTable;
         TalismanTable talismanTable;
         ReviveScrollTable scrollTable;
+        ExpBoosterTable boosterTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -64,12 +65,18 @@ public sealed class CharacterProcess(string configPath)
             // （一转基础，生息与卷轴同源，二转减免只给生息），不在这里抄数。
             scrollTable = ReviveScrollTable.Load(
                 config.ReviveScrollTable, "config/classes.json", items, talismanTable);
+            // 方案 10 章 / 12.1：限时经验道具只乘结算这一笔，时长与倍率在
+            // exp_booster.json；到期时刻落角色库，不在这里生成，也不在内存计时。
+            // 与符、卷轴的编号不许撞（三种是三种东西）。
+            boosterTable = ExpBoosterTable.Load(
+                config.ExpBoosterTable, items, talismanTable, scrollTable);
             // 方案 12.1 定死十八种可上架种类，商城只收元宝；清单外的编号在购买时拒绝。
             // P1-5c2 起逐种接发货：已接的种类必须指向 items.json 里的真物品，
             // 保护券还必须就是 enhance.json 那一个编号（两处发的是同一种券），
             // 红符必须就是 talisman.json 那一个编号（红符不是红药）。
             shopTable = ShopTable.Load(
-                config.ShopTable, currencies, items, enhanceTable, talismanTable, scrollTable);
+                config.ShopTable, currencies, items, enhanceTable, talismanTable,
+                scrollTable, boosterTable);
         }
         catch (ConfigException ex)
         {
@@ -156,6 +163,12 @@ public sealed class CharacterProcess(string configPath)
             + " cooldown_ms=" + scrollTable.ReviveScroll.CooldownMs
             + " hp_restore_pct=" + scrollTable.HpRestorePct
             + " exp_cost_pct=" + scrollTable.ExpCostPct);
+        // 与 --exp-booster-list 只读入口同形：时长、倍率改一条，重启后这里能直接核对到。
+        // 到期时刻不在这里，在角色库那一行（--exp-booster-state 读）。
+        Console.WriteLine("exp_booster_table_version=" + boosterTable.Version
+            + " item=" + boosterTable.ExpBooster.ItemId
+            + " duration_ms=" + boosterTable.ExpBooster.DurationMs
+            + " gain_pct=" + boosterTable.ExpBooster.GainPct);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -186,6 +199,9 @@ public sealed class CharacterProcess(string configPath)
         // 卷轴的冷却到期、背包张数、当前级经验都从角色库读；写那一笔复用
         // ExpSettlementRepository（等级经验只从那里写，不另开一条路）。
         var scrolls = new ReviveScrollRepository(dataSource);
+        // 限时经验道具的到期时刻、背包余量都从角色库读；写那一笔也只在这个
+        // Repository。结算那一笔只读「这一刻有没有生效」，不写这张表。
+        var boosters = new ExpBoosterRepository(dataSource);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -227,6 +243,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(shopTable);
         builder.Services.AddSingleton(talismanTable);
         builder.Services.AddSingleton(scrollTable);
+        builder.Services.AddSingleton(boosters);
+        builder.Services.AddSingleton(boosterTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
         builder.Services.AddSingleton(config);

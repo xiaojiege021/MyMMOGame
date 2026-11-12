@@ -63,3 +63,14 @@ ALTER TABLE "角色".character
     DROP CONSTRAINT IF EXISTS character_exp_non_negative;
 ALTER TABLE "角色".character
     ADD CONSTRAINT character_exp_non_negative CHECK (exp >= 0);
+
+-- P1-5c7：限时经验道具的剩余时间。表定义与说明在 db/character/exp_booster.sql；
+-- 这里放同一份幂等 DDL，是因为 SettleExp 那一笔事务会读这张表，而只跑主迁移的
+-- 老卡（P1-2d 起）也要能正常结算——表不在，它们的结算会整笔挂掉。
+-- 库里只存到期时刻，不存倍率；倍率只从 config/exp_booster.json 读一个。
+CREATE TABLE IF NOT EXISTS "角色".exp_booster (
+    character_id bigint      PRIMARY KEY REFERENCES "角色".character (id) ON DELETE CASCADE,
+    expires_at   timestamptz NOT NULL,
+    used_at      timestamptz NOT NULL DEFAULT now(),
+    last_txn_id  text        NOT NULL
+);

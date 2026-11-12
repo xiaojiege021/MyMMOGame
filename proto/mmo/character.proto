@@ -117,6 +117,10 @@ service CharacterService {
   // P1-5c6：真用掉一张卷轴。战斗服发过来，角色服在一笔事务里扣一张、
   // 只扣当前等级已有经验的一部分、写下跨场保留的冷却到期；不碰生命与蓝量。
   rpc ConsumeReviveScroll(ConsumeReviveScrollRequest) returns (ConsumeReviveScrollResponse);
+  // P1-5c7：用掉一张限时经验道具。网关转过来，角色服在一笔事务里扣一张、
+  // 把「剩余时间」的到期时刻刷成 now() + 配置时长；库里一个角色最多一行，
+  // 再用一张只刷新、不叠倍率。时长与倍率全在配置，请求里带不进来。
+  rpc UseExpBooster(UseExpBoosterRequest) returns (UseExpBoosterResponse);
 }
 
 message SettleExpRequest {
@@ -148,6 +152,10 @@ message SettleExpResponse {
   bool at_cap = 9;
   uint32 party_size = 10;
   string source = 11;
+  // P1-5c7：这一笔生效的道具倍率（100 是原倍率）与它额外带来的经验。
+  // 都是只读结果，客户端与战斗服都带不进来；判定在角色服用库里的到期时刻做。
+  uint32 booster_pct = 12;
+  int64 booster_exp = 13;
 }
 
 message UseHotSpringRequest {
@@ -664,4 +672,32 @@ message ConsumeReviveScrollResponse {
   uint32 cooldown_ms = 10;
   // 同一个事务号重放：整笔没执行，卷轴、经验、冷却都不动。
   bool duplicate = 11;
+}
+
+// P1-5c7：用掉一张限时经验道具。请求里只有标识与物品编号，
+// 时长、倍率、到期时刻、张数一个都带不进来，全由角色服从配置与角色库读。
+message UseExpBoosterRequest {
+  // 网关转发时填令牌账号；服间可信调用为空，只按角色编号找角色。
+  string account = 1;
+  uint64 character_id = 2;
+  string item_id = 3;
+  // 网关生成的幂等号：同一个号只扣一张，重放整笔不做。
+  string txn_id = 4;
+}
+
+message UseExpBoosterResponse {
+  bool ok = 1;
+  // not_booster / no_booster / character_not_found / duplicate / 空串表示真用掉了。
+  string reason = 2;
+  string item_id = 3;
+  // 扣掉之后背包里还剩几张；没扣时给的是当前张数（事实值）。
+  int64 count_left = 4;
+  // 配置里的一段时长与结算倍率，只作回包事实值，生效判定不在这里。
+  uint32 duration_ms = 5;
+  uint32 gain_pct = 6;
+  // 写进角色库的到期时刻与库当前时刻（Unix 毫秒）；剩余时间就是两者之差。
+  // 再用一张只刷新同一行的 expires_at，不累加、也不新增第二行。
+  int64 expires_at_ms = 7;
+  int64 now_ms = 8;
+  bool duplicate = 9;
 }

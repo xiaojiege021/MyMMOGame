@@ -11,25 +11,34 @@ public sealed record ExpSettlementOutcome(
     long ExpGain,
     int LevelBefore,
     int Level,
-    long Exp);
+    long Exp,
+    int BoosterPct,
+    long BoosterExp);
 
 /// <summary>
 /// 等级经验的唯一写入点。活动、副本、任务、竞技场、战场、城战和世界 Boss
 /// 都调同一笔：基础经验 + （同一场至少两人时）一截少量加成，只加经验。
+/// P1-5c7：限时经验道具生效时，这一笔再乘配置里的一个倍率；到点后回到原倍率。
+/// 倍率只从 config/exp_booster.json 读一个，角色库那一行只有到期时刻、没有倍率列，
+/// 所以「同时只生效一个、不叠倍率」是结构上落死的，不是靠一句约定。
 ///
-/// 事务顺序与前面的发奖/进本一致：锁角色行 → 抢事务号 → 只写 level 与 exp → 提交。
-/// 抢不到号（重复提交）整笔回滚；并发两笔不同号冲同一角色由行锁串行，
-/// 不会把这一笔算丢。等级到 level_cap 就不再升，库层 CHECK 仍在。
+/// 事务顺序与前面的发奖/进本一致：锁角色行 → 读生效状态 → 抢事务号 →
+/// 只写 level 与 exp → 提交。抢不到号（重复提交）整笔回滚；并发两笔不同号
+/// 冲同一角色由行锁串行，不会把这一笔算丢。等级到 level_cap 就不再升，
+/// 库层 CHECK 仍在。
 ///
 /// account 为空表示服间可信调用（战斗服通关后直连），只按角色编号归属；
 /// 网关转发时一定带账号，where 里再核一次，别的账号改不到这个角色。
 /// 这一笔只 set level / exp 与写 exp_settlement 流水：疲劳、周份额、货币、
-/// 背包、进本记录一概不碰。
+/// 背包、进本记录一概不碰；生效判定只 `select`，不写 exp_booster 那张表。
 /// </summary>
 public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
 {
     public const int MaxTxnLength = 128;
     public const int MaxSourceLength = 32;
+
+    /// <summary>没有生效道具时的结算倍率：乘 100/100 就是原倍率，不是配置数值。</summary>
+    public const int OriginalPct = 100;
 
     public async Task<ExpSettlementOutcome> SettleAsync(
         long characterId,
@@ -38,11 +47,12 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         string source,
         int partySize,
         ExpTable table,
+        ExpBoosterTable boosterTable,
         CancellationToken stopping)
     {
         var baseExp = table.BaseExp;
         var bonus = table.PartyBonus(partySize);
-        var gain = baseExp + bonus;
+        var rawGain = table.Gain(partySize);
 
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         await using var transaction = await connection.BeginTransactionAsync(stopping);
@@ -80,9 +90,30 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         if (!found)
         {
             await transaction.RollbackAsync(stopping);
-            return new ExpSettlementOutcome(false, false, 0, 0, 0, 0, 0, 0);
+            return new ExpSettlementOutcome(
+                false, false, 0, 0, 0, 0, 0, 0, OriginalPct, 0);
         }
 
+        // 限时经验道具（P1-5c7）：生效判定放在这一笔事务里，用数据库当前时刻，
+        // 不用客户端时间，也不让战斗服自己算倍率。库里那一行只存到期时刻，
+        // 到期 / 没有行都取原倍率；倍率只从配置读一个，再多张也不会累乘。
+        var boosterPct = OriginalPct;
+        await using (var boost = new NpgsqlCommand(
+            "select (b.expires_at > now()) from \"角色\".exp_booster b "
+            + "where b.character_id = $1",
+            connection, transaction))
+        {
+            boost.Parameters.AddWithValue(characterId);
+            var active = await boost.ExecuteScalarAsync(stopping);
+            if (active is not null && Convert.ToBoolean(active))
+            {
+                boosterPct = boosterTable.ExpBooster.GainPct;
+            }
+        }
+
+        // 只乘「结算这一笔」：基础 + 组队加成算完再乘倍率，别的一分不加。
+        var gain = rawGain * boosterPct / OriginalPct;
+        var boosterExp = gain - rawGain;
         var (level, exp) = table.Apply(levelBefore, expBefore, gain);
 
         // 2. 抢事务号。同一个号已经发过就整笔不做，返回当时的状态。
@@ -108,7 +139,8 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
             {
                 await transaction.RollbackAsync(stopping);
                 return new ExpSettlementOutcome(
-                    true, true, 0, 0, 0, levelBefore, levelBefore, expBefore);
+                    true, true, 0, 0, 0, levelBefore, levelBefore, expBefore,
+                    OriginalPct, 0);
             }
         }
 
@@ -125,7 +157,8 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
 
         await transaction.CommitAsync(stopping);
         return new ExpSettlementOutcome(
-            true, false, baseExp, bonus, gain, levelBefore, level, exp);
+            true, false, baseExp, bonus, gain, levelBefore, level, exp,
+            boosterPct, boosterExp);
     }
 
     /// <summary>只给核对用：读等级、当前级经验、结算笔数与累计入账经验。</summary>

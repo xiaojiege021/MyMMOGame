@@ -134,6 +134,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeReviveScrollRequest> __Marshaller_mmo_character_ConsumeReviveScrollRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeReviveScrollRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeReviveScrollResponse> __Marshaller_mmo_character_ConsumeReviveScrollResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeReviveScrollResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseExpBoosterRequest> __Marshaller_mmo_character_UseExpBoosterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseExpBoosterRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseExpBoosterResponse> __Marshaller_mmo_character_UseExpBoosterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseExpBoosterResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -310,6 +314,14 @@ namespace Mmo.Proto.Character {
         "ConsumeReviveScroll",
         __Marshaller_mmo_character_ConsumeReviveScrollRequest,
         __Marshaller_mmo_character_ConsumeReviveScrollResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.UseExpBoosterRequest, global::Mmo.Proto.Character.UseExpBoosterResponse> __Method_UseExpBooster = new grpc::Method<global::Mmo.Proto.Character.UseExpBoosterRequest, global::Mmo.Proto.Character.UseExpBoosterResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "UseExpBooster",
+        __Marshaller_mmo_character_UseExpBoosterRequest,
+        __Marshaller_mmo_character_UseExpBoosterResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -594,6 +606,20 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ConsumeReviveScrollResponse> ConsumeReviveScroll(global::Mmo.Proto.Character.ConsumeReviveScrollRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P1-5c7：用掉一张限时经验道具。网关转过来，角色服在一笔事务里扣一张、
+      /// 把「剩余时间」的到期时刻刷成 now() + 配置时长；库里一个角色最多一行，
+      /// 再用一张只刷新、不叠倍率。时长与倍率全在配置，请求里带不进来。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UseExpBoosterResponse> UseExpBooster(global::Mmo.Proto.Character.UseExpBoosterRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1727,6 +1753,62 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_ConsumeReviveScroll, null, options, request);
       }
+      /// <summary>
+      /// P1-5c7：用掉一张限时经验道具。网关转过来，角色服在一笔事务里扣一张、
+      /// 把「剩余时间」的到期时刻刷成 now() + 配置时长；库里一个角色最多一行，
+      /// 再用一张只刷新、不叠倍率。时长与倍率全在配置，请求里带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseExpBoosterResponse UseExpBooster(global::Mmo.Proto.Character.UseExpBoosterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseExpBooster(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c7：用掉一张限时经验道具。网关转过来，角色服在一笔事务里扣一张、
+      /// 把「剩余时间」的到期时刻刷成 now() + 配置时长；库里一个角色最多一行，
+      /// 再用一张只刷新、不叠倍率。时长与倍率全在配置，请求里带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseExpBoosterResponse UseExpBooster(global::Mmo.Proto.Character.UseExpBoosterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_UseExpBooster, null, options, request);
+      }
+      /// <summary>
+      /// P1-5c7：用掉一张限时经验道具。网关转过来，角色服在一笔事务里扣一张、
+      /// 把「剩余时间」的到期时刻刷成 now() + 配置时长；库里一个角色最多一行，
+      /// 再用一张只刷新、不叠倍率。时长与倍率全在配置，请求里带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseExpBoosterResponse> UseExpBoosterAsync(global::Mmo.Proto.Character.UseExpBoosterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseExpBoosterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P1-5c7：用掉一张限时经验道具。网关转过来，角色服在一笔事务里扣一张、
+      /// 把「剩余时间」的到期时刻刷成 now() + 配置时长；库里一个角色最多一行，
+      /// 再用一张只刷新、不叠倍率。时长与倍率全在配置，请求里带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseExpBoosterResponse> UseExpBoosterAsync(global::Mmo.Proto.Character.UseExpBoosterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_UseExpBooster, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1762,7 +1844,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_ConsumeTalisman, serviceImpl.ConsumeTalisman)
           .AddMethod(__Method_DescribeTalisman, serviceImpl.DescribeTalisman)
           .AddMethod(__Method_DescribeReviveScroll, serviceImpl.DescribeReviveScroll)
-          .AddMethod(__Method_ConsumeReviveScroll, serviceImpl.ConsumeReviveScroll).Build();
+          .AddMethod(__Method_ConsumeReviveScroll, serviceImpl.ConsumeReviveScroll)
+          .AddMethod(__Method_UseExpBooster, serviceImpl.UseExpBooster).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1794,6 +1877,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DescribeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeTalismanRequest, global::Mmo.Proto.Character.DescribeTalismanResponse>(serviceImpl.DescribeTalisman));
       serviceBinder.AddMethod(__Method_DescribeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse>(serviceImpl.DescribeReviveScroll));
       serviceBinder.AddMethod(__Method_ConsumeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeReviveScrollRequest, global::Mmo.Proto.Character.ConsumeReviveScrollResponse>(serviceImpl.ConsumeReviveScroll));
+      serviceBinder.AddMethod(__Method_UseExpBooster, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseExpBoosterRequest, global::Mmo.Proto.Character.UseExpBoosterResponse>(serviceImpl.UseExpBooster));
     }
 
   }

@@ -110,13 +110,19 @@ currencies = [c["id"] for c in json.loads(read(currency_config))["currencies"]]
 report("currency_yuanbao", shop["currency"] == "yuanbao" and "yuanbao" in currencies,
        "currency=%s" % shop["currency"])
 
-# 这张卡只接一种发货：保护券。别处留空、数量 0，不许留半个发货物。
+# 这张卡只接保护券一种发货。后面的卡还会往白名单里加种类、接更多发货，
+# 所以这里只钉「保护券在白名单里 / 有一条保护券发货、且都不重复」，
+# 不写死当时的全集——写死过一次，接到第五种发货就整段假失败。
 delivered_code = re.findall(r'"([a-z_]+)"', table.split("DeliveredKinds")[1].split("}")[0])
-report("delivered_kinds_scope", delivered_code == ["protect_ticket"],
+report("delivered_kinds_scope",
+       "protect_ticket" in delivered_code
+       and len(delivered_code) == len(set(delivered_code)),
        "code=%s" % ",".join(delivered_code))
 
 filled = [i["kind"] for i in shop["items"] if (i.get("delivery_item_id") or "")]
-report("delivery_only_ticket", filled == ["protect_ticket"], ",".join(filled))
+report("delivery_only_ticket",
+       "protect_ticket" in filled and len(filled) == len(set(filled)),
+       ",".join(filled))
 half = [i["kind"] for i in shop["items"]
         if not (i.get("delivery_item_id") or "") and (i.get("delivery_count") or 0) != 0]
 report("no_half_delivery", not half, ",".join(half))
@@ -210,10 +216,16 @@ fi
 
 echo "== 3. 只读入口与坏清单 =="
 if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
-  if grep -q 'shop_list_state=ok' "$TMP/list.txt" \
-     && grep -q 'delivered_kinds=1' "$TMP/list.txt" \
-     && grep -q 'deliverable_items=1' "$TMP/list.txt"; then
-    ok "清单读得出来：18 种、只接了一种发货（保护券）"
+  # 已接种类数与可发货物数会随后面的卡增长，只钉「两个数字相等且至少有一种」，
+  # 不写死 delivered_kinds=1 / deliverable_items=1。
+  if [ "$(LIST="$TMP/list.txt" python3 -c 'import os, re
+line = open(os.environ["LIST"], encoding="utf-8").readline()
+def f(k):
+    m = re.search(r"\b" + k + r"=(\d+)", line)
+    return int(m.group(1)) if m else -1
+d, v = f("delivered_kinds"), f("deliverable_items")
+print("ok" if "shop_list_state=ok" in line and d >= 1 and d == v else "bad")')" = "ok" ]; then
+    ok "清单读得出来：已接发货种类与可发货物一一对应"
   else
     bad "清单头部不对：$(head -1 "$TMP/list.txt")"
   fi
@@ -225,7 +237,12 @@ if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
     bad "保护券的发货物不对：$(grep 'shop_protect_ticket_1' "$TMP/list.txt" | head -1)"
   fi
   pending=$(grep -c ' delivery=pending ' "$TMP/list.txt" || true)
-  [ "$pending" = "17" ] && ok "另外十七种仍写着 pending" || bad "pending 条数不是 17：$pending"
+  filled_n=$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(sum(1 for i in d["items"] if i.get("delivery_item_id")))')
+  if [ "$filled_n" -ge 1 ] && [ "$((pending + filled_n))" -eq "$items" ]; then
+    ok "清单 ${items} 条 = ${filled_n} 条已接发货 + ${pending} 条 pending（不钉当时的种类数）"
+  else
+    bad "pending 与已接发货对不上：pending=$pending filled=$filled_n items=$items"
+  fi
 else
   bad "清单读取失败"; tail -5 "$TMP/list.txt" | detail
 fi
@@ -349,13 +366,18 @@ print(n)'
     bad "清单外商品没按清单拒绝：$body"
   fi
 
-  # 还没接发货的种类：红符仍是 delivery_pending，且一分不扣
-  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"shop_red_talisman_1\"}")"
+  # 还没接发货的种类：从清单里动态挑一条，不写死「红符」——
+  # 红符从 P1-5c3 起就真发货了，写死会在后面的卡里假失败。
+  pending_goods="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); g=next((i for i in d["items"] if not i.get("delivery_item_id")), None); print((g["id"] + " " + g["kind"]) if g else "")')"
+  pending_id="${pending_goods%% *}"
+  pending_kind="${pending_goods##* }"
+  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"$pending_id\"}")"
   body="$(body_of "$resp")"
-  if [ "$(expect_json "$body" ok=false reason=delivery_pending kind=red_talisman charged_yuanbao=0 delivered=false)" = "ok" ]; then
-    ok "红符还没接发货：delivery_pending，不扣不发"
+  if [ -n "$pending_id" ] \
+     && [ "$(expect_json "$body" ok=false reason=delivery_pending kind="$pending_kind" charged_yuanbao=0 delivered=false)" = "ok" ]; then
+    ok "未接发货的种类（${pending_id}）：delivery_pending，不扣不发"
   else
-    bad "红符回包不对：$body"
+    bad "未接发货的种类回包不对：$body"
   fi
 
   # 买一张保护券：扣 50、入包一张、到账即绑

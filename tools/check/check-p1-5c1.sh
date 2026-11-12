@@ -268,12 +268,17 @@ else:
     bad "清单外商品没按清单拒绝：$body"
   fi
 
-  # 清单内但还没接发货：红符这一种到 P1-5c8 之前都是这条，用它验最稳
-  # （保护券从 P1-5c2 起真发货了，再拿它验 delivery_pending 会随那张卡一起变）。
-  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"shop_red_talisman_1\"}")"
+  # 清单内但还没接发货：从清单里动态挑一条空发货的商品。
+  # 保护券、红符、蓝符、卷轴、限时经验道具会一张卡一张卡接上发货，
+  # 写死任何一个编号都会在后面某张卡里假失败。
+  pending_goods="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); g=next((i for i in d["items"] if not i.get("delivery_item_id")), None); print((g["id"] + " " + g["kind"]) if g else "")')"
+  pending_id="${pending_goods%% *}"
+  pending_kind="${pending_goods##* }"
+  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"$pending_id\"}")"
   body="$(body_of "$resp")"
-  if [ "$(expect_json "$body" ok=false reason=delivery_pending kind=red_talisman charged_yuanbao=0 delivered=false)" = "ok" ]; then
-    ok "清单内商品：还没接发货，拒绝且不扣（delivery_pending）"
+  if [ -n "$pending_id" ] \
+     && [ "$(expect_json "$body" ok=false reason=delivery_pending kind="$pending_kind" charged_yuanbao=0 delivered=false)" = "ok" ]; then
+    ok "清单内商品（${pending_id}）：还没接发货，拒绝且不扣（delivery_pending）"
   else
     bad "清单内商品回包不对：$body"
   fi

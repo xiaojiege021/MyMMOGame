@@ -69,6 +69,8 @@ public sealed class GatewayProcess(string configPath)
         AuctionApi.Map(app, tokens, config);
         // P1-5c1：商城只认清单，清单外拒绝且不扣元宝。
         ShopApi.Map(app, tokens, config);
+        // P1-5c7：限时经验道具走网关到角色服，扣一张与写到期时刻在同一笔事务里。
+        ExpBoosterApi.Map(app, tokens, config);
 
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
         WorldApi.Map(app, tokens, config);

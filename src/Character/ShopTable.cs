@@ -36,10 +36,10 @@ public sealed class ShopTable
     };
 
     // 已经接上发货的种类。P1-5c2 接保护券，P1-5c3 接红符，P1-5c5 接蓝符，
-    // P1-5c6 接复活卷轴；其余种类的发货在后面的卡，没接的种类必须把
-    // delivery_item_id 留空，免得清单上看着能买、实际发不出东西。
+    // P1-5c6 接复活卷轴，P1-5c7 接限时经验道具；其余种类的发货在后面的卡，
+    // 没接的种类必须把 delivery_item_id 留空，免得清单上看着能买、实际发不出东西。
     public static readonly string[] DeliveredKinds =
-        { "protect_ticket", "red_talisman", "blue_talisman", "revive_scroll" };
+        { "protect_ticket", "red_talisman", "blue_talisman", "revive_scroll", "exp_booster" };
 
     /// <summary>ProtectItemId 是 enhance.json 里那唯一一种保护券的编号，本表要对得上。</summary>
     public sealed record Item(
@@ -95,7 +95,8 @@ public sealed class ShopTable
         ItemTable itemTable,
         EnhanceTable enhance,
         TalismanTable talismans,
-        ReviveScrollTable scrolls)
+        ReviveScrollTable scrolls,
+        ExpBoosterTable boosters)
     {
         if (!File.Exists(path))
         {
@@ -348,6 +349,37 @@ public sealed class ShopTable
                     if (goods.Bind != BindRule.Always)
                     {
                         throw new ConfigException("shop.json 的复活卷轴发货物必须到账即绑："
+                            + deliveryId);
+                    }
+                }
+                else if (string.Equals(kind, "exp_booster", StringComparison.Ordinal))
+                {
+                    // 方案 12.1：限时经验道具只从商城来，副本、任务、拍卖、
+                    // 月叠和通行证都不发，也不留接口。商城只能发
+                    // exp_booster.json 里那一种编号，别处不许另立。
+                    var booster = boosters.ExpBooster;
+                    if (!string.Equals(deliveryId, booster.ItemId, StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的限时经验道具必须发 "
+                            + "exp_booster.json 的 booster.item_id（" + booster.ItemId
+                            + "），不许另立：" + deliveryId);
+                    }
+
+                    if (deliveryCount != 1)
+                    {
+                        throw new ConfigException("shop.json 的限时经验道具按张卖，每份数量必须是 1："
+                            + deliveryCount);
+                    }
+
+                    if (!string.Equals(goods.Kind, "consumable", StringComparison.Ordinal))
+                    {
+                        throw new ConfigException("shop.json 的限时经验道具发货物必须是 consumable："
+                            + goods.Kind);
+                    }
+
+                    if (goods.Bind != BindRule.Always)
+                    {
+                        throw new ConfigException("shop.json 的限时经验道具发货物必须到账即绑："
                             + deliveryId);
                     }
                 }

@@ -10,7 +10,7 @@ namespace Character;
 public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
-    string ShopTable, string TalismanTable, string ReviveScrollTable)
+    string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -21,6 +21,7 @@ public sealed record CharacterConfig(
     public const string DefaultShopTable = "config/shop.json";
     public const string DefaultTalismanTable = "config/talisman.json";
     public const string DefaultReviveScrollTable = "config/revive_scroll.json";
+    public const string DefaultExpBoosterTable = "config/exp_booster.json";
 
     public static CharacterConfig Load(string path)
     {
@@ -125,10 +126,18 @@ public sealed record CharacterConfig(
             throw new ConfigException("revive_scroll_table 不能为空");
         }
 
+        // 限时经验道具也走同一份配置正本；核对脚本可以指到临时表试坏配置。
+        // 时长与倍率都在这份文件里，角色库只存到期时刻，不存倍率。
+        var expBoosterTable = (wire.ExpBoosterTable ?? DefaultExpBoosterTable).Trim();
+        if (expBoosterTable.Length == 0)
+        {
+            throw new ConfigException("exp_booster_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
-            reviveScrollTable);
+            reviveScrollTable, expBoosterTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -174,6 +183,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("revive_scroll_table")]
         public string? ReviveScrollTable { get; init; }
+
+        [JsonPropertyName("exp_booster_table")]
+        public string? ExpBoosterTable { get; init; }
     }
 }
 

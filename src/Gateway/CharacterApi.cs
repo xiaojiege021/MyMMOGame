@@ -762,7 +762,9 @@ public static class CharacterApi
                     + " gain=" + result.ExpGain
                     + " level=" + result.LevelBefore + "->" + result.Level
                     + " exp=" + result.Exp
-                    + " cap=" + result.LevelCap);
+                    + " cap=" + result.LevelCap
+                    + " booster_pct=" + result.BoosterPct
+                    + " booster_exp=" + result.BoosterExp);
 
                 await WriteAsync(context, 200, new
                 {
@@ -777,6 +779,9 @@ public static class CharacterApi
                     at_cap = result.AtCap,
                     party_size = result.PartySize,
                     source = result.Source,
+                    // P1-5c7：这一笔生效的道具倍率与它额外带来的经验，只读事实值。
+                    booster_pct = result.BoosterPct,
+                    booster_exp = result.BoosterExp,
                 });
             }
             catch (RpcException ex)

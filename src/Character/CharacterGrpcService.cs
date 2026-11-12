@@ -38,6 +38,8 @@ public sealed class CharacterGrpcService(
     TalismanRepository talismans,
     ReviveScrollTable scrollTable,
     ReviveScrollRepository scrolls,
+    ExpBoosterTable boosterTable,
+    ExpBoosterRepository boosters,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -740,7 +742,7 @@ public sealed class CharacterGrpcService(
 
         var outcome = await expSettlements.SettleAsync(
             (long)request.CharacterId, account.Length == 0 ? null : account,
-            txnId, source, partySize, expTable, context.CancellationToken);
+            txnId, source, partySize, expTable, boosterTable, context.CancellationToken);
         if (!outcome.Found)
         {
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
@@ -749,10 +751,12 @@ public sealed class CharacterGrpcService(
         logger.LogInformation(
             "exp_settle account={Account} id={Id} txn={Txn} source={Source} party={Party} "
             + "duplicate={Duplicate} base={Base} bonus={Bonus} gain={Gain} "
-            + "level={LevelBefore}->{Level} exp={Exp}",
+            + "level={LevelBefore}->{Level} exp={Exp} "
+            + "booster_pct={BoosterPct} booster_exp={BoosterExp}",
             account.Length == 0 ? "service" : account, request.CharacterId, txnId, source, partySize,
             outcome.Duplicate, outcome.BaseExp, outcome.PartyBonus, outcome.ExpGain,
-            outcome.LevelBefore, outcome.Level, outcome.Exp);
+            outcome.LevelBefore, outcome.Level, outcome.Exp,
+            outcome.BoosterPct, outcome.BoosterExp);
 
         return new SettleExpResponse
         {
@@ -767,6 +771,9 @@ public sealed class CharacterGrpcService(
             AtCap = outcome.Level >= expTable.LevelCap,
             PartySize = (uint)partySize,
             Source = source,
+            // 这一笔有没有吃到道具倍率，是角色服按库里到期时刻判的只读结果。
+            BoosterPct = (uint)outcome.BoosterPct,
+            BoosterExp = outcome.BoosterExp,
         };
     }
 
@@ -1785,6 +1792,98 @@ public sealed class CharacterGrpcService(
             Duplicate = false,
         };
     }
+
+    /// <summary>
+    /// P1-5c7：用掉一张限时经验道具。请求里只有标识与物品编号，时长、倍率、
+    /// 到期时刻都在角色服：编号认配置、到期时刻写角色库，网关与客户端一个都带不进来。
+    /// 业务拒绝（编号不对、背包没有、同号重放）回正常包里的 ok=false + reason。
+    /// </summary>
+    public override async Task<UseExpBoosterResponse> UseExpBooster(
+        UseExpBoosterRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var itemId = (request.ItemId ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        if (request.CharacterId == 0 || itemId.Length == 0
+            || txnId.Length == 0 || txnId.Length > ExpSettlementRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        var spec = boosterTable.Find(itemId);
+        if (spec is null)
+        {
+            // 不是道具：符、券、卷轴、随便什么编号都走这条，一个字不写。
+            var state = await boosters.StateAsync(characterId, itemId, context.CancellationToken);
+            logger.LogInformation(
+                "exp_booster_use_reject id={Id} item={Item} reason=not_booster",
+                characterId, itemId);
+            return BoosterRejected("not_booster", itemId, state.Count, false);
+        }
+
+        // 服间直连没有账号，照 SettleExp / ConsumeTalisman 的口径分两支：
+        // 有账号核归属，空账号只按角色号确认存在。
+        if (account.Length > 0)
+        {
+            if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+        }
+        else if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await boosters.UseAsync(
+            characterId, account, txnId, spec.ItemId, spec.DurationMs,
+            context.CancellationToken);
+
+        if (!outcome.Found || outcome.Reason.Length > 0)
+        {
+            var reason = outcome.Found ? outcome.Reason : "character_not_found";
+            logger.LogInformation(
+                "exp_booster_use_reject id={Id} item={Item} txn={Txn} reason={Reason}",
+                characterId, spec.ItemId, txnId, reason);
+            return BoosterRejected(reason, spec.ItemId, outcome.CountLeft, outcome.Duplicate);
+        }
+
+        logger.LogInformation(
+            "exp_booster_use id={Id} item={Item} txn={Txn} left={Left}"
+            + " duration_ms={Duration} gain_pct={GainPct} expires_at={ExpiresAt}",
+            characterId, spec.ItemId, txnId, outcome.CountLeft,
+            spec.DurationMs, spec.GainPct, outcome.ExpiresAtMs);
+
+        return new UseExpBoosterResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = spec.ItemId,
+            CountLeft = outcome.CountLeft,
+            DurationMs = (uint)Math.Max(0, spec.DurationMs),
+            GainPct = (uint)Math.Max(0, spec.GainPct),
+            ExpiresAtMs = outcome.ExpiresAtMs,
+            NowMs = outcome.NowMs,
+            Duplicate = false,
+        };
+    }
+
+    /// <summary>没用成的回包：时长、倍率与到期时刻一律不给生效值。</summary>
+    static UseExpBoosterResponse BoosterRejected(
+        string reason, string itemId, long countLeft, bool duplicate) =>
+        new()
+        {
+            Ok = false,
+            Reason = reason,
+            ItemId = itemId,
+            CountLeft = countLeft,
+            DurationMs = 0,
+            GainPct = 0,
+            ExpiresAtMs = 0,
+            NowMs = 0,
+            Duplicate = duplicate,
+        };
 
     /// <summary>没扣成的回包：比例、经验变化与到期时刻一律不给生效值。</summary>
     static ConsumeReviveScrollResponse ScrollRejected(
