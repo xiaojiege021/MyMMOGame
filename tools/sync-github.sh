@@ -53,6 +53,26 @@ if ! command -v git-filter-repo >/dev/null 2>&1; then
   fi
 fi
 
+# pip 的 --user 安装目录（macOS 上是 ~/Library/Python/X.Y/bin）默认不在 PATH，
+# 装完 command -v 仍找不到，git filter-repo 子命令也会报 "not a git command"。
+# 这里把这类目录补进 PATH 再判一次，避免「装好了却每次都要手工加 PATH」。
+if ! command -v git-filter-repo >/dev/null 2>&1; then
+  for d in "$HOME/Library/Python"/*/bin "$HOME/.local/bin"; do
+    if [ -x "$d/git-filter-repo" ]; then
+      case ":$PATH:" in
+        *":$d:"*) ;;
+        *) PATH="$d:$PATH" ;;
+      esac
+    fi
+  done
+  export PATH
+fi
+
+if ! command -v git-filter-repo >/dev/null 2>&1; then
+  echo "!! git-filter-repo 已安装但不在 PATH；把 pip 的 bin 目录加进 PATH 后重跑" >&2
+  exit 1
+fi
+
 echo ">> 检查 GitHub SSH 连通…"
 # 注意：GitHub SSH 即使认证成功也返回退出码 1（"does not provide shell access"），
 # 故用 || true 接住 ssh，再对捕获到的输出做判断，避免 pipefail 把成功判成失败。
