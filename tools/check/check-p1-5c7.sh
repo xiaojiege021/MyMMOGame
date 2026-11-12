@@ -346,8 +346,16 @@ else
 fi
 
 SHOP="$("$DOTNET" "$CHARACTER_DLL" --shop-list 2>&1)"
-if printf '%s' "$SHOP" | grep -q "delivery=${BOOSTER}x1" \
-   && printf '%s' "$SHOP" | grep -q 'delivered_kinds=5'; then
+# 已接发货的种类以后还会涨（c8 起还会加），只钉「头部两个数字相等且不少于本卡的 5 种」，
+# 不写死 delivered_kinds=5：写死数字的话，下一张卡接第六种发货时这张老卡就会假失败。
+SHOP_HDR="$(printf '%s' "$SHOP" | python3 -c 'import re, sys
+line = sys.stdin.readline()
+def f(k):
+    m = re.search(r"\b" + k + r"=(\d+)", line)
+    return int(m.group(1)) if m else -1
+d, v = f("delivered_kinds"), f("deliverable_items")
+print("ok" if d >= 5 and d == v else "bad")')"
+if printf '%s' "$SHOP" | grep -q "delivery=${BOOSTER}x1" && [ "$SHOP_HDR" = "ok" ]; then
   ok "清单里限时经验道具发 ${BOOSTER}x1，前四种发货未被带坏"
 else
   bad "商城清单发货不对：$SHOP"
