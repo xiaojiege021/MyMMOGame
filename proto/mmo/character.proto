@@ -129,6 +129,10 @@ service CharacterService {
   // 一笔订单只发一次元宝，同一笔回调重复到达整笔不做。
   rpc CreateRechargeOrder(CreateRechargeOrderRequest) returns (CreateRechargeOrderResponse);
   rpc SettleRechargeOrder(SettleRechargeOrderRequest) returns (SettleRechargeOrderResponse);
+  // P2-3b：战场进场前的只读战斗属性快照。只给事实值——职业、分支、等级、
+  // 各槽强化等级之和；属性折算、战力与同队平衡全在战斗服按 config/battlefield.json 做。
+  // 不写库，也不返回背包、货币与任何客户端能改的输入。
+  rpc DescribeBattleProfile(DescribeBattleProfileRequest) returns (DescribeBattleProfileResponse);
 }
 
 message SettleExpRequest {
@@ -796,4 +800,22 @@ message SettleRechargeOrderResponse {
   int64 balance = 6;
   int64 paid_at_ms = 7;
   bool duplicate = 8;
+}
+
+// P2-3b：战场要按「装备生效」算属性。装备在当前数据模型里只有强化这一条
+// 数值成长线，所以这张快照给的是「各槽强化等级之和」，由战斗服乘配置里的
+// 每级折算。角色服不做战力、不做平衡，只把库里的值原样给出去。
+message DescribeBattleProfileRequest {
+  uint64 character_id = 1;
+}
+
+message DescribeBattleProfileResponse {
+  // 角色不存在时 false，其余字段全是 0，战斗服据此拒绝进场。
+  bool found = 1;
+  string class_id = 2;
+  string branch = 3;
+  int32 level = 4;
+  int32 enhance_total = 5;
+  // 有强化记录的槽位数；只给核对与日志用，不参与战力。
+  int32 enhance_slots = 6;
 }

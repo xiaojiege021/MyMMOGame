@@ -346,6 +346,7 @@ public sealed class BattleConfig
     public string SkillTablePath { get; init; } = "";
     public string ClassTablePath { get; init; } = "";
     public string ArenaMatchTablePath { get; init; } = "";
+    public string BattlefieldTablePath { get; init; } = "";
     public string DefaultClass { get; init; } = "";
 
     /// <summary>
@@ -376,6 +377,12 @@ public sealed class BattleConfig
     /// </summary>
     public ArenaMatchTable ArenaMatch { get; private set; } = null!;
 
+    /// <summary>
+    /// 战场：10 对 10、同队 1.3 倍平衡、每级强化折算与战力权重（config/battlefield.json）。
+    /// 与上面的 Arena 与 ArenaMatch 都不同——战场是「装备生效 + 同队压缩」那一层。
+    /// </summary>
+    public BattlefieldTable Battlefield { get; private set; } = null!;
+
     /// <summary>配置文件的绝对路径，日志里要打出来才知道跑的是哪一份。</summary>
     public string SourcePath { get; private set; } = "";
 
@@ -394,6 +401,7 @@ public sealed class BattleConfig
         var classPath = Resolve(dir, raw.ClassTable, "classes.json");
         var dungeonPath = Resolve(dir, raw.DungeonTable, "dungeons.json");
         var arenaMatchPath = Resolve(dir, raw.ArenaMatchTable, "arena_match.json");
+        var battlefieldPath = Resolve(dir, raw.BattlefieldTable, "battlefield.json");
         // 竞技场表是可选项：没写这一项、文件也不在，就起一张空表（竞技场一律拒），
         // 副本与练习场不受影响。但显式写了路径就必须兑现，缺文件照样起不来。
         var arenaMatch = File.Exists(arenaMatchPath)
@@ -401,6 +409,12 @@ public sealed class BattleConfig
             : string.IsNullOrWhiteSpace(raw.ArenaMatchTable)
                 ? ArenaMatchTable.Missing()
                 : throw new ConfigException($"{path}：arena_match_table 指的 {arenaMatchPath} 不存在");
+        // 战场表同理：老卡临时配置里没有这一项，缺失不能让副本起不来。
+        var battlefield = File.Exists(battlefieldPath)
+            ? BattlefieldTable.Load(battlefieldPath)
+            : string.IsNullOrWhiteSpace(raw.BattlefieldTable)
+                ? BattlefieldTable.Missing()
+                : throw new ConfigException($"{path}：battlefield_table 指的 {battlefieldPath} 不存在");
 
         var config = new BattleConfig
         {
@@ -426,6 +440,7 @@ public sealed class BattleConfig
             Classes = ClassTable.Load(classPath),
             Dungeons = DungeonTable.Load(dungeonPath),
             ArenaMatch = arenaMatch,
+            Battlefield = battlefield,
         };
 
         // 模板与职业表对齐：每个职业都要有默认模板，模板里也不许出现职业表没有的职业。
@@ -638,6 +653,7 @@ public sealed class BattleConfig
         public string ClassTable { get; init; } = "classes.json";
         public string DungeonTable { get; init; } = "dungeons.json";
         public string ArenaMatchTable { get; init; } = "";
+        public string BattlefieldTable { get; init; } = "";
         public string DefaultClass { get; init; } = "warrior";
         public string ExpUpstream { get; init; } = "";
 

@@ -48,6 +48,7 @@ internal static class Program
             return name switch
             {
                 "open" => await CaseOpenAsync(url),
+                "battlefield_open" => await CaseBattlefieldOpenAsync(url, holdMs),
                 "damage" => await CaseDamageAsync(url, boss, ranged),
                 "cooldown" => await CaseCooldownAsync(url, boss, ranged),
                 "casting" => await CaseCastingAsync(url, boss, ranged),
@@ -122,6 +123,25 @@ internal static class Program
     }
 
     /// <summary>打一下。回包里的伤害、剩余血量、硬直、冷却都要对得上。</summary>
+    /// <summary>
+    /// P2-3b：战场进场。战场要等同队凑满或到时限才开场，所以等开场包的时间
+    /// 比普通副本长；核对用临时表把 fill_timeout_ms 调短。
+    /// 打出来的是压缩之后的属性，和报名时的真实战力比一下就是平衡系数。
+    /// </summary>
+    static async Task<int> CaseBattlefieldOpenAsync(string url, int holdMs)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var o = session.Opened;
+        Console.WriteLine($"case=battlefield_open caster={o.CasterId} class={o.ClassId}"
+            + $" hp={o.CasterHp} hp_max={o.CasterHpMax} mana={o.Mana} mana_max={o.ManaMax}");
+        if (holdMs > 0)
+        {
+            await Task.Delay(holdMs);
+        }
+
+        return Report(o.CasterHpMax > 0, "case=battlefield_open held_ms=" + holdMs);
+    }
+
     static async Task<int> CaseDamageAsync(string url, ulong boss, uint ranged)
     {
         await using var session = await Session.ConnectAsync(url);

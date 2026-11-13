@@ -33,6 +33,11 @@ public sealed class BattleProcess(string configPath)
         using IReviveScrollUse scrolls = string.IsNullOrEmpty(config.CharacterUpstream)
             ? new NoReviveScrollUse()
             : new GrpcReviveScrollUse(config.CharacterUpstream);
+        // P2-3b：战场要按装备算属性，装备只在角色库里。没配上游就是本机口径：
+        // 战场一律拒（battle_profile_missing），不从别处编一份属性出来。
+        using IBattleProfileSource profiles = string.IsNullOrEmpty(config.CharacterUpstream)
+            ? new NoBattleProfileSource()
+            : new GrpcBattleProfileSource(config.CharacterUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
         Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
@@ -66,13 +71,25 @@ public sealed class BattleProcess(string configPath)
             Console.WriteLine($"arena_mode={mode.Id} name={mode.Name}"
                 + $" team_size={mode.TeamSize} teams={mode.Teams} players={mode.Players}");
         }
+
+        // 战场：10 对 10、同队 1.3 倍、每级强化折算与战力权重都在 arena 之外的同一份表。
+        Console.WriteLine($"battlefield_table={config.BattlefieldTablePath}"
+            + (config.Battlefield.IsMissing
+                ? " battlefield=missing"
+                : $" battlefield_version={config.Battlefield.Version}"
+                  + $" battlefield_mode={config.Battlefield.ModeId}"
+                  + $" team_size={config.Battlefield.TeamSize}"
+                  + $" teams={config.Battlefield.Teams}"
+                  + $" players={config.Battlefield.Players}"
+                  + $" ratio={config.Battlefield.Ratio}"
+                  + $" fill_timeout_ms={config.Battlefield.FillTimeoutMs}"));
         // 场次全在内存里，进程一停就没了。重启不恢复、不补发，这句是给核对脚本看的。
         Console.WriteLine("resume=off");
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);
 
         try
         {
-            await new BattleServer(config, settlements, characters, expSettlement, talismans, scrolls)
+            await new BattleServer(config, settlements, characters, expSettlement, talismans, scrolls, profiles)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

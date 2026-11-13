@@ -1,0 +1,33 @@
+{
+  "schema": "battlefield-table/1",
+  "version": 1,
+  "note": "战场 10v10 的唯一正本（方案 12.3 三层战力、开发架构 P2-3b）。战场是「装备生效 + 场次平衡系数」那一层：先按装备算出真实战力，再把同一队里战力差压进 1.3 倍内。装备在当前数据模型里只有强化这一条数值成长线（config/items.json 的装备没有属性字段），所以每级强化折算成多少攻击与生命放在这里。战力权重方案没给数字，占位标待定。竞技场的统一模板在 config/arena_match.json，与这张表是两条独立的线。",
+  "mode": {
+    "id": "battlefield",
+    "name": "战场",
+    "team_size": 10,
+    "teams": 2,
+    "note": "技术架构第 23 行写定 10 对 10；team_size 与 teams 都由这里配，代码不写第二套人数"
+  },
+  "fill_timeout_ms": 3000,
+  "fill_timeout_note": "同一队没在时限内凑满就按已到的人开场，防挂机；方案没给时限，占位标待定",
+  "balance": {
+    "ratio": 1.3,
+    "rule": "raise_low_only",
+    "note": "同队战力差压缩至 1.3 倍内：低于「本队最高战力 / ratio」的人抬到这条线，最高的人不动。方案只写「压缩至 1.3 倍内」，没写削高还是抬低；这里只抬低不削高，避免动到已经养成的战力。"
+  },
+  "equipment": {
+    "attack_per_level": 12,
+    "hp_per_level": 80,
+    "mana_per_level": 0,
+    "heal_per_level": 0,
+    "note": "每级强化的折算，占位标待定；只作用于战场这一层，副本与竞技场不读这一段"
+  },
+  "power": {
+    "attack_weight": 2,
+    "hp_weight": 1,
+    "mana_weight": 0,
+    "heal_weight": 2,
+    "note": "有效战力 = 攻击×2 + 生命×1 + 蓝×0 + 治疗×2，权重占位标待定；战力只用来算平衡系数，不写进任何回包以外的持久数据"
+  }
+}

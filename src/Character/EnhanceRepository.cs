@@ -354,6 +354,24 @@ public sealed class EnhanceRepository(
         return Convert.ToInt32(await command.ExecuteScalarAsync(stopping));
     }
 
+    /// <summary>
+    /// P2-3b：一个角色的强化总级与有记录的槽数。战场按它折算装备加成，
+    /// 只读，不写库；没有强化记录就是 0 级、0 槽。
+    /// </summary>
+    public async Task<(int Total, int Slots)> TotalsAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select coalesce(sum(level), 0)::int, count(*)::int from \"角色\".enhance where character_id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return (0, 0);
+        }
+
+        return (reader.GetInt32(0), reader.GetInt32(1));
+    }
+
     /// <summary>只给核对用：绕开业务层直写等级，验证库层 CHECK 挡得住越界。</summary>
     public async Task RawWriteLevelAsync(long characterId, int slot, int level, CancellationToken stopping)
     {

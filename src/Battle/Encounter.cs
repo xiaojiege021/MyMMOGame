@@ -29,6 +29,14 @@ sealed class PendingCast
     public required ulong TargetId { get; init; }
 }
 
+/// <summary>
+/// 战场这一层的最终属性：职业表 + 装备强化折算，再乘同队平衡系数。
+/// 与竞技场的 ArenaTemplate 分开：模板是按职业与分支取的固定值，
+/// 这里是「装备生效之后再压缩」算出来的结果。
+/// </summary>
+public sealed record CombatStats(
+    long Attack, long HpMax, long ManaMax, long HealPower, long ThreatStability);
+
 /// <summary>一场里的一条命。编号就是连接进来时的角色编号。</summary>
 public sealed class Member
 {
@@ -41,14 +49,22 @@ public sealed class Member
     /// </summary>
     public ArenaTemplate? Template { get; init; }
 
-    /// <summary>攻击：有模板就用模板给的绝对值，没有才读职业表的主属性系数。</summary>
-    public double AttackPower() => Template?.Attack ?? Class.Attack();
+    /// <summary>
+    /// 战场算好的最终属性（装备生效 + 同队平衡）。优先级高于模板与职业表；
+    /// 只有带 battlefield 参数的连接才会有它。
+    /// </summary>
+    public CombatStats? Combat { get; init; }
 
-    /// <summary>治疗：模板给绝对值；没有模板仍是精神 × 职业治疗系数。</summary>
-    public double HealPower() => Template?.HealPower ?? Class.Attributes.Spirit * Class.HealPerSpirit;
+    /// <summary>攻击：战场 > 竞技场模板 > 职业表主属性系数。</summary>
+    public double AttackPower() => Combat?.Attack ?? Template?.Attack ?? Class.Attack();
 
-    /// <summary>仇恨稳定值：模板给绝对值；没有模板仍是体力 × 职业系数。</summary>
-    public long ThreatStability() => Template?.ThreatStability ?? Class.ThreatStability();
+    /// <summary>治疗：战场 > 模板 > 精神 × 职业治疗系数。</summary>
+    public double HealPower() =>
+        Combat?.HealPower ?? Template?.HealPower ?? Class.Attributes.Spirit * Class.HealPerSpirit;
+
+    /// <summary>仇恨稳定值：战场 > 模板 > 体力 × 职业系数。</summary>
+    public long ThreatStability() =>
+        Combat?.ThreatStability ?? Template?.ThreatStability ?? Class.ThreatStability();
 
     public long Hp { get; internal set; }
     public long HpMax { get; internal set; }
@@ -185,7 +201,7 @@ public sealed class Encounter
     /// arena 不为空时，生命、蓝、攻击、治疗与仇恨稳定值全部取竞技场模板，
     /// 不看职业表的属性，也不看这个人的装备与强化等级。
     /// </summary>
-    public Member Join(ulong memberId, ClassDef cls, ArenaTemplate? arena = null)
+    public Member Join(ulong memberId, ClassDef cls, ArenaTemplate? arena = null, CombatStats? combat = null)
     {
         lock (_gate)
         {
@@ -203,8 +219,9 @@ public sealed class Encounter
                 Id = memberId,
                 Class = cls,
                 Template = arena,
-                HpMax = arena?.HpMax ?? cls.HpMax(_config.Classes.HpPerVitality),
-                ManaMax = arena?.ManaMax ?? cls.ManaMax(),
+                Combat = combat,
+                HpMax = combat?.HpMax ?? arena?.HpMax ?? cls.HpMax(_config.Classes.HpPerVitality),
+                ManaMax = combat?.ManaMax ?? arena?.ManaMax ?? cls.ManaMax(),
                 X = _config.Caster.SpawnMm.X,
                 Y = _config.Caster.SpawnMm.Y,
             };

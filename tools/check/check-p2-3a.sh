@@ -110,14 +110,10 @@ R("arena_not_in_settlement", "Arena" not in settle)
 # 竞技场路径不碰装备：这两个文件里不应出现背包/装备字样（模板表里的禁用键除外）。
 R("arena_no_inventory_read", not re.search(r"inventory|equipment", enc + srv, re.I))
 
-gitdiff = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "proto", "client/MMOGame/Assets/Proto"],
-                         cwd=root, capture_output=True, text=True)
-# 笔记本上的同步副本不是 git 仓库，那里跳过这条（本机跑时仍然真验）。
-if gitdiff.returncode != 0:
-    o.write("SKIP no_proto_change（不是 git 仓库，跳过）\n")
-else:
-    diff = gitdiff.stdout.strip()
-    R("no_proto_change", diff == "", diff)
+# 竞技场参数走 query，一个字没进协议：这条钉的是本卡语义，
+# 而不是「这个提交里 proto 有没有动」——后面的卡改 proto 不该让这里假红。
+bproto = rd(os.path.join(root, "proto", "mmo", "battle.proto"))
+R("arena_not_in_proto", "arena_mode" not in bproto and "arena_template" not in bproto)
 
 o.close()
 PY

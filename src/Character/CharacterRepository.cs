@@ -189,6 +189,25 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
         await command.ExecuteNonQueryAsync(stopping);
     }
 
+    /// <summary>
+    /// P2-3b：战场要的只读身份——职业、分支、等级。战场属性按职业表 + 装备折算，
+    /// 装备那条线由强化总级给（EnhanceRepository.TotalsAsync）。这里不写库。
+    /// </summary>
+    public async Task<(string ClassId, string Branch, int Level)?> BattleIdentityAsync(
+        long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select class_id, coalesce(branch, ''), level from \"角色\".character where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return null;
+        }
+
+        return (reader.GetString(0), reader.GetString(1), reader.GetInt32(2));
+    }
+
     /// <summary>只给核对用：读一行的等级与归属账号。</summary>
     public async Task<(string Account, int Level)?> LevelOfAsync(long characterId, CancellationToken stopping)
     {

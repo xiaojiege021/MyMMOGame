@@ -1739,6 +1739,42 @@ public sealed class CharacterGrpcService(
     }
 
     /// <summary>
+    /// P2-3b：战场进场前的只读战斗属性快照。只给事实值——职业、分支、等级、
+    /// 各槽强化等级之和与有强化记录的槽数。属性折算（每级强化折多少攻击与生命）、
+    /// 有效战力、同队 1.3 倍平衡全在战斗服按 config/battlefield.json 做：
+    /// 角色服不参与数值，也不把背包、货币带出去。这里一个字都不写库。
+    /// </summary>
+    public override async Task<DescribeBattleProfileResponse> DescribeBattleProfile(
+        DescribeBattleProfileRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var identity = await characters.BattleIdentityAsync(
+            (long)request.CharacterId, context.CancellationToken);
+        if (identity is null)
+        {
+            // 不抛 NotFound：战场拿到 found=false 自己拒进场，比服间 502 好定位。
+            return new DescribeBattleProfileResponse { Found = false };
+        }
+
+        var (total, slots) = await enhances.TotalsAsync(
+            (long)request.CharacterId, context.CancellationToken);
+
+        return new DescribeBattleProfileResponse
+        {
+            Found = true,
+            ClassId = identity.Value.ClassId,
+            Branch = identity.Value.Branch,
+            Level = identity.Value.Level,
+            EnhanceTotal = total,
+            EnhanceSlots = slots,
+        };
+    }
+
+    /// <summary>
     /// 用符之前的只读查询：这个编号是不是符、回复落在哪个池，只有角色服说了算。
     /// 战斗服拿到池之后才能做「池是不是满了」「这一组冷却到没到」的本地预判，
     /// 预判不过就根本不扣符。这里不写库、不扣符、不碰生命与蓝量。

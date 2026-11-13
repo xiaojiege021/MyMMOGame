@@ -150,6 +150,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleRechargeOrderRequest> __Marshaller_mmo_character_SettleRechargeOrderRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleRechargeOrderRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleRechargeOrderResponse> __Marshaller_mmo_character_SettleRechargeOrderResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleRechargeOrderResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeBattleProfileRequest> __Marshaller_mmo_character_DescribeBattleProfileRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeBattleProfileRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeBattleProfileResponse> __Marshaller_mmo_character_DescribeBattleProfileResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeBattleProfileResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -358,6 +362,14 @@ namespace Mmo.Proto.Character {
         "SettleRechargeOrder",
         __Marshaller_mmo_character_SettleRechargeOrderRequest,
         __Marshaller_mmo_character_SettleRechargeOrderResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse> __Method_DescribeBattleProfile = new grpc::Method<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeBattleProfile",
+        __Marshaller_mmo_character_DescribeBattleProfileRequest,
+        __Marshaller_mmo_character_DescribeBattleProfileResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -689,6 +701,20 @@ namespace Mmo.Proto.Character {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SettleRechargeOrderResponse> SettleRechargeOrder(global::Mmo.Proto.Character.SettleRechargeOrderRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P2-3b：战场进场前的只读战斗属性快照。只给事实值——职业、分支、等级、
+      /// 各槽强化等级之和；属性折算、战力与同队平衡全在战斗服按 config/battlefield.json 做。
+      /// 不写库，也不返回背包、货币与任何客户端能改的输入。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeBattleProfileResponse> DescribeBattleProfile(global::Mmo.Proto.Character.DescribeBattleProfileRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2006,6 +2032,62 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_SettleRechargeOrder, null, options, request);
       }
+      /// <summary>
+      /// P2-3b：战场进场前的只读战斗属性快照。只给事实值——职业、分支、等级、
+      /// 各槽强化等级之和；属性折算、战力与同队平衡全在战斗服按 config/battlefield.json 做。
+      /// 不写库，也不返回背包、货币与任何客户端能改的输入。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeBattleProfileResponse DescribeBattleProfile(global::Mmo.Proto.Character.DescribeBattleProfileRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeBattleProfile(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-3b：战场进场前的只读战斗属性快照。只给事实值——职业、分支、等级、
+      /// 各槽强化等级之和；属性折算、战力与同队平衡全在战斗服按 config/battlefield.json 做。
+      /// 不写库，也不返回背包、货币与任何客户端能改的输入。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeBattleProfileResponse DescribeBattleProfile(global::Mmo.Proto.Character.DescribeBattleProfileRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeBattleProfile, null, options, request);
+      }
+      /// <summary>
+      /// P2-3b：战场进场前的只读战斗属性快照。只给事实值——职业、分支、等级、
+      /// 各槽强化等级之和；属性折算、战力与同队平衡全在战斗服按 config/battlefield.json 做。
+      /// 不写库，也不返回背包、货币与任何客户端能改的输入。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeBattleProfileResponse> DescribeBattleProfileAsync(global::Mmo.Proto.Character.DescribeBattleProfileRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeBattleProfileAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-3b：战场进场前的只读战斗属性快照。只给事实值——职业、分支、等级、
+      /// 各槽强化等级之和；属性折算、战力与同队平衡全在战斗服按 config/battlefield.json 做。
+      /// 不写库，也不返回背包、货币与任何客户端能改的输入。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeBattleProfileResponse> DescribeBattleProfileAsync(global::Mmo.Proto.Character.DescribeBattleProfileRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeBattleProfile, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -2045,7 +2127,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_UseExpBooster, serviceImpl.UseExpBooster)
           .AddMethod(__Method_UseUnbindItem, serviceImpl.UseUnbindItem)
           .AddMethod(__Method_CreateRechargeOrder, serviceImpl.CreateRechargeOrder)
-          .AddMethod(__Method_SettleRechargeOrder, serviceImpl.SettleRechargeOrder).Build();
+          .AddMethod(__Method_SettleRechargeOrder, serviceImpl.SettleRechargeOrder)
+          .AddMethod(__Method_DescribeBattleProfile, serviceImpl.DescribeBattleProfile).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -2081,6 +2164,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_UseUnbindItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseUnbindItemRequest, global::Mmo.Proto.Character.UseUnbindItemResponse>(serviceImpl.UseUnbindItem));
       serviceBinder.AddMethod(__Method_CreateRechargeOrder, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CreateRechargeOrderRequest, global::Mmo.Proto.Character.CreateRechargeOrderResponse>(serviceImpl.CreateRechargeOrder));
       serviceBinder.AddMethod(__Method_SettleRechargeOrder, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleRechargeOrderRequest, global::Mmo.Proto.Character.SettleRechargeOrderResponse>(serviceImpl.SettleRechargeOrder));
+      serviceBinder.AddMethod(__Method_DescribeBattleProfile, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse>(serviceImpl.DescribeBattleProfile));
     }
 
   }
