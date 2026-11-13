@@ -163,19 +163,21 @@ else
   warn "缺 tools/check/preflight.sh"
 fi
 
-echo "== 9. 提交作者身份 =="
-# 换机器开工时 git 会用系统默认名加主机名邮箱（例如 yewenkeji@*.local），
-# Gitea 按邮箱认账号，认不出就只在作者列显示一个陌生名字。只在仓库级没配时补，
-# 不覆盖别人机器上已经选定的身份。
+echo "== 9. 提交作者身份 ==
+# 开源协作：不替你写死邮箱。若本地还没配 git 身份，提示自行设置，
+# 或读取可选环境变量 MMO_GIT_EMAIL 作为仓库级邮箱；不覆盖已选定的身份。
 CUR_MAIL="$(git -C "$ROOT" config --local user.email 2>/dev/null || true)"
 if [ -z "$CUR_MAIL" ]; then
-  git -C "$ROOT" config --local user.name "xiaojiege"
-  git -C "$ROOT" config --local user.email "xiaojiege@users.noreply.github.com"
-  ok "已补上仓库级提交身份：xiaojiege <xiaojiege@users.noreply.github.com>"
-elif [ "$CUR_MAIL" = "xiaojiege@users.noreply.github.com" ]; then
-  ok "提交身份与 Gitea 账号一致"
+  if [ -n "$MMO_GIT_EMAIL" ]; then
+    git -C "$ROOT" config --local user.email "$MMO_GIT_EMAIL"
+    ok "已用环境变量 MMO_GIT_EMAIL 补上仓库级提交邮箱"
+  else
+    warn "尚未配置 git 提交邮箱；本仓库是开源协作，请用你自己的身份："
+    warn "  git config --local user.name "你的名字""
+    warn "  git config --local user.email "you@example.com""
+  fi
 else
-  warn "仓库级提交邮箱是 $CUR_MAIL，与 Gitea 账号不一致；要改就跑 git config --local user.email xiaojiege@users.noreply.github.com"
+  ok "提交身份已配置：$CUR_MAIL"
 fi
 
 echo
