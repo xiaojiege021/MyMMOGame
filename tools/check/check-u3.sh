@@ -89,8 +89,12 @@ party = read(ui + '/UiPartyScreen.cs')
 dungeon_cfg = json.loads(read(root + '/config/dungeons.json'))
 exp_cfg = json.loads(read(root + '/config/exp.json'))
 rows = dungeon_cfg['dungeons']
-assert len(rows) == 3, 'config dungeons=%d' % len(rows)
-for row in rows:
+# 配置正本按卡追加副本（P2-1b 起有宗门秘境等高级本），U3 只展示 P1-2 写定的
+# main/abyss/lair 三条，后续副本由各自的界面卡开屏；这里只验展示的三条逐条
+# 对得上，不数死配置条数、也不要求客户端 codex 提前列出还没开屏的副本。
+shown = [r for r in rows if r['id'] in ('main', 'abyss', 'lair')]
+assert len(shown) == 3, 'config dungeons shown=%d' % len(shown)
+for row in shown:
     assert 'Id = "%s"' % row['id'] in codex, 'dungeon id ' + row['id']
     assert row['name'] in codex, 'dungeon name ' + row['name']
     assert 'MaxPlayers = %d' % row['max_players'] in codex, 'max_players ' + row['id']
