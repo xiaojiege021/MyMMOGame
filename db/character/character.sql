@@ -133,3 +133,47 @@ ALTER TABLE "角色".character
 UPDATE "角色".character
    SET branch_step = 1
  WHERE branch IS NOT NULL AND branch <> '' AND branch_step = 0;
+
+-- P3-1a2：境界突破。main 迁移自包含：老卡只跑 character.sql 的机器也要有
+-- drill 列与三张表，否则突破、历练结算与炼心判定都会整笔挂掉。
+-- 内容与 db/character/realm_advance.sql 逐条一致，跑几次都不变。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS drill bigint NOT NULL DEFAULT 0;
+
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_drill_non_negative;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_drill_non_negative CHECK (drill >= 0);
+
+CREATE TABLE IF NOT EXISTS "角色".character_quest (
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    quest_id     text        NOT NULL,
+    completed_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, quest_id)
+);
+
+CREATE TABLE IF NOT EXISTS "角色".realm_breakthrough (
+    txn_id       text        PRIMARY KEY,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    from_realm   text        NOT NULL,
+    to_realm     text        NOT NULL,
+    success      boolean     NOT NULL,
+    drill_cost   bigint      NOT NULL CHECK (drill_cost >= 0),
+    stone_kind   text        NOT NULL,
+    stone_cost   bigint      NOT NULL CHECK (stone_cost > 0),
+    attempted_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS realm_breakthrough_character
+    ON "角色".realm_breakthrough (character_id, attempted_at DESC);
+
+CREATE TABLE IF NOT EXISTS "角色".realm_drill (
+    txn_id       text        PRIMARY KEY,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    dungeon_id   text        NOT NULL,
+    drill        bigint      NOT NULL CHECK (drill >= 0),
+    settled_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS realm_drill_character
+    ON "角色".realm_drill (character_id, settled_at DESC);

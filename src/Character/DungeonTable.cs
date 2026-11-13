@@ -23,7 +23,8 @@ public sealed record DungeonDef(
     int FatiguePerPlayer,
     int EntriesPerWeek,
     int RewardPerPlayer,
-    string? Realm = null)
+    string? Realm = null,
+    long Drill = 0)
 {
     public bool IsHard => Tier == "hard";
 }
@@ -232,6 +233,12 @@ public sealed class DungeonTable
                 throw new ConfigException("副本 " + id + " 的 realm 不能为空");
             }
 
+            // P3-1a2：历练值可以缺省（旧卡的临时表），写了就必须是非负数。
+            if (item.Drill is < 0)
+            {
+                throw new ConfigException("副本 " + id + " 的 drill 不能是负数");
+            }
+
             map[id] = new DungeonDef(
                 id,
                 (item.Name ?? id).Trim(),
@@ -243,7 +250,8 @@ public sealed class DungeonTable
                 charges ? perPlayer : 0,
                 entriesPerWeek,
                 rewardPerPlayer,
-                realm.Length == 0 ? null : realm);
+                realm.Length == 0 ? null : realm,
+                item.Drill ?? 0);
         }
 
         if (map.Count == 0)
@@ -320,5 +328,10 @@ public sealed class DungeonTable
         // P3-1a1：元婴起的新副本才写；旧副本不写，门槛不抬高。
         [JsonPropertyName("realm")]
         public string? Realm { get; init; }
+
+        // P3-1a2：一次通关结算给多少历练值。方案没给数值，由配置给；
+        // 缺省 0 只表示这一条还没配，不抬高旧卡的临时副本表。
+        [JsonPropertyName("drill")]
+        public long? Drill { get; init; }
     }
 }

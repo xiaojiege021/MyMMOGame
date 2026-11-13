@@ -57,6 +57,20 @@ string? realmDungeonPath = null;
 long realmStateOf = 0;
 long rawRealmId = 0;
 string? rawRealmValue = null;
+// P3-1a2：只给核对用——直写历练 / 主线场次、记一条必要支线、读突破状态，
+// 以及不经过网关直接走一次突破或历练结算。
+long rawDrillId = 0;
+var rawDrillValue = 0L;
+long rawMainStageId = 0;
+var rawMainStageValue = 0;
+long completeQuestOf = 0;
+string? completeQuestId = null;
+long realmBreakStateOf = 0;
+long advanceRealmOf = 0;
+string? advanceRealmTxn = null;
+long settleDrillOf = 0;
+string? settleDrillDungeon = null;
+string? settleDrillTxn = null;
 // 只给核对用：读高难本本周已用次数，或把进本记录整体往前挪一周验跨周归零。
 long hardEntryStateOf = 0;
 string? hardEntryDungeon = null;
@@ -291,6 +305,36 @@ for (var i = 0; i < args.Length; i++)
             long.TryParse(args[++i], out rawRealmId);
             rawRealmValue = args[++i];
             break;
+
+        case "--raw-drill-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawDrillId);
+            long.TryParse(args[++i], out rawDrillValue);
+            break;
+
+        case "--raw-main-stage-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawMainStageId);
+            int.TryParse(args[++i], out rawMainStageValue);
+            break;
+
+        case "--complete-quest" when i + 2 < args.Length:
+            long.TryParse(args[++i], out completeQuestOf);
+            completeQuestId = args[++i];
+            break;
+
+        case "--realm-break-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out realmBreakStateOf);
+            break;
+
+        case "--advance-realm" when i + 2 < args.Length:
+            long.TryParse(args[++i], out advanceRealmOf);
+            advanceRealmTxn = args[++i];
+            break;
+
+        case "--settle-drill" when i + 3 < args.Length:
+            long.TryParse(args[++i], out settleDrillOf);
+            settleDrillDungeon = args[++i];
+            settleDrillTxn = args[++i];
+            break;
         // 只给核对用：高难本本周已用次数 / 剩余次数，不经过进本逻辑。
         case "--hard-entry-state" when i + 2 < args.Length:
             long.TryParse(args[++i], out hardEntryStateOf);
@@ -516,7 +560,8 @@ if (dungeonTableState)
                 + " reward_per_player=" + dungeon.RewardPerPlayer
                 + " fatigue=" + (dungeon.ChargesFatigue ? "true" : "false")
                 + " share=" + (dungeon.TakesWeeklyShare ? "true" : "false")
-                + " realm=" + (dungeon.Realm ?? "none"));
+                + " realm=" + (dungeon.Realm ?? "none")
+                + " drill=" + dungeon.Drill);
         }
     }
     catch (ConfigException ex)
@@ -542,7 +587,8 @@ if (realmTableState)
         var characterConfig = CharacterConfig.Load(configPath);
         var dungeons = DungeonTable.Load(
             realmDungeonPath ?? characterConfig.DungeonTable);
-        var table = RealmTable.Load(realmTablePath ?? characterConfig.RealmTable, dungeons);
+        var currencies = CurrencyTable.Load("config/currency.json");
+        var table = RealmTable.Load(realmTablePath ?? characterConfig.RealmTable, dungeons, currencies);
         Console.WriteLine("realm_table_state=ok version=" + table.Version
             + " realms=" + table.Realms.Count
             + " launch_until=" + table.LaunchUntil
@@ -556,6 +602,17 @@ if (realmTableState)
         foreach (var pair in table.Aliases)
         {
             Console.WriteLine("alias=" + pair.Key + "=" + pair.Value);
+        }
+        // P3-1a2：每段的突破要求，数值全部来自配置。
+        foreach (var requirement in table.Requirements)
+        {
+            Console.WriteLine("advance_req=" + requirement.From + "->" + requirement.Next
+                + " drill=" + requirement.Drill
+                + " stone=" + requirement.Stone
+                + " stone_cost=" + requirement.StoneCost
+                + " success_pct=" + requirement.SuccessPct
+                + " main_stage=" + requirement.MainStage
+                + " side_quests=" + string.Join("+", requirement.SideQuests));
         }
         foreach (var realm in table.Realms)
         {
@@ -1043,7 +1100,9 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || boosterStateOf != 0 || boosterResetOf != 0 || boosterExpireOf != 0
     || unbindQuoteOf != 0 || unbindStateOf != 0 || rawBoundAtOf != 0
     || hardEntryStateOf != 0 || shiftEntryWeekOf != 0
-    || rechargeStateOf != null || realmStateOf != 0 || rawRealmId != 0)
+    || rechargeStateOf != null || realmStateOf != 0 || rawRealmId != 0
+    || rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
+    || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -1141,7 +1200,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             {
                 var realmConfig = CharacterConfig.Load(configPath);
                 var realmDungeons = DungeonTable.Load(realmConfig.DungeonTable);
-                var table = RealmTable.Load(realmConfig.RealmTable, realmDungeons);
+                var realmCurrencies = CurrencyTable.Load("config/currency.json");
+                var table = RealmTable.Load(realmConfig.RealmTable, realmDungeons, realmCurrencies);
                 var advance = table.CheckAdvance(realm);
                 Console.WriteLine("realm_state=ok id=" + realmStateOf
                     + " realm=" + advance.From
@@ -1149,6 +1209,111 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + " next=" + (advance.Next.Length == 0 ? "none" : advance.Next)
                     + " next_open=" + (advance.NextOpen ? "true" : "false")
                     + " advance=" + (advance.Ok ? "ok" : advance.Reason));
+            }
+        }
+
+        // P3-1a2：突破与历练结算的核对入口。只给核对用；玩法路径走 gRPC。
+        if (rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
+            || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0)
+        {
+            var realmConfig = CharacterConfig.Load(configPath);
+            var realmDungeons = DungeonTable.Load(realmConfig.DungeonTable);
+            var realmCurrencies = CurrencyTable.Load("config/currency.json");
+            var realmTable = RealmTable.Load(realmConfig.RealmTable, realmDungeons, realmCurrencies);
+            var realmAdvances = new RealmAdvanceRepository(dataSource, realmTable);
+
+            if (rawDrillId != 0)
+            {
+                try
+                {
+                    await realmAdvances.RawWriteDrillAsync(rawDrillId, rawDrillValue, CancellationToken.None);
+                    Console.WriteLine("raw_drill=written id=" + rawDrillId + " drill=" + rawDrillValue);
+                }
+                catch (PostgresException ex)
+                {
+                    Console.WriteLine("raw_drill=rejected id=" + rawDrillId
+                        + " drill=" + rawDrillValue + " sqlstate=" + ex.SqlState);
+                }
+            }
+
+            if (rawMainStageId != 0)
+            {
+                await realmAdvances.RawWriteMainStageAsync(
+                    rawMainStageId, rawMainStageValue, CancellationToken.None);
+                Console.WriteLine("raw_main_stage=written id=" + rawMainStageId
+                    + " stage=" + rawMainStageValue);
+            }
+
+            if (completeQuestOf != 0)
+            {
+                await realmAdvances.CompleteQuestAsync(
+                    completeQuestOf, completeQuestId!, CancellationToken.None);
+                Console.WriteLine("quest_complete=ok id=" + completeQuestOf
+                    + " quest=" + completeQuestId);
+            }
+
+            if (realmBreakStateOf != 0)
+            {
+                var state = await realmAdvances.StateAsync(realmBreakStateOf, CancellationToken.None);
+                if (state is null)
+                {
+                    Console.WriteLine("realm_break_state=missing id=" + realmBreakStateOf);
+                }
+                else
+                {
+                    Console.WriteLine("realm_break_state=ok id=" + realmBreakStateOf
+                        + " realm=" + state.Value.Realm
+                        + " drill=" + state.Value.Drill
+                        + " main_stage=" + state.Value.MainStage
+                        + " quests=" + string.Join(",", state.Value.Quests));
+                }
+            }
+
+            if (advanceRealmOf != 0)
+            {
+                var outcome = await realmAdvances.AdvanceAsync(
+                    advanceRealmOf, null, advanceRealmTxn!, CancellationToken.None);
+                Console.WriteLine("advance_realm=done id=" + advanceRealmOf
+                    + " executed=" + (outcome.Executed ? "true" : "false")
+                    + " duplicate=" + (outcome.Duplicate ? "true" : "false")
+                    + " success=" + (outcome.Success ? "true" : "false")
+                    + " from=" + outcome.From
+                    + " next=" + outcome.Next
+                    + " realm=" + outcome.Realm
+                    + " reason=" + outcome.Reason
+                    + " drill=" + outcome.DrillBefore
+                    + " drill_required=" + outcome.DrillRequired
+                    + " drill_cost=" + outcome.DrillCost
+                    + " drill_after=" + outcome.DrillAfter
+                    + " stone=" + outcome.StoneKind
+                    + " stone_cost=" + outcome.StoneCost
+                    + " stone_left=" + outcome.StoneLeft
+                    + " main_stage=" + outcome.MainStage
+                    + " main_required=" + outcome.MainStageRequired
+                    + " missing=" + string.Join("+", outcome.MissingQuests)
+                    + " success_pct=" + outcome.SuccessPct);
+            }
+
+            if (settleDrillOf != 0)
+            {
+                var dungeon = realmDungeons.Find(settleDrillDungeon!);
+                if (dungeon is null)
+                {
+                    Console.WriteLine("settle_drill=unknown_dungeon id=" + settleDrillOf
+                        + " dungeon=" + settleDrillDungeon);
+                }
+                else
+                {
+                    var outcome = await realmAdvances.SettleDrillAsync(
+                        settleDrillOf, null, dungeon.Id, dungeon.Realm, dungeon.Drill,
+                        settleDrillTxn!, CancellationToken.None);
+                    Console.WriteLine("settle_drill=done id=" + settleDrillOf
+                        + " dungeon=" + outcome.DungeonId
+                        + " gain=" + outcome.Gain
+                        + " drill=" + outcome.Drill
+                        + " duplicate=" + (outcome.Duplicate ? "true" : "false")
+                        + " reason=" + outcome.Reason);
+                }
             }
         }
 

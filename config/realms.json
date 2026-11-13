@@ -1,7 +1,7 @@
 {
-  "schema": "realm-table/1",
-  "version": 1,
-  "note": "境界版本开关。方案 8.1 写定十一段按顺序走：炼体、筑基、结丹、元婴、化神、返虚、合体、渡劫、大乘、金仙或散仙、极境。首发可到结丹；元婴及之后每段一个大版本，由 switches 逐段打开，未打开时不能突破到这一段，也不能进该段新副本。段内的初、中、后、大圆满不在这张表，突破仍看修为、历练与炼心（P3-1a2）。第十段由立仙或立魔决定叫金仙还是散仙，这里把金仙记为顺序表里的名字、散仙记为别名，两边的历练、灵石、副本次数相同。旧副本不写 realm，门槛仍是原等级门槛，不因这张表抬高；新副本才在 dungeons.json 里写 realm，且只能写首发之后（元婴起）的境界。开后面的段必须先开前面的段，配置里出现「元婴关着、化神开着」直接起不来。境界只有角色服写，世界服的地表与飞行门槛仍读 config/flight.json。",
+  "schema": "realm-table/2",
+  "version": 2,
+  "note": "境界版本开关与突破要求。方案 8.1 写定十一段按顺序走：炼体、筑基、结丹、元婴、化神、返虚、合体、渡劫、大乘、金仙或散仙、极境。首发可到结丹；元婴及之后每段一个大版本，由 switches 逐段打开，未打开时不能突破到这一段，也不能进该段新副本。段内的初、中、后、大圆满不在这张表，突破只按大境界。第十段由立仙或立魔决定叫金仙还是散仙，这里把金仙记为顺序表里的名字、散仙记为别名，两边的历练、灵石、副本次数相同。旧副本不写 realm，门槛仍是原等级门槛，不因这张表抬高；新副本才在 dungeons.json 里写 realm，且只能写首发之后（元婴起）的境界。开后面的段必须先开前面的段，配置里出现「元婴关着、化神开着」直接起不来。境界只有角色服写，世界服的地表与飞行门槛仍读 config/flight.json。P3-1a2 追加 advance：每一段（极境除外）一条突破要求——修为（当前境界）由顺序表给，历练值 drill、灵石档位 stone 与数量 stone_cost、炼心的主线场次 main_stage 与必要支线 side_quests、成功率 success_pct 都在这份配置里。方案只写「突破消耗灵石、扣掉这次要求的历练值、失败停在原境界」，没写每段要多少历练与灵石、失败概率多少、首发三段之外的支线叫什么，所以这些数值全部标待定，代码里不写第二套数。炼心按方案 8.1 的口径：炼体查第 1–9 场、筑基查第 10 场、结丹查第 11 场；第 12 场要等结丹成功才打开，所以元婴及以后查第 12 场。首发三段没有列必要支线（side_quests 为空），后面的支线等主线卡定下名字再填，填了就自动卡突破，不需要改代码。",
   "realms": [
     "炼体",
     "筑基",
@@ -19,6 +19,98 @@
     "散仙": "金仙"
   },
   "launch_until": "结丹",
+  "advance": [
+    {
+      "from": "炼体",
+      "drill": 100,
+      "stone": "stone_1",
+      "stone_cost": 10,
+      "success_pct": 70,
+      "main_stage": 9,
+      "side_quests": []
+    },
+    {
+      "from": "筑基",
+      "drill": 300,
+      "stone": "stone_1",
+      "stone_cost": 30,
+      "success_pct": 70,
+      "main_stage": 10,
+      "side_quests": []
+    },
+    {
+      "from": "结丹",
+      "drill": 800,
+      "stone": "stone_1",
+      "stone_cost": 80,
+      "success_pct": 70,
+      "main_stage": 11,
+      "side_quests": []
+    },
+    {
+      "from": "元婴",
+      "drill": 2000,
+      "stone": "stone_1",
+      "stone_cost": 200,
+      "success_pct": 70,
+      "main_stage": 12,
+      "side_quests": []
+    },
+    {
+      "from": "化神",
+      "drill": 4000,
+      "stone": "stone_1",
+      "stone_cost": 400,
+      "success_pct": 70,
+      "main_stage": 12,
+      "side_quests": []
+    },
+    {
+      "from": "返虚",
+      "drill": 8000,
+      "stone": "stone_1",
+      "stone_cost": 800,
+      "success_pct": 70,
+      "main_stage": 12,
+      "side_quests": []
+    },
+    {
+      "from": "合体",
+      "drill": 16000,
+      "stone": "stone_1",
+      "stone_cost": 1600,
+      "success_pct": 70,
+      "main_stage": 12,
+      "side_quests": []
+    },
+    {
+      "from": "渡劫",
+      "drill": 32000,
+      "stone": "stone_1",
+      "stone_cost": 3200,
+      "success_pct": 70,
+      "main_stage": 12,
+      "side_quests": []
+    },
+    {
+      "from": "大乘",
+      "drill": 64000,
+      "stone": "stone_1",
+      "stone_cost": 6400,
+      "success_pct": 70,
+      "main_stage": 12,
+      "side_quests": []
+    },
+    {
+      "from": "金仙",
+      "drill": 100000,
+      "stone": "stone_1",
+      "stone_cost": 10000,
+      "success_pct": 70,
+      "main_stage": 12,
+      "side_quests": []
+    }
+  ],
   "switches": [
     {
       "realm": "元婴",

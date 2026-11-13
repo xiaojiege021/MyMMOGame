@@ -209,69 +209,88 @@ namespace Mmo.Proto.Character {
             "IAEoBBIPCgdpdGVtX2lkGAIgASgJInsKEENhbkVxdWlwUmVzcG9uc2USCgoC",
             "b2sYASABKAgSDgoGcmVhc29uGAIgASgJEhMKC3dlYXBvbl9raW5kGAMgASgJ",
             "EhUKDXJlcXVpcmVfbGV2ZWwYBCABKAUSDQoFbGV2ZWwYBSABKAUSEAoIY2xh",
-            "c3NfaWQYBiABKAkqWwoMVGFsaXNtYW5Qb29sEh0KGVRBTElTTUFOX1BPT0xf",
-            "VU5TUEVDSUZJRUQQABIUChBUQUxJU01BTl9QT09MX0hQEAESFgoSVEFMSVNN",
-            "QU5fUE9PTF9NQU5BEAIy9hQKEENoYXJhY3RlclNlcnZpY2USYAoPQ3JlYXRl",
-            "Q2hhcmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXF1",
-            "ZXN0GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXNwb25zZRJL",
-            "CghTZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXF1ZXN0Gh8u",
-            "bW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYKB0FkZEl0ZW0SHS5t",
-            "bW8uY2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNoYXJhY3Rlci5J",
-            "bnZlbnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8uY2hhcmFjdGVy",
-            "Lkxpc3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5MaXN0SW52",
-            "ZW50b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hhcmFjdGVyLkNh",
-            "blRyYWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXNwb25z",
-            "ZRJQCgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRkQ3VycmVuY3lS",
-            "ZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFuY2USVAoLR2V0",
-            "Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVxdWVzdBoi",
-            "Lm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJRCgpBcHBseUdy",
-            "YW50EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVxdWVzdBohLm1tby5j",
-            "aGFyYWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVudGVyRHVuZ2VvbhIi",
-            "Lm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBojLm1tby5jaGFy",
-            "YWN0ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNlSG90U3ByaW5nEiIu",
-            "bW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMubW1vLmNoYXJh",
-            "Y3Rlci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0bGVFeHASHy5tbW8u",
-            "Y2hhcmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8uY2hhcmFjdGVyLlNl",
-            "dHRsZUV4cFJlc3BvbnNlEkgKB0VuaGFuY2USHS5tbW8uY2hhcmFjdGVyLkVu",
-            "aGFuY2VSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5FbmhhbmNlUmVzcG9uc2US",
-            "YAoPVHJhbnNmZXJFbmhhbmNlEiUubW1vLmNoYXJhY3Rlci5UcmFuc2ZlckVu",
-            "aGFuY2VSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5UcmFuc2ZlckVuaGFuY2VS",
-            "ZXNwb25zZRJWCg5JbnN0YWxsQ3J5c3RhbBIkLm1tby5jaGFyYWN0ZXIuSW5z",
-            "dGFsbENyeXN0YWxSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DcnlzdGFsUmVz",
-            "cG9uc2USVAoNUmVtb3ZlQ3J5c3RhbBIjLm1tby5jaGFyYWN0ZXIuUmVtb3Zl",
-            "Q3J5c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0YWxSZXNwb25z",
-            "ZRJaCg1TZXR0bGVBdWN0aW9uEiMubW1vLmNoYXJhY3Rlci5BdWN0aW9uU2V0",
-            "dGxlUmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuQXVjdGlvblNldHRsZVJlc3Bv",
-            "bnNlEmIKC1NldHRsZUluZ290EigubW1vLmNoYXJhY3Rlci5BdWN0aW9uSW5n",
-            "b3RTZXR0bGVSZXF1ZXN0GikubW1vLmNoYXJhY3Rlci5BdWN0aW9uSW5nb3RT",
-            "ZXR0bGVSZXNwb25zZRJUCgtCdXlTaG9wSXRlbRIhLm1tby5jaGFyYWN0ZXIu",
-            "QnV5U2hvcEl0ZW1SZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5CdXlTaG9wSXRl",
-            "bVJlc3BvbnNlEmAKD0NvbnN1bWVUYWxpc21hbhIlLm1tby5jaGFyYWN0ZXIu",
-            "Q29uc3VtZVRhbGlzbWFuUmVxdWVzdBomLm1tby5jaGFyYWN0ZXIuQ29uc3Vt",
-            "ZVRhbGlzbWFuUmVzcG9uc2USYwoQRGVzY3JpYmVUYWxpc21hbhImLm1tby5j",
-            "aGFyYWN0ZXIuRGVzY3JpYmVUYWxpc21hblJlcXVlc3QaJy5tbW8uY2hhcmFj",
-            "dGVyLkRlc2NyaWJlVGFsaXNtYW5SZXNwb25zZRJvChREZXNjcmliZVJldml2",
-            "ZVNjcm9sbBIqLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVSZXZpdmVTY3JvbGxS",
-            "ZXF1ZXN0GisubW1vLmNoYXJhY3Rlci5EZXNjcmliZVJldml2ZVNjcm9sbFJl",
-            "c3BvbnNlEmwKE0NvbnN1bWVSZXZpdmVTY3JvbGwSKS5tbW8uY2hhcmFjdGVy",
-            "LkNvbnN1bWVSZXZpdmVTY3JvbGxSZXF1ZXN0GioubW1vLmNoYXJhY3Rlci5D",
-            "b25zdW1lUmV2aXZlU2Nyb2xsUmVzcG9uc2USWgoNVXNlRXhwQm9vc3RlchIj",
-            "Lm1tby5jaGFyYWN0ZXIuVXNlRXhwQm9vc3RlclJlcXVlc3QaJC5tbW8uY2hh",
-            "cmFjdGVyLlVzZUV4cEJvb3N0ZXJSZXNwb25zZRJaCg1Vc2VVbmJpbmRJdGVt",
-            "EiMubW1vLmNoYXJhY3Rlci5Vc2VVbmJpbmRJdGVtUmVxdWVzdBokLm1tby5j",
-            "aGFyYWN0ZXIuVXNlVW5iaW5kSXRlbVJlc3BvbnNlEmwKE0NyZWF0ZVJlY2hh",
-            "cmdlT3JkZXISKS5tbW8uY2hhcmFjdGVyLkNyZWF0ZVJlY2hhcmdlT3JkZXJS",
-            "ZXF1ZXN0GioubW1vLmNoYXJhY3Rlci5DcmVhdGVSZWNoYXJnZU9yZGVyUmVz",
-            "cG9uc2USbAoTU2V0dGxlUmVjaGFyZ2VPcmRlchIpLm1tby5jaGFyYWN0ZXIu",
-            "U2V0dGxlUmVjaGFyZ2VPcmRlclJlcXVlc3QaKi5tbW8uY2hhcmFjdGVyLlNl",
-            "dHRsZVJlY2hhcmdlT3JkZXJSZXNwb25zZRJyChVEZXNjcmliZUJhdHRsZVBy",
-            "b2ZpbGUSKy5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlQmF0dGxlUHJvZmlsZVJl",
-            "cXVlc3QaLC5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlQmF0dGxlUHJvZmlsZVJl",
-            "c3BvbnNlEloKDUFkdmFuY2VCcmFuY2gSIy5tbW8uY2hhcmFjdGVyLkFkdmFu",
-            "Y2VCcmFuY2hSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5BZHZhbmNlQnJhbmNo",
-            "UmVzcG9uc2USSwoIQ2FuRXF1aXASHi5tbW8uY2hhcmFjdGVyLkNhbkVxdWlw",
-            "UmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuRXF1aXBSZXNwb25zZUIWqgIT",
-            "TW1vLlByb3RvLkNoYXJhY3RlcmIGcHJvdG8z"));
+            "c3NfaWQYBiABKAkiTAoTQWR2YW5jZVJlYWxtUmVxdWVzdBIPCgdhY2NvdW50",
+            "GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIOCgZ0eG5faWQYAyABKAki",
+            "/QIKFEFkdmFuY2VSZWFsbVJlc3BvbnNlEgoKAm9rGAEgASgIEg8KB3N1Y2Nl",
+            "c3MYAiABKAgSDgoGcmVhc29uGAMgASgJEhIKCmZyb21fcmVhbG0YBCABKAkS",
+            "EgoKbmV4dF9yZWFsbRgFIAEoCRINCgVyZWFsbRgGIAEoCRIUCgxkcmlsbF9i",
+            "ZWZvcmUYByABKAMSFgoOZHJpbGxfcmVxdWlyZWQYCCABKAMSEgoKZHJpbGxf",
+            "Y29zdBgJIAEoAxISCgpzdG9uZV9raW5kGAogASgJEhIKCnN0b25lX2Nvc3QY",
+            "CyABKAMSDQoFZHJpbGwYDCABKAMSEgoKc3RvbmVfbGVmdBgNIAEoAxISCgpt",
+            "YWluX3N0YWdlGA4gASgFEhsKE21haW5fc3RhZ2VfcmVxdWlyZWQYDyABKAUS",
+            "GwoTc2lkZV9xdWVzdHNfbWlzc2luZxgQIAMoCRITCgtzdWNjZXNzX3BjdBgR",
+            "IAEoBRIRCglkdXBsaWNhdGUYEiABKAgiXwoSU2V0dGxlRHJpbGxSZXF1ZXN0",
+            "Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEhIKCmR1",
+            "bmdlb25faWQYAyABKAkSDgoGdHhuX2lkGAQgASgJInsKE1NldHRsZURyaWxs",
+            "UmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJEhIKCmR1bmdl",
+            "b25faWQYAyABKAkSEgoKZHJpbGxfZ2FpbhgEIAEoAxINCgVkcmlsbBgFIAEo",
+            "AxIRCglkdXBsaWNhdGUYBiABKAgqWwoMVGFsaXNtYW5Qb29sEh0KGVRBTElT",
+            "TUFOX1BPT0xfVU5TUEVDSUZJRUQQABIUChBUQUxJU01BTl9QT09MX0hQEAES",
+            "FgoSVEFMSVNNQU5fUE9PTF9NQU5BEAIypRYKEENoYXJhY3RlclNlcnZpY2US",
+            "YAoPQ3JlYXRlQ2hhcmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFy",
+            "YWN0ZXJSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJS",
+            "ZXNwb25zZRJLCghTZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxS",
+            "ZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYKB0Fk",
+            "ZEl0ZW0SHS5tbW8uY2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNo",
+            "YXJhY3Rlci5JbnZlbnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8u",
+            "Y2hhcmFjdGVyLkxpc3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rl",
+            "ci5MaXN0SW52ZW50b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hh",
+            "cmFjdGVyLkNhblRyYWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJh",
+            "ZGVSZXNwb25zZRJQCgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRk",
+            "Q3VycmVuY3lSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFu",
+            "Y2USVAoLR2V0Q3VycmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5",
+            "UmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJR",
+            "CgpBcHBseUdyYW50EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVxdWVz",
+            "dBohLm1tby5jaGFyYWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVudGVy",
+            "RHVuZ2VvbhIiLm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBoj",
+            "Lm1tby5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNlSG90",
+            "U3ByaW5nEiIubW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMu",
+            "bW1vLmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0bGVF",
+            "eHASHy5tbW8uY2hhcmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8uY2hh",
+            "cmFjdGVyLlNldHRsZUV4cFJlc3BvbnNlEkgKB0VuaGFuY2USHS5tbW8uY2hh",
+            "cmFjdGVyLkVuaGFuY2VSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5FbmhhbmNl",
+            "UmVzcG9uc2USYAoPVHJhbnNmZXJFbmhhbmNlEiUubW1vLmNoYXJhY3Rlci5U",
+            "cmFuc2ZlckVuaGFuY2VSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5UcmFuc2Zl",
+            "ckVuaGFuY2VSZXNwb25zZRJWCg5JbnN0YWxsQ3J5c3RhbBIkLm1tby5jaGFy",
+            "YWN0ZXIuSW5zdGFsbENyeXN0YWxSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5D",
+            "cnlzdGFsUmVzcG9uc2USVAoNUmVtb3ZlQ3J5c3RhbBIjLm1tby5jaGFyYWN0",
+            "ZXIuUmVtb3ZlQ3J5c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0",
+            "YWxSZXNwb25zZRJaCg1TZXR0bGVBdWN0aW9uEiMubW1vLmNoYXJhY3Rlci5B",
+            "dWN0aW9uU2V0dGxlUmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuQXVjdGlvblNl",
+            "dHRsZVJlc3BvbnNlEmIKC1NldHRsZUluZ290EigubW1vLmNoYXJhY3Rlci5B",
+            "dWN0aW9uSW5nb3RTZXR0bGVSZXF1ZXN0GikubW1vLmNoYXJhY3Rlci5BdWN0",
+            "aW9uSW5nb3RTZXR0bGVSZXNwb25zZRJUCgtCdXlTaG9wSXRlbRIhLm1tby5j",
+            "aGFyYWN0ZXIuQnV5U2hvcEl0ZW1SZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5C",
+            "dXlTaG9wSXRlbVJlc3BvbnNlEmAKD0NvbnN1bWVUYWxpc21hbhIlLm1tby5j",
+            "aGFyYWN0ZXIuQ29uc3VtZVRhbGlzbWFuUmVxdWVzdBomLm1tby5jaGFyYWN0",
+            "ZXIuQ29uc3VtZVRhbGlzbWFuUmVzcG9uc2USYwoQRGVzY3JpYmVUYWxpc21h",
+            "bhImLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVUYWxpc21hblJlcXVlc3QaJy5t",
+            "bW8uY2hhcmFjdGVyLkRlc2NyaWJlVGFsaXNtYW5SZXNwb25zZRJvChREZXNj",
+            "cmliZVJldml2ZVNjcm9sbBIqLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVSZXZp",
+            "dmVTY3JvbGxSZXF1ZXN0GisubW1vLmNoYXJhY3Rlci5EZXNjcmliZVJldml2",
+            "ZVNjcm9sbFJlc3BvbnNlEmwKE0NvbnN1bWVSZXZpdmVTY3JvbGwSKS5tbW8u",
+            "Y2hhcmFjdGVyLkNvbnN1bWVSZXZpdmVTY3JvbGxSZXF1ZXN0GioubW1vLmNo",
+            "YXJhY3Rlci5Db25zdW1lUmV2aXZlU2Nyb2xsUmVzcG9uc2USWgoNVXNlRXhw",
+            "Qm9vc3RlchIjLm1tby5jaGFyYWN0ZXIuVXNlRXhwQm9vc3RlclJlcXVlc3Qa",
+            "JC5tbW8uY2hhcmFjdGVyLlVzZUV4cEJvb3N0ZXJSZXNwb25zZRJaCg1Vc2VV",
+            "bmJpbmRJdGVtEiMubW1vLmNoYXJhY3Rlci5Vc2VVbmJpbmRJdGVtUmVxdWVz",
+            "dBokLm1tby5jaGFyYWN0ZXIuVXNlVW5iaW5kSXRlbVJlc3BvbnNlEmwKE0Ny",
+            "ZWF0ZVJlY2hhcmdlT3JkZXISKS5tbW8uY2hhcmFjdGVyLkNyZWF0ZVJlY2hh",
+            "cmdlT3JkZXJSZXF1ZXN0GioubW1vLmNoYXJhY3Rlci5DcmVhdGVSZWNoYXJn",
+            "ZU9yZGVyUmVzcG9uc2USbAoTU2V0dGxlUmVjaGFyZ2VPcmRlchIpLm1tby5j",
+            "aGFyYWN0ZXIuU2V0dGxlUmVjaGFyZ2VPcmRlclJlcXVlc3QaKi5tbW8uY2hh",
+            "cmFjdGVyLlNldHRsZVJlY2hhcmdlT3JkZXJSZXNwb25zZRJyChVEZXNjcmli",
+            "ZUJhdHRsZVByb2ZpbGUSKy5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlQmF0dGxl",
+            "UHJvZmlsZVJlcXVlc3QaLC5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlQmF0dGxl",
+            "UHJvZmlsZVJlc3BvbnNlEloKDUFkdmFuY2VCcmFuY2gSIy5tbW8uY2hhcmFj",
+            "dGVyLkFkdmFuY2VCcmFuY2hSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5BZHZh",
+            "bmNlQnJhbmNoUmVzcG9uc2USSwoIQ2FuRXF1aXASHi5tbW8uY2hhcmFjdGVy",
+            "LkNhbkVxdWlwUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuRXF1aXBSZXNw",
+            "b25zZRJXCgxBZHZhbmNlUmVhbG0SIi5tbW8uY2hhcmFjdGVyLkFkdmFuY2VS",
+            "ZWFsbVJlcXVlc3QaIy5tbW8uY2hhcmFjdGVyLkFkdmFuY2VSZWFsbVJlc3Bv",
+            "bnNlElQKC1NldHRsZURyaWxsEiEubW1vLmNoYXJhY3Rlci5TZXR0bGVEcmls",
+            "bFJlcXVlc3QaIi5tbW8uY2hhcmFjdGVyLlNldHRsZURyaWxsUmVzcG9uc2VC",
+            "FqoCE01tby5Qcm90by5DaGFyYWN0ZXJiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Character.TalismanPool), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -334,7 +353,11 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AdvanceBranchRequest), global::Mmo.Proto.Character.AdvanceBranchRequest.Parser, new[]{ "Account", "CharacterId", "BranchId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AdvanceBranchResponse), global::Mmo.Proto.Character.AdvanceBranchResponse.Parser, new[]{ "Ok", "Reason", "Branch", "BranchStep", "Level", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanEquipRequest), global::Mmo.Proto.Character.CanEquipRequest.Parser, new[]{ "CharacterId", "ItemId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanEquipResponse), global::Mmo.Proto.Character.CanEquipResponse.Parser, new[]{ "Ok", "Reason", "WeaponKind", "RequireLevel", "Level", "ClassId" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.CanEquipResponse), global::Mmo.Proto.Character.CanEquipResponse.Parser, new[]{ "Ok", "Reason", "WeaponKind", "RequireLevel", "Level", "ClassId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AdvanceRealmRequest), global::Mmo.Proto.Character.AdvanceRealmRequest.Parser, new[]{ "Account", "CharacterId", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AdvanceRealmResponse), global::Mmo.Proto.Character.AdvanceRealmResponse.Parser, new[]{ "Ok", "Success", "Reason", "FromRealm", "NextRealm", "Realm", "DrillBefore", "DrillRequired", "DrillCost", "StoneKind", "StoneCost", "Drill", "StoneLeft", "MainStage", "MainStageRequired", "SideQuestsMissing", "SuccessPct", "Duplicate" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.SettleDrillRequest), global::Mmo.Proto.Character.SettleDrillRequest.Parser, new[]{ "Account", "CharacterId", "DungeonId", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.SettleDrillResponse), global::Mmo.Proto.Character.SettleDrillResponse.Parser, new[]{ "Ok", "Reason", "DungeonId", "DrillGain", "Drill", "Duplicate" }, null, null, null, null)
           }));
     }
     #endregion
@@ -23757,6 +23780,1840 @@ namespace Mmo.Proto.Character {
           }
           case 50: {
             ClassId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// P3-1a2：突破。请求只有标识：修为、历练、炼心、灵石与成功率都带不进来。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class AdvanceRealmRequest : pb::IMessage<AdvanceRealmRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<AdvanceRealmRequest> _parser = new pb::MessageParser<AdvanceRealmRequest>(() => new AdvanceRealmRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<AdvanceRealmRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[60]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AdvanceRealmRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AdvanceRealmRequest(AdvanceRealmRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      txnId_ = other.txnId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AdvanceRealmRequest Clone() {
+      return new AdvanceRealmRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    /// <summary>
+    /// 网关转发时填令牌账号；服间可信调用为空，只按角色编号找角色。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 3;
+    private string txnId_ = "";
+    /// <summary>
+    /// 幂等号：同一次突破一个号，同一个号再提交不掷第二次。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as AdvanceRealmRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(AdvanceRealmRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (TxnId != other.TxnId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(AdvanceRealmRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class AdvanceRealmResponse : pb::IMessage<AdvanceRealmResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<AdvanceRealmResponse> _parser = new pb::MessageParser<AdvanceRealmResponse>(() => new AdvanceRealmResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<AdvanceRealmResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[61]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AdvanceRealmResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AdvanceRealmResponse(AdvanceRealmResponse other) : this() {
+      ok_ = other.ok_;
+      success_ = other.success_;
+      reason_ = other.reason_;
+      fromRealm_ = other.fromRealm_;
+      nextRealm_ = other.nextRealm_;
+      realm_ = other.realm_;
+      drillBefore_ = other.drillBefore_;
+      drillRequired_ = other.drillRequired_;
+      drillCost_ = other.drillCost_;
+      stoneKind_ = other.stoneKind_;
+      stoneCost_ = other.stoneCost_;
+      drill_ = other.drill_;
+      stoneLeft_ = other.stoneLeft_;
+      mainStage_ = other.mainStage_;
+      mainStageRequired_ = other.mainStageRequired_;
+      sideQuestsMissing_ = other.sideQuestsMissing_.Clone();
+      successPct_ = other.successPct_;
+      duplicate_ = other.duplicate_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AdvanceRealmResponse Clone() {
+      return new AdvanceRealmResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    /// <summary>
+    /// true 表示条件满足、这一笔真的掷过了（成功或失败都算执行）。
+    /// 条件不满足时 false，reason 给原因，历练与灵石都不动。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "success" field.</summary>
+    public const int SuccessFieldNumber = 2;
+    private bool success_;
+    /// <summary>
+    /// 这一笔突破成功：修为进入下一段。失败时 false，修为停在原境界。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Success {
+      get { return success_; }
+      set {
+        success_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 3;
+    private string reason_ = "";
+    /// <summary>
+    /// realm_locked / realm_max / realm_unknown / heart_not_done /
+    /// drill_not_enough / stone_not_enough / character_not_found；空串表示掷过了。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "from_realm" field.</summary>
+    public const int FromRealmFieldNumber = 4;
+    private string fromRealm_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string FromRealm {
+      get { return fromRealm_; }
+      set {
+        fromRealm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "next_realm" field.</summary>
+    public const int NextRealmFieldNumber = 5;
+    private string nextRealm_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string NextRealm {
+      get { return nextRealm_; }
+      set {
+        nextRealm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "realm" field.</summary>
+    public const int RealmFieldNumber = 6;
+    private string realm_ = "";
+    /// <summary>
+    /// 这一笔之后的当前境界：成功是下一段，失败仍是 from_realm。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Realm {
+      get { return realm_; }
+      set {
+        realm_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "drill_before" field.</summary>
+    public const int DrillBeforeFieldNumber = 7;
+    private long drillBefore_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long DrillBefore {
+      get { return drillBefore_; }
+      set {
+        drillBefore_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "drill_required" field.</summary>
+    public const int DrillRequiredFieldNumber = 8;
+    private long drillRequired_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long DrillRequired {
+      get { return drillRequired_; }
+      set {
+        drillRequired_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "drill_cost" field.</summary>
+    public const int DrillCostFieldNumber = 9;
+    private long drillCost_;
+    /// <summary>
+    /// 这一次要求扣掉的历练与灵石（配置值）；条件不满足时为 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long DrillCost {
+      get { return drillCost_; }
+      set {
+        drillCost_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "stone_kind" field.</summary>
+    public const int StoneKindFieldNumber = 10;
+    private string stoneKind_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string StoneKind {
+      get { return stoneKind_; }
+      set {
+        stoneKind_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "stone_cost" field.</summary>
+    public const int StoneCostFieldNumber = 11;
+    private long stoneCost_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long StoneCost {
+      get { return stoneCost_; }
+      set {
+        stoneCost_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "drill" field.</summary>
+    public const int DrillFieldNumber = 12;
+    private long drill_;
+    /// <summary>
+    /// 这一笔之后的历练与灵石余额；条件不满足时是当前值（事实值）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Drill {
+      get { return drill_; }
+      set {
+        drill_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "stone_left" field.</summary>
+    public const int StoneLeftFieldNumber = 13;
+    private long stoneLeft_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long StoneLeft {
+      get { return stoneLeft_; }
+      set {
+        stoneLeft_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "main_stage" field.</summary>
+    public const int MainStageFieldNumber = 14;
+    private int mainStage_;
+    /// <summary>
+    /// 炼心：这一步之前已经走到的主线场次、这一段要求到哪里、还缺哪些必要支线。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int MainStage {
+      get { return mainStage_; }
+      set {
+        mainStage_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "main_stage_required" field.</summary>
+    public const int MainStageRequiredFieldNumber = 15;
+    private int mainStageRequired_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int MainStageRequired {
+      get { return mainStageRequired_; }
+      set {
+        mainStageRequired_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "side_quests_missing" field.</summary>
+    public const int SideQuestsMissingFieldNumber = 16;
+    private static readonly pb::FieldCodec<string> _repeated_sideQuestsMissing_codec
+        = pb::FieldCodec.ForString(130);
+    private readonly pbc::RepeatedField<string> sideQuestsMissing_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<string> SideQuestsMissing {
+      get { return sideQuestsMissing_; }
+    }
+
+    /// <summary>Field number for the "success_pct" field.</summary>
+    public const int SuccessPctFieldNumber = 17;
+    private int successPct_;
+    /// <summary>
+    /// 配置里的成功率，只作展示；判定在角色服，客户端带不进来。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int SuccessPct {
+      get { return successPct_; }
+      set {
+        successPct_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duplicate" field.</summary>
+    public const int DuplicateFieldNumber = 18;
+    private bool duplicate_;
+    /// <summary>
+    /// 同一个事务号再提交：这一笔没掷，历练与灵石都没动。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Duplicate {
+      get { return duplicate_; }
+      set {
+        duplicate_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as AdvanceRealmResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(AdvanceRealmResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Success != other.Success) return false;
+      if (Reason != other.Reason) return false;
+      if (FromRealm != other.FromRealm) return false;
+      if (NextRealm != other.NextRealm) return false;
+      if (Realm != other.Realm) return false;
+      if (DrillBefore != other.DrillBefore) return false;
+      if (DrillRequired != other.DrillRequired) return false;
+      if (DrillCost != other.DrillCost) return false;
+      if (StoneKind != other.StoneKind) return false;
+      if (StoneCost != other.StoneCost) return false;
+      if (Drill != other.Drill) return false;
+      if (StoneLeft != other.StoneLeft) return false;
+      if (MainStage != other.MainStage) return false;
+      if (MainStageRequired != other.MainStageRequired) return false;
+      if(!sideQuestsMissing_.Equals(other.sideQuestsMissing_)) return false;
+      if (SuccessPct != other.SuccessPct) return false;
+      if (Duplicate != other.Duplicate) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Success != false) hash ^= Success.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (FromRealm.Length != 0) hash ^= FromRealm.GetHashCode();
+      if (NextRealm.Length != 0) hash ^= NextRealm.GetHashCode();
+      if (Realm.Length != 0) hash ^= Realm.GetHashCode();
+      if (DrillBefore != 0L) hash ^= DrillBefore.GetHashCode();
+      if (DrillRequired != 0L) hash ^= DrillRequired.GetHashCode();
+      if (DrillCost != 0L) hash ^= DrillCost.GetHashCode();
+      if (StoneKind.Length != 0) hash ^= StoneKind.GetHashCode();
+      if (StoneCost != 0L) hash ^= StoneCost.GetHashCode();
+      if (Drill != 0L) hash ^= Drill.GetHashCode();
+      if (StoneLeft != 0L) hash ^= StoneLeft.GetHashCode();
+      if (MainStage != 0) hash ^= MainStage.GetHashCode();
+      if (MainStageRequired != 0) hash ^= MainStageRequired.GetHashCode();
+      hash ^= sideQuestsMissing_.GetHashCode();
+      if (SuccessPct != 0) hash ^= SuccessPct.GetHashCode();
+      if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Success != false) {
+        output.WriteRawTag(16);
+        output.WriteBool(Success);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Reason);
+      }
+      if (FromRealm.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(FromRealm);
+      }
+      if (NextRealm.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(NextRealm);
+      }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Realm);
+      }
+      if (DrillBefore != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(DrillBefore);
+      }
+      if (DrillRequired != 0L) {
+        output.WriteRawTag(64);
+        output.WriteInt64(DrillRequired);
+      }
+      if (DrillCost != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(DrillCost);
+      }
+      if (StoneKind.Length != 0) {
+        output.WriteRawTag(82);
+        output.WriteString(StoneKind);
+      }
+      if (StoneCost != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(StoneCost);
+      }
+      if (Drill != 0L) {
+        output.WriteRawTag(96);
+        output.WriteInt64(Drill);
+      }
+      if (StoneLeft != 0L) {
+        output.WriteRawTag(104);
+        output.WriteInt64(StoneLeft);
+      }
+      if (MainStage != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(MainStage);
+      }
+      if (MainStageRequired != 0) {
+        output.WriteRawTag(120);
+        output.WriteInt32(MainStageRequired);
+      }
+      sideQuestsMissing_.WriteTo(output, _repeated_sideQuestsMissing_codec);
+      if (SuccessPct != 0) {
+        output.WriteRawTag(136, 1);
+        output.WriteInt32(SuccessPct);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(144, 1);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Success != false) {
+        output.WriteRawTag(16);
+        output.WriteBool(Success);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Reason);
+      }
+      if (FromRealm.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(FromRealm);
+      }
+      if (NextRealm.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(NextRealm);
+      }
+      if (Realm.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Realm);
+      }
+      if (DrillBefore != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(DrillBefore);
+      }
+      if (DrillRequired != 0L) {
+        output.WriteRawTag(64);
+        output.WriteInt64(DrillRequired);
+      }
+      if (DrillCost != 0L) {
+        output.WriteRawTag(72);
+        output.WriteInt64(DrillCost);
+      }
+      if (StoneKind.Length != 0) {
+        output.WriteRawTag(82);
+        output.WriteString(StoneKind);
+      }
+      if (StoneCost != 0L) {
+        output.WriteRawTag(88);
+        output.WriteInt64(StoneCost);
+      }
+      if (Drill != 0L) {
+        output.WriteRawTag(96);
+        output.WriteInt64(Drill);
+      }
+      if (StoneLeft != 0L) {
+        output.WriteRawTag(104);
+        output.WriteInt64(StoneLeft);
+      }
+      if (MainStage != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(MainStage);
+      }
+      if (MainStageRequired != 0) {
+        output.WriteRawTag(120);
+        output.WriteInt32(MainStageRequired);
+      }
+      sideQuestsMissing_.WriteTo(ref output, _repeated_sideQuestsMissing_codec);
+      if (SuccessPct != 0) {
+        output.WriteRawTag(136, 1);
+        output.WriteInt32(SuccessPct);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(144, 1);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Success != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (FromRealm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(FromRealm);
+      }
+      if (NextRealm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(NextRealm);
+      }
+      if (Realm.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Realm);
+      }
+      if (DrillBefore != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(DrillBefore);
+      }
+      if (DrillRequired != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(DrillRequired);
+      }
+      if (DrillCost != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(DrillCost);
+      }
+      if (StoneKind.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(StoneKind);
+      }
+      if (StoneCost != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(StoneCost);
+      }
+      if (Drill != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Drill);
+      }
+      if (StoneLeft != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(StoneLeft);
+      }
+      if (MainStage != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MainStage);
+      }
+      if (MainStageRequired != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MainStageRequired);
+      }
+      size += sideQuestsMissing_.CalculateSize(_repeated_sideQuestsMissing_codec);
+      if (SuccessPct != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeInt32Size(SuccessPct);
+      }
+      if (Duplicate != false) {
+        size += 2 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(AdvanceRealmResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Success != false) {
+        Success = other.Success;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.FromRealm.Length != 0) {
+        FromRealm = other.FromRealm;
+      }
+      if (other.NextRealm.Length != 0) {
+        NextRealm = other.NextRealm;
+      }
+      if (other.Realm.Length != 0) {
+        Realm = other.Realm;
+      }
+      if (other.DrillBefore != 0L) {
+        DrillBefore = other.DrillBefore;
+      }
+      if (other.DrillRequired != 0L) {
+        DrillRequired = other.DrillRequired;
+      }
+      if (other.DrillCost != 0L) {
+        DrillCost = other.DrillCost;
+      }
+      if (other.StoneKind.Length != 0) {
+        StoneKind = other.StoneKind;
+      }
+      if (other.StoneCost != 0L) {
+        StoneCost = other.StoneCost;
+      }
+      if (other.Drill != 0L) {
+        Drill = other.Drill;
+      }
+      if (other.StoneLeft != 0L) {
+        StoneLeft = other.StoneLeft;
+      }
+      if (other.MainStage != 0) {
+        MainStage = other.MainStage;
+      }
+      if (other.MainStageRequired != 0) {
+        MainStageRequired = other.MainStageRequired;
+      }
+      sideQuestsMissing_.Add(other.sideQuestsMissing_);
+      if (other.SuccessPct != 0) {
+        SuccessPct = other.SuccessPct;
+      }
+      if (other.Duplicate != false) {
+        Duplicate = other.Duplicate;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 16: {
+            Success = input.ReadBool();
+            break;
+          }
+          case 26: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 34: {
+            FromRealm = input.ReadString();
+            break;
+          }
+          case 42: {
+            NextRealm = input.ReadString();
+            break;
+          }
+          case 50: {
+            Realm = input.ReadString();
+            break;
+          }
+          case 56: {
+            DrillBefore = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            DrillRequired = input.ReadInt64();
+            break;
+          }
+          case 72: {
+            DrillCost = input.ReadInt64();
+            break;
+          }
+          case 82: {
+            StoneKind = input.ReadString();
+            break;
+          }
+          case 88: {
+            StoneCost = input.ReadInt64();
+            break;
+          }
+          case 96: {
+            Drill = input.ReadInt64();
+            break;
+          }
+          case 104: {
+            StoneLeft = input.ReadInt64();
+            break;
+          }
+          case 112: {
+            MainStage = input.ReadInt32();
+            break;
+          }
+          case 120: {
+            MainStageRequired = input.ReadInt32();
+            break;
+          }
+          case 130: {
+            sideQuestsMissing_.AddEntriesFrom(input, _repeated_sideQuestsMissing_codec);
+            break;
+          }
+          case 136: {
+            SuccessPct = input.ReadInt32();
+            break;
+          }
+          case 144: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 16: {
+            Success = input.ReadBool();
+            break;
+          }
+          case 26: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 34: {
+            FromRealm = input.ReadString();
+            break;
+          }
+          case 42: {
+            NextRealm = input.ReadString();
+            break;
+          }
+          case 50: {
+            Realm = input.ReadString();
+            break;
+          }
+          case 56: {
+            DrillBefore = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            DrillRequired = input.ReadInt64();
+            break;
+          }
+          case 72: {
+            DrillCost = input.ReadInt64();
+            break;
+          }
+          case 82: {
+            StoneKind = input.ReadString();
+            break;
+          }
+          case 88: {
+            StoneCost = input.ReadInt64();
+            break;
+          }
+          case 96: {
+            Drill = input.ReadInt64();
+            break;
+          }
+          case 104: {
+            StoneLeft = input.ReadInt64();
+            break;
+          }
+          case 112: {
+            MainStage = input.ReadInt32();
+            break;
+          }
+          case 120: {
+            MainStageRequired = input.ReadInt32();
+            break;
+          }
+          case 130: {
+            sideQuestsMissing_.AddEntriesFrom(ref input, _repeated_sideQuestsMissing_codec);
+            break;
+          }
+          case 136: {
+            SuccessPct = input.ReadInt32();
+            break;
+          }
+          case 144: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// P3-1a2：历练结算。请求只有角色、副本与事务号；给多少历练由配置决定。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class SettleDrillRequest : pb::IMessage<SettleDrillRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<SettleDrillRequest> _parser = new pb::MessageParser<SettleDrillRequest>(() => new SettleDrillRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<SettleDrillRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[62]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SettleDrillRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SettleDrillRequest(SettleDrillRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      dungeonId_ = other.dungeonId_;
+      txnId_ = other.txnId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SettleDrillRequest Clone() {
+      return new SettleDrillRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    /// <summary>
+    /// 战斗服服间直连时为空，只按角色编号找角色；客户端填不了这个字段。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dungeon_id" field.</summary>
+    public const int DungeonIdFieldNumber = 3;
+    private string dungeonId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string DungeonId {
+      get { return dungeonId_; }
+      set {
+        dungeonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 4;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as SettleDrillRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(SettleDrillRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (DungeonId != other.DungeonId) return false;
+      if (TxnId != other.TxnId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (DungeonId.Length != 0) hash ^= DungeonId.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (DungeonId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(DungeonId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (DungeonId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(DungeonId);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (DungeonId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(DungeonId);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(SettleDrillRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.DungeonId.Length != 0) {
+        DungeonId = other.DungeonId;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            DungeonId = input.ReadString();
+            break;
+          }
+          case 34: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            DungeonId = input.ReadString();
+            break;
+          }
+          case 34: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class SettleDrillResponse : pb::IMessage<SettleDrillResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<SettleDrillResponse> _parser = new pb::MessageParser<SettleDrillResponse>(() => new SettleDrillResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<SettleDrillResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[63]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SettleDrillResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SettleDrillResponse(SettleDrillResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      dungeonId_ = other.dungeonId_;
+      drillGain_ = other.drillGain_;
+      drill_ = other.drill_;
+      duplicate_ = other.duplicate_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SettleDrillResponse Clone() {
+      return new SettleDrillResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    /// <summary>
+    /// unknown_dungeon / realm_locked / realm_not_enough / realm_unknown /
+    /// character_not_found；空串表示加上了（或者 duplicate）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "dungeon_id" field.</summary>
+    public const int DungeonIdFieldNumber = 3;
+    private string dungeonId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string DungeonId {
+      get { return dungeonId_; }
+      set {
+        dungeonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "drill_gain" field.</summary>
+    public const int DrillGainFieldNumber = 4;
+    private long drillGain_;
+    /// <summary>
+    /// 这一笔加上的历练；重复提交时为 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long DrillGain {
+      get { return drillGain_; }
+      set {
+        drillGain_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "drill" field.</summary>
+    public const int DrillFieldNumber = 5;
+    private long drill_;
+    /// <summary>
+    /// 这一笔之后的历练值（事实值）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Drill {
+      get { return drill_; }
+      set {
+        drill_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duplicate" field.</summary>
+    public const int DuplicateFieldNumber = 6;
+    private bool duplicate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Duplicate {
+      get { return duplicate_; }
+      set {
+        duplicate_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as SettleDrillResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(SettleDrillResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (DungeonId != other.DungeonId) return false;
+      if (DrillGain != other.DrillGain) return false;
+      if (Drill != other.Drill) return false;
+      if (Duplicate != other.Duplicate) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (DungeonId.Length != 0) hash ^= DungeonId.GetHashCode();
+      if (DrillGain != 0L) hash ^= DrillGain.GetHashCode();
+      if (Drill != 0L) hash ^= Drill.GetHashCode();
+      if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (DungeonId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(DungeonId);
+      }
+      if (DrillGain != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(DrillGain);
+      }
+      if (Drill != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(Drill);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (DungeonId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(DungeonId);
+      }
+      if (DrillGain != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(DrillGain);
+      }
+      if (Drill != 0L) {
+        output.WriteRawTag(40);
+        output.WriteInt64(Drill);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(Duplicate);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (DungeonId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(DungeonId);
+      }
+      if (DrillGain != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(DrillGain);
+      }
+      if (Drill != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Drill);
+      }
+      if (Duplicate != false) {
+        size += 1 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(SettleDrillResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.DungeonId.Length != 0) {
+        DungeonId = other.DungeonId;
+      }
+      if (other.DrillGain != 0L) {
+        DrillGain = other.DrillGain;
+      }
+      if (other.Drill != 0L) {
+        Drill = other.Drill;
+      }
+      if (other.Duplicate != false) {
+        Duplicate = other.Duplicate;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            DungeonId = input.ReadString();
+            break;
+          }
+          case 32: {
+            DrillGain = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            Drill = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            DungeonId = input.ReadString();
+            break;
+          }
+          case 32: {
+            DrillGain = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            Drill = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            Duplicate = input.ReadBool();
             break;
           }
         }

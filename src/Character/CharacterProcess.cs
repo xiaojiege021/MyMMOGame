@@ -50,7 +50,7 @@ public sealed class CharacterProcess(string configPath)
             dungeons = DungeonTable.Load(config.DungeonTable);
             // P3-1a1：十一段按顺序开放，首发到结丹；元婴起每段一个开关。
             // 与副本表交叉校验：写 realm 的只能是首发之后的新副本，旧副本不许写。
-            realms = RealmTable.Load(config.RealmTable, dungeons);
+            realms = RealmTable.Load(config.RealmTable, dungeons, currencies);
             expTable = ExpTable.Load(config.ExpTable);
             // 开发架构第 7 节：强化概率由角色服读。三档材料要在物品表里存在，
             // 扣的金币要在币种表里存在，缺一样就起不来。
@@ -123,7 +123,8 @@ public sealed class CharacterProcess(string configPath)
                 + " min=" + dungeon.MinPlayers
                 + " max=" + dungeon.MaxPlayers
                 + " entries=" + dungeon.EntriesPerWeek
-                + " reward=" + dungeon.RewardPerPlayer);
+                + " reward=" + dungeon.RewardPerPlayer
+                + " drill=" + dungeon.Drill);
         }
         // P3-1a1：十一段顺序与开关。改 realms.json 重启后这里能直接核对到。
         Console.WriteLine("realms=" + realms.Realms.Count
@@ -134,6 +135,18 @@ public sealed class CharacterProcess(string configPath)
         foreach (var dungeon in dungeons.All.Where(d => d.Realm is not null))
         {
             Console.WriteLine("dungeon_realm=" + dungeon.Id + " realm=" + dungeon.Realm);
+        }
+
+        // P3-1a2：每一段的突破要求。改 realms.json 重启后这里能直接核对到。
+        foreach (var requirement in realms.Requirements)
+        {
+            Console.WriteLine("realm_advance=" + requirement.From + "->" + requirement.Next
+                + " drill=" + requirement.Drill
+                + " stone=" + requirement.Stone
+                + " stone_cost=" + requirement.StoneCost
+                + " success_pct=" + requirement.SuccessPct
+                + " main_stage=" + requirement.MainStage
+                + " side_quests=" + string.Join("+", requirement.SideQuests));
         }
         Console.WriteLine("exp_table_version=" + expTable.Version
             + " level_cap=" + expTable.LevelCap
@@ -255,6 +268,9 @@ public sealed class CharacterProcess(string configPath)
         // 充值订单的一笔只在这里结算：锁订单行 → 认归属 → 已 paid 就不做 →
         // 抢事务号 → 加元宝 → 订单改 paid → 读回。
         var recharges = new RechargeRepository(dataSource);
+        // P3-1a2：突破与历练结算的唯一写入点。历练、炼心与灵石都在库里读，
+        // 上一段开没开复用同一个 RealmTable。
+        var realmAdvances = new RealmAdvanceRepository(dataSource, realms);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -307,6 +323,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(unbinds);
         builder.Services.AddSingleton(unbindTable);
         builder.Services.AddSingleton(recharges);
+        builder.Services.AddSingleton(realmAdvances);
         builder.Services.AddSingleton(rechargeTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);

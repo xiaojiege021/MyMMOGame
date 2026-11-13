@@ -70,14 +70,14 @@ R("enter_gate", "realms.CheckDungeon(dungeon.Realm" in grpc and "RealmAsync" in 
 cfg = rd(os.path.join(root, "src", "Character", "CharacterConfig.cs"))
 R("realm_config", "config/realms.json" in cfg and "RealmTable" in cfg)
 proc = rd(os.path.join(root, "src", "Character", "CharacterProcess.cs"))
-R("startup_load", "RealmTable.Load(config.RealmTable, dungeons)" in proc)
+R("startup_load", "RealmTable.Load(config.RealmTable, dungeons" in proc)
 prog = rd(os.path.join(root, "src", "Character", "Program.cs"))
 R("readonly_entries", "--realm-table" in prog and "--realm-state" in prog)
 repo = rd(os.path.join(root, "src", "Character", "CharacterRepository.cs"))
 R("realm_reader", "RealmOfAsync" in repo)
 battle = rd(os.path.join(root, "src", "Battle", "Server.cs")) + rd(os.path.join(root, "src", "Battle", "Encounter.cs"))
 R("gate_in_character", "realm_locked" not in battle)
-R("no_proto_change", "rpc AdvanceRealm(" not in rd(os.path.join(root, "proto", "mmo", "character.proto")))
+R("enter_gate_readonly", "RawWriteRealm" not in grpc and "RealmAsync" in grpc)
 o.close()
 PY
 while IFS= read -r line; do
@@ -90,7 +90,7 @@ done < "$TMP/static.txt"
 echo "== 3. 只读入口 --realm-table =="
 RT="$("$DOTNET" "$CD" --realm-table $CC 2>&1)"; rc=$?
 if [ "$rc" = "0" ] \
-   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=1 realms=11 launch_until=结丹 open=炼体,筑基,结丹 closed=元婴' \
+   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=[0-9]\+ realms=11 launch_until=结丹 open=炼体,筑基,结丹 closed=元婴' \
    && printf '%s' "$RT" | grep -q '^realm=4:元婴:closed' \
    && printf '%s' "$RT" | grep -q '^alias=散仙=金仙'; then
   ok "十一段顺序、首发到结丹、元婴起全部关着（不连库）"

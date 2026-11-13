@@ -162,6 +162,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipRequest> __Marshaller_mmo_character_CanEquipRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipResponse> __Marshaller_mmo_character_CanEquipResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AdvanceRealmRequest> __Marshaller_mmo_character_AdvanceRealmRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AdvanceRealmRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AdvanceRealmResponse> __Marshaller_mmo_character_AdvanceRealmResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AdvanceRealmResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleDrillRequest> __Marshaller_mmo_character_SettleDrillRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleDrillRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleDrillResponse> __Marshaller_mmo_character_SettleDrillResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleDrillResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -394,6 +402,22 @@ namespace Mmo.Proto.Character {
         "CanEquip",
         __Marshaller_mmo_character_CanEquipRequest,
         __Marshaller_mmo_character_CanEquipResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse> __Method_AdvanceRealm = new grpc::Method<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "AdvanceRealm",
+        __Marshaller_mmo_character_AdvanceRealmRequest,
+        __Marshaller_mmo_character_AdvanceRealmResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.SettleDrillRequest, global::Mmo.Proto.Character.SettleDrillResponse> __Method_SettleDrill = new grpc::Method<global::Mmo.Proto.Character.SettleDrillRequest, global::Mmo.Proto.Character.SettleDrillResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SettleDrill",
+        __Marshaller_mmo_character_SettleDrillRequest,
+        __Marshaller_mmo_character_SettleDrillResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -765,6 +789,35 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CanEquipResponse> CanEquip(global::Mmo.Proto.Character.CanEquipRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
+      /// 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
+      /// 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
+      /// 历练与灵石照扣。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AdvanceRealmResponse> AdvanceRealm(global::Mmo.Proto.Character.AdvanceRealmRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-1a2：历练结算。战斗服通关后发过来，只统计已经能进入的副本；
+      /// 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
+      /// 同一个事务号再提交不会加第二次。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SettleDrillResponse> SettleDrill(global::Mmo.Proto.Character.SettleDrillRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2242,6 +2295,122 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_CanEquip, null, options, request);
       }
+      /// <summary>
+      /// P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
+      /// 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
+      /// 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
+      /// 历练与灵石照扣。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AdvanceRealmResponse AdvanceRealm(global::Mmo.Proto.Character.AdvanceRealmRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AdvanceRealm(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
+      /// 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
+      /// 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
+      /// 历练与灵石照扣。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AdvanceRealmResponse AdvanceRealm(global::Mmo.Proto.Character.AdvanceRealmRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_AdvanceRealm, null, options, request);
+      }
+      /// <summary>
+      /// P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
+      /// 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
+      /// 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
+      /// 历练与灵石照扣。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AdvanceRealmResponse> AdvanceRealmAsync(global::Mmo.Proto.Character.AdvanceRealmRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AdvanceRealmAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
+      /// 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
+      /// 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
+      /// 历练与灵石照扣。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AdvanceRealmResponse> AdvanceRealmAsync(global::Mmo.Proto.Character.AdvanceRealmRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_AdvanceRealm, null, options, request);
+      }
+      /// <summary>
+      /// P3-1a2：历练结算。战斗服通关后发过来，只统计已经能进入的副本；
+      /// 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
+      /// 同一个事务号再提交不会加第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SettleDrillResponse SettleDrill(global::Mmo.Proto.Character.SettleDrillRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleDrill(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-1a2：历练结算。战斗服通关后发过来，只统计已经能进入的副本；
+      /// 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
+      /// 同一个事务号再提交不会加第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SettleDrillResponse SettleDrill(global::Mmo.Proto.Character.SettleDrillRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SettleDrill, null, options, request);
+      }
+      /// <summary>
+      /// P3-1a2：历练结算。战斗服通关后发过来，只统计已经能进入的副本；
+      /// 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
+      /// 同一个事务号再提交不会加第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SettleDrillResponse> SettleDrillAsync(global::Mmo.Proto.Character.SettleDrillRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleDrillAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-1a2：历练结算。战斗服通关后发过来，只统计已经能进入的副本；
+      /// 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
+      /// 同一个事务号再提交不会加第二次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SettleDrillResponse> SettleDrillAsync(global::Mmo.Proto.Character.SettleDrillRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SettleDrill, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -2284,7 +2453,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_SettleRechargeOrder, serviceImpl.SettleRechargeOrder)
           .AddMethod(__Method_DescribeBattleProfile, serviceImpl.DescribeBattleProfile)
           .AddMethod(__Method_AdvanceBranch, serviceImpl.AdvanceBranch)
-          .AddMethod(__Method_CanEquip, serviceImpl.CanEquip).Build();
+          .AddMethod(__Method_CanEquip, serviceImpl.CanEquip)
+          .AddMethod(__Method_AdvanceRealm, serviceImpl.AdvanceRealm)
+          .AddMethod(__Method_SettleDrill, serviceImpl.SettleDrill).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -2323,6 +2494,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DescribeBattleProfile, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse>(serviceImpl.DescribeBattleProfile));
       serviceBinder.AddMethod(__Method_AdvanceBranch, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceBranchRequest, global::Mmo.Proto.Character.AdvanceBranchResponse>(serviceImpl.AdvanceBranch));
       serviceBinder.AddMethod(__Method_CanEquip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(serviceImpl.CanEquip));
+      serviceBinder.AddMethod(__Method_AdvanceRealm, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse>(serviceImpl.AdvanceRealm));
+      serviceBinder.AddMethod(__Method_SettleDrill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleDrillRequest, global::Mmo.Proto.Character.SettleDrillResponse>(serviceImpl.SettleDrill));
     }
 
   }

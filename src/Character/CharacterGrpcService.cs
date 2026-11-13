@@ -47,6 +47,7 @@ public sealed class CharacterGrpcService(
     UnbindRepository unbinds,
     RechargeTable rechargeTable,
     RechargeRepository recharges,
+    RealmAdvanceRepository realmAdvances,
     SocialService.SocialServiceClient social,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
@@ -2533,4 +2534,112 @@ public sealed class CharacterGrpcService(
             WeeklyShareCap = dungeons.WeeklyShareCap,
             RewardShares = 0,
         };
+
+    /// <summary>
+    /// P3-1a2：突破。修为就是当前境界，历练、炼心（主线 + 必要支线）与灵石
+    /// 全部由仓储在库里读；版本开关复用 P3-1a1 的 RealmTable.CheckAdvance。
+    /// 条件不满足时 ok=false + reason，历练与灵石都不动；掷过了才扣，
+    /// 失败时修为停在原境界。
+    /// </summary>
+    public override async Task<AdvanceRealmResponse> AdvanceRealm(
+        AdvanceRealmRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > RealmAdvanceRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_id_invalid"));
+        }
+
+        var account = (request.Account ?? "").Trim();
+        var outcome = await realmAdvances.AdvanceAsync(
+            (long)request.CharacterId,
+            account.Length == 0 ? null : account,
+            txnId,
+            context.CancellationToken);
+
+        var response = new AdvanceRealmResponse
+        {
+            Ok = outcome.Executed,
+            Success = outcome.Success,
+            Reason = outcome.Reason,
+            FromRealm = outcome.From,
+            NextRealm = outcome.Next,
+            Realm = outcome.Realm,
+            DrillBefore = outcome.DrillBefore,
+            DrillRequired = outcome.DrillRequired,
+            DrillCost = outcome.DrillCost,
+            StoneKind = outcome.StoneKind,
+            StoneCost = outcome.StoneCost,
+            Drill = outcome.DrillAfter,
+            StoneLeft = outcome.StoneLeft,
+            MainStage = outcome.MainStage,
+            MainStageRequired = outcome.MainStageRequired,
+            SuccessPct = outcome.SuccessPct,
+            Duplicate = outcome.Duplicate,
+        };
+        response.SideQuestsMissing.AddRange(outcome.MissingQuests);
+        return response;
+    }
+
+    /// <summary>
+    /// P3-1a2：历练结算。只统计已经能进入的副本：写了 realm 的新副本仍按
+    /// 「这一段开没开、个人境界够不够」判，旧副本没有境界门槛。给多少历练
+    /// 由 config/dungeons.json 的 drill 决定，请求里带不进来。
+    /// </summary>
+    public override async Task<SettleDrillResponse> SettleDrill(
+        SettleDrillRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var dungeonId = (request.DungeonId ?? "").Trim();
+        if (dungeonId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "dungeon_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > RealmAdvanceRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_id_invalid"));
+        }
+
+        var dungeon = dungeons.Find(dungeonId);
+        if (dungeon is null)
+        {
+            return new SettleDrillResponse
+            {
+                Ok = false,
+                Reason = "unknown_dungeon",
+                DungeonId = dungeonId,
+            };
+        }
+
+        var account = (request.Account ?? "").Trim();
+        var outcome = await realmAdvances.SettleDrillAsync(
+            (long)request.CharacterId,
+            account.Length == 0 ? null : account,
+            dungeon.Id,
+            dungeon.Realm,
+            dungeon.Drill,
+            txnId,
+            context.CancellationToken);
+
+        return new SettleDrillResponse
+        {
+            Ok = outcome.Found && outcome.Reason.Length == 0 && !outcome.Duplicate,
+            Reason = outcome.Reason,
+            DungeonId = outcome.DungeonId,
+            DrillGain = outcome.Gain,
+            Drill = outcome.Drill,
+            Duplicate = outcome.Duplicate,
+        };
+    }
 }

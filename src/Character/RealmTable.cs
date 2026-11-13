@@ -16,6 +16,22 @@ public sealed record DungeonRealmGate(bool Ok, string Reason, string Realm, stri
 public sealed record RealmAdvance(bool Ok, string Reason, string From, string Next, bool NextOpen);
 
 /// <summary>
+/// 一段的突破要求（方案 8.1）。修为就是当前境界，这里不另记一池点数；
+/// Drill 是这一笔要扣掉的历练值，Stone / StoneCost 是灵石档位与数量，
+/// MainStage 是炼心要查到的已经打开的主线场次，SideQuests 是这一段列出的必要支线。
+/// 数值都没在方案里写定，全部来自 config/realms.json，代码里不写第二套。
+/// </summary>
+public sealed record RealmAdvanceRequirement(
+    string From,
+    string Next,
+    long Drill,
+    string Stone,
+    long StoneCost,
+    int SuccessPct,
+    int MainStage,
+    IReadOnlyList<string> SideQuests);
+
+/// <summary>
 /// 十一段境界的顺序与版本开关，读 config/realms.json。首发这一段（含）以前一律开放，
 /// 之后的每段各有一个开关；开关按顺序打开，后面的段不能在前面还关着时先开。
 /// 境界本身仍只由角色服写，这里只回答「这一段开没开」「这个人能不能进这个副本」。
@@ -25,6 +41,7 @@ public sealed class RealmTable
     readonly List<string> _order;
     readonly Dictionary<string, string> _aliases;
     readonly HashSet<string> _open;
+    readonly Dictionary<string, RealmAdvanceRequirement> _requirements;
 
     public int Version { get; }
 
@@ -34,19 +51,28 @@ public sealed class RealmTable
 
     public IReadOnlyDictionary<string, string> Aliases => _aliases;
 
+    /// <summary>每一段（极境除外）的突破要求，顺序与 Realms 一致。</summary>
+    public IReadOnlyCollection<RealmAdvanceRequirement> Requirements => _requirements.Values;
+
     RealmTable(
         List<string> order,
         Dictionary<string, string> aliases,
         HashSet<string> open,
+        Dictionary<string, RealmAdvanceRequirement> requirements,
         int version,
         string launchUntil)
     {
         _order = order;
         _aliases = aliases;
         _open = open;
+        _requirements = requirements;
         Version = version;
         LaunchUntil = launchUntil;
     }
+
+    /// <summary>这一段的突破要求；极境没有下一段，返回 null。</summary>
+    public RealmAdvanceRequirement? Requirement(string? realm)
+        => _requirements.GetValueOrDefault(Normalize(realm));
 
     /// <summary>把「散仙」这类别名归到顺序表里的名字；不认识的境界原样返回。</summary>
     public string Normalize(string? realm)
@@ -125,7 +151,7 @@ public sealed class RealmTable
     /// 同时校验副本表：写了 realm 的副本只能是首发之后（元婴起）的境界，
     /// 名字必须在十一段里；旧副本写了 realm 直接起不来，堵住「顺手抬高旧门槛」。
     /// </summary>
-    public static RealmTable Load(string path, DungeonTable dungeons)
+    public static RealmTable Load(string path, DungeonTable dungeons, CurrencyTable currencies)
     {
         if (!File.Exists(path))
         {
@@ -264,6 +290,100 @@ public sealed class RealmTable
             }
         }
 
+        // P3-1a2：每一段（极境除外）一条突破要求。数值只在这份配置里；
+        // 灵石必须是灵石五档、成功率 0–100、历练与主线场次非负。
+        var requirements = new Dictionary<string, RealmAdvanceRequirement>(StringComparer.Ordinal);
+        foreach (var item in wire.Advance ?? new List<AdvanceItem>())
+        {
+            var from = (item.From ?? "").Trim();
+            if (from.Length == 0)
+            {
+                throw new ConfigException("realms.json 的 advance 里有条目缺 from");
+            }
+
+            if (!order.Contains(from))
+            {
+                throw new ConfigException("realms.json 的突破要求不在顺序表里：" + from);
+            }
+
+            if (from == order[^1])
+            {
+                throw new ConfigException("realms.json 的 " + from + " 是最后一段，没有下一段，不该配突破要求");
+            }
+
+            if (requirements.ContainsKey(from))
+            {
+                throw new ConfigException("realms.json 的突破要求重复：" + from);
+            }
+
+            if (item.Drill is null || item.Drill < 0)
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破要求缺 drill 或 drill 是负数");
+            }
+
+            if (item.StoneCost is null || item.StoneCost <= 0)
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破要求缺 stone_cost 或不是正数");
+            }
+
+            var stone = (item.Stone ?? "").Trim();
+            if (stone.Length == 0)
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破要求缺 stone");
+            }
+
+            if (!stone.StartsWith("stone_", StringComparison.Ordinal))
+            {
+                throw new ConfigException(
+                    "realms.json 的 " + from + " 突破灵石必须是灵石五档（stone_1..stone_5）：" + stone);
+            }
+
+            if (currencies.Find(stone) is null)
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破灵石不在币种表里：" + stone);
+            }
+
+            if (item.SuccessPct is null || item.SuccessPct < 0 || item.SuccessPct > 100)
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破成功率 success_pct 必须在 0–100");
+            }
+
+            if (item.MainStage is null || item.MainStage < 0)
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破的主线场次 main_stage 必须是非负数");
+            }
+
+            var sides = new List<string>();
+            foreach (var raw in item.SideQuests ?? new List<string?>())
+            {
+                var quest = (raw ?? "").Trim();
+                if (quest.Length == 0)
+                {
+                    throw new ConfigException("realms.json 的 " + from + " 必要支线里有空名字");
+                }
+
+                if (sides.Contains(quest))
+                {
+                    throw new ConfigException("realms.json 的 " + from + " 必要支线重复：" + quest);
+                }
+
+                sides.Add(quest);
+            }
+
+            var index = order.IndexOf(from);
+            requirements[from] = new RealmAdvanceRequirement(
+                from, order[index + 1], item.Drill.Value, stone, item.StoneCost.Value,
+                item.SuccessPct.Value, item.MainStage.Value, sides);
+        }
+
+        for (var i = 0; i < order.Count - 1; i++)
+        {
+            if (!requirements.ContainsKey(order[i]))
+            {
+                throw new ConfigException("realms.json 缺 " + order[i] + " 的突破要求");
+            }
+        }
+
         // 副本表的境界门槛只许落在首发之后，名字必须在十一段里。
         foreach (var dungeon in dungeons.All)
         {
@@ -294,7 +414,7 @@ public sealed class RealmTable
             throw new ConfigException("realms.json 的 version 必须是正整数");
         }
 
-        return new RealmTable(order, aliases, open, wire.Version, launch);
+        return new RealmTable(order, aliases, open, requirements, wire.Version, launch);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -319,6 +439,33 @@ public sealed class RealmTable
 
         [JsonPropertyName("switches")]
         public List<SwitchItem>? Switches { get; init; }
+
+        [JsonPropertyName("advance")]
+        public List<AdvanceItem>? Advance { get; init; }
+    }
+
+    sealed record AdvanceItem
+    {
+        [JsonPropertyName("from")]
+        public string? From { get; init; }
+
+        [JsonPropertyName("drill")]
+        public long? Drill { get; init; }
+
+        [JsonPropertyName("stone")]
+        public string? Stone { get; init; }
+
+        [JsonPropertyName("stone_cost")]
+        public long? StoneCost { get; init; }
+
+        [JsonPropertyName("success_pct")]
+        public int? SuccessPct { get; init; }
+
+        [JsonPropertyName("main_stage")]
+        public int? MainStage { get; init; }
+
+        [JsonPropertyName("side_quests")]
+        public List<string?>? SideQuests { get; init; }
     }
 
     sealed record SwitchItem

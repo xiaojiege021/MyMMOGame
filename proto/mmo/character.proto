@@ -139,6 +139,17 @@ service CharacterService {
   // P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
   // 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
   rpc CanEquip(CanEquipRequest) returns (CanEquipResponse);
+
+  // P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
+  // 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
+  // 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
+  // 历练与灵石照扣。
+  rpc AdvanceRealm(AdvanceRealmRequest) returns (AdvanceRealmResponse);
+
+  // P3-1a2：历练结算。战斗服通关后发过来，只统计已经能进入的副本；
+  // 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
+  // 同一个事务号再提交不会加第二次。
+  rpc SettleDrill(SettleDrillRequest) returns (SettleDrillResponse);
 }
 
 message SettleExpRequest {
@@ -862,3 +873,67 @@ message CanEquipResponse {
   int32 level = 5;
   string class_id = 6;
 }
+
+// P3-1a2：突破。请求只有标识：修为、历练、炼心、灵石与成功率都带不进来。
+message AdvanceRealmRequest {
+  // 网关转发时填令牌账号；服间可信调用为空，只按角色编号找角色。
+  string account = 1;
+  uint64 character_id = 2;
+  // 幂等号：同一次突破一个号，同一个号再提交不掷第二次。
+  string txn_id = 3;
+}
+
+message AdvanceRealmResponse {
+  // true 表示条件满足、这一笔真的掷过了（成功或失败都算执行）。
+  // 条件不满足时 false，reason 给原因，历练与灵石都不动。
+  bool ok = 1;
+  // 这一笔突破成功：修为进入下一段。失败时 false，修为停在原境界。
+  bool success = 2;
+  // realm_locked / realm_max / realm_unknown / heart_not_done /
+  // drill_not_enough / stone_not_enough / character_not_found；空串表示掷过了。
+  string reason = 3;
+  string from_realm = 4;
+  string next_realm = 5;
+  // 这一笔之后的当前境界：成功是下一段，失败仍是 from_realm。
+  string realm = 6;
+  int64 drill_before = 7;
+  int64 drill_required = 8;
+  // 这一次要求扣掉的历练与灵石（配置值）；条件不满足时为 0。
+  int64 drill_cost = 9;
+  string stone_kind = 10;
+  int64 stone_cost = 11;
+  // 这一笔之后的历练与灵石余额；条件不满足时是当前值（事实值）。
+  int64 drill = 12;
+  int64 stone_left = 13;
+  // 炼心：这一步之前已经走到的主线场次、这一段要求到哪里、还缺哪些必要支线。
+  int32 main_stage = 14;
+  int32 main_stage_required = 15;
+  repeated string side_quests_missing = 16;
+  // 配置里的成功率，只作展示；判定在角色服，客户端带不进来。
+  int32 success_pct = 17;
+  // 同一个事务号再提交：这一笔没掷，历练与灵石都没动。
+  bool duplicate = 18;
+}
+
+// P3-1a2：历练结算。请求只有角色、副本与事务号；给多少历练由配置决定。
+message SettleDrillRequest {
+  // 战斗服服间直连时为空，只按角色编号找角色；客户端填不了这个字段。
+  string account = 1;
+  uint64 character_id = 2;
+  string dungeon_id = 3;
+  string txn_id = 4;
+}
+
+message SettleDrillResponse {
+  bool ok = 1;
+  // unknown_dungeon / realm_locked / realm_not_enough / realm_unknown /
+  // character_not_found；空串表示加上了（或者 duplicate）。
+  string reason = 2;
+  string dungeon_id = 3;
+  // 这一笔加上的历练；重复提交时为 0。
+  int64 drill_gain = 4;
+  // 这一笔之后的历练值（事实值）。
+  int64 drill = 5;
+  bool duplicate = 6;
+}
+
