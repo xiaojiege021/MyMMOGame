@@ -254,6 +254,30 @@ public sealed class SectRepository(NpgsqlDataSource dataSource, SectTable sectTa
     }
 
     /// <summary>
+    /// P2-1c：只读查一个角色当前归属的宗门编号。建宗门的人不进名册
+    /// （册里只有弟子），所以判定要同时看 sect_member.sect_id 与
+    /// sect.master_character_id：任一条命中就算在这个宗门。只回宗门编号，
+    /// 不写库。角色服据此判「整队是否同宗门」。
+    /// </summary>
+    public sealed record CharacterSect(bool Found, long SectId);
+
+    public async Task<CharacterSect> CharacterSectAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select sm.sect_id from \"社交\".sect_member sm where sm.character_id = $1 "
+            + "union "
+            + "select s.id from \"社交\".sect s where s.master_character_id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (await reader.ReadAsync(stopping))
+        {
+            return new CharacterSect(true, reader.GetInt64(0));
+        }
+
+        return new CharacterSect(false, 0);
+    }
+
+    /// <summary>
     /// 只给核对用：把某个宗门的 level 改到指定档，验「第 31 人被拒」这类上限切换，
     /// 不做升级逻辑（升级属 P2-1a4）。玩法代码不碰这个入口。
     /// </summary>

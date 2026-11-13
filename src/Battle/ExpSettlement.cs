@@ -63,6 +63,8 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
                         TxnId = txnId,
                         Source = source,
                         PartySize = (uint)partySize,
+                        // P2-1c：把整队成员交给角色服判同宗门；战斗服不解析谁同门。
+                        MemberIds = { memberIds },
                     },
                     deadline: DateTime.UtcNow.AddSeconds(5));
 
@@ -71,6 +73,7 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
                     + " party=" + partySize
                     + " gain=" + reply.ExpGain
                     + " bonus=" + reply.PartyBonus
+                    + " same_sect=" + reply.SameSectBonus
                     + " level=" + reply.Level
                     + " duplicate=" + reply.Duplicate);
             }

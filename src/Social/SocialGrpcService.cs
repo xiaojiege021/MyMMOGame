@@ -103,6 +103,32 @@ public sealed class SocialGrpcService(
         };
     }
 
+    // ---- P2-1c：只读查一个角色归属的宗门编号 ----
+    // 建宗门的人不进名册，判定看 sect_member.sect_id 与 sect.master_character_id；
+    // 两条都查不到才算没宗门。只回宗门编号，不写库。角色服据此判整队是否同宗门。
+    public override async Task<DescribeCharacterSectResponse> DescribeCharacterSect(
+        DescribeCharacterSectRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            return new DescribeCharacterSectResponse
+            {
+                Ok = false, Reason = "request_missing", Found = false, SectId = 0,
+            };
+        }
+
+        var sect = await sects.CharacterSectAsync(
+            (long)request.CharacterId, context.CancellationToken);
+        return new DescribeCharacterSectResponse
+        {
+            Ok = true,
+            Reason = sect.Found ? "" : "not_in_sect",
+            Found = sect.Found,
+            SectId = (ulong)sect.SectId,
+        };
+    }
+
     // ---- P2-1a2：任命 / 免职 / 只读查席位 ----
     // 席位数字只从 config/sect.json 读，请求里带不进来；回包都是只读事实值。
     public override async Task<PositionStateResponse> AppointPosition(

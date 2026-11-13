@@ -1,5 +1,7 @@
 using System.Net;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Mmo.Proto.Social;
 using Npgsql;
 
 namespace Character;
@@ -96,6 +98,7 @@ public sealed class CharacterProcess(string configPath)
 
         Console.WriteLine("config=" + configPath);
         Console.WriteLine("listen=" + config.Listen);
+        Console.WriteLine("social_upstream=" + config.SocialUpstream);
         Console.WriteLine("races=" + races.All.Count + " race_table_version=" + races.Version);
         Console.WriteLine("branches=" + branches.All.Count + " branch_table_version=" + branches.Version);
         Console.WriteLine("items=" + items.All.Count + " item_table_version=" + items.Version
@@ -225,6 +228,10 @@ public sealed class CharacterProcess(string configPath)
         // 抢事务号 → 加元宝 → 订单改 paid → 读回。
         var recharges = new RechargeRepository(dataSource);
 
+        // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
+        var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
+        var social = new SocialService.SocialServiceClient(socialChannel);
+
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
         // 否则 Kestrel 在明文上只谈 HTTP/1.1，gRPC 握手直接失败。
@@ -273,6 +280,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(rechargeTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
+        builder.Services.AddSingleton(social);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

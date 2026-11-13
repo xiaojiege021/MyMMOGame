@@ -33,10 +33,11 @@ public static class CharacterApi
 
     public sealed record HotSpringBody(ulong? CharacterId);
 
-    // 经验结算请求里只有角色、事务号、来源与人数，没有经验数值：
-    // 客户端多传一个 exp_gain 也进不了角色服的那一笔。
+    // 经验结算请求里只有角色、事务号、来源、人数与整队成员，没有经验数值：
+    // 客户端多传一个 exp_gain 也进不了角色服的那一笔。member_ids 只用于判同门，
+    // 客户端传不传都不影响「谁同门」的最终判定——角色服按社交服的事实重判。
     public sealed record SettleExpBody(
-        ulong? CharacterId, string? TxnId, string? Source, uint? PartySize);
+        ulong? CharacterId, string? TxnId, string? Source, uint? PartySize, List<ulong>? MemberIds);
 
     // 强化请求里只有角色、格子、用哪种石头和「这一手用不用保护券」：等级、
     // 成功率、消耗、结果、券编号 / 数量 / 来源与事务号都读不进来
@@ -747,6 +748,8 @@ public static class CharacterApi
                         TxnId = (body.TxnId ?? "").Trim(),
                         Source = (body.Source ?? "").Trim(),
                         PartySize = body.PartySize.Value,
+                        // P2-1c：把整队成员透传给角色服判同门；网关不解析谁同门。
+                        MemberIds = { body.MemberIds ?? new List<ulong>() },
                     },
                     deadline: DateTime.UtcNow.AddSeconds(5),
                     cancellationToken: context.RequestAborted);
@@ -759,6 +762,7 @@ public static class CharacterApi
                     + " duplicate=" + result.Duplicate
                     + " base=" + result.BaseExp
                     + " bonus=" + result.PartyBonus
+                    + " same_sect=" + result.SameSectBonus
                     + " gain=" + result.ExpGain
                     + " level=" + result.LevelBefore + "->" + result.Level
                     + " exp=" + result.Exp
@@ -771,6 +775,8 @@ public static class CharacterApi
                     duplicate = result.Duplicate,
                     base_exp = result.BaseExp,
                     party_bonus = result.PartyBonus,
+                    // P2-1c：同宗门这一截额外经验（独立字段，只读事实值）。
+                    same_sect_bonus = result.SameSectBonus,
                     exp_gain = result.ExpGain,
                     level_before = result.LevelBefore,
                     level = result.Level,

@@ -17,10 +17,11 @@ public sealed class ExpTable
     public int PartyBonusPct { get; }
     public int PartyMinSize { get; }
     public int PartyMaxSize { get; }
+    public int SameSectBonusPct { get; }
     public long ExpPerLevel { get; }
 
     ExpTable(int version, int levelCap, long baseExp, int partyBonusPct,
-        int partyMinSize, int partyMaxSize, long expPerLevel)
+        int partyMinSize, int partyMaxSize, int sameSectBonusPct, long expPerLevel)
     {
         Version = version;
         LevelCap = levelCap;
@@ -28,6 +29,7 @@ public sealed class ExpTable
         PartyBonusPct = partyBonusPct;
         PartyMinSize = partyMinSize;
         PartyMaxSize = partyMaxSize;
+        SameSectBonusPct = sameSectBonusPct;
         ExpPerLevel = expPerLevel;
     }
 
@@ -35,8 +37,16 @@ public sealed class ExpTable
     public long PartyBonus(int partySize) =>
         partySize >= PartyMinSize ? BaseExp * PartyBonusPct / 100 : 0L;
 
+    /// <summary>
+    /// 同宗门这一截：整队都同宗门、且至少两人（本就是组队结算）才有；方案写的是
+    /// 「更窄」，独立字段叠在组队加成之外，幅度由 same_sect_bonus_pct 决定，不碰别的账。
+    /// </summary>
+    public long SameSectBonus(int partySize, bool allSameSect) =>
+        allSameSect && partySize >= PartyMinSize ? BaseExp * SameSectBonusPct / 100 : 0L;
+
     /// <summary>这一笔一共结算多少经验。只加经验，不碰别的账。</summary>
-    public long Gain(int partySize) => BaseExp + PartyBonus(partySize);
+    public long Gain(int partySize, bool allSameSect) =>
+        BaseExp + PartyBonus(partySize) + SameSectBonus(partySize, allSameSect);
 
     /// <summary>
     /// 把这一笔加进当前级经验，够一次升一级。到 level_cap 就停，等级不再往上写；
@@ -79,6 +89,7 @@ public sealed class ExpTable
         var bonusPct = wire.PartyBonusPct ?? throw new ConfigException("exp.json 缺 party_bonus_pct");
         var minSize = wire.PartyMinSize ?? throw new ConfigException("exp.json 缺 party_min_size");
         var maxSize = wire.PartyMaxSize ?? throw new ConfigException("exp.json 缺 party_max_size");
+        var sameSectPct = wire.SameSectBonusPct ?? throw new ConfigException("exp.json 缺 same_sect_bonus_pct");
         var perLevel = wire.ExpPerLevel ?? throw new ConfigException("exp.json 缺 exp_per_level");
 
         // 方案写定上限 100，大版本也不抬；配置只能在这条线以内取值。
@@ -97,6 +108,11 @@ public sealed class ExpTable
             throw new ConfigException("party_bonus_pct 必须在 0 到 1000 之间，现在是 " + bonusPct);
         }
 
+        if (sameSectPct < 0 || sameSectPct > 1000)
+        {
+            throw new ConfigException("same_sect_bonus_pct 必须在 0 到 1000 之间，现在是 " + sameSectPct);
+        }
+
         // 方案写的是「至少两个人」，2 以下的起算人数会改成单人也有加成。
         if (minSize < 2)
         {
@@ -113,7 +129,7 @@ public sealed class ExpTable
             throw new ConfigException("exp_per_level 必须大于 0，现在是 " + perLevel);
         }
 
-        return new ExpTable(version, cap, baseExp, bonusPct, minSize, maxSize, perLevel);
+        return new ExpTable(version, cap, baseExp, bonusPct, minSize, maxSize, sameSectPct, perLevel);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -141,6 +157,9 @@ public sealed class ExpTable
 
         [JsonPropertyName("party_max_size")]
         public int? PartyMaxSize { get; init; }
+
+        [JsonPropertyName("same_sect_bonus_pct")]
+        public int? SameSectBonusPct { get; init; }
 
         [JsonPropertyName("exp_per_level")]
         public long? ExpPerLevel { get; init; }

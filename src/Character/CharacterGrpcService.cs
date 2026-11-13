@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Mmo.Proto.Character;
+using Mmo.Proto.Social;
 using Npgsql;
 
 namespace Character;
@@ -44,6 +45,7 @@ public sealed class CharacterGrpcService(
     UnbindRepository unbinds,
     RechargeTable rechargeTable,
     RechargeRepository recharges,
+    SocialService.SocialServiceClient social,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
 {
@@ -744,9 +746,15 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
         }
 
+        // P2-1c：同宗门加成要问社交服。判 allSameSect 必须放在 DB 行锁事务之外，
+        // 否则跨服调用会拖长行锁、还可能死锁。社交服只是「额外一截」的来源：
+        // 不可达时按「不是同门」处理（少给那一小截），绝不让整笔结算失败——
+        // 结算本身（基础 + 组队加成）不能硬依赖社交服，只加经验、不该阻塞。
+        var allSameSect = await ComputeAllSameSectAsync(request.MemberIds, context.CancellationToken);
+
         var outcome = await expSettlements.SettleAsync(
             (long)request.CharacterId, account.Length == 0 ? null : account,
-            txnId, source, partySize, expTable, boosterTable, context.CancellationToken);
+            txnId, source, partySize, allSameSect, expTable, boosterTable, context.CancellationToken);
         if (!outcome.Found)
         {
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
@@ -754,11 +762,11 @@ public sealed class CharacterGrpcService(
 
         logger.LogInformation(
             "exp_settle account={Account} id={Id} txn={Txn} source={Source} party={Party} "
-            + "duplicate={Duplicate} base={Base} bonus={Bonus} gain={Gain} "
+            + "duplicate={Duplicate} base={Base} bonus={Bonus} same_sect={SameSect} gain={Gain} "
             + "level={LevelBefore}->{Level} exp={Exp} "
             + "booster_pct={BoosterPct} booster_exp={BoosterExp}",
             account.Length == 0 ? "service" : account, request.CharacterId, txnId, source, partySize,
-            outcome.Duplicate, outcome.BaseExp, outcome.PartyBonus, outcome.ExpGain,
+            outcome.Duplicate, outcome.BaseExp, outcome.PartyBonus, outcome.SameSectBonus, outcome.ExpGain,
             outcome.LevelBefore, outcome.Level, outcome.Exp,
             outcome.BoosterPct, outcome.BoosterExp);
 
@@ -778,7 +786,63 @@ public sealed class CharacterGrpcService(
             // 这一笔有没有吃到道具倍率，是角色服按库里到期时刻判的只读结果。
             BoosterPct = (uint)outcome.BoosterPct,
             BoosterExp = outcome.BoosterExp,
+            // P2-1c：同宗门这一截额外经验，只作回包事实值。
+            SameSectBonus = outcome.SameSectBonus,
         };
+    }
+
+    /// <summary>
+    /// P2-1c：判整个队伍是否同宗门。逐个问社交服 DescribeCharacterSect；
+    /// 任一人没进宗门、或跟第一个人的宗门编号不一致，就判 false。
+    /// 人数不足 2 直接 false（同门加成只在整队至少两人时算）。member_ids 没带
+    /// 也判 false，不臆造同门关系。社交服不可达抛 Unavailable，交给调用方重试。
+    /// </summary>
+    async Task<bool> ComputeAllSameSectAsync(
+        global::Google.Protobuf.Collections.RepeatedField<ulong> memberIds,
+        CancellationToken stopping)
+    {
+        if (memberIds.Count < 2)
+        {
+            return false;
+        }
+
+        long? commonSect = null;
+        foreach (var memberId in memberIds)
+        {
+            DescribeCharacterSectResponse sect;
+            try
+            {
+                sect = await social.DescribeCharacterSectAsync(
+                    new DescribeCharacterSectRequest { CharacterId = memberId },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: stopping);
+            }
+            catch (RpcException ex)
+            {
+                // 社交服不可达：按「不是同门」降级，照常结算基础 + 组队加成。
+                // 只可能少给那一小截同门加成，绝不会超发，也不阻塞结算本身。
+                logger.LogWarning(
+                    "exp_settle_same_sect_unavailable member={Member} detail={Detail}",
+                    memberId, ex.Status.Detail);
+                return false;
+            }
+
+            if (!sect.Found)
+            {
+                return false;
+            }
+
+            if (commonSect is null)
+            {
+                commonSect = (long)sect.SectId;
+            }
+            else if (commonSect != (long)sect.SectId)
+            {
+                return false;
+            }
+        }
+
+        return commonSect.HasValue;
     }
 
     /// <summary>

@@ -35,6 +35,9 @@ string? sharesTotalDungeon = null;
 long expStateOf = 0;
 long rawExpId = 0;
 var rawExpValue = 0L;
+// P2-1c：把经验表读出来，不连库、不启动进程，坏配置也走这里。
+var expConfigState = false;
+string? expConfigPath = null;
 var enhanceState = false;
 string? enhanceConfigPath = null;
 long enhanceLevelOf = 0;
@@ -202,6 +205,15 @@ for (var i = 0; i < args.Length; i++)
         case "--raw-exp-write" when i + 2 < args.Length:
             long.TryParse(args[++i], out rawExpId);
             long.TryParse(args[++i], out rawExpValue);
+            break;
+        // P2-1c：把经验表读出来，不连库、不启动进程，坏配置也走这里。
+        // 与真实启动共用同一 ExpTable.Load（默认指向 CharacterConfig.ExpTable）。
+        case "--exp-config":
+            expConfigState = true;
+            break;
+        case "--exp-config-path" when i + 1 < args.Length:
+            expConfigState = true;
+            expConfigPath = args[++i];
             break;
         // 只给核对用：把强化表读出来，不连库、不启动进程。坏配置也走这里。
         case "--enhance-state":
@@ -397,6 +409,40 @@ for (var i = 0; i < args.Length; i++)
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
     }
+}
+
+// 经验表只读核对（P2-1c）：与真实启动共用同一 ExpTable.Load，不连库也不启动进程，
+// 坏配置能在这一步直接看出来。gain 三个数证明「组队加成 / 同宗门加成 / 单人」三档口径。
+if (expConfigState)
+{
+    try
+    {
+        var characterConfig = CharacterConfig.Load(configPath);
+        var table = ExpTable.Load(expConfigPath ?? characterConfig.ExpTable);
+        Console.WriteLine("exp_config_state=ok version=" + table.Version
+            + " level_cap=" + table.LevelCap
+            + " base_exp=" + table.BaseExp
+            + " party_bonus_pct=" + table.PartyBonusPct
+            + " party_min_size=" + table.PartyMinSize
+            + " party_max_size=" + table.PartyMaxSize
+            + " same_sect_bonus_pct=" + table.SameSectBonusPct
+            + " exp_per_level=" + table.ExpPerLevel
+            + " gain1=" + table.Gain(1, false)
+            + " gain2=" + table.Gain(2, false)
+            + " gain2_same=" + table.Gain(2, true));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
 }
 
 // 强化表只读核对：与启动共用同一套校验（三档材料要在物品表里、金币要在币种表里），

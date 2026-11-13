@@ -8,6 +8,7 @@ public sealed record ExpSettlementOutcome(
     bool Duplicate,
     long BaseExp,
     long PartyBonus,
+    long SameSectBonus,
     long ExpGain,
     int LevelBefore,
     int Level,
@@ -46,13 +47,17 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         string txnId,
         string source,
         int partySize,
+        bool allSameSect,
         ExpTable table,
         ExpBoosterTable boosterTable,
         CancellationToken stopping)
     {
         var baseExp = table.BaseExp;
-        var bonus = table.PartyBonus(partySize);
-        var rawGain = table.Gain(partySize);
+        var partyBonus = table.PartyBonus(partySize);
+        // P2-1c：同宗门这一截独立字段，叠在组队加成之外；幅度由配置决定。
+        var sameSectBonus = table.SameSectBonus(partySize, allSameSect);
+        // base + 组队 + 同门，整笔再被限时道具倍率作用（P1-5c7）。
+        var rawGain = baseExp + partyBonus + sameSectBonus;
 
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         await using var transaction = await connection.BeginTransactionAsync(stopping);
@@ -91,7 +96,7 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         {
             await transaction.RollbackAsync(stopping);
             return new ExpSettlementOutcome(
-                false, false, 0, 0, 0, 0, 0, 0, OriginalPct, 0);
+                false, false, 0, 0, 0, 0, 0, 0, 0, OriginalPct, 0);
         }
 
         // 限时经验道具（P1-5c7）：生效判定放在这一笔事务里，用数据库当前时刻，
@@ -119,9 +124,9 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         // 2. 抢事务号。同一个号已经发过就整笔不做，返回当时的状态。
         await using (var claim = new NpgsqlCommand(
             "insert into \"角色\".exp_settlement "
-            + "(txn_id, character_id, source, party_size, base_exp, party_bonus, exp_gain, "
-            + " level_before, level_after) "
-            + "values ($1, $2, $3, $4, $5, $6, $7, $8, $9) "
+            + "(txn_id, character_id, source, party_size, base_exp, party_bonus, "
+            + " same_sect_bonus, exp_gain, level_before, level_after) "
+            + "values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) "
             + "on conflict (txn_id) do nothing returning txn_id",
             connection, transaction))
         {
@@ -130,7 +135,8 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
             claim.Parameters.AddWithValue(source);
             claim.Parameters.AddWithValue(partySize);
             claim.Parameters.AddWithValue(baseExp);
-            claim.Parameters.AddWithValue(bonus);
+            claim.Parameters.AddWithValue(partyBonus);
+            claim.Parameters.AddWithValue(sameSectBonus);
             claim.Parameters.AddWithValue(gain);
             claim.Parameters.AddWithValue(levelBefore);
             claim.Parameters.AddWithValue(level);
@@ -139,7 +145,7 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
             {
                 await transaction.RollbackAsync(stopping);
                 return new ExpSettlementOutcome(
-                    true, true, 0, 0, 0, levelBefore, levelBefore, expBefore,
+                    true, true, 0, 0, 0, 0, levelBefore, levelBefore, expBefore,
                     OriginalPct, 0);
             }
         }
@@ -157,7 +163,7 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
 
         await transaction.CommitAsync(stopping);
         return new ExpSettlementOutcome(
-            true, false, baseExp, bonus, gain, levelBefore, level, exp,
+            true, false, baseExp, partyBonus, sameSectBonus, gain, levelBefore, level, exp,
             boosterPct, boosterExp);
     }
 

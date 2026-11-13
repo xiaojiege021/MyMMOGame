@@ -155,6 +155,25 @@ message UpgradeResponse {
   string txn_id = 10;
 }
 
+// P2-1c：只读查一个角色当前归属的宗门编号。建宗门的人不进名册（册里只有弟子），
+// 因此判定要同时看 sect_member.sect_id 与 sect.master_character_id：两条都查不到
+// 才算没宗门。用于角色服判「整队是否同宗门」——只回宗门编号，不写库。
+message DescribeCharacterSectRequest {
+  // 服间可信调用；account 仅作日志上下文，不参与归属判定。
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message DescribeCharacterSectResponse {
+  bool ok = 1;
+  // character_not_found / 空串表示查到了（found 决定有没有 sect_id）。
+  string reason = 2;
+  // true 表示进了某个宗门（含掌门本人）；false 表示没宗门，sect_id 给 0。
+  bool found = 3;
+  // 归属的宗门编号。掌门本人按 master_character_id 命中，sect_id 等于其宗门。
+  uint64 sect_id = 4;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
@@ -169,4 +188,7 @@ service SocialService {
   // P2-1a4：升级只耗建设（建设不从商城买）/ 只读查升级事实。
   rpc UpgradeSect(UpgradeSectRequest) returns (UpgradeResponse);
   rpc DescribeUpgrade(UpgradeSectRequest) returns (UpgradeResponse);
+  // P2-1c：只读查一个角色当前归属的宗门编号。判同宗门加成在角色服调用；
+  // found=false 表示没进宗门（含掌门本人：建宗门不进名册，按 master_character_id 判）。
+  rpc DescribeCharacterSect(DescribeCharacterSectRequest) returns (DescribeCharacterSectResponse);
 }

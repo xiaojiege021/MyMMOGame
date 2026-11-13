@@ -142,6 +142,9 @@ message SettleExpRequest {
   string source = 4;
   // 同一场的进本人数，与战斗服连接、角色服进本用的是同一个数字。
   uint32 party_size = 5;
+  // 同一场所有参战角色编号，用于判同宗门加成（P2-1c）。至少两人才有意义；
+  // 客户端填不进来，由战斗服服间直连带上、网关透传。
+  repeated uint64 member_ids = 6;
 }
 
 message SettleExpResponse {
@@ -164,6 +167,10 @@ message SettleExpResponse {
   // 都是只读结果，客户端与战斗服都带不进来；判定在角色服用库里的到期时刻做。
   uint32 booster_pct = 12;
   int64 booster_exp = 13;
+  // P2-1c：同宗门这一截额外经验。整队同宗门、且至少两人才有；独立字段，
+  // 叠在组队加成之外，幅度由 config/exp.json 的 same_sect_bonus_pct 决定。
+  // 只作回包事实值，客户端与战斗服都带不进来。
+  int64 same_sect_bonus = 14;
 }
 
 message UseHotSpringRequest {
