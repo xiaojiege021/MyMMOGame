@@ -17,6 +17,11 @@ var sectPositionConfig = false;
 var sectPositionList = false;
 long sectPositionStateOf = 0;
 long sectPositionMembersOf = 0;
+// P2-1a3：四个只读入口，与真实启动共用 SocialLoader.LoadAll 同一组参数。
+var sectLeadershipConfig = false;
+long sectLeadershipStateOf = 0;
+long sectLeadershipMembersOf = 0;
+long sectLeaveStateOf = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -63,6 +68,19 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--sect-position-members" when i + 1 < args.Length:
             long.TryParse(args[++i], out sectPositionMembersOf);
+            break;
+        // P2-1a3：四个只读入口。
+        case "--sect-leadership-config":
+            sectLeadershipConfig = true;
+            break;
+        case "--sect-leadership-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectLeadershipStateOf);
+            break;
+        case "--sect-leadership-members" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectLeadershipMembersOf);
+            break;
+        case "--sect-leave-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectLeaveStateOf);
             break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
@@ -124,11 +142,42 @@ if (sectPositionConfig)
     return 0;
 }
 
+// --sect-leadership-config：不连库，逐项打印传位段。坏配置在这一步就起不来
+// （config_error= + 非 0 退出），与真实启动共用同一份 Load + 同一组参数。
+if (sectLeadershipConfig)
+{
+    try
+    {
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        var t = loaded.Sect.Transfer;
+        Console.WriteLine("sect_leadership_config_state=ok version=" + loaded.Sect.Version
+            + " idempotency=" + t.Idempotency
+            + " old_master_position=" + t.OldMasterPosition
+            + " old_master_position_pending=" + t.OldMasterPositionPending);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 连库入口：--migrate / --sect-list / --sect-state / --sect-members /
+// --sect-set-level / --sect-position-* / --sect-leadership-state /
+// --sect-leadership-members / --sect-leave-state。都先过与真实启动同一份
+// Load + 同一组参数。
 // --sect-set-level / --sect-position-list / --sect-position-state /
 // --sect-position-members。都先过与真实启动同一份 Load + 同一组参数。
 if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLevelOf != 0
-    || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0)
+    || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0
+    || sectLeadershipStateOf != 0 || sectLeadershipMembersOf != 0 || sectLeaveStateOf != 0)
 {
     SectTable table;
     try
@@ -233,6 +282,39 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
             Console.WriteLine("sect_position_members_state=ok sect=" + sectPositionMembersOf
                 + " rows=" + rows.Count
                 + " ids=" + string.Join(",", rows.Select(r => r.CharacterId + ":" + r.Position)));
+        }
+
+        if (sectLeadershipStateOf != 0)
+        {
+            var st = await repo.LeadershipStateAsync(sectLeadershipStateOf, CancellationToken.None);
+            Console.WriteLine(st.Found
+                ? "sect_leadership_state=ok sect=" + st.SectId
+                    + " master_character_id=" + st.MasterCharacterId
+                    + " old_master=" + st.LastTransferOldMaster
+                    + " new_master=" + st.MasterCharacterId
+                    + " master=" + st.MasterCount
+                    + " vice_master=" + st.ViceMasterCount
+                    + " member_count=" + st.MemberCount
+                    + " last_transfer_txn=" + st.LastTransferTxn
+                : "sect_leadership_state=missing sect=" + sectLeadershipStateOf);
+        }
+
+        if (sectLeadershipMembersOf != 0)
+        {
+            var rows = await repo.PositionMembersAsync(sectLeadershipMembersOf, CancellationToken.None);
+            Console.WriteLine("sect_leadership_members_state=ok sect=" + sectLeadershipMembersOf
+                + " rows=" + rows.Count
+                + " ids=" + string.Join(",", rows.Select(r => r.CharacterId + ":" + r.Position)));
+        }
+
+        if (sectLeaveStateOf != 0)
+        {
+            var st = await repo.LeadershipStateAsync(sectLeaveStateOf, CancellationToken.None);
+            Console.WriteLine(st.Found
+                ? "sect_leave_state=ok sect=" + st.SectId
+                    + " rows=" + st.MemberCount
+                    + " master_character_id=" + st.MasterCharacterId
+                : "sect_leave_state=missing sect=" + sectLeaveStateOf);
         }
     }
     catch (Exception ex) when (ex is NpgsqlException or IOException)

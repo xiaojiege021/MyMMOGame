@@ -16,6 +16,11 @@ namespace Social;
 /// P2-1a2：disciple 是无席位上限的默认职位（不在 positions 里、不占席位）；
 /// 职位不加属性、不代替境界；1 级只有 10 个席位，任满为止，不要求把执事名额填满。
 /// 职位席位之和不超过 5 级名册上限（按配置挡，不写死 200）。
+///
+/// P2-1a3：transfer 段钉传位规则。掌门本人可以不在名册，名册里的 master 行
+/// 只是席位展示；当前掌门唯一权威是 sect.master_character_id。old_master_position
+/// 是传位后旧掌门的去向（方案 11.1 没写定，默认 disciple，标待定，代码不写死）；
+/// idempotency 是 sect 上幂等列名，只读入口自检，缺段/非法都起不来。
 /// </summary>
 public sealed class SectTable
 {
@@ -34,20 +39,28 @@ public sealed class SectTable
         int FounderLevelGate, string FounderGoldKind, long FounderGoldCost,
         bool FounderGoldCostPending);
 
+    // P2-1a3：传位只给副掌门。old_master_position 是传位后旧掌门的去向
+    // （方案 11.1 没写定，默认 disciple，代码不写死）；idempotency 钉 sect 上的
+    // 幂等列名，只读入口自检这一项，缺了就起不来。
+    public sealed record TransferRule(
+        string Idempotency, string OldMasterPosition, bool OldMasterPositionPending);
+
     public int Version { get; }
     public string Note { get; }
     public IReadOnlyList<Level> Levels { get; }
     public IReadOnlyList<Seat> Positions { get; }
     public CreateRule Create { get; }
+    public TransferRule Transfer { get; }
 
     SectTable(int version, string note, IReadOnlyList<Level> levels,
-        IReadOnlyList<Seat> positions, CreateRule create)
+        IReadOnlyList<Seat> positions, CreateRule create, TransferRule transfer)
     {
         Version = version;
         Note = note;
         Levels = levels;
         Positions = positions;
         Create = create;
+        Transfer = transfer;
     }
 
     /// <summary>按等级取名册上限。等级不在表里时抛 ConfigException，由调用方回拒绝。</summary>
@@ -257,7 +270,34 @@ public sealed class SectTable
         var create = new CreateRule(c.FounderLevelGate, kind, c.FounderGoldCost,
             c.FounderGoldCostPending);
 
-        return new SectTable(wire.Version, (wire.Note ?? "").Trim(), levels, positions, create);
+        // ---- P2-1a3：传位段的硬校验 ----
+        var t = wire.Transfer;
+        if (t is null)
+        {
+            throw new ConfigException("sect.json 缺 transfer 段");
+        }
+
+        // 幂等列自检：缺 idempotency / 值不对都起不来（挡「幂等列缺失」）。
+        var idempotency = (t.Idempotency ?? "").Trim();
+        if (idempotency.Length == 0
+            || !string.Equals(idempotency, "last_transfer_txn", StringComparison.Ordinal))
+        {
+            throw new ConfigException(
+                "sect.json 的 transfer.idempotency 必须是 last_transfer_txn（幂等列缺失自检）");
+        }
+
+        // 旧掌门去向：方案 11.1 没写定，默认 disciple（配置里标待定），代码不写死。
+        // 不能还是 master，否则提交后名册可能出现两条 master 行、破掌门 1 席。
+        var oldMaster = (t.OldMasterPosition ?? "").Trim();
+        if (!IsKnownPosition(oldMaster) || oldMaster == "master")
+        {
+            throw new ConfigException("sect.json 的 transfer.old_master_position 非法：" + oldMaster);
+        }
+
+        var transfer = new TransferRule(idempotency, oldMaster, t.OldMasterPositionPending);
+
+        return new SectTable(wire.Version, (wire.Note ?? "").Trim(), levels, positions,
+            create, transfer);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -274,6 +314,7 @@ public sealed class SectTable
         [JsonPropertyName("levels")] public List<WireLevel?>? Levels { get; set; }
         [JsonPropertyName("positions")] public List<WirePosition?>? Positions { get; set; }
         [JsonPropertyName("create")] public WireCreate? Create { get; set; }
+        [JsonPropertyName("transfer")] public WireTransfer? Transfer { get; set; }
     }
 
     sealed class WireLevel
@@ -295,5 +336,12 @@ public sealed class SectTable
         [JsonPropertyName("founder_gold_kind")] public string? FounderGoldKind { get; set; }
         [JsonPropertyName("founder_gold_cost")] public long FounderGoldCost { get; set; }
         [JsonPropertyName("founder_gold_cost_pending")] public bool FounderGoldCostPending { get; set; }
+    }
+
+    sealed class WireTransfer
+    {
+        [JsonPropertyName("idempotency")] public string? Idempotency { get; set; }
+        [JsonPropertyName("old_master_position")] public string? OldMasterPosition { get; set; }
+        [JsonPropertyName("old_master_position_pending")] public bool OldMasterPositionPending { get; set; }
     }
 }

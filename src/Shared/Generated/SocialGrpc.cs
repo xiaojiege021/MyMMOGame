@@ -57,6 +57,12 @@ namespace Mmo.Proto.Social {
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.PositionRequest> __Marshaller_mmo_social_PositionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PositionRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.PositionStateResponse> __Marshaller_mmo_social_PositionStateResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PositionStateResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.LeadershipRequest> __Marshaller_mmo_social_LeadershipRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.LeadershipRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.LeadershipResponse> __Marshaller_mmo_social_LeadershipResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.LeadershipResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.LeaveSectRequest> __Marshaller_mmo_social_LeaveSectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.LeaveSectRequest.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse> __Method_CreateSect = new grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse>(
@@ -106,6 +112,30 @@ namespace Mmo.Proto.Social {
         __Marshaller_mmo_social_PositionRequest,
         __Marshaller_mmo_social_PositionStateResponse);
 
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.LeadershipRequest, global::Mmo.Proto.Social.LeadershipResponse> __Method_TransferLeadership = new grpc::Method<global::Mmo.Proto.Social.LeadershipRequest, global::Mmo.Proto.Social.LeadershipResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "TransferLeadership",
+        __Marshaller_mmo_social_LeadershipRequest,
+        __Marshaller_mmo_social_LeadershipResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.LeaveSectRequest, global::Mmo.Proto.Social.LeadershipResponse> __Method_LeaveSect = new grpc::Method<global::Mmo.Proto.Social.LeaveSectRequest, global::Mmo.Proto.Social.LeadershipResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "LeaveSect",
+        __Marshaller_mmo_social_LeaveSectRequest,
+        __Marshaller_mmo_social_LeadershipResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.LeadershipRequest, global::Mmo.Proto.Social.LeadershipResponse> __Method_DescribeLeadership = new grpc::Method<global::Mmo.Proto.Social.LeadershipRequest, global::Mmo.Proto.Social.LeadershipResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeLeadership",
+        __Marshaller_mmo_social_LeadershipRequest,
+        __Marshaller_mmo_social_LeadershipResponse);
+
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
     {
@@ -148,6 +178,30 @@ namespace Mmo.Proto.Social {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PositionStateResponse> DescribePositions(global::Mmo.Proto.Social.PositionRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P2-1a3：传位只给副掌门 / 掌门不能直接退出 / 只读查掌门状态。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.LeadershipResponse> TransferLeadership(global::Mmo.Proto.Social.LeadershipRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.LeadershipResponse> LeaveSect(global::Mmo.Proto.Social.LeaveSectRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.LeadershipResponse> DescribeLeadership(global::Mmo.Proto.Social.LeadershipRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -301,6 +355,94 @@ namespace Mmo.Proto.Social {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribePositions, null, options, request);
       }
+      /// <summary>
+      /// P2-1a3：传位只给副掌门 / 掌门不能直接退出 / 只读查掌门状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.LeadershipResponse TransferLeadership(global::Mmo.Proto.Social.LeadershipRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return TransferLeadership(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-1a3：传位只给副掌门 / 掌门不能直接退出 / 只读查掌门状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.LeadershipResponse TransferLeadership(global::Mmo.Proto.Social.LeadershipRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_TransferLeadership, null, options, request);
+      }
+      /// <summary>
+      /// P2-1a3：传位只给副掌门 / 掌门不能直接退出 / 只读查掌门状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.LeadershipResponse> TransferLeadershipAsync(global::Mmo.Proto.Social.LeadershipRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return TransferLeadershipAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-1a3：传位只给副掌门 / 掌门不能直接退出 / 只读查掌门状态。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.LeadershipResponse> TransferLeadershipAsync(global::Mmo.Proto.Social.LeadershipRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_TransferLeadership, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.LeadershipResponse LeaveSect(global::Mmo.Proto.Social.LeaveSectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return LeaveSect(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.LeadershipResponse LeaveSect(global::Mmo.Proto.Social.LeaveSectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_LeaveSect, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.LeadershipResponse> LeaveSectAsync(global::Mmo.Proto.Social.LeaveSectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return LeaveSectAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.LeadershipResponse> LeaveSectAsync(global::Mmo.Proto.Social.LeaveSectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_LeaveSect, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.LeadershipResponse DescribeLeadership(global::Mmo.Proto.Social.LeadershipRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeLeadership(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.LeadershipResponse DescribeLeadership(global::Mmo.Proto.Social.LeadershipRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeLeadership, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.LeadershipResponse> DescribeLeadershipAsync(global::Mmo.Proto.Social.LeadershipRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeLeadershipAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.LeadershipResponse> DescribeLeadershipAsync(global::Mmo.Proto.Social.LeadershipRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeLeadership, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override SocialServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -320,7 +462,10 @@ namespace Mmo.Proto.Social {
           .AddMethod(__Method_DescribeSect, serviceImpl.DescribeSect)
           .AddMethod(__Method_AppointPosition, serviceImpl.AppointPosition)
           .AddMethod(__Method_DismissPosition, serviceImpl.DismissPosition)
-          .AddMethod(__Method_DescribePositions, serviceImpl.DescribePositions).Build();
+          .AddMethod(__Method_DescribePositions, serviceImpl.DescribePositions)
+          .AddMethod(__Method_TransferLeadership, serviceImpl.TransferLeadership)
+          .AddMethod(__Method_LeaveSect, serviceImpl.LeaveSect)
+          .AddMethod(__Method_DescribeLeadership, serviceImpl.DescribeLeadership).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -336,6 +481,9 @@ namespace Mmo.Proto.Social {
       serviceBinder.AddMethod(__Method_AppointPosition, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(serviceImpl.AppointPosition));
       serviceBinder.AddMethod(__Method_DismissPosition, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(serviceImpl.DismissPosition));
       serviceBinder.AddMethod(__Method_DescribePositions, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PositionRequest, global::Mmo.Proto.Social.PositionStateResponse>(serviceImpl.DescribePositions));
+      serviceBinder.AddMethod(__Method_TransferLeadership, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.LeadershipRequest, global::Mmo.Proto.Social.LeadershipResponse>(serviceImpl.TransferLeadership));
+      serviceBinder.AddMethod(__Method_LeaveSect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.LeaveSectRequest, global::Mmo.Proto.Social.LeadershipResponse>(serviceImpl.LeaveSect));
+      serviceBinder.AddMethod(__Method_DescribeLeadership, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.LeadershipRequest, global::Mmo.Proto.Social.LeadershipResponse>(serviceImpl.DescribeLeadership));
     }
 
   }

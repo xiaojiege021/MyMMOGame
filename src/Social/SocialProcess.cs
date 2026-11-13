@@ -26,6 +26,10 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect)
         // P2-1a2：四个席位逐项打印，与 --sect-position-config 同形。
         Console.WriteLine("positions=" + string.Join(",",
             sect.Positions.Select(p => p.Id + ":" + p.Cap)));
+        // P2-1a3：传位段逐项打印，与 --sect-leadership-config 同形。
+        Console.WriteLine("transfer=idempotency:" + sect.Transfer.Idempotency
+            + " old_master_position:" + sect.Transfer.OldMasterPosition
+            + " old_master_position_pending:" + sect.Transfer.OldMasterPositionPending);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());

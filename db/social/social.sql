@@ -41,3 +41,30 @@ ALTER TABLE "社交".sect_member
 ALTER TABLE "社交".sect_member
     ADD CONSTRAINT sect_member_position_chk
     CHECK (position IN ('master', 'vice_master', 'elder', 'steward', 'disciple'));
+
+-- === P2-1a3 sect_transfer.sql（同一份幂等 DDL，追加进主迁移）===
+-- 给 "社交".sect 加「当前掌门」与「幂等事务号」两列，另建传位流水表
+-- sect_transfer（txn_id 主键）挡同一事务号重放。master_character_id 是
+-- 当前掌门的唯一权威（创建时 = founder_character_id）；founder_character_id
+-- 只作创建历史，不再参与权限判定。a1 两表与 a2 的 position 列结构不动。
+-- 幂等：ADD COLUMN IF NOT EXISTS / CREATE TABLE IF NOT EXISTS / UPDATE ... WHERE IS NULL
+-- / ALTER COLUMN SET NOT NULL，重复跑主迁移不报错。
+ALTER TABLE "社交".sect
+    ADD COLUMN IF NOT EXISTS master_character_id bigint;
+ALTER TABLE "社交".sect
+    ADD COLUMN IF NOT EXISTS last_transfer_txn text;
+
+UPDATE "社交".sect
+    SET master_character_id = founder_character_id
+    WHERE master_character_id IS NULL;
+
+ALTER TABLE "社交".sect
+    ALTER COLUMN master_character_id SET NOT NULL;
+
+CREATE TABLE IF NOT EXISTS "社交".sect_transfer (
+    txn_id      text        PRIMARY KEY,
+    sect_id     bigint      NOT NULL REFERENCES "社交".sect (id) ON DELETE CASCADE,
+    old_master  bigint      NOT NULL,
+    new_master  bigint      NOT NULL,
+    at          timestamptz NOT NULL DEFAULT now()
+);

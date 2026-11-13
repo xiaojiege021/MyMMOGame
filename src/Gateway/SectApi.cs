@@ -7,7 +7,8 @@ using Mmo.Proto.Social;
 namespace Gateway;
 
 /// <summary>
-/// 宗门的 HTTP 入口（P2-1a1）：建 1 级宗门 /post /sect/create、收人 /post /sect/join。
+/// 宗门的 HTTP 入口（P2-1a1 / a2 / a3）：建宗门 / 收人 / 任命免职 /
+/// 传位（P2-1a3 只给副掌门）/ 退出宗门（掌门不能直接退）。
 /// 网关只做三件事：认令牌、复核角色归属、服务端生成事务号后转给社交服。
 /// 人数上限、等级、人数都在社交服按 config/sect.json 判定，网关一个都不算，
 /// 也不碰社交库或角色库。业务前提不满足是 HTTP 200 + ok=false + reason；
@@ -22,6 +23,14 @@ public static class SectApi
     // P2-1a2 请求体只带这四个字段，席位数字带不进来。
     public sealed record PositionBody(
         ulong? CharacterId, ulong? SectId, ulong? TargetCharacterId, string? Position);
+
+    // P2-1a3 传位请求体：发起者 / 宗门 / 传位目标（现任副掌门）。
+    // 谁是新掌门之外的判定值（掌门权威、席位数字）一概带不进来。
+    public sealed record TransferBody(
+        ulong? CharacterId, ulong? SectId, ulong? TargetCharacterId);
+
+    // P2-1a3 退出请求体：不带 target（谁是新掌门、席位数字都带不进来）。
+    public sealed record LeaveBody(ulong? CharacterId, ulong? SectId);
 
     static readonly JsonSerializerOptions Json = new()
     {
@@ -172,6 +181,9 @@ public static class SectApi
         // P2-1a2：任命 / 免职。认令牌、复核归属、服务端生成 txn_id。
         MapPositionRoute(app, tokens, social, character, "/sect/appoint", "sect_appoint", true);
         MapPositionRoute(app, tokens, social, character, "/sect/dismiss", "sect_dismiss", false);
+        // P2-1a3：传位只给副掌门 / 掌门不能直接退出。
+        MapLeadershipRoute(app, tokens, social, character, "/sect/transfer", "sect_transfer", true);
+        MapLeadershipRoute(app, tokens, social, character, "/sect/leave", "sect_leave", false);
     }
 
     static object SectBody(SectResponse r) => new
@@ -194,6 +206,20 @@ public static class SectApi
         position = r.Position,
         seat_cap = r.SeatCap,
         seat_count = r.SeatCount,
+        txn_id = r.TxnId,
+    };
+
+    // P2-1a3 回包全是只读事实值；业务拒绝时社交服把未生效数值给 0。
+    static object LeadershipSectBody(LeadershipResponse r) => new
+    {
+        ok = r.Ok,
+        reason = r.Reason,
+        sect_id = r.SectId,
+        old_master = r.OldMaster,
+        new_master = r.NewMaster,
+        master_count = r.MasterCount,
+        vice_master_count = r.ViceMasterCount,
+        member_count = r.MemberCount,
         txn_id = r.TxnId,
     };
 
@@ -278,6 +304,114 @@ public static class SectApi
                     + " seat_count=" + result.SeatCount);
 
                 await WriteAsync(context, 200, PositionSectBody(result));
+            }
+            catch (RpcException ex)
+            {
+                Console.WriteLine(what + "_error account=" + account + " detail=" + ex.Status.Detail);
+                await WriteAsync(context, 502, new { error = ex.Status.Detail });
+            }
+        });
+    }
+
+    // P2-1a3：传位 / 退出共用一条出口——认令牌、复核发起者归属、服务端生成 txn_id，
+    // 掌门权威与席位判定都在社交服，网关一个都不算。退出请求体不带 target。
+    static void MapLeadershipRoute(
+        WebApplication app, TokenStore tokens,
+        SocialService.SocialServiceClient social,
+        CharacterService.CharacterServiceClient character,
+        string path, string what, bool transfer)
+    {
+        app.MapPost(path, async context =>
+        {
+            if (!Authorize(context, tokens, what, out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            ulong characterId = 0, sectId = 0, targetId = 0;
+            try
+            {
+                if (transfer)
+                {
+                    var body = await JsonSerializer.DeserializeAsync<TransferBody>(
+                        context.Request.Body, Json, context.RequestAborted);
+                    characterId = body?.CharacterId ?? 0;
+                    sectId = body?.SectId ?? 0;
+                    targetId = body?.TargetCharacterId ?? 0;
+                }
+                else
+                {
+                    var body = await JsonSerializer.DeserializeAsync<LeaveBody>(
+                        context.Request.Body, Json, context.RequestAborted);
+                    characterId = body?.CharacterId ?? 0;
+                    sectId = body?.SectId ?? 0;
+                }
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (characterId == 0 || sectId == 0 || (transfer && targetId == 0))
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(character, account, characterId, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                // 事务号服务端生成：客户端带不进来，sect_transfer 用它挡重放。
+                var txnId = what + ":" + Guid.NewGuid().ToString("N");
+                LeadershipResponse result;
+                if (transfer)
+                {
+                    result = await social.TransferLeadershipAsync(
+                        new LeadershipRequest
+                        {
+                            Account = account,
+                            CharacterId = characterId,
+                            TxnId = txnId,
+                            SectId = sectId,
+                            TargetCharacterId = targetId,
+                        },
+                        deadline: DateTime.UtcNow.AddSeconds(10),
+                        cancellationToken: context.RequestAborted);
+                }
+                else
+                {
+                    result = await social.LeaveSectAsync(
+                        new LeaveSectRequest
+                        {
+                            Account = account,
+                            CharacterId = characterId,
+                            TxnId = txnId,
+                            SectId = sectId,
+                        },
+                        deadline: DateTime.UtcNow.AddSeconds(10),
+                        cancellationToken: context.RequestAborted);
+                }
+
+                Console.WriteLine(what + " account=" + account
+                    + " id=" + characterId
+                    + " sect=" + sectId
+                    + (transfer ? " target=" + targetId : "")
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " old_master=" + result.OldMaster
+                    + " new_master=" + result.NewMaster
+                    + " master_count=" + result.MasterCount
+                    + " vice_master_count=" + result.ViceMasterCount);
+
+                await WriteAsync(context, 200, LeadershipSectBody(result));
             }
             catch (RpcException ex)
             {

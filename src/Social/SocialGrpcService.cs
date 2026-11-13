@@ -173,6 +173,90 @@ public sealed class SocialGrpcService(
         };
     }
 
+    // ---- P2-1a3：传位只给副掌门 / 退出宗门 / 只读查掌门状态 ----
+    // 掌门权威、席位计数都只在社交服判定，请求里带不进来；回包都是只读事实值。
+    // 业务拒绝是正常回包里的 ok=false + reason，未生效数值给 0。
+    public override async Task<LeadershipResponse> TransferLeadership(
+        LeadershipRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        if (!LeadershipFieldsOk(request, txnId) || request.TargetCharacterId == 0)
+        {
+            return LeadershipFail("request_missing", request.SectId, txnId);
+        }
+
+        var outcome = await sects.TransferAsync(
+            (long)request.SectId, (long)request.CharacterId,
+            (long)request.TargetCharacterId, txnId, context.CancellationToken);
+        return LeadershipBody(outcome, txnId);
+    }
+
+    public override async Task<LeadershipResponse> LeaveSect(
+        LeaveSectRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0 || request.CharacterId == 0
+            || txnId.Length == 0 || request.SectId == 0)
+        {
+            return LeadershipFail("request_missing", request.SectId, txnId);
+        }
+
+        var outcome = await sects.LeaveAsync(
+            (long)request.SectId, (long)request.CharacterId, context.CancellationToken);
+        return LeadershipBody(outcome, txnId);
+    }
+
+    public override async Task<LeadershipResponse> DescribeLeadership(
+        LeadershipRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        if (!LeadershipFieldsOk(request, txnId))
+        {
+            return LeadershipFail("request_missing", request.SectId, txnId);
+        }
+
+        var state = await sects.LeadershipStateAsync(
+            (long)request.SectId, context.CancellationToken);
+        if (!state.Found)
+        {
+            return LeadershipFail("sect_not_found", request.SectId, txnId);
+        }
+
+        return new LeadershipResponse
+        {
+            Ok = true,
+            SectId = (ulong)state.SectId,
+            OldMaster = (ulong)state.LastTransferOldMaster,
+            NewMaster = (ulong)state.MasterCharacterId,
+            MasterCount = state.MasterCount,
+            ViceMasterCount = state.ViceMasterCount,
+            MemberCount = state.MemberCount,
+            TxnId = txnId,
+        };
+    }
+
+    static bool LeadershipFieldsOk(LeadershipRequest r, string txnId) =>
+        (r.Account ?? "").Trim().Length > 0 && r.CharacterId != 0 && txnId.Length > 0
+        && r.SectId != 0;
+
+    static LeadershipResponse LeadershipBody(LeadershipOutcome o, string txnId) =>
+        new()
+        {
+            Ok = o.Ok,
+            Reason = o.Reason,
+            SectId = (ulong)o.SectId,
+            OldMaster = o.Ok ? (ulong)o.OldMaster : 0,
+            NewMaster = o.Ok ? (ulong)o.NewMaster : 0,
+            MasterCount = o.Ok ? o.MasterCount : 0,
+            ViceMasterCount = o.Ok ? o.ViceMasterCount : 0,
+            MemberCount = o.Ok ? o.MemberCount : 0,
+            TxnId = txnId,
+        };
+
+    static LeadershipResponse LeadershipFail(string reason, ulong sectId, string txnId) =>
+        new() { Ok = false, Reason = reason, SectId = sectId, TxnId = txnId };
+
     static bool PositionFieldsOk(PositionRequest r, string txnId) =>
         (r.Account ?? "").Trim().Length > 0 && r.CharacterId != 0 && txnId.Length > 0
         && r.SectId != 0 && r.TargetCharacterId != 0 && (r.Position ?? "").Trim().Length > 0;

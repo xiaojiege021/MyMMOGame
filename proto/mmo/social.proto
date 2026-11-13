@@ -9,8 +9,11 @@ option csharp_namespace = "Mmo.Proto.Social";
 // member_cap / member_count / seat_cap / seat_count 都是只读事实值。
 // txn_id 由网关服务端生成（客户端填不进来）：同一号重放不重复扣创建金币、
 // 不重复建宗门；职位是状态设定，重复请求不重复改。
-// 职位权限只落「任命 / 免职由现任掌门发起」这一条最小出口；传位、退出宗门、
-// 分级任免、改宣言称号、建设升级、秘境人数、同门经验都不在这一版。
+// P2-1a3：掌门改为可变（"社交".sect.master_character_id 是当前掌门唯一权威，
+// 创建时 = founder_character_id），任命 / 免职的 not_leader 改查这一列；
+// founder_character_id 只作创建历史，不再参与权限判定。传位只给现任副掌门、
+// 掌门不能直接退出、有职位的人先辞成弟子再退出宗门。分级任免、改宣言称号、
+// 建设升级、秘境人数、同门经验仍不做。
 
 message CreateSectRequest {
   string account = 1;
@@ -81,6 +84,44 @@ message PositionStateResponse {
   int32 disciple_count = 12;
 }
 
+// P2-1a3：传位只给副掌门 / 退出宗门 / 只读查掌门状态。
+// account + character_id 是发起者，txn_id 由网关服务端生成（客户端填不进来）；
+// target_character_id 是传位目标（现任副掌门），DescribeLeadership 不用（填 0）。
+// 请求里带不进「谁是新掌门之外的判定值」：掌门权威、席位数字都只在社交服
+// 按 config/sect.json 与库里的事实判定。
+message LeadershipRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 sect_id = 4;
+  uint64 target_character_id = 5;
+}
+
+// 退出不带 target：谁是新掌门、席位数字一概带不进来。
+message LeaveSectRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 sect_id = 4;
+}
+
+// 回包全是只读事实值：old_master / new_master 是传位前后现任掌门，
+// master_count / vice_master_count / member_count 是名册里的事实计数，
+// txn_id 只作核对。业务拒绝（not_vice_master / not_leader / master_cannot_leave /
+// resign_first / sect_not_found / not_member）是正常回包里的 ok=false + reason，
+// 未生效数值给 0。
+message LeadershipResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 sect_id = 3;
+  uint64 old_master = 4;
+  uint64 new_master = 5;
+  int32 master_count = 6;
+  int32 vice_master_count = 7;
+  int32 member_count = 8;
+  string txn_id = 9;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
@@ -88,4 +129,8 @@ service SocialService {
   rpc AppointPosition(PositionRequest) returns (PositionStateResponse);
   rpc DismissPosition(PositionRequest) returns (PositionStateResponse);
   rpc DescribePositions(PositionRequest) returns (PositionStateResponse);
+  // P2-1a3：传位只给副掌门 / 掌门不能直接退出 / 只读查掌门状态。
+  rpc TransferLeadership(LeadershipRequest) returns (LeadershipResponse);
+  rpc LeaveSect(LeaveSectRequest) returns (LeadershipResponse);
+  rpc DescribeLeadership(LeadershipRequest) returns (LeadershipResponse);
 }
