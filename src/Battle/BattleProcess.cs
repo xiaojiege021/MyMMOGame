@@ -54,6 +54,18 @@ public sealed class BattleProcess(string configPath)
         }
         Console.WriteLine($"boss={config.Boss.Id} hp_max={config.Boss.HpMax} exp_on_clear={config.Boss.ExpOnClear}"
             + (config.Boss.Phases is { Count: > 0 } phases ? $" phases={phases.Count}" : ""));
+        // 竞技场：模式与模板数打出来，核对脚本按这几行验「模板只有职业与分支这一层」。
+        Console.WriteLine($"arena_match_table={config.ArenaMatchTablePath}"
+            + (config.ArenaMatch.IsMissing
+                ? " arena_table=missing"
+                : $" arena_table_version={config.ArenaMatch.Version}"
+                  + $" arena_modes={config.ArenaMatch.Modes.Count}"
+                  + $" arena_templates={config.ArenaMatch.Templates.Count}"));
+        foreach (var mode in config.ArenaMatch.Modes)
+        {
+            Console.WriteLine($"arena_mode={mode.Id} name={mode.Name}"
+                + $" team_size={mode.TeamSize} teams={mode.Teams} players={mode.Players}");
+        }
         // 场次全在内存里，进程一停就没了。重启不恢复、不补发，这句是给核对脚本看的。
         Console.WriteLine("resume=off");
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);

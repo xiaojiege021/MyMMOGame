@@ -35,6 +35,21 @@ public sealed class Member
     public required ulong Id { get; init; }
     public required ClassDef Class { get; init; }
 
+    /// <summary>
+    /// 竞技场模板。为空表示这一场按职业表算属性——副本、练习场与所有不带
+    /// arena_mode 的老连接都走这条，行为与 P0 完全一致。
+    /// </summary>
+    public ArenaTemplate? Template { get; init; }
+
+    /// <summary>攻击：有模板就用模板给的绝对值，没有才读职业表的主属性系数。</summary>
+    public double AttackPower() => Template?.Attack ?? Class.Attack();
+
+    /// <summary>治疗：模板给绝对值；没有模板仍是精神 × 职业治疗系数。</summary>
+    public double HealPower() => Template?.HealPower ?? Class.Attributes.Spirit * Class.HealPerSpirit;
+
+    /// <summary>仇恨稳定值：模板给绝对值；没有模板仍是体力 × 职业系数。</summary>
+    public long ThreatStability() => Template?.ThreatStability ?? Class.ThreatStability();
+
     public long Hp { get; internal set; }
     public long HpMax { get; internal set; }
     public long Mana { get; internal set; }
@@ -68,8 +83,8 @@ public sealed class Member
 
     public bool Down => Hp <= 0;
 
-    /// <summary>有效仇恨 = 打出的伤害 + 职业稳定值（坦克 = 体力 × 系数）。</summary>
-    public long EffectiveThreat => DamageDealt + Class.ThreatStability();
+    /// <summary>有效仇恨 = 打出的伤害 + 稳定值（职业表是体力 × 系数，竞技场是模板值）。</summary>
+    public long EffectiveThreat => DamageDealt + ThreatStability();
 
     internal void TouchMoveClock(long now) => _lastMoveMs = now;
 
@@ -165,8 +180,12 @@ public sealed class Encounter
 
     // ---- 成员 ----
 
-    /// <summary>一个人进场。编号撞了抛异常，由连接层拒绝这条连接。</summary>
-    public Member Join(ulong memberId, ClassDef cls)
+    /// <summary>
+    /// 一个人进场。编号撞了抛异常，由连接层拒绝这条连接。
+    /// arena 不为空时，生命、蓝、攻击、治疗与仇恨稳定值全部取竞技场模板，
+    /// 不看职业表的属性，也不看这个人的装备与强化等级。
+    /// </summary>
+    public Member Join(ulong memberId, ClassDef cls, ArenaTemplate? arena = null)
     {
         lock (_gate)
         {
@@ -183,8 +202,9 @@ public sealed class Encounter
             {
                 Id = memberId,
                 Class = cls,
-                HpMax = cls.HpMax(_config.Classes.HpPerVitality),
-                ManaMax = cls.ManaMax(),
+                Template = arena,
+                HpMax = arena?.HpMax ?? cls.HpMax(_config.Classes.HpPerVitality),
+                ManaMax = arena?.ManaMax ?? cls.ManaMax(),
                 X = _config.Caster.SpawnMm.X,
                 Y = _config.Caster.SpawnMm.Y,
             };
@@ -930,9 +950,8 @@ public sealed class Encounter
                 return;
             }
 
-            // 治疗读精神：精神 × 职业治疗系数 × 技能倍率。
-            var healing = (long)Math.Round(
-                member.Class.Attributes.Spirit * member.Class.HealPerSpirit * skill.DamageMultiplier);
+            // 治疗读精神：精神 × 职业治疗系数 × 技能倍率；竞技场里读模板的治疗值。
+            var healing = (long)Math.Round(member.HealPower() * skill.DamageMultiplier);
             target.Hp = Math.Min(target.HpMax, target.Hp + healing);
             member.Mana -= skill.ManaCost;
             _castCount++;
@@ -1028,7 +1047,7 @@ public sealed class Encounter
     }
 
     long DamageOf(Member member, SkillDef skill) =>
-        (long)Math.Round(member.Class.Attack() * skill.DamageMultiplier);
+        (long)Math.Round(member.AttackPower() * skill.DamageMultiplier);
 
     // ---- Boss 的出手与阶段 ----
 

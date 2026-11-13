@@ -1,0 +1,33 @@
+{
+  "schema": "arena-match-table/1",
+  "version": 1,
+  "note": "竞技场 1v1 与 3v3 的唯一正本（方案 12 章三层战力、开发架构 P2-3a）。模板只按职业与分支给属性：装备、强化等级、能量结晶、角色等级一概不进模板，所以换装不改变模板属性。battle.json 里的 arena 段是场地半径与移速，和这张表的模式、模板是两回事。段位、赛季与专属外观方案没给数值，标待定，本卡不做。分支编号与 config/branches.json 一致，代码不另存一份分支表。",
+  "modes": [
+    { "id": "duel", "name": "1v1", "team_size": 1, "teams": 2 },
+    { "id": "trio", "name": "3v3", "team_size": 3, "teams": 2 }
+  ],
+  "templates": [
+    { "class_id": "warrior", "branch_id": "", "attack": 150, "hp_max": 1000, "mana_max": 500, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "archer", "branch_id": "", "attack": 160, "hp_max": 900, "mana_max": 600, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "mage", "branch_id": "", "attack": 170, "hp_max": 850, "mana_max": 1200, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "priest", "branch_id": "", "attack": 120, "hp_max": 950, "mana_max": 1200, "heal_power": 130, "threat_stability": 0 },
+    { "class_id": "tank", "branch_id": "", "attack": 100, "hp_max": 1100, "mana_max": 400, "heal_power": 0, "threat_stability": 250 },
+
+    { "class_id": "warrior", "branch_id": "pojun", "attack": 160, "hp_max": 1000, "mana_max": 500, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "warrior", "branch_id": "xianzhen", "attack": 155, "hp_max": 1050, "mana_max": 500, "heal_power": 0, "threat_stability": 20 },
+    { "class_id": "archer", "branch_id": "chuanyang", "attack": 170, "hp_max": 900, "mana_max": 600, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "archer", "branch_id": "luowang", "attack": 165, "hp_max": 930, "mana_max": 620, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "mage", "branch_id": "chixiao", "attack": 180, "hp_max": 850, "mana_max": 1200, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "mage", "branch_id": "xuanfu", "attack": 175, "hp_max": 850, "mana_max": 1250, "heal_power": 0, "threat_stability": 0 },
+    { "class_id": "priest", "branch_id": "shengxi", "attack": 120, "hp_max": 950, "mana_max": 1200, "heal_power": 140, "threat_stability": 0 },
+    { "class_id": "priest", "branch_id": "jielv", "attack": 125, "hp_max": 950, "mana_max": 1200, "heal_power": 130, "threat_stability": 0 },
+    { "class_id": "tank", "branch_id": "zhenyue", "attack": 100, "hp_max": 1150, "mana_max": 400, "heal_power": 0, "threat_stability": 280 },
+    { "class_id": "tank", "branch_id": "gulei", "attack": 100, "hp_max": 1200, "mana_max": 400, "heal_power": 0, "threat_stability": 300 }
+  ],
+  "season": {
+    "id": 1,
+    "ranking_pending": true,
+    "appearance_pending": true,
+    "note": "段位分与专属外观方案没给数值，本卡不写第二套数字"
+  }
+}

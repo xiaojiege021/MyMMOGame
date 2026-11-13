@@ -345,6 +345,7 @@ public sealed class BattleConfig
     public string CharacterDir { get; init; } = "";
     public string SkillTablePath { get; init; } = "";
     public string ClassTablePath { get; init; } = "";
+    public string ArenaMatchTablePath { get; init; } = "";
     public string DefaultClass { get; init; } = "";
 
     /// <summary>
@@ -369,6 +370,12 @@ public sealed class BattleConfig
     /// <summary>副本表：人数上限与进本时的扣减规则。与角色服读同一份配置。</summary>
     public DungeonTable Dungeons { get; private set; } = null!;
 
+    /// <summary>
+    /// 竞技场模式与统一属性模板（config/arena_match.json）。注意与上面那个
+    /// Arena 区分：Arena 是场地半径和移速，这里是 1v1 / 3v3 与模板属性。
+    /// </summary>
+    public ArenaMatchTable ArenaMatch { get; private set; } = null!;
+
     /// <summary>配置文件的绝对路径，日志里要打出来才知道跑的是哪一份。</summary>
     public string SourcePath { get; private set; } = "";
 
@@ -386,6 +393,14 @@ public sealed class BattleConfig
         var skillPath = Resolve(dir, raw.SkillTable, "skills.json");
         var classPath = Resolve(dir, raw.ClassTable, "classes.json");
         var dungeonPath = Resolve(dir, raw.DungeonTable, "dungeons.json");
+        var arenaMatchPath = Resolve(dir, raw.ArenaMatchTable, "arena_match.json");
+        // 竞技场表是可选项：没写这一项、文件也不在，就起一张空表（竞技场一律拒），
+        // 副本与练习场不受影响。但显式写了路径就必须兑现，缺文件照样起不来。
+        var arenaMatch = File.Exists(arenaMatchPath)
+            ? ArenaMatchTable.Load(arenaMatchPath)
+            : string.IsNullOrWhiteSpace(raw.ArenaMatchTable)
+                ? ArenaMatchTable.Missing()
+                : throw new ConfigException($"{path}：arena_match_table 指的 {arenaMatchPath} 不存在");
 
         var config = new BattleConfig
         {
@@ -396,6 +411,7 @@ public sealed class BattleConfig
             CharacterDir = Path.GetFullPath(raw.CharacterDir),
             SkillTablePath = skillPath,
             ClassTablePath = classPath,
+            ArenaMatchTablePath = arenaMatchPath,
             DefaultClass = string.IsNullOrWhiteSpace(raw.DefaultClass) ? "warrior" : raw.DefaultClass,
             ExpUpstream = (raw.ExpUpstream ?? "").Trim(),
             // 没单独配就跟经验结算走同一个角色服；两个都空才是本机口径。
@@ -409,8 +425,11 @@ public sealed class BattleConfig
             Skills = SkillTable.Load(skillPath),
             Classes = ClassTable.Load(classPath),
             Dungeons = DungeonTable.Load(dungeonPath),
+            ArenaMatch = arenaMatch,
         };
 
+        // 模板与职业表对齐：每个职业都要有默认模板，模板里也不许出现职业表没有的职业。
+        config.ArenaMatch.ValidateAgainst(config.Classes);
         config.Validate();
         return config;
     }
@@ -618,6 +637,7 @@ public sealed class BattleConfig
         public string SkillTable { get; init; } = "skills.json";
         public string ClassTable { get; init; } = "classes.json";
         public string DungeonTable { get; init; } = "dungeons.json";
+        public string ArenaMatchTable { get; init; } = "";
         public string DefaultClass { get; init; } = "warrior";
         public string ExpUpstream { get; init; } = "";
 

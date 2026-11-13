@@ -35,6 +35,12 @@ sealed class Party
 
     /// <summary>进本人数，与角色服扣份额/疲劳用的是同一个数字；缺省 1（单人练习场）。</summary>
     public required int PartySize { get; init; }
+
+    /// <summary>
+    /// 这一场是不是竞技场。为空是普通副本或练习场；不为空时场上每个人的属性
+    /// 都取竞技场模板，不看装备。同一个队伍钥匙不能一半人打副本、一半人打竞技场。
+    /// </summary>
+    public required ArenaModeDef? ArenaMode { get; init; }
 }
 
 /// <summary>
@@ -162,6 +168,48 @@ public sealed class BattleServer(
             return;
         }
 
+        // 竞技场：1v1 或 3v3，属性走模板（装备、强化、等级都不参与）。
+        // 老连接不带 arena_mode，仍然走副本与练习场那一套，行为不变。
+        var arenaModeRaw = QueryOrNull(query, "arena_mode");
+        ArenaModeDef? arenaMode = null;
+        ArenaTemplate? arenaTemplate = null;
+        var branchId = QueryOrNull(query, "branch") ?? "";
+        if (arenaModeRaw is not null)
+        {
+            if (dungeon is not null)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                Console.WriteLine("join_reject=arena_with_dungeon arena_mode=" + arenaModeRaw
+                    + " dungeon=" + dungeon.Id);
+                return;
+            }
+
+            if (!config.ArenaMatch.TryGetMode(arenaModeRaw, out arenaMode))
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                Console.WriteLine("join_reject=arena_mode_unknown id=" + arenaModeRaw);
+                return;
+            }
+
+            // 人数必须正好是这个模式的开打人数：1v1 两人、3v3 六人。
+            // 人数决定怪物缩放，不能让它和模式各说一套。
+            if (partySize != arenaMode.Players)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                Console.WriteLine("join_reject=arena_party_size_mismatch arena_mode=" + arenaMode.Id
+                    + " party_size=" + partySize + " players=" + arenaMode.Players);
+                return;
+            }
+
+            if (!config.ArenaMatch.TryGetTemplate(classId, branchId, out arenaTemplate))
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                Console.WriteLine("join_reject=arena_template_missing class=" + classId
+                    + " branch=" + branchId);
+                return;
+            }
+        }
+
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
 
         Party party;
@@ -184,6 +232,7 @@ public sealed class BattleServer(
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
                     PartySize = partySize,
+                    ArenaMode = arenaMode,
                 };
                 _parties[partyKey] = party;
                 created = true;
@@ -209,6 +258,17 @@ public sealed class BattleServer(
                     DungeonId = party.Dungeon?.Id ?? "",
                 };
             }
+            else if (!SameArena(party.ArenaMode, arenaMode))
+            {
+                // 同一个队伍钥匙一半人打竞技场、一半人打副本，属性来源会对不上。
+                rejected = new EnterRejected
+                {
+                    Reason = "arena_mode_mismatch",
+                    Limit = (uint)(party.ArenaMode?.Players ?? 0),
+                    Current = (uint)(arenaMode?.Players ?? 0),
+                    DungeonId = party.ArenaMode?.Id ?? "",
+                };
+            }
             else if (dungeon is not null && party.Connections.Count >= dungeon.MaxPlayers)
             {
                 // 主线这里就是 1：第二个人进不来。
@@ -229,7 +289,7 @@ public sealed class BattleServer(
             {
                 try
                 {
-                    member = party.Encounter.Join(charId, cls);
+                    member = party.Encounter.Join(charId, cls, arenaTemplate);
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -263,7 +323,19 @@ public sealed class BattleServer(
 
         Console.WriteLine(
             $"session_open={party.Encounter.SessionId} caster={charId} class={cls.Id} party={partyKey} boss={config.Boss.Id}"
-            + $" party_size={party.PartySize} boss_hp_max={party.Encounter.BossHpMax}");
+            + $" party_size={party.PartySize} boss_hp_max={party.Encounter.BossHpMax}"
+            + (arenaMode is { } mode
+                ? $" arena_mode={mode.Id} arena_players={mode.Players} stats_source=arena_template branch={branchId}"
+                : ""));
+
+        // 模板值单独打一行，核对脚本按这一行验「竞技场里用的是模板、不是职业表」。
+        if (arenaTemplate is { } template)
+        {
+            Console.WriteLine(
+                $"arena_template=class={template.ClassId} branch={template.BranchId}"
+                + $" attack={template.Attack} hp_max={template.HpMax} mana_max={template.ManaMax}"
+                + $" heal_power={template.HealPower} threat={template.ThreatStability}");
+        }
 
         // 新人进场说给老人听，界面上的队友名单靠这条更新。不发给本人：
         // 本人已经在 Opened 里拿到整份名单，多发一条会把它的读序顶乱。
@@ -504,6 +576,10 @@ public sealed class BattleServer(
 
     /// <summary>同一个队伍钥匙只能待在一个副本里。空表示练习场。</summary>
     static bool SameDungeon(DungeonDef? left, DungeonDef? right) =>
+        string.Equals(left?.Id ?? "", right?.Id ?? "", StringComparison.Ordinal);
+
+    /// <summary>同一个队伍钥匙只能有一种竞技场模式。空表示不是竞技场。</summary>
+    static bool SameArena(ArenaModeDef? left, ArenaModeDef? right) =>
         string.Equals(left?.Id ?? "", right?.Id ?? "", StringComparison.Ordinal);
 
     /// <summary>正常关一条连接。进本被拒时先说原因，再走这里。</summary>
