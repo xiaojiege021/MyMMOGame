@@ -280,5 +280,75 @@ public sealed class SocialGrpcService(
             Position = (r.Position ?? "").Trim(), TxnId = txnId,
         };
 
+    // ---- P2-1a4：升级只耗建设 / 只读查升级事实 ----
+    // 升级消耗、目标等级、名册上限都只由社交服按 config/sect.json 与库里的事实判定，
+    // 请求里带不进来；回包都是只读事实值，业务拒绝时未生效数值给 0。
+    public override async Task<UpgradeResponse> UpgradeSect(
+        UpgradeSectRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0 || request.CharacterId == 0
+            || txnId.Length == 0 || request.SectId == 0)
+        {
+            return UpgradeFail("request_missing", request.SectId, txnId);
+        }
+
+        var outcome = await sects.UpgradeAsync(
+            (long)request.SectId, (long)request.CharacterId, txnId, context.CancellationToken);
+        return UpgradeBody(outcome, txnId);
+    }
+
+    public override async Task<UpgradeResponse> DescribeUpgrade(
+        UpgradeSectRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0 || request.CharacterId == 0
+            || txnId.Length == 0 || request.SectId == 0)
+        {
+            return UpgradeFail("request_missing", request.SectId, txnId);
+        }
+
+        var state = await sects.UpgradeStateAsync(
+            (long)request.SectId, context.CancellationToken);
+        if (!state.Found)
+        {
+            return UpgradeFail("sect_not_found", request.SectId, txnId);
+        }
+
+        // 只读：old/new 都填当前等级，建设前后都填当前值，cost 填下一档消耗（5 级为 0）。
+        return new UpgradeResponse
+        {
+            Ok = true,
+            SectId = (ulong)state.SectId,
+            OldLevel = state.Level,
+            NewLevel = state.Level,
+            MemberCap = state.MemberCap,
+            ConstructionBefore = state.Construction,
+            ConstructionAfter = state.Construction,
+            UpgradeCost = state.NextCost,
+            TxnId = txnId,
+        };
+    }
+
+    static UpgradeResponse UpgradeBody(UpgradeOutcome o, string txnId) =>
+        new()
+        {
+            Ok = o.Ok,
+            Reason = o.Reason,
+            SectId = (ulong)o.SectId,
+            OldLevel = o.Ok ? o.OldLevel : 0,
+            NewLevel = o.Ok ? o.NewLevel : 0,
+            MemberCap = o.Ok ? o.MemberCap : 0,
+            ConstructionBefore = o.Ok ? o.ConstructionBefore : 0,
+            ConstructionAfter = o.Ok ? o.ConstructionAfter : 0,
+            UpgradeCost = o.Ok ? o.UpgradeCost : 0,
+            TxnId = txnId,
+        };
+
+    static UpgradeResponse UpgradeFail(string reason, ulong sectId, string txnId) =>
+        new() { Ok = false, Reason = reason, SectId = sectId, TxnId = txnId };
+
     static SectResponse Fail(string reason) => new() { Ok = false, Reason = reason };
 }

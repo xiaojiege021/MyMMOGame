@@ -1,7 +1,7 @@
 {
   "schema": "sect-table/1",
   "version": 1,
-  "note": "宗门五级人数上限的唯一正本（方案 11.1 / 技术架构第 49 行 / 开发架构 4.4）。人数是名册上限，不是进本人数：宗门秘境、巢穴、龙巢的进本人数不变，社交服不读副本人数配置、不向战斗服下发人数。方案 11.1 写定「45 级之后可以建立宗门，创建消耗金币」，金币数字方案没给，这里标待定（founder_gold_cost=0 表示待定未启用，代码不写死）；扣减链路已经就位，只经角色服一笔 grant_txn 事务，社交服不碰角色 schema。改这份配置重启社交服生效。P2-1a2 追加职位席位：positions 是四个有席位职位的唯一正本（掌门 1、副掌门 1、长老 4、执事 12），disciple 是无席位上限的默认职位、不占席位；1 级只有 10 个席位，任满为止，不要求把执事名额填满；职位不加属性、不代替境界。职位席位之和不超过 5 级名册上限（按配置挡），代码 / proto / SQL 不写第二套席位数字。P2-1a3 追加：传位只给副掌门（只认现任副掌门，传给弟子 / 长老 / 执事 / 非本门成员都拒绝）、传位后谁有掌门权限跟着变、掌门不能直接退出宗门、有职位的人先辞成弟子再退出宗门。掌门本人可以不在名册（创建者只建 sect 行、不进 sect_member）；名册里的 master 行只是席位展示，权限判定只认 sect.master_character_id 这个当前掌门唯一权威；传位事务会先把名册里所有 master 行降掉、再升新掌门，保证提交后名册恰好一条 master 行且等于新掌门。",
+  "note": "宗门五级人数上限的唯一正本（方案 11.1 / 技术架构第 49 行 / 开发架构 4.4）。人数是名册上限，不是进本人数：宗门秘境、巢穴、龙巢的进本人数不变，社交服不读副本人数配置、不向战斗服下发人数。方案 11.1 写定「45 级之后可以建立宗门，创建消耗金币」，金币数字方案没给，这里标待定（founder_gold_cost=0 表示待定未启用，代码不写死）；扣减链路已经就位，只经角色服一笔 grant_txn 事务，社交服不碰角色 schema。改这份配置重启社交服生效。P2-1a2 追加职位席位：positions 是四个有席位职位的唯一正本（掌门 1、副掌门 1、长老 4、执事 12），disciple 是无席位上限的默认职位、不占席位；1 级只有 10 个席位，任满为止，不要求把执事名额填满；职位不加属性、不代替境界。职位席位之和不超过 5 级名册上限（按配置挡），代码 / proto / SQL 不写第二套席位数字。P2-1a3 追加：传位只给副掌门（只认现任副掌门，传给弟子 / 长老 / 执事 / 非本门成员都拒绝）、传位后谁有掌门权限跟着变、掌门不能直接退出宗门、有职位的人先辞成弟子再退出宗门。掌门本人可以不在名册（创建者只建 sect 行、不进 sect_member）；名册里的 master 行只是席位展示，权限判定只认 sect.master_character_id 这个当前掌门唯一权威；传位事务会先把名册里所有 master 行降掉、再升新掌门，保证提交后名册恰好一条 master 行且等于新掌门。P2-1a4 追加升级只耗建设：方案 11.1 写定「创建消耗金币，升级消耗宗门建设。建设和贡献来自宗门秘境和宗门任务，不从商城买」，但没给升级消耗数字；upgrade.costs 四档（1→2 / 2→3 / 3→4 / 4→5）是正整数占位并标待定（upgrade_cost_pending=true），改配置重启社交服即生效，代码 / proto / SQL 不写第二套消耗数字、不硬编码。建设和贡献只从宗门秘境和宗门任务来、不从商城买；本卡不做来源（宗门秘境是 P2-1b、宗门任务无单独行），商城买不到建设，升级一个字不扣角色货币。发起者权限方案没写定「谁发起升级」，这里复用 a3 的 sect.master_character_id 判「发起者必须现任掌门」（not_leader）、不新造第二套权限，标待定。升级只扣建设：五档名册上限仍只由 levels[].member_cap / CapFor(level) 给，5 级封顶，已有名册人数不变；建设、幂等事务号与升级流水落在 社交 schema 的 sect.construction / sect.last_upgrade_txn / sect_upgrade，社交服只写社交 schema。",
   "levels": [
     { "level": 1, "member_cap": 10, "title": "初建" },
     { "level": 2, "member_cap": 30, "title": "开始能分工" },
@@ -27,5 +27,16 @@
     "old_master_position": "disciple",
     "old_master_position_pending": true,
     "note": "方案 11.1 写定「传位只传给副掌门，不能直接退会」「有职位的人先辞成弟子，再退出宗门」，但没写定传位后旧掌门的去向职位。这里落成 old_master_position=disciple + old_master_position_pending=true（待定、代码不写死），数字/职位名定了只改这一处配置重启社交服即生效。idempotency 钉 sect 上的幂等列名（last_transfer_txn），只读入口自检这一项，缺了就起不来；同一笔 txn_id 重放由 sect_transfer.txn_id 主键挡。"
+  },
+  "upgrade": {
+    "idempotency": "last_upgrade_txn",
+    "upgrade_cost_pending": true,
+    "costs": [
+      { "from_level": 1, "to_level": 2, "cost": 100 },
+      { "from_level": 2, "to_level": 3, "cost": 300 },
+      { "from_level": 3, "to_level": 4, "cost": 600 },
+      { "from_level": 4, "to_level": 5, "cost": 1000 }
+    ],
+    "note": "方案 11.1 / 开发架构 4.4 写定「升级消耗宗门建设。建设和贡献来自宗门秘境和宗门任务，不从商城买」，方案没给升级消耗数字：costs 四档是正整数占位并标待定（upgrade_cost_pending=true），改配置重启社交服即生效，代码 / proto / SQL 不写第二套消耗数字、不硬编码。占位值必须为正整数才能真跑通「建设不足被拒」（吸取 a1 创建金币 =0+pending 验不了重放的教训）。本卡不做建设来源：宗门秘境是 P2-1b、宗门任务无单独行；商城买不到建设，建设和贡献只从宗门秘境和宗门任务来。发起者必须现任掌门（复用 a3 的 sect.master_character_id，not_leader），方案没写定，标待定。idempotency 钉 sect 上的幂等列名 last_upgrade_txn，同一笔 txn_id 重放由 sect_upgrade.txn_id 主键挡。"
   }
 }

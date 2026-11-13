@@ -45,15 +45,26 @@ public sealed class SectTable
     public sealed record TransferRule(
         string Idempotency, string OldMasterPosition, bool OldMasterPositionPending);
 
+    // P2-1a4：升级只耗建设。一档 = 从 from_level 升到 to_level 消耗多少宗门建设。
+    // 方案 11.1 写定「升级消耗宗门建设」但没给数字：costs 是正整数占位（待定），
+    // 只从 config/sect.json 读，代码 / proto / SQL 不写第二套数字、不硬编码。
+    public sealed record UpgradeTier(int FromLevel, int ToLevel, long Cost);
+
+    public sealed record UpgradeRule(
+        string Idempotency, bool UpgradeCostPending, string Note,
+        IReadOnlyList<UpgradeTier> Costs);
+
     public int Version { get; }
     public string Note { get; }
     public IReadOnlyList<Level> Levels { get; }
     public IReadOnlyList<Seat> Positions { get; }
     public CreateRule Create { get; }
     public TransferRule Transfer { get; }
+    public UpgradeRule Upgrade { get; }
 
     SectTable(int version, string note, IReadOnlyList<Level> levels,
-        IReadOnlyList<Seat> positions, CreateRule create, TransferRule transfer)
+        IReadOnlyList<Seat> positions, CreateRule create, TransferRule transfer,
+        UpgradeRule upgrade)
     {
         Version = version;
         Note = note;
@@ -61,6 +72,27 @@ public sealed class SectTable
         Positions = positions;
         Create = create;
         Transfer = transfer;
+        Upgrade = upgrade;
+    }
+
+    /// <summary>5 级封顶：最高档的等级号。升到这一档之后不再有 cost 档。</summary>
+    public int MaxLevel => Levels[Levels.Count - 1].Number;
+
+    /// <summary>
+    /// 按当前等级取「升下一级」要扣的建设数；5 级封顶（没有下一档）返回 null。
+    /// 消耗只从配置正本读，找不到就不给数，调用方据此回 at_max_level / bad_sect_level。
+    /// </summary>
+    public long? CostFor(int fromLevel)
+    {
+        foreach (var tier in Upgrade.Costs)
+        {
+            if (tier.FromLevel == fromLevel)
+            {
+                return tier.Cost;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>按等级取名册上限。等级不在表里时抛 ConfigException，由调用方回拒绝。</summary>
@@ -106,15 +138,27 @@ public sealed class SectTable
             throw new ConfigException("找不到配置文件 " + path);
         }
 
+        var rawText = File.ReadAllText(path);
         Wire wire;
         try
         {
-            wire = JsonSerializer.Deserialize<Wire>(File.ReadAllText(path), JsonOptions)
+            wire = JsonSerializer.Deserialize<Wire>(rawText, JsonOptions)
                 ?? throw new ConfigException("配置是空的 " + path);
         }
         catch (JsonException ex)
         {
             throw new ConfigException("配置不是合法 JSON：" + ex.Message);
+        }
+
+        // P2-1a4 硬口径：建设和贡献只从宗门秘境和宗门任务来、不从商城买。
+        // 配置里任何一处写「商城可买建设」这类反口径，整份配置起不来。
+        foreach (var claim in ShopBuyConstructionClaims)
+        {
+            if (rawText.Contains(claim, StringComparison.Ordinal))
+            {
+                throw new ConfigException("sect.json 不允许出现「" + claim
+                    + "」：建设和贡献只从宗门秘境和宗门任务来、不从商城买");
+            }
         }
 
         if (!string.Equals(wire.Schema, WrittenSchema, StringComparison.Ordinal))
@@ -296,9 +340,76 @@ public sealed class SectTable
 
         var transfer = new TransferRule(idempotency, oldMaster, t.OldMasterPositionPending);
 
+        // ---- P2-1a4：升级段的硬校验 ----
+        var up = wire.Upgrade;
+        if (up is null)
+        {
+            throw new ConfigException("sect.json 缺 upgrade 段");
+        }
+
+        // 幂等列自检：idempotency 必须钉 sect 上的 last_upgrade_txn（挡「幂等列缺失」）。
+        var upgradeIdempotency = (up.Idempotency ?? "").Trim();
+        if (!string.Equals(upgradeIdempotency, "last_upgrade_txn", StringComparison.Ordinal))
+        {
+            throw new ConfigException(
+                "sect.json 的 upgrade.idempotency 必须是 last_upgrade_txn（幂等列缺失自检）");
+        }
+
+        var rawCosts = up.Costs;
+        if (rawCosts is null || rawCosts.Count == 0)
+        {
+            throw new ConfigException("sect.json 的 upgrade.costs 不能为空（缺档）");
+        }
+
+        // 五级 → 正好 levels.Count-1 档升级（1→2 / 2→3 / 3→4 / 4→5）。
+        // 多一档（5 级还配 cost）/ 少一档（缺档）都起不来；档数不写死，从五档推。
+        var expectedTiers = levels.Count - 1;
+        if (rawCosts.Count != expectedTiers)
+        {
+            throw new ConfigException("sect.json 的 upgrade.costs 必须正好 " + expectedTiers
+                + " 档（四档齐全、5 级不能再升），现在是 " + rawCosts.Count);
+        }
+
+        var costs = new List<UpgradeTier>();
+        for (var i = 0; i < rawCosts.Count; i++)
+        {
+            var tier = rawCosts[i];
+            if (tier is null)
+            {
+                throw new ConfigException("sect.json 的 upgrade.costs 有空项");
+            }
+
+            // 等级必须连续且从 1 起：不允许跳级（请求里也没有目标等级），
+            // 也不允许把 5 级配成升级起点（5 级封顶）。
+            if (tier.FromLevel != i + 1 || tier.ToLevel != tier.FromLevel + 1)
+            {
+                throw new ConfigException("sect.json 的 upgrade.costs 第 " + (i + 1)
+                    + " 档等级不连续（必须 " + (i + 1) + "→" + (i + 2) + "）");
+            }
+
+            if (tier.Cost <= 0)
+            {
+                throw new ConfigException("sect.json 的 upgrade.costs 第 " + (i + 1)
+                    + " 档 cost 必须是正整数（建设不足才能被拒）");
+            }
+
+            costs.Add(new UpgradeTier(tier.FromLevel, tier.ToLevel, tier.Cost));
+        }
+
+        var upgrade = new UpgradeRule(upgradeIdempotency, up.UpgradeCostPending,
+            (up.Note ?? "").Trim(), costs);
+
         return new SectTable(wire.Version, (wire.Note ?? "").Trim(), levels, positions,
-            create, transfer);
+            create, transfer, upgrade);
     }
+
+    // P2-1a4 硬口径：建设和贡献只从宗门秘境和宗门任务来、不从商城买。
+    // 配置里出现这种「商城可买建设」的反口径就起不来（坏配置自检）。
+    static readonly string[] ShopBuyConstructionClaims =
+    {
+        "商城可买建设", "商城可以买建设", "建设可从商城买", "建设能在商城买",
+        "商城出售建设", "商城可买贡献",
+    };
 
     static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -315,6 +426,7 @@ public sealed class SectTable
         [JsonPropertyName("positions")] public List<WirePosition?>? Positions { get; set; }
         [JsonPropertyName("create")] public WireCreate? Create { get; set; }
         [JsonPropertyName("transfer")] public WireTransfer? Transfer { get; set; }
+        [JsonPropertyName("upgrade")] public WireUpgrade? Upgrade { get; set; }
     }
 
     sealed class WireLevel
@@ -343,5 +455,20 @@ public sealed class SectTable
         [JsonPropertyName("idempotency")] public string? Idempotency { get; set; }
         [JsonPropertyName("old_master_position")] public string? OldMasterPosition { get; set; }
         [JsonPropertyName("old_master_position_pending")] public bool OldMasterPositionPending { get; set; }
+    }
+
+    sealed class WireUpgrade
+    {
+        [JsonPropertyName("idempotency")] public string? Idempotency { get; set; }
+        [JsonPropertyName("upgrade_cost_pending")] public bool UpgradeCostPending { get; set; }
+        [JsonPropertyName("note")] public string? Note { get; set; }
+        [JsonPropertyName("costs")] public List<WireUpgradeTier?>? Costs { get; set; }
+    }
+
+    sealed class WireUpgradeTier
+    {
+        [JsonPropertyName("from_level")] public int FromLevel { get; set; }
+        [JsonPropertyName("to_level")] public int ToLevel { get; set; }
+        [JsonPropertyName("cost")] public long Cost { get; set; }
     }
 }

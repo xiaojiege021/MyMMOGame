@@ -22,6 +22,12 @@ var sectLeadershipConfig = false;
 long sectLeadershipStateOf = 0;
 long sectLeadershipMembersOf = 0;
 long sectLeaveStateOf = 0;
+// P2-1a4：升级只读入口 + 仅核对用的建设赋值，同样与启动共用 LoadAll 同一组参数。
+var sectUpgradeConfig = false;
+long sectUpgradeStateOf = 0;
+long sectUpgradeMembersOf = 0;
+long sectConstructionSetOf = 0;
+long sectConstructionSetTo = -1;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -81,6 +87,20 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--sect-leave-state" when i + 1 < args.Length:
             long.TryParse(args[++i], out sectLeaveStateOf);
+            break;
+        // P2-1a4：升级只读入口 + 仅核对用的建设赋值（不对外、不作为玩法来源）。
+        case "--sect-upgrade-config":
+            sectUpgradeConfig = true;
+            break;
+        case "--sect-upgrade-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectUpgradeStateOf);
+            break;
+        case "--sect-upgrade-members" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectUpgradeMembersOf);
+            break;
+        case "--sect-construction-set" when i + 2 < args.Length:
+            long.TryParse(args[++i], out sectConstructionSetOf);
+            long.TryParse(args[++i], out sectConstructionSetTo);
             break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
@@ -169,6 +189,37 @@ if (sectLeadershipConfig)
     return 0;
 }
 
+// --sect-upgrade-config：不连库，逐项打印升级档与五档名册上限。坏配置在这一步就起不来
+// （config_error= + 非 0 退出），与真实启动共用同一份 Load + 同一组参数。
+if (sectUpgradeConfig)
+{
+    try
+    {
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        var u = loaded.Sect.Upgrade;
+        Console.WriteLine("sect_upgrade_config_state=ok version=" + loaded.Sect.Version
+            + " idempotency=" + u.Idempotency
+            + " upgrade_cost_pending=" + u.UpgradeCostPending
+            + " upgrade_costs=" + string.Join(",",
+                u.Costs.Select(c => c.FromLevel + "->" + c.ToLevel + ":" + c.Cost))
+            + " max_level=" + loaded.Sect.MaxLevel
+            + " levels=" + string.Join(",",
+                loaded.Sect.Levels.Select(l => l.Number + ":" + l.MemberCap)));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 连库入口：--migrate / --sect-list / --sect-state / --sect-members /
 // --sect-set-level / --sect-position-* / --sect-leadership-state /
 // --sect-leadership-members / --sect-leave-state。都先过与真实启动同一份
@@ -177,7 +228,8 @@ if (sectLeadershipConfig)
 // --sect-position-members。都先过与真实启动同一份 Load + 同一组参数。
 if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLevelOf != 0
     || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0
-    || sectLeadershipStateOf != 0 || sectLeadershipMembersOf != 0 || sectLeaveStateOf != 0)
+    || sectLeadershipStateOf != 0 || sectLeadershipMembersOf != 0 || sectLeaveStateOf != 0
+    || sectUpgradeStateOf != 0 || sectUpgradeMembersOf != 0 || sectConstructionSetOf != 0)
 {
     SectTable table;
     try
@@ -315,6 +367,37 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
                     + " rows=" + st.MemberCount
                     + " master_character_id=" + st.MasterCharacterId
                 : "sect_leave_state=missing sect=" + sectLeaveStateOf);
+        }
+
+        if (sectUpgradeStateOf != 0)
+        {
+            var st = await repo.UpgradeStateAsync(sectUpgradeStateOf, CancellationToken.None);
+            Console.WriteLine(st.Found
+                ? "sect_upgrade_state=ok sect=" + st.SectId
+                    + " level=" + st.Level
+                    + " member_cap=" + st.MemberCap
+                    + " construction=" + st.Construction
+                    + " next_cost=" + st.NextCost
+                    + " last_upgrade_txn=" + st.LastUpgradeTxn
+                    + " member_count=" + st.MemberCount
+                    + " upgrade_txns=" + st.UpgradeTxnCount
+                : "sect_upgrade_state=missing sect=" + sectUpgradeStateOf);
+        }
+
+        if (sectUpgradeMembersOf != 0)
+        {
+            var members = await repo.MembersAsync(sectUpgradeMembersOf, CancellationToken.None);
+            Console.WriteLine("sect_upgrade_members_state=ok sect=" + sectUpgradeMembersOf
+                + " rows=" + members.Count
+                + " ids=" + string.Join(",", members));
+        }
+
+        if (sectConstructionSetOf != 0 && sectConstructionSetTo >= 0)
+        {
+            var changed = await repo.SetConstructionAsync(
+                sectConstructionSetOf, sectConstructionSetTo, CancellationToken.None);
+            Console.WriteLine("sect_construction_set=" + (changed ? "ok" : "missing")
+                + " sect=" + sectConstructionSetOf + " construction=" + sectConstructionSetTo);
         }
     }
     catch (Exception ex) when (ex is NpgsqlException or IOException)

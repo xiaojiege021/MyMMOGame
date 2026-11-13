@@ -14,6 +14,10 @@ option csharp_namespace = "Mmo.Proto.Social";
 // founder_character_id 只作创建历史，不再参与权限判定。传位只给现任副掌门、
 // 掌门不能直接退出、有职位的人先辞成弟子再退出宗门。分级任免、改宣言称号、
 // 建设升级、秘境人数、同门经验仍不做。
+// P2-1a4：升级只耗建设。每级扣一次宗门建设，建设不足被拒且不扣、5 级封顶、
+// 名册上限随五档变（CapFor 仍是唯一来源）、已有名册人数不变。升级消耗只从
+// config/sect.json 的 upgrade.costs 读，请求里带不进目标等级 / 建设数 / 消耗；
+// 建设和贡献来自宗门秘境和宗门任务，不从商城买。升级一笔事务、txn_id 挡重放。
 
 message CreateSectRequest {
   string account = 1;
@@ -122,6 +126,35 @@ message LeadershipResponse {
   string txn_id = 9;
 }
 
+// P2-1a4：升级只耗建设 / 只读查升级事实。请求只带发起者 + 宗门 + 事务号，
+// 不带目标等级、不带建设数、不带消耗：升到几级、扣多少建设只由社交服按
+// config/sect.json 的 upgrade.costs 与库里的事实判定（不跳级：请求里没有目标等级）。
+// txn_id 由网关服务端生成（客户端填不进来），sect_upgrade.txn_id 主键 +
+// sect.last_upgrade_txn 挡同一事务号重放。
+message UpgradeSectRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 sect_id = 4;
+}
+
+// 回包全是只读事实值。业务拒绝（not_enough_construction / at_max_level /
+// not_leader / sect_not_found / duplicate）是正常回包里的 ok=false + reason，
+// 未生效数值给 0。member_cap 由 CapFor(new_level) 给，是名册上限唯一来源；
+// construction_before / construction_after / upgrade_cost 都是这一笔库里的事实值。
+message UpgradeResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 sect_id = 3;
+  int32 old_level = 4;
+  int32 new_level = 5;
+  int32 member_cap = 6;
+  int64 construction_before = 7;
+  int64 construction_after = 8;
+  int64 upgrade_cost = 9;
+  string txn_id = 10;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
@@ -133,4 +166,7 @@ service SocialService {
   rpc TransferLeadership(LeadershipRequest) returns (LeadershipResponse);
   rpc LeaveSect(LeaveSectRequest) returns (LeadershipResponse);
   rpc DescribeLeadership(LeadershipRequest) returns (LeadershipResponse);
+  // P2-1a4：升级只耗建设（建设不从商城买）/ 只读查升级事实。
+  rpc UpgradeSect(UpgradeSectRequest) returns (UpgradeResponse);
+  rpc DescribeUpgrade(UpgradeSectRequest) returns (UpgradeResponse);
 }

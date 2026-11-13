@@ -30,6 +30,11 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect)
         Console.WriteLine("transfer=idempotency:" + sect.Transfer.Idempotency
             + " old_master_position:" + sect.Transfer.OldMasterPosition
             + " old_master_position_pending:" + sect.Transfer.OldMasterPositionPending);
+        // P2-1a4：升级档逐项打印，与 --sect-upgrade-config 同形（同一 upgrade_costs 拼法）。
+        Console.WriteLine("upgrade_costs=" + string.Join(",",
+            sect.Upgrade.Costs.Select(c => c.FromLevel + "->" + c.ToLevel + ":" + c.Cost))
+            + " max_level=" + sect.MaxLevel
+            + " levels=" + string.Join(",", sect.Levels.Select(l => l.Number + ":" + l.MemberCap)));
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());

@@ -68,3 +68,30 @@ CREATE TABLE IF NOT EXISTS "社交".sect_transfer (
     new_master  bigint      NOT NULL,
     at          timestamptz NOT NULL DEFAULT now()
 );
+
+-- === P2-1a4 sect_upgrade.sql（同一份幂等 DDL，追加进主迁移）===
+-- 给 "社交".sect 加「宗门建设」与「升级幂等事务号」两列，另建 sect_upgrade
+-- （txn_id 主键）流水挡重放。建设只从宗门秘境和宗门任务来、不从商城买；
+-- 升级一个字不扣角色货币，社交服不碰角色 schema。a1 两表、a2 的 position 列、
+-- a3 的 master_character_id / sect_transfer 结构都不动。
+-- 幂等：ADD COLUMN IF NOT EXISTS / DROP + ADD CONSTRAINT /
+-- CREATE TABLE IF NOT EXISTS，重复跑主迁移不报错。
+ALTER TABLE "社交".sect
+    ADD COLUMN IF NOT EXISTS construction bigint NOT NULL DEFAULT 0;
+
+ALTER TABLE "社交".sect
+    DROP CONSTRAINT IF EXISTS sect_construction_chk;
+ALTER TABLE "社交".sect
+    ADD CONSTRAINT sect_construction_chk CHECK (construction >= 0);
+
+ALTER TABLE "社交".sect
+    ADD COLUMN IF NOT EXISTS last_upgrade_txn text;
+
+CREATE TABLE IF NOT EXISTS "社交".sect_upgrade (
+    txn_id      text        PRIMARY KEY,
+    sect_id     bigint      NOT NULL REFERENCES "社交".sect (id) ON DELETE CASCADE,
+    from_level  int         NOT NULL,
+    to_level    int         NOT NULL,
+    cost        bigint      NOT NULL,
+    created_at  timestamptz NOT NULL DEFAULT now()
+);

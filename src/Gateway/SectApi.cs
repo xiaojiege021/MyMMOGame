@@ -7,8 +7,9 @@ using Mmo.Proto.Social;
 namespace Gateway;
 
 /// <summary>
-/// 宗门的 HTTP 入口（P2-1a1 / a2 / a3）：建宗门 / 收人 / 任命免职 /
-/// 传位（P2-1a3 只给副掌门）/ 退出宗门（掌门不能直接退）。
+/// 宗门的 HTTP 入口（P2-1a1 / a2 / a3 / a4）：建宗门 / 收人 / 任命免职 /
+/// 传位（P2-1a3 只给副掌门）/ 退出宗门（掌门不能直接退）/
+/// 升级（P2-1a4 只耗建设、建设不从商城买）。
 /// 网关只做三件事：认令牌、复核角色归属、服务端生成事务号后转给社交服。
 /// 人数上限、等级、人数都在社交服按 config/sect.json 判定，网关一个都不算，
 /// 也不碰社交库或角色库。业务前提不满足是 HTTP 200 + ok=false + reason；
@@ -31,6 +32,10 @@ public static class SectApi
 
     // P2-1a3 退出请求体：不带 target（谁是新掌门、席位数字都带不进来）。
     public sealed record LeaveBody(ulong? CharacterId, ulong? SectId);
+
+    // P2-1a4 升级请求体：只带发起者 / 宗门。目标等级、建设数、消耗一概带不进来，
+    // 升到几级、扣多少建设只由社交服按 config/sect.json 判定。
+    public sealed record UpgradeBody(ulong? CharacterId, ulong? SectId);
 
     static readonly JsonSerializerOptions Json = new()
     {
@@ -184,6 +189,77 @@ public static class SectApi
         // P2-1a3：传位只给副掌门 / 掌门不能直接退出。
         MapLeadershipRoute(app, tokens, social, character, "/sect/transfer", "sect_transfer", true);
         MapLeadershipRoute(app, tokens, social, character, "/sect/leave", "sect_leave", false);
+
+        // P2-1a4：升级只耗建设。认令牌 + OwnsAsync + 服务端生成 txn_id，
+        // 请求体只带 character_id / sect_id，网关一个数值都不算、不碰社交库/角色库。
+        app.MapPost("/sect/upgrade", async context =>
+        {
+            if (!Authorize(context, tokens, "sect_upgrade", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            UpgradeBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<UpgradeBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.SectId is null || body.SectId == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "sect_upgrade:" + Guid.NewGuid().ToString("N");
+                var result = await social.UpgradeSectAsync(
+                    new UpgradeSectRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        TxnId = txnId,
+                        SectId = body.SectId.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(10),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("sect_upgrade account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " sect=" + body.SectId.Value
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " old_level=" + result.OldLevel
+                    + " new_level=" + result.NewLevel
+                    + " cap=" + result.MemberCap
+                    + " before=" + result.ConstructionBefore
+                    + " after=" + result.ConstructionAfter
+                    + " cost=" + result.UpgradeCost);
+
+                await WriteAsync(context, 200, UpgradeSectBody(result));
+            }
+            catch (RpcException ex)
+            {
+                Console.WriteLine("sect_upgrade_error account=" + account + " detail=" + ex.Status.Detail);
+                await WriteAsync(context, 502, new { error = ex.Status.Detail });
+            }
+        });
     }
 
     static object SectBody(SectResponse r) => new
@@ -220,6 +296,21 @@ public static class SectApi
         master_count = r.MasterCount,
         vice_master_count = r.ViceMasterCount,
         member_count = r.MemberCount,
+        txn_id = r.TxnId,
+    };
+
+    // P2-1a4 回包全是只读事实值；业务拒绝时社交服把未生效数值给 0。
+    static object UpgradeSectBody(UpgradeResponse r) => new
+    {
+        ok = r.Ok,
+        reason = r.Reason,
+        sect_id = r.SectId,
+        old_level = r.OldLevel,
+        new_level = r.NewLevel,
+        member_cap = r.MemberCap,
+        construction_before = r.ConstructionBefore,
+        construction_after = r.ConstructionAfter,
+        upgrade_cost = r.UpgradeCost,
         txn_id = r.TxnId,
     };
 
