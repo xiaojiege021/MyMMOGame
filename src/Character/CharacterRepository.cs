@@ -190,14 +190,78 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
     }
 
     /// <summary>
-    /// P2-3b：战场要的只读身份——职业、分支、等级。战场属性按职业表 + 装备折算，
-    /// 装备那条线由强化总级给（EnhanceRepository.TotalsAsync）。这里不写库。
+    /// P2-4a：二转只把 15 级选定的那条分支往前推一步。一笔事务锁角色行 → 校验
+    /// 等级 / 已有分支 / 目标分支是否同一条 → 把 branch_step 写成 2。
+    /// 分支归属（目标分支是不是这个职业的）由调用方按配置先验，这里只管库里的状态。
     /// </summary>
-    public async Task<(string ClassId, string Branch, int Level)?> BattleIdentityAsync(
+    public async Task<(string Reason, string Branch, int Step, int Level, bool Duplicate)>
+        AdvanceBranchAsync(long characterId, string branchId, CancellationToken stopping)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(stopping);
+        await using var transaction = await connection.BeginTransactionAsync(stopping);
+
+        string branch;
+        int step;
+        int level;
+        // 先把这一行读完再回滚/提交：reader 没关就 Rollback 会撞 Npgsql 的子通道错误。
+        await using (var read = new NpgsqlCommand(
+            "select coalesce(branch, ''), branch_step, level from \"角色\".character where id = $1 for update",
+            connection, transaction))
+        {
+            read.Parameters.AddWithValue(characterId);
+            await using var reader = await read.ExecuteReaderAsync(stopping);
+            if (!await reader.ReadAsync(stopping))
+            {
+                await reader.DisposeAsync();
+                await transaction.RollbackAsync(stopping);
+                return ("character_not_found", "", 0, 0, false);
+            }
+
+            branch = reader.GetString(0);
+            step = reader.GetInt32(1);
+            level = reader.GetInt32(2);
+        }
+
+        // 目标必须是已经选定的那条：换一条分支，不论几转都是 branch_locked。
+        if (!string.Equals(branch, branchId, StringComparison.Ordinal))
+        {
+            await transaction.RollbackAsync(stopping);
+            return (branch.Length == 0 ? "branch_missing" : "branch_locked", branch, step, level, false);
+        }
+
+        if (step >= 2)
+        {
+            await transaction.RollbackAsync(stopping);
+            return ("", branch, step, level, true);
+        }
+
+        if (level < BranchAdvanceLevel)
+        {
+            await transaction.RollbackAsync(stopping);
+            return ("not_enough_level", branch, step, level, false);
+        }
+
+        await using (var write = new NpgsqlCommand(
+            "update \"角色\".character set branch_step = 2 where id = $1", connection, transaction))
+        {
+            write.Parameters.AddWithValue(characterId);
+            await write.ExecuteNonQueryAsync(stopping);
+        }
+
+        await transaction.CommitAsync(stopping);
+        return ("", branch, 2, level, false);
+    }
+
+    /// <summary>方案写定二转在 45 级，不跟着境界往后挪；这条是规则常量，不是玩法数值。</summary>
+    public const int BranchAdvanceLevel = 45;
+
+    /// <summary>只给核对用：读回分支与二转步数。</summary>
+    public async Task<(string Branch, int Step, int Level, string ClassId)?> BranchStateAsync(
         long characterId, CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(
-            "select class_id, coalesce(branch, ''), level from \"角色\".character where id = $1");
+            "select coalesce(branch, ''), branch_step, level, class_id"
+            + " from \"角色\".character where id = $1");
         command.Parameters.AddWithValue(characterId);
         await using var reader = await command.ExecuteReaderAsync(stopping);
         if (!await reader.ReadAsync(stopping))
@@ -205,7 +269,26 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
             return null;
         }
 
-        return (reader.GetString(0), reader.GetString(1), reader.GetInt32(2));
+        return (reader.GetString(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetString(3));
+    }
+
+    /// <summary>
+    /// P2-3b：战场要的只读身份——职业、分支、等级。战场属性按职业表 + 装备折算，
+    /// 装备那条线由强化总级给（EnhanceRepository.TotalsAsync）。这里不写库。
+    /// </summary>
+    public async Task<(string ClassId, string Branch, int Level, int BranchStep)?> BattleIdentityAsync(
+        long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select class_id, coalesce(branch, ''), level, branch_step from \"角色\".character where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return null;
+        }
+
+        return (reader.GetString(0), reader.GetString(1), reader.GetInt32(2), reader.GetInt32(3));
     }
 
     /// <summary>只给核对用：读一行的等级与归属账号。</summary>

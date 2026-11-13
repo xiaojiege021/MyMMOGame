@@ -12,6 +12,14 @@ var migrate = false;
 long rawLevelWrite = 0;
 var rawLevelValue = 0;
 long levelOf = 0;
+long branchStateOf = 0;
+long advanceBranchId = 0;
+string? advanceBranchTo = null;
+long canEquipOf = 0;
+string? canEquipItem = null;
+var weaponRules = false;
+string? weaponRulesBranchPath = null;
+string? weaponRulesItemPath = null;
 string? bindingOf = null;
 var bindingSlot = 0;
 long rawCurrencyId = 0;
@@ -145,6 +153,30 @@ for (var i = 0; i < args.Length; i++)
         case "--raw-level-write" when i + 2 < args.Length:
             long.TryParse(args[++i], out rawLevelWrite);
             int.TryParse(args[++i], out rawLevelValue);
+            break;
+        // 只给核对用：读回分支与二转步数。
+        case "--branch-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out branchStateOf);
+            break;
+        // 只给核对用：走一遍二转（等级、分支锁定与幂等都在仓储里判）。
+        case "--advance-branch" when i + 2 < args.Length:
+            long.TryParse(args[++i], out advanceBranchId);
+            advanceBranchTo = args[++i];
+            break;
+        // 只给核对用：把武器锁与职业可用兵器打出来，不连库。坏配置也走这里。
+        case "--weapon-rules":
+            weaponRules = true;
+            break;
+        // 坏配置走这里：指定另一份分支表 / 物品表，不碰仓库里那两份。
+        case "--weapon-rules-path" when i + 2 < args.Length:
+            weaponRules = true;
+            weaponRulesBranchPath = args[++i];
+            weaponRulesItemPath = args[++i];
+            break;
+        // 只给核对用：这件装备这个人能不能穿（与 RPC 同一套判定）。
+        case "--can-equip" when i + 2 < args.Length:
+            long.TryParse(args[++i], out canEquipOf);
+            canEquipItem = args[++i];
             break;
         case "--level-of" when i + 1 < args.Length:
             long.TryParse(args[++i], out levelOf);
@@ -881,8 +913,40 @@ if (unbindList)
     return 0;
 }
 
+if (weaponRules)
+{
+    try
+    {
+        var itemTable = ItemTable.Load(weaponRulesItemPath ?? "config/items.json");
+        var branchTable = BranchTable.Load(weaponRulesBranchPath ?? "config/branches.json");
+        Console.WriteLine("weapon_lock_level=" + branchTable.WeaponLockLevel);
+        foreach (var item in itemTable.All.Where(i => i.IsWeapon).OrderBy(i => i.Id, StringComparer.Ordinal))
+        {
+            Console.WriteLine("weapon=" + item.Id + " kind=" + item.WeaponKind
+                + " require_level=" + item.RequireLevel);
+        }
+        foreach (var cls in branchTable.All.Select(b => b.ClassId)
+            .Distinct(StringComparer.Ordinal).OrderBy(c => c, StringComparer.Ordinal))
+        {
+            Console.WriteLine("class=" + cls + " kinds=" + string.Join(",", branchTable.WeaponKindsOf(cls)));
+        }
+        return 0;
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
+    || branchStateOf != 0 || advanceBranchId != 0 || canEquipOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
@@ -1251,6 +1315,70 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                   + " now_ms=" + order.NowMs
                   + " balance=" + order.Balance
                 : "recharge_state=missing order=" + rechargeStateOf);
+        }
+
+        if (branchStateOf != 0)
+        {
+            var state = await characters.BranchStateAsync(branchStateOf, CancellationToken.None);
+            Console.WriteLine(state is null
+                ? "branch_state=missing id=" + branchStateOf
+                : "branch_state=ok id=" + branchStateOf + " class=" + state.Value.ClassId
+                  + " branch=" + state.Value.Branch + " branch_step=" + state.Value.Step
+                  + " level=" + state.Value.Level);
+        }
+
+        if (advanceBranchId != 0)
+        {
+            var branchTable = BranchTable.Load("config/branches.json");
+            var identity = await characters.BattleIdentityAsync(advanceBranchId, CancellationToken.None);
+            if (identity is null)
+            {
+                Console.WriteLine("advance_branch=character_not_found id=" + advanceBranchId);
+            }
+            else if (!branchTable.BelongsTo(advanceBranchTo!, identity.Value.ClassId))
+            {
+                Console.WriteLine("advance_branch=reason=branch_not_found id=" + advanceBranchId
+                    + " branch=" + advanceBranchTo);
+            }
+            else
+            {
+                var outcome = await characters.AdvanceBranchAsync(
+                    advanceBranchId, advanceBranchTo!, CancellationToken.None);
+                Console.WriteLine("advance_branch=ok id=" + advanceBranchId
+                    + " reason=" + (outcome.Reason.Length == 0 ? "none" : outcome.Reason)
+                    + " branch=" + outcome.Branch + " branch_step=" + outcome.Step
+                    + " level=" + outcome.Level
+                    + " duplicate=" + (outcome.Duplicate ? "true" : "false"));
+            }
+        }
+
+        if (canEquipOf != 0)
+        {
+            var itemTable = ItemTable.Load("config/items.json");
+            var branchTable = BranchTable.Load("config/branches.json");
+            var identity = await characters.BattleIdentityAsync(canEquipOf, CancellationToken.None);
+            if (identity is null)
+            {
+                Console.WriteLine("can_equip=ok=false reason=character_missing id=" + canEquipOf);
+            }
+            else
+            {
+                var item = itemTable.Find(canEquipItem!);
+                if (item is null)
+                {
+                    Console.WriteLine("can_equip=ok=false reason=item_not_found id=" + canEquipOf
+                        + " item=" + canEquipItem);
+                }
+                else
+                {
+                    var reason = EquipRules.Check(item, identity.Value.Level, identity.Value.ClassId, branchTable);
+                    Console.WriteLine("can_equip=ok=" + (reason.Length == 0 ? "true" : "false")
+                        + " reason=" + (reason.Length == 0 ? "none" : reason)
+                        + " id=" + canEquipOf + " item=" + item.Id
+                        + " weapon_kind=" + item.WeaponKind + " require_level=" + item.RequireLevel
+                        + " level=" + identity.Value.Level + " class=" + identity.Value.ClassId);
+                }
+            }
         }
 
         if (levelOf != 0)

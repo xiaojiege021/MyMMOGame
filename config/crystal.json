@@ -1,23 +1,46 @@
 {
   "schema": "crystal-table/1",
-  "version": 1,
+  "version": 2,
   "note": "方案第 9 章第 3 层写定：能量结晶分攻击 / 防御 / 功能三类、部位限定、可拆卸复用，换装时拆卸带走；9.1 写定结晶不改制作时掷定的基础属性；7.2 伤害公式里结晶是「能量结晶固定值 / 基础攻击」这一项固定值而不是百分比，本卡不做伤害结算。10 章写定结晶从副本掉落（深渊碎片、龙巢顶级），商城与宗门 NPC 不卖，掉落发货在后面的卡。方案没写定的：每类允许装到哪些部位、每件装备几个镶嵌位、结晶固定值、结晶物品编号与装备部位归属，全部留在本表并注明待定，代码里不写第二套数字；改这张表重启角色服即生效。装上和拆下都不消耗金币，也不消耗结晶本身——「可拆卸复用」的落点。",
-  "categories": ["attack", "defense", "utility"],
+  "categories": [
+    "attack",
+    "defense",
+    "utility"
+  ],
   "socket_count": 2,
   "category_parts": {
-    "attack": ["weapon"],
-    "defense": ["armor"],
-    "utility": ["accessory"]
+    "attack": [
+      "weapon"
+    ],
+    "defense": [
+      "armor"
+    ],
+    "utility": [
+      "accessory"
+    ]
   },
   "equipment_parts": {
     "sword_trial": "weapon",
     "sword_trade": "weapon",
     "robe_trial": "armor",
-    "ring_trial": "accessory"
+    "ring_trial": "accessory",
+    "staff_trade": "weapon"
   },
   "crystals": [
-    { "id": "crystal_attack", "category": "attack", "fixed_value": 12 },
-    { "id": "crystal_defense", "category": "defense", "fixed_value": 8 },
-    { "id": "crystal_utility", "category": "utility", "fixed_value": 5 }
+    {
+      "id": "crystal_attack",
+      "category": "attack",
+      "fixed_value": 12
+    },
+    {
+      "id": "crystal_defense",
+      "category": "defense",
+      "fixed_value": 8
+    },
+    {
+      "id": "crystal_utility",
+      "category": "utility",
+      "fixed_value": 5
+    }
   ]
 }

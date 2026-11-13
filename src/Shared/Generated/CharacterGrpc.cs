@@ -154,6 +154,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeBattleProfileRequest> __Marshaller_mmo_character_DescribeBattleProfileRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeBattleProfileRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeBattleProfileResponse> __Marshaller_mmo_character_DescribeBattleProfileResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeBattleProfileResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AdvanceBranchRequest> __Marshaller_mmo_character_AdvanceBranchRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AdvanceBranchRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AdvanceBranchResponse> __Marshaller_mmo_character_AdvanceBranchResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AdvanceBranchResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipRequest> __Marshaller_mmo_character_CanEquipRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipResponse> __Marshaller_mmo_character_CanEquipResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -370,6 +378,22 @@ namespace Mmo.Proto.Character {
         "DescribeBattleProfile",
         __Marshaller_mmo_character_DescribeBattleProfileRequest,
         __Marshaller_mmo_character_DescribeBattleProfileResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.AdvanceBranchRequest, global::Mmo.Proto.Character.AdvanceBranchResponse> __Method_AdvanceBranch = new grpc::Method<global::Mmo.Proto.Character.AdvanceBranchRequest, global::Mmo.Proto.Character.AdvanceBranchResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "AdvanceBranch",
+        __Marshaller_mmo_character_AdvanceBranchRequest,
+        __Marshaller_mmo_character_AdvanceBranchResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse> __Method_CanEquip = new grpc::Method<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CanEquip",
+        __Marshaller_mmo_character_CanEquipRequest,
+        __Marshaller_mmo_character_CanEquipResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -715,6 +739,32 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeBattleProfileResponse> DescribeBattleProfile(global::Mmo.Proto.Character.DescribeBattleProfileRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P2-4a：二转只把 15 级选定的那条分支往前推一步。45 级才允许，目标必须就是
+      /// 已经选定的那条；改去另一条分支一律拒绝。分支步数写在角色库里，不靠客户端传。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AdvanceBranchResponse> AdvanceBranch(global::Mmo.Proto.Character.AdvanceBranchRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
+      /// 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CanEquipResponse> CanEquip(global::Mmo.Proto.Character.CanEquipRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2088,6 +2138,110 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeBattleProfile, null, options, request);
       }
+      /// <summary>
+      /// P2-4a：二转只把 15 级选定的那条分支往前推一步。45 级才允许，目标必须就是
+      /// 已经选定的那条；改去另一条分支一律拒绝。分支步数写在角色库里，不靠客户端传。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AdvanceBranchResponse AdvanceBranch(global::Mmo.Proto.Character.AdvanceBranchRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AdvanceBranch(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-4a：二转只把 15 级选定的那条分支往前推一步。45 级才允许，目标必须就是
+      /// 已经选定的那条；改去另一条分支一律拒绝。分支步数写在角色库里，不靠客户端传。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AdvanceBranchResponse AdvanceBranch(global::Mmo.Proto.Character.AdvanceBranchRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_AdvanceBranch, null, options, request);
+      }
+      /// <summary>
+      /// P2-4a：二转只把 15 级选定的那条分支往前推一步。45 级才允许，目标必须就是
+      /// 已经选定的那条；改去另一条分支一律拒绝。分支步数写在角色库里，不靠客户端传。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AdvanceBranchResponse> AdvanceBranchAsync(global::Mmo.Proto.Character.AdvanceBranchRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AdvanceBranchAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-4a：二转只把 15 级选定的那条分支往前推一步。45 级才允许，目标必须就是
+      /// 已经选定的那条；改去另一条分支一律拒绝。分支步数写在角色库里，不靠客户端传。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AdvanceBranchResponse> AdvanceBranchAsync(global::Mmo.Proto.Character.AdvanceBranchRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_AdvanceBranch, null, options, request);
+      }
+      /// <summary>
+      /// P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
+      /// 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CanEquipResponse CanEquip(global::Mmo.Proto.Character.CanEquipRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CanEquip(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
+      /// 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CanEquipResponse CanEquip(global::Mmo.Proto.Character.CanEquipRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CanEquip, null, options, request);
+      }
+      /// <summary>
+      /// P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
+      /// 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CanEquipResponse> CanEquipAsync(global::Mmo.Proto.Character.CanEquipRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CanEquipAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
+      /// 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CanEquipResponse> CanEquipAsync(global::Mmo.Proto.Character.CanEquipRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CanEquip, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -2128,7 +2282,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_UseUnbindItem, serviceImpl.UseUnbindItem)
           .AddMethod(__Method_CreateRechargeOrder, serviceImpl.CreateRechargeOrder)
           .AddMethod(__Method_SettleRechargeOrder, serviceImpl.SettleRechargeOrder)
-          .AddMethod(__Method_DescribeBattleProfile, serviceImpl.DescribeBattleProfile).Build();
+          .AddMethod(__Method_DescribeBattleProfile, serviceImpl.DescribeBattleProfile)
+          .AddMethod(__Method_AdvanceBranch, serviceImpl.AdvanceBranch)
+          .AddMethod(__Method_CanEquip, serviceImpl.CanEquip).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -2165,6 +2321,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_CreateRechargeOrder, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CreateRechargeOrderRequest, global::Mmo.Proto.Character.CreateRechargeOrderResponse>(serviceImpl.CreateRechargeOrder));
       serviceBinder.AddMethod(__Method_SettleRechargeOrder, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleRechargeOrderRequest, global::Mmo.Proto.Character.SettleRechargeOrderResponse>(serviceImpl.SettleRechargeOrder));
       serviceBinder.AddMethod(__Method_DescribeBattleProfile, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse>(serviceImpl.DescribeBattleProfile));
+      serviceBinder.AddMethod(__Method_AdvanceBranch, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceBranchRequest, global::Mmo.Proto.Character.AdvanceBranchResponse>(serviceImpl.AdvanceBranch));
+      serviceBinder.AddMethod(__Method_CanEquip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(serviceImpl.CanEquip));
     }
 
   }

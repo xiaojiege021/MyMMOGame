@@ -10,7 +10,7 @@ namespace Battle;
 /// config/battlefield.json 算，角色服不参与数值。
 /// </summary>
 public sealed record BattleProfile(
-    string ClassId, string Branch, int Level, int EnhanceTotal, int EnhanceSlots);
+    string ClassId, string Branch, int Level, int EnhanceTotal, int EnhanceSlots, int BranchStep);
 
 public interface IBattleProfileSource : IDisposable
 {
@@ -52,7 +52,8 @@ public sealed class GrpcBattleProfileSource : IBattleProfileSource
                 deadline: DateTime.UtcNow.AddSeconds(5));
             return reply.Found
                 ? new BattleProfile(
-                    reply.ClassId, reply.Branch, reply.Level, reply.EnhanceTotal, reply.EnhanceSlots)
+                    reply.ClassId, reply.Branch, reply.Level, reply.EnhanceTotal,
+                    reply.EnhanceSlots, reply.BranchStep)
                 : null;
         }
         catch (RpcException ex)

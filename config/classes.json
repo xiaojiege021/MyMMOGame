@@ -1,72 +1,119 @@
 {
   "schema": "class-table/1",
-  "version": 1,
+  "version": 2,
   "hp_per_vitality": 40,
   "resurrect": {
     "hp_restore_pct": 50,
-    "exp_cost_pct": 10
+    "exp_cost_pct": 10,
+    "second_turn_exp_cost_pct": 5,
+    "note": "一转按 exp_cost_pct 扣；生息二转只把这个比例减小，不掉级（P2-4a，数字待定）"
   },
   "classes": [
     {
       "id": "warrior",
       "name": "战士",
       "primary": "strength",
-      "attributes": { "strength": 100, "agility": 40, "spirit": 40, "vitality": 30 },
+      "attributes": {
+        "strength": 100,
+        "agility": 40,
+        "spirit": 40,
+        "vitality": 30
+      },
       "attack_per_primary": 2.0,
       "equipment_attack": 0,
       "mana_base": 400,
       "mana_per_spirit": 3,
       "threat_per_vitality": 1,
-      "skills": [1001, 1002, 1003]
+      "skills": [
+        1001,
+        1002,
+        1003
+      ]
     },
     {
       "id": "archer",
       "name": "射手",
       "primary": "agility",
-      "attributes": { "strength": 40, "agility": 100, "spirit": 40, "vitality": 26 },
+      "attributes": {
+        "strength": 40,
+        "agility": 100,
+        "spirit": 40,
+        "vitality": 26
+      },
       "attack_per_primary": 2.0,
       "equipment_attack": 0,
       "mana_base": 500,
       "mana_per_spirit": 4,
       "threat_per_vitality": 0,
-      "skills": [1101, 1102, 1103]
+      "skills": [
+        1101,
+        1102,
+        1103
+      ]
     },
     {
       "id": "mage",
       "name": "法师",
       "primary": "spirit",
-      "attributes": { "strength": 30, "agility": 40, "spirit": 100, "vitality": 22 },
+      "attributes": {
+        "strength": 30,
+        "agility": 40,
+        "spirit": 100,
+        "vitality": 22
+      },
       "attack_per_primary": 2.0,
       "equipment_attack": 0,
       "mana_base": 800,
       "mana_per_spirit": 6,
       "threat_per_vitality": 0,
-      "skills": [1201, 1202, 1203]
+      "skills": [
+        1201,
+        1202,
+        1203
+      ]
     },
     {
       "id": "priest",
       "name": "牧师",
       "primary": "spirit",
-      "attributes": { "strength": 30, "agility": 40, "spirit": 100, "vitality": 24 },
+      "attributes": {
+        "strength": 30,
+        "agility": 40,
+        "spirit": 100,
+        "vitality": 24
+      },
       "attack_per_primary": 2.0,
       "equipment_attack": 0,
       "heal_per_spirit": 1.5,
       "mana_base": 800,
       "mana_per_spirit": 6,
       "threat_per_vitality": 0,
-      "skills": [1301, 1302, 1303]
+      "skills": [
+        1301,
+        1302,
+        1303
+      ]
     },
     {
       "id": "tank",
       "name": "坦克",
       "primary": "none",
-      "attributes": { "strength": 40, "agility": 40, "spirit": 40, "vitality": 30 },
+      "attributes": {
+        "strength": 40,
+        "agility": 40,
+        "spirit": 40,
+        "vitality": 30
+      },
       "attack_per_primary": 0,
       "equipment_attack": 120,
       "mana_base": 300,
       "mana_per_spirit": 2,
       "threat_per_vitality": 10,
-      "skills": [1401, 1402, 1403]
+      "skills": [
+        1401,
+        1402,
+        1403
+      ]
     }
   ]
 }

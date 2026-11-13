@@ -55,6 +55,8 @@ enum SkillRejectReason {
   SKILL_REJECT_NO_MANA = 9;
   // 目标不对：复活选了自己，或者选的不是倒地的队友
   SKILL_REJECT_BAD_TARGET = 10;
+  // P2-4a：这个分支不能复活（诫律）。请求不算错，是这个职业分支没有这条能力。
+  SKILL_REJECT_CANNOT_RESURRECT = 11;
 }
 
 // 没有结算就退回来了。这条不改变任何人的生命。

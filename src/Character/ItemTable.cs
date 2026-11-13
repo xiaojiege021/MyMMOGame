@@ -16,10 +16,15 @@ public enum BindRule
     Always = 2,
 }
 
-public sealed record ItemDef(string Id, string Name, string Kind, int StackMax, BindRule Bind)
+public sealed record ItemDef(
+    string Id, string Name, string Kind, int StackMax, BindRule Bind,
+    string WeaponKind = "", int RequireLevel = 0)
 {
     /// <summary>这一件到账时是不是绑定。绑定物品不能直接交易。</summary>
     public bool BindsOnArrival => Bind != BindRule.None;
+
+    /// <summary>是不是武器。没有 weapon_kind 的装备（衣服、戒指）不受武器锁约束。</summary>
+    public bool IsWeapon => WeaponKind.Length > 0;
 }
 
 public sealed class ItemTable
@@ -72,7 +77,19 @@ public sealed class ItemTable
                 throw new ConfigException("物品 " + id + " 没有 bind 规则");
             }
 
-            map[id] = new ItemDef(id, (item.Name ?? id).Trim(), (item.Kind ?? "material").Trim(), stackMax, item.Bind.Value);
+            var weaponKind = (item.WeaponKind ?? "").Trim();
+            var requireLevel = item.RequireLevel ?? 0;
+            if (requireLevel < 0 || requireLevel > 100)
+            {
+                throw new ConfigException("物品 " + id + " 的 require_level 要在 0..100 之间");
+            }
+            if (weaponKind.Length > 0 && requireLevel == 0)
+            {
+                throw new ConfigException("武器 " + id + " 必须写 require_level，不写就是任意等级都能穿");
+            }
+            map[id] = new ItemDef(
+                id, (item.Name ?? id).Trim(), (item.Kind ?? "material").Trim(), stackMax,
+                item.Bind.Value, weaponKind, requireLevel);
         }
 
         if (map.Count == 0)
@@ -105,6 +122,12 @@ public sealed class ItemTable
 
         [JsonPropertyName("name")]
         public string? Name { get; init; }
+
+        [JsonPropertyName("weapon_kind")]
+        public string? WeaponKind { get; init; }
+
+        [JsonPropertyName("require_level")]
+        public int? RequireLevel { get; init; }
 
         [JsonPropertyName("kind")]
         public string? Kind { get; init; }

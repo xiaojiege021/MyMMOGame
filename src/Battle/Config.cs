@@ -190,6 +190,12 @@ public sealed class ResurrectConfig
 {
     public int HpRestorePct { get; init; }
     public int ExpCostPct { get; init; }
+
+    /// <summary>
+    /// P2-4a：生息二转之后扣的经验比例，比一转基础值小。方案只说「把这个比例减小、
+    /// 少多少走配置」，数字在这里；卷轴仍按 ExpCostPct 扣，不吃这个减免。
+    /// </summary>
+    public int SecondTurnExpCostPct { get; init; }
 }
 
 public sealed class AttributesConfig
@@ -306,6 +312,22 @@ public sealed class ClassTable
         if (byId.Count == 0)
         {
             throw new ConfigException($"{path}：职业表是空的");
+        }
+
+        if (file.Resurrect.HpRestorePct is < 0 or > 100)
+        {
+            throw new ConfigException($"{path}：resurrect.hp_restore_pct 要在 0..100 之间");
+        }
+        if (file.Resurrect.ExpCostPct is < 0 or > 100)
+        {
+            throw new ConfigException($"{path}：resurrect.exp_cost_pct 要在 0..100 之间");
+        }
+        // 二转只把比例减小：写大了就不是「减少」了，配置直接不认。
+        if (file.Resurrect.SecondTurnExpCostPct is < 0 or > 100
+            || file.Resurrect.SecondTurnExpCostPct > file.Resurrect.ExpCostPct)
+        {
+            throw new ConfigException(
+                $"{path}：resurrect.second_turn_exp_cost_pct 要在 0..exp_cost_pct 之间");
         }
 
         if (file.HpPerVitality <= 0)

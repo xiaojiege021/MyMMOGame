@@ -1,17 +1,105 @@
 {
   "schema": "branch-table/1",
-  "version": 1,
-  "note": "15 级一转时五个职业各选一条，45 级二转只把这条往前推，不另开分支（方案 8.3）。创建角色时分支可以留空，一转时再写。",
+  "version": 2,
+  "note": "15 级一转时五个职业各选一条，45 级二转只把这条往前推，不另开分支（方案 8.3）。创建角色时分支可以留空，一转时再写。weapon_kinds 是这条分支的本命兵器种类，15 级起只能用本职业兵器——按职业取该职业所有分支的并集，兵器不改分支（P2-4a）。 weapon_lock_level 是「15 级起只能用本职业兵器」的那条线，不满这个等级的武器五个职业都能装备。",
   "branches": [
-    { "id": "zhenyue", "name": "镇岳", "class_id": "tank", "weapons": "锤、斧、钺" },
-    { "id": "gulei", "name": "固垒", "class_id": "tank", "weapons": "戟、镋、棒" },
-    { "id": "pojun", "name": "破军", "class_id": "warrior", "weapons": "刀、剑、锏" },
-    { "id": "xianzhen", "name": "陷阵", "class_id": "warrior", "weapons": "枪、槊、叉" },
-    { "id": "chuanyang", "name": "穿杨", "class_id": "archer", "weapons": "弓、弩" },
-    { "id": "luowang", "name": "罗网", "class_id": "archer", "weapons": "弓、弩，以及流星、钩、抓、鞭" },
-    { "id": "chixiao", "name": "赤霄", "class_id": "mage", "weapons": "法杖" },
-    { "id": "xuanfu", "name": "玄缚", "class_id": "mage", "weapons": "法杖" },
-    { "id": "shengxi", "name": "生息", "class_id": "priest", "weapons": "棍" },
-    { "id": "jielv", "name": "诫律", "class_id": "priest", "weapons": "拐" }
-  ]
+    {
+      "id": "zhenyue",
+      "name": "镇岳",
+      "class_id": "tank",
+      "weapons": "锤、斧、钺",
+      "weapon_kinds": [
+        "mace",
+        "axe"
+      ]
+    },
+    {
+      "id": "gulei",
+      "name": "固垒",
+      "class_id": "tank",
+      "weapons": "戟、镋、棒",
+      "weapon_kinds": [
+        "spear",
+        "club"
+      ]
+    },
+    {
+      "id": "pojun",
+      "name": "破军",
+      "class_id": "warrior",
+      "weapons": "刀、剑、锏",
+      "weapon_kinds": [
+        "saber",
+        "sword"
+      ]
+    },
+    {
+      "id": "xianzhen",
+      "name": "陷阵",
+      "class_id": "warrior",
+      "weapons": "枪、槊、叉",
+      "weapon_kinds": [
+        "spear",
+        "halberd"
+      ]
+    },
+    {
+      "id": "chuanyang",
+      "name": "穿杨",
+      "class_id": "archer",
+      "weapons": "弓、弩",
+      "weapon_kinds": [
+        "bow",
+        "crossbow"
+      ]
+    },
+    {
+      "id": "luowang",
+      "name": "罗网",
+      "class_id": "archer",
+      "weapons": "弓、弩，以及流星、钩、抓、鞭",
+      "weapon_kinds": [
+        "bow",
+        "crossbow",
+        "whip"
+      ]
+    },
+    {
+      "id": "chixiao",
+      "name": "赤霄",
+      "class_id": "mage",
+      "weapons": "法杖",
+      "weapon_kinds": [
+        "staff"
+      ]
+    },
+    {
+      "id": "xuanfu",
+      "name": "玄缚",
+      "class_id": "mage",
+      "weapons": "法杖",
+      "weapon_kinds": [
+        "staff"
+      ]
+    },
+    {
+      "id": "shengxi",
+      "name": "生息",
+      "class_id": "priest",
+      "weapons": "棍",
+      "weapon_kinds": [
+        "staff"
+      ]
+    },
+    {
+      "id": "jielv",
+      "name": "诫律",
+      "class_id": "priest",
+      "weapons": "拐",
+      "weapon_kinds": [
+        "crutch"
+      ]
+    }
+  ],
+  "weapon_lock_level": 15
 }

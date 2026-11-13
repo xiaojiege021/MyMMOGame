@@ -97,6 +97,12 @@ public sealed class Member
     /// <summary>打出去的伤害累计。仇恨里看得见的那部分。</summary>
     internal long DamageDealt;
 
+    /// <summary>
+    /// P2-4a：这个人的角色库快照（职业、分支、二转步数）。第一次用到时才向角色服要，
+    /// 之后缓存在这条命上——复活判定要读它，但一场里不会变。
+    /// </summary>
+    internal BattleProfile? Profile;
+
     public bool Down => Hp <= 0;
 
     /// <summary>有效仇恨 = 打出的伤害 + 稳定值（职业表是体力 × 系数，竞技场是模板值）。</summary>
@@ -124,6 +130,7 @@ public sealed class Encounter
     readonly IExpSettlement _expSettlement;
     readonly ITalismanSpend _talismans;
     readonly IReviveScrollUse _scrolls;
+    readonly IBattleProfileSource _profiles;
     readonly Dictionary<ulong, Member> _members = [];
 
     readonly long _bossHpMax;
@@ -154,7 +161,7 @@ public sealed class Encounter
     public Encounter(
         BattleConfig config, SettlementStore settlements, ICharacterStore characters,
         ulong sessionId, int partySize, IExpSettlement expSettlement, ITalismanSpend talismans,
-        IReviveScrollUse scrolls)
+        IReviveScrollUse scrolls, IBattleProfileSource profiles)
     {
         _config = config;
         _settlements = settlements;
@@ -162,6 +169,7 @@ public sealed class Encounter
         _expSettlement = expSettlement;
         _talismans = talismans;
         _scrolls = scrolls;
+        _profiles = profiles;
         SessionId = sessionId;
         _partySize = partySize;
         _bossHpMax = Scale(config.Boss.HpMax, config.Dungeons.MonsterHpScalePerPlayer, partySize);
@@ -190,6 +198,22 @@ public sealed class Encounter
 
     static long ScaleDamage(long baseDamage, double scale) =>
         scale == 1.0 ? baseDamage : checked((long)Math.Round(baseDamage * scale));
+
+    /// <summary>诫律（牧师的两个分支之一）：没有复活这条能力。</summary>
+    const string CannotResurrectBranch = "jielv";
+
+    /// <summary>生息：15 级一转就有复活，45 级二转只把扣经验的比例减小。</summary>
+    const string ShengxiBranch = "shengxi";
+
+    /// <summary>
+    /// 这个人的角色库快照。第一次用到时才向角色服要，之后缓存在这条命上。
+    /// 没配上游时返回 null：复活仍按一转基础比例，不因为查不到就不让拉人。
+    /// </summary>
+    BattleProfile? ProfileOf(Member member)
+    {
+        member.Profile ??= _profiles.Get(member.Id);
+        return member.Profile;
+    }
 
     /// <summary>单调时钟，毫秒。冷却和前摇都用它算，不受系统时间跳变影响。</summary>
     static long NowMs() => (long)Stopwatch.GetElapsedTime(0).TotalMilliseconds;
@@ -348,6 +372,18 @@ public sealed class Encounter
 
             // 目标按技能种类分：打 Boss 的看 Boss 编号，治疗和复活看队友编号。
             Member? target = null;
+            // P2-4a：诫律没有复活这条能力。在目标校验之前就拒——不是「目标选错了」，
+            // 是这个分支不该发出这次请求，所以没人倒地时也一样拒。
+            if (skill.Kind == SkillKind.Resurrect)
+            {
+                var casterProfile = ProfileOf(member);
+                if (casterProfile is not null
+                    && string.Equals(casterProfile.Branch, CannotResurrectBranch, StringComparison.Ordinal))
+                {
+                    return Reject(request, SkillRejectReason.SkillRejectCannotResurrect);
+                }
+            }
+
             if (skill.Kind is SkillKind.Heal or SkillKind.Resurrect)
             {
                 if (!_members.TryGetValue(request.TargetId, out target))
@@ -1005,8 +1041,28 @@ public sealed class Encounter
             return;
         }
 
+        // P2-4a：诫律没有复活这条能力。这不是目标选错，是这个分支本来就不该有这次请求。
+        var casterProfile = ProfileOf(member);
+        if (casterProfile is not null
+            && string.Equals(casterProfile.Branch, CannotResurrectBranch, StringComparison.Ordinal))
+        {
+            outbox.Add(new ServerMessage
+            {
+                Rejected = Reject(PendingRequest(pending), SkillRejectReason.SkillRejectCannotResurrect),
+            });
+            return;
+        }
+
         var restore = Math.Max(1L, raised.HpMax * _config.Classes.Resurrect.HpRestorePct / 100);
-        var expCost = ExpCostOf(raised.Id);
+        // 生息二转只把这个比例减小；卷轴走角色服那一笔，仍按基础比例，不在这里。
+        var costPct = _config.Classes.Resurrect.ExpCostPct;
+        if (casterProfile is not null && casterProfile.BranchStep >= 2
+            && string.Equals(casterProfile.Branch, ShengxiBranch, StringComparison.Ordinal))
+        {
+            costPct = _config.Classes.Resurrect.SecondTurnExpCostPct;
+        }
+
+        var expCost = ExpCostOf(raised.Id, costPct);
         if (expCost is null)
         {
             // 角色那张表写不下就不拉，和结算不给号同一个道理。
@@ -1047,12 +1103,12 @@ public sealed class Encounter
     /// 当前级经验是零时这次不扣。等级不动，只动经验。
     /// 写不下去返回 null，由调用方把这次复活退回去。
     /// </summary>
-    long? ExpCostOf(ulong characterId)
+    long? ExpCostOf(ulong characterId, int costPct)
     {
         try
         {
             var state = _characters.Get(characterId);
-            var cost = state.Exp * _config.Classes.Resurrect.ExpCostPct / 100;
+            var cost = state.Exp * costPct / 100;
             _characters.Save(characterId, state with { Exp = Math.Max(0, state.Exp - cost) });
             return cost;
         }

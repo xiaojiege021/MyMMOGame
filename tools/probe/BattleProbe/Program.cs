@@ -61,6 +61,7 @@ internal static class Program
                 "p03a_tank" => await CaseP03aTankAsync(url, boss, hit),
                 "p03a_mana" => await CaseP03aManaAsync(url, boss, hit),
                 "p03a_resurrect" => await CaseP03aResurrectAsync(url, boss, party, warriorChar, priestChar, hit, resurrect, second),
+                "p24a_jielv" => await CaseP24aJielvAsync(url, boss, party, warriorChar, priestChar, hit, resurrect),
                 "p03b_phase" => await CaseP03bPhaseAsync(url, boss, ranged),
                 "p11a2_connect" => await CaseP11a2ConnectAsync(url, boss, hit, waitMs),
                 "p11a2_reject" => await CaseP11a2RejectAsync(url),
@@ -470,6 +471,33 @@ internal static class Program
     /// 第二段按 --second 的期望走：ok（蓝还够，再拉一次）或 no_mana（蓝不够，拉不起来）。
     /// 经验扣没扣、扣多少，由脚本读角色那张表来对。
     /// </summary>
+    /// <summary>
+    /// P2-4a：诫律（牧师分支之一）没有复活。战士先被 Boss 打倒，诫律牧师再拉他，
+    /// 期望这一下被拒 reason=CANNOT_RESURRECT，人还倒着。
+    /// </summary>
+    /// <summary>
+    /// P2-4a：诫律（牧师分支之一）没有复活这条能力，所以目标还没倒地也要立刻拒，
+    /// 不能先等到结算再说「目标不对」。
+    /// </summary>
+    static async Task<int> CaseP24aJielvAsync(
+        string url, ulong boss, string? party, ulong warriorChar, ulong priestChar,
+        uint hit, uint resurrect)
+    {
+        var key = string.IsNullOrEmpty(party) ? "p24a-" + Guid.NewGuid().ToString("N")[..8] : party;
+
+        await using var warrior = await Session.ConnectAsync(
+            WithQuery(url, $"party={key}&class=warrior&char={warriorChar}"));
+        await using var priest = await Session.ConnectAsync(
+            WithQuery(url, $"party={key}&class=priest&char={priestChar}"));
+
+        await priest.SubmitAsync(resurrect, warriorChar, Session.NowMs());
+        var rejected = await priest.ReadRejectedAsync(5000);
+
+        var ok = rejected?.Reason == SkillRejectReason.SkillRejectCannotResurrect;
+        Console.WriteLine($"p24a_jielv reason={rejected?.Reason}");
+        return Report(ok, "p24a_jielv cannot_resurrect");
+    }
+
     static async Task<int> CaseP03aResurrectAsync(
         string url, ulong boss, string? party, ulong warriorChar, ulong priestChar,
         uint hit, uint resurrect, string second)

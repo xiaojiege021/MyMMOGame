@@ -1771,7 +1771,105 @@ public sealed class CharacterGrpcService(
             Level = identity.Value.Level,
             EnhanceTotal = total,
             EnhanceSlots = slots,
+            BranchStep = identity.Value.BranchStep,
         };
+    }
+
+    /// <summary>
+    /// P2-4a：二转。只把 15 级选定的那条分支往前推一步：45 级才允许，
+    /// 目标必须就是已经写下的那条，改去另一条分支一律 branch_locked。
+    /// 分支归属（是不是这个职业的分支）在这里按配置先验，库里的状态由仓储一笔事务说了算。
+    /// </summary>
+    public override async Task<AdvanceBranchResponse> AdvanceBranch(
+        AdvanceBranchRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var branchId = (request.BranchId ?? "").Trim();
+        if (branchId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "branch_missing"));
+        }
+
+        var identity = await characters.BattleIdentityAsync(
+            (long)request.CharacterId, context.CancellationToken);
+        if (identity is null)
+        {
+            return new AdvanceBranchResponse { Ok = false, Reason = "character_not_found" };
+        }
+
+        if (!branches.BelongsTo(branchId, identity.Value.ClassId))
+        {
+            return new AdvanceBranchResponse
+            {
+                Ok = false,
+                Reason = "branch_not_found",
+                Branch = identity.Value.Branch,
+                BranchStep = identity.Value.BranchStep,
+                Level = identity.Value.Level,
+            };
+        }
+
+        var outcome = await characters.AdvanceBranchAsync(
+            (long)request.CharacterId, branchId, context.CancellationToken);
+        return new AdvanceBranchResponse
+        {
+            Ok = outcome.Reason.Length == 0,
+            Reason = outcome.Reason,
+            Branch = outcome.Branch,
+            BranchStep = outcome.Step,
+            Level = outcome.Level,
+            Duplicate = outcome.Duplicate,
+        };
+    }
+
+    /// <summary>
+    /// P2-4a：这件装备这个人能不能穿。不到 weapon_lock_level 的武器五个职业都能装备；
+    /// 到了就要看职业可用兵器（该职业所有分支的本命兵器并集）。等级与职业都从库里读。
+    /// </summary>
+    public override async Task<CanEquipResponse> CanEquip(
+        CanEquipRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var identity = await characters.BattleIdentityAsync(
+            (long)request.CharacterId, context.CancellationToken);
+        if (identity is null)
+        {
+            return new CanEquipResponse { Ok = false, Reason = "character_missing" };
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        var item = items.Find(itemId);
+        if (item is null)
+        {
+            return new CanEquipResponse
+            {
+                Ok = false,
+                Reason = "item_not_found",
+                Level = identity.Value.Level,
+                ClassId = identity.Value.ClassId,
+            };
+        }
+
+        var response = new CanEquipResponse
+        {
+            WeaponKind = item.WeaponKind,
+            RequireLevel = item.RequireLevel,
+            Level = identity.Value.Level,
+            ClassId = identity.Value.ClassId,
+        };
+
+        var reason = EquipRules.Check(item, identity.Value.Level, identity.Value.ClassId, branches);
+        response.Ok = reason.Length == 0;
+        response.Reason = reason;
+        return response;
     }
 
     /// <summary>

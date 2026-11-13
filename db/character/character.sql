@@ -121,3 +121,15 @@ CREATE INDEX IF NOT EXISTS dungeon_entry_character
 
 CREATE INDEX IF NOT EXISTS dungeon_entry_character_dungeon
     ON "角色".dungeon_entry (character_id, dungeon_id, entered_at DESC);
+
+-- P2-4a：二转步数（0 未转 / 1 一转 / 2 二转）。主迁移自包含：
+-- 老卡只跑 character.sql 的机器也要有这一列，否则二转与复活减免读不到。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS branch_step integer NOT NULL DEFAULT 0;
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_branch_step_range;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_branch_step_range CHECK (branch_step BETWEEN 0 AND 2);
+UPDATE "角色".character
+   SET branch_step = 1
+ WHERE branch IS NOT NULL AND branch <> '' AND branch_step = 0;

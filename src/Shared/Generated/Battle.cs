@@ -103,15 +103,16 @@ namespace Mmo.Proto.Battle {
             "EgoKY291bnRfbGVmdBgKIAEoAyJ1ChRSZXZpdmVTY3JvbGxSZWplY3RlZBIP",
             "CgdpdGVtX2lkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIWCg5yZXRyeV9hZnRl",
             "cl9tcxgDIAEoDRIQCghocF9hZnRlchgEIAEoAxISCgptYW5hX2FmdGVyGAUg",
-            "ASgDKtMCChFTa2lsbFJlamVjdFJlYXNvbhIcChhTS0lMTF9SRUpFQ1RfVU5T",
+            "ASgDKvYCChFTa2lsbFJlamVjdFJlYXNvbhIcChhTS0lMTF9SRUpFQ1RfVU5T",
             "UEVDSUZJRUQQABIeChpTS0lMTF9SRUpFQ1RfTk9UX0lOX0JBVFRMRRABEh4K",
             "GlNLSUxMX1JFSkVDVF9VTktOT1dOX1NLSUxMEAISHAoYU0tJTExfUkVKRUNU",
             "X1RBUkdFVF9HT05FEAMSHAoYU0tJTExfUkVKRUNUX0NBU1RFUl9ERUFEEAQS",
             "GQoVU0tJTExfUkVKRUNUX0NPT0xET1dOEAUSHQoZU0tJTExfUkVKRUNUX09V",
             "VF9PRl9SQU5HRRAGEhgKFFNLSUxMX1JFSkVDVF9DQVNUSU5HEAcSGQoVU0tJ",
             "TExfUkVKRUNUX1JFQ09WRVJZEAgSGAoUU0tJTExfUkVKRUNUX05PX01BTkEQ",
-            "CRIbChdTS0lMTF9SRUpFQ1RfQkFEX1RBUkdFVBAKQhOqAhBNbW8uUHJvdG8u",
-            "QmF0dGxlYgZwcm90bzM="));
+            "CRIbChdTS0lMTF9SRUpFQ1RfQkFEX1RBUkdFVBAKEiEKHVNLSUxMX1JFSkVD",
+            "VF9DQU5OT1RfUkVTVVJSRUNUEAtCE6oCEE1tby5Qcm90by5CYXR0bGViBnBy",
+            "b3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Battle.SkillRejectReason), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -189,6 +190,10 @@ namespace Mmo.Proto.Battle {
     /// 目标不对：复活选了自己，或者选的不是倒地的队友
     /// </summary>
     [pbr::OriginalName("SKILL_REJECT_BAD_TARGET")] SkillRejectBadTarget = 10,
+    /// <summary>
+    /// P2-4a：这个分支不能复活（诫律）。请求不算错，是这个职业分支没有这条能力。
+    /// </summary>
+    [pbr::OriginalName("SKILL_REJECT_CANNOT_RESURRECT")] SkillRejectCannotResurrect = 11,
   }
 
   #endregion

@@ -133,6 +133,12 @@ service CharacterService {
   // 各槽强化等级之和；属性折算、战力与同队平衡全在战斗服按 config/battlefield.json 做。
   // 不写库，也不返回背包、货币与任何客户端能改的输入。
   rpc DescribeBattleProfile(DescribeBattleProfileRequest) returns (DescribeBattleProfileResponse);
+  // P2-4a：二转只把 15 级选定的那条分支往前推一步。45 级才允许，目标必须就是
+  // 已经选定的那条；改去另一条分支一律拒绝。分支步数写在角色库里，不靠客户端传。
+  rpc AdvanceBranch(AdvanceBranchRequest) returns (AdvanceBranchResponse);
+  // P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
+  // 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
+  rpc CanEquip(CanEquipRequest) returns (CanEquipResponse);
 }
 
 message SettleExpRequest {
@@ -818,4 +824,41 @@ message DescribeBattleProfileResponse {
   int32 enhance_total = 5;
   // 有强化记录的槽位数；只给核对与日志用，不参与战力。
   int32 enhance_slots = 6;
+  // 二转步数：0 未转、1 一转、2 二转。生息二转的复活减免按它算。
+  int32 branch_step = 7;
+}
+
+// P2-4a：二转。只推进一步已经选定的分支，不另开分支、不改兵器。
+message AdvanceBranchRequest {
+  // 网关转发时填令牌账号；服间直连为空时只按角色编号找。
+  string account = 1;
+  uint64 character_id = 2;
+  string branch_id = 3;
+}
+
+message AdvanceBranchResponse {
+  bool ok = 1;
+  // not_enough_level / branch_missing / branch_locked / branch_not_found；
+  // 空串表示这一笔做成了（或者 duplicate）。
+  string reason = 2;
+  string branch = 3;
+  int32 branch_step = 4;
+  int32 level = 5;
+  bool duplicate = 6;
+}
+
+// P2-4a：武器锁。请求只带角色与物品，等级与职业都从库里读。
+message CanEquipRequest {
+  uint64 character_id = 1;
+  string item_id = 2;
+}
+
+message CanEquipResponse {
+  bool ok = 1;
+  // not_equipment / weapon_unknown / level_not_enough / class_mismatch / character_missing
+  string reason = 2;
+  string weapon_kind = 3;
+  int32 require_level = 4;
+  int32 level = 5;
+  string class_id = 6;
 }

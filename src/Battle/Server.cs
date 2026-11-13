@@ -302,7 +302,7 @@ public sealed class BattleServer(
                     Key = partyKey,
                     Encounter = new Encounter(
                         config, settlements, characters, NextSessionId(), partySize,
-                        expSettlement, talismans, scrolls),
+                        expSettlement, talismans, scrolls, profiles),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
                     PartySize = partySize,
@@ -599,7 +599,7 @@ public sealed class BattleServer(
                     Key = partyKey,
                     Encounter = new Encounter(
                         config, settlements, characters, NextSessionId(), config.Battlefield.Players,
-                        expSettlement, talismans, scrolls),
+                        expSettlement, talismans, scrolls, profiles),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = null,
                     PartySize = config.Battlefield.Players,
