@@ -291,10 +291,10 @@ fi
 
 if grep -q 'if (dungeon.TakesWeeklyShare)' "$SVC" \
    && grep -q 'if (!dungeon.ChargesFatigue)' "$SVC" \
-   && ! sed -n '/public override async Task<EnterDungeonResponse> EnterDungeon/,/^    }$/p' "$SVC" | grep -qi 'realm'; then
-  ok "巢穴走份额分支、主线仍走不扣疲劳分支；准入只看等级，没提前加境界门槛"
+   && python3 -c 'import json,sys; d=json.load(open(sys.argv[1]+"/config/dungeons.json",encoding="utf-8")); old={"main","abyss","lair","sect"}; rows=[x for x in d["dungeons"] if x.get("id") in old]; sys.exit(0 if len(rows)==4 and all("realm" not in x for x in rows) else 1)' "$ROOT"; then
+  ok "巢穴走份额分支、主线仍走不扣疲劳分支；旧副本不设境界门槛（P3-1a1 起只有新副本写 realm）"
 else
-  bad "进本分路不对，或者提前写了境界门槛"
+  bad "进本分路不对，或者旧副本被加了境界门槛"
 fi
 
 if grep -q 'party_size' "$BATTLE_SRV" && grep -q 'required int PartySize' "$BATTLE_SRV" \

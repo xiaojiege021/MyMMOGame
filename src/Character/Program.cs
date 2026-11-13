@@ -49,6 +49,14 @@ string? expConfigPath = null;
 // P2-2a：把副本表读出来，不连库、不启动进程，坏配置也走这里（与启动共用同一 DungeonTable.Load）。
 var dungeonTableState = false;
 string? dungeonTablePath = null;
+// P3-1a1：把境界表读出来（与启动共用同一 RealmTable.Load），坏配置也走这里。
+var realmTableState = false;
+string? realmTablePath = null;
+string? realmDungeonPath = null;
+// 只给核对用：单角色的当前境界与「下一段开没开」，或直写境界验开关。
+long realmStateOf = 0;
+long rawRealmId = 0;
+string? rawRealmValue = null;
 // 只给核对用：读高难本本周已用次数，或把进本记录整体往前挪一周验跨周归零。
 long hardEntryStateOf = 0;
 string? hardEntryDungeon = null;
@@ -263,6 +271,25 @@ for (var i = 0; i < args.Length; i++)
         case "--dungeon-table-path" when i + 1 < args.Length:
             dungeonTableState = true;
             dungeonTablePath = args[++i];
+            break;
+        // P3-1a1：境界表只读核对。与启动共用同一 RealmTable.Load；给两个路径时
+        // 第一个是临时境界表、第二个是临时副本表，用来验「旧副本不许写 realm」。
+        case "--realm-table":
+            realmTableState = true;
+            break;
+        case "--realm-table-path" when i + 2 < args.Length:
+            realmTableState = true;
+            realmTablePath = args[++i];
+            realmDungeonPath = args[++i];
+            break;
+        // 只给核对用：读一个角色的境界，并按配置回答「能不能突破到下一段」。
+        case "--realm-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out realmStateOf);
+            break;
+        // 只给核对用：绕过突破流程直写境界，验开关关着时进不去该段副本。
+        case "--raw-realm-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawRealmId);
+            rawRealmValue = args[++i];
             break;
         // 只给核对用：高难本本周已用次数 / 剩余次数，不经过进本逻辑。
         case "--hard-entry-state" when i + 2 < args.Length:
@@ -488,7 +515,64 @@ if (dungeonTableState)
                 + " entries_per_week=" + dungeon.EntriesPerWeek
                 + " reward_per_player=" + dungeon.RewardPerPlayer
                 + " fatigue=" + (dungeon.ChargesFatigue ? "true" : "false")
-                + " share=" + (dungeon.TakesWeeklyShare ? "true" : "false"));
+                + " share=" + (dungeon.TakesWeeklyShare ? "true" : "false")
+                + " realm=" + (dungeon.Realm ?? "none"));
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
+// P3-1a1 境界表只读核对：与启动共用同一 RealmTable.Load，不连库也不启动进程。
+// 坏配置（缺开关、首发段配了开关、别名指错、旧副本写了 realm）能在这一步直接看出来。
+if (realmTableState)
+{
+    try
+    {
+        var characterConfig = CharacterConfig.Load(configPath);
+        var dungeons = DungeonTable.Load(
+            realmDungeonPath ?? characterConfig.DungeonTable);
+        var table = RealmTable.Load(realmTablePath ?? characterConfig.RealmTable, dungeons);
+        Console.WriteLine("realm_table_state=ok version=" + table.Version
+            + " realms=" + table.Realms.Count
+            + " launch_until=" + table.LaunchUntil
+            + " open=" + string.Join(",", table.Realms.Where(table.IsOpen))
+            + " closed=" + string.Join(",", table.Realms.Where(r => !table.IsOpen(r))));
+        for (var r = 0; r < table.Realms.Count; r++)
+        {
+            Console.WriteLine("realm=" + (r + 1) + ":" + table.Realms[r]
+                + ":" + (table.IsOpen(table.Realms[r]) ? "open" : "closed"));
+        }
+        foreach (var pair in table.Aliases)
+        {
+            Console.WriteLine("alias=" + pair.Key + "=" + pair.Value);
+        }
+        foreach (var realm in table.Realms)
+        {
+            var advance = table.CheckAdvance(realm);
+            Console.WriteLine("advance=" + realm + "->"
+                + (advance.Next.Length == 0 ? "none" : advance.Next)
+                + ":" + (advance.Ok ? "ok" : advance.Reason));
+        }
+        foreach (var dungeon in dungeons.All)
+        {
+            // 用首发那一段去试：关着时应该回 realm_locked，开着时也只是 realm_not_enough；
+            // 旧副本没写 realm，这里应当直接 ok。
+            var gate = table.CheckDungeon(dungeon.Realm, table.LaunchUntil);
+            Console.WriteLine("dungeon_gate=" + dungeon.Id
+                + " realm=" + (dungeon.Realm ?? "none")
+                + " open=" + (dungeon.Realm is null || table.IsOpen(dungeon.Realm) ? "true" : "false")
+                + " from_launch=" + (gate.Ok ? "ok" : gate.Reason));
         }
     }
     catch (ConfigException ex)
@@ -959,7 +1043,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || boosterStateOf != 0 || boosterResetOf != 0 || boosterExpireOf != 0
     || unbindQuoteOf != 0 || unbindStateOf != 0 || rawBoundAtOf != 0
     || hardEntryStateOf != 0 || shiftEntryWeekOf != 0
-    || rechargeStateOf != null)
+    || rechargeStateOf != null || realmStateOf != 0 || rawRealmId != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -1037,6 +1121,34 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 // 核对要看到的就是这个：库层的 CHECK 把越界值挡住了。
                 Console.WriteLine("raw_level=rejected id=" + rawLevelWrite
                     + " level=" + rawLevelValue + " sqlstate=" + ex.SqlState);
+            }
+        }
+
+        if (rawRealmId != 0)
+        {
+            await characters.RawWriteRealmAsync(rawRealmId, rawRealmValue!, CancellationToken.None);
+            Console.WriteLine("raw_realm=written id=" + rawRealmId + " realm=" + rawRealmValue);
+        }
+
+        if (realmStateOf != 0)
+        {
+            var realm = await characters.RealmOfAsync(realmStateOf, CancellationToken.None);
+            if (realm is null)
+            {
+                Console.WriteLine("realm_state=missing id=" + realmStateOf);
+            }
+            else
+            {
+                var realmConfig = CharacterConfig.Load(configPath);
+                var realmDungeons = DungeonTable.Load(realmConfig.DungeonTable);
+                var table = RealmTable.Load(realmConfig.RealmTable, realmDungeons);
+                var advance = table.CheckAdvance(realm);
+                Console.WriteLine("realm_state=ok id=" + realmStateOf
+                    + " realm=" + advance.From
+                    + " rank=" + table.Rank(realm)
+                    + " next=" + (advance.Next.Length == 0 ? "none" : advance.Next)
+                    + " next_open=" + (advance.NextOpen ? "true" : "false")
+                    + " advance=" + (advance.Ok ? "ok" : advance.Reason));
             }
         }
 

@@ -20,6 +20,7 @@ public sealed class CharacterGrpcService(
     ItemTable items,
     CurrencyTable currencies,
     DungeonTable dungeons,
+    RealmTable realms,
     DungeonEntryRepository dungeonEntries,
     HardEntryRepository hardEntries,
     WeeklyShareRepository weeklyShares,
@@ -500,7 +501,8 @@ public sealed class CharacterGrpcService(
     /// 到日上限就整笔拒绝；占周份额的本（巢穴）按人数扣份额、按人数记产出份数，
     /// 到周上限整笔拒绝。两种扣减与进本记录各在一个事务里。
     /// 战斗服那边还有一道同样的人数上限（它按 party 开本），两道都挡。
-    /// 准入只看等级，不查境界：元婴副本的境界门槛在后面的卡。
+    /// 旧副本只看等级；写了 realm 的新副本（元婴起）还要这一段已经开放、
+    /// 个人境界也不低于门槛，判定与「能不能突破」共用 RealmTable。
     /// P2-2a 的高难本（龙巢）另加一条：人数不足回 party_too_small，
     /// 本周次数用完由 HardEntryRepository 回 hard_entries_exhausted，两条都不留进本记录。
     /// </summary>
@@ -541,6 +543,22 @@ public sealed class CharacterGrpcService(
         if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
         {
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        // P3-1a1：境界从库里读，客户端带进来的字段一概不认。
+        // 旧副本没写 realm，这一步直接放行；写了 realm 的新副本先看这一段开没开，
+        // 再看个人境界够不够，关着时谁都进不去（包括已经到元婴的人）。
+        var realm = await inventory.RealmAsync(account, characterId, context.CancellationToken);
+        var gate = realms.CheckDungeon(dungeon.Realm, realm);
+        if (!gate.Ok)
+        {
+            logger.LogInformation(
+                "dungeon_reject account={Account} id={Id} dungeon={Dungeon} reason={Reason} "
+                + "realm={Realm} required={Required}",
+                account, characterId, dungeon.Id, gate.Reason, gate.Realm, gate.Required);
+
+            return Rejected(
+                gate.Reason, dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
         }
 
         // 人数超上限：不是错误码能表达的「业务不允许」，回 allowed=false 让客户端提示。

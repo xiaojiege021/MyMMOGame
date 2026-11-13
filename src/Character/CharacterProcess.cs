@@ -28,6 +28,7 @@ public sealed class CharacterProcess(string configPath)
         ItemTable items;
         CurrencyTable currencies;
         DungeonTable dungeons;
+        RealmTable realms;
         ExpTable expTable;
         EnhanceTable enhanceTable;
         TransferTable transferTable;
@@ -47,6 +48,9 @@ public sealed class CharacterProcess(string configPath)
             items = ItemTable.Load("config/items.json");
             currencies = CurrencyTable.Load("config/currency.json");
             dungeons = DungeonTable.Load(config.DungeonTable);
+            // P3-1a1：十一段按顺序开放，首发到结丹；元婴起每段一个开关。
+            // 与副本表交叉校验：写 realm 的只能是首发之后的新副本，旧副本不许写。
+            realms = RealmTable.Load(config.RealmTable, dungeons);
             expTable = ExpTable.Load(config.ExpTable);
             // 开发架构第 7 节：强化概率由角色服读。三档材料要在物品表里存在，
             // 扣的金币要在币种表里存在，缺一样就起不来。
@@ -120,6 +124,16 @@ public sealed class CharacterProcess(string configPath)
                 + " max=" + dungeon.MaxPlayers
                 + " entries=" + dungeon.EntriesPerWeek
                 + " reward=" + dungeon.RewardPerPlayer);
+        }
+        // P3-1a1：十一段顺序与开关。改 realms.json 重启后这里能直接核对到。
+        Console.WriteLine("realms=" + realms.Realms.Count
+            + " realm_table_version=" + realms.Version
+            + " launch_until=" + realms.LaunchUntil
+            + " open_realms=" + string.Join(",", realms.Realms.Where(realms.IsOpen))
+            + " closed_realms=" + string.Join(",", realms.Realms.Where(r => !realms.IsOpen(r))));
+        foreach (var dungeon in dungeons.All.Where(d => d.Realm is not null))
+        {
+            Console.WriteLine("dungeon_realm=" + dungeon.Id + " realm=" + dungeon.Realm);
         }
         Console.WriteLine("exp_table_version=" + expTable.Version
             + " level_cap=" + expTable.LevelCap
@@ -271,6 +285,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(items);
         builder.Services.AddSingleton(currencies);
         builder.Services.AddSingleton(dungeons);
+        builder.Services.AddSingleton(realms);
         builder.Services.AddSingleton(dungeonEntries);
         builder.Services.AddSingleton(hardEntries);
         builder.Services.AddSingleton(weeklyShares);

@@ -22,7 +22,8 @@ public sealed record DungeonDef(
     bool TakesWeeklyShare,
     int FatiguePerPlayer,
     int EntriesPerWeek,
-    int RewardPerPlayer)
+    int RewardPerPlayer,
+    string? Realm = null)
 {
     public bool IsHard => Tier == "hard";
 }
@@ -223,6 +224,14 @@ public sealed class DungeonTable
                 throw new ConfigException("副本 " + id + " 满员一次的份额就超过周上限，永远进不去");
             }
 
+            // P3-1a1：元婴起的新副本写 realm，旧副本不写（旧副本不提高境界门槛）。
+            // 门槛名字是否在十一段里、是否落在首发之后，由 RealmTable.Load 交叉校验。
+            var realm = (item.Realm ?? "").Trim();
+            if (item.Realm is not null && realm.Length == 0)
+            {
+                throw new ConfigException("副本 " + id + " 的 realm 不能为空");
+            }
+
             map[id] = new DungeonDef(
                 id,
                 (item.Name ?? id).Trim(),
@@ -233,7 +242,8 @@ public sealed class DungeonTable
                 takesShare,
                 charges ? perPlayer : 0,
                 entriesPerWeek,
-                rewardPerPlayer);
+                rewardPerPlayer,
+                realm.Length == 0 ? null : realm);
         }
 
         if (map.Count == 0)
@@ -306,5 +316,9 @@ public sealed class DungeonTable
 
         [JsonPropertyName("reward_per_player")]
         public int? RewardPerPlayer { get; init; }
+
+        // P3-1a1：元婴起的新副本才写；旧副本不写，门槛不抬高。
+        [JsonPropertyName("realm")]
+        public string? Realm { get; init; }
     }
 }

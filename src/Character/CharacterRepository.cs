@@ -189,6 +189,29 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
         await command.ExecuteNonQueryAsync(stopping);
     }
 
+    /// <summary>只读：单角色的当前境界。突破与进本的版本开关都按这一列判。</summary>
+    public async Task<string?> RealmOfAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select realm from \"角色\".character where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        return await reader.ReadAsync(stopping) ? reader.GetString(0) : null;
+    }
+
+    /// <summary>
+    /// 只给核对用：绕过突破流程直写境界，验开关关着时不能进副本、开了以后才放行。
+    /// 正常路径不能走这里；境界只由 P3-1a2 的突破那一笔事务写。
+    /// </summary>
+    public async Task RawWriteRealmAsync(long characterId, string realm, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "update \"角色\".character set realm = $2 where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(realm);
+        await command.ExecuteNonQueryAsync(stopping);
+    }
+
     /// <summary>
     /// P2-4a：二转只把 15 级选定的那条分支往前推一步。一笔事务锁角色行 → 校验
     /// 等级 / 已有分支 / 目标分支是否同一条 → 把 branch_step 写成 2。

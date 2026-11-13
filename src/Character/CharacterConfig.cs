@@ -11,7 +11,7 @@ public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
     string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
-    string UnbindTable, string RechargeTable, string SocialUpstream)
+    string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -25,6 +25,8 @@ public sealed record CharacterConfig(
     public const string DefaultExpBoosterTable = "config/exp_booster.json";
     public const string DefaultUnbindTable = "config/unbind_item.json";
     public const string DefaultRechargeTable = "config/recharge.json";
+    // P3-1a1：十一段境界顺序与版本开关；核对脚本可以指到临时表试坏配置。
+    public const string DefaultRealmTable = "config/realms.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -165,11 +167,19 @@ public sealed record CharacterConfig(
             throw new ConfigException("social_upstream 必须是 http:// 或 https:// 的地址：" + socialUpstream);
         }
 
+        // P3-1a1：境界顺序与版本开关也走同一份配置正本；核对脚本可以指到临时表
+        // 改开关做隔离测试（例如把元婴打开）。
+        var realmTable = (wire.RealmTable ?? DefaultRealmTable).Trim();
+        if (realmTable.Length == 0)
+        {
+            throw new ConfigException("realm_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
-            socialUpstream.TrimEnd('/'));
+            socialUpstream.TrimEnd('/'), realmTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -227,6 +237,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("social_upstream")]
         public string? SocialUpstream { get; init; }
+
+        [JsonPropertyName("realm_table")]
+        public string? RealmTable { get; init; }
     }
 }
 

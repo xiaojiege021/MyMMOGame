@@ -40,7 +40,7 @@ def rd(p): return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 cfg = json.loads(rd("config/dungeons.json"))
 ds = {d.get("id"): d for d in cfg.get("dungeons", [])}
-R("version", cfg.get("version") == 6, "version=6")
+R("version", isinstance(cfg.get("version"), int) and cfg.get("version") >= 6, str(cfg.get("version")))
 dr = ds.get("dragon", {})
 R("dragon", dr.get("tier") == "hard" and dr.get("min_players") == 2 and dr.get("max_players") == 8
   and dr.get("entries_per_week") == 1 and dr.get("reward_per_player") == 1
@@ -113,10 +113,11 @@ fi
 
 echo "== 3. 只读入口（与启动同一份 Load）=="
 DT="$("$DOTNET" "$CD" --dungeon-table $CC 2>&1)"
-printf '%s' "$DT" | grep -q '^dungeon_table_state=ok version=6' \
+# 只钉龙巢与主线的字段，不写死表版本：后面的卡会追加条目（P3-1a1 加了元婴副本）。
+printf '%s' "$DT" | grep -q '^dungeon_table_state=ok version=[0-9][0-9]*' \
   && printf '%s' "$DT" | grep -qE '^dungeon=dragon tier=hard min=2 max=8 entries_per_week=1 reward_per_player=1 ' \
   && printf '%s' "$DT" | grep -qE '^dungeon=main tier=normal min=1 max=1 ' \
-  && ok "副本表只读口径：version=6、龙巢 hard/2–8/每周1/每人1、主线 normal/1–1" \
+  && ok "副本表只读口径：龙巢 hard/2–8/每周1/每人1、主线 normal/1–1" \
   || bad "--dungeon-table 不对：$DT"
 
 echo "== 4. 坏配置起不来（真实 DungeonTable.Load）=="
