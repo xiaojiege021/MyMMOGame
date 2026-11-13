@@ -228,7 +228,7 @@ PY
   start_social && ok "社交服就绪（65000）" || bad "社交服没起来 / 子通道没恢复"
   grep -q '^positions=master:1,vice_master:1,elder:4,steward:12' "$TMP/harness/social.log" && ok "真实启动日志打印同形 positions 行" || bad "启动日志缺同形 positions 行"
 
-  IDS=""; for i in $(seq 1 23); do id="$(new_char "a2_$$_$i")"; [ -n "$id" ] && IDS="$IDS $id"; done
+  IDS=""; for i in $(seq 1 23); do id="$(new_char "a2_$$_$i")"; [ -n "$id" ] && IDS="${IDS:+$IDS }$id"; done
   [ "$(printf '%s\n' "$IDS" | wc -w | tr -d ' ')" -ge 23 ] \
     && ok "23 个测试角色就位" || bad "角色不足 23 个（${IDS}）"
   NAME="a2s_$$_$(date +%s)"
@@ -321,15 +321,6 @@ PY
     printf '       （角色库 db_cli 段未跑：缺 Character.dll；社交库 position 列断言已覆盖）\n'
   fi
 
-  # 免职同一笔事务、txn_id 服务端生成、重放不重复改。
-  T="$(nth "$IDS" 10)"
-  r="$(dismiss "$SECT" "$T" steward)"
-  check "$r" "ok=true position=disciple" "免职：把执事免成弟子"
-  [ -n "$(json_field "$(body_of "$r")" txn_id)" ] && ok "txn_id 服务端生成" || bad "缺 txn_id"
-  check "$(dismiss "$SECT" "$T" steward)" "ok=true position=disciple" "免职重放：幂等不重复改"
-  printf '%s' "$(read_pos "$SECT")" | grep -qE "(^|,)${T}:disciple" \
-    && ok "免职读库：该成员 position=disciple" || bad "免职没落库"
-
   # ② 席位数字只有一个正本、改配置重启生效。
   set_steward 13
   start_social && ok "改 steward=13 后重启、轮询只读回 200" || bad "改 13 重启失败"
@@ -342,6 +333,16 @@ PY
   CONF2="$("$DOTNET" "$SOCIAL_DLL" --sect-position-config 2>&1)"
   printf '%s' "$CONF2" | grep -q 'positions=master:1,vice_master:1,elder:4,steward:12' \
     && ok "--sect-position-config 改回后仍逐项打印四席位" || bad "config 打印不对：$CONF2"
+
+  # 免职同一笔事务、txn_id 服务端生成、重放不重复改（放在 ② 之后，免得免职空出一席
+  # 影响 ②「改 13 后任命第 13 席」的 seat_count）。
+  T="$(nth "$IDS" 10)"
+  r="$(dismiss "$SECT" "$T" steward)"
+  check "$r" "ok=true position=disciple" "免职：把执事免成弟子"
+  [ -n "$(json_field "$(body_of "$r")" txn_id)" ] && ok "txn_id 服务端生成" || bad "缺 txn_id"
+  check "$(dismiss "$SECT" "$T" steward)" "ok=true position=disciple" "免职重放：幂等不重复改"
+  printf '%s' "$(read_pos "$SECT")" | grep -qE "(^|,)${T}:disciple" \
+    && ok "免职读库：该成员 position=disciple" || bad "免职没落库"
 
   cp "$TMP/sect.orig.json" "$ROOT/config/sect.json"
   harness_cleanup
