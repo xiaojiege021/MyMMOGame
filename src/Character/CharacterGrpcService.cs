@@ -21,6 +21,7 @@ public sealed class CharacterGrpcService(
     CurrencyTable currencies,
     DungeonTable dungeons,
     DungeonEntryRepository dungeonEntries,
+    HardEntryRepository hardEntries,
     WeeklyShareRepository weeklyShares,
     HotSpringRepository hotSpring,
     ExpSettlementRepository expSettlements,
@@ -500,6 +501,8 @@ public sealed class CharacterGrpcService(
     /// 到周上限整笔拒绝。两种扣减与进本记录各在一个事务里。
     /// 战斗服那边还有一道同样的人数上限（它按 party 开本），两道都挡。
     /// 准入只看等级，不查境界：元婴副本的境界门槛在后面的卡。
+    /// P2-2a 的高难本（龙巢）另加一条：人数不足回 party_too_small，
+    /// 本周次数用完由 HardEntryRepository 回 hard_entries_exhausted，两条都不留进本记录。
     /// </summary>
     public override async Task<EnterDungeonResponse> EnterDungeon(
         EnterDungeonRequest request,
@@ -551,6 +554,58 @@ public sealed class CharacterGrpcService(
                 "party_too_large", dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
         }
 
+        // 人数不足下限：高难本（龙巢）至少 2 人，普通本下限是 1、走不到这里。
+        // 不扣次数、不留进本记录，回包带上配置里的下限供客户端提示。
+        if (partySize < dungeon.MinPlayers)
+        {
+            logger.LogInformation(
+                "dungeon_reject account={Account} id={Id} dungeon={Dungeon} party={Party} min={Min}",
+                account, characterId, dungeon.Id, partySize, dungeon.MinPlayers);
+
+            return Rejected(
+                "party_too_small", dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
+        }
+
+        // 高难本（龙巢）：每人每周固定次数，进一次扣 1 次，产出就是配置里的那 1 份，
+        // 不乘进本人数。次数以角色库里已经写下的进本记录为准，只写 dungeon_entry 一行。
+        if (dungeon.IsHard)
+        {
+            var hard = await hardEntries.EnterHardAsync(
+                characterId, account, dungeon, partySize, context.CancellationToken);
+            if (hard.Reason == "character_not_found")
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+
+            logger.LogInformation(
+                "dungeon_enter account={Account} id={Id} dungeon={Dungeon} party={Party} "
+                + "allowed={Allowed} reason={Reason} hard_used={Used} hard_cap={Cap} "
+                + "hard_remaining={Remaining} reward_shares={Shares} entry={Entry}",
+                account, characterId, dungeon.Id, partySize,
+                hard.Allowed, hard.Reason, hard.Used, hard.Cap,
+                hard.Remaining, hard.RewardShares, hard.EntryId);
+
+            return new EnterDungeonResponse
+            {
+                Allowed = hard.Allowed,
+                Reason = hard.Reason,
+                MaxPlayers = (uint)dungeon.MaxPlayers,
+                MinPlayers = (uint)dungeon.MinPlayers,
+                Fatigue = reserves.Value.Fatigue,
+                WeeklyShare = reserves.Value.WeeklyShare,
+                EntryId = (ulong)hard.EntryId,
+                FatigueCost = 0,
+                FatigueDailyCap = dungeons.FatigueDailyCap,
+                WeeklyShareCost = 0,
+                WeeklyShareRemaining = dungeons.WeeklyShareCap - reserves.Value.WeeklyShare,
+                WeeklyShareCap = dungeons.WeeklyShareCap,
+                RewardShares = hard.RewardShares,
+                HardEntriesUsed = hard.Used,
+                HardEntriesCap = hard.Cap,
+                HardEntriesRemaining = hard.Remaining,
+            };
+        }
+
         // 占周份额的本（巢穴）：与疲劳解绑，不扣疲劳，但按人数扣份额、按人数记份数。
         // 单人 1 份，4 人一次 4 份；一周 12 份，扣完这周就不能再进。
         if (dungeon.TakesWeeklyShare)
@@ -576,6 +631,7 @@ public sealed class CharacterGrpcService(
                 Allowed = share.Allowed,
                 Reason = share.Reason,
                 MaxPlayers = (uint)dungeon.MaxPlayers,
+                MinPlayers = (uint)dungeon.MinPlayers,
                 Fatigue = share.Fatigue,
                 WeeklyShare = share.Used,
                 EntryId = (ulong)share.EntryId,
@@ -585,6 +641,10 @@ public sealed class CharacterGrpcService(
                 WeeklyShareRemaining = share.Remaining,
                 WeeklyShareCap = share.WeeklyCap,
                 RewardShares = share.RewardShares,
+                // 巢穴不是高难本：次数三项恒为 0。
+                HardEntriesUsed = 0,
+                HardEntriesCap = 0,
+                HardEntriesRemaining = 0,
             };
         }
 
@@ -605,6 +665,7 @@ public sealed class CharacterGrpcService(
                 Allowed = true,
                 Reason = "",
                 MaxPlayers = (uint)dungeon.MaxPlayers,
+                MinPlayers = (uint)dungeon.MinPlayers,
                 Fatigue = reserves.Value.Fatigue,
                 WeeklyShare = reserves.Value.WeeklyShare,
                 EntryId = (ulong)entryId,
@@ -614,6 +675,10 @@ public sealed class CharacterGrpcService(
                 WeeklyShareRemaining = dungeons.WeeklyShareCap - reserves.Value.WeeklyShare,
                 WeeklyShareCap = dungeons.WeeklyShareCap,
                 RewardShares = 0,
+                // 主线不是高难本：次数三项恒为 0。
+                HardEntriesUsed = 0,
+                HardEntriesCap = 0,
+                HardEntriesRemaining = 0,
             };
         }
 
@@ -640,6 +705,7 @@ public sealed class CharacterGrpcService(
             Allowed = outcome.Allowed,
             Reason = outcome.Reason,
             MaxPlayers = (uint)dungeon.MaxPlayers,
+            MinPlayers = (uint)dungeon.MinPlayers,
             Fatigue = outcome.Fatigue,
             WeeklyShare = outcome.WeeklyShare,
             // 允许进本时是库里的自增编号（> 0），被拒时是 0。
@@ -650,6 +716,10 @@ public sealed class CharacterGrpcService(
             WeeklyShareRemaining = dungeons.WeeklyShareCap - outcome.WeeklyShare,
             WeeklyShareCap = dungeons.WeeklyShareCap,
             RewardShares = 0,
+            // 深渊不是高难本：次数三项恒为 0。
+            HardEntriesUsed = 0,
+            HardEntriesCap = 0,
+            HardEntriesRemaining = 0,
         };
     }
 
@@ -2301,6 +2371,7 @@ public sealed class CharacterGrpcService(
             Allowed = false,
             Reason = reason,
             MaxPlayers = (uint)dungeon.MaxPlayers,
+            MinPlayers = (uint)dungeon.MinPlayers,
             Fatigue = fatigue,
             WeeklyShare = weeklyShare,
             FatigueCost = 0,

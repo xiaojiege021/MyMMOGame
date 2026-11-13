@@ -38,6 +38,14 @@ var rawExpValue = 0L;
 // P2-1c：把经验表读出来，不连库、不启动进程，坏配置也走这里。
 var expConfigState = false;
 string? expConfigPath = null;
+// P2-2a：把副本表读出来，不连库、不启动进程，坏配置也走这里（与启动共用同一 DungeonTable.Load）。
+var dungeonTableState = false;
+string? dungeonTablePath = null;
+// 只给核对用：读高难本本周已用次数，或把进本记录整体往前挪一周验跨周归零。
+long hardEntryStateOf = 0;
+string? hardEntryDungeon = null;
+long shiftEntryWeekOf = 0;
+string? shiftEntryWeekDungeon = null;
 var enhanceState = false;
 string? enhanceConfigPath = null;
 long enhanceLevelOf = 0;
@@ -214,6 +222,25 @@ for (var i = 0; i < args.Length; i++)
         case "--exp-config-path" when i + 1 < args.Length:
             expConfigState = true;
             expConfigPath = args[++i];
+            break;
+        // P2-2a：副本表只读核对。与真实启动共用同一 DungeonTable.Load，
+        // 不连库也不启动进程；--dungeon-table-path 指到临时副本验坏配置。
+        case "--dungeon-table":
+            dungeonTableState = true;
+            break;
+        case "--dungeon-table-path" when i + 1 < args.Length:
+            dungeonTableState = true;
+            dungeonTablePath = args[++i];
+            break;
+        // 只给核对用：高难本本周已用次数 / 剩余次数，不经过进本逻辑。
+        case "--hard-entry-state" when i + 2 < args.Length:
+            long.TryParse(args[++i], out hardEntryStateOf);
+            hardEntryDungeon = args[++i];
+            break;
+        // 只给核对用：把进本记录整体往前挪一周，验新的一周次数归零。
+        case "--shift-entry-week" when i + 2 < args.Length:
+            long.TryParse(args[++i], out shiftEntryWeekOf);
+            shiftEntryWeekDungeon = args[++i];
             break;
         // 只给核对用：把强化表读出来，不连库、不启动进程。坏配置也走这里。
         case "--enhance-state":
@@ -409,6 +436,41 @@ for (var i = 0; i < args.Length; i++)
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
     }
+}
+
+// P2-2a 副本表只读核对：与真实启动共用同一 DungeonTable.Load，不连库也不启动进程，
+// 坏配置（高难缺字段、下限超过上限、普通本配了高难三项）能在这一步直接看出来。
+if (dungeonTableState)
+{
+    try
+    {
+        var table = DungeonTable.Load(
+            dungeonTablePath ?? CharacterConfig.Load(configPath).DungeonTable);
+        Console.WriteLine("dungeon_table_state=ok version=" + table.Version);
+        foreach (var dungeon in table.All)
+        {
+            Console.WriteLine("dungeon=" + dungeon.Id
+                + " tier=" + dungeon.Tier
+                + " min=" + dungeon.MinPlayers
+                + " max=" + dungeon.MaxPlayers
+                + " entries_per_week=" + dungeon.EntriesPerWeek
+                + " reward_per_player=" + dungeon.RewardPerPlayer
+                + " fatigue=" + (dungeon.ChargesFatigue ? "true" : "false")
+                + " share=" + (dungeon.TakesWeeklyShare ? "true" : "false"));
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
 }
 
 // 经验表只读核对（P2-1c）：与真实启动共用同一 ExpTable.Load，不连库也不启动进程，
@@ -832,6 +894,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || scrollStateOf != 0 || scrollResetOf != 0
     || boosterStateOf != 0 || boosterResetOf != 0 || boosterExpireOf != 0
     || unbindQuoteOf != 0 || unbindStateOf != 0 || rawBoundAtOf != 0
+    || hardEntryStateOf != 0 || shiftEntryWeekOf != 0
     || rechargeStateOf != null)
 {
     var connectionString = DbEnv.Resolve();
@@ -1253,6 +1316,39 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             command.Parameters.AddWithValue(entryCountOf);
             var value = await command.ExecuteScalarAsync(CancellationToken.None);
             Console.WriteLine("entry_count=" + Convert.ToInt32(value) + " id=" + entryCountOf);
+        }
+
+        if (hardEntryStateOf != 0 || shiftEntryWeekOf != 0)
+        {
+            // P2-2a：高难次数只从「角色」.dungeon_entry 数，不经过进本逻辑。
+            var hardEntries = new HardEntryRepository(dataSource);
+
+            if (hardEntryStateOf != 0 && hardEntryDungeon != null)
+            {
+                // 上限从同一个副本表读，和跑着的角色服看到的是同一份。
+                var hardDungeon = DungeonTable.Load(
+                    CharacterConfig.Load(configPath).DungeonTable).Find(hardEntryDungeon);
+                var cap = hardDungeon?.EntriesPerWeek ?? 0;
+                var state = await hardEntries.HardEntryStateAsync(
+                    hardEntryStateOf, hardEntryDungeon, cap, CancellationToken.None);
+                Console.WriteLine(state is null
+                    ? "hard_entry_state=missing id=" + hardEntryStateOf
+                      + " dungeon=" + hardEntryDungeon
+                    : "hard_entry_state=ok id=" + hardEntryStateOf
+                      + " dungeon=" + hardEntryDungeon
+                      + " used=" + state.Value.Used
+                      + " cap=" + state.Value.Cap
+                      + " remaining=" + state.Value.Remaining);
+            }
+
+            if (shiftEntryWeekOf != 0 && shiftEntryWeekDungeon != null)
+            {
+                // 只给核对用：把进本记录挪到上一周，验新的一周从 0 起算。
+                await hardEntries.ShiftEntryWeekAsync(
+                    shiftEntryWeekOf, shiftEntryWeekDungeon, CancellationToken.None);
+                Console.WriteLine("shift_entry_week=ok id=" + shiftEntryWeekOf
+                    + " dungeon=" + shiftEntryWeekDungeon);
+            }
         }
 
         if (fatigueStateOf != 0 || setFatigueDay != null || rawFatigueId != 0)

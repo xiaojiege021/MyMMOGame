@@ -153,6 +153,15 @@ public sealed class BattleServer(
             return;
         }
 
+        // 高难本不能单人进（龙巢至少 2 人）。普通本 min_players 缺省 1，这条不会命中。
+        if (dungeon is not null && partySize < dungeon.MinPlayers)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            Console.WriteLine("join_reject=party_too_small party_size=" + partySize
+                + " min=" + dungeon.MinPlayers + " dungeon=" + dungeon.Id);
+            return;
+        }
+
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
 
         Party party;

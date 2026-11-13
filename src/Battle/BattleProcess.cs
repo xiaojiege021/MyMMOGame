@@ -45,6 +45,13 @@ public sealed class BattleProcess(string configPath)
         Console.WriteLine("character_dir=" + characters.Dir);
         Console.WriteLine($"skills={config.Skills.All.Count} skill_table_version={config.Skills.Version}");
         Console.WriteLine($"classes={config.Classes.All.Count} class_table_version={config.Classes.Version} default_class={config.DefaultClass}");
+        // 副本表的难度档与人数上下限打出来：高难本至少 2 人，普通本 min_players 是 1。
+        Console.WriteLine($"dungeons={config.Dungeons.All.Count} dungeon_table_version={config.Dungeons.Version}");
+        foreach (var dungeon in config.Dungeons.All)
+        {
+            Console.WriteLine($"dungeon={dungeon.Id} tier={dungeon.Tier}"
+                + $" min_players={dungeon.MinPlayers} max_players={dungeon.MaxPlayers}");
+        }
         Console.WriteLine($"boss={config.Boss.Id} hp_max={config.Boss.HpMax} exp_on_clear={config.Boss.ExpOnClear}"
             + (config.Boss.Phases is { Count: > 0 } phases ? $" phases={phases.Count}" : ""));
         // 场次全在内存里，进程一停就没了。重启不恢复、不补发，这句是给核对脚本看的。

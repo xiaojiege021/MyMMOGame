@@ -22,3 +22,8 @@ ALTER TABLE "角色".dungeon_entry
 
 CREATE INDEX IF NOT EXISTS dungeon_entry_character
     ON "角色".dungeon_entry (character_id, entered_at DESC);
+
+-- P2-2a：高难本（龙巢）每人每周的次数就数这张表：同一角色 + 同一副本、
+-- entered_at 落在本周的行数。不进新表、不加新列，索引只服务这一个计数。
+CREATE INDEX IF NOT EXISTS dungeon_entry_character_dungeon
+    ON "角色".dungeon_entry (character_id, dungeon_id, entered_at DESC);

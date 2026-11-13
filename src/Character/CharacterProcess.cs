@@ -105,11 +105,22 @@ public sealed class CharacterProcess(string configPath)
             + " bag_slots=" + config.BagSlots);
         Console.WriteLine("currencies=" + currencies.All.Count + " currency_table_version=" + currencies.Version);
         Console.WriteLine("dungeons=" + dungeons.All.Count + " dungeon_table_version=" + dungeons.Version
+            + " dungeons_version=" + dungeons.Version
             + " fatigue_daily_cap=" + dungeons.FatigueDailyCap
             + " hot_spring_recovery=" + dungeons.HotSpringRecovery
             + " weekly_share_cap=" + dungeons.WeeklyShareCap
             + " monster_hp_scale_per_player=" + dungeons.MonsterHpScalePerPlayer
             + " monster_damage_scale_per_player=" + dungeons.MonsterDamageScalePerPlayer);
+        // 逐条列出人数区间与「每周次数 / 每人份数」，高难本的规则改一条重启后能直接核对到。
+        foreach (var dungeon in dungeons.All)
+        {
+            Console.WriteLine("dungeon=" + dungeon.Id
+                + " tier=" + dungeon.Tier
+                + " min=" + dungeon.MinPlayers
+                + " max=" + dungeon.MaxPlayers
+                + " entries=" + dungeon.EntriesPerWeek
+                + " reward=" + dungeon.RewardPerPlayer);
+        }
         Console.WriteLine("exp_table_version=" + expTable.Version
             + " level_cap=" + expTable.LevelCap
             + " base_exp=" + expTable.BaseExp
@@ -205,6 +216,9 @@ public sealed class CharacterProcess(string configPath)
         var currency = new CurrencyRepository(dataSource);
         var grants = new GrantRepository(dataSource, items, currencies, config);
         var dungeonEntries = new DungeonEntryRepository(dataSource);
+        // P2-2a：高难本（龙巢）每人每周的次数。只写 dungeon_entry 一行，
+        // 不碰疲劳与周份额；次数以库里已写下的进本记录为准。
+        var hardEntries = new HardEntryRepository(dataSource);
         var weeklyShares = new WeeklyShareRepository(dataSource);
         var hotSpring = new HotSpringRepository(dataSource);
         var expSettlements = new ExpSettlementRepository(dataSource);
@@ -258,6 +272,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(currencies);
         builder.Services.AddSingleton(dungeons);
         builder.Services.AddSingleton(dungeonEntries);
+        builder.Services.AddSingleton(hardEntries);
         builder.Services.AddSingleton(weeklyShares);
         builder.Services.AddSingleton(hotSpring);
         builder.Services.AddSingleton(expSettlements);

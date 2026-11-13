@@ -624,7 +624,11 @@ public static class CharacterApi
                     + " share=" + result.WeeklyShare
                     + " share_cost=" + result.WeeklyShareCost
                     + " share_left=" + result.WeeklyShareRemaining
-                    + " rewards=" + result.RewardShares);
+                    + " rewards=" + result.RewardShares
+                    + " min_players=" + result.MinPlayers
+                    + " hard_entries_used=" + result.HardEntriesUsed
+                    + " hard_entries_cap=" + result.HardEntriesCap
+                    + " hard_entries_left=" + result.HardEntriesRemaining);
 
                 await WriteAsync(context, 200, new
                 {
@@ -640,6 +644,10 @@ public static class CharacterApi
                     weekly_share_remaining = result.WeeklyShareRemaining,
                     weekly_share_cap = result.WeeklyShareCap,
                     reward_shares = result.RewardShares,
+                    min_players = result.MinPlayers,
+                    hard_entries_used = result.HardEntriesUsed,
+                    hard_entries_cap = result.HardEntriesCap,
+                    hard_entries_remaining = result.HardEntriesRemaining,
                 });
             }
             catch (RpcException ex)

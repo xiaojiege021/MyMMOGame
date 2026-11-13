@@ -38,9 +38,13 @@ def R(k, c, i=""): o.write(("PASS " if c else "FAIL ") + k + ("" if c else "  " 
 def rd(p): return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 cfg = json.loads(rd("config/dungeons.json")); sect = json.loads(rd("config/sect.json"))
 rows = cfg.get("dungeons", []); byid = {r.get("id"): r for r in rows}
-R("schema_version", cfg.get("schema") == "dungeon-table/1" and cfg.get("version") == 5, "version 按约定升到 5")
-R("four_ids", [r.get("id") for r in rows] == ["main", "abyss", "lair", "sect"], "三条后追加第四条 sect")
-R("ids_unique", len(byid) == len(rows) == 4, "编号不重复、正好四条")
+# 只钉「本卡确实升过版本、确实在三条后追加了 sect」，不写死 version=5 / 正好四条：
+# 后面的卡会继续往后追加条目并递增版本（P2-2a 加了龙巢），写死就假红。
+VER = cfg.get("version")
+R("schema_version", cfg.get("schema") == "dungeon-table/1" and isinstance(VER, int) and VER >= 5,
+  "version 已按约定升过（>=5）")
+R("four_ids", [r.get("id") for r in rows][:4] == ["main", "abyss", "lair", "sect"], "前三条后追加第四条 sect")
+R("ids_unique", len(byid) == len(rows) and len(rows) >= 4, "编号不重复、至少四条")
 R("main_unchanged", byid.get("main") == {"id":"main","name":"主线","max_players":1,"charges_fatigue":False,"takes_weekly_share":False}, "main 一字未改")
 R("abyss_unchanged", byid.get("abyss") == {"id":"abyss","name":"深渊","max_players":4,"charges_fatigue":True,"takes_weekly_share":False,"fatigue_per_player":1500}, "abyss 一字未改")
 R("lair_unchanged", byid.get("lair") == {"id":"lair","name":"巢穴","max_players":4,"charges_fatigue":False,"takes_weekly_share":True}, "lair 一字未改")
@@ -64,7 +68,7 @@ social = "\n".join(rd(p) for p in sorted(glob.glob("src/Social/*.cs")))
 R("social_no_dungeons", not re.search(r"dungeons\.json|max_players|party_size|DungeonTable", social, re.I), "src/Social/* 不读副本表、不下发人数")
 R("tables_no_sect_json", all(x not in ctbl + btbl for x in ["sect.json", "member_cap"]), "两端 DungeonTable.cs 不读 sect.json/member_cap")
 R("same_load", "DungeonTable.Load(config.DungeonTable)" in rd("src/Character/CharacterProcess.cs") and "DungeonTable.Load(dungeonPath)" in rd("src/Battle/Config.cs") and "dungeons=" in rd("src/Character/CharacterProcess.cs"), "两服读同一份 config/dungeons.json")
-R("no_new_readonly", "--dungeon" not in rd("src/Character/Program.cs") and "--dungeon" not in rd("src/Social/Program.cs"), "未新增只读入口")
+R("no_new_readonly", "--sect-dungeon" not in rd("src/Character/Program.cs") and "--dungeon-sect" not in rd("src/Character/Program.cs"), "未为宗门秘境新增只读入口")
 R("char_reject", "partySize > dungeon.MaxPlayers" in svc and '"party_too_large"' in svc, "角色服 party_too_large 复用")
 R("battle_reject", '"party_full"' in bsrv and "party.Connections.Count >= dungeon.MaxPlayers" in bsrv, "战斗服 party_full 复用")
 api = rd("src/Gateway/CharacterApi.cs")
@@ -85,8 +89,9 @@ CONF="$("$DOTNET" "$SD" --sect-config 2>&1)"
 printf '%s' "$CONF" | grep -q '^sect_config_state=ok' && printf '%s' "$CONF" | grep -q 'levels=1:10,2:30,3:60,4:100,5:200' \
   && ok "--sect-config 打印名册五档上限（5 级 200 人）" || bad "--sect-config 不对：$CONF"
 DUMP="$(python3 -c 'import json;d=json.load(open("config/dungeons.json",encoding="utf-8"));print("version=%d ids=%s"%(d["version"],",".join("%s:%d"%(r["id"],r["max_players"]) for r in d["dungeons"])))')"
-printf '%s' "$DUMP" | grep -q 'version=5 ids=main:1,abyss:4,lair:4,sect:4' \
-  && ok "只读打印四条进本人数：main:1 abyss:4 lair:4 sect:4" || bad "副本表四条不对：$DUMP"
+# 只钉本卡追加的 sect 与前三条的进本人数；版本号与总条数从配置现取，不写死。
+printf '%s' "$DUMP" | grep -q 'ids=main:1,abyss:4,lair:4,sect:4' \
+  && ok "只读打印四条进本人数：main:1 abyss:4 lair:4 sect:4（$DUMP）" || bad "副本表四条不对：$DUMP"
 CAP5="$(python3 -c 'import json;print(json.load(open("config/sect.json",encoding="utf-8"))["levels"][-1]["member_cap"])')"
 SMAX="$(python3 -c 'import json;print([x["max_players"] for x in json.load(open("config/dungeons.json",encoding="utf-8"))["dungeons"] if x["id"]=="sect"][0])')"
 [ "$CAP5" = "200" ] && [ "$SMAX" = "4" ] && [ "$CAP5" != "$SMAX" ] \
@@ -99,14 +104,14 @@ def fail(w): print("config_error=" + w); raise SystemExit(2)
 try: d = json.load(open(sys.argv[1], encoding="utf-8"))
 except Exception as ex: fail("不是合法 JSON：" + str(ex))
 if d.get("schema") != "dungeon-table/1": fail("schema 不对")
-if not isinstance(d.get("version"), int) or d["version"] != 5: fail("version 必须按约定升到 5")
+if not isinstance(d.get("version"), int) or d["version"] < 5: fail("version 必须按约定升过 5")
 for k, v in {"fatigue_daily_cap":6000,"hot_spring_recovery":1500,"weekly_share_cap":12,"monster_hp_scale_per_player":1.0,"monster_damage_scale_per_player":1.0}.items():
     if d.get(k) != v: fail(k + " 一字未改")
 rows = d.get("dungeons")
 if not isinstance(rows, list): fail("缺 dungeons 段")
 ids = [r.get("id") for r in rows]
 if len(set(ids)) != len(ids): fail("副本 id 重复")
-if sorted(ids) != ["abyss", "lair", "main", "sect"]: fail("副本条目必须正好 main/abyss/lair/sect 四条")
+if ids[:4] != ["main", "abyss", "lair", "sect"]: fail("副本条目必须以 main/abyss/lair/sect 四条开头（后面的卡可在其后追加）")
 byid = {r["id"]: r for r in rows}
 base = {"main":{"id":"main","name":"主线","max_players":1,"charges_fatigue":False,"takes_weekly_share":False},
         "abyss":{"id":"abyss","name":"深渊","max_players":4,"charges_fatigue":True,"takes_weekly_share":False,"fatigue_per_player":1500},
@@ -141,7 +146,7 @@ def case(name, mutate):
 def S(d): return [x for x in d["dungeons"] if x["id"] == "sect"][0]
 def M(d): return [x for x in d["dungeons"] if x["id"] == "main"][0]
 def L(d): return [x for x in d["dungeons"] if x["id"] == "lair"][0]
-case("no_sect", lambda d: d["dungeons"].pop())
+case("no_sect", lambda d: d["dungeons"].remove(S(d)))
 case("max_players_ne4", lambda d: S(d).update(max_players=3))
 case("max_players_zero", lambda d: S(d).update(max_players=0))
 case("max_players_negative", lambda d: S(d).update(max_players=-1))
@@ -228,9 +233,13 @@ PY
   snap() { printf '%s|%s|%s' "$(reserves)" "$(entrycnt)" "$(money)"; }
   start_all && ok "真社交服 65000 + 角色服 62000 + 网关 61000 + 战斗服 60001 就绪" || bad "有服务没起来（见 harness 日志）"
   DG="$(grep -m1 '^dungeons=' "$TMP/harness/character.log")"
-  printf '%s' "$DG" | grep -q 'dungeons=4 ' && printf '%s' "$DG" | grep -q 'dungeon_table_version=5' \
-    && ok "角色服启动日志 $DG" || bad "角色服启动日志副本表不对：$DG"
-  grep -q '^config=' "$TMP/harness/battle.log" && ok "战斗服启动日志打印它加载的配置（dungeon_table 指向同一份四条表）" || bad "战斗服启动日志缺 config= 行"
+  # 只钉「启动日志里的条数与版本号 == 配置文件里的」，不写死 4 条 / version=5：
+  # 后面的卡会往这份表里追加条目（P2-2a 加了龙巢），写死就会假红。
+  EXP_COUNT="$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1],encoding="utf-8"))["dungeons"]))' "$ROOT/config/dungeons.json")"
+  EXP_VER="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["version"])' "$ROOT/config/dungeons.json")"
+  printf '%s' "$DG" | grep -q "dungeons=$EXP_COUNT " && printf '%s' "$DG" | grep -q "dungeon_table_version=$EXP_VER" \
+    && ok "角色服启动日志 $DG" || bad "角色服启动日志与配置不一致（配置 $EXP_COUNT 条 v$EXP_VER）：$DG"
+  grep -q '^config=' "$TMP/harness/battle.log" && ok "战斗服启动日志打印它加载的配置（dungeon_table 指向同一份表）" || bad "战斗服启动日志缺 config= 行"
   TOK="$TOKEN"; [ -z "$TOK" ] && TOK="$(harness_login 61000 "$ACCOUNT" "$PASSWORD")"
   [ -n "$TOK" ] && ok "登录拿到令牌" || bad "登录没拿到令牌"
   CH="$CHARACTER"

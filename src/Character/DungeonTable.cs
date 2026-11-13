@@ -4,17 +4,28 @@ using System.Text.Json.Serialization;
 namespace Character;
 
 /// <summary>
-/// 一个副本：编号、名字、人数上限、进本时扣不扣疲劳与周份额。
+/// 一个副本：编号、名字、难度档、人数区间、进本时扣不扣疲劳与周份额。
 /// FatiguePerPlayer 是单人进一次的基础消耗，扣的时候再乘进本人数；
 /// 不扣疲劳的本（主线）它是 0。
+///
+/// P2-2a：tier=hard 的高难本（龙巢）另有三条口径——至少 MinPlayers 人、
+/// 每人每周 EntriesPerWeek 次、进一次得 RewardPerPlayer 份（不乘人数）。
+/// 普通本这三项固定为 1 / 0 / 0，由 DungeonTable.Load 填，不另存一套。
 /// </summary>
 public sealed record DungeonDef(
     string Id,
     string Name,
+    string Tier,
+    int MinPlayers,
     int MaxPlayers,
     bool ChargesFatigue,
     bool TakesWeeklyShare,
-    int FatiguePerPlayer);
+    int FatiguePerPlayer,
+    int EntriesPerWeek,
+    int RewardPerPlayer)
+{
+    public bool IsHard => Tier == "hard";
+}
 
 /// <summary>
 /// 副本表。与战斗服读同一份 config/dungeons.json：战斗服按它开本，
@@ -129,6 +140,71 @@ public sealed class DungeonTable
                 throw new ConfigException("副本 " + id + " 的人数上限要在 1 到 100 之间");
             }
 
+            // tier 缺省是 normal；高难本才允许出现 min_players / entries_per_week /
+            // reward_per_player。老四条不写这四个字段，走 normal 的固定值。
+            var tier = (item.Tier ?? "normal").Trim();
+            if (tier is not ("normal" or "hard"))
+            {
+                throw new ConfigException("副本 " + id + " 的 tier 只能是 normal 或 hard，现在是 " + tier);
+            }
+
+            int minPlayers;
+            int entriesPerWeek;
+            int rewardPerPlayer;
+            if (tier == "hard")
+            {
+                if (item.MinPlayers is null)
+                {
+                    throw new ConfigException("高难副本 " + id + " 缺 min_players");
+                }
+
+                if (item.MinPlayers.Value < 2 || item.MinPlayers.Value > item.MaxPlayers.Value)
+                {
+                    throw new ConfigException(
+                        "高难副本 " + id + " 的 min_players 要在 2 到人数上限 "
+                        + item.MaxPlayers.Value + " 之间，现在是 " + item.MinPlayers.Value);
+                }
+
+                if (item.EntriesPerWeek is null)
+                {
+                    throw new ConfigException("高难副本 " + id + " 缺 entries_per_week");
+                }
+
+                if (item.EntriesPerWeek.Value < 1)
+                {
+                    throw new ConfigException("高难副本 " + id + " 的 entries_per_week 必须是正数");
+                }
+
+                if (item.RewardPerPlayer is null)
+                {
+                    throw new ConfigException("高难副本 " + id + " 缺 reward_per_player");
+                }
+
+                if (item.RewardPerPlayer.Value < 1)
+                {
+                    throw new ConfigException("高难副本 " + id + " 的 reward_per_player 必须是正数");
+                }
+
+                minPlayers = item.MinPlayers.Value;
+                entriesPerWeek = item.EntriesPerWeek.Value;
+                rewardPerPlayer = item.RewardPerPlayer.Value;
+            }
+            else
+            {
+                // 普通本不许配高难三项：配了说明配置写错了，不让它悄悄生效。
+                if (item.MinPlayers is not null || item.EntriesPerWeek is not null
+                    || item.RewardPerPlayer is not null)
+                {
+                    throw new ConfigException(
+                        "副本 " + id + " 不是高难本，只有高难本才配 min_players / "
+                        + "entries_per_week / reward_per_player");
+                }
+
+                minPlayers = 1;
+                entriesPerWeek = 0;
+                rewardPerPlayer = 0;
+            }
+
             var charges = item.ChargesFatigue ?? false;
             var perPlayer = item.FatiguePerPlayer ?? 0;
             if (charges && perPlayer < 1)
@@ -150,10 +226,14 @@ public sealed class DungeonTable
             map[id] = new DungeonDef(
                 id,
                 (item.Name ?? id).Trim(),
+                tier,
+                minPlayers,
                 item.MaxPlayers.Value,
                 charges,
                 takesShare,
-                charges ? perPlayer : 0);
+                charges ? perPlayer : 0,
+                entriesPerWeek,
+                rewardPerPlayer);
         }
 
         if (map.Count == 0)
@@ -202,6 +282,13 @@ public sealed class DungeonTable
         [JsonPropertyName("name")]
         public string? Name { get; init; }
 
+        // P2-2a：缺省 normal；只有 hard 才配下面三项。
+        [JsonPropertyName("tier")]
+        public string? Tier { get; init; }
+
+        [JsonPropertyName("min_players")]
+        public int? MinPlayers { get; init; }
+
         [JsonPropertyName("max_players")]
         public int? MaxPlayers { get; init; }
 
@@ -213,5 +300,11 @@ public sealed class DungeonTable
 
         [JsonPropertyName("fatigue_per_player")]
         public int? FatiguePerPlayer { get; init; }
+
+        [JsonPropertyName("entries_per_week")]
+        public int? EntriesPerWeek { get; init; }
+
+        [JsonPropertyName("reward_per_player")]
+        public int? RewardPerPlayer { get; init; }
     }
 }
