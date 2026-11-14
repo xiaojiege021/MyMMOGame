@@ -115,6 +115,16 @@ var claimSeasonPassStage = 0;
 string? claimSeasonPassTxn = null;
 long shopStateOf = 0;
 long shopLedgerOf = 0;
+// P3-4b：月叠与第二角色栏。list 只读配置不连库（坏配置也走这里），
+// 三个连库入口只给核对用：名额现状、账号外观收藏、把名额直推到指定值（种子 / 核对）。
+var monthlyBundleList = false;
+string? monthlyBundlePath = null;
+var characterSlotList = false;
+string? characterSlotPath = null;
+string? characterSlotsOf = null;
+string? wardrobeOf = null;
+string? rawSlotAccount = null;
+var rawSlotValue = 0;
 // 红符：只读核对用。talismanConfigPath 指向临时表试坏配置，talismanStateOf 连库读张数。
 var talismanList = false;
 string? talismanConfigPath = null;
@@ -499,6 +509,35 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--pass-claim-txn" when i + 1 < args.Length:
             claimSeasonPassTxn = args[++i];
+            break;
+        // P3-4b：月叠表只读。与启动共用同一 MonthlyBundleTable.Load（含与 shop.json、
+        // items.json、talisman.json 的交叉校验），塞蓝符 / 卷轴 / 经验道具在这一步就起不来。
+        case "--monthly-bundle-list":
+            monthlyBundleList = true;
+            break;
+        case "--monthly-bundle-path" when i + 1 < args.Length:
+            monthlyBundlePath = args[++i];
+            break;
+        // P3-4b：角色栏表只读。与启动共用同一 CharacterSlotTable.Load（基础位 1、上限 2、
+        // 商品必须是 second_slot 且没有假发货物）。
+        case "--character-slot-list":
+            characterSlotList = true;
+            break;
+        case "--character-slot-path" when i + 1 < args.Length:
+            characterSlotPath = args[++i];
+            break;
+        // 只给核对用：读回这个账号有几个角色位、已经建了几个角色。
+        case "--character-slots" when i + 1 < args.Length:
+            characterSlotsOf = args[++i];
+            break;
+        // 只给核对用：读回这个账号的外观收藏（只读并集，不写库）。
+        case "--wardrobe" when i + 1 < args.Length:
+            wardrobeOf = args[++i];
+            break;
+        // 只给核对 / 种子用：把名额直推到指定值（只增不减，不扣钱）。产品路径不走这里。
+        case "--raw-grant-character-slot" when i + 2 < args.Length:
+            rawSlotAccount = args[++i];
+            int.TryParse(args[++i], out rawSlotValue);
             break;
         // 只给核对用：把红符表读出来，不连库也不启动进程。坏表也走这里——
         // 「回复超过同级红药」「发货物不是红符」都在这一步就起不来。
@@ -1028,6 +1067,72 @@ if (seasonPassList)
 }
 
 // 拍卖税率只读核对：与启动共用同一套 5%–8% 写定区间校验，不连库也不启动进程。
+if (monthlyBundleList)
+{
+    try
+    {
+        var bundleConfig = CharacterConfig.Load(configPath);
+        var bundleTable = LoadMonthlyBundle(bundleConfig, monthlyBundlePath);
+        Console.WriteLine("monthly_bundle_list_state=ok version=" + bundleTable.Version
+            + " pending=" + (bundleTable.Pending ? "true" : "false")
+            + " product=" + bundleTable.ProductId
+            + " price=" + bundleTable.PriceYuanbao
+            + " days=" + bundleTable.Days
+            + " kinds=" + bundleTable.Entries.Count);
+        foreach (var entry in bundleTable.Entries)
+        {
+            Console.WriteLine("monthly_bundle_item=" + entry.Kind
+                + " item=" + entry.ItemId
+                + " per_day=" + entry.PerDay
+                + " count=" + entry.Count
+                + " bind=always");
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
+// P3-4b：第二角色栏只读核对。与启动共用同一 CharacterSlotTable.Load，
+// 基础位不是 1、上限不是「基础位 + 1」、商品不是 second_slot，都在这一步起不来。
+if (characterSlotList)
+{
+    try
+    {
+        var slotConfig = CharacterConfig.Load(configPath);
+        var slotTable = LoadCharacterSlot(slotConfig, characterSlotPath);
+        Console.WriteLine("character_slot_list_state=ok version=" + slotTable.Version
+            + " pending=" + (slotTable.Pending ? "true" : "false")
+            + " product=" + slotTable.ProductId
+            + " price=" + slotTable.PriceYuanbao
+            + " base_slots=" + slotTable.BaseSlots
+            + " max_slots=" + slotTable.MaxSlots
+            + " table=character_slot");
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
+// 拍卖税率只读核对：与启动共用同一套 5%–8% 写定区间校验，不连库也不启动进程。
 if (auctionState)
 {
     try
@@ -1384,7 +1489,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0
     || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || stoneListingState
     || siegeResultState || applySiegeResultTxn != null
-    || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0)
+    || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0
+    || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -2630,6 +2736,56 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + " claimed=" + (outcome.Claimed ? "true" : "false"));
             }
         }
+
+        // P3-4b：第二角色栏与外观收藏。名额的事实值在库里那一行（没有就按配置的基础位），
+        // 外观收藏按账号把名下所有角色持有的外观类物品取并集——三个入口都只读，
+        // 只有 --raw-grant-character-slot 会写，而它只给种子 / 核对用，不扣钱也不推进产品路径。
+        if (characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null)
+        {
+            var slotConfig = CharacterConfig.Load(configPath);
+            var slotTable = LoadCharacterSlot(slotConfig, characterSlotPath);
+            var slotRepo = new CharacterSlotRepository(dataSource, slotTable);
+            var wardrobeRepo = new WardrobeRepository(
+                dataSource, ItemTable.Load("config/items.json"));
+
+            if (rawSlotAccount != null)
+            {
+                var granted = await slotRepo.RawGrantAsync(
+                    rawSlotAccount, rawSlotValue, "raw-slot-grant", CancellationToken.None);
+                Console.WriteLine("character_slot_raw=done account=" + rawSlotAccount
+                    + " slots=" + rawSlotValue
+                    + " ok=" + (granted ? "true" : "false"));
+            }
+
+            if (characterSlotsOf != null)
+            {
+                var state = await slotRepo.DescribeAsync(characterSlotsOf, CancellationToken.None);
+                Console.WriteLine("character_slots=ok account=" + state.Account
+                    + " found=" + (state.Found ? "true" : "false")
+                    + " base_slots=" + state.BaseSlots
+                    + " max_slots=" + state.MaxSlots
+                    + " slots=" + state.Slots
+                    + " used=" + state.Used
+                    + " product=" + state.ProductId
+                    + " price=" + state.PriceYuanbao);
+            }
+
+            if (wardrobeOf != null)
+            {
+                var (found, entries) = await wardrobeRepo.DescribeAsync(
+                    wardrobeOf, CancellationToken.None);
+                Console.WriteLine("wardrobe=ok account=" + wardrobeOf
+                    + " found=" + (found ? "true" : "false")
+                    + " entries=" + entries.Count
+                    + " items=" + (entries.Count == 0
+                        ? "-"
+                        : string.Join(",", entries.Select(e => e.ItemId)))
+                    + " owners=" + (entries.Count == 0
+                        ? "-"
+                        : string.Join(",", entries.Select(
+                            e => e.ItemId + ":" + string.Join("+", e.CharacterIds)))));
+            }
+        }
     }
     catch (Exception ex) when (ex is NpgsqlException or IOException)
     {
@@ -2659,6 +2815,39 @@ static (SeasonPassTable Table, ItemTable Items) LoadSeasonPass(CharacterConfig c
     var table = SeasonPassTable.Load(
         path ?? cfg.SeasonPassTable, File.ReadAllText(cfg.SeasonTable), shop, items, enhance);
     return (table, items);
+}
+
+// P3-4b：月叠表的加载链。与真实启动同一份 MonthlyBundleTable.Load：
+// 商品与标价、物品与堆叠上限、红符编号都在这条链上交叉校验。
+static MonthlyBundleTable LoadMonthlyBundle(CharacterConfig cfg, string? path)
+{
+    var currencies = CurrencyTable.Load("config/currency.json");
+    var items = ItemTable.Load("config/items.json");
+    var enhance = EnhanceTable.Load(cfg.EnhanceTable, items, currencies);
+    var talismans = TalismanTable.Load(cfg.TalismanTable, items);
+    var scrolls = ReviveScrollTable.Load(
+        cfg.ReviveScrollTable, "config/classes.json", items, talismans);
+    var boosters = ExpBoosterTable.Load(cfg.ExpBoosterTable, items, talismans, scrolls);
+    var unbinds = UnbindTable.Load(cfg.UnbindTable, items, talismans, scrolls, boosters);
+    var shop = ShopTable.Load(
+        cfg.ShopTable, currencies, items, enhance, talismans, scrolls, boosters, unbinds);
+    return MonthlyBundleTable.Load(path ?? cfg.MonthlyBundleTable, shop, items, talismans);
+}
+
+// P3-4b：角色栏表的加载链。商城清单是同一份正本，商品与标价都从那里读。
+static CharacterSlotTable LoadCharacterSlot(CharacterConfig cfg, string? path)
+{
+    var currencies = CurrencyTable.Load("config/currency.json");
+    var items = ItemTable.Load("config/items.json");
+    var enhance = EnhanceTable.Load(cfg.EnhanceTable, items, currencies);
+    var talismans = TalismanTable.Load(cfg.TalismanTable, items);
+    var scrolls = ReviveScrollTable.Load(
+        cfg.ReviveScrollTable, "config/classes.json", items, talismans);
+    var boosters = ExpBoosterTable.Load(cfg.ExpBoosterTable, items, talismans, scrolls);
+    var unbinds = UnbindTable.Load(cfg.UnbindTable, items, talismans, scrolls, boosters);
+    var shop = ShopTable.Load(
+        cfg.ShopTable, currencies, items, enhance, talismans, scrolls, boosters, unbinds);
+    return CharacterSlotTable.Load(path ?? cfg.CharacterSlotTable, shop);
 }
 
 using var stop = new CancellationTokenSource();

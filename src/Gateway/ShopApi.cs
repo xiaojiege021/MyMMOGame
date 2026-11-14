@@ -88,7 +88,8 @@ public static class ShopApi
                     + " goods=" + result.DeliveryItemId
                     + " slot=" + result.BagSlot
                     + " bound=" + result.Bound
-                    + " duplicate=" + result.Duplicate);
+                    + " duplicate=" + result.Duplicate
+                    + " character_slots=" + result.CharacterSlots);
 
                 await WriteAsync(context, 200, new
                 {
@@ -110,6 +111,7 @@ public static class ShopApi
                     duplicate = result.Duplicate,
                     season_id = result.SeasonId,
                     pass_owned = result.PassOwned,
+                    character_slots = result.CharacterSlots,
                 });
             }
             catch (RpcException ex)

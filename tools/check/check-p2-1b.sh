@@ -199,7 +199,7 @@ PY
   [ "$MIG" = "1" ] && grep -q '^migrate=ok' "$TMP/m1" "$TMP/m2" "$TMP/m3" \
     && ok "真 gamedb 三 schema 主迁移（账号/角色/进本记录/社交）" || bad "建表失败：$(head -3 "$TMP/m1" "$TMP/m3")"
   ACCOUNT="p21b_$$"; PASSWORD="P21b-$$-$(date +%s)"
-  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" $CG >/dev/null 2>&1
+  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" --seed-slots 8 $CG >/dev/null 2>&1
   ok "自造临时账号（口令/令牌/角色号只在内存，不落盘不打印）"
   start_all() {
     local p f

@@ -44,6 +44,8 @@ public sealed class CharacterProcess(string configPath)
         CityTable cityTable;
         SiegeTerritoryPolicy siegeTerritoryPolicy;
         SeasonPassTable seasonPassTable;
+        MonthlyBundleTable monthlyBundleTable;
+        CharacterSlotTable characterSlotTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -113,6 +115,13 @@ public sealed class CharacterProcess(string configPath)
             seasonPassTable = SeasonPassTable.Load(
                 config.SeasonPassTable, File.ReadAllText(config.SeasonTable),
                 shopTable, items, enhanceTable);
+            // P3-4b：月叠只许发传送符与红符（三十天份），两种编号分别等于商城那条传送符
+            // 与 talisman.json 那一件；蓝符 / 卷轴 / 经验道具 / 金币材料在加载期就长不出来。
+            monthlyBundleTable = MonthlyBundleTable.Load(
+                config.MonthlyBundleTable, shopTable, items, talismanTable);
+            // P3-4b：第二角色栏只改「一个账号能建几个角色」。基础位 1、上限 2（方案只写了
+            // 「第二」这一种），商品与标价在 shop.json；装备 / 等级 / 境界仍按角色各存一行。
+            characterSlotTable = CharacterSlotTable.Load(config.CharacterSlotTable, shopTable);
         }
         catch (ConfigException ex)
         {
@@ -272,6 +281,32 @@ public sealed class CharacterProcess(string configPath)
                 + " paid_items=" + string.Join("+", pass.Paid.Select(x => x.Rewards[0].ItemId)));
         }
 
+        // P3-4b：月叠的事实值。改配置重启后这里能直接核对到：只两种符、每天几张、
+        // 共几天、总张数，价格来自 shop.json 那条 monthly_bundle 商品。
+        Console.WriteLine("monthly_bundle=version=" + monthlyBundleTable.Version
+            + " pending=" + (monthlyBundleTable.Pending ? "true" : "false")
+            + " product=" + monthlyBundleTable.ProductId
+            + " price=" + monthlyBundleTable.PriceYuanbao
+            + " days=" + monthlyBundleTable.Days
+            + " kinds=" + monthlyBundleTable.Entries.Count);
+        foreach (var entry in monthlyBundleTable.Entries)
+        {
+            Console.WriteLine("monthly_bundle_item=" + entry.Kind
+                + " item=" + entry.ItemId
+                + " per_day=" + entry.PerDay
+                + " count=" + entry.Count
+                + " bind=always");
+        }
+
+        // P3-4b：第二角色栏的事实值。基础位与上限只在这里，名额的事实值在库里那一行。
+        Console.WriteLine("character_slot=version=" + characterSlotTable.Version
+            + " pending=" + (characterSlotTable.Pending ? "true" : "false")
+            + " product=" + characterSlotTable.ProductId
+            + " price=" + characterSlotTable.PriceYuanbao
+            + " base_slots=" + characterSlotTable.BaseSlots
+            + " max_slots=" + characterSlotTable.MaxSlots
+            + " table=character_slot");
+
         // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
         foreach (var city in cityTable.Cities)
         {
@@ -361,6 +396,12 @@ public sealed class CharacterProcess(string configPath)
             dataSource, cityTable, siegeTerritoryPolicy);
         // P3-4a2：通行证的唯一写入点。买与领各一笔事务，奖励物品与数量只从配置读。
         var seasonPasses = new SeasonPassRepository(dataSource, seasonPassTable, items, config);
+        // P3-4b：月叠的唯一写入点（扣元宝 + 两种符一次到账，跨堆叠上限就占多格），
+        // 与第二角色栏的名额事务（账号一行、只存总名额）。
+        var monthlyBundles = new MonthlyBundleRepository(dataSource, monthlyBundleTable, items, config);
+        var characterSlotsRepo = new CharacterSlotRepository(dataSource, characterSlotTable);
+        // P3-4b：外观收藏是账号级只读视图，不写库、不改背包归属。
+        var wardrobeRepo = new WardrobeRepository(dataSource, items);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -432,6 +473,11 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(social);
         builder.Services.AddSingleton(seasonPassTable);
         builder.Services.AddSingleton(seasonPasses);
+        builder.Services.AddSingleton(monthlyBundleTable);
+        builder.Services.AddSingleton(monthlyBundles);
+        builder.Services.AddSingleton(characterSlotTable);
+        builder.Services.AddSingleton(characterSlotsRepo);
+        builder.Services.AddSingleton(wardrobeRepo);
         builder.Services.AddSingleton(seasonSource);
         builder.Services.AddSingleton(config);
 

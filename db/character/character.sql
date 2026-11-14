@@ -288,3 +288,15 @@ CREATE TABLE IF NOT EXISTS "角色".season_pass_claim (
     claimed_at   timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (character_id, season_id, track, stage)
 );
+
+-- P3-4b：以下 DDL 与 db/character/character_slot.sql 是同一份，整份追加进主迁移。
+-- 第二角色栏只存「这名账号最多几个角色」一个事实值；没有这一行就按
+-- config/character_slot.json 的 base_slots 算，所以只跑主迁移的老卡环境也不受影响。
+-- 装备 / 等级 / 境界仍按 character_id 各存一行，「不共享」是表结构的结果，不靠这张表守。
+CREATE TABLE IF NOT EXISTS "角色".character_slot (
+    account       text        PRIMARY KEY REFERENCES "角色".account (account) ON DELETE CASCADE,
+    slots         integer     NOT NULL CHECK (slots BETWEEN 1 AND 16),
+    price_yuanbao bigint      NOT NULL CHECK (price_yuanbao >= 0),
+    txn_id        text        NOT NULL,
+    updated_at    timestamptz NOT NULL DEFAULT now()
+);

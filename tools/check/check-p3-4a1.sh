@@ -251,7 +251,7 @@ PY
     [ -n "$code" ] && [ "$code" != "000" ] && break; sleep 0.2
   done
   ACCT="p341_$$"; PW="P341-$$-$(date +%s)"
-  printf '%s\n' "$PW" | "$DOTNET" "$GD" --seed-account "$ACCT" \
+  printf '%s\n' "$PW" | "$DOTNET" "$GD" --seed-account "$ACCT" --seed-slots 8 \
       --config "$ROOT/config/gateway.json" >/dev/null 2>&1
   TOK="$(curl -s --noproxy '*' -X POST http://127.0.0.1:61000/login \
     -H 'Content-Type: application/json' -d "{\"account\":\"$ACCT\",\"password\":\"$PW\"}" | jget token)"

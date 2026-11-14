@@ -16,20 +16,78 @@ public sealed record CreatedCharacter(
     bool AlignmentEmpty);
 
 /// <summary>
+/// 建号的结果。三种：建成了、账号角色位已满（slot_full）、账号不在（account_not_found）。
+/// 名额判定与插入在同一笔事务里，两笔并发建角不会各自数到「还差一个」。
+/// </summary>
+public sealed record CreateOutcome(bool Ok, string Reason, CreatedCharacter? Created);
+
+/// <summary>
 /// 角色表的唯一写入点。网关只能转请求过来，自己不写库。
 /// 这一行只做「建一个角色」；查角色、改角色、背包与货币都不在这里。
 /// </summary>
 public sealed class CharacterRepository(NpgsqlDataSource dataSource)
 {
-    public async Task<CreatedCharacter> CreateAsync(
+    /// <summary>
+    /// 建一个角色。账号角色位（P3-4b 第二角色栏）在**同一笔事务**里判：
+    /// 锁账号行 → 读这个账号的名额（库里那一行，没有就按 baseSlots）→ 数已有角色数 →
+    /// 到上限就 slot_full，否则插入。锁在同一行上，两个并发建角会排队，不会都数到「还差一个」。
+    /// </summary>
+    public async Task<CreateOutcome> CreateAsync(
         string account,
         string name,
         string race,
         string appearance,
         string classId,
         string? branch,
+        int baseSlots,
         CancellationToken stopping)
     {
+        await using var connection = await dataSource.OpenConnectionAsync(stopping);
+        await using var transaction = await connection.BeginTransactionAsync(stopping);
+
+        // 锁账号行：名额与人数都在这把锁里读，读完到插入之间别人进不来。
+        await using (var lockAccount = new NpgsqlCommand(
+            "select account from \"角色\".account where account = $1 for update",
+            connection, transaction))
+        {
+            lockAccount.Parameters.AddWithValue(account);
+            if (await lockAccount.ExecuteScalarAsync(stopping) is null)
+            {
+                await transaction.RollbackAsync(stopping);
+                return new CreateOutcome(false, "account_not_found", null);
+            }
+        }
+
+        var slots = baseSlots;
+        await using (var readSlots = new NpgsqlCommand(
+            "select slots from \"角色\".character_slot where account = $1",
+            connection, transaction))
+        {
+            readSlots.Parameters.AddWithValue(account);
+            var value = await readSlots.ExecuteScalarAsync(stopping);
+            if (value is not null and not DBNull)
+            {
+                slots = Convert.ToInt32(value);
+            }
+        }
+
+        int used;
+        await using (var readUsed = new NpgsqlCommand(
+            "select count(*) from \"角色\".character where account = $1",
+            connection, transaction))
+        {
+            readUsed.Parameters.AddWithValue(account);
+            var value = await readUsed.ExecuteScalarAsync(stopping);
+            used = value is null or DBNull ? 0 : Convert.ToInt32(value);
+        }
+
+        if (used >= slots)
+        {
+            // 一个账号默认一位；第二位要买第二角色栏（方案 12.1 第 810 行）。
+            await transaction.RollbackAsync(stopping);
+            return new CreateOutcome(false, "slot_full", null);
+        }
+
         const string sql = """
             insert into "角色".character (account, name, race, appearance, class_id, branch)
             values ($1, $2, $3, $4::jsonb, $5, $6)
@@ -37,7 +95,7 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
                       level, realm, main_stage is null, alignment is null
             """;
 
-        await using var command = dataSource.CreateCommand(sql);
+        await using var command = new NpgsqlCommand(sql, connection, transaction);
         command.Parameters.AddWithValue(account);
         command.Parameters.AddWithValue(name);
         command.Parameters.AddWithValue(race);
@@ -45,19 +103,25 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
         command.Parameters.AddWithValue(classId);
         command.Parameters.AddWithValue(branch is null ? DBNull.Value : branch);
 
-        await using var reader = await command.ExecuteReaderAsync(stopping);
-        await reader.ReadAsync(stopping);
-        return new CreatedCharacter(
-            reader.GetInt64(0),
-            reader.GetString(1),
-            reader.GetString(2),
-            reader.GetString(3),
-            reader.GetString(4),
-            reader.GetString(5),
-            reader.GetInt32(6),
-            reader.GetString(7),
-            reader.GetBoolean(8),
-            reader.GetBoolean(9));
+        CreatedCharacter created;
+        await using (var reader = await command.ExecuteReaderAsync(stopping))
+        {
+            await reader.ReadAsync(stopping);
+            created = new CreatedCharacter(
+                reader.GetInt64(0),
+                reader.GetString(1),
+                reader.GetString(2),
+                reader.GetString(3),
+                reader.GetString(4),
+                reader.GetString(5),
+                reader.GetInt32(6),
+                reader.GetString(7),
+                reader.GetBoolean(8),
+                reader.GetBoolean(9));
+        }
+
+        await transaction.CommitAsync(stopping);
+        return new CreateOutcome(true, "", created);
     }
 
     /// <summary>同一个账号下名字不重。撞了返回 false，由调用方转成错误码。</summary>

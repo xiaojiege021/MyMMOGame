@@ -388,7 +388,7 @@ done
 [ "$MIGRATE_OK" = "1" ] || finish
 HAVE_DB=1
 for acct in "$ACCOUNT" "$OTHER"; do
-  printf '%s\n' "$TEST_PASSWORD" | "$DOTNET" "$GATEWAY_DLL" --seed-account "$acct" --config config/gateway.json >>"$TMP/seed.log" 2>&1
+  printf '%s\n' "$TEST_PASSWORD" | "$DOTNET" "$GATEWAY_DLL" --seed-account "$acct" --seed-slots 8 --config config/gateway.json >>"$TMP/seed.log" 2>&1
 done
 ok "两个测试账号已播种"
 

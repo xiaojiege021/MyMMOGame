@@ -172,6 +172,14 @@ service CharacterService {
   // 请求里带不进物品编号、数量、季，也带不进任何金币 / 灵石 / 强化石 / 装备。
   rpc DescribeSeasonPass(DescribeSeasonPassRequest) returns (DescribeSeasonPassResponse);
   rpc ClaimSeasonPassReward(ClaimSeasonPassRequest) returns (ClaimSeasonPassResponse);
+  // P3-4b：这个账号有几个角色位、已经用掉几个。第二角色栏是账号级状态发货：
+  // 名额记在库里的 "角色".character_slot，基础位与上限只在 config/character_slot.json，
+  // 装备 / 等级 / 境界仍按角色各存一行，这条口只回名额与人数，不碰任何角色数据。
+  rpc DescribeCharacterSlots(DescribeCharacterSlotsRequest) returns (DescribeCharacterSlotsResponse);
+  // P3-4b：外观收藏是账号级只读视图——同账号下所有角色持有的外观类物品取并集。
+  // 方案写定「外观收藏可以共享」，装备 / 等级 / 境界不共享；这条口不写库、
+  // 不改背包归属、不新建解锁流水。
+  rpc DescribeWardrobe(DescribeWardrobeRequest) returns (DescribeWardrobeResponse);
 }
 
 message SettleExpRequest {
@@ -640,6 +648,9 @@ message BuyShopItemResponse {
   // 商品上是有效值：别的商品恒空串 / false，不拿它们顶任何数。
   string season_id = 17;
   bool pass_owned = 18;
+  // P3-4b：第二角色栏买完之后这个账号一共几个角色位（账号级事实值，从库里读回）。
+  // 只在 kind=second_slot 这条商品上是有效值：别的商品恒 0，不拿它顶任何数。
+  int32 character_slots = 19;
 }
 
 // 回复落在哪个池。方案 12.1：红符只回生命、蓝符只回蓝量，两者互不越界。
@@ -1122,4 +1133,44 @@ message ClaimSeasonPassResponse {
   bool duplicate = 10;
   // 领完之后这一阶是不是已领。duplicate 时也是 true。
   bool claimed = 11;
+}
+
+// P3-4b：账号级角色位。请求只有账号——名额与人数都从库里读，
+// 客户端表达不了「我有几个位」，也改不动。
+message DescribeCharacterSlotsRequest {
+  string account = 1;
+}
+
+message DescribeCharacterSlotsResponse {
+  string account = 1;
+  // 配置里的基础位与上限（config/character_slot.json），改配置重启后这里能直接核对到。
+  int32 base_slots = 2;
+  int32 max_slots = 3;
+  // 库里记的总名额。没有那一行就是 base_slots（老账号按基础位算）。
+  int32 slots = 4;
+  // 已经建了几个角色。前面两个都是事实值，不在这里算「还能建几个」。
+  int32 used = 5;
+  // 第二角色栏这条商品的编号与标价，来自 config/shop.json；本服务不另存价格。
+  string product_id = 6;
+  int64 price_yuanbao = 7;
+}
+
+// P3-4b：外观收藏。按账号取，不按角色：同账号下任一角色持有的外观类物品都算。
+message DescribeWardrobeRequest {
+  string account = 1;
+}
+
+message WardrobeEntry {
+  string item_id = 1;
+  string kind = 2;
+  string name = 3;
+  // 这一件在哪些角色身上（只给编号，便于核对「共享的是收藏、不是装备」）。
+  repeated uint64 character_ids = 4;
+}
+
+message DescribeWardrobeResponse {
+  string account = 1;
+  bool found = 2;
+  // 外观类物品的并集，按物品编号稳定排序。装备 / 强化 / 等级 / 境界一条都不在这里。
+  repeated WardrobeEntry entries = 3;
 }

@@ -68,6 +68,35 @@ public sealed class AccountRepository(NpgsqlDataSource dataSource)
     }
 
     /// <summary>
+    /// 只给核对 / 运维种子用：把种子账号的角色位放宽到指定值（只增不减，不扣钱）。
+    ///
+    /// 产品里的角色位只由角色服那一笔「买第二角色栏」的事务写（P3-4b）。这里放宽是因为
+    /// 核对脚本常在一个账号上造好几个角色（城战要六个、宗门要好几名成员），那些脚本
+    /// 验的不是名额，名额由 check-p3-4b.sh 用默认基础位的账号单独验。
+    /// 表不在（老库只跑了账号迁移）时返回 false，由调用方打 skipped，不拖垮整个种子。
+    /// </summary>
+    public async Task<bool> SeedSlotsAsync(string account, int slots, CancellationToken stopping)
+    {
+        try
+        {
+            await using var command = dataSource.CreateCommand(
+                "insert into \"角色\".character_slot (account, slots, price_yuanbao, txn_id) "
+                + "values ($1, $2, 0, 'seed') "
+                + "on conflict (account) do update set "
+                + "slots = greatest(\"角色\".character_slot.slots, excluded.slots), "
+                + "updated_at = now()");
+            command.Parameters.AddWithValue(account);
+            command.Parameters.AddWithValue(Math.Clamp(slots, 1, 16));
+            await command.ExecuteNonQueryAsync(stopping);
+            return true;
+        }
+        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UndefinedTable)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// 只给核对用的统计：账号数、不同哈希数、不同盐数、哈希长度区间。
     /// 同一口令的多个账号哈希必须各不相同（盐生效）；哈希长度固定 32 字节，
     /// 说明库里存的不是口令明文。不打印任何哈希。

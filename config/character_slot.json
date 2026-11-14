@@ -1,0 +1,9 @@
+{
+  "schema": "character-slot-table/1",
+  "version": 1,
+  "note": "第二角色栏唯一正本（方案 12.1 第 810 行「第二角色栏 同账号再养一名修士 装备、等级、境界不共享。外观收藏可以共享」、技术架构 5 节商城上架范围、开发架构 11 节 P3-4 / 13 节 P3-4b / 14 节第 69 行）。一个账号默认只有 base_slots 个角色位，买到第二角色栏之后是 max_slots 个；名额记在库里的 \"角色\".character_slot（账号一行、只存总名额），没有行就按 base_slots 算。方案只写了「第二角色栏」这一种，第三个及以后没有卡承接，所以 max_slots 必须是 base_slots + 1，写大了起不来。装备、等级、境界本来就按角色各存一行（背包 / 强化 / 境界都按 character_id 落库），本卡不新增任何共享列，也不做跨角色的复制；「外观收藏可以共享」只落成账号级的只读视图（角色服 DescribeWardrobe，按账号下所有角色持有的外观类物品取并集），不新建解锁流水、不改背包归属。product_id 指向 config/shop.json 里那条 second_slot 商品：第二角色栏在商城直接标价卖，价格只存在 shop.json，本表不写第二套价格；买下是状态发货，不往背包放东西。表只许出现下列键。",
+  "pending": true,
+  "product_id": "shop_second_slot_1",
+  "base_slots": 1,
+  "max_slots": 2
+}

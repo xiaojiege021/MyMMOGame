@@ -171,7 +171,7 @@ fi
 seed_account() {
   local account="$1"
   printf '%s\n' "$TEST_PASSWORD" \
-    | "$DOTNET" "$GATEWAY_DLL" --seed-account "$account" --config "$TMP/gateway.json" 2>&1
+    | "$DOTNET" "$GATEWAY_DLL" --seed-account "$account" --seed-slots 8 --config "$TMP/gateway.json" 2>&1
 }
 
 SEED_A="$(seed_account "$ACCOUNT_A")"

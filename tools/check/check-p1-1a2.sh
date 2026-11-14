@@ -211,7 +211,7 @@ if ! "$DOTNET" "$GATEWAY_DLL" --migrate --config "$TMP/gateway.json" --sql "$ROO
 fi
 
 if printf '%s\n' "$TEST_PASSWORD" \
-   | "$DOTNET" "$GATEWAY_DLL" --seed-account "$ACCOUNT" --config "$TMP/gateway.json" 2>&1 \
+   | "$DOTNET" "$GATEWAY_DLL" --seed-account "$ACCOUNT" --seed-slots 8 --config "$TMP/gateway.json" 2>&1 \
    | grep -q '^seed=ok'; then
   ok "测试账号已写入：${ACCOUNT}"
 else

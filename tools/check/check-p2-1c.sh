@@ -169,7 +169,7 @@ except Exception: print("")')"; [ -n "$id" ] && { printf '%s' "$id"; return 0; }
   [ "$MIG" = "1" ] && grep -q '^migrate=ok' "$TMP/m1" "$TMP/m3" \
     && ok "真 gamedb 主迁移（账号/角色/经验流水/社交）" || bad "建表失败：$(head -3 "$TMP/m1" "$TMP/m3")"
   ACCOUNT="p21c_$$"; PASSWORD="P21c-$$-$(date +%s)"
-  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" $CG >/dev/null 2>&1
+  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" --seed-slots 8 $CG >/dev/null 2>&1
   ok "自造临时账号（口令/令牌/角色号只在内存，不落盘不打印）"
   start_all && ok "真社交服 65000 + 角色服 62000 + 网关 61000 就绪" || bad "有服务没起来（见 harness 日志）"
   TOK="$TOKEN"; [ -z "$TOK" ] && TOK="$(harness_login 61000 "$ACCOUNT" "$PASSWORD")"

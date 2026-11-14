@@ -172,7 +172,7 @@ else
     [ -n "$code" ] && [ "$code" != "000" ] && break; sleep 0.2
   done
   ACCT="p32a_$$"; PW="P32a-$$-$(date +%s)"
-  printf '%s\n' "$PW" | "$DOTNET" "$GD" --seed-account "$ACCT" $CG >/dev/null 2>&1
+  printf '%s\n' "$PW" | "$DOTNET" "$GD" --seed-account "$ACCT" --seed-slots 8 $CG >/dev/null 2>&1
   TOK="$(curl -s --noproxy '*' -X POST http://127.0.0.1:61000/login -H 'Content-Type: application/json' \
     -d "{\"account\":\"$ACCT\",\"password\":\"$PW\"}" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("token",""))' 2>/dev/null)"
   [ -n "$TOK" ] && ok "登录拿到令牌（账号/口令只在内存）" || bad "登录没拿到令牌"

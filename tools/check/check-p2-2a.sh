@@ -182,7 +182,7 @@ except Exception: print("")')"
   [ "$MIG" = "1" ] && grep -q '^migrate=ok' "$TMP/m1" && grep -q '^migrate=ok' "$TMP/m2" \
     && ok "真 gamedb 主迁移（账号/角色/进本/背包/货币/流水/经验）" || bad "建表失败：$(head -3 "$TMP/m1" "$TMP/m2")"
   ACCOUNT="p22a_$$"; PASSWORD="P22a-$$-$(date +%s)"
-  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" $CG >/dev/null 2>&1
+  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" --seed-slots 8 $CG >/dev/null 2>&1
   ok "自造临时账号（口令/令牌/角色号只在内存，不落盘不打印）"
   for p in 62000 61000 "$BP"; do harness_kill_port "$p"; done
   harness_start "$TMP/harness/battle.log" "$DOTNET" "$BD" --config "$TMP/battle.json" >/dev/null

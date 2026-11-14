@@ -1,0 +1,12 @@
+{
+  "schema": "monthly-bundle-table/1",
+  "version": 1,
+  "note": "月叠唯一正本（方案 12.1 第 809 行「月叠 三十天份的传送符和红符 给活跃账号按月续。这一叠里只有这两种符，不附带金币、材料、复活卷轴、解绑道具和经验道具」、技术架构 5 节「蓝符不进月叠」「蓝符、复活卷轴、解绑道具和限时经验道具，副本、任务、拍卖、月叠和通行证都不产出」、开发架构 11 节 P3-4 / 13 节 P3-4b / 14 节第 69 行）。这一叠只许两种符，种类白名单就是 teleport_talisman 与 red_talisman：蓝符、复活卷轴、经验道具、解绑道具、金币、材料、装备、副本次数在加载期就长不出来（塞一条就 config_error 起不来）。两种符的编号不许另立：红符必须就是 config/talisman.json 的 red.item_id（方案写定「红符不是红药」，商城卖的是同一件），传送符必须就是 config/shop.json 那条 teleport_talisman 商品发的同一件（P1-5c4 只接发货、用法留给本卡）。「三十天份」按 days 与每条 per_day 算总量，一次买一次到账、一次性进背包；方案没写定每天几张，per_day 全是占位并标 pending=true，改这两个数即可，代码里没有第二套数量。方案另写「给活跃账号按月续」，本卡只落成「每月可再买一次」，自动续费 / 每日分批发放没有任何卡承接（见开发日志的欠项登记），因此这里不写到期时刻、也不写到账节奏，库表里同样没有月叠状态行。product_id 指向 config/shop.json 里那条 monthly_bundle 商品：月叠在商城直接标价卖，价格只存在 shop.json，本表不写第二套价格；买下不把「月叠」本身放进背包，只放这两种符（不是状态发货，也不是单物品发货）。表只许出现下列键。",
+  "pending": true,
+  "product_id": "shop_monthly_bundle_1",
+  "days": 30,
+  "items": [
+    { "kind": "teleport_talisman", "item_id": "teleport_talisman", "per_day": 1 },
+    { "kind": "red_talisman", "item_id": "talisman_red", "per_day": 1 }
+  ]
+}

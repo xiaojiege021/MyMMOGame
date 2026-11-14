@@ -249,7 +249,7 @@ PY
     [ -n "$code" ] && [ "$code" != "000" ] && break; sleep 0.2
   done
   ACCT="p334_$$"; PW="P334-$$-$(date +%s)"; TX="p334-$$-$(date +%s)"
-  printf '%s\n' "$PW" | "$DOTNET" "$GD" --seed-account "$ACCT" $GR >/dev/null 2>&1
+  printf '%s\n' "$PW" | "$DOTNET" "$GD" --seed-account "$ACCT" --seed-slots 8 $GR >/dev/null 2>&1
   TOK="$(curl -s --noproxy '*' -X POST http://127.0.0.1:61000/login -H 'Content-Type: application/json' \
     -d "{\"account\":\"$ACCT\",\"password\":\"$PW\"}" | jget token 2>/dev/null)"
   [ -n "$TOK" ] && ok "真服：登录拿到令牌（账号/口令只在内存）" || bad "真服：登录没拿到令牌"

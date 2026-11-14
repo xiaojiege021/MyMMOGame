@@ -414,7 +414,7 @@ fi
 
 for acct in "$ACCOUNT" "$OTHER"; do
   printf '%s\n' "$TEST_PASSWORD" \
-    | "$DOTNET" "$GATEWAY_DLL" --seed-account "$acct" --config "$TMP/gateway.json" >/dev/null 2>&1 || true
+    | "$DOTNET" "$GATEWAY_DLL" --seed-account "$acct" --seed-slots 8 --config "$TMP/gateway.json" >/dev/null 2>&1 || true
 done
 ok "两个测试账号已写入"
 

@@ -13,7 +13,8 @@ public sealed record CharacterConfig(
     string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
     string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable,
     string StoneExchangeTable, string CityTable, string SiegeTerritoryTable,
-    string SeasonPassTable, string SeasonTable, string GlobalUpstream)
+    string SeasonPassTable, string SeasonTable, string MonthlyBundleTable,
+    string CharacterSlotTable, string GlobalUpstream)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -38,6 +39,11 @@ public sealed record CharacterConfig(
     public const string DefaultSeasonPassTable = "config/season_pass.json";
     // P3-4a2：season.json 只用来交叉校验「通行证里的季真的存在」，当前是哪一季仍归全局服务。
     public const string DefaultSeasonTable = "config/season.json";
+    // P3-4b：月叠的正本。哪些符、每天几张、共几天都在这份文件里，价格仍在 shop.json。
+    public const string DefaultMonthlyBundleTable = "config/monthly_bundle.json";
+    // P3-4b：账号角色位的正本（基础位、上限、商品编号）。名额的事实值在库里的
+    // "角色".character_slot，这里只是规则与标价来源。
+    public const string DefaultCharacterSlotTable = "config/character_slot.json";
     // P3-4a2：当前季是全局服务的事实值；角色服经 DescribeSeason 只读它，不自己认定。
     public const string DefaultGlobalUpstream = "http://127.0.0.1:64000";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
@@ -223,6 +229,21 @@ public sealed record CharacterConfig(
             throw new ConfigException("season_table 不能为空");
         }
 
+        // P3-4b：月叠与第二角色栏各一份正本；都不显式登记进 config/character.json，
+        // 老卡的临时配置目录里没有这两份也照常起（走默认文件名）。
+        var monthlyBundleTable =
+            (wire.MonthlyBundleTable ?? DefaultMonthlyBundleTable).Trim();
+        if (monthlyBundleTable.Length == 0)
+        {
+            throw new ConfigException("monthly_bundle_table 不能为空");
+        }
+
+        var characterSlotTable = (wire.CharacterSlotTable ?? DefaultCharacterSlotTable).Trim();
+        if (characterSlotTable.Length == 0)
+        {
+            throw new ConfigException("character_slot_table 不能为空");
+        }
+
         // 当前季在全局服务；缺省指到本机 64000，老卡配置不写这项也照常起。
         var globalUpstream = (wire.GlobalUpstream ?? DefaultGlobalUpstream).Trim().TrimEnd('/');
         if (globalUpstream.Length == 0
@@ -237,7 +258,8 @@ public sealed record CharacterConfig(
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
-            siegeTerritoryTable, seasonPassTable, seasonTable, globalUpstream);
+            siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
+            characterSlotTable, globalUpstream);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -313,6 +335,12 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("season_table")]
         public string? SeasonTable { get; init; }
+
+        [JsonPropertyName("monthly_bundle_table")]
+        public string? MonthlyBundleTable { get; init; }
+
+        [JsonPropertyName("character_slot_table")]
+        public string? CharacterSlotTable { get; init; }
 
         [JsonPropertyName("global_upstream")]
         public string? GlobalUpstream { get; init; }

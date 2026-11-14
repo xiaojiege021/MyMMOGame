@@ -6,6 +6,9 @@ using Npgsql;
 var configPath = "config/gateway.json";
 var sqlPath = "db/character/account.sql";
 string? seedAccount = null;
+// P3-4b：种子账号的角色位。0 表示不动（账号按配置的基础位算 1 个）；
+// 核对脚本一次要造好几个角色时显式给一个数，产品路径不走这里。
+var seedSlots = 0;
 string? deleteAccount = null;
 var migrate = false;
 var stats = false;
@@ -22,6 +25,10 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--seed-account" when i + 1 < args.Length:
             seedAccount = args[++i];
+            break;
+        // P3-4b：只给核对 / 种子用，把种子账号的角色位放宽到 N（只增不减，不扣钱）。
+        case "--seed-slots" when i + 1 < args.Length:
+            int.TryParse(args[++i], out seedSlots);
             break;
         case "--delete-account" when i + 1 < args.Length:
             deleteAccount = args[++i];
@@ -85,6 +92,15 @@ if (migrate || seedAccount != null || deleteAccount != null || stats)
 
             await accounts.SeedAsync(seedAccount, password, config.Pbkdf2Iterations, stopping.Token);
             Console.WriteLine("seed=ok account=" + seedAccount);
+
+            // P3-4b：显式给了 --seed-slots 才放宽名额；不给就是配置的基础位（1 个角色）。
+            if (seedSlots > 0)
+            {
+                var widened = await accounts.SeedSlotsAsync(seedAccount, seedSlots, stopping.Token);
+                Console.WriteLine(widened
+                    ? "seed_slots=ok account=" + seedAccount + " slots=" + seedSlots
+                    : "seed_slots=skipped account=" + seedAccount + " reason=table_missing");
+            }
         }
 
         if (deleteAccount != null)
