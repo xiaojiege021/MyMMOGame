@@ -263,3 +263,28 @@ CREATE TABLE IF NOT EXISTS "社交".siege_result (
     tax_pct      int         NOT NULL CHECK (tax_pct BETWEEN 0 AND 100),
     recorded_at  timestamptz NOT NULL DEFAULT now()
 );
+
+-- P3-4a2：以下 DDL 与 db/character/season_pass.sql 是同一份，整份追加进主迁移。
+-- 通行证只存「这一季付费轨开没开」与「这一轨这一阶领过没有」；奖励内容全在
+-- config/season_pass.json，库里不另存物品编号与数量的第二套账。
+CREATE TABLE IF NOT EXISTS "角色".season_pass (
+    character_id  bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    season_id     text        NOT NULL,
+    paid          boolean     NOT NULL DEFAULT true,
+    price_yuanbao bigint      NOT NULL CHECK (price_yuanbao >= 0),
+    txn_id        text        NOT NULL,
+    purchased_at  timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, season_id)
+);
+
+CREATE TABLE IF NOT EXISTS "角色".season_pass_claim (
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    season_id    text        NOT NULL,
+    track        text        NOT NULL CHECK (track IN ('free', 'paid')),
+    stage        int         NOT NULL CHECK (stage >= 1),
+    item_id      text        NOT NULL,
+    item_count   int         NOT NULL CHECK (item_count >= 1),
+    txn_id       text        NOT NULL,
+    claimed_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, season_id, track, stage)
+);

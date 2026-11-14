@@ -182,6 +182,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ApplySiegeResultRequest> __Marshaller_mmo_character_ApplySiegeResultRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ApplySiegeResultRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ApplySiegeResultResponse> __Marshaller_mmo_character_ApplySiegeResultResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ApplySiegeResultResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeSeasonPassRequest> __Marshaller_mmo_character_DescribeSeasonPassRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeSeasonPassRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeSeasonPassResponse> __Marshaller_mmo_character_DescribeSeasonPassResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeSeasonPassResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ClaimSeasonPassRequest> __Marshaller_mmo_character_ClaimSeasonPassRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ClaimSeasonPassRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ClaimSeasonPassResponse> __Marshaller_mmo_character_ClaimSeasonPassResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ClaimSeasonPassResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -454,6 +462,22 @@ namespace Mmo.Proto.Character {
         "ApplySiegeResult",
         __Marshaller_mmo_character_ApplySiegeResultRequest,
         __Marshaller_mmo_character_ApplySiegeResultResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeSeasonPassRequest, global::Mmo.Proto.Character.DescribeSeasonPassResponse> __Method_DescribeSeasonPass = new grpc::Method<global::Mmo.Proto.Character.DescribeSeasonPassRequest, global::Mmo.Proto.Character.DescribeSeasonPassResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeSeasonPass",
+        __Marshaller_mmo_character_DescribeSeasonPassRequest,
+        __Marshaller_mmo_character_DescribeSeasonPassResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ClaimSeasonPassRequest, global::Mmo.Proto.Character.ClaimSeasonPassResponse> __Method_ClaimSeasonPassReward = new grpc::Method<global::Mmo.Proto.Character.ClaimSeasonPassRequest, global::Mmo.Proto.Character.ClaimSeasonPassResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ClaimSeasonPassReward",
+        __Marshaller_mmo_character_ClaimSeasonPassRequest,
+        __Marshaller_mmo_character_ClaimSeasonPassResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -896,6 +920,27 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ApplySiegeResultResponse> ApplySiegeResult(global::Mmo.Proto.Character.ApplySiegeResultRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-4a2：赛季通行证。免费轨只发称号与外观碎片，付费轨只发当季秘境外观、
+      /// 洞府摆件与很少几张保护券（就是 enhance.json 的 protect_item_id，和商城同一种）。
+      /// 奖励内容全在 config/season_pass.json，哪一季由角色服向全局服务确认；
+      /// 请求里带不进物品编号、数量、季，也带不进任何金币 / 灵石 / 强化石 / 装备。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeSeasonPassResponse> DescribeSeasonPass(global::Mmo.Proto.Character.DescribeSeasonPassRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ClaimSeasonPassResponse> ClaimSeasonPassReward(global::Mmo.Proto.Character.ClaimSeasonPassRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2657,6 +2702,86 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_ApplySiegeResult, null, options, request);
       }
+      /// <summary>
+      /// P3-4a2：赛季通行证。免费轨只发称号与外观碎片，付费轨只发当季秘境外观、
+      /// 洞府摆件与很少几张保护券（就是 enhance.json 的 protect_item_id，和商城同一种）。
+      /// 奖励内容全在 config/season_pass.json，哪一季由角色服向全局服务确认；
+      /// 请求里带不进物品编号、数量、季，也带不进任何金币 / 灵石 / 强化石 / 装备。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeSeasonPassResponse DescribeSeasonPass(global::Mmo.Proto.Character.DescribeSeasonPassRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSeasonPass(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-4a2：赛季通行证。免费轨只发称号与外观碎片，付费轨只发当季秘境外观、
+      /// 洞府摆件与很少几张保护券（就是 enhance.json 的 protect_item_id，和商城同一种）。
+      /// 奖励内容全在 config/season_pass.json，哪一季由角色服向全局服务确认；
+      /// 请求里带不进物品编号、数量、季，也带不进任何金币 / 灵石 / 强化石 / 装备。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeSeasonPassResponse DescribeSeasonPass(global::Mmo.Proto.Character.DescribeSeasonPassRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeSeasonPass, null, options, request);
+      }
+      /// <summary>
+      /// P3-4a2：赛季通行证。免费轨只发称号与外观碎片，付费轨只发当季秘境外观、
+      /// 洞府摆件与很少几张保护券（就是 enhance.json 的 protect_item_id，和商城同一种）。
+      /// 奖励内容全在 config/season_pass.json，哪一季由角色服向全局服务确认；
+      /// 请求里带不进物品编号、数量、季，也带不进任何金币 / 灵石 / 强化石 / 装备。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeSeasonPassResponse> DescribeSeasonPassAsync(global::Mmo.Proto.Character.DescribeSeasonPassRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSeasonPassAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-4a2：赛季通行证。免费轨只发称号与外观碎片，付费轨只发当季秘境外观、
+      /// 洞府摆件与很少几张保护券（就是 enhance.json 的 protect_item_id，和商城同一种）。
+      /// 奖励内容全在 config/season_pass.json，哪一季由角色服向全局服务确认；
+      /// 请求里带不进物品编号、数量、季，也带不进任何金币 / 灵石 / 强化石 / 装备。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeSeasonPassResponse> DescribeSeasonPassAsync(global::Mmo.Proto.Character.DescribeSeasonPassRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeSeasonPass, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ClaimSeasonPassResponse ClaimSeasonPassReward(global::Mmo.Proto.Character.ClaimSeasonPassRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ClaimSeasonPassReward(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ClaimSeasonPassResponse ClaimSeasonPassReward(global::Mmo.Proto.Character.ClaimSeasonPassRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ClaimSeasonPassReward, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ClaimSeasonPassResponse> ClaimSeasonPassRewardAsync(global::Mmo.Proto.Character.ClaimSeasonPassRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ClaimSeasonPassRewardAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ClaimSeasonPassResponse> ClaimSeasonPassRewardAsync(global::Mmo.Proto.Character.ClaimSeasonPassRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ClaimSeasonPassReward, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -2704,7 +2829,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_SettleDrill, serviceImpl.SettleDrill)
           .AddMethod(__Method_ExchangeStone, serviceImpl.ExchangeStone)
           .AddMethod(__Method_SettleStoneAuction, serviceImpl.SettleStoneAuction)
-          .AddMethod(__Method_ApplySiegeResult, serviceImpl.ApplySiegeResult).Build();
+          .AddMethod(__Method_ApplySiegeResult, serviceImpl.ApplySiegeResult)
+          .AddMethod(__Method_DescribeSeasonPass, serviceImpl.DescribeSeasonPass)
+          .AddMethod(__Method_ClaimSeasonPassReward, serviceImpl.ClaimSeasonPassReward).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -2748,6 +2875,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_ExchangeStone, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse>(serviceImpl.ExchangeStone));
       serviceBinder.AddMethod(__Method_SettleStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.StoneAuctionSettleRequest, global::Mmo.Proto.Character.StoneAuctionSettleResponse>(serviceImpl.SettleStoneAuction));
       serviceBinder.AddMethod(__Method_ApplySiegeResult, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ApplySiegeResultRequest, global::Mmo.Proto.Character.ApplySiegeResultResponse>(serviceImpl.ApplySiegeResult));
+      serviceBinder.AddMethod(__Method_DescribeSeasonPass, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeSeasonPassRequest, global::Mmo.Proto.Character.DescribeSeasonPassResponse>(serviceImpl.DescribeSeasonPass));
+      serviceBinder.AddMethod(__Method_ClaimSeasonPassReward, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ClaimSeasonPassRequest, global::Mmo.Proto.Character.ClaimSeasonPassResponse>(serviceImpl.ClaimSeasonPassReward));
     }
 
   }

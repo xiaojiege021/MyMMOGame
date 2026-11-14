@@ -12,7 +12,8 @@ public sealed record CharacterConfig(
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
     string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
     string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable,
-    string StoneExchangeTable, string CityTable, string SiegeTerritoryTable)
+    string StoneExchangeTable, string CityTable, string SiegeTerritoryTable,
+    string SeasonPassTable, string SeasonTable, string GlobalUpstream)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -33,6 +34,12 @@ public sealed record CharacterConfig(
     public const string DefaultCityTable = "config/city.json";
     // P3-3a4：城战易主后的抽成比例与城池编号，缺省读仓库那一份；核对脚本可以指到临时表。
     public const string DefaultSiegeTerritoryTable = "config/siege_territory.json";
+    // P3-4a2：通行证两轨的正本。它只记「哪一季发什么」，不记价格（价格在 shop.json）。
+    public const string DefaultSeasonPassTable = "config/season_pass.json";
+    // P3-4a2：season.json 只用来交叉校验「通行证里的季真的存在」，当前是哪一季仍归全局服务。
+    public const string DefaultSeasonTable = "config/season.json";
+    // P3-4a2：当前季是全局服务的事实值；角色服经 DescribeSeason 只读它，不自己认定。
+    public const string DefaultGlobalUpstream = "http://127.0.0.1:64000";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -203,12 +210,34 @@ public sealed record CharacterConfig(
             throw new ConfigException("siege_territory_table 不能为空");
         }
 
+        // P3-4a2：通行证表与它的两处交叉校验来源（season.json 的季、shop.json 的标价）。
+        var seasonPassTable = (wire.SeasonPassTable ?? DefaultSeasonPassTable).Trim();
+        if (seasonPassTable.Length == 0)
+        {
+            throw new ConfigException("season_pass_table 不能为空");
+        }
+
+        var seasonTable = (wire.SeasonTable ?? DefaultSeasonTable).Trim();
+        if (seasonTable.Length == 0)
+        {
+            throw new ConfigException("season_table 不能为空");
+        }
+
+        // 当前季在全局服务；缺省指到本机 64000，老卡配置不写这项也照常起。
+        var globalUpstream = (wire.GlobalUpstream ?? DefaultGlobalUpstream).Trim().TrimEnd('/');
+        if (globalUpstream.Length == 0
+            || !Uri.TryCreate(globalUpstream, UriKind.Absolute, out var globalUri)
+            || (globalUri.Scheme != "http" && globalUri.Scheme != "https"))
+        {
+            throw new ConfigException("global_upstream 必须是 http:// 或 https:// 的地址：" + globalUpstream);
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
-            siegeTerritoryTable);
+            siegeTerritoryTable, seasonPassTable, seasonTable, globalUpstream);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -278,6 +307,15 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("siege_territory_table")]
         public string? SiegeTerritoryTable { get; init; }
+
+        [JsonPropertyName("season_pass_table")]
+        public string? SeasonPassTable { get; init; }
+
+        [JsonPropertyName("season_table")]
+        public string? SeasonTable { get; init; }
+
+        [JsonPropertyName("global_upstream")]
+        public string? GlobalUpstream { get; init; }
     }
 }
 

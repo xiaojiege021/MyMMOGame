@@ -43,6 +43,7 @@ public sealed class CharacterProcess(string configPath)
         StoneExchangeTable stoneExchange;
         CityTable cityTable;
         SiegeTerritoryPolicy siegeTerritoryPolicy;
+        SeasonPassTable seasonPassTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -106,6 +107,12 @@ public sealed class CharacterProcess(string configPath)
             // 城战胜负写回时角色服不另算税率，也不接受请求里带来的税率。
             siegeTerritoryPolicy = SiegeTerritoryPolicy.Load(
                 config.SiegeTerritoryTable, cityTable);
+            // P3-4a2：通行证两轨。免费轨只许发称号与外观碎片，付费轨只许发当季外观、
+            // 洞府摆件与保护券；保护券必须就是 enhance.json 那一件（商城卖的同一种），
+            // 四种奖励都要在 items.json 里且到账即绑。season.json 只用来核对季真的存在。
+            seasonPassTable = SeasonPassTable.Load(
+                config.SeasonPassTable, File.ReadAllText(config.SeasonTable),
+                shopTable, items, enhanceTable);
         }
         catch (ConfigException ex)
         {
@@ -116,6 +123,7 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("config=" + configPath);
         Console.WriteLine("listen=" + config.Listen);
         Console.WriteLine("social_upstream=" + config.SocialUpstream);
+        Console.WriteLine("global_upstream=" + config.GlobalUpstream);
         Console.WriteLine("races=" + races.All.Count + " race_table_version=" + races.Version);
         Console.WriteLine("branches=" + branches.All.Count + " branch_table_version=" + branches.Version);
         Console.WriteLine("items=" + items.All.Count + " item_table_version=" + items.Version
@@ -246,6 +254,24 @@ public sealed class CharacterProcess(string configPath)
             + " highest=" + stoneExchange.HighestKind + "/" + stoneExchange.HighestName
             + " ingot=" + stoneExchange.IngotKind
             + " version=" + stoneExchange.Version);
+        // P3-4a2：通行证两轨的事实值。改配置重启后这里能直接核对到：
+        // 标价来自 shop.json 那条 season_pass 商品，保护券就是 enhance.json 那一件。
+        Console.WriteLine("season_pass=version=" + seasonPassTable.Version
+            + " pending=" + (seasonPassTable.Pending ? "true" : "false")
+            + " seasons=" + seasonPassTable.Seasons.Count
+            + " product=" + seasonPassTable.ProductId
+            + " price=" + seasonPassTable.PriceYuanbao
+            + " protect=" + seasonPassTable.ProtectItemId
+            + " protect_per_stage_max=" + seasonPassTable.ProtectPerStageMax);
+        foreach (var pass in seasonPassTable.Seasons)
+        {
+            Console.WriteLine("season_pass_season=" + pass.SeasonId
+                + " free=" + pass.Free.Count
+                + " paid=" + pass.Paid.Count
+                + " free_items=" + string.Join("+", pass.Free.Select(x => x.Rewards[0].ItemId))
+                + " paid_items=" + string.Join("+", pass.Paid.Select(x => x.Rewards[0].ItemId)));
+        }
+
         // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
         foreach (var city in cityTable.Cities)
         {
@@ -333,10 +359,18 @@ public sealed class CharacterProcess(string configPath)
         // P3-3a4：城战易主的唯一写入点，一笔事务里改归属与抽成比例、抢事务号、读回提交。
         var siegeTerritories = new SiegeTerritoryRepository(
             dataSource, cityTable, siegeTerritoryPolicy);
+        // P3-4a2：通行证的唯一写入点。买与领各一笔事务，奖励物品与数量只从配置读。
+        var seasonPasses = new SeasonPassRepository(dataSource, seasonPassTable, items, config);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
         var social = new SocialService.SocialServiceClient(socialChannel);
+
+        // P3-4a2：当前是哪一季只问全局服务（P3-4a1 的正本）。上游没起时通行证的
+        // 购买与领取拒绝（season_unavailable），强化 / 拍卖 / 背包等老链路一律不受影响。
+        var globalChannel = GrpcChannel.ForAddress(config.GlobalUpstream);
+        ISeasonSource seasonSource = new GrpcSeasonSource(
+            new Mmo.Proto.Trade.TradeService.TradeServiceClient(globalChannel));
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2，
@@ -396,6 +430,9 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(siegeTerritories);
         builder.Services.AddSingleton(siegeTerritoryPolicy);
         builder.Services.AddSingleton(social);
+        builder.Services.AddSingleton(seasonPassTable);
+        builder.Services.AddSingleton(seasonPasses);
+        builder.Services.AddSingleton(seasonSource);
         builder.Services.AddSingleton(config);
 
         var app = builder.Build();

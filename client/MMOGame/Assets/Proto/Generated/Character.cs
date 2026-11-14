@@ -141,188 +141,209 @@ namespace Mmo.Proto.Character {
             "EhQKDHNlbGxlcl9pbmdvdBgLIAEoAxIUCgx0YXhfcmF0ZV9wY3QYDCABKAUS",
             "DQoFc3RhdGUYDSABKAkSEQoJZHVwbGljYXRlGA4gASgIIlwKEkJ1eVNob3BJ",
             "dGVtUmVxdWVzdBIPCgdhY2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgC",
-            "IAEoBBIPCgdpdGVtX2lkGAMgASgJEg4KBnR4bl9pZBgEIAEoCSKxAgoTQnV5",
+            "IAEoBBIPCgdpdGVtX2lkGAMgASgJEg4KBnR4bl9pZBgEIAEoCSLYAgoTQnV5",
             "U2hvcEl0ZW1SZXNwb25zZRIKCgJvaxgBIAEoCBIOCgZyZWFzb24YAiABKAkS",
             "DwoHaXRlbV9pZBgDIAEoCRIMCgRraW5kGAQgASgJEgwKBG5hbWUYBSABKAkS",
             "FQoNcHJpY2VfeXVhbmJhbxgGIAEoAxIQCghjdXJyZW5jeRgHIAEoCRIPCgdi",
             "YWxhbmNlGAggASgDEg4KBmVub3VnaBgJIAEoCBIXCg9jaGFyZ2VkX3l1YW5i",
             "YW8YCiABKAMSEQoJZGVsaXZlcmVkGAsgASgIEg0KBXN0YXRlGAwgASgJEhgK",
             "EGRlbGl2ZXJ5X2l0ZW1faWQYDSABKAkSEAoIYmFnX3Nsb3QYDiABKA0SDQoF",
-            "Ym91bmQYDyABKAgSEQoJZHVwbGljYXRlGBAgASgIImAKFkNvbnN1bWVUYWxp",
-            "c21hblJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQY",
-            "AiABKAQSDwoHaXRlbV9pZBgDIAEoCRIOCgZ0eG5faWQYBCABKAki/QEKF0Nv",
-            "bnN1bWVUYWxpc21hblJlc3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgC",
-            "IAEoCRIPCgdpdGVtX2lkGAMgASgJEhIKCmNvdW50X2xlZnQYBCABKAMSDAoE",
-            "c2xvdBgFIAEoDRIRCglkdXBsaWNhdGUYBiABKAgSEgoKaHBfcmVzdG9yZRgH",
-            "IAEoAxITCgtjb29sZG93bl9tcxgIIAEoDRIWCg5jb29sZG93bl9ncm91cBgJ",
-            "IAEoCRIpCgRwb29sGAogASgOMhsubW1vLmNoYXJhY3Rlci5UYWxpc21hblBv",
-            "b2wSFAoMbWFuYV9yZXN0b3JlGAsgASgDIkAKF0Rlc2NyaWJlVGFsaXNtYW5S",
-            "ZXF1ZXN0EhQKDGNoYXJhY3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJ",
-            "IoYBChhEZXNjcmliZVRhbGlzbWFuUmVzcG9uc2USCgoCb2sYASABKAgSDgoG",
-            "cmVhc29uGAIgASgJEg8KB2l0ZW1faWQYAyABKAkSKQoEcG9vbBgEIAEoDjIb",
-            "Lm1tby5jaGFyYWN0ZXIuVGFsaXNtYW5Qb29sEhIKCmNvdW50X2xlZnQYBSAB",
-            "KAMiRAobRGVzY3JpYmVSZXZpdmVTY3JvbGxSZXF1ZXN0EhQKDGNoYXJhY3Rl",
-            "cl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJIuMBChxEZXNjcmliZVJldml2",
-            "ZVNjcm9sbFJlc3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIP",
-            "CgdpdGVtX2lkGAMgASgJEhIKCmNvdW50X2xlZnQYBCABKAMSEwoLY29vbGRv",
-            "d25fbXMYBSABKA0SFgoOaHBfcmVzdG9yZV9wY3QYBiABKA0SFAoMZXhwX2Nv",
-            "c3RfcGN0GAcgASgNEhMKC3JlYWR5X2F0X21zGAggASgDEg4KBm5vd19tcxgJ",
-            "IAEoAxINCgVsZXZlbBgKIAEoAxILCgNleHAYCyABKAMiZAoaQ29uc3VtZVJl",
-            "dml2ZVNjcm9sbFJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0",
-            "ZXJfaWQYAiABKAQSDwoHaXRlbV9pZBgDIAEoCRIOCgZ0eG5faWQYBCABKAki",
-            "5wEKG0NvbnN1bWVSZXZpdmVTY3JvbGxSZXNwb25zZRIKCgJvaxgBIAEoCBIO",
-            "CgZyZWFzb24YAiABKAkSDwoHaXRlbV9pZBgDIAEoCRISCgpjb3VudF9sZWZ0",
-            "GAQgASgDEhYKDmhwX3Jlc3RvcmVfcGN0GAUgASgNEhAKCGV4cF9jb3N0GAYg",
-            "ASgDEg0KBWxldmVsGAcgASgDEhEKCWV4cF9hZnRlchgIIAEoAxITCgtyZWFk",
-            "eV9hdF9tcxgJIAEoAxITCgtjb29sZG93bl9tcxgKIAEoDRIRCglkdXBsaWNh",
-            "dGUYCyABKAgiXgoUVXNlRXhwQm9vc3RlclJlcXVlc3QSDwoHYWNjb3VudBgB",
-            "IAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQSDwoHaXRlbV9pZBgDIAEoCRIO",
-            "CgZ0eG5faWQYBCABKAkiuQEKFVVzZUV4cEJvb3N0ZXJSZXNwb25zZRIKCgJv",
-            "axgBIAEoCBIOCgZyZWFzb24YAiABKAkSDwoHaXRlbV9pZBgDIAEoCRISCgpj",
-            "b3VudF9sZWZ0GAQgASgDEhMKC2R1cmF0aW9uX21zGAUgASgNEhAKCGdhaW5f",
-            "cGN0GAYgASgNEhUKDWV4cGlyZXNfYXRfbXMYByABKAMSDgoGbm93X21zGAgg",
-            "ASgDEhEKCWR1cGxpY2F0ZRgJIAEoCCJsChRVc2VVbmJpbmRJdGVtUmVxdWVz",
-            "dBIPCgdhY2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIMCgRz",
-            "bG90GAMgASgFEg8KB2l0ZW1faWQYBCABKAkSDgoGdHhuX2lkGAUgASgJIrIB",
-            "ChVVc2VVbmJpbmRJdGVtUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29u",
-            "GAIgASgJEg8KB2l0ZW1faWQYAyABKAkSDAoEc2xvdBgEIAEoBRIWCg50YXJn",
-            "ZXRfaXRlbV9pZBgFIAEoCRIMCgRjb3N0GAYgASgNEhIKCmNvdW50X2xlZnQY",
-            "ByABKAMSEQoJYWdlX2hvdXJzGAggASgDEhEKCWZsb29yX2hpdBgJIAEoCCJX",
-            "ChpDcmVhdGVSZWNoYXJnZU9yZGVyUmVxdWVzdBIPCgdhY2NvdW50GAEgASgJ",
-            "EhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBISCgpwcm9kdWN0X2lkGAMgASgJIoAB",
-            "ChtDcmVhdGVSZWNoYXJnZU9yZGVyUmVzcG9uc2USCgoCb2sYASABKAgSDgoG",
-            "cmVhc29uGAIgASgJEhAKCG9yZGVyX2lkGAMgASgJEhIKCnByb2R1Y3RfaWQY",
-            "BCABKAkSDwoHeXVhbmJhbxgFIAEoAxIOCgZzdGF0dXMYBiABKAkiPwoaU2V0",
-            "dGxlUmVjaGFyZ2VPcmRlclJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIQCghv",
-            "cmRlcl9pZBgCIAEoCSKkAQobU2V0dGxlUmVjaGFyZ2VPcmRlclJlc3BvbnNl",
-            "EgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIQCghvcmRlcl9pZBgDIAEo",
-            "CRIOCgZzdGF0dXMYBCABKAkSDwoHeXVhbmJhbxgFIAEoAxIPCgdiYWxhbmNl",
-            "GAYgASgDEhIKCnBhaWRfYXRfbXMYByABKAMSEQoJZHVwbGljYXRlGAggASgI",
-            "IjQKHERlc2NyaWJlQmF0dGxlUHJvZmlsZVJlcXVlc3QSFAoMY2hhcmFjdGVy",
-            "X2lkGAEgASgEIqIBCh1EZXNjcmliZUJhdHRsZVByb2ZpbGVSZXNwb25zZRIN",
-            "CgVmb3VuZBgBIAEoCBIQCghjbGFzc19pZBgCIAEoCRIOCgZicmFuY2gYAyAB",
-            "KAkSDQoFbGV2ZWwYBCABKAUSFQoNZW5oYW5jZV90b3RhbBgFIAEoBRIVCg1l",
-            "bmhhbmNlX3Nsb3RzGAYgASgFEhMKC2JyYW5jaF9zdGVwGAcgASgFIlAKFEFk",
-            "dmFuY2VCcmFuY2hSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFj",
-            "dGVyX2lkGAIgASgEEhEKCWJyYW5jaF9pZBgDIAEoCSJ6ChVBZHZhbmNlQnJh",
-            "bmNoUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJEg4KBmJy",
-            "YW5jaBgDIAEoCRITCgticmFuY2hfc3RlcBgEIAEoBRINCgVsZXZlbBgFIAEo",
-            "BRIRCglkdXBsaWNhdGUYBiABKAgiOAoPQ2FuRXF1aXBSZXF1ZXN0EhQKDGNo",
-            "YXJhY3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJInsKEENhbkVxdWlw",
-            "UmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJEhMKC3dlYXBv",
-            "bl9raW5kGAMgASgJEhUKDXJlcXVpcmVfbGV2ZWwYBCABKAUSDQoFbGV2ZWwY",
-            "BSABKAUSEAoIY2xhc3NfaWQYBiABKAkiTAoTQWR2YW5jZVJlYWxtUmVxdWVz",
-            "dBIPCgdhY2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIOCgZ0",
-            "eG5faWQYAyABKAki/QIKFEFkdmFuY2VSZWFsbVJlc3BvbnNlEgoKAm9rGAEg",
-            "ASgIEg8KB3N1Y2Nlc3MYAiABKAgSDgoGcmVhc29uGAMgASgJEhIKCmZyb21f",
-            "cmVhbG0YBCABKAkSEgoKbmV4dF9yZWFsbRgFIAEoCRINCgVyZWFsbRgGIAEo",
-            "CRIUCgxkcmlsbF9iZWZvcmUYByABKAMSFgoOZHJpbGxfcmVxdWlyZWQYCCAB",
-            "KAMSEgoKZHJpbGxfY29zdBgJIAEoAxISCgpzdG9uZV9raW5kGAogASgJEhIK",
-            "CnN0b25lX2Nvc3QYCyABKAMSDQoFZHJpbGwYDCABKAMSEgoKc3RvbmVfbGVm",
-            "dBgNIAEoAxISCgptYWluX3N0YWdlGA4gASgFEhsKE21haW5fc3RhZ2VfcmVx",
-            "dWlyZWQYDyABKAUSGwoTc2lkZV9xdWVzdHNfbWlzc2luZxgQIAMoCRITCgtz",
-            "dWNjZXNzX3BjdBgRIAEoBRIRCglkdXBsaWNhdGUYEiABKAgiXwoSU2V0dGxl",
-            "RHJpbGxSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lk",
-            "GAIgASgEEhIKCmR1bmdlb25faWQYAyABKAkSDgoGdHhuX2lkGAQgASgJInsK",
-            "E1NldHRsZURyaWxsUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIg",
-            "ASgJEhIKCmR1bmdlb25faWQYAyABKAkSEgoKZHJpbGxfZ2FpbhgEIAEoAxIN",
-            "CgVkcmlsbBgFIAEoAxIRCglkdXBsaWNhdGUYBiABKAgiYAoURXhjaGFuZ2VT",
-            "dG9uZVJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQY",
-            "AiABKAQSEQoJZnJvbV9raW5kGAMgASgJEg4KBnR4bl9pZBgEIAEoCSLbAQoV",
-            "RXhjaGFuZ2VTdG9uZVJlc3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgC",
-            "IAEoCRIRCglmcm9tX2tpbmQYAyABKAkSDwoHdG9fa2luZBgEIAEoCRIRCglm",
-            "cm9tX2Nvc3QYBSABKAMSDwoHdG9fZ2FpbhgGIAEoAxITCgtmcm9tX2Ftb3Vu",
-            "dBgHIAEoAxIRCgl0b19hbW91bnQYCCABKAMSDQoFcmF0aW8YCSABKAUSFAoM",
-            "aGlnaGVzdF9uYW1lGAogASgJEhEKCWR1cGxpY2F0ZRgLIAEoCCJmChlTdG9u",
-            "ZUF1Y3Rpb25TZXR0bGVSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hh",
-            "cmFjdGVyX2lkGAIgASgEEhIKCmxpc3RpbmdfaWQYAyABKAQSDgoGdHhuX2lk",
-            "GAQgASgJIroCChpTdG9uZUF1Y3Rpb25TZXR0bGVSZXNwb25zZRIKCgJvaxgB",
-            "IAEoCBIOCgZyZWFzb24YAiABKAkSEgoKbGlzdGluZ19pZBgDIAEoBBISCgpz",
-            "dG9uZV9raW5kGAQgASgJEhQKDHN0b25lX2Ftb3VudBgFIAEoAxISCgpwcmlj",
-            "ZV9nb2xkGAYgASgDEhAKCHRheF9nb2xkGAcgASgDEhAKCG5ldF9nb2xkGAgg",
-            "ASgDEhIKCmJ1eWVyX2dvbGQYCSABKAMSEwoLc2VsbGVyX2dvbGQYCiABKAMS",
-            "EwoLYnV5ZXJfc3RvbmUYCyABKAMSFAoMc2VsbGVyX3N0b25lGAwgASgDEhQK",
-            "DHRheF9yYXRlX3BjdBgNIAEoBRINCgVzdGF0ZRgOIAEoCRIRCglkdXBsaWNh",
-            "dGUYDyABKAgihwEKF0FwcGx5U2llZ2VSZXN1bHRSZXF1ZXN0Eg8KB2FjY291",
-            "bnQYASABKAkSDgoGdHhuX2lkGAIgASgJEg8KB2NpdHlfaWQYAyABKAkSEAoI",
-            "bWF0Y2hfaWQYBCABKAkSEwoLd2lubmVyX3RlYW0YBSABKA0SEwoLd2lubmVy",
-            "X3NlY3QYBiABKAQijwEKGEFwcGx5U2llZ2VSZXN1bHRSZXNwb25zZRIKCgJv",
-            "axgBIAEoCBIOCgZyZWFzb24YAiABKAkSEQoJZHVwbGljYXRlGAMgASgIEg8K",
-            "B2NpdHlfaWQYBCABKAkSEgoKb3duZXJfc2VjdBgFIAEoCRIPCgd0YXhfcGN0",
-            "GAYgASgFEg4KBnR4bl9pZBgHIAEoCSpbCgxUYWxpc21hblBvb2wSHQoZVEFM",
-            "SVNNQU5fUE9PTF9VTlNQRUNJRklFRBAAEhQKEFRBTElTTUFOX1BPT0xfSFAQ",
-            "ARIWChJUQUxJU01BTl9QT09MX01BTkEQAjLRGAoQQ2hhcmFjdGVyU2Vydmlj",
-            "ZRJgCg9DcmVhdGVDaGFyYWN0ZXISJS5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNo",
-            "YXJhY3RlclJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3Rl",
-            "clJlc3BvbnNlEksKCFNldExldmVsEh4ubW1vLmNoYXJhY3Rlci5TZXRMZXZl",
-            "bFJlcXVlc3QaHy5tbW8uY2hhcmFjdGVyLlNldExldmVsUmVzcG9uc2USRgoH",
-            "QWRkSXRlbRIdLm1tby5jaGFyYWN0ZXIuQWRkSXRlbVJlcXVlc3QaHC5tbW8u",
-            "Y2hhcmFjdGVyLkludmVudG9yeVNsb3QSWgoNTGlzdEludmVudG9yeRIjLm1t",
-            "by5jaGFyYWN0ZXIuTGlzdEludmVudG9yeVJlcXVlc3QaJC5tbW8uY2hhcmFj",
-            "dGVyLkxpc3RJbnZlbnRvcnlSZXNwb25zZRJLCghDYW5UcmFkZRIeLm1tby5j",
-            "aGFyYWN0ZXIuQ2FuVHJhZGVSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5U",
-            "cmFkZVJlc3BvbnNlElAKC0FkZEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5B",
-            "ZGRDdXJyZW5jeVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFs",
-            "YW5jZRJUCgtHZXRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVu",
-            "Y3lSZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5jeVJlc3BvbnNl",
-            "ElEKCkFwcGx5R3JhbnQSIC5tbW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXF1",
-            "ZXN0GiEubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVzcG9uc2USVwoMRW50",
-            "ZXJEdW5nZW9uEiIubW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXF1ZXN0",
-            "GiMubW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXNwb25zZRJXCgxVc2VI",
-            "b3RTcHJpbmcSIi5tbW8uY2hhcmFjdGVyLlVzZUhvdFNwcmluZ1JlcXVlc3Qa",
-            "Iy5tbW8uY2hhcmFjdGVyLlVzZUhvdFNwcmluZ1Jlc3BvbnNlEk4KCVNldHRs",
-            "ZUV4cBIfLm1tby5jaGFyYWN0ZXIuU2V0dGxlRXhwUmVxdWVzdBogLm1tby5j",
-            "aGFyYWN0ZXIuU2V0dGxlRXhwUmVzcG9uc2USSAoHRW5oYW5jZRIdLm1tby5j",
-            "aGFyYWN0ZXIuRW5oYW5jZVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkVuaGFu",
-            "Y2VSZXNwb25zZRJgCg9UcmFuc2ZlckVuaGFuY2USJS5tbW8uY2hhcmFjdGVy",
-            "LlRyYW5zZmVyRW5oYW5jZVJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLlRyYW5z",
-            "ZmVyRW5oYW5jZVJlc3BvbnNlElYKDkluc3RhbGxDcnlzdGFsEiQubW1vLmNo",
-            "YXJhY3Rlci5JbnN0YWxsQ3J5c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVy",
-            "LkNyeXN0YWxSZXNwb25zZRJUCg1SZW1vdmVDcnlzdGFsEiMubW1vLmNoYXJh",
-            "Y3Rlci5SZW1vdmVDcnlzdGFsUmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3J5",
-            "c3RhbFJlc3BvbnNlEloKDVNldHRsZUF1Y3Rpb24SIy5tbW8uY2hhcmFjdGVy",
-            "LkF1Y3Rpb25TZXR0bGVSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5BdWN0aW9u",
-            "U2V0dGxlUmVzcG9uc2USYgoLU2V0dGxlSW5nb3QSKC5tbW8uY2hhcmFjdGVy",
-            "LkF1Y3Rpb25JbmdvdFNldHRsZVJlcXVlc3QaKS5tbW8uY2hhcmFjdGVyLkF1",
-            "Y3Rpb25JbmdvdFNldHRsZVJlc3BvbnNlElQKC0J1eVNob3BJdGVtEiEubW1v",
-            "LmNoYXJhY3Rlci5CdXlTaG9wSXRlbVJlcXVlc3QaIi5tbW8uY2hhcmFjdGVy",
-            "LkJ1eVNob3BJdGVtUmVzcG9uc2USYAoPQ29uc3VtZVRhbGlzbWFuEiUubW1v",
-            "LmNoYXJhY3Rlci5Db25zdW1lVGFsaXNtYW5SZXF1ZXN0GiYubW1vLmNoYXJh",
-            "Y3Rlci5Db25zdW1lVGFsaXNtYW5SZXNwb25zZRJjChBEZXNjcmliZVRhbGlz",
-            "bWFuEiYubW1vLmNoYXJhY3Rlci5EZXNjcmliZVRhbGlzbWFuUmVxdWVzdBon",
-            "Lm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVUYWxpc21hblJlc3BvbnNlEm8KFERl",
-            "c2NyaWJlUmV2aXZlU2Nyb2xsEioubW1vLmNoYXJhY3Rlci5EZXNjcmliZVJl",
-            "dml2ZVNjcm9sbFJlcXVlc3QaKy5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlUmV2",
-            "aXZlU2Nyb2xsUmVzcG9uc2USbAoTQ29uc3VtZVJldml2ZVNjcm9sbBIpLm1t",
-            "by5jaGFyYWN0ZXIuQ29uc3VtZVJldml2ZVNjcm9sbFJlcXVlc3QaKi5tbW8u",
-            "Y2hhcmFjdGVyLkNvbnN1bWVSZXZpdmVTY3JvbGxSZXNwb25zZRJaCg1Vc2VF",
-            "eHBCb29zdGVyEiMubW1vLmNoYXJhY3Rlci5Vc2VFeHBCb29zdGVyUmVxdWVz",
-            "dBokLm1tby5jaGFyYWN0ZXIuVXNlRXhwQm9vc3RlclJlc3BvbnNlEloKDVVz",
-            "ZVVuYmluZEl0ZW0SIy5tbW8uY2hhcmFjdGVyLlVzZVVuYmluZEl0ZW1SZXF1",
-            "ZXN0GiQubW1vLmNoYXJhY3Rlci5Vc2VVbmJpbmRJdGVtUmVzcG9uc2USbAoT",
-            "Q3JlYXRlUmVjaGFyZ2VPcmRlchIpLm1tby5jaGFyYWN0ZXIuQ3JlYXRlUmVj",
-            "aGFyZ2VPcmRlclJlcXVlc3QaKi5tbW8uY2hhcmFjdGVyLkNyZWF0ZVJlY2hh",
-            "cmdlT3JkZXJSZXNwb25zZRJsChNTZXR0bGVSZWNoYXJnZU9yZGVyEikubW1v",
-            "LmNoYXJhY3Rlci5TZXR0bGVSZWNoYXJnZU9yZGVyUmVxdWVzdBoqLm1tby5j",
-            "aGFyYWN0ZXIuU2V0dGxlUmVjaGFyZ2VPcmRlclJlc3BvbnNlEnIKFURlc2Ny",
-            "aWJlQmF0dGxlUHJvZmlsZRIrLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVCYXR0",
-            "bGVQcm9maWxlUmVxdWVzdBosLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVCYXR0",
-            "bGVQcm9maWxlUmVzcG9uc2USWgoNQWR2YW5jZUJyYW5jaBIjLm1tby5jaGFy",
-            "YWN0ZXIuQWR2YW5jZUJyYW5jaFJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkFk",
-            "dmFuY2VCcmFuY2hSZXNwb25zZRJLCghDYW5FcXVpcBIeLm1tby5jaGFyYWN0",
-            "ZXIuQ2FuRXF1aXBSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5FcXVpcFJl",
-            "c3BvbnNlElcKDEFkdmFuY2VSZWFsbRIiLm1tby5jaGFyYWN0ZXIuQWR2YW5j",
-            "ZVJlYWxtUmVxdWVzdBojLm1tby5jaGFyYWN0ZXIuQWR2YW5jZVJlYWxtUmVz",
-            "cG9uc2USVAoLU2V0dGxlRHJpbGwSIS5tbW8uY2hhcmFjdGVyLlNldHRsZURy",
-            "aWxsUmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuU2V0dGxlRHJpbGxSZXNwb25z",
-            "ZRJaCg1FeGNoYW5nZVN0b25lEiMubW1vLmNoYXJhY3Rlci5FeGNoYW5nZVN0",
-            "b25lUmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuRXhjaGFuZ2VTdG9uZVJlc3Bv",
-            "bnNlEmkKElNldHRsZVN0b25lQXVjdGlvbhIoLm1tby5jaGFyYWN0ZXIuU3Rv",
-            "bmVBdWN0aW9uU2V0dGxlUmVxdWVzdBopLm1tby5jaGFyYWN0ZXIuU3RvbmVB",
-            "dWN0aW9uU2V0dGxlUmVzcG9uc2USYwoQQXBwbHlTaWVnZVJlc3VsdBImLm1t",
-            "by5jaGFyYWN0ZXIuQXBwbHlTaWVnZVJlc3VsdFJlcXVlc3QaJy5tbW8uY2hh",
-            "cmFjdGVyLkFwcGx5U2llZ2VSZXN1bHRSZXNwb25zZUIWqgITTW1vLlByb3Rv",
-            "LkNoYXJhY3RlcmIGcHJvdG8z"));
+            "Ym91bmQYDyABKAgSEQoJZHVwbGljYXRlGBAgASgIEhEKCXNlYXNvbl9pZBgR",
+            "IAEoCRISCgpwYXNzX293bmVkGBIgASgIImAKFkNvbnN1bWVUYWxpc21hblJl",
+            "cXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQS",
+            "DwoHaXRlbV9pZBgDIAEoCRIOCgZ0eG5faWQYBCABKAki/QEKF0NvbnN1bWVU",
+            "YWxpc21hblJlc3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIP",
+            "CgdpdGVtX2lkGAMgASgJEhIKCmNvdW50X2xlZnQYBCABKAMSDAoEc2xvdBgF",
+            "IAEoDRIRCglkdXBsaWNhdGUYBiABKAgSEgoKaHBfcmVzdG9yZRgHIAEoAxIT",
+            "Cgtjb29sZG93bl9tcxgIIAEoDRIWCg5jb29sZG93bl9ncm91cBgJIAEoCRIp",
+            "CgRwb29sGAogASgOMhsubW1vLmNoYXJhY3Rlci5UYWxpc21hblBvb2wSFAoM",
+            "bWFuYV9yZXN0b3JlGAsgASgDIkAKF0Rlc2NyaWJlVGFsaXNtYW5SZXF1ZXN0",
+            "EhQKDGNoYXJhY3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJIoYBChhE",
+            "ZXNjcmliZVRhbGlzbWFuUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29u",
+            "GAIgASgJEg8KB2l0ZW1faWQYAyABKAkSKQoEcG9vbBgEIAEoDjIbLm1tby5j",
+            "aGFyYWN0ZXIuVGFsaXNtYW5Qb29sEhIKCmNvdW50X2xlZnQYBSABKAMiRAob",
+            "RGVzY3JpYmVSZXZpdmVTY3JvbGxSZXF1ZXN0EhQKDGNoYXJhY3Rlcl9pZBgB",
+            "IAEoBBIPCgdpdGVtX2lkGAIgASgJIuMBChxEZXNjcmliZVJldml2ZVNjcm9s",
+            "bFJlc3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIPCgdpdGVt",
+            "X2lkGAMgASgJEhIKCmNvdW50X2xlZnQYBCABKAMSEwoLY29vbGRvd25fbXMY",
+            "BSABKA0SFgoOaHBfcmVzdG9yZV9wY3QYBiABKA0SFAoMZXhwX2Nvc3RfcGN0",
+            "GAcgASgNEhMKC3JlYWR5X2F0X21zGAggASgDEg4KBm5vd19tcxgJIAEoAxIN",
+            "CgVsZXZlbBgKIAEoAxILCgNleHAYCyABKAMiZAoaQ29uc3VtZVJldml2ZVNj",
+            "cm9sbFJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQY",
+            "AiABKAQSDwoHaXRlbV9pZBgDIAEoCRIOCgZ0eG5faWQYBCABKAki5wEKG0Nv",
+            "bnN1bWVSZXZpdmVTY3JvbGxSZXNwb25zZRIKCgJvaxgBIAEoCBIOCgZyZWFz",
+            "b24YAiABKAkSDwoHaXRlbV9pZBgDIAEoCRISCgpjb3VudF9sZWZ0GAQgASgD",
+            "EhYKDmhwX3Jlc3RvcmVfcGN0GAUgASgNEhAKCGV4cF9jb3N0GAYgASgDEg0K",
+            "BWxldmVsGAcgASgDEhEKCWV4cF9hZnRlchgIIAEoAxITCgtyZWFkeV9hdF9t",
+            "cxgJIAEoAxITCgtjb29sZG93bl9tcxgKIAEoDRIRCglkdXBsaWNhdGUYCyAB",
+            "KAgiXgoUVXNlRXhwQm9vc3RlclJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIU",
+            "CgxjaGFyYWN0ZXJfaWQYAiABKAQSDwoHaXRlbV9pZBgDIAEoCRIOCgZ0eG5f",
+            "aWQYBCABKAkiuQEKFVVzZUV4cEJvb3N0ZXJSZXNwb25zZRIKCgJvaxgBIAEo",
+            "CBIOCgZyZWFzb24YAiABKAkSDwoHaXRlbV9pZBgDIAEoCRISCgpjb3VudF9s",
+            "ZWZ0GAQgASgDEhMKC2R1cmF0aW9uX21zGAUgASgNEhAKCGdhaW5fcGN0GAYg",
+            "ASgNEhUKDWV4cGlyZXNfYXRfbXMYByABKAMSDgoGbm93X21zGAggASgDEhEK",
+            "CWR1cGxpY2F0ZRgJIAEoCCJsChRVc2VVbmJpbmRJdGVtUmVxdWVzdBIPCgdh",
+            "Y2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIMCgRzbG90GAMg",
+            "ASgFEg8KB2l0ZW1faWQYBCABKAkSDgoGdHhuX2lkGAUgASgJIrIBChVVc2VV",
+            "bmJpbmRJdGVtUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJ",
+            "Eg8KB2l0ZW1faWQYAyABKAkSDAoEc2xvdBgEIAEoBRIWCg50YXJnZXRfaXRl",
+            "bV9pZBgFIAEoCRIMCgRjb3N0GAYgASgNEhIKCmNvdW50X2xlZnQYByABKAMS",
+            "EQoJYWdlX2hvdXJzGAggASgDEhEKCWZsb29yX2hpdBgJIAEoCCJXChpDcmVh",
+            "dGVSZWNoYXJnZU9yZGVyUmVxdWVzdBIPCgdhY2NvdW50GAEgASgJEhQKDGNo",
+            "YXJhY3Rlcl9pZBgCIAEoBBISCgpwcm9kdWN0X2lkGAMgASgJIoABChtDcmVh",
+            "dGVSZWNoYXJnZU9yZGVyUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29u",
+            "GAIgASgJEhAKCG9yZGVyX2lkGAMgASgJEhIKCnByb2R1Y3RfaWQYBCABKAkS",
+            "DwoHeXVhbmJhbxgFIAEoAxIOCgZzdGF0dXMYBiABKAkiPwoaU2V0dGxlUmVj",
+            "aGFyZ2VPcmRlclJlcXVlc3QSDwoHYWNjb3VudBgBIAEoCRIQCghvcmRlcl9p",
+            "ZBgCIAEoCSKkAQobU2V0dGxlUmVjaGFyZ2VPcmRlclJlc3BvbnNlEgoKAm9r",
+            "GAEgASgIEg4KBnJlYXNvbhgCIAEoCRIQCghvcmRlcl9pZBgDIAEoCRIOCgZz",
+            "dGF0dXMYBCABKAkSDwoHeXVhbmJhbxgFIAEoAxIPCgdiYWxhbmNlGAYgASgD",
+            "EhIKCnBhaWRfYXRfbXMYByABKAMSEQoJZHVwbGljYXRlGAggASgIIjQKHERl",
+            "c2NyaWJlQmF0dGxlUHJvZmlsZVJlcXVlc3QSFAoMY2hhcmFjdGVyX2lkGAEg",
+            "ASgEIqIBCh1EZXNjcmliZUJhdHRsZVByb2ZpbGVSZXNwb25zZRINCgVmb3Vu",
+            "ZBgBIAEoCBIQCghjbGFzc19pZBgCIAEoCRIOCgZicmFuY2gYAyABKAkSDQoF",
+            "bGV2ZWwYBCABKAUSFQoNZW5oYW5jZV90b3RhbBgFIAEoBRIVCg1lbmhhbmNl",
+            "X3Nsb3RzGAYgASgFEhMKC2JyYW5jaF9zdGVwGAcgASgFIlAKFEFkdmFuY2VC",
+            "cmFuY2hSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lk",
+            "GAIgASgEEhEKCWJyYW5jaF9pZBgDIAEoCSJ6ChVBZHZhbmNlQnJhbmNoUmVz",
+            "cG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJEg4KBmJyYW5jaBgD",
+            "IAEoCRITCgticmFuY2hfc3RlcBgEIAEoBRINCgVsZXZlbBgFIAEoBRIRCglk",
+            "dXBsaWNhdGUYBiABKAgiOAoPQ2FuRXF1aXBSZXF1ZXN0EhQKDGNoYXJhY3Rl",
+            "cl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJInsKEENhbkVxdWlwUmVzcG9u",
+            "c2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJEhMKC3dlYXBvbl9raW5k",
+            "GAMgASgJEhUKDXJlcXVpcmVfbGV2ZWwYBCABKAUSDQoFbGV2ZWwYBSABKAUS",
+            "EAoIY2xhc3NfaWQYBiABKAkiTAoTQWR2YW5jZVJlYWxtUmVxdWVzdBIPCgdh",
+            "Y2NvdW50GAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBBIOCgZ0eG5faWQY",
+            "AyABKAki/QIKFEFkdmFuY2VSZWFsbVJlc3BvbnNlEgoKAm9rGAEgASgIEg8K",
+            "B3N1Y2Nlc3MYAiABKAgSDgoGcmVhc29uGAMgASgJEhIKCmZyb21fcmVhbG0Y",
+            "BCABKAkSEgoKbmV4dF9yZWFsbRgFIAEoCRINCgVyZWFsbRgGIAEoCRIUCgxk",
+            "cmlsbF9iZWZvcmUYByABKAMSFgoOZHJpbGxfcmVxdWlyZWQYCCABKAMSEgoK",
+            "ZHJpbGxfY29zdBgJIAEoAxISCgpzdG9uZV9raW5kGAogASgJEhIKCnN0b25l",
+            "X2Nvc3QYCyABKAMSDQoFZHJpbGwYDCABKAMSEgoKc3RvbmVfbGVmdBgNIAEo",
+            "AxISCgptYWluX3N0YWdlGA4gASgFEhsKE21haW5fc3RhZ2VfcmVxdWlyZWQY",
+            "DyABKAUSGwoTc2lkZV9xdWVzdHNfbWlzc2luZxgQIAMoCRITCgtzdWNjZXNz",
+            "X3BjdBgRIAEoBRIRCglkdXBsaWNhdGUYEiABKAgiXwoSU2V0dGxlRHJpbGxS",
+            "ZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgE",
+            "EhIKCmR1bmdlb25faWQYAyABKAkSDgoGdHhuX2lkGAQgASgJInsKE1NldHRs",
+            "ZURyaWxsUmVzcG9uc2USCgoCb2sYASABKAgSDgoGcmVhc29uGAIgASgJEhIK",
+            "CmR1bmdlb25faWQYAyABKAkSEgoKZHJpbGxfZ2FpbhgEIAEoAxINCgVkcmls",
+            "bBgFIAEoAxIRCglkdXBsaWNhdGUYBiABKAgiYAoURXhjaGFuZ2VTdG9uZVJl",
+            "cXVlc3QSDwoHYWNjb3VudBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAQS",
+            "EQoJZnJvbV9raW5kGAMgASgJEg4KBnR4bl9pZBgEIAEoCSLbAQoVRXhjaGFu",
+            "Z2VTdG9uZVJlc3BvbnNlEgoKAm9rGAEgASgIEg4KBnJlYXNvbhgCIAEoCRIR",
+            "Cglmcm9tX2tpbmQYAyABKAkSDwoHdG9fa2luZBgEIAEoCRIRCglmcm9tX2Nv",
+            "c3QYBSABKAMSDwoHdG9fZ2FpbhgGIAEoAxITCgtmcm9tX2Ftb3VudBgHIAEo",
+            "AxIRCgl0b19hbW91bnQYCCABKAMSDQoFcmF0aW8YCSABKAUSFAoMaGlnaGVz",
+            "dF9uYW1lGAogASgJEhEKCWR1cGxpY2F0ZRgLIAEoCCJmChlTdG9uZUF1Y3Rp",
+            "b25TZXR0bGVSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVy",
+            "X2lkGAIgASgEEhIKCmxpc3RpbmdfaWQYAyABKAQSDgoGdHhuX2lkGAQgASgJ",
+            "IroCChpTdG9uZUF1Y3Rpb25TZXR0bGVSZXNwb25zZRIKCgJvaxgBIAEoCBIO",
+            "CgZyZWFzb24YAiABKAkSEgoKbGlzdGluZ19pZBgDIAEoBBISCgpzdG9uZV9r",
+            "aW5kGAQgASgJEhQKDHN0b25lX2Ftb3VudBgFIAEoAxISCgpwcmljZV9nb2xk",
+            "GAYgASgDEhAKCHRheF9nb2xkGAcgASgDEhAKCG5ldF9nb2xkGAggASgDEhIK",
+            "CmJ1eWVyX2dvbGQYCSABKAMSEwoLc2VsbGVyX2dvbGQYCiABKAMSEwoLYnV5",
+            "ZXJfc3RvbmUYCyABKAMSFAoMc2VsbGVyX3N0b25lGAwgASgDEhQKDHRheF9y",
+            "YXRlX3BjdBgNIAEoBRINCgVzdGF0ZRgOIAEoCRIRCglkdXBsaWNhdGUYDyAB",
+            "KAgihwEKF0FwcGx5U2llZ2VSZXN1bHRSZXF1ZXN0Eg8KB2FjY291bnQYASAB",
+            "KAkSDgoGdHhuX2lkGAIgASgJEg8KB2NpdHlfaWQYAyABKAkSEAoIbWF0Y2hf",
+            "aWQYBCABKAkSEwoLd2lubmVyX3RlYW0YBSABKA0SEwoLd2lubmVyX3NlY3QY",
+            "BiABKAQijwEKGEFwcGx5U2llZ2VSZXN1bHRSZXNwb25zZRIKCgJvaxgBIAEo",
+            "CBIOCgZyZWFzb24YAiABKAkSEQoJZHVwbGljYXRlGAMgASgIEg8KB2NpdHlf",
+            "aWQYBCABKAkSEgoKb3duZXJfc2VjdBgFIAEoCRIPCgd0YXhfcGN0GAYgASgF",
+            "Eg4KBnR4bl9pZBgHIAEoCSJCChlEZXNjcmliZVNlYXNvblBhc3NSZXF1ZXN0",
+            "Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEImEKEFNl",
+            "YXNvblBhc3NSZXdhcmQSDQoFdHJhY2sYASABKAkSDQoFc3RhZ2UYAiABKA0S",
+            "DwoHaXRlbV9pZBgDIAEoCRINCgVjb3VudBgEIAEoDRIPCgdjbGFpbWVkGAUg",
+            "ASgIIsoBChpEZXNjcmliZVNlYXNvblBhc3NSZXNwb25zZRIKCgJvaxgBIAEo",
+            "CBIOCgZyZWFzb24YAiABKAkSDQoFZm91bmQYAyABKAgSEQoJc2Vhc29uX2lk",
+            "GAQgASgJEgwKBHBhaWQYBSABKAgSFQoNcHJpY2VfeXVhbmJhbxgGIAEoAxIw",
+            "CgdyZXdhcmRzGAcgAygLMh8ubW1vLmNoYXJhY3Rlci5TZWFzb25QYXNzUmV3",
+            "YXJkEhcKD3Byb3RlY3RfaXRlbV9pZBgIIAEoCSJtChZDbGFpbVNlYXNvblBh",
+            "c3NSZXF1ZXN0Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIg",
+            "ASgEEg0KBXRyYWNrGAMgASgJEg0KBXN0YWdlGAQgASgNEg4KBnR4bl9pZBgF",
+            "IAEoCSLLAQoXQ2xhaW1TZWFzb25QYXNzUmVzcG9uc2USCgoCb2sYASABKAgS",
+            "DgoGcmVhc29uGAIgASgJEhEKCXNlYXNvbl9pZBgDIAEoCRINCgV0cmFjaxgE",
+            "IAEoCRINCgVzdGFnZRgFIAEoDRIPCgdpdGVtX2lkGAYgASgJEg0KBWNvdW50",
+            "GAcgASgNEhAKCGJhZ19zbG90GAggASgNEg0KBWJvdW5kGAkgASgIEhEKCWR1",
+            "cGxpY2F0ZRgKIAEoCBIPCgdjbGFpbWVkGAsgASgIKlsKDFRhbGlzbWFuUG9v",
+            "bBIdChlUQUxJU01BTl9QT09MX1VOU1BFQ0lGSUVEEAASFAoQVEFMSVNNQU5f",
+            "UE9PTF9IUBABEhYKElRBTElTTUFOX1BPT0xfTUFOQRACMqQaChBDaGFyYWN0",
+            "ZXJTZXJ2aWNlEmAKD0NyZWF0ZUNoYXJhY3RlchIlLm1tby5jaGFyYWN0ZXIu",
+            "Q3JlYXRlQ2hhcmFjdGVyUmVxdWVzdBomLm1tby5jaGFyYWN0ZXIuQ3JlYXRl",
+            "Q2hhcmFjdGVyUmVzcG9uc2USSwoIU2V0TGV2ZWwSHi5tbW8uY2hhcmFjdGVy",
+            "LlNldExldmVsUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXNw",
+            "b25zZRJGCgdBZGRJdGVtEh0ubW1vLmNoYXJhY3Rlci5BZGRJdGVtUmVxdWVz",
+            "dBocLm1tby5jaGFyYWN0ZXIuSW52ZW50b3J5U2xvdBJaCg1MaXN0SW52ZW50",
+            "b3J5EiMubW1vLmNoYXJhY3Rlci5MaXN0SW52ZW50b3J5UmVxdWVzdBokLm1t",
+            "by5jaGFyYWN0ZXIuTGlzdEludmVudG9yeVJlc3BvbnNlEksKCENhblRyYWRl",
+            "Eh4ubW1vLmNoYXJhY3Rlci5DYW5UcmFkZVJlcXVlc3QaHy5tbW8uY2hhcmFj",
+            "dGVyLkNhblRyYWRlUmVzcG9uc2USUAoLQWRkQ3VycmVuY3kSIS5tbW8uY2hh",
+            "cmFjdGVyLkFkZEN1cnJlbmN5UmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3Vy",
+            "cmVuY3lCYWxhbmNlElQKC0dldEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5H",
+            "ZXRDdXJyZW5jeVJlcXVlc3QaIi5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5",
+            "UmVzcG9uc2USUQoKQXBwbHlHcmFudBIgLm1tby5jaGFyYWN0ZXIuQXBwbHlH",
+            "cmFudFJlcXVlc3QaIS5tbW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXNwb25z",
+            "ZRJXCgxFbnRlckR1bmdlb24SIi5tbW8uY2hhcmFjdGVyLkVudGVyRHVuZ2Vv",
+            "blJlcXVlc3QaIy5tbW8uY2hhcmFjdGVyLkVudGVyRHVuZ2VvblJlc3BvbnNl",
+            "ElcKDFVzZUhvdFNwcmluZxIiLm1tby5jaGFyYWN0ZXIuVXNlSG90U3ByaW5n",
+            "UmVxdWVzdBojLm1tby5jaGFyYWN0ZXIuVXNlSG90U3ByaW5nUmVzcG9uc2US",
+            "TgoJU2V0dGxlRXhwEh8ubW1vLmNoYXJhY3Rlci5TZXR0bGVFeHBSZXF1ZXN0",
+            "GiAubW1vLmNoYXJhY3Rlci5TZXR0bGVFeHBSZXNwb25zZRJICgdFbmhhbmNl",
+            "Eh0ubW1vLmNoYXJhY3Rlci5FbmhhbmNlUmVxdWVzdBoeLm1tby5jaGFyYWN0",
+            "ZXIuRW5oYW5jZVJlc3BvbnNlEmAKD1RyYW5zZmVyRW5oYW5jZRIlLm1tby5j",
+            "aGFyYWN0ZXIuVHJhbnNmZXJFbmhhbmNlUmVxdWVzdBomLm1tby5jaGFyYWN0",
+            "ZXIuVHJhbnNmZXJFbmhhbmNlUmVzcG9uc2USVgoOSW5zdGFsbENyeXN0YWwS",
+            "JC5tbW8uY2hhcmFjdGVyLkluc3RhbGxDcnlzdGFsUmVxdWVzdBoeLm1tby5j",
+            "aGFyYWN0ZXIuQ3J5c3RhbFJlc3BvbnNlElQKDVJlbW92ZUNyeXN0YWwSIy5t",
+            "bW8uY2hhcmFjdGVyLlJlbW92ZUNyeXN0YWxSZXF1ZXN0Gh4ubW1vLmNoYXJh",
+            "Y3Rlci5DcnlzdGFsUmVzcG9uc2USWgoNU2V0dGxlQXVjdGlvbhIjLm1tby5j",
+            "aGFyYWN0ZXIuQXVjdGlvblNldHRsZVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVy",
+            "LkF1Y3Rpb25TZXR0bGVSZXNwb25zZRJiCgtTZXR0bGVJbmdvdBIoLm1tby5j",
+            "aGFyYWN0ZXIuQXVjdGlvbkluZ290U2V0dGxlUmVxdWVzdBopLm1tby5jaGFy",
+            "YWN0ZXIuQXVjdGlvbkluZ290U2V0dGxlUmVzcG9uc2USVAoLQnV5U2hvcEl0",
+            "ZW0SIS5tbW8uY2hhcmFjdGVyLkJ1eVNob3BJdGVtUmVxdWVzdBoiLm1tby5j",
+            "aGFyYWN0ZXIuQnV5U2hvcEl0ZW1SZXNwb25zZRJgCg9Db25zdW1lVGFsaXNt",
+            "YW4SJS5tbW8uY2hhcmFjdGVyLkNvbnN1bWVUYWxpc21hblJlcXVlc3QaJi5t",
+            "bW8uY2hhcmFjdGVyLkNvbnN1bWVUYWxpc21hblJlc3BvbnNlEmMKEERlc2Ny",
+            "aWJlVGFsaXNtYW4SJi5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlVGFsaXNtYW5S",
+            "ZXF1ZXN0GicubW1vLmNoYXJhY3Rlci5EZXNjcmliZVRhbGlzbWFuUmVzcG9u",
+            "c2USbwoURGVzY3JpYmVSZXZpdmVTY3JvbGwSKi5tbW8uY2hhcmFjdGVyLkRl",
+            "c2NyaWJlUmV2aXZlU2Nyb2xsUmVxdWVzdBorLm1tby5jaGFyYWN0ZXIuRGVz",
+            "Y3JpYmVSZXZpdmVTY3JvbGxSZXNwb25zZRJsChNDb25zdW1lUmV2aXZlU2Ny",
+            "b2xsEikubW1vLmNoYXJhY3Rlci5Db25zdW1lUmV2aXZlU2Nyb2xsUmVxdWVz",
+            "dBoqLm1tby5jaGFyYWN0ZXIuQ29uc3VtZVJldml2ZVNjcm9sbFJlc3BvbnNl",
+            "EloKDVVzZUV4cEJvb3N0ZXISIy5tbW8uY2hhcmFjdGVyLlVzZUV4cEJvb3N0",
+            "ZXJSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5Vc2VFeHBCb29zdGVyUmVzcG9u",
+            "c2USWgoNVXNlVW5iaW5kSXRlbRIjLm1tby5jaGFyYWN0ZXIuVXNlVW5iaW5k",
+            "SXRlbVJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLlVzZVVuYmluZEl0ZW1SZXNw",
+            "b25zZRJsChNDcmVhdGVSZWNoYXJnZU9yZGVyEikubW1vLmNoYXJhY3Rlci5D",
+            "cmVhdGVSZWNoYXJnZU9yZGVyUmVxdWVzdBoqLm1tby5jaGFyYWN0ZXIuQ3Jl",
+            "YXRlUmVjaGFyZ2VPcmRlclJlc3BvbnNlEmwKE1NldHRsZVJlY2hhcmdlT3Jk",
+            "ZXISKS5tbW8uY2hhcmFjdGVyLlNldHRsZVJlY2hhcmdlT3JkZXJSZXF1ZXN0",
+            "GioubW1vLmNoYXJhY3Rlci5TZXR0bGVSZWNoYXJnZU9yZGVyUmVzcG9uc2US",
+            "cgoVRGVzY3JpYmVCYXR0bGVQcm9maWxlEisubW1vLmNoYXJhY3Rlci5EZXNj",
+            "cmliZUJhdHRsZVByb2ZpbGVSZXF1ZXN0GiwubW1vLmNoYXJhY3Rlci5EZXNj",
+            "cmliZUJhdHRsZVByb2ZpbGVSZXNwb25zZRJaCg1BZHZhbmNlQnJhbmNoEiMu",
+            "bW1vLmNoYXJhY3Rlci5BZHZhbmNlQnJhbmNoUmVxdWVzdBokLm1tby5jaGFy",
+            "YWN0ZXIuQWR2YW5jZUJyYW5jaFJlc3BvbnNlEksKCENhbkVxdWlwEh4ubW1v",
+            "LmNoYXJhY3Rlci5DYW5FcXVpcFJlcXVlc3QaHy5tbW8uY2hhcmFjdGVyLkNh",
+            "bkVxdWlwUmVzcG9uc2USVwoMQWR2YW5jZVJlYWxtEiIubW1vLmNoYXJhY3Rl",
+            "ci5BZHZhbmNlUmVhbG1SZXF1ZXN0GiMubW1vLmNoYXJhY3Rlci5BZHZhbmNl",
+            "UmVhbG1SZXNwb25zZRJUCgtTZXR0bGVEcmlsbBIhLm1tby5jaGFyYWN0ZXIu",
+            "U2V0dGxlRHJpbGxSZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5TZXR0bGVEcmls",
+            "bFJlc3BvbnNlEloKDUV4Y2hhbmdlU3RvbmUSIy5tbW8uY2hhcmFjdGVyLkV4",
+            "Y2hhbmdlU3RvbmVSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5FeGNoYW5nZVN0",
+            "b25lUmVzcG9uc2USaQoSU2V0dGxlU3RvbmVBdWN0aW9uEigubW1vLmNoYXJh",
+            "Y3Rlci5TdG9uZUF1Y3Rpb25TZXR0bGVSZXF1ZXN0GikubW1vLmNoYXJhY3Rl",
+            "ci5TdG9uZUF1Y3Rpb25TZXR0bGVSZXNwb25zZRJjChBBcHBseVNpZWdlUmVz",
+            "dWx0EiYubW1vLmNoYXJhY3Rlci5BcHBseVNpZWdlUmVzdWx0UmVxdWVzdBon",
+            "Lm1tby5jaGFyYWN0ZXIuQXBwbHlTaWVnZVJlc3VsdFJlc3BvbnNlEmkKEkRl",
+            "c2NyaWJlU2Vhc29uUGFzcxIoLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVTZWFz",
+            "b25QYXNzUmVxdWVzdBopLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVTZWFzb25Q",
+            "YXNzUmVzcG9uc2USZgoVQ2xhaW1TZWFzb25QYXNzUmV3YXJkEiUubW1vLmNo",
+            "YXJhY3Rlci5DbGFpbVNlYXNvblBhc3NSZXF1ZXN0GiYubW1vLmNoYXJhY3Rl",
+            "ci5DbGFpbVNlYXNvblBhc3NSZXNwb25zZUIWqgITTW1vLlByb3RvLkNoYXJh",
+            "Y3RlcmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Character.TalismanPool), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -363,7 +384,7 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionIngotSettleRequest), global::Mmo.Proto.Character.AuctionIngotSettleRequest.Parser, new[]{ "Account", "CharacterId", "ListingId", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.AuctionIngotSettleResponse), global::Mmo.Proto.Character.AuctionIngotSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "IngotAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerIngot", "SellerIngot", "TaxRatePct", "State", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemRequest), global::Mmo.Proto.Character.BuyShopItemRequest.Parser, new[]{ "Account", "CharacterId", "ItemId", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemResponse), global::Mmo.Proto.Character.BuyShopItemResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "Kind", "Name", "PriceYuanbao", "Currency", "Balance", "Enough", "ChargedYuanbao", "Delivered", "State", "DeliveryItemId", "BagSlot", "Bound", "Duplicate" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.BuyShopItemResponse), global::Mmo.Proto.Character.BuyShopItemResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "Kind", "Name", "PriceYuanbao", "Currency", "Balance", "Enough", "ChargedYuanbao", "Delivered", "State", "DeliveryItemId", "BagSlot", "Bound", "Duplicate", "SeasonId", "PassOwned" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ConsumeTalismanRequest), global::Mmo.Proto.Character.ConsumeTalismanRequest.Parser, new[]{ "Account", "CharacterId", "ItemId", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ConsumeTalismanResponse), global::Mmo.Proto.Character.ConsumeTalismanResponse.Parser, new[]{ "Ok", "Reason", "ItemId", "CountLeft", "Slot", "Duplicate", "HpRestore", "CooldownMs", "CooldownGroup", "Pool", "ManaRestore" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.DescribeTalismanRequest), global::Mmo.Proto.Character.DescribeTalismanRequest.Parser, new[]{ "CharacterId", "ItemId" }, null, null, null, null),
@@ -395,7 +416,12 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.StoneAuctionSettleRequest), global::Mmo.Proto.Character.StoneAuctionSettleRequest.Parser, new[]{ "Account", "CharacterId", "ListingId", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.StoneAuctionSettleResponse), global::Mmo.Proto.Character.StoneAuctionSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "StoneKind", "StoneAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerStone", "SellerStone", "TaxRatePct", "State", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ApplySiegeResultRequest), global::Mmo.Proto.Character.ApplySiegeResultRequest.Parser, new[]{ "Account", "TxnId", "CityId", "MatchId", "WinnerTeam", "WinnerSect" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ApplySiegeResultResponse), global::Mmo.Proto.Character.ApplySiegeResultResponse.Parser, new[]{ "Ok", "Reason", "Duplicate", "CityId", "OwnerSect", "TaxPct", "TxnId" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ApplySiegeResultResponse), global::Mmo.Proto.Character.ApplySiegeResultResponse.Parser, new[]{ "Ok", "Reason", "Duplicate", "CityId", "OwnerSect", "TaxPct", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.DescribeSeasonPassRequest), global::Mmo.Proto.Character.DescribeSeasonPassRequest.Parser, new[]{ "Account", "CharacterId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.SeasonPassReward), global::Mmo.Proto.Character.SeasonPassReward.Parser, new[]{ "Track", "Stage", "ItemId", "Count", "Claimed" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.DescribeSeasonPassResponse), global::Mmo.Proto.Character.DescribeSeasonPassResponse.Parser, new[]{ "Ok", "Reason", "Found", "SeasonId", "Paid", "PriceYuanbao", "Rewards", "ProtectItemId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ClaimSeasonPassRequest), global::Mmo.Proto.Character.ClaimSeasonPassRequest.Parser, new[]{ "Account", "CharacterId", "Track", "Stage", "TxnId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ClaimSeasonPassResponse), global::Mmo.Proto.Character.ClaimSeasonPassResponse.Parser, new[]{ "Ok", "Reason", "SeasonId", "Track", "Stage", "ItemId", "Count", "BagSlot", "Bound", "Duplicate", "Claimed" }, null, null, null, null)
           }));
     }
     #endregion
@@ -15071,6 +15097,8 @@ namespace Mmo.Proto.Character {
       bagSlot_ = other.bagSlot_;
       bound_ = other.bound_;
       duplicate_ = other.duplicate_;
+      seasonId_ = other.seasonId_;
+      passOwned_ = other.passOwned_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -15303,6 +15331,35 @@ namespace Mmo.Proto.Character {
       }
     }
 
+    /// <summary>Field number for the "season_id" field.</summary>
+    public const int SeasonIdFieldNumber = 17;
+    private string seasonId_ = "";
+    /// <summary>
+    /// P3-4a2：通行证是商城里的「状态发货」，买下即开本季付费轨，不往背包放东西。
+    /// 这一笔对应的季（角色服向全局服务确认的事实值）与付费轨是否已开，只在这条
+    /// 商品上是有效值：别的商品恒空串 / false，不拿它们顶任何数。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string SeasonId {
+      get { return seasonId_; }
+      set {
+        seasonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "pass_owned" field.</summary>
+    public const int PassOwnedFieldNumber = 18;
+    private bool passOwned_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool PassOwned {
+      get { return passOwned_; }
+      set {
+        passOwned_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -15334,6 +15391,8 @@ namespace Mmo.Proto.Character {
       if (BagSlot != other.BagSlot) return false;
       if (Bound != other.Bound) return false;
       if (Duplicate != other.Duplicate) return false;
+      if (SeasonId != other.SeasonId) return false;
+      if (PassOwned != other.PassOwned) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -15357,6 +15416,8 @@ namespace Mmo.Proto.Character {
       if (BagSlot != 0) hash ^= BagSlot.GetHashCode();
       if (Bound != false) hash ^= Bound.GetHashCode();
       if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (SeasonId.Length != 0) hash ^= SeasonId.GetHashCode();
+      if (PassOwned != false) hash ^= PassOwned.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -15439,6 +15500,14 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(128, 1);
         output.WriteBool(Duplicate);
       }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(138, 1);
+        output.WriteString(SeasonId);
+      }
+      if (PassOwned != false) {
+        output.WriteRawTag(144, 1);
+        output.WriteBool(PassOwned);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -15513,6 +15582,14 @@ namespace Mmo.Proto.Character {
         output.WriteRawTag(128, 1);
         output.WriteBool(Duplicate);
       }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(138, 1);
+        output.WriteString(SeasonId);
+      }
+      if (PassOwned != false) {
+        output.WriteRawTag(144, 1);
+        output.WriteBool(PassOwned);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -15569,6 +15646,12 @@ namespace Mmo.Proto.Character {
         size += 1 + 1;
       }
       if (Duplicate != false) {
+        size += 2 + 1;
+      }
+      if (SeasonId.Length != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeStringSize(SeasonId);
+      }
+      if (PassOwned != false) {
         size += 2 + 1;
       }
       if (_unknownFields != null) {
@@ -15630,6 +15713,12 @@ namespace Mmo.Proto.Character {
       }
       if (other.Duplicate != false) {
         Duplicate = other.Duplicate;
+      }
+      if (other.SeasonId.Length != 0) {
+        SeasonId = other.SeasonId;
+      }
+      if (other.PassOwned != false) {
+        PassOwned = other.PassOwned;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -15714,6 +15803,14 @@ namespace Mmo.Proto.Character {
             Duplicate = input.ReadBool();
             break;
           }
+          case 138: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 144: {
+            PassOwned = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -15795,6 +15892,14 @@ namespace Mmo.Proto.Character {
           }
           case 128: {
             Duplicate = input.ReadBool();
+            break;
+          }
+          case 138: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 144: {
+            PassOwned = input.ReadBool();
             break;
           }
         }
@@ -28604,6 +28709,1984 @@ namespace Mmo.Proto.Character {
           }
           case 58: {
             TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// P3-4a2：通行证的只读状态。请求只带账号与角色号（服间可信调用），
+  /// 季由角色服向全局服务确认，客户端表达不了「看哪一季的通行证」。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class DescribeSeasonPassRequest : pb::IMessage<DescribeSeasonPassRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<DescribeSeasonPassRequest> _parser = new pb::MessageParser<DescribeSeasonPassRequest>(() => new DescribeSeasonPassRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<DescribeSeasonPassRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[70]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonPassRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonPassRequest(DescribeSeasonPassRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonPassRequest Clone() {
+      return new DescribeSeasonPassRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as DescribeSeasonPassRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(DescribeSeasonPassRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(DescribeSeasonPassRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 一阶的一条奖励。物品编号、数量与领没领都是服务端事实值：
+  /// 免费轨只有称号与外观碎片，付费轨只有当季外观、洞府摆件与保护券。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class SeasonPassReward : pb::IMessage<SeasonPassReward>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<SeasonPassReward> _parser = new pb::MessageParser<SeasonPassReward>(() => new SeasonPassReward());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<SeasonPassReward> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[71]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SeasonPassReward() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SeasonPassReward(SeasonPassReward other) : this() {
+      track_ = other.track_;
+      stage_ = other.stage_;
+      itemId_ = other.itemId_;
+      count_ = other.count_;
+      claimed_ = other.claimed_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SeasonPassReward Clone() {
+      return new SeasonPassReward(this);
+    }
+
+    /// <summary>Field number for the "track" field.</summary>
+    public const int TrackFieldNumber = 1;
+    private string track_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Track {
+      get { return track_; }
+      set {
+        track_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "stage" field.</summary>
+    public const int StageFieldNumber = 2;
+    private uint stage_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Stage {
+      get { return stage_; }
+      set {
+        stage_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 3;
+    private string itemId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "count" field.</summary>
+    public const int CountFieldNumber = 4;
+    private uint count_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Count {
+      get { return count_; }
+      set {
+        count_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "claimed" field.</summary>
+    public const int ClaimedFieldNumber = 5;
+    private bool claimed_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Claimed {
+      get { return claimed_; }
+      set {
+        claimed_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as SeasonPassReward);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(SeasonPassReward other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Track != other.Track) return false;
+      if (Stage != other.Stage) return false;
+      if (ItemId != other.ItemId) return false;
+      if (Count != other.Count) return false;
+      if (Claimed != other.Claimed) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Track.Length != 0) hash ^= Track.GetHashCode();
+      if (Stage != 0) hash ^= Stage.GetHashCode();
+      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
+      if (Count != 0) hash ^= Count.GetHashCode();
+      if (Claimed != false) hash ^= Claimed.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Track.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Track);
+      }
+      if (Stage != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(Stage);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(ItemId);
+      }
+      if (Count != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Count);
+      }
+      if (Claimed != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Claimed);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Track.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Track);
+      }
+      if (Stage != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(Stage);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(ItemId);
+      }
+      if (Count != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Count);
+      }
+      if (Claimed != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Claimed);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Track.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Track);
+      }
+      if (Stage != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Stage);
+      }
+      if (ItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
+      }
+      if (Count != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Count);
+      }
+      if (Claimed != false) {
+        size += 1 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(SeasonPassReward other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Track.Length != 0) {
+        Track = other.Track;
+      }
+      if (other.Stage != 0) {
+        Stage = other.Stage;
+      }
+      if (other.ItemId.Length != 0) {
+        ItemId = other.ItemId;
+      }
+      if (other.Count != 0) {
+        Count = other.Count;
+      }
+      if (other.Claimed != false) {
+        Claimed = other.Claimed;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Track = input.ReadString();
+            break;
+          }
+          case 16: {
+            Stage = input.ReadUInt32();
+            break;
+          }
+          case 26: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 32: {
+            Count = input.ReadUInt32();
+            break;
+          }
+          case 40: {
+            Claimed = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Track = input.ReadString();
+            break;
+          }
+          case 16: {
+            Stage = input.ReadUInt32();
+            break;
+          }
+          case 26: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 32: {
+            Count = input.ReadUInt32();
+            break;
+          }
+          case 40: {
+            Claimed = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class DescribeSeasonPassResponse : pb::IMessage<DescribeSeasonPassResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<DescribeSeasonPassResponse> _parser = new pb::MessageParser<DescribeSeasonPassResponse>(() => new DescribeSeasonPassResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<DescribeSeasonPassResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[72]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonPassResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonPassResponse(DescribeSeasonPassResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      found_ = other.found_;
+      seasonId_ = other.seasonId_;
+      paid_ = other.paid_;
+      priceYuanbao_ = other.priceYuanbao_;
+      rewards_ = other.rewards_.Clone();
+      protectItemId_ = other.protectItemId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonPassResponse Clone() {
+      return new DescribeSeasonPassResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    /// <summary>
+    /// season_unavailable（全局服务没起或没配）/ found=false 表示这一季没有通行证配置。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "found" field.</summary>
+    public const int FoundFieldNumber = 3;
+    private bool found_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Found {
+      get { return found_; }
+      set {
+        found_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "season_id" field.</summary>
+    public const int SeasonIdFieldNumber = 4;
+    private string seasonId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string SeasonId {
+      get { return seasonId_; }
+      set {
+        seasonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "paid" field.</summary>
+    public const int PaidFieldNumber = 5;
+    private bool paid_;
+    /// <summary>
+    /// 这一季的付费轨开了没有。免费轨恒可领。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Paid {
+      get { return paid_; }
+      set {
+        paid_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "price_yuanbao" field.</summary>
+    public const int PriceYuanbaoFieldNumber = 6;
+    private long priceYuanbao_;
+    /// <summary>
+    /// 商城里的标价，来自 config/shop.json 那条 season_pass 商品；本卡不另存价格。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long PriceYuanbao {
+      get { return priceYuanbao_; }
+      set {
+        priceYuanbao_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rewards" field.</summary>
+    public const int RewardsFieldNumber = 7;
+    private static readonly pb::FieldCodec<global::Mmo.Proto.Character.SeasonPassReward> _repeated_rewards_codec
+        = pb::FieldCodec.ForMessage(58, global::Mmo.Proto.Character.SeasonPassReward.Parser);
+    private readonly pbc::RepeatedField<global::Mmo.Proto.Character.SeasonPassReward> rewards_ = new pbc::RepeatedField<global::Mmo.Proto.Character.SeasonPassReward>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::Mmo.Proto.Character.SeasonPassReward> Rewards {
+      get { return rewards_; }
+    }
+
+    /// <summary>Field number for the "protect_item_id" field.</summary>
+    public const int ProtectItemIdFieldNumber = 8;
+    private string protectItemId_ = "";
+    /// <summary>
+    /// 保护券的编号（enhance.json 的 protect_item_id）。它和商城卖的是同一种券，
+    /// 回包里给出来只是让界面能显示「这一阶给什么」。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ProtectItemId {
+      get { return protectItemId_; }
+      set {
+        protectItemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as DescribeSeasonPassResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(DescribeSeasonPassResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (Found != other.Found) return false;
+      if (SeasonId != other.SeasonId) return false;
+      if (Paid != other.Paid) return false;
+      if (PriceYuanbao != other.PriceYuanbao) return false;
+      if(!rewards_.Equals(other.rewards_)) return false;
+      if (ProtectItemId != other.ProtectItemId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (Found != false) hash ^= Found.GetHashCode();
+      if (SeasonId.Length != 0) hash ^= SeasonId.GetHashCode();
+      if (Paid != false) hash ^= Paid.GetHashCode();
+      if (PriceYuanbao != 0L) hash ^= PriceYuanbao.GetHashCode();
+      hash ^= rewards_.GetHashCode();
+      if (ProtectItemId.Length != 0) hash ^= ProtectItemId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Found != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Found);
+      }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(SeasonId);
+      }
+      if (Paid != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Paid);
+      }
+      if (PriceYuanbao != 0L) {
+        output.WriteRawTag(48);
+        output.WriteInt64(PriceYuanbao);
+      }
+      rewards_.WriteTo(output, _repeated_rewards_codec);
+      if (ProtectItemId.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(ProtectItemId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Found != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Found);
+      }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(SeasonId);
+      }
+      if (Paid != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Paid);
+      }
+      if (PriceYuanbao != 0L) {
+        output.WriteRawTag(48);
+        output.WriteInt64(PriceYuanbao);
+      }
+      rewards_.WriteTo(ref output, _repeated_rewards_codec);
+      if (ProtectItemId.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(ProtectItemId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (Found != false) {
+        size += 1 + 1;
+      }
+      if (SeasonId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(SeasonId);
+      }
+      if (Paid != false) {
+        size += 1 + 1;
+      }
+      if (PriceYuanbao != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(PriceYuanbao);
+      }
+      size += rewards_.CalculateSize(_repeated_rewards_codec);
+      if (ProtectItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ProtectItemId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(DescribeSeasonPassResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.Found != false) {
+        Found = other.Found;
+      }
+      if (other.SeasonId.Length != 0) {
+        SeasonId = other.SeasonId;
+      }
+      if (other.Paid != false) {
+        Paid = other.Paid;
+      }
+      if (other.PriceYuanbao != 0L) {
+        PriceYuanbao = other.PriceYuanbao;
+      }
+      rewards_.Add(other.rewards_);
+      if (other.ProtectItemId.Length != 0) {
+        ProtectItemId = other.ProtectItemId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Found = input.ReadBool();
+            break;
+          }
+          case 34: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 40: {
+            Paid = input.ReadBool();
+            break;
+          }
+          case 48: {
+            PriceYuanbao = input.ReadInt64();
+            break;
+          }
+          case 58: {
+            rewards_.AddEntriesFrom(input, _repeated_rewards_codec);
+            break;
+          }
+          case 66: {
+            ProtectItemId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Found = input.ReadBool();
+            break;
+          }
+          case 34: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 40: {
+            Paid = input.ReadBool();
+            break;
+          }
+          case 48: {
+            PriceYuanbao = input.ReadInt64();
+            break;
+          }
+          case 58: {
+            rewards_.AddEntriesFrom(ref input, _repeated_rewards_codec);
+            break;
+          }
+          case 66: {
+            ProtectItemId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 领取只带轨与阶。季由角色服向全局服务确认，物品编号与数量全从配置读。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ClaimSeasonPassRequest : pb::IMessage<ClaimSeasonPassRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ClaimSeasonPassRequest> _parser = new pb::MessageParser<ClaimSeasonPassRequest>(() => new ClaimSeasonPassRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ClaimSeasonPassRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[73]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ClaimSeasonPassRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ClaimSeasonPassRequest(ClaimSeasonPassRequest other) : this() {
+      account_ = other.account_;
+      characterId_ = other.characterId_;
+      track_ = other.track_;
+      stage_ = other.stage_;
+      txnId_ = other.txnId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ClaimSeasonPassRequest Clone() {
+      return new ClaimSeasonPassRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "character_id" field.</summary>
+    public const int CharacterIdFieldNumber = 2;
+    private ulong characterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong CharacterId {
+      get { return characterId_; }
+      set {
+        characterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "track" field.</summary>
+    public const int TrackFieldNumber = 3;
+    private string track_ = "";
+    /// <summary>
+    /// free 或 paid。表外的轨一律拒绝。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Track {
+      get { return track_; }
+      set {
+        track_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "stage" field.</summary>
+    public const int StageFieldNumber = 4;
+    private uint stage_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Stage {
+      get { return stage_; }
+      set {
+        stage_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 5;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ClaimSeasonPassRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ClaimSeasonPassRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (CharacterId != other.CharacterId) return false;
+      if (Track != other.Track) return false;
+      if (Stage != other.Stage) return false;
+      if (TxnId != other.TxnId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (CharacterId != 0UL) hash ^= CharacterId.GetHashCode();
+      if (Track.Length != 0) hash ^= Track.GetHashCode();
+      if (Stage != 0) hash ^= Stage.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (Track.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Track);
+      }
+      if (Stage != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Stage);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (CharacterId != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(CharacterId);
+      }
+      if (Track.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Track);
+      }
+      if (Stage != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Stage);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (CharacterId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CharacterId);
+      }
+      if (Track.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Track);
+      }
+      if (Stage != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Stage);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ClaimSeasonPassRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.CharacterId != 0UL) {
+        CharacterId = other.CharacterId;
+      }
+      if (other.Track.Length != 0) {
+        Track = other.Track;
+      }
+      if (other.Stage != 0) {
+        Stage = other.Stage;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            Track = input.ReadString();
+            break;
+          }
+          case 32: {
+            Stage = input.ReadUInt32();
+            break;
+          }
+          case 42: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 16: {
+            CharacterId = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            Track = input.ReadString();
+            break;
+          }
+          case 32: {
+            Stage = input.ReadUInt32();
+            break;
+          }
+          case 42: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ClaimSeasonPassResponse : pb::IMessage<ClaimSeasonPassResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ClaimSeasonPassResponse> _parser = new pb::MessageParser<ClaimSeasonPassResponse>(() => new ClaimSeasonPassResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ClaimSeasonPassResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[74]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ClaimSeasonPassResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ClaimSeasonPassResponse(ClaimSeasonPassResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      seasonId_ = other.seasonId_;
+      track_ = other.track_;
+      stage_ = other.stage_;
+      itemId_ = other.itemId_;
+      count_ = other.count_;
+      bagSlot_ = other.bagSlot_;
+      bound_ = other.bound_;
+      duplicate_ = other.duplicate_;
+      claimed_ = other.claimed_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ClaimSeasonPassResponse Clone() {
+      return new ClaimSeasonPassResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    /// <summary>
+    /// unknown_track / unknown_stage / pass_not_owned / already_claimed / bag_full /
+    /// season_unavailable / character_not_found / txn_missing / duplicate。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "season_id" field.</summary>
+    public const int SeasonIdFieldNumber = 3;
+    private string seasonId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string SeasonId {
+      get { return seasonId_; }
+      set {
+        seasonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "track" field.</summary>
+    public const int TrackFieldNumber = 4;
+    private string track_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Track {
+      get { return track_; }
+      set {
+        track_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "stage" field.</summary>
+    public const int StageFieldNumber = 5;
+    private uint stage_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Stage {
+      get { return stage_; }
+      set {
+        stage_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 6;
+    private string itemId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "count" field.</summary>
+    public const int CountFieldNumber = 7;
+    private uint count_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Count {
+      get { return count_; }
+      set {
+        count_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "bag_slot" field.</summary>
+    public const int BagSlotFieldNumber = 8;
+    private uint bagSlot_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint BagSlot {
+      get { return bagSlot_; }
+      set {
+        bagSlot_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "bound" field.</summary>
+    public const int BoundFieldNumber = 9;
+    private bool bound_;
+    /// <summary>
+    /// 通行证的奖励到账即绑；这一条恒为 true。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Bound {
+      get { return bound_; }
+      set {
+        bound_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duplicate" field.</summary>
+    public const int DuplicateFieldNumber = 10;
+    private bool duplicate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Duplicate {
+      get { return duplicate_; }
+      set {
+        duplicate_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "claimed" field.</summary>
+    public const int ClaimedFieldNumber = 11;
+    private bool claimed_;
+    /// <summary>
+    /// 领完之后这一阶是不是已领。duplicate 时也是 true。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Claimed {
+      get { return claimed_; }
+      set {
+        claimed_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ClaimSeasonPassResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ClaimSeasonPassResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (SeasonId != other.SeasonId) return false;
+      if (Track != other.Track) return false;
+      if (Stage != other.Stage) return false;
+      if (ItemId != other.ItemId) return false;
+      if (Count != other.Count) return false;
+      if (BagSlot != other.BagSlot) return false;
+      if (Bound != other.Bound) return false;
+      if (Duplicate != other.Duplicate) return false;
+      if (Claimed != other.Claimed) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (SeasonId.Length != 0) hash ^= SeasonId.GetHashCode();
+      if (Track.Length != 0) hash ^= Track.GetHashCode();
+      if (Stage != 0) hash ^= Stage.GetHashCode();
+      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
+      if (Count != 0) hash ^= Count.GetHashCode();
+      if (BagSlot != 0) hash ^= BagSlot.GetHashCode();
+      if (Bound != false) hash ^= Bound.GetHashCode();
+      if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (Claimed != false) hash ^= Claimed.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(SeasonId);
+      }
+      if (Track.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Track);
+      }
+      if (Stage != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(Stage);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(ItemId);
+      }
+      if (Count != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Count);
+      }
+      if (BagSlot != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(BagSlot);
+      }
+      if (Bound != false) {
+        output.WriteRawTag(72);
+        output.WriteBool(Bound);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(80);
+        output.WriteBool(Duplicate);
+      }
+      if (Claimed != false) {
+        output.WriteRawTag(88);
+        output.WriteBool(Claimed);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(SeasonId);
+      }
+      if (Track.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Track);
+      }
+      if (Stage != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(Stage);
+      }
+      if (ItemId.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(ItemId);
+      }
+      if (Count != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Count);
+      }
+      if (BagSlot != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(BagSlot);
+      }
+      if (Bound != false) {
+        output.WriteRawTag(72);
+        output.WriteBool(Bound);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(80);
+        output.WriteBool(Duplicate);
+      }
+      if (Claimed != false) {
+        output.WriteRawTag(88);
+        output.WriteBool(Claimed);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (SeasonId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(SeasonId);
+      }
+      if (Track.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Track);
+      }
+      if (Stage != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Stage);
+      }
+      if (ItemId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
+      }
+      if (Count != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Count);
+      }
+      if (BagSlot != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(BagSlot);
+      }
+      if (Bound != false) {
+        size += 1 + 1;
+      }
+      if (Duplicate != false) {
+        size += 1 + 1;
+      }
+      if (Claimed != false) {
+        size += 1 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ClaimSeasonPassResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.SeasonId.Length != 0) {
+        SeasonId = other.SeasonId;
+      }
+      if (other.Track.Length != 0) {
+        Track = other.Track;
+      }
+      if (other.Stage != 0) {
+        Stage = other.Stage;
+      }
+      if (other.ItemId.Length != 0) {
+        ItemId = other.ItemId;
+      }
+      if (other.Count != 0) {
+        Count = other.Count;
+      }
+      if (other.BagSlot != 0) {
+        BagSlot = other.BagSlot;
+      }
+      if (other.Bound != false) {
+        Bound = other.Bound;
+      }
+      if (other.Duplicate != false) {
+        Duplicate = other.Duplicate;
+      }
+      if (other.Claimed != false) {
+        Claimed = other.Claimed;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 34: {
+            Track = input.ReadString();
+            break;
+          }
+          case 40: {
+            Stage = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 56: {
+            Count = input.ReadUInt32();
+            break;
+          }
+          case 64: {
+            BagSlot = input.ReadUInt32();
+            break;
+          }
+          case 72: {
+            Bound = input.ReadBool();
+            break;
+          }
+          case 80: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+          case 88: {
+            Claimed = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 26: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 34: {
+            Track = input.ReadString();
+            break;
+          }
+          case 40: {
+            Stage = input.ReadUInt32();
+            break;
+          }
+          case 50: {
+            ItemId = input.ReadString();
+            break;
+          }
+          case 56: {
+            Count = input.ReadUInt32();
+            break;
+          }
+          case 64: {
+            BagSlot = input.ReadUInt32();
+            break;
+          }
+          case 72: {
+            Bound = input.ReadBool();
+            break;
+          }
+          case 80: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+          case 88: {
+            Claimed = input.ReadBool();
             break;
           }
         }

@@ -101,6 +101,18 @@ var auctionState = false;
 string? auctionConfigPath = null;
 var shopList = false;
 string? shopConfigPath = null;
+// P3-4a2 通行证：list 只读配置不连库；state 连库读回；买与领另有两个直连入口，
+// 玩法路径走网关 /shop/buy 与 /season/pass/claim，这两个只给核对用。
+var seasonPassList = false;
+string? seasonPassPath = null;
+long seasonPassStateOf = 0;
+string? seasonPassSeason = null;
+long buySeasonPassOf = 0;
+string? buySeasonPassTxn = null;
+long claimSeasonPassOf = 0;
+string? claimSeasonPassTrack = null;
+var claimSeasonPassStage = 0;
+string? claimSeasonPassTxn = null;
 long shopStateOf = 0;
 long shopLedgerOf = 0;
 // 红符：只读核对用。talismanConfigPath 指向临时表试坏配置，talismanStateOf 连库读张数。
@@ -451,6 +463,42 @@ for (var i = 0; i < args.Length; i++)
         // 只给核对用：数一数这个角色名下有几笔商城成交（事务表里 shop_buy: 前缀）。
         case "--shop-ledger" when i + 1 < args.Length:
             long.TryParse(args[++i], out shopLedgerOf);
+            break;
+        // P3-4a2：通行证表只读。与启动共用同一 SeasonPassTable.Load（含与 season.json、
+        // shop.json、items.json、enhance.json 的交叉校验），坏表在这一步就起不来。
+        case "--season-pass-list":
+            seasonPassList = true;
+            break;
+        case "--season-pass-path" when i + 1 < args.Length:
+            seasonPassPath = args[++i];
+            break;
+        // 只给核对用：从库里读回这一季付费轨开没开、哪几阶领过、包里那几件绑定态。
+        case "--season-pass-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out seasonPassStateOf);
+            break;
+        // 季由全局服务回答，这里显式给出来只用于直连核对入口；网关那条路不带季。
+        case "--pass-season" when i + 1 < args.Length:
+            seasonPassSeason = args[++i];
+            break;
+        // 只给核对用：不经过网关直接买一次（扣元宝 + 开付费轨同一笔事务）。
+        case "--buy-season-pass" when i + 1 < args.Length:
+            long.TryParse(args[++i], out buySeasonPassOf);
+            break;
+        case "--pass-buy-txn" when i + 1 < args.Length:
+            buySeasonPassTxn = args[++i];
+            break;
+        // 只给核对用：不经过网关直接领一阶（入包 + 领取流水同一笔事务）。
+        case "--claim-season-pass" when i + 1 < args.Length:
+            long.TryParse(args[++i], out claimSeasonPassOf);
+            break;
+        case "--pass-track" when i + 1 < args.Length:
+            claimSeasonPassTrack = args[++i];
+            break;
+        case "--pass-stage" when i + 1 < args.Length:
+            int.TryParse(args[++i], out claimSeasonPassStage);
+            break;
+        case "--pass-claim-txn" when i + 1 < args.Length:
+            claimSeasonPassTxn = args[++i];
             break;
         // 只给核对用：把红符表读出来，不连库也不启动进程。坏表也走这里——
         // 「回复超过同级红药」「发货物不是红符」都在这一步就起不来。
@@ -923,6 +971,62 @@ if (shopList)
     return 0;
 }
 
+// P3-4a2 通行证只读核对：与启动共用同一套校验（免费轨只许称号与外观碎片、付费轨只许
+// 当季外观 / 洞府摆件 / 保护券、保护券必须就是 enhance.json 那一件且到账即绑、
+// 标价只从 shop.json 那条 season_pass 商品读），不连库也不启动进程。
+if (seasonPassList)
+{
+    try
+    {
+        var passConfig = CharacterConfig.Load(configPath);
+        var (passTable, _) = LoadSeasonPass(passConfig, seasonPassPath);
+        Console.WriteLine("season_pass_list_state=ok version=" + passTable.Version
+            + " pending=" + (passTable.Pending ? "true" : "false")
+            + " seasons=" + passTable.Seasons.Count
+            + " product=" + passTable.ProductId
+            + " price=" + passTable.PriceYuanbao
+            + " protect=" + passTable.ProtectItemId
+            + " protect_per_stage_max=" + passTable.ProtectPerStageMax);
+        foreach (var season in passTable.Seasons)
+        {
+            Console.WriteLine("season_pass_season=" + season.SeasonId
+                + " free=" + season.Free.Count
+                + " paid=" + season.Paid.Count);
+            foreach (var stage in season.Free)
+            {
+                Console.WriteLine("season_pass_stage=" + season.SeasonId + " track=free"
+                    + " stage=" + stage.Stage
+                    + " kind=" + stage.Rewards[0].Kind
+                    + " item=" + stage.Rewards[0].ItemId
+                    + " count=" + stage.Rewards[0].Count
+                    + " bind=always");
+            }
+
+            foreach (var stage in season.Paid)
+            {
+                Console.WriteLine("season_pass_stage=" + season.SeasonId + " track=paid"
+                    + " stage=" + stage.Stage
+                    + " kind=" + stage.Rewards[0].Kind
+                    + " item=" + stage.Rewards[0].ItemId
+                    + " count=" + stage.Rewards[0].Count
+                    + " bind=always");
+            }
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 拍卖税率只读核对：与启动共用同一套 5%–8% 写定区间校验，不连库也不启动进程。
 if (auctionState)
 {
@@ -1279,7 +1383,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
     || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0
     || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || stoneListingState
-    || siegeResultState || applySiegeResultTxn != null)
+    || siegeResultState || applySiegeResultTxn != null
+    || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -2442,6 +2547,89 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + " appearance_len=" + report.AppearanceLength);
             }
         }
+
+        // P3-4a2：通行证。三条入口共用同一份配置加载与同一个仓储：
+        // state 只读；买与领各一笔事务——和网关那条路走的是同一段仓储代码。
+        if (seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0)
+        {
+            var passConfig = CharacterConfig.Load(configPath);
+            var (passTable, passItems) = LoadSeasonPass(passConfig, seasonPassPath);
+            var passSeason = (seasonPassSeason ?? "").Trim();
+            var seasonPassRepo = new SeasonPassRepository(
+                dataSource, passTable, passItems, passConfig);
+
+            if (seasonPassStateOf != 0)
+            {
+                var state = await seasonPassRepo.StateAsync(
+                    seasonPassStateOf, passSeason, CancellationToken.None);
+                Console.WriteLine("season_pass_state=ok id=" + seasonPassStateOf
+                    + " season=" + state.SeasonId
+                    + " paid=" + (state.Paid ? "true" : "false")
+                    + " claims=" + state.Claims.Count
+                    + " claimed=" + (state.Claims.Count == 0
+                        ? "-"
+                        : string.Join(",", state.Claims.Select(
+                            c => c.Track + ":" + c.Stage + ":" + c.ItemId + "x" + c.Count))));
+
+                // 包里那几件通行证奖励：编号、数量、绑定态都从库里读，不另算。
+                var passDef = passTable.Find(state.SeasonId);
+                var rewardIds = new HashSet<string>(StringComparer.Ordinal);
+                if (passDef is not null)
+                {
+                    foreach (var stage in passDef.Free)
+                    {
+                        rewardIds.Add(stage.Rewards[0].ItemId);
+                    }
+
+                    foreach (var stage in passDef.Paid)
+                    {
+                        rewardIds.Add(stage.Rewards[0].ItemId);
+                    }
+                }
+
+                var passInventory = new InventoryRepository(dataSource);
+                var passSlots = await passInventory.ListAsync(
+                    seasonPassStateOf, CancellationToken.None);
+                var held = passSlots.Where(x => rewardIds.Contains(x.ItemId)).ToList();
+                Console.WriteLine("season_pass_bag=" + (held.Count == 0
+                    ? "-"
+                    : string.Join(",", held.Select(
+                        x => x.ItemId + "x" + x.Count + (x.Bound ? "@bound" : "@free")
+                            + ":slot" + x.Slot))));
+            }
+
+            if (buySeasonPassOf != 0)
+            {
+                var outcome = await seasonPassRepo.BuyAsync(
+                    buySeasonPassOf, passSeason, buySeasonPassTxn ?? "", CancellationToken.None);
+                Console.WriteLine("season_pass_buy=done id=" + buySeasonPassOf
+                    + " season=" + outcome.SeasonId
+                    + " ok=" + (outcome.Ok ? "true" : "false")
+                    + " reason=" + outcome.Reason
+                    + " price=" + outcome.Price
+                    + " balance=" + outcome.Balance
+                    + " paid=" + (outcome.Paid ? "true" : "false")
+                    + " duplicate=" + (outcome.Duplicate ? "true" : "false"));
+            }
+
+            if (claimSeasonPassOf != 0)
+            {
+                var outcome = await seasonPassRepo.ClaimAsync(
+                    claimSeasonPassOf, passSeason, claimSeasonPassTrack ?? "",
+                    claimSeasonPassStage, claimSeasonPassTxn ?? "", CancellationToken.None);
+                Console.WriteLine("season_pass_claim=done id=" + claimSeasonPassOf
+                    + " season=" + outcome.SeasonId
+                    + " track=" + outcome.Track
+                    + " stage=" + outcome.Stage
+                    + " ok=" + (outcome.Ok ? "true" : "false")
+                    + " reason=" + outcome.Reason
+                    + " item=" + outcome.ItemId
+                    + " count=" + outcome.Count
+                    + " slot=" + outcome.Slot
+                    + " duplicate=" + (outcome.Duplicate ? "true" : "false")
+                    + " claimed=" + (outcome.Claimed ? "true" : "false"));
+            }
+        }
     }
     catch (Exception ex) when (ex is NpgsqlException or IOException)
     {
@@ -2450,6 +2638,27 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     }
 
     return 0;
+}
+
+// P3-4a2：通行证表的加载链。--season-pass-list 与三条连库入口共用这一份，
+// 免得「只读入口」与「真实启动」各校验一套（preflight 第 3 道闸门的规矩）。
+static (SeasonPassTable Table, ItemTable Items) LoadSeasonPass(CharacterConfig cfg, string? path)
+{
+    var currencies = CurrencyTable.Load("config/currency.json");
+    var items = ItemTable.Load("config/items.json");
+    var enhance = EnhanceTable.Load(cfg.EnhanceTable, items, currencies);
+    var talismans = TalismanTable.Load(cfg.TalismanTable, items);
+    var scrolls = ReviveScrollTable.Load(
+        cfg.ReviveScrollTable, "config/classes.json", items, talismans);
+    var boosters = ExpBoosterTable.Load(
+        cfg.ExpBoosterTable, items, talismans, scrolls);
+    var unbinds = UnbindTable.Load(
+        cfg.UnbindTable, items, talismans, scrolls, boosters);
+    var shop = ShopTable.Load(
+        cfg.ShopTable, currencies, items, enhance, talismans, scrolls, boosters, unbinds);
+    var table = SeasonPassTable.Load(
+        path ?? cfg.SeasonPassTable, File.ReadAllText(cfg.SeasonTable), shop, items, enhance);
+    return (table, items);
 }
 
 using var stop = new CancellationTokenSource();

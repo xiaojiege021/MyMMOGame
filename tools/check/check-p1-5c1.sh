@@ -142,9 +142,14 @@ sh_rej = sh_rej[:sh_rej.find("// 拒绝与重放都不带")] if "// 拒绝与重
 report("reject_no_delivery",
        "Delivered = false" in sh_rej and "ChargedYuanbao = 0" in sh_rej,
        "rejected_helper len=%d" % len(sh_rej))
+# P3-4a2 起「通行证」是第二条成交分支（状态发货：只开轨、不往背包放东西），同样按
+# item.PriceYuanbao 扣一次。所以不再钉「全仓只有一处扣款」，改钉真正的不变式：
+# 每处扣款要么是商品配置价，要么是拒绝路径的 0，代码里没有第三个写死金额。
+charges = re.findall(r"ChargedYuanbao\s*=\s*([A-Za-z0-9_.]+)", body)
 report("charge_only_on_success",
-       body.count("ChargedYuanbao = item.PriceYuanbao") == 1,
-       "charge_true=%d" % body.count("ChargedYuanbao = item.PriceYuanbao"))
+       "ChargedYuanbao = item.PriceYuanbao" in body
+       and [c for c in charges if c not in ("0", "item.PriceYuanbao")] == [],
+       "charges=%s" % ",".join(charges))
 
 # 只读入口：--shop-list 不连库，--shop-state 连库读余额。
 report("readonly_entry",

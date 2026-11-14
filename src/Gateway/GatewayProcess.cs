@@ -70,6 +70,8 @@ public sealed class GatewayProcess(string configPath)
         AuctionApi.Map(app, tokens, config);
         // P3-4a1：赛季当前目标只读口，认令牌后转给全局服务，不读请求参数。
         SeasonApi.Map(app, tokens, config);
+        // P3-4a2：通行证只读与领取。季由角色服向全局服务确认，客户端只带角色号、轨与阶。
+        PassApi.Map(app, tokens, config);
         // P1-5c1：商城只认清单，清单外拒绝且不扣元宝。
         ShopApi.Map(app, tokens, config);
         // P1-5c7：限时经验道具走网关到角色服，扣一张与写到期时刻在同一笔事务里。

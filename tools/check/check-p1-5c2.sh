@@ -218,8 +218,10 @@ echo "== 3. 只读入口与坏清单 =="
 if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
   # 已接种类数与可发货物数会随后面的卡增长，只钉「两个数字相等且至少有一种」，
   # 不写死 delivered_kinds=1 / deliverable_items=1。
+  # Windows 上 dotnet 重定向输出走 GBK，按 utf-8 整块解码会在后续中文处炸掉；
+  # 头部字段全是 ASCII，用 latin-1 逐字节读首行最稳（P3-4a2 复跑回归时补）。
   if [ "$(LIST="$TMP/list.txt" python3 -c 'import os, re
-line = open(os.environ["LIST"], encoding="utf-8").readline()
+line = open(os.environ["LIST"], "rb").readline().decode("latin-1")
 def f(k):
     m = re.search(r"\b" + k + r"=(\d+)", line)
     return int(m.group(1)) if m else -1

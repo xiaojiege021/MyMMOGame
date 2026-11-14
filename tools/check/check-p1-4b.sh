@@ -12,6 +12,9 @@
 #   bash tools/check/check-p1-4b.sh                          服务端段：编译、静态、连库连服（要有 gamedb）
 #   MMO_P14B_MODE=client bash tools/check/check-p1-4b.sh    客户端段：静态 + Unity 编辑器自检（要有 Unity）
 set -uo pipefail
+# 本机设了代理时 .NET 会把 127.0.0.1 的明文 HTTP/2（h2c）请求也送进代理，网关建角一律 502；
+# 与 P3-4a2 等新卡脚本保持一致，进脚本就清掉（P3-4a2 复跑回归时补）。
+unset HTTP_PROXY http_proxy HTTPS_PROXY https_proxy ALL_PROXY all_proxy
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
@@ -19,6 +22,16 @@ export ROOT
 # 公共函数库：ok/bad/detail/stop_pid/body_of/code_of/json_field/expect_json/
 # wait_ready/wait_line/finish，签名与既有核对脚本一致，别再复制一份。
 source "$ROOT/tools/check/lib-common.sh"
+
+# Windows 上 dotnet 重定向输出走 GBK；中文断言先按平台转码成 UTF-8 再比（与 check-p3-4a2.sh 同款）。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -278,7 +291,9 @@ w = copy.deepcopy(base); w['protect_item_id'] = 'ore_iron'; dump('bad-coupon-mat
 PY
 config_reject() {
   local label="$1" file="$2" expect="$3" out
-  out="$("$DOTNET" "$CHARACTER_DLL" --enhance-state --enhance-config "$TMP/$file" --config config/character.json 2>&1)"
+  # Windows 上 dotnet 重定向输出走 GBK；中文断言必须按平台转码，不能「先试 UTF-8 再退 GBK」
+  # （GBK 双字节偶尔恰好是合法 UTF-8 序列，不报错但比不对，见 check-p3-1a1.sh）。
+  out="$("$DOTNET" "$CHARACTER_DLL" --enhance-state --enhance-config "$TMP/$file" --config config/character.json 2>&1 | utf8)"
   if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "$label：${out:0:160}"; fi
 }
 config_reject "缺 protect_item_id 起不来" bad-no-coupon.json "config_error=enhance.json 缺 protect_item_id"

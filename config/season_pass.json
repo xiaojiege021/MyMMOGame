@@ -1,0 +1,121 @@
+{
+  "schema": "season-pass-table/1",
+  "version": 1,
+  "note": "赛季通行证唯一正本（方案 12.1「赛季通行证：免费轨给称号和少量外观碎片；付费轨给当季秘境外观、洞府摆件，以及很少几张保护券。不给金币、强化石、转移石、能量结晶、灵石、装备、副本次数」、技术架构 5 节「商城和通行证付费轨发的是同一种绑定券」、开发架构 11 节 P3-4 / 13 节 P3-4a2 / 14 节第 68 行）。每季一套、两轨必须齐全：免费轨只许发称号与外观碎片，付费轨只许发当季秘境外观、洞府摆件与保护券——这两条在加载期就是硬约束，往免费轨塞券、往付费轨塞强化石或装备都起不来。保护券不许另立编号，只能是 config/enhance.json 的 protect_item_id（也就是商城那个 shop_protect_ticket_1 发出去的同一件），每阶张数不超过 protect_per_stage_max（方案只写「很少几张」，这里取 3 作上限，改这一个数即可）。product_id 指向 config/shop.json 里那条 season_pass 商品：通行证在商城直接标价卖，价格只存在 shop.json，本表不写第二套价格；买下即开本季付费轨，不往背包里放东西（状态发货，不是物品发货）。方案没写定通行证等级、积分与解锁节奏，本卡按「每季每轨若干阶、逐阶领一次」落，阶只是奖励分组的序号，不引入第二套进度数值；解锁条件等方案写定后另排卡，届时只加字段、不改这一笔事务。方案也没给这些称号 / 外观 / 摆件起名字，物品编号与名字全在 config/items.json 里标占位，改本表换成别的编号即可。表只许出现下列键：金币、灵石、强化石、装备、副本次数、战力材料、抽卡一类字段一律不许从这份配置里长出来。",
+  "pending": true,
+  "product_id": "shop_season_pass_1",
+  "protect_per_stage_max": 3,
+  "seasons": [
+    {
+      "season": "s1",
+      "free": [
+        {
+          "stage": 1,
+          "rewards": [
+            { "kind": "title", "item_id": "title_s1", "count": 1 }
+          ]
+        },
+        {
+          "stage": 2,
+          "rewards": [
+            { "kind": "appearance_fragment", "item_id": "fragment_s1", "count": 3 }
+          ]
+        }
+      ],
+      "paid": [
+        {
+          "stage": 1,
+          "rewards": [
+            { "kind": "season_outfit", "item_id": "outfit_s1", "count": 1 }
+          ]
+        },
+        {
+          "stage": 2,
+          "rewards": [
+            { "kind": "home_decor", "item_id": "decor_s1", "count": 1 }
+          ]
+        },
+        {
+          "stage": 3,
+          "rewards": [
+            { "kind": "protect_ticket", "item_id": "ticket_protect", "count": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "season": "s2",
+      "free": [
+        {
+          "stage": 1,
+          "rewards": [
+            { "kind": "title", "item_id": "title_s2", "count": 1 }
+          ]
+        },
+        {
+          "stage": 2,
+          "rewards": [
+            { "kind": "appearance_fragment", "item_id": "fragment_s2", "count": 3 }
+          ]
+        }
+      ],
+      "paid": [
+        {
+          "stage": 1,
+          "rewards": [
+            { "kind": "season_outfit", "item_id": "outfit_s2", "count": 1 }
+          ]
+        },
+        {
+          "stage": 2,
+          "rewards": [
+            { "kind": "home_decor", "item_id": "decor_s2", "count": 1 }
+          ]
+        },
+        {
+          "stage": 3,
+          "rewards": [
+            { "kind": "protect_ticket", "item_id": "ticket_protect", "count": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "season": "s3",
+      "free": [
+        {
+          "stage": 1,
+          "rewards": [
+            { "kind": "title", "item_id": "title_s3", "count": 1 }
+          ]
+        },
+        {
+          "stage": 2,
+          "rewards": [
+            { "kind": "appearance_fragment", "item_id": "fragment_s3", "count": 3 }
+          ]
+        }
+      ],
+      "paid": [
+        {
+          "stage": 1,
+          "rewards": [
+            { "kind": "season_outfit", "item_id": "outfit_s3", "count": 1 }
+          ]
+        },
+        {
+          "stage": 2,
+          "rewards": [
+            { "kind": "home_decor", "item_id": "decor_s3", "count": 1 }
+          ]
+        },
+        {
+          "stage": 3,
+          "rewards": [
+            { "kind": "protect_ticket", "item_id": "ticket_protect", "count": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

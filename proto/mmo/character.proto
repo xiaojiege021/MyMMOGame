@@ -165,6 +165,13 @@ service CharacterService {
   // 城池编号、抽成比例与归属变更都在角色服从配置和库里读；请求里带不进税率、
   // 旧归属，也不带任何奖励 / 金币 / 灵石。同一个事务号只写一次。
   rpc ApplySiegeResult(ApplySiegeResultRequest) returns (ApplySiegeResultResponse);
+
+  // P3-4a2：赛季通行证。免费轨只发称号与外观碎片，付费轨只发当季秘境外观、
+  // 洞府摆件与很少几张保护券（就是 enhance.json 的 protect_item_id，和商城同一种）。
+  // 奖励内容全在 config/season_pass.json，哪一季由角色服向全局服务确认；
+  // 请求里带不进物品编号、数量、季，也带不进任何金币 / 灵石 / 强化石 / 装备。
+  rpc DescribeSeasonPass(DescribeSeasonPassRequest) returns (DescribeSeasonPassResponse);
+  rpc ClaimSeasonPassReward(ClaimSeasonPassRequest) returns (ClaimSeasonPassResponse);
 }
 
 message SettleExpRequest {
@@ -628,6 +635,11 @@ message BuyShopItemResponse {
   bool bound = 15;
   // 同一个事务号重复提交时为 true：整笔不做，余额与背包都不动。
   bool duplicate = 16;
+  // P3-4a2：通行证是商城里的「状态发货」，买下即开本季付费轨，不往背包放东西。
+  // 这一笔对应的季（角色服向全局服务确认的事实值）与付费轨是否已开，只在这条
+  // 商品上是有效值：别的商品恒空串 / false，不拿它们顶任何数。
+  string season_id = 17;
+  bool pass_owned = 18;
 }
 
 // 回复落在哪个池。方案 12.1：红符只回生命、蓝符只回蓝量，两者互不越界。
@@ -1049,4 +1061,65 @@ message ApplySiegeResultResponse {
   string owner_sect = 5;
   int32 tax_pct = 6;
   string txn_id = 7;
+}
+
+// P3-4a2：通行证的只读状态。请求只带账号与角色号（服间可信调用），
+// 季由角色服向全局服务确认，客户端表达不了「看哪一季的通行证」。
+message DescribeSeasonPassRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+// 一阶的一条奖励。物品编号、数量与领没领都是服务端事实值：
+// 免费轨只有称号与外观碎片，付费轨只有当季外观、洞府摆件与保护券。
+message SeasonPassReward {
+  string track = 1;
+  uint32 stage = 2;
+  string item_id = 3;
+  uint32 count = 4;
+  bool claimed = 5;
+}
+
+message DescribeSeasonPassResponse {
+  bool ok = 1;
+  // season_unavailable（全局服务没起或没配）/ found=false 表示这一季没有通行证配置。
+  string reason = 2;
+  bool found = 3;
+  string season_id = 4;
+  // 这一季的付费轨开了没有。免费轨恒可领。
+  bool paid = 5;
+  // 商城里的标价，来自 config/shop.json 那条 season_pass 商品；本卡不另存价格。
+  int64 price_yuanbao = 6;
+  repeated SeasonPassReward rewards = 7;
+  // 保护券的编号（enhance.json 的 protect_item_id）。它和商城卖的是同一种券，
+  // 回包里给出来只是让界面能显示「这一阶给什么」。
+  string protect_item_id = 8;
+}
+
+// 领取只带轨与阶。季由角色服向全局服务确认，物品编号与数量全从配置读。
+message ClaimSeasonPassRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  // free 或 paid。表外的轨一律拒绝。
+  string track = 3;
+  uint32 stage = 4;
+  string txn_id = 5;
+}
+
+message ClaimSeasonPassResponse {
+  bool ok = 1;
+  // unknown_track / unknown_stage / pass_not_owned / already_claimed / bag_full /
+  // season_unavailable / character_not_found / txn_missing / duplicate。
+  string reason = 2;
+  string season_id = 3;
+  string track = 4;
+  uint32 stage = 5;
+  string item_id = 6;
+  uint32 count = 7;
+  uint32 bag_slot = 8;
+  // 通行证的奖励到账即绑；这一条恒为 true。
+  bool bound = 9;
+  bool duplicate = 10;
+  // 领完之后这一阶是不是已领。duplicate 时也是 true。
+  bool claimed = 11;
 }

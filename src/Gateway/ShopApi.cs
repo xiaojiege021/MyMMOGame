@@ -108,6 +108,8 @@ public static class ShopApi
                     bag_slot = result.BagSlot,
                     bound = result.Bound,
                     duplicate = result.Duplicate,
+                    season_id = result.SeasonId,
+                    pass_owned = result.PassOwned,
                 });
             }
             catch (RpcException ex)

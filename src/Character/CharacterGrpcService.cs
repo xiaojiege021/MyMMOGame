@@ -55,7 +55,10 @@ public sealed class CharacterGrpcService(
     StoneExchangeRepository stoneExchanges,
     StoneAuctionRepository stoneAuctions,
     CityTable cities,
-    SiegeTerritoryRepository siegeTerritories) : CharacterService.CharacterServiceBase
+    SiegeTerritoryRepository siegeTerritories,
+    SeasonPassTable seasonPassTable,
+    SeasonPassRepository seasonPasses,
+    ISeasonSource seasonSource) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
@@ -1506,6 +1509,13 @@ public sealed class CharacterGrpcService(
             };
         }
 
+        // P3-4a2：通行证在商城里是「状态发货」——买下即开本季付费轨，不往背包放东西，
+        // 所以它没有 delivery_item_id。这一支先于「还没接发货」判断，按种类分，不靠清单字段。
+        if (string.Equals(item.Kind, "season_pass", StringComparison.Ordinal))
+        {
+            return await BuySeasonPassAsync(account, characterId, item, request.TxnId ?? "", context);
+        }
+
         if (!item.Deliverable)
         {
             logger.LogInformation(
@@ -1652,6 +1662,258 @@ public sealed class CharacterGrpcService(
 
             return ShopRejected(reason, item, balance);
         }
+    }
+
+    // ------------------------------------------------------------------ P3-4a2 通行证
+
+    /// <summary>
+    /// 商城里的通行证：扣元宝与开本季付费轨在同一笔事务里（缺一样整笔退回）。
+    /// 季向全局服务确认——客户端表达不了「买哪一季」，标价只从清单读。
+    /// 买下不往背包放东西，所以回包 delivered 恒为 false，state 用 pass_activated 区分。
+    /// </summary>
+    async Task<BuyShopItemResponse> BuySeasonPassAsync(
+        string account, long characterId, ShopTable.Item item, string txnId,
+        ServerCallContext context)
+    {
+        var txn = (txnId ?? "").Trim();
+        if (txn.Length == 0 || txn.Length > GrantRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var season = await seasonSource.CurrentSeasonAsync(context.CancellationToken);
+        if (season is null)
+        {
+            logger.LogInformation(
+                "shop_buy_reject account={Account} id={Id} item={Item} kind={Kind} reason=season_unavailable",
+                account, characterId, item.Id, item.Kind);
+            return new BuyShopItemResponse
+            {
+                Ok = false,
+                Reason = "season_unavailable",
+                ItemId = item.Id,
+                Kind = item.Kind,
+                Name = item.Name,
+                PriceYuanbao = item.PriceYuanbao,
+                Currency = ShopTable.WrittenCurrency,
+                ChargedYuanbao = 0,
+                Delivered = false,
+                State = "season_unavailable",
+            };
+        }
+
+        var outcome = await seasonPasses.BuyAsync(
+            characterId, season, txn, context.CancellationToken);
+
+        if (!outcome.Ok)
+        {
+            logger.LogInformation(
+                "shop_buy_reject account={Account} id={Id} item={Item} kind={Kind} reason={Reason}"
+                + " season={Season} price={Price} balance={Balance}",
+                account, characterId, item.Id, item.Kind, outcome.Reason, season,
+                item.PriceYuanbao, outcome.Balance);
+
+            return new BuyShopItemResponse
+            {
+                Ok = false,
+                Reason = outcome.Reason,
+                ItemId = item.Id,
+                Kind = item.Kind,
+                Name = item.Name,
+                PriceYuanbao = item.PriceYuanbao,
+                Currency = ShopTable.WrittenCurrency,
+                Balance = outcome.Balance,
+                Enough = outcome.Balance >= item.PriceYuanbao,
+                ChargedYuanbao = 0,
+                Delivered = false,
+                State = outcome.Reason,
+                SeasonId = season,
+                PassOwned = outcome.Paid,
+                Duplicate = outcome.Duplicate,
+            };
+        }
+
+        logger.LogInformation(
+            "shop_buy account={Account} id={Id} item={Item} kind={Kind} txn={Txn} price={Price}"
+            + " charged={Charged} season={Season} pass_owned={Owned} balance={Balance}",
+            account, characterId, item.Id, item.Kind, txn, item.PriceYuanbao,
+            item.PriceYuanbao, season, outcome.Paid, outcome.Balance);
+
+        return new BuyShopItemResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = item.Id,
+            Kind = item.Kind,
+            Name = item.Name,
+            PriceYuanbao = item.PriceYuanbao,
+            Currency = ShopTable.WrittenCurrency,
+            Balance = outcome.Balance,
+            Enough = true,
+            ChargedYuanbao = item.PriceYuanbao,
+            Delivered = false,
+            State = "pass_activated",
+            SeasonId = season,
+            PassOwned = outcome.Paid,
+            Duplicate = false,
+        };
+    }
+
+    /// <summary>
+    /// 通行证只读状态：这一季两轨每阶发什么、领没领、付费轨开没开。
+    /// 季向全局服务确认；奖励物品与数量全从 config/season_pass.json 读。
+    /// </summary>
+    public override async Task<DescribeSeasonPassResponse> DescribeSeasonPass(
+        DescribeSeasonPassRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var season = await seasonSource.CurrentSeasonAsync(context.CancellationToken);
+        if (season is null)
+        {
+            return new DescribeSeasonPassResponse
+            {
+                Ok = false,
+                Reason = "season_unavailable",
+                Found = false,
+            };
+        }
+
+        var pass = seasonPassTable.Find(season);
+        if (pass is null)
+        {
+            // 配置里没有这一季：照实回 found=false，不拿别的季凑一份。
+            return new DescribeSeasonPassResponse
+            {
+                Ok = false,
+                Reason = "unknown_season",
+                Found = false,
+                SeasonId = season,
+            };
+        }
+
+        var state = await seasonPasses.StateAsync(characterId, season, context.CancellationToken);
+        var claimed = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var row in state.Claims)
+        {
+            claimed.Add(row.Track + "#" + row.Stage);
+        }
+
+        var reply = new DescribeSeasonPassResponse
+        {
+            Ok = true,
+            Found = true,
+            SeasonId = season,
+            Paid = state.Paid,
+            PriceYuanbao = seasonPassTable.PriceYuanbao,
+            ProtectItemId = seasonPassTable.ProtectItemId,
+        };
+
+        foreach (var stage in pass.Free)
+        {
+            reply.Rewards.Add(PassReward(SeasonPassTable.FreeTrack, stage, claimed));
+        }
+
+        foreach (var stage in pass.Paid)
+        {
+            reply.Rewards.Add(PassReward(SeasonPassTable.PaidTrack, stage, claimed));
+        }
+
+        return reply;
+    }
+
+    static SeasonPassReward PassReward(
+        string track, SeasonPassStage stage, HashSet<string> claimed)
+    {
+        var reward = stage.Rewards[0];
+        return new SeasonPassReward
+        {
+            Track = track,
+            Stage = (uint)stage.Stage,
+            ItemId = reward.ItemId,
+            Count = (uint)reward.Count,
+            Claimed = claimed.Contains(track + "#" + stage.Stage),
+        };
+    }
+
+    /// <summary>
+    /// 领一阶。物品、数量、绑定全从配置与物品表定；季向全局服务确认。
+    /// 付费轨要先买过这一季的通行证；同一事务号重放只回 duplicate，不发第二次。
+    /// </summary>
+    public override async Task<ClaimSeasonPassResponse> ClaimSeasonPassReward(
+        ClaimSeasonPassRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var txn = (request.TxnId ?? "").Trim();
+        if (txn.Length == 0 || txn.Length > GrantRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var season = await seasonSource.CurrentSeasonAsync(context.CancellationToken);
+        if (season is null)
+        {
+            return new ClaimSeasonPassResponse { Ok = false, Reason = "season_unavailable" };
+        }
+
+        var result = await seasonPasses.ClaimAsync(
+            characterId, season, request.Track ?? "", (int)request.Stage, txn,
+            context.CancellationToken);
+
+        if (result.Ok)
+        {
+            logger.LogInformation(
+                "season_pass_claim account={Account} id={Id} season={Season} track={Track} stage={Stage}"
+                + " item={Item} count={Count} slot={Slot} bound=true txn={Txn}",
+                account, characterId, result.SeasonId, result.Track, result.Stage,
+                result.ItemId, result.Count, result.Slot, txn);
+        }
+        else
+        {
+            logger.LogInformation(
+                "season_pass_claim_reject account={Account} id={Id} season={Season} track={Track}"
+                + " stage={Stage} reason={Reason} duplicate={Duplicate}",
+                account, characterId, result.SeasonId, result.Track, result.Stage,
+                result.Reason, result.Duplicate);
+        }
+
+        return new ClaimSeasonPassResponse
+        {
+            Ok = result.Ok,
+            Reason = result.Reason,
+            SeasonId = result.SeasonId,
+            Track = result.Track,
+            Stage = (uint)result.Stage,
+            ItemId = result.ItemId,
+            Count = (uint)result.Count,
+            BagSlot = (uint)result.Slot,
+            Bound = result.Claimed,
+            Duplicate = result.Duplicate,
+            Claimed = result.Claimed,
+        };
     }
 
     /// <summary>

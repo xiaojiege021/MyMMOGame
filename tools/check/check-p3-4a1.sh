@@ -119,8 +119,16 @@ ck("两端 Trade.cs 生成物一致，TradeGrpc.cs 只在服务端",
    sha("src/Shared/Generated/Trade.cs") == sha("client/MMOGame/Assets/Proto/Generated/Trade.cs")
    and os.path.exists(os.path.join(root, "src/Shared/Generated/TradeGrpc.cs"))
    and not os.path.exists(os.path.join(root, "client/MMOGame/Assets/Proto/Generated/TradeGrpc.cs")))
-ck("赛季表不写角色库（没有新 SQL / 新表）",
-   not any("season" in f for f in os.listdir(os.path.join(root, "db/character"))))
+# P3-4a2 起角色库里多了 season_pass / season_pass_claim，它们只记「这个角色买过哪一季、领过哪一阶」，
+# 不存赛季本身的目标与奖励（那些仍只从 config/season.json 和全局服务来）。所以按建表名钉，
+# 不再按文件名里有没有 season 钉。
+tables = set()
+for f in os.listdir(os.path.join(root, "db/character")):
+    if f.endswith(".sql"):
+        txt = open(os.path.join(root, "db/character", f), encoding="utf-8").read()
+        tables |= {t.lower() for t in re.findall(r'create table[^;]*?"?([a-z_0-9]+)"?\s*\(', txt, re.I)}
+ck("赛季表不写角色库（角色库里没有 season / season_target 表，赛季事实只从配置与全局服务来）",
+   not (tables & {"season", "season_target", "season_goal"}))
 for name, cond in checks: print(("OK " if cond else "BAD ") + name)
 PY
 while IFS= read -r line; do
