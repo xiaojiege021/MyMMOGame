@@ -8,6 +8,8 @@ var battlefieldOnly = false;
 string? battlefieldPath = null;
 var siegeOnly = false;
 string? siegePath = null;
+var sectTechOnly = false;
+string? sectTechPath = null;
 var siegeViewOnly = false;
 var siegeViewArgs = new List<string>();
 for (var i = 0; i < args.Length; i++)
@@ -41,6 +43,14 @@ for (var i = 0; i < args.Length; i++)
             siegeOnly = true;
             siegePath = args[++i];
             break;
+        // 只读入口：打印宗门科技折算表就退出，不起服务、不连库、不查社交服。
+        case "--sect-tech-table":
+            sectTechOnly = true;
+            break;
+        case "--sect-tech-table-path" when i + 1 < args.Length:
+            sectTechOnly = true;
+            sectTechPath = args[++i];
+            break;
         // 只读入口：不连库不起服，直接核对城战同屏档位的纯计算。
         case "--siege-view":
             siegeViewOnly = true;
@@ -49,6 +59,37 @@ for (var i = 0; i < args.Length; i++)
                 siegeViewArgs.Add(args[++i]);
             }
             break;
+    }
+}
+
+if (sectTechOnly)
+{
+    try
+    {
+        Battle.SectTechTable table = sectTechPath is null
+            ? Battle.BattleConfig.Load(configPath).SectTech
+            : Battle.SectTechTable.Load(sectTechPath);
+
+        if (table.IsMissing)
+        {
+            Console.WriteLine("sect_tech=missing");
+            return 0;
+        }
+
+        Console.WriteLine($"sect_tech_table_version={table.Version}"
+            + $" power_pct_per_level={table.PowerPctPerLevel}"
+            + $" max_level={table.MaxLevel}"
+            + $" pending={(table.Pending ? "true" : "false")}");
+        // 纯计算：等级 0 恒 1，等级越高系数越大；数字全部从配置现取，不写死。
+        Console.WriteLine($"sect_tech_factor=level=0 {table.Factor(0):0.###}"
+            + $" level=1 {table.Factor(1):0.###}"
+            + $" level=max {table.Factor(table.MaxLevel):0.###}");
+        return 0;
+    }
+    catch (Battle.ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
     }
 }
 

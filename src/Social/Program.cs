@@ -28,6 +28,10 @@ long sectUpgradeStateOf = 0;
 long sectUpgradeMembersOf = 0;
 long sectConstructionSetOf = 0;
 long sectConstructionSetTo = -1;
+// P3-3a3：宗门科技等级只读入口 + 仅核对用的写入口（方案没写定科技产出规则）。
+long sectTechStateOf = 0;
+long sectTechSetOf = 0;
+int sectTechSetTo = -1;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -101,6 +105,15 @@ for (var i = 0; i < args.Length; i++)
         case "--sect-construction-set" when i + 2 < args.Length:
             long.TryParse(args[++i], out sectConstructionSetOf);
             long.TryParse(args[++i], out sectConstructionSetTo);
+            break;
+        // P3-3a3：只读查角色所属宗门的科技等级。
+        case "--sect-tech-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectTechStateOf);
+            break;
+        // 只给核对用：写某宗门的科技等级，不做升级逻辑（方案没写定产出）。
+        case "--raw-sect-tech-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out sectTechSetOf);
+            int.TryParse(args[++i], out sectTechSetTo);
             break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
@@ -229,7 +242,8 @@ if (sectUpgradeConfig)
 if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLevelOf != 0
     || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0
     || sectLeadershipStateOf != 0 || sectLeadershipMembersOf != 0 || sectLeaveStateOf != 0
-    || sectUpgradeStateOf != 0 || sectUpgradeMembersOf != 0 || sectConstructionSetOf != 0)
+    || sectUpgradeStateOf != 0 || sectUpgradeMembersOf != 0 || sectConstructionSetOf != 0
+    || sectTechStateOf != 0 || sectTechSetOf != 0)
 {
     SectTable table;
     try
@@ -390,6 +404,23 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
             Console.WriteLine("sect_upgrade_members_state=ok sect=" + sectUpgradeMembersOf
                 + " rows=" + members.Count
                 + " ids=" + string.Join(",", members));
+        }
+
+        if (sectTechStateOf != 0)
+        {
+            var st = await repo.SectTechAsync(sectTechStateOf, CancellationToken.None);
+            Console.WriteLine("sect_tech_state=ok character=" + sectTechStateOf
+                + " found=" + (st.Found ? "true" : "false")
+                + " sect=" + st.SectId
+                + " level=" + st.TechLevel);
+        }
+
+        if (sectTechSetOf != 0 && sectTechSetTo >= 0)
+        {
+            var changed = await repo.SetSectTechAsync(
+                sectTechSetOf, sectTechSetTo, CancellationToken.None);
+            Console.WriteLine("raw_sect_tech=" + (changed ? "ok" : "missing")
+                + " sect=" + sectTechSetOf + " level=" + sectTechSetTo);
         }
 
         if (sectConstructionSetOf != 0 && sectConstructionSetTo >= 0)

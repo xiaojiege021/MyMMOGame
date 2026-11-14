@@ -129,6 +129,32 @@ public sealed class SocialGrpcService(
         };
     }
 
+    // ---- P3-3a3：只读查一个角色所属宗门的科技等级 ----
+    // 战斗服开城战时来读；社交服只回等级事实值，不算伤害、不给加成系数、不写库。
+    // 没宗门 / 没科技行都给 0，上游不可达由战斗服降级处理，这里不抛 gRPC 错误。
+    public override async Task<DescribeSectTechResponse> DescribeSectTech(
+        DescribeSectTechRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            return new DescribeSectTechResponse
+            {
+                Ok = false, Reason = "request_missing", Found = false, SectId = 0, TechLevel = 0,
+            };
+        }
+
+        var state = await sects.SectTechAsync(
+            (long)request.CharacterId, context.CancellationToken);
+        return new DescribeSectTechResponse
+        {
+            Ok = true,
+            Reason = state.Found ? "" : "not_in_sect",
+            Found = state.Found,
+            SectId = (ulong)state.SectId,
+            TechLevel = state.TechLevel,
+        };
+    }
+
     // ---- P2-1a2：任命 / 免职 / 只读查席位 ----
     // 席位数字只从 config/sect.json 读，请求里带不进来；回包都是只读事实值。
     public override async Task<PositionStateResponse> AppointPosition(

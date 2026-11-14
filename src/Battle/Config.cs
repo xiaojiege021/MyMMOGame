@@ -412,6 +412,17 @@ public sealed class BattleConfig
     /// </summary>
     public SiegeTable Siege { get; private set; } = null!;
 
+    /// <summary>
+    /// 宗门科技加成折算（config/sect_tech.json）。只城战读，日常副本不读。
+    /// 与 siege.json 分开：老卡把 siege.json 的顶层键口径钉死了，科技段不能塞进去。
+    /// </summary>
+    public SectTechTable SectTech { get; private set; } = null!;
+
+    public string SectTechTablePath { get; private set; } = "";
+
+    /// <summary>社交服地址。留空就不查科技（老链路照跑）；城战依赖社交服的科技（9 节）。</summary>
+    public string SocialUpstream { get; init; } = "";
+
     /// <summary>配置文件的绝对路径，日志里要打出来才知道跑的是哪一份。</summary>
     public string SourcePath { get; private set; } = "";
 
@@ -432,6 +443,7 @@ public sealed class BattleConfig
         var arenaMatchPath = Resolve(dir, raw.ArenaMatchTable, "arena_match.json");
         var battlefieldPath = Resolve(dir, raw.BattlefieldTable, "battlefield.json");
         var siegePath = Resolve(dir, raw.SiegeTable, "siege.json");
+        var sectTechPath = Resolve(dir, raw.SectTechTable, "sect_tech.json");
         // 竞技场表是可选项：没写这一项、文件也不在，就起一张空表（竞技场一律拒），
         // 副本与练习场不受影响。但显式写了路径就必须兑现，缺文件照样起不来。
         var arenaMatch = File.Exists(arenaMatchPath)
@@ -453,6 +465,14 @@ public sealed class BattleConfig
             : string.IsNullOrWhiteSpace(raw.SiegeTable)
                 ? SiegeTable.Missing()
                 : throw new ConfigException($"{path}：siege_table 指的 {siegePath} 不存在");
+        // 宗门科技表同理：config/battle.json 不显式登记 sect_tech_table，靠默认文件名 +
+        // 文件存在性判断。老卡临时配置目录里没有这份表，缺表只让科技恒 0，
+        // 副本 / 练习场 / 竞技场 / 战场 / 城战照常开场；显式写了路径却缺文件照样起不来。
+        var sectTech = File.Exists(sectTechPath)
+            ? SectTechTable.Load(sectTechPath)
+            : string.IsNullOrWhiteSpace(raw.SectTechTable)
+                ? SectTechTable.Missing()
+                : throw new ConfigException($"{path}：sect_tech_table 指的 {sectTechPath} 不存在");
 
         var config = new BattleConfig
         {
@@ -465,6 +485,8 @@ public sealed class BattleConfig
             ClassTablePath = classPath,
             ArenaMatchTablePath = arenaMatchPath,
             SiegeTablePath = siegePath,
+            SectTechTablePath = sectTechPath,
+            SocialUpstream = (raw.SocialUpstream ?? "").Trim(),
             DefaultClass = string.IsNullOrWhiteSpace(raw.DefaultClass) ? "warrior" : raw.DefaultClass,
             ExpUpstream = (raw.ExpUpstream ?? "").Trim(),
             // 没单独配就跟经验结算走同一个角色服；两个都空才是本机口径。
@@ -481,6 +503,7 @@ public sealed class BattleConfig
             ArenaMatch = arenaMatch,
             Battlefield = battlefield,
             Siege = siege,
+            SectTech = sectTech,
         };
 
         // 模板与职业表对齐：每个职业都要有默认模板，模板里也不许出现职业表没有的职业。
@@ -695,6 +718,9 @@ public sealed class BattleConfig
         public string ArenaMatchTable { get; init; } = "";
         public string BattlefieldTable { get; init; } = "";
         public string SiegeTable { get; init; } = "";
+        public string SectTechTable { get; init; } = "";
+        /// <summary>社交服地址；留空就不查宗门科技，老链路照跑。</summary>
+        public string SocialUpstream { get; init; } = "";
         public string DefaultClass { get; init; } = "warrior";
         public string ExpUpstream { get; init; } = "";
 

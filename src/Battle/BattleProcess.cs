@@ -38,6 +38,12 @@ public sealed class BattleProcess(string configPath)
         using IBattleProfileSource profiles = string.IsNullOrEmpty(config.CharacterUpstream)
             ? new NoBattleProfileSource()
             : new GrpcBattleProfileSource(config.CharacterUpstream);
+        // P3-3a3：城战开场要读社交服的宗门科技（开发架构 4.4 / 8 / 9 节）。
+        // 没配 social_upstream 就不查，科技恒 0；上游不可达也由客户端降级为 0，
+        // 不让「社交服没起」拖垮练习场 / 副本 / 竞技场 / 战场 / 城战老链路。
+        using ISectTechSource sectTech = string.IsNullOrEmpty(config.SocialUpstream)
+            ? new NoSectTechSource()
+            : new GrpcSectTechSource(config.SocialUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
         Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
@@ -97,12 +103,21 @@ public sealed class BattleProcess(string configPath)
                   + $" siege_fill_timeout_ms={config.Siege.FillTimeoutMs}"
                   + $" siege_view_limit={config.Siege.ViewFullModelLimit}"));
         // 场次全在内存里，进程一停就没了。重启不恢复、不补发，这句是给核对脚本看的。
+        // 宗门科技表与社交服地址单独一行，免得混进 siege_table= 那行的老断言里。
+        Console.WriteLine($"sect_tech_table={config.SectTechTablePath}"
+            + (config.SectTech.IsMissing
+                ? " sect_tech=missing"
+                : $" sect_tech_version={config.SectTech.Version}"
+                  + $" sect_tech_pct={config.SectTech.PowerPctPerLevel}"
+                  + $" sect_tech_max_level={config.SectTech.MaxLevel}")
+            + $" social_upstream={(config.SocialUpstream.Length == 0 ? "off" : config.SocialUpstream)}");
         Console.WriteLine("resume=off");
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);
 
         try
         {
-            await new BattleServer(config, settlements, characters, expSettlement, talismans, scrolls, profiles)
+            await new BattleServer(config, settlements, characters, expSettlement, talismans,
+                scrolls, profiles, sectTech)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

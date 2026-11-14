@@ -174,6 +174,26 @@ message DescribeCharacterSectResponse {
   uint64 sect_id = 4;
 }
 
+// P3-3a3：只读查一个角色所属宗门的科技等级。战斗服开城战时来读（开发架构 4.4 / 8 / 9 节），
+// 社交服只回等级事实值，不算伤害、不给加成系数、不写库。没宗门或没科技行都给 0，
+// 日常副本 / 练习场 / 竞技场 / 战场不调用这条 RPC。
+message DescribeSectTechRequest {
+  // 服间可信调用；account 仅作日志上下文，不参与归属判定。
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message DescribeSectTechResponse {
+  bool ok = 1;
+  // request_missing / not_in_sect / 空串表示查到了。
+  string reason = 2;
+  // true 表示这个角色在某个宗门里；false 表示没宗门。
+  bool found = 3;
+  uint64 sect_id = 4;
+  // 宗门科技等级。没宗门、宗门还没写科技行都是 0（无加成）。
+  int32 tech_level = 5;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
@@ -191,4 +211,7 @@ service SocialService {
   // P2-1c：只读查一个角色当前归属的宗门编号。判同宗门加成在角色服调用；
   // found=false 表示没进宗门（含掌门本人：建宗门不进名册，按 master_character_id 判）。
   rpc DescribeCharacterSect(DescribeCharacterSectRequest) returns (DescribeCharacterSectResponse);
+  // P3-3a3：只读查一个角色所属宗门的科技等级。战斗服开城战时来读；
+  // 社交服只回等级事实值，不算伤害、不给加成系数，没宗门 / 没科技行都给 0。
+  rpc DescribeSectTech(DescribeSectTechRequest) returns (DescribeSectTechResponse);
 }

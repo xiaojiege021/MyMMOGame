@@ -45,6 +45,18 @@ sealed class BattlefieldEntry
 
     public long AdjustedPower { get; set; }
     public double K { get; set; } = 1.0;
+
+    /// <summary>
+    /// P3-3a3：只城战进场时从社交服读到的宗门科技等级（0 表示没有加成）。
+    /// 事实值只活在这条连接上，离场即丢，不写角色库、不进结算。
+    /// </summary>
+    public int SectTechLevel { get; set; }
+
+    /// <summary>
+    /// 城战专属的第二层系数：装备全额（K=1）之上再乘宗门科技。
+    /// 其他模式恒 1，所以战场 / 竞技场 / 副本 / 练习场的属性一字不变。
+    /// </summary>
+    public double TechFactor { get; set; } = 1.0;
     public Member? Member { get; set; }
     public bool Rejected { get; set; }
     public string RejectReason { get; set; } = "";
@@ -89,7 +101,7 @@ sealed class Party
 public sealed class BattleServer(
     BattleConfig config, SettlementStore settlements, ICharacterStore characters,
     IExpSettlement expSettlement, ITalismanSpend talismans, IReviveScrollUse scrolls,
-    IBattleProfileSource profiles)
+    IBattleProfileSource profiles, ISectTechSource sectTech)
 {
     /// <summary>20Hz。前摇、冷却、后摇的判定精度都在这个粒度上。</summary>
     const int TickIntervalMs = 50;
@@ -715,13 +727,20 @@ public sealed class BattleServer(
         }
     }
 
-    /// <summary>属性同乘一个系数。战力是属性的线性组合，所以乘完之后战力也正好乘这个系数。</summary>
-    static CombatStats ScaledStats(BattlefieldEntry entry) => new(
-        (long)Math.Round(entry.RawAttack * entry.K),
-        (long)Math.Round(entry.RawHp * entry.K),
-        (long)Math.Round(entry.RawMana * entry.K),
-        (long)Math.Round(entry.RawHeal * entry.K),
-        (long)Math.Round(entry.RawThreat * entry.K));
+    /// <summary>
+    /// 属性同乘一个系数。战力是属性的线性组合，所以乘完之后战力也正好乘这个系数。
+    /// K 是竞技场 / 战场的平衡压缩；TechFactor 只在城战开场赋值，其他路径恒 1。
+    /// </summary>
+    static CombatStats ScaledStats(BattlefieldEntry entry)
+    {
+        var factor = entry.K * entry.TechFactor;
+        return new CombatStats(
+            (long)Math.Round(entry.RawAttack * factor),
+            (long)Math.Round(entry.RawHp * factor),
+            (long)Math.Round(entry.RawMana * factor),
+            (long)Math.Round(entry.RawHeal * factor),
+            (long)Math.Round(entry.RawThreat * factor));
+    }
 
     /// <summary>
     /// 城战的一次进场（P3-3a1）。属性以角色库为准，按「职业表 + 强化总级 × 每级折算」
@@ -759,6 +778,14 @@ public sealed class BattleServer(
         var rawThreat = realClass.ThreatStability();
         var rawPower = table.Power(rawAttack, rawHp, rawMana, rawHeal);
 
+        // P3-3a3：只在城战开场读社交服的宗门科技。练习场 / 副本 / 竞技场 / 战场
+        // 都不走这条分支，读不到也没有这份加成；上游不可用降级为 0，不挡进场。
+        // 科技等级是社交服给的事实值，折算系数只从 config/sect_tech.json 取。
+        var techLevel = config.SectTech.IsMissing
+            ? 0
+            : Math.Clamp(sectTech.Get(charId), 0, config.SectTech.MaxLevel);
+        var techFactor = config.SectTech.Factor(techLevel);
+
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
         var send = new SemaphoreSlim(1, 1);
         var entry = new BattlefieldEntry
@@ -776,6 +803,8 @@ public sealed class BattleServer(
             // 装备全额生效：登记时的属性就是进场属性，K 从 1 开始不再改。
             AdjustedPower = rawPower,
             K = 1.0,
+            SectTechLevel = techLevel,
+            TechFactor = techFactor,
         };
 
         bool full;
@@ -793,7 +822,9 @@ public sealed class BattleServer(
 
         Console.WriteLine($"siege_join=match={matchId} team={team} character={charId}"
             + $" class={realClass.Id} level={profile.Level} enhance_total={profile.EnhanceTotal}"
-            + $" enhance_slots={profile.EnhanceSlots} power={rawPower} balance=none filled={full}");
+            + $" enhance_slots={profile.EnhanceSlots} power={rawPower} balance=none filled={full}"
+            + $" sect_tech_level={techLevel}"
+            + $" sect_tech_bonus={config.SectTech.Bonus(rawPower, techLevel)}");
 
         if (full)
         {
@@ -967,7 +998,9 @@ public sealed class BattleServer(
                     + $" power={entry.RawPower} effective_power={entry.AdjustedPower}"
                     + $" k={entry.K:0.###} balance=none"
                     + $" team_size={table.TeamSize} teams={table.Teams} players={table.Players}"
-                    + $" session={party.Encounter.SessionId}");
+                    + $" session={party.Encounter.SessionId}"
+                    + $" sect_tech_level={entry.SectTechLevel}"
+                    + $" sect_tech_bonus={config.SectTech.Bonus(entry.RawPower, entry.SectTechLevel)}");
             }
             entry.Ready.TrySetResult(!entry.Rejected);
         }

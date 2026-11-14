@@ -95,3 +95,15 @@ CREATE TABLE IF NOT EXISTS "社交".sect_upgrade (
     cost        bigint      NOT NULL,
     created_at  timestamptz NOT NULL DEFAULT now()
 );
+
+-- === P3-3a3 sect_tech.sql（同一份幂等 DDL，追加进主迁移）===
+-- 宗门科技等级事实表。方案 11.1 只写「贡献 / 建设 / 科技三条线，科技只在城战生效」，
+-- 没写定档位数与升级规则：这里只存等级，不存加成系数（系数在 config/sect_tech.json，
+-- 战斗服折算），不写商城 / 税收 / 领地字段。社交服写、战斗服经 gRPC 只读。
+-- 等级上限不写死在 SQL，由配置硬校验；a1 两表 / a2 position 列 / a3 掌门列 /
+-- a4 建设列与 sect_upgrade 结构都不动。
+CREATE TABLE IF NOT EXISTS "社交".sect_tech (
+    sect_id     bigint      PRIMARY KEY REFERENCES "社交".sect (id) ON DELETE CASCADE,
+    level       int         NOT NULL DEFAULT 0 CHECK (level >= 0),
+    updated_at  timestamptz NOT NULL DEFAULT now()
+);
