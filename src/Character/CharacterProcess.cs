@@ -42,6 +42,7 @@ public sealed class CharacterProcess(string configPath)
         RechargeTable rechargeTable;
         StoneExchangeTable stoneExchange;
         CityTable cityTable;
+        SiegeTerritoryPolicy siegeTerritoryPolicy;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -101,6 +102,10 @@ public sealed class CharacterProcess(string configPath)
             // 缺一样就起不来，不带着半截配置跑。
             stoneExchange = StoneExchangeTable.Load(config.StoneExchangeTable, currencies);
             cityTable = CityTable.Load(config.CityTable);
+            // P3-3a4：领地表与城池表是同一份正本，城池编号交叉校验，抽成比例只从这里读。
+            // 城战胜负写回时角色服不另算税率，也不接受请求里带来的税率。
+            siegeTerritoryPolicy = SiegeTerritoryPolicy.Load(
+                config.SiegeTerritoryTable, cityTable);
         }
         catch (ConfigException ex)
         {
@@ -263,6 +268,32 @@ public sealed class CharacterProcess(string configPath)
         }
 
         await using var dataSource = NpgsqlDataSource.Create(DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
+
+        // P3-3a4：config/city.json 是城池的正本，库里这一行是运行时事实。
+        // P3-2a 只建了表、没写城池行，城战写回的 UPDATE 会找不到行，所以启动时
+        // 把配置里登记的城池补进库；已存在的行（含城战写回过的 owner / tax_pct）
+        // 一律不覆盖，免得每次重启把归属改回空。只跑分表迁移的老卡环境可能还没有
+        // 这张表，那就跳过，不让启动被拖垮。
+        try
+        {
+            foreach (var city in cityTable.Cities)
+            {
+                await using var seed = dataSource.CreateCommand(
+                    "insert into \"社交\".city (city_id, name, vein_id, tax_pct) "
+                    + "values ($1, $2, $3, $4) on conflict (city_id) do nothing");
+                seed.Parameters.AddWithValue(city.CityId);
+                seed.Parameters.AddWithValue(city.Name);
+                seed.Parameters.AddWithValue(city.VeinId);
+                seed.Parameters.AddWithValue(city.TaxPct);
+                await seed.ExecuteNonQueryAsync(stopping);
+            }
+            Console.WriteLine("city_seed=ok cities=" + cityTable.Cities.Count);
+        }
+        catch (NpgsqlException ex)
+        {
+            Console.WriteLine("city_seed=skipped " + ex.GetType().Name);
+        }
+
         var characters = new CharacterRepository(dataSource);
         var inventory = new InventoryRepository(dataSource);
         var currency = new CurrencyRepository(dataSource);
@@ -299,6 +330,9 @@ public sealed class CharacterProcess(string configPath)
         // P3-2a：灵石相邻档兑换与任务发放的灵石成交，两个写入点各一笔事务。
         var stoneExchanges = new StoneExchangeRepository(dataSource, currencies, stoneExchange, config);
         var stoneAuctions = new StoneAuctionRepository(dataSource, auctionTable, stoneExchange, config);
+        // P3-3a4：城战易主的唯一写入点，一笔事务里改归属与抽成比例、抢事务号、读回提交。
+        var siegeTerritories = new SiegeTerritoryRepository(
+            dataSource, cityTable, siegeTerritoryPolicy);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -359,6 +393,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(cityTable);
         builder.Services.AddSingleton(stoneExchanges);
         builder.Services.AddSingleton(stoneAuctions);
+        builder.Services.AddSingleton(siegeTerritories);
+        builder.Services.AddSingleton(siegeTerritoryPolicy);
         builder.Services.AddSingleton(social);
         builder.Services.AddSingleton(config);
 

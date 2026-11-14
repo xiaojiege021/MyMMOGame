@@ -250,3 +250,16 @@ CREATE TABLE IF NOT EXISTS "交易".stone_settlement (
     settled_at   timestamptz NOT NULL DEFAULT now(),
     CHECK (net_gold + tax_gold = price_gold)
 );
+
+-- P3-3a4：以下 DDL 与 db/character/siege_result.sql 是同一份，整份追加进主迁移。
+-- 城战易主写回只有这一张流水表；city_tax_ledger 仍只记任务发放时的抽成流水，
+-- 城战本身不产生金币，不改那张表的 CHECK。
+CREATE TABLE IF NOT EXISTS "社交".siege_result (
+    txn_id       text        PRIMARY KEY,
+    city_id      text        NOT NULL REFERENCES "社交".city (city_id) ON DELETE CASCADE,
+    match_id     text        NOT NULL,
+    winner_team  int         NOT NULL CHECK (winner_team BETWEEN 0 AND 1),
+    winner_sect  text        NOT NULL,
+    tax_pct      int         NOT NULL CHECK (tax_pct BETWEEN 0 AND 100),
+    recorded_at  timestamptz NOT NULL DEFAULT now()
+);

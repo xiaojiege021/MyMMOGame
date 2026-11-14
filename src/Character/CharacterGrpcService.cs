@@ -54,11 +54,14 @@ public sealed class CharacterGrpcService(
     StoneExchangeTable stoneExchange,
     StoneExchangeRepository stoneExchanges,
     StoneAuctionRepository stoneAuctions,
-    CityTable cities) : CharacterService.CharacterServiceBase
+    CityTable cities,
+    SiegeTerritoryRepository siegeTerritories) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
     public CityTable Cities { get; } = cities;
+    // 领地仓储只在 ApplySiegeResult 里用，不另存一份字段（同一个 primary constructor
+    // 参数既初始化字段又被方法捕获会触发 CS9124）。
 
     public override async Task<CreateCharacterResponse> CreateCharacter(
         CreateCharacterRequest request,
@@ -2801,6 +2804,39 @@ public sealed class CharacterGrpcService(
             TaxRatePct = outcome.TaxRatePct,
             State = outcome.State,
             Duplicate = outcome.Duplicate,
+        };
+    }
+
+    /// <summary>
+    /// P3-3a4：城战结束后的领地写回。战斗服只送服务端确认过的胜方事实值，
+    /// 城池编号、抽成比例与归属变更全在角色服从配置与库里读；同一个事务号只写一次。
+    /// 这条 RPC 是服间调用，网关不转发，客户端表达不了胜方 / 宗门 / 税率。
+    /// </summary>
+    public override async Task<ApplySiegeResultResponse> ApplySiegeResult(
+        ApplySiegeResultRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        var cityId = (request.CityId ?? "").Trim();
+        var outcome = await siegeTerritories.ApplyAsync(
+            txnId, cityId, request.MatchId ?? "", request.WinnerTeam,
+            request.WinnerSect, context.CancellationToken);
+
+        logger.LogInformation(
+            "siege_result_apply city={City} match={Match} txn={Txn} winner_team={Team} "
+            + "winner_sect={Sect} ok={Ok} reason={Reason} duplicate={Duplicate} "
+            + "owner={Owner} tax_pct={TaxPct}",
+            cityId, request.MatchId, txnId, request.WinnerTeam, request.WinnerSect,
+            outcome.Ok, outcome.Reason, outcome.Duplicate, outcome.OwnerSect, outcome.TaxPct);
+
+        return new ApplySiegeResultResponse
+        {
+            Ok = outcome.Ok,
+            Reason = outcome.Reason,
+            Duplicate = outcome.Duplicate,
+            CityId = outcome.CityId,
+            OwnerSect = outcome.OwnerSect,
+            TaxPct = outcome.TaxPct,
+            TxnId = txnId,
         };
     }
 }

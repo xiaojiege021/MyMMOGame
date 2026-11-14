@@ -161,6 +161,15 @@ string? exchangeStoneTxn = null;
 long stoneExchangeStateOf = 0;
 var cityState = false;
 var stoneListingState = false;
+// P3-3a4：领地表只读、城池写回状态、以及直接走同一笔写回事务的核对入口。
+var siegeTerritoryTableState = false;
+string? siegeTerritoryTablePath = null;
+var siegeResultState = false;
+string? applySiegeResultTxn = null;
+var applySiegeResultCity = "";
+var applySiegeResultMatch = "";
+uint applySiegeResultTeam = 0;
+ulong applySiegeResultSect = 0;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -577,6 +586,25 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--city-state":
             cityState = true;
+            break;
+        // P3-3a4：领地表只读核对（不连库），与启动共用同一份 SiegeTerritoryPolicy.Load。
+        case "--siege-territory-table":
+            siegeTerritoryTableState = true;
+            break;
+        case "--siege-territory-table-path" when i + 1 < args.Length:
+            siegeTerritoryTableState = true;
+            siegeTerritoryTablePath = args[++i];
+            break;
+        case "--siege-result-state":
+            siegeResultState = true;
+            break;
+        // 核对用：直接调同一笔写回事务，验重放幂等与各类拒绝，不必每次都打一场城战。
+        case "--apply-siege-result" when i + 5 < args.Length:
+            applySiegeResultTxn = args[++i];
+            applySiegeResultCity = args[++i];
+            applySiegeResultMatch = args[++i];
+            uint.TryParse(args[++i], out applySiegeResultTeam);
+            ulong.TryParse(args[++i], out applySiegeResultSect);
             break;
         case "--stone-listing-state":
             stoneListingState = true;
@@ -1200,6 +1228,38 @@ if (cityTableState)
     return 0;
 }
 
+// P3-3a4 领地表只读核对：不连库、不启动进程，与启动共用 SiegeTerritoryPolicy.Load。
+// 坏配置（税率越界、城池编号对不上 city.json、配置里预写归属）在这一步就能看出来。
+if (siegeTerritoryTableState)
+{
+    try
+    {
+        var cfg = CharacterConfig.Load(configPath);
+        var cityTable = CityTable.Load(cfg.CityTable);
+        var policy = SiegeTerritoryPolicy.Load(
+            siegeTerritoryTablePath ?? cfg.SiegeTerritoryTable, cityTable);
+        Console.WriteLine("siege_territory_table_state=ok version=" + policy.Version
+            + " pending=" + (policy.Pending ? "true" : "false"));
+        foreach (var city in cityTable.Cities)
+        {
+            Console.WriteLine("siege_territory_city=city=" + city.CityId
+                + " tax_pct=" + policy.TaxPctOf(city.CityId));
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || branchStateOf != 0 || advanceBranchId != 0 || canEquipOf != 0
@@ -1218,7 +1278,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || rechargeStateOf != null || realmStateOf != 0 || rawRealmId != 0
     || rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
     || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0
-    || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || stoneListingState)
+    || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || stoneListingState
+    || siegeResultState || applySiegeResultTxn != null)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -2271,6 +2332,66 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " auction_tax_rows=" + auctionTaxRows
                 + " auction_tax_sum=" + auctionTaxSum
                 + " stone_listing_rows=" + stoneListingRows);
+        }
+
+        // P3-3a4：与真实服务共用同一个 Repository，验重放幂等与各类拒绝路径，
+        // 不必每验一次都打一场城战。事务号、宗门与队伍都由核对脚本给，
+        // 与生产链路走的是同一笔事务，不是另一套写入。
+        if (applySiegeResultTxn != null)
+        {
+            var cfg = CharacterConfig.Load(configPath);
+            var cityTable = CityTable.Load(cfg.CityTable);
+            var policy = SiegeTerritoryPolicy.Load(cfg.SiegeTerritoryTable, cityTable);
+            var repo = new SiegeTerritoryRepository(dataSource, cityTable, policy);
+            var outcome = await repo.ApplyAsync(
+                applySiegeResultTxn, applySiegeResultCity, applySiegeResultMatch,
+                applySiegeResultTeam, applySiegeResultSect, CancellationToken.None);
+            Console.WriteLine("siege_result_apply=txn=" + applySiegeResultTxn
+                + " city=" + outcome.CityId
+                + " ok=" + (outcome.Ok ? "true" : "false")
+                + " reason=" + outcome.Reason
+                + " duplicate=" + (outcome.Duplicate ? "true" : "false")
+                + " owner=" + outcome.OwnerSect
+                + " tax_pct=" + outcome.TaxPct);
+        }
+
+        // P3-3a4：写回之后从库里独立读回城池事实值，不看回包。
+        if (siegeResultState)
+        {
+            long rows;
+            await using (var read = dataSource.CreateCommand(
+                "select count(*) from \"社交\".siege_result"))
+            {
+                rows = Convert.ToInt64(await read.ExecuteScalarAsync(CancellationToken.None));
+            }
+            Console.WriteLine("siege_result_rows=" + rows);
+
+            await using (var read = dataSource.CreateCommand(
+                "select city_id, coalesce(owner_sect, ''), tax_pct from \"社交\".city order by city_id"))
+            {
+                await using var reader = await read.ExecuteReaderAsync(CancellationToken.None);
+                while (await reader.ReadAsync(CancellationToken.None))
+                {
+                    Console.WriteLine("siege_result_city=city=" + reader.GetString(0)
+                        + " owner=" + reader.GetString(1)
+                        + " tax_pct=" + reader.GetInt32(2));
+                }
+            }
+
+            await using (var read = dataSource.CreateCommand(
+                "select txn_id, match_id, winner_team, winner_sect, tax_pct "
+                + "from \"社交\".siege_result order by recorded_at desc, txn_id desc limit 1"))
+            {
+                await using var reader = await read.ExecuteReaderAsync(CancellationToken.None);
+                if (await reader.ReadAsync(CancellationToken.None))
+                {
+                    Console.WriteLine("siege_result_last=txn=" + reader.GetString(0)
+                        + " match=" + reader.GetString(1)
+                        + " winner_team=" + reader.GetInt32(2)
+                        + " winner_sect=" + reader.GetString(3)
+                        + " tax_pct=" + reader.GetInt32(4));
+                }
+            }
         }
 
         // P3-2a：给核对脚本看「兑换不经过拍卖」——兑换前后挂单数不变。

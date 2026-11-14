@@ -12,7 +12,7 @@ public sealed record CharacterConfig(
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
     string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
     string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable,
-    string StoneExchangeTable, string CityTable)
+    string StoneExchangeTable, string CityTable, string SiegeTerritoryTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -31,6 +31,8 @@ public sealed record CharacterConfig(
     // P3-2a：灵石五档兑换表与城池表，缺省读仓库那两份；核对脚本可以指到临时表试坏配置。
     public const string DefaultStoneExchangeTable = "config/stone_exchange.json";
     public const string DefaultCityTable = "config/city.json";
+    // P3-3a4：城战易主后的抽成比例与城池编号，缺省读仓库那一份；核对脚本可以指到临时表。
+    public const string DefaultSiegeTerritoryTable = "config/siege_territory.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -193,11 +195,20 @@ public sealed record CharacterConfig(
             throw new ConfigException("city_table 不能为空");
         }
 
+        // P3-3a4：领地表与城池表是同一份正本，抽成比例只从这里读，请求里带不进来。
+        var siegeTerritoryTable =
+            (wire.SiegeTerritoryTable ?? DefaultSiegeTerritoryTable).Trim();
+        if (siegeTerritoryTable.Length == 0)
+        {
+            throw new ConfigException("siege_territory_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
-            socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable);
+            socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
+            siegeTerritoryTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -264,6 +275,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("city_table")]
         public string? CityTable { get; init; }
+
+        [JsonPropertyName("siege_territory_table")]
+        public string? SiegeTerritoryTable { get; init; }
     }
 }
 

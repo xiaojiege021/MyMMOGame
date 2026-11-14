@@ -243,77 +243,86 @@ namespace Mmo.Proto.Character {
             "ASgDEhIKCmJ1eWVyX2dvbGQYCSABKAMSEwoLc2VsbGVyX2dvbGQYCiABKAMS",
             "EwoLYnV5ZXJfc3RvbmUYCyABKAMSFAoMc2VsbGVyX3N0b25lGAwgASgDEhQK",
             "DHRheF9yYXRlX3BjdBgNIAEoBRINCgVzdGF0ZRgOIAEoCRIRCglkdXBsaWNh",
-            "dGUYDyABKAgqWwoMVGFsaXNtYW5Qb29sEh0KGVRBTElTTUFOX1BPT0xfVU5T",
-            "UEVDSUZJRUQQABIUChBUQUxJU01BTl9QT09MX0hQEAESFgoSVEFMSVNNQU5f",
-            "UE9PTF9NQU5BEAIy7BcKEENoYXJhY3RlclNlcnZpY2USYAoPQ3JlYXRlQ2hh",
-            "cmFjdGVyEiUubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXF1ZXN0",
-            "GiYubW1vLmNoYXJhY3Rlci5DcmVhdGVDaGFyYWN0ZXJSZXNwb25zZRJLCghT",
-            "ZXRMZXZlbBIeLm1tby5jaGFyYWN0ZXIuU2V0TGV2ZWxSZXF1ZXN0Gh8ubW1v",
-            "LmNoYXJhY3Rlci5TZXRMZXZlbFJlc3BvbnNlEkYKB0FkZEl0ZW0SHS5tbW8u",
-            "Y2hhcmFjdGVyLkFkZEl0ZW1SZXF1ZXN0GhwubW1vLmNoYXJhY3Rlci5JbnZl",
-            "bnRvcnlTbG90EloKDUxpc3RJbnZlbnRvcnkSIy5tbW8uY2hhcmFjdGVyLkxp",
-            "c3RJbnZlbnRvcnlSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5MaXN0SW52ZW50",
-            "b3J5UmVzcG9uc2USSwoIQ2FuVHJhZGUSHi5tbW8uY2hhcmFjdGVyLkNhblRy",
-            "YWRlUmVxdWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuVHJhZGVSZXNwb25zZRJQ",
-            "CgtBZGRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuQWRkQ3VycmVuY3lSZXF1",
-            "ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DdXJyZW5jeUJhbGFuY2USVAoLR2V0Q3Vy",
-            "cmVuY3kSIS5tbW8uY2hhcmFjdGVyLkdldEN1cnJlbmN5UmVxdWVzdBoiLm1t",
-            "by5jaGFyYWN0ZXIuR2V0Q3VycmVuY3lSZXNwb25zZRJRCgpBcHBseUdyYW50",
-            "EiAubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVxdWVzdBohLm1tby5jaGFy",
-            "YWN0ZXIuQXBwbHlHcmFudFJlc3BvbnNlElcKDEVudGVyRHVuZ2VvbhIiLm1t",
-            "by5jaGFyYWN0ZXIuRW50ZXJEdW5nZW9uUmVxdWVzdBojLm1tby5jaGFyYWN0",
-            "ZXIuRW50ZXJEdW5nZW9uUmVzcG9uc2USVwoMVXNlSG90U3ByaW5nEiIubW1v",
-            "LmNoYXJhY3Rlci5Vc2VIb3RTcHJpbmdSZXF1ZXN0GiMubW1vLmNoYXJhY3Rl",
-            "ci5Vc2VIb3RTcHJpbmdSZXNwb25zZRJOCglTZXR0bGVFeHASHy5tbW8uY2hh",
-            "cmFjdGVyLlNldHRsZUV4cFJlcXVlc3QaIC5tbW8uY2hhcmFjdGVyLlNldHRs",
-            "ZUV4cFJlc3BvbnNlEkgKB0VuaGFuY2USHS5tbW8uY2hhcmFjdGVyLkVuaGFu",
-            "Y2VSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5FbmhhbmNlUmVzcG9uc2USYAoP",
-            "VHJhbnNmZXJFbmhhbmNlEiUubW1vLmNoYXJhY3Rlci5UcmFuc2ZlckVuaGFu",
-            "Y2VSZXF1ZXN0GiYubW1vLmNoYXJhY3Rlci5UcmFuc2ZlckVuaGFuY2VSZXNw",
-            "b25zZRJWCg5JbnN0YWxsQ3J5c3RhbBIkLm1tby5jaGFyYWN0ZXIuSW5zdGFs",
-            "bENyeXN0YWxSZXF1ZXN0Gh4ubW1vLmNoYXJhY3Rlci5DcnlzdGFsUmVzcG9u",
-            "c2USVAoNUmVtb3ZlQ3J5c3RhbBIjLm1tby5jaGFyYWN0ZXIuUmVtb3ZlQ3J5",
-            "c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkNyeXN0YWxSZXNwb25zZRJa",
-            "Cg1TZXR0bGVBdWN0aW9uEiMubW1vLmNoYXJhY3Rlci5BdWN0aW9uU2V0dGxl",
-            "UmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuQXVjdGlvblNldHRsZVJlc3BvbnNl",
-            "EmIKC1NldHRsZUluZ290EigubW1vLmNoYXJhY3Rlci5BdWN0aW9uSW5nb3RT",
-            "ZXR0bGVSZXF1ZXN0GikubW1vLmNoYXJhY3Rlci5BdWN0aW9uSW5nb3RTZXR0",
-            "bGVSZXNwb25zZRJUCgtCdXlTaG9wSXRlbRIhLm1tby5jaGFyYWN0ZXIuQnV5",
-            "U2hvcEl0ZW1SZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5CdXlTaG9wSXRlbVJl",
-            "c3BvbnNlEmAKD0NvbnN1bWVUYWxpc21hbhIlLm1tby5jaGFyYWN0ZXIuQ29u",
-            "c3VtZVRhbGlzbWFuUmVxdWVzdBomLm1tby5jaGFyYWN0ZXIuQ29uc3VtZVRh",
-            "bGlzbWFuUmVzcG9uc2USYwoQRGVzY3JpYmVUYWxpc21hbhImLm1tby5jaGFy",
-            "YWN0ZXIuRGVzY3JpYmVUYWxpc21hblJlcXVlc3QaJy5tbW8uY2hhcmFjdGVy",
-            "LkRlc2NyaWJlVGFsaXNtYW5SZXNwb25zZRJvChREZXNjcmliZVJldml2ZVNj",
-            "cm9sbBIqLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVSZXZpdmVTY3JvbGxSZXF1",
-            "ZXN0GisubW1vLmNoYXJhY3Rlci5EZXNjcmliZVJldml2ZVNjcm9sbFJlc3Bv",
-            "bnNlEmwKE0NvbnN1bWVSZXZpdmVTY3JvbGwSKS5tbW8uY2hhcmFjdGVyLkNv",
-            "bnN1bWVSZXZpdmVTY3JvbGxSZXF1ZXN0GioubW1vLmNoYXJhY3Rlci5Db25z",
-            "dW1lUmV2aXZlU2Nyb2xsUmVzcG9uc2USWgoNVXNlRXhwQm9vc3RlchIjLm1t",
-            "by5jaGFyYWN0ZXIuVXNlRXhwQm9vc3RlclJlcXVlc3QaJC5tbW8uY2hhcmFj",
-            "dGVyLlVzZUV4cEJvb3N0ZXJSZXNwb25zZRJaCg1Vc2VVbmJpbmRJdGVtEiMu",
-            "bW1vLmNoYXJhY3Rlci5Vc2VVbmJpbmRJdGVtUmVxdWVzdBokLm1tby5jaGFy",
-            "YWN0ZXIuVXNlVW5iaW5kSXRlbVJlc3BvbnNlEmwKE0NyZWF0ZVJlY2hhcmdl",
-            "T3JkZXISKS5tbW8uY2hhcmFjdGVyLkNyZWF0ZVJlY2hhcmdlT3JkZXJSZXF1",
-            "ZXN0GioubW1vLmNoYXJhY3Rlci5DcmVhdGVSZWNoYXJnZU9yZGVyUmVzcG9u",
-            "c2USbAoTU2V0dGxlUmVjaGFyZ2VPcmRlchIpLm1tby5jaGFyYWN0ZXIuU2V0",
-            "dGxlUmVjaGFyZ2VPcmRlclJlcXVlc3QaKi5tbW8uY2hhcmFjdGVyLlNldHRs",
-            "ZVJlY2hhcmdlT3JkZXJSZXNwb25zZRJyChVEZXNjcmliZUJhdHRsZVByb2Zp",
-            "bGUSKy5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlQmF0dGxlUHJvZmlsZVJlcXVl",
-            "c3QaLC5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlQmF0dGxlUHJvZmlsZVJlc3Bv",
-            "bnNlEloKDUFkdmFuY2VCcmFuY2gSIy5tbW8uY2hhcmFjdGVyLkFkdmFuY2VC",
-            "cmFuY2hSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5BZHZhbmNlQnJhbmNoUmVz",
-            "cG9uc2USSwoIQ2FuRXF1aXASHi5tbW8uY2hhcmFjdGVyLkNhbkVxdWlwUmVx",
-            "dWVzdBofLm1tby5jaGFyYWN0ZXIuQ2FuRXF1aXBSZXNwb25zZRJXCgxBZHZh",
-            "bmNlUmVhbG0SIi5tbW8uY2hhcmFjdGVyLkFkdmFuY2VSZWFsbVJlcXVlc3Qa",
-            "Iy5tbW8uY2hhcmFjdGVyLkFkdmFuY2VSZWFsbVJlc3BvbnNlElQKC1NldHRs",
-            "ZURyaWxsEiEubW1vLmNoYXJhY3Rlci5TZXR0bGVEcmlsbFJlcXVlc3QaIi5t",
-            "bW8uY2hhcmFjdGVyLlNldHRsZURyaWxsUmVzcG9uc2USWgoNRXhjaGFuZ2VT",
-            "dG9uZRIjLm1tby5jaGFyYWN0ZXIuRXhjaGFuZ2VTdG9uZVJlcXVlc3QaJC5t",
-            "bW8uY2hhcmFjdGVyLkV4Y2hhbmdlU3RvbmVSZXNwb25zZRJpChJTZXR0bGVT",
-            "dG9uZUF1Y3Rpb24SKC5tbW8uY2hhcmFjdGVyLlN0b25lQXVjdGlvblNldHRs",
-            "ZVJlcXVlc3QaKS5tbW8uY2hhcmFjdGVyLlN0b25lQXVjdGlvblNldHRsZVJl",
-            "c3BvbnNlQhaqAhNNbW8uUHJvdG8uQ2hhcmFjdGVyYgZwcm90bzM="));
+            "dGUYDyABKAgihwEKF0FwcGx5U2llZ2VSZXN1bHRSZXF1ZXN0Eg8KB2FjY291",
+            "bnQYASABKAkSDgoGdHhuX2lkGAIgASgJEg8KB2NpdHlfaWQYAyABKAkSEAoI",
+            "bWF0Y2hfaWQYBCABKAkSEwoLd2lubmVyX3RlYW0YBSABKA0SEwoLd2lubmVy",
+            "X3NlY3QYBiABKAQijwEKGEFwcGx5U2llZ2VSZXN1bHRSZXNwb25zZRIKCgJv",
+            "axgBIAEoCBIOCgZyZWFzb24YAiABKAkSEQoJZHVwbGljYXRlGAMgASgIEg8K",
+            "B2NpdHlfaWQYBCABKAkSEgoKb3duZXJfc2VjdBgFIAEoCRIPCgd0YXhfcGN0",
+            "GAYgASgFEg4KBnR4bl9pZBgHIAEoCSpbCgxUYWxpc21hblBvb2wSHQoZVEFM",
+            "SVNNQU5fUE9PTF9VTlNQRUNJRklFRBAAEhQKEFRBTElTTUFOX1BPT0xfSFAQ",
+            "ARIWChJUQUxJU01BTl9QT09MX01BTkEQAjLRGAoQQ2hhcmFjdGVyU2Vydmlj",
+            "ZRJgCg9DcmVhdGVDaGFyYWN0ZXISJS5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNo",
+            "YXJhY3RlclJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLkNyZWF0ZUNoYXJhY3Rl",
+            "clJlc3BvbnNlEksKCFNldExldmVsEh4ubW1vLmNoYXJhY3Rlci5TZXRMZXZl",
+            "bFJlcXVlc3QaHy5tbW8uY2hhcmFjdGVyLlNldExldmVsUmVzcG9uc2USRgoH",
+            "QWRkSXRlbRIdLm1tby5jaGFyYWN0ZXIuQWRkSXRlbVJlcXVlc3QaHC5tbW8u",
+            "Y2hhcmFjdGVyLkludmVudG9yeVNsb3QSWgoNTGlzdEludmVudG9yeRIjLm1t",
+            "by5jaGFyYWN0ZXIuTGlzdEludmVudG9yeVJlcXVlc3QaJC5tbW8uY2hhcmFj",
+            "dGVyLkxpc3RJbnZlbnRvcnlSZXNwb25zZRJLCghDYW5UcmFkZRIeLm1tby5j",
+            "aGFyYWN0ZXIuQ2FuVHJhZGVSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5U",
+            "cmFkZVJlc3BvbnNlElAKC0FkZEN1cnJlbmN5EiEubW1vLmNoYXJhY3Rlci5B",
+            "ZGRDdXJyZW5jeVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkN1cnJlbmN5QmFs",
+            "YW5jZRJUCgtHZXRDdXJyZW5jeRIhLm1tby5jaGFyYWN0ZXIuR2V0Q3VycmVu",
+            "Y3lSZXF1ZXN0GiIubW1vLmNoYXJhY3Rlci5HZXRDdXJyZW5jeVJlc3BvbnNl",
+            "ElEKCkFwcGx5R3JhbnQSIC5tbW8uY2hhcmFjdGVyLkFwcGx5R3JhbnRSZXF1",
+            "ZXN0GiEubW1vLmNoYXJhY3Rlci5BcHBseUdyYW50UmVzcG9uc2USVwoMRW50",
+            "ZXJEdW5nZW9uEiIubW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXF1ZXN0",
+            "GiMubW1vLmNoYXJhY3Rlci5FbnRlckR1bmdlb25SZXNwb25zZRJXCgxVc2VI",
+            "b3RTcHJpbmcSIi5tbW8uY2hhcmFjdGVyLlVzZUhvdFNwcmluZ1JlcXVlc3Qa",
+            "Iy5tbW8uY2hhcmFjdGVyLlVzZUhvdFNwcmluZ1Jlc3BvbnNlEk4KCVNldHRs",
+            "ZUV4cBIfLm1tby5jaGFyYWN0ZXIuU2V0dGxlRXhwUmVxdWVzdBogLm1tby5j",
+            "aGFyYWN0ZXIuU2V0dGxlRXhwUmVzcG9uc2USSAoHRW5oYW5jZRIdLm1tby5j",
+            "aGFyYWN0ZXIuRW5oYW5jZVJlcXVlc3QaHi5tbW8uY2hhcmFjdGVyLkVuaGFu",
+            "Y2VSZXNwb25zZRJgCg9UcmFuc2ZlckVuaGFuY2USJS5tbW8uY2hhcmFjdGVy",
+            "LlRyYW5zZmVyRW5oYW5jZVJlcXVlc3QaJi5tbW8uY2hhcmFjdGVyLlRyYW5z",
+            "ZmVyRW5oYW5jZVJlc3BvbnNlElYKDkluc3RhbGxDcnlzdGFsEiQubW1vLmNo",
+            "YXJhY3Rlci5JbnN0YWxsQ3J5c3RhbFJlcXVlc3QaHi5tbW8uY2hhcmFjdGVy",
+            "LkNyeXN0YWxSZXNwb25zZRJUCg1SZW1vdmVDcnlzdGFsEiMubW1vLmNoYXJh",
+            "Y3Rlci5SZW1vdmVDcnlzdGFsUmVxdWVzdBoeLm1tby5jaGFyYWN0ZXIuQ3J5",
+            "c3RhbFJlc3BvbnNlEloKDVNldHRsZUF1Y3Rpb24SIy5tbW8uY2hhcmFjdGVy",
+            "LkF1Y3Rpb25TZXR0bGVSZXF1ZXN0GiQubW1vLmNoYXJhY3Rlci5BdWN0aW9u",
+            "U2V0dGxlUmVzcG9uc2USYgoLU2V0dGxlSW5nb3QSKC5tbW8uY2hhcmFjdGVy",
+            "LkF1Y3Rpb25JbmdvdFNldHRsZVJlcXVlc3QaKS5tbW8uY2hhcmFjdGVyLkF1",
+            "Y3Rpb25JbmdvdFNldHRsZVJlc3BvbnNlElQKC0J1eVNob3BJdGVtEiEubW1v",
+            "LmNoYXJhY3Rlci5CdXlTaG9wSXRlbVJlcXVlc3QaIi5tbW8uY2hhcmFjdGVy",
+            "LkJ1eVNob3BJdGVtUmVzcG9uc2USYAoPQ29uc3VtZVRhbGlzbWFuEiUubW1v",
+            "LmNoYXJhY3Rlci5Db25zdW1lVGFsaXNtYW5SZXF1ZXN0GiYubW1vLmNoYXJh",
+            "Y3Rlci5Db25zdW1lVGFsaXNtYW5SZXNwb25zZRJjChBEZXNjcmliZVRhbGlz",
+            "bWFuEiYubW1vLmNoYXJhY3Rlci5EZXNjcmliZVRhbGlzbWFuUmVxdWVzdBon",
+            "Lm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVUYWxpc21hblJlc3BvbnNlEm8KFERl",
+            "c2NyaWJlUmV2aXZlU2Nyb2xsEioubW1vLmNoYXJhY3Rlci5EZXNjcmliZVJl",
+            "dml2ZVNjcm9sbFJlcXVlc3QaKy5tbW8uY2hhcmFjdGVyLkRlc2NyaWJlUmV2",
+            "aXZlU2Nyb2xsUmVzcG9uc2USbAoTQ29uc3VtZVJldml2ZVNjcm9sbBIpLm1t",
+            "by5jaGFyYWN0ZXIuQ29uc3VtZVJldml2ZVNjcm9sbFJlcXVlc3QaKi5tbW8u",
+            "Y2hhcmFjdGVyLkNvbnN1bWVSZXZpdmVTY3JvbGxSZXNwb25zZRJaCg1Vc2VF",
+            "eHBCb29zdGVyEiMubW1vLmNoYXJhY3Rlci5Vc2VFeHBCb29zdGVyUmVxdWVz",
+            "dBokLm1tby5jaGFyYWN0ZXIuVXNlRXhwQm9vc3RlclJlc3BvbnNlEloKDVVz",
+            "ZVVuYmluZEl0ZW0SIy5tbW8uY2hhcmFjdGVyLlVzZVVuYmluZEl0ZW1SZXF1",
+            "ZXN0GiQubW1vLmNoYXJhY3Rlci5Vc2VVbmJpbmRJdGVtUmVzcG9uc2USbAoT",
+            "Q3JlYXRlUmVjaGFyZ2VPcmRlchIpLm1tby5jaGFyYWN0ZXIuQ3JlYXRlUmVj",
+            "aGFyZ2VPcmRlclJlcXVlc3QaKi5tbW8uY2hhcmFjdGVyLkNyZWF0ZVJlY2hh",
+            "cmdlT3JkZXJSZXNwb25zZRJsChNTZXR0bGVSZWNoYXJnZU9yZGVyEikubW1v",
+            "LmNoYXJhY3Rlci5TZXR0bGVSZWNoYXJnZU9yZGVyUmVxdWVzdBoqLm1tby5j",
+            "aGFyYWN0ZXIuU2V0dGxlUmVjaGFyZ2VPcmRlclJlc3BvbnNlEnIKFURlc2Ny",
+            "aWJlQmF0dGxlUHJvZmlsZRIrLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVCYXR0",
+            "bGVQcm9maWxlUmVxdWVzdBosLm1tby5jaGFyYWN0ZXIuRGVzY3JpYmVCYXR0",
+            "bGVQcm9maWxlUmVzcG9uc2USWgoNQWR2YW5jZUJyYW5jaBIjLm1tby5jaGFy",
+            "YWN0ZXIuQWR2YW5jZUJyYW5jaFJlcXVlc3QaJC5tbW8uY2hhcmFjdGVyLkFk",
+            "dmFuY2VCcmFuY2hSZXNwb25zZRJLCghDYW5FcXVpcBIeLm1tby5jaGFyYWN0",
+            "ZXIuQ2FuRXF1aXBSZXF1ZXN0Gh8ubW1vLmNoYXJhY3Rlci5DYW5FcXVpcFJl",
+            "c3BvbnNlElcKDEFkdmFuY2VSZWFsbRIiLm1tby5jaGFyYWN0ZXIuQWR2YW5j",
+            "ZVJlYWxtUmVxdWVzdBojLm1tby5jaGFyYWN0ZXIuQWR2YW5jZVJlYWxtUmVz",
+            "cG9uc2USVAoLU2V0dGxlRHJpbGwSIS5tbW8uY2hhcmFjdGVyLlNldHRsZURy",
+            "aWxsUmVxdWVzdBoiLm1tby5jaGFyYWN0ZXIuU2V0dGxlRHJpbGxSZXNwb25z",
+            "ZRJaCg1FeGNoYW5nZVN0b25lEiMubW1vLmNoYXJhY3Rlci5FeGNoYW5nZVN0",
+            "b25lUmVxdWVzdBokLm1tby5jaGFyYWN0ZXIuRXhjaGFuZ2VTdG9uZVJlc3Bv",
+            "bnNlEmkKElNldHRsZVN0b25lQXVjdGlvbhIoLm1tby5jaGFyYWN0ZXIuU3Rv",
+            "bmVBdWN0aW9uU2V0dGxlUmVxdWVzdBopLm1tby5jaGFyYWN0ZXIuU3RvbmVB",
+            "dWN0aW9uU2V0dGxlUmVzcG9uc2USYwoQQXBwbHlTaWVnZVJlc3VsdBImLm1t",
+            "by5jaGFyYWN0ZXIuQXBwbHlTaWVnZVJlc3VsdFJlcXVlc3QaJy5tbW8uY2hh",
+            "cmFjdGVyLkFwcGx5U2llZ2VSZXN1bHRSZXNwb25zZUIWqgITTW1vLlByb3Rv",
+            "LkNoYXJhY3RlcmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Character.TalismanPool), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -384,7 +393,9 @@ namespace Mmo.Proto.Character {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ExchangeStoneRequest), global::Mmo.Proto.Character.ExchangeStoneRequest.Parser, new[]{ "Account", "CharacterId", "FromKind", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ExchangeStoneResponse), global::Mmo.Proto.Character.ExchangeStoneResponse.Parser, new[]{ "Ok", "Reason", "FromKind", "ToKind", "FromCost", "ToGain", "FromAmount", "ToAmount", "Ratio", "HighestName", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.StoneAuctionSettleRequest), global::Mmo.Proto.Character.StoneAuctionSettleRequest.Parser, new[]{ "Account", "CharacterId", "ListingId", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.StoneAuctionSettleResponse), global::Mmo.Proto.Character.StoneAuctionSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "StoneKind", "StoneAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerStone", "SellerStone", "TaxRatePct", "State", "Duplicate" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.StoneAuctionSettleResponse), global::Mmo.Proto.Character.StoneAuctionSettleResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "StoneKind", "StoneAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerStone", "SellerStone", "TaxRatePct", "State", "Duplicate" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ApplySiegeResultRequest), global::Mmo.Proto.Character.ApplySiegeResultRequest.Parser, new[]{ "Account", "TxnId", "CityId", "MatchId", "WinnerTeam", "WinnerSect" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Character.ApplySiegeResultResponse), global::Mmo.Proto.Character.ApplySiegeResultResponse.Parser, new[]{ "Ok", "Reason", "Duplicate", "CityId", "OwnerSect", "TaxPct", "TxnId" }, null, null, null, null)
           }));
     }
     #endregion
@@ -27759,6 +27770,840 @@ namespace Mmo.Proto.Character {
           }
           case 120: {
             Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// P3-3a4：城战胜负写回。方案 11 章「阵营 · 领地（全服）：地块税收、灵石矿脉」，
+  /// 9.5 / 12 章「掌管方按城池税收抽成，比例走配置」。开发架构第 66 行只要求把胜负
+  /// 写回城池税收和矿脉归属：这里写的是「社交」.city 的 owner_sect（谁掌管矿脉）与
+  /// tax_pct（掌管方抽成比例），不是发奖，也不往 city_tax_ledger 造一笔金币税——
+  /// 城战易主本身不产生金币，账本记的是任务发放时的抽成流水。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ApplySiegeResultRequest : pb::IMessage<ApplySiegeResultRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ApplySiegeResultRequest> _parser = new pb::MessageParser<ApplySiegeResultRequest>(() => new ApplySiegeResultRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ApplySiegeResultRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[68]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ApplySiegeResultRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ApplySiegeResultRequest(ApplySiegeResultRequest other) : this() {
+      account_ = other.account_;
+      txnId_ = other.txnId_;
+      cityId_ = other.cityId_;
+      matchId_ = other.matchId_;
+      winnerTeam_ = other.winnerTeam_;
+      winnerSect_ = other.winnerSect_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ApplySiegeResultRequest Clone() {
+      return new ApplySiegeResultRequest(this);
+    }
+
+    /// <summary>Field number for the "account" field.</summary>
+    public const int AccountFieldNumber = 1;
+    private string account_ = "";
+    /// <summary>
+    /// 服间可信调用；战斗服直连时为空，网关不转发这条。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Account {
+      get { return account_; }
+      set {
+        account_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 2;
+    private string txnId_ = "";
+    /// <summary>
+    /// 幂等号：一场城战一个号，同一号重放只回 duplicate，不写第二次。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "city_id" field.</summary>
+    public const int CityIdFieldNumber = 3;
+    private string cityId_ = "";
+    /// <summary>
+    /// 由战斗服的领地表按 match 前缀给出，客户端表达不了「我要改哪座城」。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string CityId {
+      get { return cityId_; }
+      set {
+        cityId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "match_id" field.</summary>
+    public const int MatchIdFieldNumber = 4;
+    private string matchId_ = "";
+    /// <summary>
+    /// 只记账，不参与判定。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string MatchId {
+      get { return matchId_; }
+      set {
+        matchId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "winner_team" field.</summary>
+    public const int WinnerTeamFieldNumber = 5;
+    private uint winnerTeam_;
+    /// <summary>
+    /// 战斗服按本场各队累计有效伤害判出的胜方队伍（服务端事实值）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint WinnerTeam {
+      get { return winnerTeam_; }
+      set {
+        winnerTeam_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "winner_sect" field.</summary>
+    public const int WinnerSectFieldNumber = 6;
+    private ulong winnerSect_;
+    /// <summary>
+    /// 社交服只读给回的胜方宗门编号；0 表示没宗门，角色服一律拒绝写回。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong WinnerSect {
+      get { return winnerSect_; }
+      set {
+        winnerSect_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ApplySiegeResultRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ApplySiegeResultRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Account != other.Account) return false;
+      if (TxnId != other.TxnId) return false;
+      if (CityId != other.CityId) return false;
+      if (MatchId != other.MatchId) return false;
+      if (WinnerTeam != other.WinnerTeam) return false;
+      if (WinnerSect != other.WinnerSect) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Account.Length != 0) hash ^= Account.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (CityId.Length != 0) hash ^= CityId.GetHashCode();
+      if (MatchId.Length != 0) hash ^= MatchId.GetHashCode();
+      if (WinnerTeam != 0) hash ^= WinnerTeam.GetHashCode();
+      if (WinnerSect != 0UL) hash ^= WinnerSect.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(TxnId);
+      }
+      if (CityId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(CityId);
+      }
+      if (MatchId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(MatchId);
+      }
+      if (WinnerTeam != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(WinnerTeam);
+      }
+      if (WinnerSect != 0UL) {
+        output.WriteRawTag(48);
+        output.WriteUInt64(WinnerSect);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Account.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Account);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(TxnId);
+      }
+      if (CityId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(CityId);
+      }
+      if (MatchId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(MatchId);
+      }
+      if (WinnerTeam != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(WinnerTeam);
+      }
+      if (WinnerSect != 0UL) {
+        output.WriteRawTag(48);
+        output.WriteUInt64(WinnerSect);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Account.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Account);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (CityId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(CityId);
+      }
+      if (MatchId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(MatchId);
+      }
+      if (WinnerTeam != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WinnerTeam);
+      }
+      if (WinnerSect != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(WinnerSect);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ApplySiegeResultRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Account.Length != 0) {
+        Account = other.Account;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      if (other.CityId.Length != 0) {
+        CityId = other.CityId;
+      }
+      if (other.MatchId.Length != 0) {
+        MatchId = other.MatchId;
+      }
+      if (other.WinnerTeam != 0) {
+        WinnerTeam = other.WinnerTeam;
+      }
+      if (other.WinnerSect != 0UL) {
+        WinnerSect = other.WinnerSect;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 18: {
+            TxnId = input.ReadString();
+            break;
+          }
+          case 26: {
+            CityId = input.ReadString();
+            break;
+          }
+          case 34: {
+            MatchId = input.ReadString();
+            break;
+          }
+          case 40: {
+            WinnerTeam = input.ReadUInt32();
+            break;
+          }
+          case 48: {
+            WinnerSect = input.ReadUInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Account = input.ReadString();
+            break;
+          }
+          case 18: {
+            TxnId = input.ReadString();
+            break;
+          }
+          case 26: {
+            CityId = input.ReadString();
+            break;
+          }
+          case 34: {
+            MatchId = input.ReadString();
+            break;
+          }
+          case 40: {
+            WinnerTeam = input.ReadUInt32();
+            break;
+          }
+          case 48: {
+            WinnerSect = input.ReadUInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ApplySiegeResultResponse : pb::IMessage<ApplySiegeResultResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ApplySiegeResultResponse> _parser = new pb::MessageParser<ApplySiegeResultResponse>(() => new ApplySiegeResultResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ApplySiegeResultResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Character.CharacterReflection.Descriptor.MessageTypes[69]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ApplySiegeResultResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ApplySiegeResultResponse(ApplySiegeResultResponse other) : this() {
+      ok_ = other.ok_;
+      reason_ = other.reason_;
+      duplicate_ = other.duplicate_;
+      cityId_ = other.cityId_;
+      ownerSect_ = other.ownerSect_;
+      taxPct_ = other.taxPct_;
+      txnId_ = other.txnId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ApplySiegeResultResponse Clone() {
+      return new ApplySiegeResultResponse(this);
+    }
+
+    /// <summary>Field number for the "ok" field.</summary>
+    public const int OkFieldNumber = 1;
+    private bool ok_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Ok {
+      get { return ok_; }
+      set {
+        ok_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "reason" field.</summary>
+    public const int ReasonFieldNumber = 2;
+    private string reason_ = "";
+    /// <summary>
+    /// request_missing / unknown_city / winner_sect_missing / duplicate / 空串表示写回成功。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Reason {
+      get { return reason_; }
+      set {
+        reason_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "duplicate" field.</summary>
+    public const int DuplicateFieldNumber = 3;
+    private bool duplicate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Duplicate {
+      get { return duplicate_; }
+      set {
+        duplicate_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "city_id" field.</summary>
+    public const int CityIdFieldNumber = 4;
+    private string cityId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string CityId {
+      get { return cityId_; }
+      set {
+        cityId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "owner_sect" field.</summary>
+    public const int OwnerSectFieldNumber = 5;
+    private string ownerSect_ = "";
+    /// <summary>
+    /// 事务内读回的城池事实值，不是请求回声。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string OwnerSect {
+      get { return ownerSect_; }
+      set {
+        ownerSect_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "tax_pct" field.</summary>
+    public const int TaxPctFieldNumber = 6;
+    private int taxPct_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int TaxPct {
+      get { return taxPct_; }
+      set {
+        taxPct_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "txn_id" field.</summary>
+    public const int TxnIdFieldNumber = 7;
+    private string txnId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TxnId {
+      get { return txnId_; }
+      set {
+        txnId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ApplySiegeResultResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ApplySiegeResultResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Ok != other.Ok) return false;
+      if (Reason != other.Reason) return false;
+      if (Duplicate != other.Duplicate) return false;
+      if (CityId != other.CityId) return false;
+      if (OwnerSect != other.OwnerSect) return false;
+      if (TaxPct != other.TaxPct) return false;
+      if (TxnId != other.TxnId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Ok != false) hash ^= Ok.GetHashCode();
+      if (Reason.Length != 0) hash ^= Reason.GetHashCode();
+      if (Duplicate != false) hash ^= Duplicate.GetHashCode();
+      if (CityId.Length != 0) hash ^= CityId.GetHashCode();
+      if (OwnerSect.Length != 0) hash ^= OwnerSect.GetHashCode();
+      if (TaxPct != 0) hash ^= TaxPct.GetHashCode();
+      if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Duplicate);
+      }
+      if (CityId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(CityId);
+      }
+      if (OwnerSect.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(OwnerSect);
+      }
+      if (TaxPct != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(TaxPct);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Ok != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Ok);
+      }
+      if (Reason.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Reason);
+      }
+      if (Duplicate != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(Duplicate);
+      }
+      if (CityId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(CityId);
+      }
+      if (OwnerSect.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(OwnerSect);
+      }
+      if (TaxPct != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(TaxPct);
+      }
+      if (TxnId.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteString(TxnId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Ok != false) {
+        size += 1 + 1;
+      }
+      if (Reason.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Reason);
+      }
+      if (Duplicate != false) {
+        size += 1 + 1;
+      }
+      if (CityId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(CityId);
+      }
+      if (OwnerSect.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(OwnerSect);
+      }
+      if (TaxPct != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(TaxPct);
+      }
+      if (TxnId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TxnId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ApplySiegeResultResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Ok != false) {
+        Ok = other.Ok;
+      }
+      if (other.Reason.Length != 0) {
+        Reason = other.Reason;
+      }
+      if (other.Duplicate != false) {
+        Duplicate = other.Duplicate;
+      }
+      if (other.CityId.Length != 0) {
+        CityId = other.CityId;
+      }
+      if (other.OwnerSect.Length != 0) {
+        OwnerSect = other.OwnerSect;
+      }
+      if (other.TaxPct != 0) {
+        TaxPct = other.TaxPct;
+      }
+      if (other.TxnId.Length != 0) {
+        TxnId = other.TxnId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+          case 34: {
+            CityId = input.ReadString();
+            break;
+          }
+          case 42: {
+            OwnerSect = input.ReadString();
+            break;
+          }
+          case 48: {
+            TaxPct = input.ReadInt32();
+            break;
+          }
+          case 58: {
+            TxnId = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Ok = input.ReadBool();
+            break;
+          }
+          case 18: {
+            Reason = input.ReadString();
+            break;
+          }
+          case 24: {
+            Duplicate = input.ReadBool();
+            break;
+          }
+          case 34: {
+            CityId = input.ReadString();
+            break;
+          }
+          case 42: {
+            OwnerSect = input.ReadString();
+            break;
+          }
+          case 48: {
+            TaxPct = input.ReadInt32();
+            break;
+          }
+          case 58: {
+            TxnId = input.ReadString();
             break;
           }
         }

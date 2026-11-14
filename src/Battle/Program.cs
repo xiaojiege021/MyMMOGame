@@ -10,6 +10,8 @@ var siegeOnly = false;
 string? siegePath = null;
 var sectTechOnly = false;
 string? sectTechPath = null;
+var siegeTerritoryOnly = false;
+string? siegeTerritoryPath = null;
 var siegeViewOnly = false;
 var siegeViewArgs = new List<string>();
 for (var i = 0; i < args.Length; i++)
@@ -51,6 +53,14 @@ for (var i = 0; i < args.Length; i++)
             sectTechOnly = true;
             sectTechPath = args[++i];
             break;
+        // P3-3a4：打印领地表就退出，不连库不起服，与真实启动共用同一份加载。
+        case "--siege-territory-table":
+            siegeTerritoryOnly = true;
+            break;
+        case "--siege-territory-table-path" when i + 1 < args.Length:
+            siegeTerritoryOnly = true;
+            siegeTerritoryPath = args[++i];
+            break;
         // 只读入口：不连库不起服，直接核对城战同屏档位的纯计算。
         case "--siege-view":
             siegeViewOnly = true;
@@ -84,6 +94,44 @@ if (sectTechOnly)
         Console.WriteLine($"sect_tech_factor=level=0 {table.Factor(0):0.###}"
             + $" level=1 {table.Factor(1):0.###}"
             + $" level=max {table.Factor(table.MaxLevel):0.###}");
+        return 0;
+    }
+    catch (Battle.ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+}
+
+if (siegeTerritoryOnly)
+{
+    try
+    {
+        Battle.SiegeTerritoryTable table = siegeTerritoryPath is null
+            ? Battle.BattleConfig.Load(configPath).SiegeTerritory
+            : Battle.SiegeTerritoryTable.Load(siegeTerritoryPath);
+
+        if (table.IsMissing)
+        {
+            Console.WriteLine("siege_territory=missing");
+            return 0;
+        }
+
+        Console.WriteLine($"siege_territory_table_version={table.Version}"
+            + $" pending={(table.Pending ? "true" : "false")}"
+            + $" cities={table.Cities.Count} city_table={table.CityTable}");
+        foreach (var city in table.Cities)
+        {
+            Console.WriteLine($"siege_territory_city=id={city.CityId}"
+                + $" prefix={city.MatchPrefix} timeout_ms={city.BattleTimeoutMs}"
+                + $" tax_pct={city.TaxPctOnCapture}");
+        }
+
+        // 纯计算：哪一场打哪座城只由服务端的前缀决定，匹配不上就不写回。
+        var first = table.Cities[0];
+        Console.WriteLine($"siege_territory_match=prefix={first.MatchPrefix}"
+            + $" city={table.CityOf(first.MatchPrefix + "-probe")?.CityId ?? "-"}"
+            + $" unknown={table.CityOf("not-a-city")?.CityId ?? "-"}");
         return 0;
     }
     catch (Battle.ConfigException ex)

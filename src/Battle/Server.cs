@@ -88,6 +88,21 @@ sealed class Party
     /// 都取竞技场模板，不看装备。同一个队伍钥匙不能一半人打副本、一半人打竞技场。
     /// </summary>
     public required ArenaModeDef? ArenaMode { get; init; }
+
+    /// <summary>
+    /// P3-3a4：城战两队对 Boss 的累计有效伤害。只在广播层按队伍累加，不改 Encounter
+    /// 的伤害公式，也不进结算 / 经验 / 发奖；离场散场后随 party 一起丢掉。
+    /// </summary>
+    public readonly long[] SiegeDamage = new long[2];
+
+    /// <summary>
+    /// 本场登记过的成员 → 队伍。与 _siegeTeams 的区别：离场时不清这里，
+    /// 否则打完就断线的人会让「胜方宗门是谁」查不到。只活在这一场实例里。
+    /// </summary>
+    public readonly Dictionary<ulong, uint> SiegeRoster = new();
+
+    /// <summary>一场城战只判一次胜负、只写回一次。</summary>
+    public bool SiegeFinished;
 }
 
 /// <summary>
@@ -101,7 +116,8 @@ sealed class Party
 public sealed class BattleServer(
     BattleConfig config, SettlementStore settlements, ICharacterStore characters,
     IExpSettlement expSettlement, ITalismanSpend talismans, IReviveScrollUse scrolls,
-    IBattleProfileSource profiles, ISectTechSource sectTech)
+    IBattleProfileSource profiles, ISectTechSource sectTech,
+    ISiegeSectSource siegeSect, ISiegeResultSink siegeResult)
 {
     /// <summary>20Hz。前摇、冷却、后摇的判定精度都在这个粒度上。</summary>
     const int TickIntervalMs = 50;
@@ -979,6 +995,8 @@ public sealed class BattleServer(
                 if (entry.Member is not null)
                 {
                     _siegeTeams[entry.Member.Id] = (uint)team;
+                    // P3-3a4：本场名单留一份不随离场清掉的，结束判胜方宗门要用。
+                    party.SiegeRoster[entry.Member.Id] = (uint)team;
                 }
             }
         }
@@ -986,6 +1004,13 @@ public sealed class BattleServer(
         if (created)
         {
             _ = TickLoopAsync(party);
+            // P3-3a4：领地表是可选表。缺失时（老卡的临时配置目录没有这张表）根本
+            // 不排结束定时器，城战照常打、不写回；配了才到时限按本场事实值判胜方。
+            var city = config.SiegeTerritory.CityOf(matchId);
+            if (city is not null)
+            {
+                _ = FinishSiegeAfterAsync(party, matchId, city);
+            }
         }
 
         foreach (var entry in entries)
@@ -1004,6 +1029,84 @@ public sealed class BattleServer(
             }
             entry.Ready.TrySetResult(!entry.Rejected);
         }
+    }
+
+    /// <summary>
+    /// P3-3a4：城战开场到配置时限就判一次胜负，并把结果交给角色服写回城池。
+    /// 胜方只按「本场各队对 Boss 的累计有效伤害」这一个服务端事实值判定，
+    /// 客户端表达不了谁赢、归属改成谁、抽成多少；平局 / 无人出手 / 胜方没宗门
+    /// 都不写回。写回只做一次，同一场重复触发也不会改第二次库。
+    /// 这里不改 Encounter、不写结算 / 经验 / 发奖、不关连接：技术架构 3 / 6 节
+    /// 把持久数据的唯一写入放在角色服，战斗服只给事实值。
+    /// </summary>
+    async Task FinishSiegeAfterAsync(
+        Party party, string matchId, SiegeTerritoryTable.CityRule city)
+    {
+        await Task.Delay(city.BattleTimeoutMs);
+
+        lock (_gate)
+        {
+            if (!_parties.TryGetValue(party.Key, out var current)
+                || !ReferenceEquals(current, party)
+                || party.SiegeFinished)
+            {
+                return;
+            }
+            party.SiegeFinished = true;
+        }
+
+        long damageA, damageB;
+        KeyValuePair<ulong, uint>[] roster;
+        lock (_gate)
+        {
+            damageA = party.SiegeDamage[0];
+            damageB = party.SiegeDamage[1];
+        }
+        lock (_siegeGate)
+        {
+            // 用本场登记过的名单，不是当前在线名单：打完就断线的人也算这一队。
+            roster = party.SiegeRoster.OrderBy(kv => kv.Key).ToArray();
+        }
+
+        // 2 表示没有胜方：两边一样、或者这一场谁都没打中。
+        uint winnerTeam = damageA > damageB ? 0u : damageB > damageA ? 1u : 2u;
+        ulong winnerSect = 0;
+        if (winnerTeam <= 1)
+        {
+            var teamMembers = roster
+                .Where(kv => kv.Value == winnerTeam)
+                .Select(kv => kv.Key)
+                .ToArray();
+
+            // 按成员编号稳定排序取第一个查得到宗门的人；方案没写定同队多宗门怎么
+            // 取代表，这里不编 weighting，只按事实值里稳定可核对的那一个。
+            foreach (var memberId in teamMembers)
+            {
+                var sect = siegeSect.SectOf(memberId);
+                if (sect is > 0)
+                {
+                    winnerSect = sect.Value;
+                    break;
+                }
+            }
+        }
+
+        var txnId = "siege:" + matchId + ":" + party.Encounter.SessionId;
+        var reason = winnerTeam > 1 ? "no_winner" : winnerSect == 0 ? "no_sect" : "";
+        var reply = new SiegeResultReply(false, reason, false, city.CityId, "", 0);
+        if (reason.Length == 0)
+        {
+            reply = siegeResult.Apply(new SiegeResultFact(
+                txnId, city.CityId, matchId, winnerTeam, winnerSect));
+            reason = reply.Ok ? "" : reply.Reason;
+        }
+
+        Console.WriteLine($"siege_result=match={matchId} city={city.CityId}"
+            + $" session={party.Encounter.SessionId}"
+            + $" damage_a={damageA} damage_b={damageB} winner_team={winnerTeam}"
+            + $" winner_sect={winnerSect} txn={txnId}"
+            + $" ok={(reply.Ok ? "true" : "false")} duplicate={(reply.Duplicate ? "true" : "false")}"
+            + $" owner={reply.OwnerSect} tax_pct={reply.TaxPct} reason={reason}");
     }
 
     /// <summary>线程安全地取一条队友快照，给进场广播用。</summary>
@@ -1241,6 +1344,27 @@ public sealed class BattleServer(
 
     async Task BroadcastAsync(Party party, ServerMessage message, CancellationToken token, WebSocket? exceptSocket)
     {
+        // P3-3a4：城战胜负只按服务端结算出来的有效伤害累计，按队伍归到这一场的
+        // 两个桶里。不改 Encounter 的伤害公式、不进结算 / 经验 / 发奖；领地表缺失
+        // （老卡临时配置）时连这一步都不做，老链路一条断言都不受影响。
+        if (!config.SiegeTerritory.IsMissing
+            && party.Key.StartsWith("siege-", StringComparison.Ordinal)
+            && message.Result is { Hit: true, Damage: > 0 } result)
+        {
+            uint team = 0;
+            lock (_siegeGate)
+            {
+                _siegeTeams.TryGetValue(result.CasterId, out team);
+            }
+            if (team <= 1)
+            {
+                lock (_gate)
+                {
+                    party.SiegeDamage[team] += result.Damage;
+                }
+            }
+        }
+
         PartyConn[] conns;
         lock (_gate)
         {

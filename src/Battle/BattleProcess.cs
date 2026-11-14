@@ -44,6 +44,14 @@ public sealed class BattleProcess(string configPath)
         using ISectTechSource sectTech = string.IsNullOrEmpty(config.SocialUpstream)
             ? new NoSectTechSource()
             : new GrpcSectTechSource(config.SocialUpstream);
+        // P3-3a4：胜方宗门只从社交服只读查，城池写回只经角色服（持久数据的唯一写入）。
+        // 没配上游就不启用；老卡临时配置没有领地表时本来也不会判胜负、不会调这两个。
+        using ISiegeSectSource siegeSect = string.IsNullOrEmpty(config.SocialUpstream)
+            ? new NoSiegeSectSource()
+            : new GrpcSiegeSectSource(config.SocialUpstream);
+        using ISiegeResultSink siegeResult = string.IsNullOrEmpty(config.CharacterUpstream)
+            ? new NoSiegeResultSink()
+            : new GrpcSiegeResultSink(config.CharacterUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
         Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
@@ -111,13 +119,21 @@ public sealed class BattleProcess(string configPath)
                   + $" sect_tech_pct={config.SectTech.PowerPctPerLevel}"
                   + $" sect_tech_max_level={config.SectTech.MaxLevel}")
             + $" social_upstream={(config.SocialUpstream.Length == 0 ? "off" : config.SocialUpstream)}");
+        // 领地表单独一行，免得混进 siege_table= 那行的老断言里；missing 表示这一进程
+        // 的城战不判胜负、不写回，老卡临时配置目录没有这张表时就是这个状态。
+        Console.WriteLine($"siege_territory_table={config.SiegeTerritoryTablePath}"
+            + (config.SiegeTerritory.IsMissing
+                ? " siege_territory=missing"
+                : $" siege_territory_version={config.SiegeTerritory.Version}"
+                  + $" siege_territory_cities={config.SiegeTerritory.Cities.Count}"
+                  + $" siege_territory_pending={(config.SiegeTerritory.Pending ? "true" : "false")}"));
         Console.WriteLine("resume=off");
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);
 
         try
         {
             await new BattleServer(config, settlements, characters, expSettlement, talismans,
-                scrolls, profiles, sectTech)
+                scrolls, profiles, sectTech, siegeSect, siegeResult)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

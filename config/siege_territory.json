@@ -1,0 +1,15 @@
+{
+  "schema": "siege-territory/1",
+  "version": 1,
+  "note": "P3-3a4：城战结束后的胜负写回。方案 11 章「阵营·领地（全服）：地块税收、灵石矿脉」、9.5 / 12 章「灵石矿脉归主城辖区，掌管方按城池税收抽成，比例走配置」、开发架构第 66 行「胜负写回城池税收和矿脉归属」。方案没写定城战时长与抽成比例：battle_timeout_ms / tax_pct_on_capture 都是正整数占位、标待定（pending=true），代码、proto、SQL 不写第二套数字。归属只由服务端事实值判定，客户端带不进胜方、宗门、税率与事务号。写入的是「社交」.city 的 owner_sect（掌管方 → 矿脉归属）与 tax_pct（掌管方抽成比例）；city_tax_ledger 记的是任务发放时的抽成流水，城战易主本身不产生金币，本卡不往账本里造一笔税。实际抽成要等 C1 主线卡把任务发放接上，按 14.2 的方式登记为规划欠项。城池编号与 gather.json 的 spirit_stone 节点仍由 config/city.json 交叉校验，个人采集照旧拒绝。",
+  "pending": true,
+  "city_table": "config/city.json",
+  "cities": [
+    {
+      "city_id": "qiyun",
+      "match_prefix": "qiyun",
+      "battle_timeout_ms": 1500,
+      "tax_pct_on_capture": 0
+    }
+  ]
+}

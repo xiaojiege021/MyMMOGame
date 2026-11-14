@@ -178,6 +178,10 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.StoneAuctionSettleRequest> __Marshaller_mmo_character_StoneAuctionSettleRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.StoneAuctionSettleRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.StoneAuctionSettleResponse> __Marshaller_mmo_character_StoneAuctionSettleResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.StoneAuctionSettleResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ApplySiegeResultRequest> __Marshaller_mmo_character_ApplySiegeResultRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ApplySiegeResultRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ApplySiegeResultResponse> __Marshaller_mmo_character_ApplySiegeResultResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ApplySiegeResultResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -442,6 +446,14 @@ namespace Mmo.Proto.Character {
         "SettleStoneAuction",
         __Marshaller_mmo_character_StoneAuctionSettleRequest,
         __Marshaller_mmo_character_StoneAuctionSettleResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ApplySiegeResultRequest, global::Mmo.Proto.Character.ApplySiegeResultResponse> __Method_ApplySiegeResult = new grpc::Method<global::Mmo.Proto.Character.ApplySiegeResultRequest, global::Mmo.Proto.Character.ApplySiegeResultResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ApplySiegeResult",
+        __Marshaller_mmo_character_ApplySiegeResultRequest,
+        __Marshaller_mmo_character_ApplySiegeResultResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -870,6 +882,20 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.StoneAuctionSettleResponse> SettleStoneAuction(global::Mmo.Proto.Character.StoneAuctionSettleRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-3a4：城战结束后的领地写回。战斗服只把服务端确认过的胜方事实值送过来，
+      /// 城池编号、抽成比例与归属变更都在角色服从配置和库里读；请求里带不进税率、
+      /// 旧归属，也不带任何奖励 / 金币 / 灵石。同一个事务号只写一次。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ApplySiegeResultResponse> ApplySiegeResult(global::Mmo.Proto.Character.ApplySiegeResultRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2575,6 +2601,62 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_SettleStoneAuction, null, options, request);
       }
+      /// <summary>
+      /// P3-3a4：城战结束后的领地写回。战斗服只把服务端确认过的胜方事实值送过来，
+      /// 城池编号、抽成比例与归属变更都在角色服从配置和库里读；请求里带不进税率、
+      /// 旧归属，也不带任何奖励 / 金币 / 灵石。同一个事务号只写一次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ApplySiegeResultResponse ApplySiegeResult(global::Mmo.Proto.Character.ApplySiegeResultRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ApplySiegeResult(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-3a4：城战结束后的领地写回。战斗服只把服务端确认过的胜方事实值送过来，
+      /// 城池编号、抽成比例与归属变更都在角色服从配置和库里读；请求里带不进税率、
+      /// 旧归属，也不带任何奖励 / 金币 / 灵石。同一个事务号只写一次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ApplySiegeResultResponse ApplySiegeResult(global::Mmo.Proto.Character.ApplySiegeResultRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ApplySiegeResult, null, options, request);
+      }
+      /// <summary>
+      /// P3-3a4：城战结束后的领地写回。战斗服只把服务端确认过的胜方事实值送过来，
+      /// 城池编号、抽成比例与归属变更都在角色服从配置和库里读；请求里带不进税率、
+      /// 旧归属，也不带任何奖励 / 金币 / 灵石。同一个事务号只写一次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ApplySiegeResultResponse> ApplySiegeResultAsync(global::Mmo.Proto.Character.ApplySiegeResultRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ApplySiegeResultAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-3a4：城战结束后的领地写回。战斗服只把服务端确认过的胜方事实值送过来，
+      /// 城池编号、抽成比例与归属变更都在角色服从配置和库里读；请求里带不进税率、
+      /// 旧归属，也不带任何奖励 / 金币 / 灵石。同一个事务号只写一次。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ApplySiegeResultResponse> ApplySiegeResultAsync(global::Mmo.Proto.Character.ApplySiegeResultRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ApplySiegeResult, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -2621,7 +2703,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_AdvanceRealm, serviceImpl.AdvanceRealm)
           .AddMethod(__Method_SettleDrill, serviceImpl.SettleDrill)
           .AddMethod(__Method_ExchangeStone, serviceImpl.ExchangeStone)
-          .AddMethod(__Method_SettleStoneAuction, serviceImpl.SettleStoneAuction).Build();
+          .AddMethod(__Method_SettleStoneAuction, serviceImpl.SettleStoneAuction)
+          .AddMethod(__Method_ApplySiegeResult, serviceImpl.ApplySiegeResult).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -2664,6 +2747,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_SettleDrill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleDrillRequest, global::Mmo.Proto.Character.SettleDrillResponse>(serviceImpl.SettleDrill));
       serviceBinder.AddMethod(__Method_ExchangeStone, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse>(serviceImpl.ExchangeStone));
       serviceBinder.AddMethod(__Method_SettleStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.StoneAuctionSettleRequest, global::Mmo.Proto.Character.StoneAuctionSettleResponse>(serviceImpl.SettleStoneAuction));
+      serviceBinder.AddMethod(__Method_ApplySiegeResult, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ApplySiegeResultRequest, global::Mmo.Proto.Character.ApplySiegeResultResponse>(serviceImpl.ApplySiegeResult));
     }
 
   }

@@ -160,6 +160,11 @@ service CharacterService {
   // 写双方灵石、买方金币、卖方净额与挂单状态；档位、数量、标价、税率
   // 与税额全从库和配置读。税仍直接销毁，不进任何角色。
   rpc SettleStoneAuction(StoneAuctionSettleRequest) returns (StoneAuctionSettleResponse);
+
+  // P3-3a4：城战结束后的领地写回。战斗服只把服务端确认过的胜方事实值送过来，
+  // 城池编号、抽成比例与归属变更都在角色服从配置和库里读；请求里带不进税率、
+  // 旧归属，也不带任何奖励 / 金币 / 灵石。同一个事务号只写一次。
+  rpc ApplySiegeResult(ApplySiegeResultRequest) returns (ApplySiegeResultResponse);
 }
 
 message SettleExpRequest {
@@ -1013,3 +1018,35 @@ message StoneAuctionSettleResponse {
   bool duplicate = 15;
 }
 
+
+// P3-3a4：城战胜负写回。方案 11 章「阵营 · 领地（全服）：地块税收、灵石矿脉」，
+// 9.5 / 12 章「掌管方按城池税收抽成，比例走配置」。开发架构第 66 行只要求把胜负
+// 写回城池税收和矿脉归属：这里写的是「社交」.city 的 owner_sect（谁掌管矿脉）与
+// tax_pct（掌管方抽成比例），不是发奖，也不往 city_tax_ledger 造一笔金币税——
+// 城战易主本身不产生金币，账本记的是任务发放时的抽成流水。
+message ApplySiegeResultRequest {
+  // 服间可信调用；战斗服直连时为空，网关不转发这条。
+  string account = 1;
+  // 幂等号：一场城战一个号，同一号重放只回 duplicate，不写第二次。
+  string txn_id = 2;
+  // 由战斗服的领地表按 match 前缀给出，客户端表达不了「我要改哪座城」。
+  string city_id = 3;
+  // 只记账，不参与判定。
+  string match_id = 4;
+  // 战斗服按本场各队累计有效伤害判出的胜方队伍（服务端事实值）。
+  uint32 winner_team = 5;
+  // 社交服只读给回的胜方宗门编号；0 表示没宗门，角色服一律拒绝写回。
+  uint64 winner_sect = 6;
+}
+
+message ApplySiegeResultResponse {
+  bool ok = 1;
+  // request_missing / unknown_city / winner_sect_missing / duplicate / 空串表示写回成功。
+  string reason = 2;
+  bool duplicate = 3;
+  string city_id = 4;
+  // 事务内读回的城池事实值，不是请求回声。
+  string owner_sect = 5;
+  int32 tax_pct = 6;
+  string txn_id = 7;
+}
