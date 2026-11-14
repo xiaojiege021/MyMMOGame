@@ -9,10 +9,12 @@ namespace Global;
 /// 税率不在这里：成交由角色服按 config/auction.json 判定，全局服务不写货币。
 /// </summary>
 public sealed record GlobalConfig(
-    string Listen, int DbPoolMax, string CharacterUpstream, string StoneExchangeTable)
+    string Listen, int DbPoolMax, string CharacterUpstream, string StoneExchangeTable,
+    string SeasonTableFile)
 {
     public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
     public const string DefaultStoneExchangeTable = "config/stone_exchange.json";
+    public const string DefaultSeasonTableFile = "season.json";
 
     public static GlobalConfig Load(string path)
     {
@@ -59,7 +61,16 @@ public sealed record GlobalConfig(
             throw new ConfigException("stone_exchange_table 不能为空");
         }
 
-        return new GlobalConfig(listen.TrimEnd('/'), pool, character, stoneExchangeTable);
+        // P3-4a1：赛季表只给一个文件名，实际从 --config 所在目录找。
+        // 老卡的临时配置目录没有 season.json 时 SeasonCatalog 直接降级，
+        // 不显式登记进 global.json 就不会让老卡起不来。
+        var seasonTableFile = (wire.SeasonTableFile ?? DefaultSeasonTableFile).Trim();
+        if (seasonTableFile.Length == 0 || Path.GetFileName(seasonTableFile) != seasonTableFile)
+        {
+            throw new ConfigException("season_table_file 必须是本目录下的文件名");
+        }
+
+        return new GlobalConfig(listen.TrimEnd('/'), pool, character, stoneExchangeTable, seasonTableFile);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -81,6 +92,9 @@ public sealed record GlobalConfig(
 
         [JsonPropertyName("stone_exchange_table")]
         public string? StoneExchangeTable { get; init; }
+
+        [JsonPropertyName("season_table_file")]
+        public string? SeasonTableFile { get; init; }
     }
 }
 

@@ -17,6 +17,9 @@ service TradeService {
   // 挂单只带档位、数量与标价，灵石从角色服的货币行转移，不进背包。
   rpc ListStoneAuction(ListStoneAuctionRequest) returns (ListStoneAuctionResponse);
   rpc BuyStoneAuction(BuyStoneAuctionRequest) returns (BuyStoneAuctionResponse);
+  // P3-4a1：赛季只读事实值。当前季与上一季的秘境目标全由全局服务从配置读，
+  // 不带请求参数，也不发奖、不写角色库。
+  rpc DescribeSeason(DescribeSeasonRequest) returns (DescribeSeasonResponse);
 }
 
 // 挂单只带卖方角色、要挂的格位、数量与金币标价。
@@ -164,4 +167,16 @@ message BuyStoneAuctionResponse {
   int32 tax_rate_pct = 13;
   string state = 14;
   bool duplicate = 15;
+}
+
+// P3-4a1：赛季不带请求参数——客户端表达不了「当前是哪一季」「目标改成哪一处」，
+// 也带不进任何奖励。回包只有全局服务确认过的事实值。
+message DescribeSeasonRequest {}
+
+message DescribeSeasonResponse {
+  bool found = 1;
+  string season_id = 2;
+  string target_dungeon = 3;
+  string previous_season_id = 4;
+  string previous_target_dungeon = 5;
 }

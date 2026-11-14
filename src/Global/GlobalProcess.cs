@@ -40,6 +40,20 @@ public sealed class GlobalProcess(string configPath)
         // 档位数与版本都从配置读出来，不在代码里写死。
         Console.WriteLine("stone_tiers=" + stoneTiers.Count + " version=" + stoneTiers.Version);
 
+        // P3-4a1：赛季表随配置目录热载（E4 / 技术架构 7 节），换季不重启进程、不写库。
+        // 按 --config 所在目录找，老卡的临时配置目录没有 season.json 时降级成 missing，
+        // 全局服务照常起，不受这张可选表影响。
+        var configDirectory = Path.GetDirectoryName(Path.GetFullPath(configPath)) ?? "config";
+        using var seasons = new SeasonCatalog(configDirectory, config.SeasonTableFile);
+        var bootSeason = seasons.Current();
+        Console.WriteLine(bootSeason.Found
+            ? "season=" + bootSeason.CurrentSeason
+              + " target=" + bootSeason.CurrentTarget
+              + " previous=" + bootSeason.PreviousSeason
+              + " previous_target=" + bootSeason.PreviousTarget
+              + " count=" + bootSeason.Count
+            : "season=missing");
+
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
         if (connectionString == null)
@@ -75,6 +89,7 @@ public sealed class GlobalProcess(string configPath)
         builder.Services.AddSingleton(stoneTiers);
         builder.Services.AddSingleton(character);
         builder.Services.AddSingleton(config);
+        builder.Services.AddSingleton(seasons);
 
         var app = builder.Build();
         app.MapGrpcService<GlobalGrpcService>();

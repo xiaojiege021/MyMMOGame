@@ -74,6 +74,10 @@ namespace Mmo.Proto.Trade {
     static readonly grpc::Marshaller<global::Mmo.Proto.Trade.BuyStoneAuctionRequest> __Marshaller_mmo_trade_BuyStoneAuctionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.BuyStoneAuctionRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Trade.BuyStoneAuctionResponse> __Marshaller_mmo_trade_BuyStoneAuctionResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.BuyStoneAuctionResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Trade.DescribeSeasonRequest> __Marshaller_mmo_trade_DescribeSeasonRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.DescribeSeasonRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Trade.DescribeSeasonResponse> __Marshaller_mmo_trade_DescribeSeasonResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.DescribeSeasonResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Trade.ListAuctionRequest, global::Mmo.Proto.Trade.ListAuctionResponse> __Method_ListAuction = new grpc::Method<global::Mmo.Proto.Trade.ListAuctionRequest, global::Mmo.Proto.Trade.ListAuctionResponse>(
@@ -122,6 +126,14 @@ namespace Mmo.Proto.Trade {
         "BuyStoneAuction",
         __Marshaller_mmo_trade_BuyStoneAuctionRequest,
         __Marshaller_mmo_trade_BuyStoneAuctionResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Trade.DescribeSeasonRequest, global::Mmo.Proto.Trade.DescribeSeasonResponse> __Method_DescribeSeason = new grpc::Method<global::Mmo.Proto.Trade.DescribeSeasonRequest, global::Mmo.Proto.Trade.DescribeSeasonResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeSeason",
+        __Marshaller_mmo_trade_DescribeSeasonRequest,
+        __Marshaller_mmo_trade_DescribeSeasonResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -178,6 +190,19 @@ namespace Mmo.Proto.Trade {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Trade.BuyStoneAuctionResponse> BuyStoneAuction(global::Mmo.Proto.Trade.BuyStoneAuctionRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-4a1：赛季只读事实值。当前季与上一季的秘境目标全由全局服务从配置读，
+      /// 不带请求参数，也不发奖、不写角色库。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Trade.DescribeSeasonResponse> DescribeSeason(global::Mmo.Proto.Trade.DescribeSeasonRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -391,6 +416,58 @@ namespace Mmo.Proto.Trade {
       {
         return CallInvoker.AsyncUnaryCall(__Method_BuyStoneAuction, null, options, request);
       }
+      /// <summary>
+      /// P3-4a1：赛季只读事实值。当前季与上一季的秘境目标全由全局服务从配置读，
+      /// 不带请求参数，也不发奖、不写角色库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Trade.DescribeSeasonResponse DescribeSeason(global::Mmo.Proto.Trade.DescribeSeasonRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSeason(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-4a1：赛季只读事实值。当前季与上一季的秘境目标全由全局服务从配置读，
+      /// 不带请求参数，也不发奖、不写角色库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Trade.DescribeSeasonResponse DescribeSeason(global::Mmo.Proto.Trade.DescribeSeasonRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeSeason, null, options, request);
+      }
+      /// <summary>
+      /// P3-4a1：赛季只读事实值。当前季与上一季的秘境目标全由全局服务从配置读，
+      /// 不带请求参数，也不发奖、不写角色库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Trade.DescribeSeasonResponse> DescribeSeasonAsync(global::Mmo.Proto.Trade.DescribeSeasonRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSeasonAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-4a1：赛季只读事实值。当前季与上一季的秘境目标全由全局服务从配置读，
+      /// 不带请求参数，也不发奖、不写角色库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Trade.DescribeSeasonResponse> DescribeSeasonAsync(global::Mmo.Proto.Trade.DescribeSeasonRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeSeason, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override TradeServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -410,7 +487,8 @@ namespace Mmo.Proto.Trade {
           .AddMethod(__Method_ListIngot, serviceImpl.ListIngot)
           .AddMethod(__Method_BuyIngot, serviceImpl.BuyIngot)
           .AddMethod(__Method_ListStoneAuction, serviceImpl.ListStoneAuction)
-          .AddMethod(__Method_BuyStoneAuction, serviceImpl.BuyStoneAuction).Build();
+          .AddMethod(__Method_BuyStoneAuction, serviceImpl.BuyStoneAuction)
+          .AddMethod(__Method_DescribeSeason, serviceImpl.DescribeSeason).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -426,6 +504,7 @@ namespace Mmo.Proto.Trade {
       serviceBinder.AddMethod(__Method_BuyIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.BuyIngotRequest, global::Mmo.Proto.Trade.BuyIngotResponse>(serviceImpl.BuyIngot));
       serviceBinder.AddMethod(__Method_ListStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.ListStoneAuctionRequest, global::Mmo.Proto.Trade.ListStoneAuctionResponse>(serviceImpl.ListStoneAuction));
       serviceBinder.AddMethod(__Method_BuyStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.BuyStoneAuctionRequest, global::Mmo.Proto.Trade.BuyStoneAuctionResponse>(serviceImpl.BuyStoneAuction));
+      serviceBinder.AddMethod(__Method_DescribeSeason, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.DescribeSeasonRequest, global::Mmo.Proto.Trade.DescribeSeasonResponse>(serviceImpl.DescribeSeason));
     }
 
   }

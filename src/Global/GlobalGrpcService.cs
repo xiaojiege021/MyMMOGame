@@ -16,8 +16,27 @@ public sealed class GlobalGrpcService(
     StoneListingRepository stones,
     StoneTierTable stoneTiers,
     CharacterService.CharacterServiceClient character,
+    SeasonCatalog seasons,
     ILogger<GlobalGrpcService> logger) : TradeService.TradeServiceBase
 {
+    /// <summary>
+    /// P3-4a1 赛季只读口：当前季、目标、上一季与上一季目标都从配置快照取，
+    /// 客户端带不进来，也不碰角色库、不发奖。表没配就回 found=false。
+    /// </summary>
+    public override Task<DescribeSeasonResponse> DescribeSeason(
+        DescribeSeasonRequest request, ServerCallContext context)
+    {
+        var table = seasons.Current();
+        return Task.FromResult(new DescribeSeasonResponse
+        {
+            Found = table.Found,
+            SeasonId = table.CurrentSeason,
+            TargetDungeon = table.CurrentTarget,
+            PreviousSeasonId = table.PreviousSeason,
+            PreviousTargetDungeon = table.PreviousTarget,
+        });
+    }
+
     public override async Task<ListAuctionResponse> ListAuction(
         ListAuctionRequest request, ServerCallContext context)
     {

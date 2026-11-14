@@ -70,19 +70,24 @@ namespace Mmo.Proto.Trade {
             "KAMSEAoIbmV0X2dvbGQYCCABKAMSEgoKYnV5ZXJfZ29sZBgJIAEoAxITCgtz",
             "ZWxsZXJfZ29sZBgKIAEoAxITCgtidXllcl9zdG9uZRgLIAEoAxIUCgxzZWxs",
             "ZXJfc3RvbmUYDCABKAMSFAoMdGF4X3JhdGVfcGN0GA0gASgFEg0KBXN0YXRl",
-            "GA4gASgJEhEKCWR1cGxpY2F0ZRgPIAEoCDLrAwoMVHJhZGVTZXJ2aWNlEkwK",
-            "C0xpc3RBdWN0aW9uEh0ubW1vLnRyYWRlLkxpc3RBdWN0aW9uUmVxdWVzdBoe",
-            "Lm1tby50cmFkZS5MaXN0QXVjdGlvblJlc3BvbnNlEkkKCkJ1eUF1Y3Rpb24S",
-            "HC5tbW8udHJhZGUuQnV5QXVjdGlvblJlcXVlc3QaHS5tbW8udHJhZGUuQnV5",
-            "QXVjdGlvblJlc3BvbnNlEkYKCUxpc3RJbmdvdBIbLm1tby50cmFkZS5MaXN0",
-            "SW5nb3RSZXF1ZXN0GhwubW1vLnRyYWRlLkxpc3RJbmdvdFJlc3BvbnNlEkMK",
-            "CEJ1eUluZ290EhoubW1vLnRyYWRlLkJ1eUluZ290UmVxdWVzdBobLm1tby50",
-            "cmFkZS5CdXlJbmdvdFJlc3BvbnNlElsKEExpc3RTdG9uZUF1Y3Rpb24SIi5t",
-            "bW8udHJhZGUuTGlzdFN0b25lQXVjdGlvblJlcXVlc3QaIy5tbW8udHJhZGUu",
-            "TGlzdFN0b25lQXVjdGlvblJlc3BvbnNlElgKD0J1eVN0b25lQXVjdGlvbhIh",
-            "Lm1tby50cmFkZS5CdXlTdG9uZUF1Y3Rpb25SZXF1ZXN0GiIubW1vLnRyYWRl",
-            "LkJ1eVN0b25lQXVjdGlvblJlc3BvbnNlQhKqAg9NbW8uUHJvdG8uVHJhZGVi",
-            "BnByb3RvMw=="));
+            "GA4gASgJEhEKCWR1cGxpY2F0ZRgPIAEoCCIXChVEZXNjcmliZVNlYXNvblJl",
+            "cXVlc3QijwEKFkRlc2NyaWJlU2Vhc29uUmVzcG9uc2USDQoFZm91bmQYASAB",
+            "KAgSEQoJc2Vhc29uX2lkGAIgASgJEhYKDnRhcmdldF9kdW5nZW9uGAMgASgJ",
+            "EhoKEnByZXZpb3VzX3NlYXNvbl9pZBgEIAEoCRIfChdwcmV2aW91c190YXJn",
+            "ZXRfZHVuZ2VvbhgFIAEoCTLCBAoMVHJhZGVTZXJ2aWNlEkwKC0xpc3RBdWN0",
+            "aW9uEh0ubW1vLnRyYWRlLkxpc3RBdWN0aW9uUmVxdWVzdBoeLm1tby50cmFk",
+            "ZS5MaXN0QXVjdGlvblJlc3BvbnNlEkkKCkJ1eUF1Y3Rpb24SHC5tbW8udHJh",
+            "ZGUuQnV5QXVjdGlvblJlcXVlc3QaHS5tbW8udHJhZGUuQnV5QXVjdGlvblJl",
+            "c3BvbnNlEkYKCUxpc3RJbmdvdBIbLm1tby50cmFkZS5MaXN0SW5nb3RSZXF1",
+            "ZXN0GhwubW1vLnRyYWRlLkxpc3RJbmdvdFJlc3BvbnNlEkMKCEJ1eUluZ290",
+            "EhoubW1vLnRyYWRlLkJ1eUluZ290UmVxdWVzdBobLm1tby50cmFkZS5CdXlJ",
+            "bmdvdFJlc3BvbnNlElsKEExpc3RTdG9uZUF1Y3Rpb24SIi5tbW8udHJhZGUu",
+            "TGlzdFN0b25lQXVjdGlvblJlcXVlc3QaIy5tbW8udHJhZGUuTGlzdFN0b25l",
+            "QXVjdGlvblJlc3BvbnNlElgKD0J1eVN0b25lQXVjdGlvbhIhLm1tby50cmFk",
+            "ZS5CdXlTdG9uZUF1Y3Rpb25SZXF1ZXN0GiIubW1vLnRyYWRlLkJ1eVN0b25l",
+            "QXVjdGlvblJlc3BvbnNlElUKDkRlc2NyaWJlU2Vhc29uEiAubW1vLnRyYWRl",
+            "LkRlc2NyaWJlU2Vhc29uUmVxdWVzdBohLm1tby50cmFkZS5EZXNjcmliZVNl",
+            "YXNvblJlc3BvbnNlQhKqAg9NbW8uUHJvdG8uVHJhZGViBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -97,7 +102,9 @@ namespace Mmo.Proto.Trade {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Trade.ListStoneAuctionRequest), global::Mmo.Proto.Trade.ListStoneAuctionRequest.Parser, new[]{ "Account", "CharacterId", "StoneKind", "StoneAmount", "PriceGold", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Trade.ListStoneAuctionResponse), global::Mmo.Proto.Trade.ListStoneAuctionResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "SellerId", "StoneKind", "StoneAmount", "PriceGold", "State", "Duplicate" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Trade.BuyStoneAuctionRequest), global::Mmo.Proto.Trade.BuyStoneAuctionRequest.Parser, new[]{ "Account", "CharacterId", "ListingId", "TxnId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Trade.BuyStoneAuctionResponse), global::Mmo.Proto.Trade.BuyStoneAuctionResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "StoneKind", "StoneAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerStone", "SellerStone", "TaxRatePct", "State", "Duplicate" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Trade.BuyStoneAuctionResponse), global::Mmo.Proto.Trade.BuyStoneAuctionResponse.Parser, new[]{ "Ok", "Reason", "ListingId", "StoneKind", "StoneAmount", "PriceGold", "TaxGold", "NetGold", "BuyerGold", "SellerGold", "BuyerStone", "SellerStone", "TaxRatePct", "State", "Duplicate" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Trade.DescribeSeasonRequest), global::Mmo.Proto.Trade.DescribeSeasonRequest.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Trade.DescribeSeasonResponse), global::Mmo.Proto.Trade.DescribeSeasonResponse.Parser, new[]{ "Found", "SeasonId", "TargetDungeon", "PreviousSeasonId", "PreviousTargetDungeon" }, null, null, null, null)
           }));
     }
     #endregion
@@ -5652,6 +5659,517 @@ namespace Mmo.Proto.Trade {
           }
           case 120: {
             Duplicate = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// P3-4a1：赛季不带请求参数——客户端表达不了「当前是哪一季」「目标改成哪一处」，
+  /// 也带不进任何奖励。回包只有全局服务确认过的事实值。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class DescribeSeasonRequest : pb::IMessage<DescribeSeasonRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<DescribeSeasonRequest> _parser = new pb::MessageParser<DescribeSeasonRequest>(() => new DescribeSeasonRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<DescribeSeasonRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Trade.TradeReflection.Descriptor.MessageTypes[12]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonRequest(DescribeSeasonRequest other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonRequest Clone() {
+      return new DescribeSeasonRequest(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as DescribeSeasonRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(DescribeSeasonRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(DescribeSeasonRequest other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class DescribeSeasonResponse : pb::IMessage<DescribeSeasonResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<DescribeSeasonResponse> _parser = new pb::MessageParser<DescribeSeasonResponse>(() => new DescribeSeasonResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<DescribeSeasonResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Trade.TradeReflection.Descriptor.MessageTypes[13]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonResponse(DescribeSeasonResponse other) : this() {
+      found_ = other.found_;
+      seasonId_ = other.seasonId_;
+      targetDungeon_ = other.targetDungeon_;
+      previousSeasonId_ = other.previousSeasonId_;
+      previousTargetDungeon_ = other.previousTargetDungeon_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public DescribeSeasonResponse Clone() {
+      return new DescribeSeasonResponse(this);
+    }
+
+    /// <summary>Field number for the "found" field.</summary>
+    public const int FoundFieldNumber = 1;
+    private bool found_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Found {
+      get { return found_; }
+      set {
+        found_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "season_id" field.</summary>
+    public const int SeasonIdFieldNumber = 2;
+    private string seasonId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string SeasonId {
+      get { return seasonId_; }
+      set {
+        seasonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "target_dungeon" field.</summary>
+    public const int TargetDungeonFieldNumber = 3;
+    private string targetDungeon_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string TargetDungeon {
+      get { return targetDungeon_; }
+      set {
+        targetDungeon_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "previous_season_id" field.</summary>
+    public const int PreviousSeasonIdFieldNumber = 4;
+    private string previousSeasonId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string PreviousSeasonId {
+      get { return previousSeasonId_; }
+      set {
+        previousSeasonId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "previous_target_dungeon" field.</summary>
+    public const int PreviousTargetDungeonFieldNumber = 5;
+    private string previousTargetDungeon_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string PreviousTargetDungeon {
+      get { return previousTargetDungeon_; }
+      set {
+        previousTargetDungeon_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as DescribeSeasonResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(DescribeSeasonResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Found != other.Found) return false;
+      if (SeasonId != other.SeasonId) return false;
+      if (TargetDungeon != other.TargetDungeon) return false;
+      if (PreviousSeasonId != other.PreviousSeasonId) return false;
+      if (PreviousTargetDungeon != other.PreviousTargetDungeon) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Found != false) hash ^= Found.GetHashCode();
+      if (SeasonId.Length != 0) hash ^= SeasonId.GetHashCode();
+      if (TargetDungeon.Length != 0) hash ^= TargetDungeon.GetHashCode();
+      if (PreviousSeasonId.Length != 0) hash ^= PreviousSeasonId.GetHashCode();
+      if (PreviousTargetDungeon.Length != 0) hash ^= PreviousTargetDungeon.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Found != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Found);
+      }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(SeasonId);
+      }
+      if (TargetDungeon.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TargetDungeon);
+      }
+      if (PreviousSeasonId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(PreviousSeasonId);
+      }
+      if (PreviousTargetDungeon.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(PreviousTargetDungeon);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Found != false) {
+        output.WriteRawTag(8);
+        output.WriteBool(Found);
+      }
+      if (SeasonId.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(SeasonId);
+      }
+      if (TargetDungeon.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(TargetDungeon);
+      }
+      if (PreviousSeasonId.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(PreviousSeasonId);
+      }
+      if (PreviousTargetDungeon.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(PreviousTargetDungeon);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Found != false) {
+        size += 1 + 1;
+      }
+      if (SeasonId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(SeasonId);
+      }
+      if (TargetDungeon.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(TargetDungeon);
+      }
+      if (PreviousSeasonId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(PreviousSeasonId);
+      }
+      if (PreviousTargetDungeon.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(PreviousTargetDungeon);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(DescribeSeasonResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Found != false) {
+        Found = other.Found;
+      }
+      if (other.SeasonId.Length != 0) {
+        SeasonId = other.SeasonId;
+      }
+      if (other.TargetDungeon.Length != 0) {
+        TargetDungeon = other.TargetDungeon;
+      }
+      if (other.PreviousSeasonId.Length != 0) {
+        PreviousSeasonId = other.PreviousSeasonId;
+      }
+      if (other.PreviousTargetDungeon.Length != 0) {
+        PreviousTargetDungeon = other.PreviousTargetDungeon;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Found = input.ReadBool();
+            break;
+          }
+          case 18: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 26: {
+            TargetDungeon = input.ReadString();
+            break;
+          }
+          case 34: {
+            PreviousSeasonId = input.ReadString();
+            break;
+          }
+          case 42: {
+            PreviousTargetDungeon = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Found = input.ReadBool();
+            break;
+          }
+          case 18: {
+            SeasonId = input.ReadString();
+            break;
+          }
+          case 26: {
+            TargetDungeon = input.ReadString();
+            break;
+          }
+          case 34: {
+            PreviousSeasonId = input.ReadString();
+            break;
+          }
+          case 42: {
+            PreviousTargetDungeon = input.ReadString();
             break;
           }
         }
