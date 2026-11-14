@@ -524,6 +524,15 @@ namespace HotUpdate
                         + " boss_hp=" + BossHp + "/" + BossHpMax);
                     break;
                 }
+
+                // 城战同屏档位（P3-3a2 的 SiegeView）。只有城战实例发这条消息，
+                // 副本 / 竞技场 / 战场都不发；收到就交给社交屏，没开屏只记一行。
+                // 这里不按距离或人数自己重排——画全几个由服务端按上限算。
+                case ServerMessage.BodyOneofCase.SiegeView:
+                {
+                    Ui.UiSocialFlow.Feed(message.SiegeView);
+                    break;
+                }
             }
         }
 
