@@ -18,6 +18,12 @@ public interface ISiegeSectSource : IDisposable
 {
     /// <summary>null 表示没宗门 / 上游不可用，这一场就不写回归属。</summary>
     ulong? SectOf(ulong characterId);
+
+    /// <summary>
+    /// P3-5a：按宗门编号只读取名字。世界 Boss 的入口上要记的是「名字」，
+    /// 城战那条路不用这个方法。查不到 / 上游不可用回空串，不编一个名字出来。
+    /// </summary>
+    string NameOf(ulong sectId);
 }
 
 /// <summary>P3-3a4：胜负写回交给角色服（城池正本与社交 schema 都在这个进程写）。</summary>
@@ -29,6 +35,8 @@ public interface ISiegeResultSink : IDisposable
 public sealed class NoSiegeSectSource : ISiegeSectSource
 {
     public ulong? SectOf(ulong characterId) => null;
+
+    public string NameOf(ulong sectId) => "";
 
     public void Dispose()
     {
@@ -79,12 +87,42 @@ public sealed class GrpcSiegeSectSource : ISiegeSectSource
         }
     }
 
+    /// <summary>
+    /// P3-5a：按编号只读取宗门名。社交服的 DescribeSect 只回事实值，不写库、
+    /// 不算任何加成；查不到就回空串，入口上宁可不记名字也不编一个。
+    /// </summary>
+    public string NameOf(ulong sectId)
+    {
+        if (sectId == 0)
+        {
+            return "";
+        }
+
+        try
+        {
+            var reply = _client.DescribeSect(
+                new DescribeSectRequest { SectId = sectId },
+                deadline: DateTime.UtcNow.AddSeconds(2));
+            return reply.Ok ? (reply.Name ?? "").Trim() : "";
+        }
+        catch (RpcException ex)
+        {
+            Console.WriteLine($"sect_name_error=sect={sectId} status={ex.StatusCode}");
+            return "";
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TimeoutException
+                                   or OperationCanceledException or IOException)
+        {
+            Console.WriteLine($"sect_name_error=sect={sectId} kind={ex.GetType().Name}");
+            return "";
+        }
+    }
+
     public void Dispose() => _channel.Dispose();
 }
 
 /// <summary>写回失败只记日志，不影响这一场已经发生的技能结算。</summary>
-public sealed class GrpcSiegeResultSink : ISiegeResultSink
-{
+public sealed class GrpcSiegeResultSink : ISiegeResultSink{
     readonly GrpcChannel _channel;
     readonly CharacterService.CharacterServiceClient _client;
 

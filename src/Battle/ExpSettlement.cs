@@ -90,7 +90,9 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
                     + " kills=" + qualifiedKills
                     + " drill=" + reply.DrillGain
                     + " drill_after=" + reply.Drill
-                    + " drill_reason=" + reply.DrillReason);
+                    + " drill_reason=" + reply.DrillReason
+                    // P3-5a：来源只追加在串尾，老断言（gain= / bonus= 的顺序）一字不动。
+                    + " source=" + source);
             }
             catch (Exception ex) when (ex is RpcException or InvalidOperationException)
             {

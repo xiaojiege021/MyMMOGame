@@ -79,6 +79,14 @@ namespace Mmo.Proto.World {
     static readonly grpc::Marshaller<global::Mmo.Proto.World.CrossRegionRequest> __Marshaller_mmo_world_CrossRegionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.CrossRegionRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.CrossRegionResponse> __Marshaller_mmo_world_CrossRegionResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.CrossRegionResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.DescribeWorldBossRequest> __Marshaller_mmo_world_DescribeWorldBossRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.DescribeWorldBossRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.DescribeWorldBossResponse> __Marshaller_mmo_world_DescribeWorldBossResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.DescribeWorldBossResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.RecordWorldBossOwnerRequest> __Marshaller_mmo_world_RecordWorldBossOwnerRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.RecordWorldBossOwnerRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.RecordWorldBossOwnerResponse> __Marshaller_mmo_world_RecordWorldBossOwnerResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.RecordWorldBossOwnerResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse> __Method_EnterLine = new grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse>(
@@ -135,6 +143,22 @@ namespace Mmo.Proto.World {
         "CrossRegion",
         __Marshaller_mmo_world_CrossRegionRequest,
         __Marshaller_mmo_world_CrossRegionResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.DescribeWorldBossRequest, global::Mmo.Proto.World.DescribeWorldBossResponse> __Method_DescribeWorldBoss = new grpc::Method<global::Mmo.Proto.World.DescribeWorldBossRequest, global::Mmo.Proto.World.DescribeWorldBossResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeWorldBoss",
+        __Marshaller_mmo_world_DescribeWorldBossRequest,
+        __Marshaller_mmo_world_DescribeWorldBossResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.RecordWorldBossOwnerRequest, global::Mmo.Proto.World.RecordWorldBossOwnerResponse> __Method_RecordWorldBossOwner = new grpc::Method<global::Mmo.Proto.World.RecordWorldBossOwnerRequest, global::Mmo.Proto.World.RecordWorldBossOwnerResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RecordWorldBossOwner",
+        __Marshaller_mmo_world_RecordWorldBossOwnerRequest,
+        __Marshaller_mmo_world_RecordWorldBossOwnerResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -206,6 +230,35 @@ namespace Mmo.Proto.World {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.CrossRegionResponse> CrossRegion(global::Mmo.Proto.World.CrossRegionRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-5a：世界 Boss 的地表入口。什么时候出现、这一刻是哪一场、最多几个人、
+      /// 上一场把名字记在入口上的是哪个宗门，全部由世界服按 config/world_boss.json
+      /// 与自己这一份服务端时钟判定；请求是空的，时刻、场次编号、上限、归属都带不进来。
+      /// 入口关着就说关着（还没到点 / 这一场已经打掉 / 表没配），不返回「下一个可进的地方」。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.DescribeWorldBossResponse> DescribeWorldBoss(global::Mmo.Proto.World.DescribeWorldBossRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-5a：战斗服把这一场的事实值交回入口：打掉没打掉、伤害最高的宗门是谁。
+      /// 世界服只关入口、记名字，不加属性、不改税收、不碰灵石矿脉，也不写任何库表。
+      /// 同一个场次只记一次（场次编号 + 事务号挡重放）。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.RecordWorldBossOwnerResponse> RecordWorldBossOwner(global::Mmo.Proto.World.RecordWorldBossOwnerRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -447,6 +500,122 @@ namespace Mmo.Proto.World {
       {
         return CallInvoker.AsyncUnaryCall(__Method_CrossRegion, null, options, request);
       }
+      /// <summary>
+      /// P3-5a：世界 Boss 的地表入口。什么时候出现、这一刻是哪一场、最多几个人、
+      /// 上一场把名字记在入口上的是哪个宗门，全部由世界服按 config/world_boss.json
+      /// 与自己这一份服务端时钟判定；请求是空的，时刻、场次编号、上限、归属都带不进来。
+      /// 入口关着就说关着（还没到点 / 这一场已经打掉 / 表没配），不返回「下一个可进的地方」。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.DescribeWorldBossResponse DescribeWorldBoss(global::Mmo.Proto.World.DescribeWorldBossRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeWorldBoss(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-5a：世界 Boss 的地表入口。什么时候出现、这一刻是哪一场、最多几个人、
+      /// 上一场把名字记在入口上的是哪个宗门，全部由世界服按 config/world_boss.json
+      /// 与自己这一份服务端时钟判定；请求是空的，时刻、场次编号、上限、归属都带不进来。
+      /// 入口关着就说关着（还没到点 / 这一场已经打掉 / 表没配），不返回「下一个可进的地方」。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.DescribeWorldBossResponse DescribeWorldBoss(global::Mmo.Proto.World.DescribeWorldBossRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeWorldBoss, null, options, request);
+      }
+      /// <summary>
+      /// P3-5a：世界 Boss 的地表入口。什么时候出现、这一刻是哪一场、最多几个人、
+      /// 上一场把名字记在入口上的是哪个宗门，全部由世界服按 config/world_boss.json
+      /// 与自己这一份服务端时钟判定；请求是空的，时刻、场次编号、上限、归属都带不进来。
+      /// 入口关着就说关着（还没到点 / 这一场已经打掉 / 表没配），不返回「下一个可进的地方」。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.DescribeWorldBossResponse> DescribeWorldBossAsync(global::Mmo.Proto.World.DescribeWorldBossRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeWorldBossAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-5a：世界 Boss 的地表入口。什么时候出现、这一刻是哪一场、最多几个人、
+      /// 上一场把名字记在入口上的是哪个宗门，全部由世界服按 config/world_boss.json
+      /// 与自己这一份服务端时钟判定；请求是空的，时刻、场次编号、上限、归属都带不进来。
+      /// 入口关着就说关着（还没到点 / 这一场已经打掉 / 表没配），不返回「下一个可进的地方」。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.DescribeWorldBossResponse> DescribeWorldBossAsync(global::Mmo.Proto.World.DescribeWorldBossRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeWorldBoss, null, options, request);
+      }
+      /// <summary>
+      /// P3-5a：战斗服把这一场的事实值交回入口：打掉没打掉、伤害最高的宗门是谁。
+      /// 世界服只关入口、记名字，不加属性、不改税收、不碰灵石矿脉，也不写任何库表。
+      /// 同一个场次只记一次（场次编号 + 事务号挡重放）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.RecordWorldBossOwnerResponse RecordWorldBossOwner(global::Mmo.Proto.World.RecordWorldBossOwnerRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RecordWorldBossOwner(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-5a：战斗服把这一场的事实值交回入口：打掉没打掉、伤害最高的宗门是谁。
+      /// 世界服只关入口、记名字，不加属性、不改税收、不碰灵石矿脉，也不写任何库表。
+      /// 同一个场次只记一次（场次编号 + 事务号挡重放）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.RecordWorldBossOwnerResponse RecordWorldBossOwner(global::Mmo.Proto.World.RecordWorldBossOwnerRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RecordWorldBossOwner, null, options, request);
+      }
+      /// <summary>
+      /// P3-5a：战斗服把这一场的事实值交回入口：打掉没打掉、伤害最高的宗门是谁。
+      /// 世界服只关入口、记名字，不加属性、不改税收、不碰灵石矿脉，也不写任何库表。
+      /// 同一个场次只记一次（场次编号 + 事务号挡重放）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.RecordWorldBossOwnerResponse> RecordWorldBossOwnerAsync(global::Mmo.Proto.World.RecordWorldBossOwnerRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RecordWorldBossOwnerAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-5a：战斗服把这一场的事实值交回入口：打掉没打掉、伤害最高的宗门是谁。
+      /// 世界服只关入口、记名字，不加属性、不改税收、不碰灵石矿脉，也不写任何库表。
+      /// 同一个场次只记一次（场次编号 + 事务号挡重放）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.RecordWorldBossOwnerResponse> RecordWorldBossOwnerAsync(global::Mmo.Proto.World.RecordWorldBossOwnerRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RecordWorldBossOwner, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override WorldServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -467,7 +636,9 @@ namespace Mmo.Proto.World {
           .AddMethod(__Method_PositionStream, serviceImpl.PositionStream)
           .AddMethod(__Method_Gather, serviceImpl.Gather)
           .AddMethod(__Method_Fly, serviceImpl.Fly)
-          .AddMethod(__Method_CrossRegion, serviceImpl.CrossRegion).Build();
+          .AddMethod(__Method_CrossRegion, serviceImpl.CrossRegion)
+          .AddMethod(__Method_DescribeWorldBoss, serviceImpl.DescribeWorldBoss)
+          .AddMethod(__Method_RecordWorldBossOwner, serviceImpl.RecordWorldBossOwner).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -484,6 +655,8 @@ namespace Mmo.Proto.World {
       serviceBinder.AddMethod(__Method_Gather, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.GatherRequest, global::Mmo.Proto.World.GatherResponse>(serviceImpl.Gather));
       serviceBinder.AddMethod(__Method_Fly, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.FlyRequest, global::Mmo.Proto.World.FlyResponse>(serviceImpl.Fly));
       serviceBinder.AddMethod(__Method_CrossRegion, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.CrossRegionRequest, global::Mmo.Proto.World.CrossRegionResponse>(serviceImpl.CrossRegion));
+      serviceBinder.AddMethod(__Method_DescribeWorldBoss, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.DescribeWorldBossRequest, global::Mmo.Proto.World.DescribeWorldBossResponse>(serviceImpl.DescribeWorldBoss));
+      serviceBinder.AddMethod(__Method_RecordWorldBossOwner, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.RecordWorldBossOwnerRequest, global::Mmo.Proto.World.RecordWorldBossOwnerResponse>(serviceImpl.RecordWorldBossOwner));
     }
 
   }

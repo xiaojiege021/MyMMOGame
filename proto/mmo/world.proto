@@ -24,6 +24,17 @@ service WorldService {
   // 权限不够就把人拉回地面 / 留在原区域，不在客户端上改权限。
   rpc Fly(FlyRequest) returns (FlyResponse);
   rpc CrossRegion(CrossRegionRequest) returns (CrossRegionResponse);
+
+  // P3-5a：世界 Boss 的地表入口。什么时候出现、这一刻是哪一场、最多几个人、
+  // 上一场把名字记在入口上的是哪个宗门，全部由世界服按 config/world_boss.json
+  // 与自己这一份服务端时钟判定；请求是空的，时刻、场次编号、上限、归属都带不进来。
+  // 入口关着就说关着（还没到点 / 这一场已经打掉 / 表没配），不返回「下一个可进的地方」。
+  rpc DescribeWorldBoss(DescribeWorldBossRequest) returns (DescribeWorldBossResponse);
+
+  // P3-5a：战斗服把这一场的事实值交回入口：打掉没打掉、伤害最高的宗门是谁。
+  // 世界服只关入口、记名字，不加属性、不改税收、不碰灵石矿脉，也不写任何库表。
+  // 同一个场次只记一次（场次编号 + 事务号挡重放）。
+  rpc RecordWorldBossOwner(RecordWorldBossOwnerRequest) returns (RecordWorldBossOwnerResponse);
 }
 
 // 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
@@ -205,4 +216,58 @@ message CrossRegionResponse {
   uint32 line_no = 5;
   string realm = 6;
   string required_realm = 7;
+}
+
+// P3-5a：查这一刻的地表入口。空请求——时刻由服务端时钟给，场次编号、上限、
+// 归属、剩余时间都由世界服算完再下发，客户端连「我想进哪一场」都表达不了。
+message DescribeWorldBossRequest {}
+
+// visible 是「入口这一刻在不在」：窗口内、且这一场还没被打掉才为 true。
+// 关着时 reason 说明为什么（not_open 未到点或已过点 / fought 这一场已经打掉 /
+// table_missing 没配这张表），window_key / starts_at_ms / ends_at_ms 给 0 或空，
+// 不给一个「看起来还能进」的场次。next_starts_at_ms 是下一次出现的时刻，只作展示。
+message DescribeWorldBossResponse {
+  bool visible = 1;
+  string reason = 2;
+  string entrance_id = 3;
+  string entrance_name = 4;
+  string region_id = 5;
+  string window_key = 6;
+  uint64 starts_at_ms = 7;
+  uint64 ends_at_ms = 8;
+  uint64 next_starts_at_ms = 9;
+  uint32 cap = 10;
+  bool killed = 11;
+  // 上一场（或这一场）结束时记在入口上的归属宗门。只记名字，不加属性、
+  // 不改税收、不把灵石矿脉转走；没有宗门打过就都是空 / 0。
+  uint64 owner_sect_id = 12;
+  string owner_sect_name = 13;
+  string owner_window_key = 14;
+  uint64 owner_recorded_at_ms = 15;
+}
+
+// 战斗服交回的这一场事实值：打掉没打掉、伤害最高的宗门是谁。
+// 请求里没有奖励、没有属性加成、没有税率、没有矿脉归属：记名字就只是记名字。
+message RecordWorldBossOwnerRequest {
+  string txn_id = 1;
+  string entrance_id = 2;
+  string window_key = 3;
+  bool killed = 4;
+  uint64 winner_sect_id = 5;
+  string winner_sect_name = 6;
+  // 本场有效伤害合计，只作日志与核对的只读事实值。
+  int64 damage_total = 7;
+}
+
+// ok=false 的 reason：request_missing / unknown_entrance / window_missing /
+// wrong_entrance / duplicate（同一个场次已经记过，不覆盖）。entrance_closed
+// 表示这一刻入口已经关了（被击杀或已过窗口），关掉之后不再接受新进场。
+message RecordWorldBossOwnerResponse {
+  bool ok = 1;
+  string reason = 2;
+  bool duplicate = 3;
+  string window_key = 4;
+  uint64 owner_sect_id = 5;
+  string owner_sect_name = 6;
+  bool entrance_closed = 7;
 }

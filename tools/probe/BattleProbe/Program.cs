@@ -43,6 +43,8 @@ internal static class Program
         var expBefore = long.TryParse(Arg(args, "--exp-before"), out var eb) ? eb : 1000L;
         var expCost = long.TryParse(Arg(args, "--exp-cost"), out var ec) ? ec : 100L;
         var expectLevel = long.TryParse(Arg(args, "--expect-level"), out var lv) ? lv : 1L;
+        var cap = int.TryParse(Arg(args, "--cap"), out var cp) ? cp : 20;
+        var secondChar = ulong.TryParse(Arg(args, "--second-char"), out var sc) ? sc : 0UL;
 
         try
         {
@@ -73,6 +75,9 @@ internal static class Program
                 "p12c_boss_hit" => await CaseP12cBossHitAsync(url),
                 "p12c_player_damage" => await CaseP12cPlayerDamageAsync(url, boss, hit),
                 "p12d_clear" => await CaseP12dClearAsync(url, boss, hit, aChar, bChar, partySize),
+                "worldboss_join" => await CaseWorldBossJoinAsync(url, boss, Arg(args, "--expect") ?? "open"),
+                "worldboss_fill" => await CaseWorldBossFillAsync(url, boss, cap, aChar),
+                "worldboss_clear" => await CaseWorldBossClearAsync(url, boss, hit, aChar, secondChar, holdMs),
                 "p15c3_talisman" => await CaseP15c3TalismanAsync(url, item),
                 "p15c3_talisman_full" => await CaseP15c3FullAsync(url, item),
                 "p15c3_talisman_other" => await CaseP15c3OtherAsync(url, otherItem),
@@ -1015,6 +1020,174 @@ internal static class Program
             $"case=p12d_clear party_size={partySize} a={aChar} b={bChar} "
             + $"casts={casts} damage={firstDamage} hp_left={hp} "
             + $"settlement_id={ended?.SettlementId} exp_gain={ended?.ExpGain} cleared={ended?.Cleared}");
+    }
+
+    // ---- P3-5a 世界 Boss ----
+
+    /// <summary>
+    /// 一个人进世界 Boss 这场。--expect open 要真打开（血量满、Boss 编号对得上），
+    /// --expect closed 要拿到 worldboss_closed（没到点或过点），--expect full 要 worldboss_full。
+    /// 结算、归属这些由核对脚本读服务端日志，这里只证明「能不能进」这一条。
+    /// </summary>
+    static async Task<int> CaseWorldBossJoinAsync(string url, ulong boss, string expect)
+    {
+        await using var session = await Session.ConnectOrRejectAsync(url);
+        if (expect == "open")
+        {
+            var o = session.Opened;
+            var ok = o is not null && o.BossId == boss && o.BossHp == o.BossHpMax && o.BossHpMax > 0
+                     && o.SessionId > 0;
+            return Report(ok,
+                $"case=worldboss_join expect={expect} session_id={o?.SessionId} boss={o?.BossId} "
+                + $"boss_hp={o?.BossHp} boss_hp_max={o?.BossHpMax} caster={o?.CasterId} "
+                + $"reject={session.EnterRejected?.Reason ?? "none"}");
+        }
+
+        var rejected = session.EnterRejected;
+        // 服务端给的是 worldboss_closed / worldboss_filled 这类全名，--expect 只写后半截。
+        var good = rejected is not null && session.Opened is null
+                   && (rejected.Reason == expect || rejected.Reason == "worldboss_" + expect);
+        return Report(good,
+            $"case=worldboss_join expect={expect} reject={rejected?.Reason ?? "none"} "
+            + $"limit={rejected?.Limit} current={rejected?.Current} opened={(session.Opened is not null)}");
+    }
+
+    /// <summary>
+    /// 首发上限：先占满 cap 个人（每人一个独立角色编号），第 cap+1 个人必须被回
+    /// worldboss_full，且 limit / current 都等于配置里的上限——代码里没有第二个数字。
+    /// </summary>
+    static async Task<int> CaseWorldBossFillAsync(string url, ulong boss, int cap, ulong firstChar)
+    {
+        var sessions = new List<Session>();
+        var opened = 0;
+        var extraReason = "none";
+        uint extraLimit = 0;
+        uint extraCurrent = 0;
+        var extraOpened = false;
+        try
+        {
+            for (var i = 0; i < cap; i++)
+            {
+                var session = await Session.ConnectAsync(
+                    WithQuery(url, "char=" + (firstChar + (ulong)i) + "&class=warrior"));
+                sessions.Add(session);
+                if (session.Opened.BossId == boss && session.Opened.SessionId > 0)
+                {
+                    opened++;
+                }
+            }
+
+            await using var extra = await Session.ConnectOrRejectAsync(
+                WithQuery(url, "char=" + (firstChar + (ulong)cap) + "&class=warrior"));
+            extraOpened = extra.Opened is not null;
+            if (extra.EnterRejected is { } rejected)
+            {
+                extraReason = rejected.Reason;
+                extraLimit = rejected.Limit;
+                extraCurrent = rejected.Current;
+            }
+
+            var ok = opened == cap && !extraOpened
+                     && extraReason == "worldboss_full"
+                     && extraLimit == (uint)cap && extraCurrent == (uint)cap;
+            return Report(ok,
+                $"case=worldboss_fill cap={cap} opened={opened} extra_opened={extraOpened} "
+                + $"extra_reason={extraReason} limit={extraLimit} current={extraCurrent}");
+        }
+        finally
+        {
+            foreach (var session in sessions)
+            {
+                await session.DisposeAsync();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 一个人把这一场的 Boss 打掉：只证明战斗服自己把血打完并回了结算号，
+    /// 经验有没有真进库、来源是不是 world_boss，由核对脚本查库与日志。
+    /// --second-char 给了就再开一条（牧师）一起在场：同一场里两个人才谈得上
+    /// 组队加成与同门加成，结算人数也才是 2。
+    /// </summary>
+    static async Task<int> CaseWorldBossClearAsync(
+        string url, ulong boss, uint skill, ulong charId, ulong secondChar, int holdMs)
+    {
+        await using var session = await Session.ConnectAsync(
+            WithQuery(url, "char=" + charId + "&class=warrior"));
+        Session? mate = secondChar == 0
+            ? null
+            : await Session.ConnectAsync(
+                WithQuery(url, "char=" + secondChar + "&class=priest"));
+        var hp = session.Opened.BossHp;
+        long firstDamage = 0;
+        var casts = 0;
+        BattleEnded? ended = null;
+
+        for (var attempt = 0; attempt < 80 && ended is null; attempt++)
+        {
+            await session.SubmitAsync(skill, boss, Session.NowMs());
+            var message = await session.ReadUntilAsync(
+                m => m.Result is not null || m.Ended is not null || m.Rejected is not null, 6000);
+            if (message is null)
+            {
+                break;
+            }
+
+            if (message.Ended is not null)
+            {
+                ended = message.Ended;
+                break;
+            }
+
+            if (message.Rejected is { } rejected)
+            {
+                if (rejected.Reason == SkillRejectReason.SkillRejectCooldown)
+                {
+                    await Task.Delay((int)rejected.RetryAfterMs + 40);
+                    continue;
+                }
+
+                if (rejected.Reason == SkillRejectReason.SkillRejectRecovery)
+                {
+                    await Task.Delay(500);
+                    continue;
+                }
+
+                break;
+            }
+
+            casts++;
+            if (firstDamage == 0)
+            {
+                firstDamage = message.Result!.Damage;
+            }
+
+            hp = message.Result!.TargetHpAfter;
+            if (hp <= 0)
+            {
+                // 结算要等角色服写完才回 Ended，留足一次建连的余量。
+                ended = (await session.ReadUntilAsync(m => m.Ended is not null, 8000))?.Ended;
+                break;
+            }
+        }
+
+        // holdMs 只用来让调用方多留一会儿，避免结算日志还没刷出来就把进程收掉。
+        if (holdMs > 0 && ended is not null)
+        {
+            await Task.Delay(holdMs);
+        }
+
+        if (mate is not null)
+        {
+            await mate.DisposeAsync();
+        }
+
+        var ok = ended is { Cleared: true } && !string.IsNullOrEmpty(ended.SettlementId)
+                 && firstDamage > 0 && hp <= 0;
+        return Report(ok,
+            $"case=worldboss_clear char={charId} mate={secondChar} boss={boss} casts={casts} "
+            + $"first_damage={firstDamage} hp_left={hp} settlement_id={ended?.SettlementId} "
+            + $"exp_gain={ended?.ExpGain} cleared={ended?.Cleared}");
     }
 
     // ---- P1-5c3 红符 ----

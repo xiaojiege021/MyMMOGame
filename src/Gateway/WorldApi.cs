@@ -418,6 +418,48 @@ public static class WorldApi
                 await WriteRpcErrorAsync(context, "world_regions", account, ex);
             }
         });
+
+        // 只读：地表入口这一刻开没开、还能进多少人、上一场记下的宗门名字。
+        // 开门与否只由世界服的时钟与窗口决定，这条路由不接任何「请开门」的参数。
+        app.MapGet("/world/worldboss", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "world_worldboss", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            try
+            {
+                var result = await world.DescribeWorldBossAsync(
+                    new DescribeWorldBossRequest(),
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                await WriteAsync(context, 200, new
+                {
+                    visible = result.Visible,
+                    reason = result.Reason,
+                    entrance_id = result.EntranceId,
+                    entrance_name = result.EntranceName,
+                    region_id = result.RegionId,
+                    window_key = result.WindowKey,
+                    starts_at_ms = result.StartsAtMs,
+                    ends_at_ms = result.EndsAtMs,
+                    next_starts_at_ms = result.NextStartsAtMs,
+                    cap = result.Cap,
+                    killed = result.Killed,
+                    owner_sect_id = result.OwnerSectId,
+                    owner_sect_name = result.OwnerSectName,
+                    owner_window_key = result.OwnerWindowKey,
+                    owner_recorded_at_ms = result.OwnerRecordedAtMs,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "world_worldboss", account, ex);
+            }
+        });
     }
 
     // 复核归属的同时取回名字，只走服与服这一段；请求体里没有这个名字字段。

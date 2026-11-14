@@ -18,6 +18,35 @@ internal sealed class Session : IAsyncDisposable
     public BattleOpened Opened { get; private set; } = null!;
 
     /// <summary>
+    /// P3-5a：第一条就是拒绝时的原因（没到点、满了、打过了）。正常开场时是 null。
+    /// 被拒的连接不会再有第二条消息，服务端发完就关，所以这里单独存一份。
+    /// </summary>
+    public EnterRejected? EnterRejected { get; private set; }
+
+    /// <summary>
+    /// P3-5a：第一条可能是开场包、也可能是拒绝包。世界 Boss 的入口会拒人，
+    /// 核对就是要把「进不去」这条事实值读出来，所以不能复用只认开场包的那个入口。
+    /// </summary>
+    public static async Task<Session> ConnectOrRejectAsync(string url)
+    {
+        var session = new Session();
+        await session._socket.ConnectAsync(new Uri(url), session._cts.Token);
+        _ = session.PumpAsync();
+
+        var first = await session.ReadAsync(5000)
+                    ?? throw new InvalidOperationException("连上以后没收到开场消息");
+        if (first.Opened is not null)
+        {
+            session.Opened = first.Opened;
+            return session;
+        }
+
+        session.EnterRejected = first.EnterRejected
+                                ?? throw new InvalidOperationException("第一条既不是开场也不是拒绝");
+        return session;
+    }
+
+    /// <summary>
     /// skipUntilOpened 只给 P3-3a2 的城战多人用例用：同一场里别人的状态广播、
     /// 档位刷新或 tick 回包可能比自己的开场包先到，连上后一直读到 BattleOpened。
     /// 缺省 false，老用例「第一条必须是开场包」的断言一字不变。

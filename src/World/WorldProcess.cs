@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace World;
 
-public sealed class WorldProcess(string configPath, string gatherConfigPath, string flightConfigPath)
+public sealed class WorldProcess(
+    string configPath, string gatherConfigPath, string flightConfigPath,
+    string worldBossConfigPath)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
@@ -11,6 +13,7 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath, str
         WorldCatalog catalog;
         GatherTable gather;
         FlightTable flights;
+        WorldBossTable? worldBossTable;
         try
         {
             config = WorldConfig.Load(configPath);
@@ -20,6 +23,9 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath, str
             gather = GatherTable.Load(gatherConfigPath, regionIds);
             // 每块已配置地表都必须有境界门槛，漏一块就等于给它开零门槛。
             flights = FlightTable.Load(flightConfigPath, regionIds);
+            // 世界 Boss 是可选表：入口必须长在已经开放的地表上。缺表 / 坏表一律降级成
+            // 「没有入口」，不让一份可选配置把分线、采集、飞行这些老链路一起拖垮。
+            worldBossTable = LoadWorldBoss(worldBossConfigPath, catalog);
         }
         catch (ConfigException ex)
         {
@@ -56,6 +62,7 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath, str
             + " region_realms=" + string.Join(",", catalog.Regions.Select(
                 r => r.Id + ":" + flights.RequiredFor(r.Id)))
             + " ground_y=" + config.SpawnY);
+        Console.WriteLine("world_boss_config=ok " + DescribeWorldBossTable(worldBossTable, worldBossConfigPath));
         Console.WriteLine("regions=" + string.Join(",", catalog.Regions.Select(r => r.Id)));
         Console.WriteLine("speakers=" + string.Join(",", catalog.Speakers));
         Console.WriteLine("locked=" + string.Join(",", catalog.Regions.Where(r => !r.Open).Select(r => r.Id)));
@@ -70,6 +77,9 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath, str
         // 境界只在角色服：世界服每次判飞行/跨区都去问，不连角色库，也不自己存境界。
         using var realmReader = new GrpcRealmReader(flights.CharacterUpstream);
         var flightGate = new FlightGate(flights, realmReader, registry, catalog);
+        // 入口的在线状态只在世界服：“这一刻开没开、这一场打掉没有、名字记的是谁”。
+        // 全在进程内存，不落库、不结算技能、不碰任何角色数据。
+        var worldBoss = new WorldBossEntrance(worldBossTable);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2。
@@ -93,6 +103,7 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath, str
         builder.Services.AddSingleton<IGatherGrant>(gatherGrants);
         builder.Services.AddSingleton(flights);
         builder.Services.AddSingleton(flightGate);
+        builder.Services.AddSingleton(worldBoss);
         builder.Services.AddHostedService<PositionBroadcaster>();
 
         var app = builder.Build();
@@ -112,4 +123,45 @@ public sealed class WorldProcess(string configPath, string gatherConfigPath, str
         Console.WriteLine("stopped name=World pid=" + Environment.ProcessId);
         return 0;
     }
+
+    /// <summary>
+    /// 世界 Boss 表是可选表：入口必须长在已经开放的地表上。缺表与坏表都降级成
+    /// 「没有入口」，只打一行 config 或 error，不把分线、采集、飞行一起拖下水。
+    /// </summary>
+    static WorldBossTable? LoadWorldBoss(string path, WorldCatalog catalog)
+    {
+        if (!File.Exists(path))
+        {
+            Console.WriteLine("world_boss_config=missing path=" + path);
+            return null;
+        }
+
+        try
+        {
+            var open = catalog.Regions.Where(r => r.Open).Select(r => r.Id)
+                .ToHashSet(StringComparer.Ordinal);
+            return WorldBossTable.Load(path, open);
+        }
+        catch (ConfigException ex)
+        {
+            Console.WriteLine("world_boss_config_error=" + ex.Message);
+            return null;
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine("world_boss_config_error=" + ex.Message);
+            return null;
+        }
+    }
+
+    static string DescribeWorldBossTable(WorldBossTable? table, string path) =>
+        table is null
+            ? "missing path=" + path
+            : "version=" + table.Version
+              + " entrance=" + table.EntranceId
+              + " region=" + table.RegionId
+              + " cap=" + table.Cap
+              + " windows=" + table.Windows.Count
+              + " pending=" + (table.Pending ? "true" : "false")
+              + " path=" + path;
 }

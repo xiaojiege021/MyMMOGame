@@ -49,6 +49,9 @@ CHAR_NAMES=("$NAME_LEDGER" "$NAME_CAP" "$NAME_CONCURRENT" "$NAME_OLDRULES" "$NAM
 PASS=0
 FAIL=0
 TMP="$(mktemp -d)"
+# Windows 上 mktemp 会给出 C 盘前缀加正斜杠的混写路径，
+# 直接塞进 JSON 会把反斜杠当成非法转义；统一成正斜杠，macOS / Linux 上原样不变。
+TMP="${TMP//\\//}"
 BATTLE_PID=""
 CHARACTER_PID=""
 GATEWAY_PID=""
@@ -278,10 +281,13 @@ else
   bad "角色服结算没复核归属或没判人数"
 fi
 
-if grep -q 'SettleParty(_settlementId' "$ENCOUNTER" \
+# P3-5a 起结算多两个入参：来源（这一场是什么）与本场实际人数。副本仍然传
+# "dungeon" 与进本时说好的人数，回包经验仍然只取这一场的首领经验，口径没变。
+if grep -q 'SettleParty(' "$ENCOUNTER" \
+   && grep -q '_settlementId, SettlementSource, settledSize' "$ENCOUNTER" \
    && grep -q '"dungeon"' "$ENCOUNTER" \
-   && grep -q 'ExpGain = _config.Boss.ExpOnClear' "$ENCOUNTER" \
-   && grep -q 'ExpGain = string.IsNullOrEmpty(_settlementId) ? 0 : _config.Boss.ExpOnClear' "$ENCOUNTER" \
+   && grep -q 'ExpGain = _boss.ExpOnClear' "$ENCOUNTER" \
+   && grep -q 'ExpGain = string.IsNullOrEmpty(_settlementId) ? 0 : _boss.ExpOnClear' "$ENCOUNTER" \
    && grep -q 'NextSessionId(), partySize' "$BATTLE_SRV" \
    && [ "$(grep -c '_settlements.Write(' "$ENCOUNTER")" = "1" ]; then
   ok "战斗服通关才把这一场交给角色服，P0 结算记录与回包经验仍走老口径"

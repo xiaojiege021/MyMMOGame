@@ -321,7 +321,10 @@ registry = open(root + '/src/World/LineRegistry.cs', encoding='utf-8').read()
 assert 'config.LineCapacity' in registry and 'config.MaxLinesPerRegion' in registry
 assert 'Npgsql' not in registry and 'Npgsql' not in open(root + '/src/World/WorldProcess.cs', encoding='utf-8').read()
 grpc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
-assert 'Damage' not in grpc and 'Skill' not in grpc
+# P3-5a 起世界服会收到战斗服报回的一个「本场伤害总额」事实值（只用来决定
+# 把哪个宗门名字写在入口上，不结算、不发奖），所以这里只放开这一个字段。
+assert 'Skill' not in grpc
+assert not re.search(r'Damage(?!Total)', grpc)
 api = open(root + '/src/Gateway/WorldApi.cs', encoding='utf-8').read()
 assert 'OwnsAsync' in api and 'config.WorldUpstream' in api and 'invalid_token' in api
 gcfg = open(root + '/src/Gateway/GatewayConfig.cs', encoding='utf-8').read()

@@ -14,6 +14,9 @@ var siegeTerritoryOnly = false;
 string? siegeTerritoryPath = null;
 var siegeViewOnly = false;
 var siegeViewArgs = new List<string>();
+var worldBossOnly = false;
+string? worldBossPath = null;
+var worldBossAtMs = 0L;
 for (var i = 0; i < args.Length; i++)
 {
     switch (args[i])
@@ -60,6 +63,22 @@ for (var i = 0; i < args.Length; i++)
         case "--siege-territory-table-path" when i + 1 < args.Length:
             siegeTerritoryOnly = true;
             siegeTerritoryPath = args[++i];
+            break;
+        // P3-5a：打印世界 Boss 表就退出，不连库不起服，与真实启动共用同一份加载。
+        case "--world-boss-table":
+            worldBossOnly = true;
+            break;
+        case "--world-boss-table-path" when i + 1 < args.Length:
+            worldBossOnly = true;
+            worldBossPath = args[++i];
+            break;
+        // 把「这一刻」定成给定的毫秒时间戳，用来验未到点 / 到点；同一时刻只算出一场。
+        case "--at" when i + 1 < args.Length:
+            if (!long.TryParse(args[++i], out worldBossAtMs))
+            {
+                Console.WriteLine("bad_arg=--at");
+                return 64;
+            }
             break;
         // 只读入口：不连库不起服，直接核对城战同屏档位的纯计算。
         case "--siege-view":
@@ -132,6 +151,56 @@ if (siegeTerritoryOnly)
         Console.WriteLine($"siege_territory_match=prefix={first.MatchPrefix}"
             + $" city={table.CityOf(first.MatchPrefix + "-probe")?.CityId ?? "-"}"
             + $" unknown={table.CityOf("not-a-city")?.CityId ?? "-"}");
+        return 0;
+    }
+    catch (Battle.ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+}
+
+if (worldBossOnly)
+{
+    try
+    {
+        Battle.WorldBossTable table = worldBossPath is null
+            ? Battle.BattleConfig.Load(configPath).WorldBoss
+            : Battle.WorldBossTable.Load(worldBossPath);
+
+        if (table.IsMissing)
+        {
+            Console.WriteLine("world_boss=missing");
+            return 0;
+        }
+
+        Console.WriteLine($"world_boss_table_version={table.Version}"
+            + $" pending={(table.Pending ? "true" : "false")}"
+            + $" entrance={table.EntranceId}"
+            + $" region={table.RegionId}"
+            + $" cap={table.Cap}"
+            + $" windows={table.Windows.Count}"
+            + $" boss={table.Boss.Id}"
+            + $" boss_hp_max={table.Boss.HpMax}"
+            + $" boss_exp={table.Boss.ExpOnClear}");
+        foreach (var window in table.Windows)
+        {
+            Console.WriteLine($"world_boss_window_rule=id={window.Id}"
+                + $" start_minutes={window.StartMinutes} duration_s={window.DurationSeconds}");
+        }
+
+        // 纯计算：这一刻是哪一场只由服务端时钟与这张表决定；与世界服那条入口
+        // 按同一个时间戳算出来的钥匙必须一样，不一样就是两份实现跑偏了。
+        var now = worldBossAtMs > 0
+            ? DateTimeOffset.FromUnixTimeMilliseconds(worldBossAtMs)
+            : DateTimeOffset.UtcNow;
+        var slot = table.WindowOf(now);
+        Console.WriteLine($"world_boss_now=at={now.ToUnixTimeMilliseconds()}"
+            + $" open={(slot.Open ? "true" : "false")}"
+            + $" key={(slot.Key.Length == 0 ? "none" : slot.Key)}"
+            + $" starts_at_ms={slot.StartsAtMs}"
+            + $" ends_at_ms={slot.EndsAtMs}"
+            + $" next_starts_at_ms={slot.NextStartsAtMs}");
         return 0;
     }
     catch (Battle.ConfigException ex)

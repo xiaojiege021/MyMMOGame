@@ -52,6 +52,11 @@ public sealed class BattleProcess(string configPath)
         using ISiegeResultSink siegeResult = string.IsNullOrEmpty(config.CharacterUpstream)
             ? new NoSiegeResultSink()
             : new GrpcSiegeResultSink(config.CharacterUpstream);
+        // P3-5a：入口在世界服，这一场打完只把事实值交回去（打掉没有、伤害最高的宗门）。
+        // 没配 world_upstream 就不交：技能与经验照常结算，只是入口上不会记名字。
+        using IWorldBossSink worldBoss = string.IsNullOrEmpty(config.WorldUpstream)
+            ? new NoWorldBossSink()
+            : new GrpcWorldBossSink(config.WorldUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
         Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
@@ -127,13 +132,26 @@ public sealed class BattleProcess(string configPath)
                 : $" siege_territory_version={config.SiegeTerritory.Version}"
                   + $" siege_territory_cities={config.SiegeTerritory.Cities.Count}"
                   + $" siege_territory_pending={(config.SiegeTerritory.Pending ? "true" : "false")}"));
+        // 世界 Boss 表单独一行：entrance / cap / 窗口数 / 首领全从这里现取。
+        // missing 表示这一进程没有入口，带 worldboss 的连接一律拒，别的模式照跑。
+        Console.WriteLine($"world_boss_table={config.WorldBossTablePath}"
+            + (config.WorldBoss.IsMissing
+                ? " world_boss=missing"
+                : $" world_boss_version={config.WorldBoss.Version}"
+                  + $" world_boss_entrance={config.WorldBoss.EntranceId}"
+                  + $" world_boss_region={config.WorldBoss.RegionId}"
+                  + $" world_boss_cap={config.WorldBoss.Cap}"
+                  + $" world_boss_windows={config.WorldBoss.Windows.Count}"
+                  + $" world_boss_boss={config.WorldBoss.Boss.Id}"
+                  + $" world_boss_pending={(config.WorldBoss.Pending ? "true" : "false")}")
+            + $" world_upstream={(config.WorldUpstream.Length == 0 ? "off" : config.WorldUpstream)}");
         Console.WriteLine("resume=off");
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);
 
         try
         {
             await new BattleServer(config, settlements, characters, expSettlement, talismans,
-                scrolls, profiles, sectTech, siegeSect, siegeResult)
+                scrolls, profiles, sectTech, siegeSect, siegeResult, worldBoss)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

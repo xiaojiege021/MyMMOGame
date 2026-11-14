@@ -134,9 +134,22 @@ public sealed class Encounter
     readonly DungeonDef? _dungeon;
     readonly Dictionary<ulong, Member> _members = [];
 
+    /// <summary>
+    /// 这一场打谁。缺省是 config/battle.json 的 boss（副本、练习场、竞技场、战场、
+    /// 城战全是它）；世界 Boss 的一场由 config/world_boss.json 的 boss 段给，
+    /// 两条线各自独立，谁都不会去改对方的数值。
+    /// </summary>
+    readonly BossConfig _boss;
+
     readonly long _bossHpMax;
     readonly double _monsterDamageScale;
     readonly int _partySize;
+
+    /// <summary>
+    /// P3-5a：结算人数。0 表示没人设过，按构造时的 party_size 结算（老路径的行为）。
+    /// 世界 Boss 在每次有人进场时把它抬到本场实际人数，组队加成按实际人数算。
+    /// </summary>
+    int _settlementPartySize;
 
     long _bossHp;
     long _damageTotal;
@@ -165,7 +178,8 @@ public sealed class Encounter
     public Encounter(
         BattleConfig config, SettlementStore settlements, ICharacterStore characters,
         ulong sessionId, int partySize, IExpSettlement expSettlement, ITalismanSpend talismans,
-        IReviveScrollUse scrolls, IBattleProfileSource profiles, DungeonDef? dungeon)
+        IReviveScrollUse scrolls, IBattleProfileSource profiles, DungeonDef? dungeon,
+        BossConfig? boss = null)
     {
         _config = config;
         _settlements = settlements;
@@ -175,9 +189,11 @@ public sealed class Encounter
         _scrolls = scrolls;
         _profiles = profiles;
         _dungeon = dungeon;
+        // 不传就用配置里那一个 boss：老调用点一个都没变。
+        _boss = boss ?? config.Boss;
         SessionId = sessionId;
         _partySize = partySize;
-        _bossHpMax = Scale(config.Boss.HpMax, config.Dungeons.MonsterHpScalePerPlayer, partySize);
+        _bossHpMax = Scale(_boss.HpMax, config.Dungeons.MonsterHpScalePerPlayer, partySize);
         _monsterDamageScale = Factor(config.Dungeons.MonsterDamageScalePerPlayer, partySize);
         _bossHp = _bossHpMax;
     }
@@ -188,6 +204,26 @@ public sealed class Encounter
     public long BossHpMax => _bossHpMax;
 
     public int PartySize => _partySize;
+
+    /// <summary>
+    /// P3-5a：这一场结算用的来源标签（写进角色服那一笔流水的 source）。
+    /// 副本、练习场、竞技场、战场、城战都是 dungeon，世界 Boss 是 world_boss。
+    /// 只改标签，不改基础经验、组队加成、同门加成里任何一个数。
+    /// </summary>
+    public string SettlementSource { get; set; } = "dungeon";
+
+    /// <summary>
+    /// P3-5a：结算时用的人数。世界 Boss 的人数随进场变化，构造那一刻还不知道最后几个人，
+    /// 所以每进一个人把它抬到「本场实际人数」。没人调过就是构造时的 party_size：
+    /// 副本 / 战场 / 城战 / 练习场的结算人数一个字节都没变。
+    /// </summary>
+    public void SetSettlementPartySize(int size)
+    {
+        lock (_gate)
+        {
+            _settlementPartySize = Math.Max(_settlementPartySize, Math.Max(1, size));
+        }
+    }
 
     /// <summary>倍率 = 1 + (人数 - 1) × 每多一人的增量；单人固定 1，不经过浮点。</summary>
     static double Factor(double perPlayer, int partySize) =>
@@ -279,7 +315,7 @@ public sealed class Encounter
             {
                 SessionId = SessionId,
                 CasterId = member.Id,
-                BossId = _config.Boss.Id,
+                BossId = _boss.Id,
                 BossHp = _bossHp,
                 BossHpMax = _bossHpMax,
                 CasterHp = member.Hp,
@@ -406,7 +442,7 @@ public sealed class Encounter
                     return Reject(request, SkillRejectReason.SkillRejectBadTarget);
                 }
             }
-            else if (request.TargetId != _config.Boss.Id)
+            else if (request.TargetId != _boss.Id)
             {
                 // 目标编号对不上本场的 Boss，就当目标已经不在了。
                 return Reject(request, SkillRejectReason.SkillRejectTargetGone);
@@ -490,8 +526,8 @@ public sealed class Encounter
     {
         lock (_gate)
         {
-            var bossX = (double)_config.Boss.SpawnMm.X;
-            var bossY = (double)_config.Boss.SpawnMm.Y;
+            var bossX = (double)_boss.SpawnMm.X;
+            var bossY = (double)_boss.SpawnMm.Y;
             var targetX = (double)request.XMm;
             var targetY = (double)request.YMm;
             var clamped = false;
@@ -953,7 +989,7 @@ public sealed class Encounter
                     Rejected = Reject(new SkillRequest
                     {
                         SkillId = skill.Id,
-                        TargetId = _config.Boss.Id,
+                        TargetId = _boss.Id,
                         CastTimeMs = pending.CastTimeMs,
                     }, SkillRejectReason.SkillRejectTargetGone),
                 });
@@ -975,7 +1011,7 @@ public sealed class Encounter
                 {
                     CasterId = member.Id,
                     SkillId = skill.Id,
-                    TargetId = _config.Boss.Id,
+                    TargetId = _boss.Id,
                     Hit = true,
                     Damage = applied,
                     Healing = 0,
@@ -1201,16 +1237,16 @@ public sealed class Encounter
     }
 
     List<PhaseConfig> Phases() =>
-        _config.Boss.Phases is { Count: > 0 } phases
+        _boss.Phases is { Count: > 0 } phases
             ? phases
             :
             [
                 new PhaseConfig
                 {
-                    Name = _config.Boss.Name,
+                    Name = _boss.Name,
                     HpPctFrom = 100,
                     HpPctTo = 0,
-                    Attack = _config.Boss.Attack,
+                    Attack = _boss.Attack,
                 },
             ];
 
@@ -1263,9 +1299,9 @@ public sealed class Encounter
                 SettlementId = $"bt{SessionId:x16}",
                 SessionId = SessionId,
                 CasterId = killerId,
-                BossId = _config.Boss.Id,
+                BossId = _boss.Id,
                 SkillTableVersion = _config.Skills.Version,
-                ExpGain = _config.Boss.ExpOnClear,
+                ExpGain = _boss.ExpOnClear,
                 DamageTotal = _damageTotal,
                 CastCount = _castCount,
                 ClosedAt = DateTimeOffset.UtcNow,
@@ -1282,10 +1318,15 @@ public sealed class Encounter
         // 同一场每人一份个人经验，交给角色服的那一笔结算。事务号用本地结算号，
         // 角色服按号幂等；没配上游时空实现什么都不做，P0 行为不变。
         // 伤害、掉落、疲劳、次数都不在这里改，组队加成只加经验。
+        // P3-5a：人数用「本场实际人数」时（世界 Boss 会设），组队与同门那一截按它算；
+        // 没设过就是进本时说好的人数，副本 / 战场 / 城战一个字都没变。
         if (_settlementId.Length > 0)
         {
+            var settledSize = _settlementPartySize > 0
+                ? Math.Max(_settlementPartySize, _partySize)
+                : _partySize;
             _expSettlement.SettleParty(
-                _settlementId, "dungeon", _partySize, _members.Keys.ToArray(),
+                _settlementId, SettlementSource, settledSize, _members.Keys.ToArray(),
                 _dungeon?.Id ?? "", _qualifiedKills);
         }
 
@@ -1294,7 +1335,7 @@ public sealed class Encounter
             SessionId = SessionId,
             Cleared = _bossHp <= 0,
             SettlementId = _settlementId,
-            ExpGain = string.IsNullOrEmpty(_settlementId) ? 0 : _config.Boss.ExpOnClear,
+            ExpGain = string.IsNullOrEmpty(_settlementId) ? 0 : _boss.ExpOnClear,
         };
     }
 
@@ -1339,8 +1380,8 @@ public sealed class Encounter
 
     uint DistanceToBossMm(Member member)
     {
-        var dx = member.X - _config.Boss.SpawnMm.X;
-        var dy = member.Y - _config.Boss.SpawnMm.Y;
+        var dx = member.X - _boss.SpawnMm.X;
+        var dy = member.Y - _boss.SpawnMm.Y;
         return (uint)Math.Round(Math.Sqrt(dx * dx + dy * dy));
     }
 

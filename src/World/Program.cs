@@ -5,11 +5,14 @@ using World;
 var configPath = "config/world.json";
 var gatherConfigPath = "config/gather.json";
 var flightConfigPath = "config/flight.json";
+var worldBossConfigPath = "config/world_boss.json";
 var regionState = false;
 var positionState = false;
 var tierState = false;
 var gatherState = false;
 var flightState = false;
+var worldBossState = false;
+var worldBossAtMs = 0L;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -45,6 +48,22 @@ for (var i = 0; i < args.Length; i++)
         // 只给核对用：把同屏三档的阈值与分档结果读出来，不启动进程。
         case "--tier-state":
             tierState = true;
+            break;
+        // 世界 Boss 表单独一份，核对脚本用临时配置跑，不碰仓库里那份。
+        case "--world-boss-config" when i + 1 < args.Length:
+            worldBossConfigPath = args[++i];
+            break;
+        // 只给核对用：把读表后的入口、上限、窗口与「这一刻是哪一场」打出来，不起进程。
+        case "--world-boss-state":
+            worldBossState = true;
+            break;
+        // 搭配 --world-boss-state：把「这一刻」定成给定的毫秒时间戳，用来验未到点 / 到点。
+        case "--at" when i + 1 < args.Length:
+            if (!long.TryParse(args[++i], out worldBossAtMs))
+            {
+                Console.WriteLine("bad_arg=--at");
+                return 64;
+            }
             break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
@@ -208,6 +227,88 @@ if (regionState)
     return 0;
 }
 
+if (worldBossState)
+{
+    WorldBossTable table;
+    try
+    {
+        var catalog = WorldCatalog.Load(WorldConfig.Load(configPath));
+        var open = catalog.Regions.Where(r => r.Open).Select(r => r.Id)
+            .ToHashSet(StringComparer.Ordinal);
+        if (!File.Exists(worldBossConfigPath))
+        {
+            Console.WriteLine("world_boss=missing");
+            return 0;
+        }
+
+        table = WorldBossTable.Load(worldBossConfigPath, open);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    Console.WriteLine("world_boss_table=ok version=" + table.Version
+        + " pending=" + (table.Pending ? "true" : "false")
+        + " entrance=" + table.EntranceId
+        + " name=" + table.EntranceName
+        + " region=" + table.RegionId
+        + " cap=" + table.Cap
+        + " windows=" + string.Join(",", table.Windows.Select(w => w.Id + "@" + w.StartMinutes + "+" + w.DurationSeconds)));
+    // 纯计算：这一刻是哪一场只由服务端时钟与这张表决定，同一时刻所有人算出来同一把钥匙。
+    var now = worldBossAtMs > 0
+        ? DateTimeOffset.FromUnixTimeMilliseconds(worldBossAtMs)
+        : DateTimeOffset.UtcNow;
+    var window = table.WindowOf(now);
+    Console.WriteLine("world_boss_window=at=" + now.ToUnixTimeMilliseconds()
+        + " open=" + (window.Open ? "true" : "false")
+        + " key=" + (window.Key.Length == 0 ? "none" : window.Key)
+        + " starts_at_ms=" + window.StartsAtMs
+        + " ends_at_ms=" + window.EndsAtMs
+        + " next_starts_at_ms=" + window.NextStartsAtMs);
+
+    // 纯计算：入口这台状态机不连线也能验。一场里「散场没打死」只记一次、
+    // 可以被后来「打死了」升级、打掉以后再来报一律 duplicate —— 顺序反过来不行。
+    var probe = new WorldBossEntrance(table);
+    var probeKey = window.Key.Length == 0
+        ? table.EntranceId + "-selftest"
+        : window.Key;
+    void Step(string name, RecordFact fact)
+    {
+        var outcome = probe.Record(fact);
+        var state = probe.WindowOf(fact.WindowKey);
+        Console.WriteLine("world_boss_record=step=" + name
+            + " ok=" + (outcome.Ok ? "true" : "false")
+            + " duplicate=" + (outcome.Duplicate ? "true" : "false")
+            + " closed=" + (outcome.EntranceClosed ? "true" : "false")
+            + " reason=" + (outcome.Reason.Length == 0 ? "none" : outcome.Reason)
+            + " winner=" + state.SectId
+            + " name=" + (state.SectName.Length == 0 ? "none" : state.SectName)
+            + " killed=" + (state.Killed ? "true" : "false"));
+    }
+
+    Step("disband", new RecordFact("txn:" + probeKey + ":1", table.EntranceId, probeKey, false, 0, "", 0));
+    Step("disband_again", new RecordFact("txn:" + probeKey + ":2", table.EntranceId, probeKey, false, 0, "", 0));
+    Step("kill", new RecordFact("txn:" + probeKey + ":3", table.EntranceId, probeKey, true, 7001, "太虚道宗", 6200));
+    Step("kill_again", new RecordFact("txn:" + probeKey + ":4", table.EntranceId, probeKey, true, 7002, "别家", 6300));
+    Step("wrong_entrance",
+        new RecordFact("txn:" + probeKey + ":5", table.EntranceId + "-x", probeKey, true, 7002, "别家", 6300));
+    Step("no_sect_name",
+        new RecordFact("txn:" + probeKey + ":6", table.EntranceId, probeKey, true, 7003, "", 6300));
+    Console.WriteLine("world_boss_record=summary recorded=" + probe.RecordCount
+        + " kills=" + probe.KillCount
+        + " owner=" + probe.WindowOf(probeKey).SectId
+        + " owner_name=" + (probe.WindowOf(probeKey).SectName.Length == 0
+            ? "none" : probe.WindowOf(probeKey).SectName));
+    return 0;
+}
+
 using var stop = new CancellationTokenSource();
 PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
 {
@@ -220,4 +321,5 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
     stop.Cancel();
 });
 
-return await new WorldProcess(configPath, gatherConfigPath, flightConfigPath).RunAsync(stop.Token);
+return await new WorldProcess(configPath, gatherConfigPath, flightConfigPath, worldBossConfigPath)
+    .RunAsync(stop.Token);

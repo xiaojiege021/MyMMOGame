@@ -429,6 +429,18 @@ public sealed class BattleConfig
 
     public string SiegeTerritoryTablePath { get; private set; } = "";
 
+    /// <summary>
+    /// P3-5a：世界 Boss 的地表入口与这一场的首领（config/world_boss.json）。
+    /// 独立可选表：老卡的临时配置目录没有这份表时，带 worldboss 参数的连接一律拒，
+    /// 副本 / 练习场 / 竞技场 / 战场 / 城战一字不回退。
+    /// </summary>
+    public WorldBossTable WorldBoss { get; private set; } = null!;
+
+    public string WorldBossTablePath { get; private set; } = "";
+
+    /// <summary>世界服地址。留空就不把入口事实值交回去（技能与经验照常结算）。</summary>
+    public string WorldUpstream { get; init; } = "";
+
     /// <summary>社交服地址。留空就不查科技（老链路照跑）；城战依赖社交服的科技（9 节）。</summary>
     public string SocialUpstream { get; init; } = "";
 
@@ -454,6 +466,7 @@ public sealed class BattleConfig
         var siegePath = Resolve(dir, raw.SiegeTable, "siege.json");
         var sectTechPath = Resolve(dir, raw.SectTechTable, "sect_tech.json");
         var siegeTerritoryPath = Resolve(dir, raw.SiegeTerritoryTable, "siege_territory.json");
+        var worldBossPath = Resolve(dir, raw.WorldBossTable, "world_boss.json");
         // 竞技场表是可选项：没写这一项、文件也不在，就起一张空表（竞技场一律拒），
         // 副本与练习场不受影响。但显式写了路径就必须兑现，缺文件照样起不来。
         var arenaMatch = File.Exists(arenaMatchPath)
@@ -493,6 +506,15 @@ public sealed class BattleConfig
                 : throw new ConfigException(
                     $"{path}：siege_territory_table 指的 {siegeTerritoryPath} 不存在");
 
+        // 世界 Boss 表同理：config/battle.json 不显式登记 world_boss_table，靠默认文件名 +
+        // 文件存在性判断。老卡的临时配置目录没有这份表，缺表只让带 worldboss 的连接一律拒，
+        // 别的模式照跑；显式写了路径却缺文件照样起不来。
+        var worldBoss = File.Exists(worldBossPath)
+            ? WorldBossTable.Load(worldBossPath)
+            : string.IsNullOrWhiteSpace(raw.WorldBossTable)
+                ? WorldBossTable.Missing()
+                : throw new ConfigException($"{path}：world_boss_table 指的 {worldBossPath} 不存在");
+
         var config = new BattleConfig
         {
             Listen = raw.Listen,
@@ -506,6 +528,8 @@ public sealed class BattleConfig
             SiegeTablePath = siegePath,
             SectTechTablePath = sectTechPath,
             SiegeTerritoryTablePath = siegeTerritoryPath,
+            WorldBossTablePath = worldBossPath,
+            WorldUpstream = (raw.WorldUpstream ?? "").Trim(),
             SocialUpstream = (raw.SocialUpstream ?? "").Trim(),
             DefaultClass = string.IsNullOrWhiteSpace(raw.DefaultClass) ? "warrior" : raw.DefaultClass,
             ExpUpstream = (raw.ExpUpstream ?? "").Trim(),
@@ -525,6 +549,7 @@ public sealed class BattleConfig
             Siege = siege,
             SectTech = sectTech,
             SiegeTerritory = siegeTerritory,
+            WorldBoss = worldBoss,
         };
 
         // 模板与职业表对齐：每个职业都要有默认模板，模板里也不许出现职业表没有的职业。
@@ -742,8 +767,12 @@ public sealed class BattleConfig
         public string SectTechTable { get; init; } = "";
         /// <summary>P3-3a4 领地表；留空时按默认文件名找，找不到就降级为不写回。</summary>
         public string SiegeTerritoryTable { get; init; } = "";
+        /// <summary>P3-5a 世界 Boss 表；留空时按默认文件名找，找不到就降级为没有入口。</summary>
+        public string WorldBossTable { get; init; } = "";
         /// <summary>社交服地址；留空就不查宗门科技，老链路照跑。</summary>
         public string SocialUpstream { get; init; } = "";
+        /// <summary>世界服地址；留空就不把入口事实值交回去。</summary>
+        public string WorldUpstream { get; init; } = "";
         public string DefaultClass { get; init; } = "warrior";
         public string ExpUpstream { get; init; } = "";
 
