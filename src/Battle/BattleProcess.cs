@@ -83,6 +83,18 @@ public sealed class BattleProcess(string configPath)
                   + $" players={config.Battlefield.Players}"
                   + $" ratio={config.Battlefield.Ratio}"
                   + $" fill_timeout_ms={config.Battlefield.FillTimeoutMs}"));
+        // 城战：40 对 40、装备全额生效。键名都带 siege_ 前缀，免得与上面战场那组
+        // team_size / players 混在一起，老核对脚本 grep 到的是各自那一行。
+        Console.WriteLine($"siege_table={config.SiegeTablePath}"
+            + (config.Siege.IsMissing
+                ? " siege=missing"
+                : $" siege_version={config.Siege.Version}"
+                  + $" siege_mode={config.Siege.ModeId}"
+                  + $" siege_team_size={config.Siege.TeamSize}"
+                  + $" siege_teams={config.Siege.Teams}"
+                  + $" siege_players={config.Siege.Players}"
+                  + $" balance=none"
+                  + $" siege_fill_timeout_ms={config.Siege.FillTimeoutMs}"));
         // 场次全在内存里，进程一停就没了。重启不恢复、不补发，这句是给核对脚本看的。
         Console.WriteLine("resume=off");
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);

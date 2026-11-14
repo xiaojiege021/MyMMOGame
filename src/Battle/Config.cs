@@ -369,6 +369,7 @@ public sealed class BattleConfig
     public string ClassTablePath { get; init; } = "";
     public string ArenaMatchTablePath { get; init; } = "";
     public string BattlefieldTablePath { get; init; } = "";
+    public string SiegeTablePath { get; init; } = "";
     public string DefaultClass { get; init; } = "";
 
     /// <summary>
@@ -405,6 +406,12 @@ public sealed class BattleConfig
     /// </summary>
     public BattlefieldTable Battlefield { get; private set; } = null!;
 
+    /// <summary>
+    /// 城战：40 对 40、装备全额生效（config/siege.json）。与战场是两条独立的线：
+    /// 战场要压同队战力，城战压根不读平衡系数，也不读竞技场模板。
+    /// </summary>
+    public SiegeTable Siege { get; private set; } = null!;
+
     /// <summary>配置文件的绝对路径，日志里要打出来才知道跑的是哪一份。</summary>
     public string SourcePath { get; private set; } = "";
 
@@ -424,6 +431,7 @@ public sealed class BattleConfig
         var dungeonPath = Resolve(dir, raw.DungeonTable, "dungeons.json");
         var arenaMatchPath = Resolve(dir, raw.ArenaMatchTable, "arena_match.json");
         var battlefieldPath = Resolve(dir, raw.BattlefieldTable, "battlefield.json");
+        var siegePath = Resolve(dir, raw.SiegeTable, "siege.json");
         // 竞技场表是可选项：没写这一项、文件也不在，就起一张空表（竞技场一律拒），
         // 副本与练习场不受影响。但显式写了路径就必须兑现，缺文件照样起不来。
         var arenaMatch = File.Exists(arenaMatchPath)
@@ -437,6 +445,14 @@ public sealed class BattleConfig
             : string.IsNullOrWhiteSpace(raw.BattlefieldTable)
                 ? BattlefieldTable.Missing()
                 : throw new ConfigException($"{path}：battlefield_table 指的 {battlefieldPath} 不存在");
+        // 城战表同理：config/battle.json 里不显式登记 siege_table，靠默认文件名 +
+        // 文件存在性判断。老卡的临时配置目录没有 siege.json，缺表只让城战一律拒，
+        // 副本 / 练习场 / 竞技场 / 战场照跑；显式写了路径却缺文件则照样起不来。
+        var siege = File.Exists(siegePath)
+            ? SiegeTable.Load(siegePath)
+            : string.IsNullOrWhiteSpace(raw.SiegeTable)
+                ? SiegeTable.Missing()
+                : throw new ConfigException($"{path}：siege_table 指的 {siegePath} 不存在");
 
         var config = new BattleConfig
         {
@@ -448,6 +464,7 @@ public sealed class BattleConfig
             SkillTablePath = skillPath,
             ClassTablePath = classPath,
             ArenaMatchTablePath = arenaMatchPath,
+            SiegeTablePath = siegePath,
             DefaultClass = string.IsNullOrWhiteSpace(raw.DefaultClass) ? "warrior" : raw.DefaultClass,
             ExpUpstream = (raw.ExpUpstream ?? "").Trim(),
             // 没单独配就跟经验结算走同一个角色服；两个都空才是本机口径。
@@ -463,6 +480,7 @@ public sealed class BattleConfig
             Dungeons = DungeonTable.Load(dungeonPath),
             ArenaMatch = arenaMatch,
             Battlefield = battlefield,
+            Siege = siege,
         };
 
         // 模板与职业表对齐：每个职业都要有默认模板，模板里也不许出现职业表没有的职业。
@@ -676,6 +694,7 @@ public sealed class BattleConfig
         public string DungeonTable { get; init; } = "dungeons.json";
         public string ArenaMatchTable { get; init; } = "";
         public string BattlefieldTable { get; init; } = "";
+        public string SiegeTable { get; init; } = "";
         public string DefaultClass { get; init; } = "warrior";
         public string ExpUpstream { get; init; } = "";
 
