@@ -23,3 +23,7 @@ client/MMOGame/Assets/HotUpdateDlls.meta
 var/
 
 .tools/
+
+# 本机 Trae CN 每日签到脚本，不是本项目文件：读本机登录态、带 token，不进仓库
+# 2026-11-14 定性后忽略；文件原地保留，可能被本机每日签到任务按绝对路径调用
+/scripts/trae_checkin.mjs
