@@ -7,13 +7,54 @@
   </assembly>
   <assembly fullname="Mmo.Net">
     <type fullname="Mmo.Net.AccountEntry" preserve="all" />
+    <type fullname="Mmo.Net.AuctionOutcome" preserve="all" />
+    <type fullname="Mmo.Net.BagOutcome" preserve="all" />
+    <type fullname="Mmo.Net.BagSlotView" preserve="all" />
     <type fullname="Mmo.Net.BattleLink" preserve="all" />
+    <type fullname="Mmo.Net.CharacterAuction" preserve="all" />
+    <type fullname="Mmo.Net.CharacterBag" preserve="all" />
+    <type fullname="Mmo.Net.CharacterCrystal" preserve="all" />
+    <type fullname="Mmo.Net.CharacterCurrency" preserve="all" />
+    <type fullname="Mmo.Net.CharacterEnhance" preserve="all" />
+    <type fullname="Mmo.Net.CharacterRecharge" preserve="all" />
+    <type fullname="Mmo.Net.CharacterShop" preserve="all" />
+    <type fullname="Mmo.Net.CharacterTransfer" preserve="all" />
     <type fullname="Mmo.Net.CreateOutcome" preserve="all" />
+    <type fullname="Mmo.Net.CrystalOutcome" preserve="all" />
+    <type fullname="Mmo.Net.CurrencyRow" preserve="all" />
     <type fullname="Mmo.Net.DungeonEntry" preserve="all" />
+    <type fullname="Mmo.Net.EnhanceOutcome" preserve="all" />
     <type fullname="Mmo.Net.EnterKind" preserve="all" />
     <type fullname="Mmo.Net.EnterOutcome" preserve="all" />
     <type fullname="Mmo.Net.EntryKind" preserve="all" />
+    <type fullname="Mmo.Net.FlyOutcome" preserve="all" />
+    <type fullname="Mmo.Net.GatherOutcome" preserve="all" />
+    <type fullname="Mmo.Net.IngotOutcome" preserve="all" />
+    <type fullname="Mmo.Net.LeadershipOutcome" preserve="all" />
     <type fullname="Mmo.Net.LoginOutcome" preserve="all" />
+    <type fullname="Mmo.Net.PeerVisual" preserve="all" />
+    <type fullname="Mmo.Net.PositionOutcome" preserve="all" />
+    <type fullname="Mmo.Net.RechargeOrderOutcome" preserve="all" />
+    <type fullname="Mmo.Net.RechargeSettleOutcome" preserve="all" />
+    <type fullname="Mmo.Net.RegionOutcome" preserve="all" />
+    <type fullname="Mmo.Net.SectGuild" preserve="all" />
+    <type fullname="Mmo.Net.SectOutcome" preserve="all" />
+    <type fullname="Mmo.Net.ShopOutcome" preserve="all" />
+    <type fullname="Mmo.Net.SiegeViewTiers" preserve="all" />
+    <type fullname="Mmo.Net.SiegeVisualKind" preserve="all" />
+    <type fullname="Mmo.Net.SiegeVisualSpec" preserve="all" />
+    <type fullname="Mmo.Net.TransferOutcome" preserve="all" />
+    <type fullname="Mmo.Net.UpgradeOutcome" preserve="all" />
+    <type fullname="Mmo.Net.WorldBossEntry" preserve="all" />
+    <type fullname="Mmo.Net.WorldBossFacts" preserve="all" />
+    <type fullname="Mmo.Net.WorldEnterKind" preserve="all" />
+    <type fullname="Mmo.Net.WorldEnterOutcome" preserve="all" />
+    <type fullname="Mmo.Net.WorldEntry" preserve="all" />
+    <type fullname="Mmo.Net.WorldFlight" preserve="all" />
+    <type fullname="Mmo.Net.WorldGather" preserve="all" />
+    <type fullname="Mmo.Net.WorldPeerTiers" preserve="all" />
+    <type fullname="Mmo.Net.WorldRegionRow" preserve="all" />
+    <type fullname="Mmo.Net.WorldRegionsOutcome" preserve="all" />
   </assembly>
   <assembly fullname="Mmo.Proto">
     <type fullname="Mmo.Proto.Battle.BattleEnded" preserve="all" />
@@ -25,6 +66,8 @@
     <type fullname="Mmo.Proto.Battle.PartyMember" preserve="all" />
     <type fullname="Mmo.Proto.Battle.ServerMessage" preserve="all" />
     <type fullname="Mmo.Proto.Battle.ServerMessage/BodyOneofCase" preserve="all" />
+    <type fullname="Mmo.Proto.Battle.SiegeUnitVisual" preserve="all" />
+    <type fullname="Mmo.Proto.Battle.SiegeView" preserve="all" />
     <type fullname="Mmo.Proto.Battle.SkillCancelled" preserve="all" />
     <type fullname="Mmo.Proto.Battle.SkillInfo" preserve="all" />
     <type fullname="Mmo.Proto.Battle.SkillRejectReason" preserve="all" />
@@ -32,6 +75,8 @@
     <type fullname="Mmo.Proto.Battle.SkillRequest" preserve="all" />
     <type fullname="Mmo.Proto.Battle.SkillResult" preserve="all" />
     <type fullname="Mmo.Proto.Common.Empty" preserve="all" />
+    <type fullname="Mmo.Proto.World.AppearanceTier" preserve="all" />
+    <type fullname="Mmo.Proto.World.AvatarPosition" preserve="all" />
   </assembly>
   <assembly fullname="Unity.InputSystem">
     <type fullname="UnityEngine.InputSystem.Controls.ButtonControl" preserve="all" />
@@ -45,6 +90,7 @@
   </assembly>
   <assembly fullname="UnityEngine.CoreModule">
     <type fullname="UnityEngine.Application" preserve="all" />
+    <type fullname="UnityEngine.AsyncOperation" preserve="all" />
     <type fullname="UnityEngine.Bounds" preserve="all" />
     <type fullname="UnityEngine.Camera" preserve="all" />
     <type fullname="UnityEngine.Color" preserve="all" />
@@ -86,6 +132,7 @@
   <assembly fullname="UnityEngine.UI">
     <type fullname="UnityEngine.UI.CanvasScaler" preserve="all" />
     <type fullname="UnityEngine.UI.CanvasScaler/ScaleMode" preserve="all" />
+    <type fullname="UnityEngine.UI.CanvasScaler/ScreenMatchMode" preserve="all" />
     <type fullname="UnityEngine.UI.Graphic" preserve="all" />
     <type fullname="UnityEngine.UI.Image" preserve="all" />
     <type fullname="UnityEngine.UI.Text" preserve="all" />
@@ -130,6 +177,7 @@
     <type fullname="System.Exception" preserve="all" />
     <type fullname="System.Func`1" preserve="all" />
     <type fullname="System.Func`2" preserve="all" />
+    <type fullname="System.Func`3" preserve="all" />
     <type fullname="System.IAsyncResult" preserve="all" />
     <type fullname="System.IDisposable" preserve="all" />
     <type fullname="System.Int32" preserve="all" />
@@ -159,6 +207,7 @@
     <type fullname="System.Single" preserve="all" />
     <type fullname="System.String" preserve="all" />
     <type fullname="System.StringComparison" preserve="all" />
+    <type fullname="System.StringSplitOptions" preserve="all" />
     <type fullname="System.Text.Encoding" preserve="all" />
     <type fullname="System.Threading.Tasks.Task" preserve="all" />
     <type fullname="System.Threading.Tasks.Task`1" preserve="all" />
