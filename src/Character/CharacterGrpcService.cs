@@ -827,6 +827,27 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "party_size_invalid"));
         }
 
+        // P3-1a2 补正：历练与等级经验走同一笔。副本编号由战斗服服间直连带上，
+        // 空串表示不是副本（表世界、活动等），按方案 8.1 不计历练。
+        // 击杀数只是个数，历练数值仍然只从 config/dungeons.json 取，请求带不进来。
+        var dungeonId = (request.DungeonId ?? "").Trim();
+        if (dungeonId.Length > ExpSettlementRepository.MaxDungeonIdLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "dungeon_invalid"));
+        }
+
+        DungeonDef? dungeon = null;
+        if (dungeonId.Length > 0)
+        {
+            dungeon = dungeons.Find(dungeonId);
+            if (dungeon is null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "dungeon_unknown"));
+            }
+        }
+
+        var qualifiedKills = (int)request.QualifiedKills;
+
         // 网关转发时先核归属，与前面各行同一个口径；服间直连没有账号，
         // 由战斗服与角色服之间的内网调用保证，仓库里只按角色编号找。
         if (account.Length > 0
@@ -843,7 +864,8 @@ public sealed class CharacterGrpcService(
 
         var outcome = await expSettlements.SettleAsync(
             (long)request.CharacterId, account.Length == 0 ? null : account,
-            txnId, source, partySize, allSameSect, expTable, boosterTable, context.CancellationToken);
+            txnId, source, partySize, allSameSect, expTable, boosterTable,
+            dungeon, qualifiedKills, realms, context.CancellationToken);
         if (!outcome.Found)
         {
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
@@ -853,11 +875,15 @@ public sealed class CharacterGrpcService(
             "exp_settle account={Account} id={Id} txn={Txn} source={Source} party={Party} "
             + "duplicate={Duplicate} base={Base} bonus={Bonus} same_sect={SameSect} gain={Gain} "
             + "level={LevelBefore}->{Level} exp={Exp} "
-            + "booster_pct={BoosterPct} booster_exp={BoosterExp}",
+            + "booster_pct={BoosterPct} booster_exp={BoosterExp} "
+            + "dungeon={Dungeon} kills={Kills} drill_gain={DrillGain} drill={Drill} "
+            + "drill_reason={DrillReason}",
             account.Length == 0 ? "service" : account, request.CharacterId, txnId, source, partySize,
             outcome.Duplicate, outcome.BaseExp, outcome.PartyBonus, outcome.SameSectBonus, outcome.ExpGain,
             outcome.LevelBefore, outcome.Level, outcome.Exp,
-            outcome.BoosterPct, outcome.BoosterExp);
+            outcome.BoosterPct, outcome.BoosterExp,
+            dungeonId.Length == 0 ? "none" : dungeonId, request.QualifiedKills,
+            outcome.DrillGain, outcome.Drill, outcome.DrillReason);
 
         return new SettleExpResponse
         {
@@ -877,6 +903,10 @@ public sealed class CharacterGrpcService(
             BoosterExp = outcome.BoosterExp,
             // P2-1c：同宗门这一截额外经验，只作回包事实值。
             SameSectBonus = outcome.SameSectBonus,
+            // P3-1a2 补正：这一笔一起写下的历练，都是角色服的事实值。
+            DrillGain = outcome.DrillGain,
+            Drill = outcome.Drill,
+            DrillReason = outcome.DrillReason,
         };
     }
 

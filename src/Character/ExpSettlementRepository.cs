@@ -14,7 +14,10 @@ public sealed record ExpSettlementOutcome(
     int Level,
     long Exp,
     int BoosterPct,
-    long BoosterExp);
+    long BoosterExp,
+    long DrillGain,
+    long Drill,
+    string DrillReason);
 
 /// <summary>
 /// 等级经验的唯一写入点。活动、副本、任务、竞技场、战场、城战和世界 Boss
@@ -30,13 +33,20 @@ public sealed record ExpSettlementOutcome(
 ///
 /// account 为空表示服间可信调用（战斗服通关后直连），只按角色编号归属；
 /// 网关转发时一定带账号，where 里再核一次，别的账号改不到这个角色。
-/// 这一笔只 set level / exp 与写 exp_settlement 流水：疲劳、周份额、货币、
-/// 背包、进本记录一概不碰；生效判定只 `select`，不写 exp_booster 那张表。
+/// P3-1a2 补正：这一笔同时是历练的唯一生产写入点。开发架构「结算离开」写定
+/// 战斗服把等级经验和这场击杀累计的历练值一次交给角色服，所以经验与历练在
+/// 同一个事务、同一把行锁、同一个事务号下写：重复结算一起回滚，不会只加一样。
+/// 历练数值 = config/dungeons.json 的 drill × 战斗服报来的有资格击杀数，
+/// 请求里带不进数值；写没写上的 reason 也随这一笔返回，战斗服只打日志。
+/// 这一笔只 set level / exp / drill 与写 exp_settlement、realm_drill 两张流水：
+/// 疲劳、周份额、货币、背包、进本记录一概不碰；生效判定只 `select`，
+/// 不写 exp_booster 那张表。
 /// </summary>
 public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
 {
     public const int MaxTxnLength = 128;
     public const int MaxSourceLength = 32;
+    public const int MaxDungeonIdLength = 32;
 
     /// <summary>没有生效道具时的结算倍率：乘 100/100 就是原倍率，不是配置数值。</summary>
     public const int OriginalPct = 100;
@@ -50,6 +60,9 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         bool allSameSect,
         ExpTable table,
         ExpBoosterTable boosterTable,
+        DungeonDef? dungeon,
+        int qualifiedKills,
+        RealmTable realms,
         CancellationToken stopping)
     {
         var baseExp = table.BaseExp;
@@ -68,9 +81,11 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
             : "where id = $1 and account = $2 for update";
         int levelBefore = 0;
         long expBefore = 0;
+        string realm = "";
+        long drillBefore = 0;
         var found = false;
         await using (var read = new NpgsqlCommand(
-            "select level, exp from \"角色\".character " + owned,
+            "select level, exp, realm, drill from \"角色\".character " + owned,
             connection, transaction))
         {
             read.Parameters.AddWithValue(characterId);
@@ -88,6 +103,8 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
                     found = true;
                     levelBefore = reader.GetInt32(0);
                     expBefore = reader.GetInt64(1);
+                    realm = reader.GetString(2);
+                    drillBefore = reader.GetInt64(3);
                 }
             }
         }
@@ -96,7 +113,40 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         {
             await transaction.RollbackAsync(stopping);
             return new ExpSettlementOutcome(
-                false, false, 0, 0, 0, 0, 0, 0, 0, OriginalPct, 0);
+                false, false, 0, 0, 0, 0, 0, 0, 0, OriginalPct, 0,
+                0, 0, "character_not_found");
+        }
+
+        // 历练只在「这一场确实在一个有资格的副本里、并且有击杀」时才算。
+        // 境界门槛在持有行锁的同一个事务里复核，不另开一次查询：突破和结算
+        // 撞在一起时，以这一刻库里的境界为准。数值只有一个来源 dungeons.json。
+        long drillGain = 0;
+        long drillAfter = drillBefore;
+        var drillReason = "";
+        if (dungeon is null)
+        {
+            drillReason = "no_dungeon";
+        }
+        else if (qualifiedKills <= 0)
+        {
+            drillReason = "no_kills";
+        }
+        else
+        {
+            var gate = realms.CheckDungeon(dungeon.Realm, realm);
+            if (!gate.Ok)
+            {
+                drillReason = gate.Reason;
+            }
+            else if (dungeon.Drill > 0 && qualifiedKills > long.MaxValue / dungeon.Drill)
+            {
+                // 不写死「一场最多几只怪」这种玩法数字，只挡算术溢出。
+                drillReason = "kills_invalid";
+            }
+            else
+            {
+                drillGain = dungeon.Drill * qualifiedKills;
+            }
         }
 
         // 限时经验道具（P1-5c7）：生效判定放在这一笔事务里，用数据库当前时刻，
@@ -144,13 +194,14 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
             if (claimed is null)
             {
                 await transaction.RollbackAsync(stopping);
+                // 抢不到号整笔回滚：经验与历练都没有写，回包里的历练是库里的当前事实值。
                 return new ExpSettlementOutcome(
                     true, true, 0, 0, 0, 0, levelBefore, levelBefore, expBefore,
-                    OriginalPct, 0);
+                    OriginalPct, 0, 0, drillBefore, "duplicate");
             }
         }
 
-        // 3. 只写这两列。越界等级写不进去，事务回滚后流水也不会留下。
+        // 3. 只写这三列。越界等级写不进去，事务回滚后流水也不会留下。
         await using (var write = new NpgsqlCommand(
             "update \"角色\".character set level = $2, exp = $3 where id = $1",
             connection, transaction))
@@ -161,10 +212,47 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
             await write.ExecuteNonQueryAsync(stopping);
         }
 
+        // 4. 同一事务里写历练流水与余额。realm_drill 与 exp_settlement 是两张表，
+        // 同号不冲突；抢号已经在上面挡住重放，所以这里不会把同一场加两次。
+        // 万一另一条写入者抢先用了同一个号，只跳过历练、经验照给，并回报原因，
+        // 不让整笔经验结算被别人的流水号拖垮。
+        if (drillGain > 0)
+        {
+            await using (var drillClaim = new NpgsqlCommand(
+                "insert into \"角色\".realm_drill "
+                + "(txn_id, character_id, dungeon_id, drill) "
+                + "values ($1, $2, $3, $4) "
+                + "on conflict (txn_id) do nothing returning txn_id",
+                connection, transaction))
+            {
+                drillClaim.Parameters.AddWithValue(txnId);
+                drillClaim.Parameters.AddWithValue(characterId);
+                drillClaim.Parameters.AddWithValue(dungeon!.Id);
+                drillClaim.Parameters.AddWithValue(drillGain);
+                if (await drillClaim.ExecuteScalarAsync(stopping) is null)
+                {
+                    drillGain = 0;
+                    drillReason = "drill_txn_conflict";
+                }
+            }
+
+            if (drillGain > 0)
+            {
+                await using (var drillWrite = new NpgsqlCommand(
+                    "update \"角色\".character set drill = drill + $2 "
+                    + "where id = $1 returning drill", connection, transaction))
+                {
+                    drillWrite.Parameters.AddWithValue(characterId);
+                    drillWrite.Parameters.AddWithValue(drillGain);
+                    drillAfter = Convert.ToInt64(await drillWrite.ExecuteScalarAsync(stopping));
+                }
+            }
+        }
+
         await transaction.CommitAsync(stopping);
         return new ExpSettlementOutcome(
             true, false, baseExp, partyBonus, sameSectBonus, gain, levelBefore, level, exp,
-            boosterPct, boosterExp);
+            boosterPct, boosterExp, drillGain, drillAfter, drillReason);
     }
 
     /// <summary>只给核对用：读等级、当前级经验、结算笔数与累计入账经验。</summary>

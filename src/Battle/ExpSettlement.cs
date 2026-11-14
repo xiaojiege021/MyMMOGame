@@ -6,14 +6,18 @@ namespace Battle;
 
 /// <summary>
 /// 一场通关之后，把「这一笔等级经验」交给角色服结算。战斗服只提供事务号、
-/// 来源和这一场的进本人数，不带任何经验数值：基础经验、组队加成与升级曲线
-/// 全在角色服的 config/exp.json，角色服是持久数据的唯一写入方。
-/// 活动、任务、竞技场等来源也调角色服同一个接口，不另写一套加成。
+/// 来源、这一场的进本人数，以及这一场所在副本与击杀数，不带任何数值：
+/// 基础经验、组队加成、升级曲线全在角色服的 config/exp.json，历练数值全在
+/// config/dungeons.json，角色服是持久数据的唯一写入方。
+/// 等级经验与历练走同一笔（开发架构「结算离开」）：同一个事务号，角色服在
+/// 同一事务里写经验与历练，重放时两样一起回滚。表世界/竞技场没有副本编号，
+/// 按方案 8.1 不计历练。活动、任务等来源也调角色服同一个接口，不另写加成。
 /// </summary>
 public interface IExpSettlement : IDisposable
 {
     void SettleParty(
-        string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds);
+        string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
+        string dungeonId, int qualifiedKills);
 }
 
 /// <summary>
@@ -23,7 +27,8 @@ public interface IExpSettlement : IDisposable
 public sealed class NoExpSettlement : IExpSettlement
 {
     public void SettleParty(
-        string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds)
+        string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
+        string dungeonId, int qualifiedKills)
     {
     }
 
@@ -49,7 +54,8 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
     }
 
     public void SettleParty(
-        string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds)
+        string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
+        string dungeonId, int qualifiedKills)
     {
         foreach (var characterId in memberIds)
         {
@@ -65,6 +71,10 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
                         PartySize = (uint)partySize,
                         // P2-1c：把整队成员交给角色服判同宗门；战斗服不解析谁同门。
                         MemberIds = { memberIds },
+                        // P3-1a2 补正：这一场的副本与有资格击杀数。历练数值由角色服
+                        // 按 config/dungeons.json 算，战斗服只报个数，不报数值。
+                        DungeonId = dungeonId,
+                        QualifiedKills = (uint)Math.Max(0, qualifiedKills),
                     },
                     deadline: DateTime.UtcNow.AddSeconds(5));
 
@@ -75,7 +85,12 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
                     + " bonus=" + reply.PartyBonus
                     + " same_sect=" + reply.SameSectBonus
                     + " level=" + reply.Level
-                    + " duplicate=" + reply.Duplicate);
+                    + " duplicate=" + reply.Duplicate
+                    + " dungeon=" + (dungeonId.Length == 0 ? "none" : dungeonId)
+                    + " kills=" + qualifiedKills
+                    + " drill=" + reply.DrillGain
+                    + " drill_after=" + reply.Drill
+                    + " drill_reason=" + reply.DrillReason);
             }
             catch (Exception ex) when (ex is RpcException or InvalidOperationException)
             {

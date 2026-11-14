@@ -5,6 +5,18 @@
 # 本卡口径：十一段按顺序开放，首发到结丹；元婴起每段一个开关。开关关着时
 # 不能突破到这一段，也不能进该段新副本；旧副本不写 realm，门槛不抬高。
 set -uo pipefail
+# 与 check-p3-1a2.sh 同一处补正：本机若设了 HTTP(S)_PROXY，.NET 会把
+# 127.0.0.1 的明文 HTTP/2 请求送进代理；dotnet 重定向输出在 Windows 上走 GBK，
+# 而中文断言是 UTF-8。两处都会让只读入口/真库段整段假失败。
+unset HTTP_PROXY http_proxy HTTPS_PROXY https_proxy ALL_PROXY all_proxy
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
@@ -88,7 +100,8 @@ while IFS= read -r line; do
 done < "$TMP/static.txt"
 
 echo "== 3. 只读入口 --realm-table =="
-RT="$("$DOTNET" "$CD" --realm-table $CC 2>&1)"; rc=$?
+"$DOTNET" "$CD" --realm-table $CC >"$TMP/rt.raw" 2>&1; rc=$?
+RT="$(utf8 < "$TMP/rt.raw")"
 if [ "$rc" = "0" ] \
    && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=[0-9]\+ realms=11 launch_until=结丹 open=炼体,筑基,结丹 closed=元婴' \
    && printf '%s' "$RT" | grep -q '^realm=4:元婴:closed' \

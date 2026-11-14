@@ -131,6 +131,7 @@ public sealed class Encounter
     readonly ITalismanSpend _talismans;
     readonly IReviveScrollUse _scrolls;
     readonly IBattleProfileSource _profiles;
+    readonly DungeonDef? _dungeon;
     readonly Dictionary<ulong, Member> _members = [];
 
     readonly long _bossHpMax;
@@ -140,6 +141,9 @@ public sealed class Encounter
     long _bossHp;
     long _damageTotal;
     int _castCount;
+    // 这一场击杀的有资格怪物数。目前只有一个 Boss，打倒它就是 1；
+    // 以后副本加怪，每倒一只在这里加一，历练 = config 的 drill × 这个数。
+    int _qualifiedKills;
     // 这一场用掉了第几张符。只用来拼事务号：同一场同一个人第几张，重放不会扣两次。
     int _talismanUses;
     // 卷轴另记一套序号：符与卷轴用同一个角色服事务号表，编号不能撞。
@@ -161,7 +165,7 @@ public sealed class Encounter
     public Encounter(
         BattleConfig config, SettlementStore settlements, ICharacterStore characters,
         ulong sessionId, int partySize, IExpSettlement expSettlement, ITalismanSpend talismans,
-        IReviveScrollUse scrolls, IBattleProfileSource profiles)
+        IReviveScrollUse scrolls, IBattleProfileSource profiles, DungeonDef? dungeon)
     {
         _config = config;
         _settlements = settlements;
@@ -170,6 +174,7 @@ public sealed class Encounter
         _talismans = talismans;
         _scrolls = scrolls;
         _profiles = profiles;
+        _dungeon = dungeon;
         SessionId = sessionId;
         _partySize = partySize;
         _bossHpMax = Scale(config.Boss.HpMax, config.Dungeons.MonsterHpScalePerPlayer, partySize);
@@ -986,6 +991,13 @@ public sealed class Encounter
 
             if (_bossHp <= 0)
             {
+                // 只有已经进本、且角色服在进本那一步判过资格的副本才计击杀。
+                // 表世界/竞技场没有副本编号，这一场一笔历练都不给。
+                if (_dungeon is not null)
+                {
+                    _qualifiedKills++;
+                }
+
                 outbox.Add(new ServerMessage { Ended = Close(member.Id) });
             }
 
@@ -1272,7 +1284,9 @@ public sealed class Encounter
         // 伤害、掉落、疲劳、次数都不在这里改，组队加成只加经验。
         if (_settlementId.Length > 0)
         {
-            _expSettlement.SettleParty(_settlementId, "dungeon", _partySize, _members.Keys.ToArray());
+            _expSettlement.SettleParty(
+                _settlementId, "dungeon", _partySize, _members.Keys.ToArray(),
+                _dungeon?.Id ?? "", _qualifiedKills);
         }
 
         return new BattleEnded

@@ -166,6 +166,14 @@ message SettleExpRequest {
   // 同一场所有参战角色编号，用于判同宗门加成（P2-1c）。至少两人才有意义；
   // 客户端填不进来，由战斗服服间直连带上、网关透传。
   repeated uint64 member_ids = 6;
+  // P3-1a2 补正：这一场所在副本的编号。空串表示不是副本结算（表世界、活动、
+  // 竞技场等），按方案 8.1「表世界不结算战斗，不计历练」一笔历练都不给。
+  // 副本是不是有资格进，角色服在进本那一步已经判过，这里只按编号查配置。
+  string dungeon_id = 7;
+  // 这一场击杀的有资格怪物数。历练 = config/dungeons.json 的 drill × 这个数，
+  // 由角色服在同一事务里算并写入；战斗服只报击杀数，带不进任何历练数值。
+  // 0 表示这一场没有可计历练的击杀（例如没通关）。
+  uint32 qualified_kills = 8;
 }
 
 message SettleExpResponse {
@@ -192,6 +200,13 @@ message SettleExpResponse {
   // 叠在组队加成之外，幅度由 config/exp.json 的 same_sect_bonus_pct 决定。
   // 只作回包事实值，客户端与战斗服都带不进来。
   int64 same_sect_bonus = 14;
+  // P3-1a2 补正：与这一笔经验在同一事务里写下的历练值，以及写后的事实值。
+  // 0 表示这次没给历练，原因看 drill_reason；重放时两者都是 0 / 当前值。
+  int64 drill_gain = 15;
+  int64 drill = 16;
+  // 没给历练的原因：no_dungeon / unknown_dungeon / no_kills / realm_locked /
+  // realm_not_enough / realm_unknown / drill_txn_conflict；空串表示给了。
+  string drill_reason = 17;
 }
 
 message UseHotSpringRequest {

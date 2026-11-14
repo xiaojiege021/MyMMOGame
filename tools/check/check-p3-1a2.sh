@@ -5,6 +5,11 @@
 # 本卡口径：修为就是当前境界；历练来自已经能进入的副本；炼心是做完这一段
 # 已经打开的主线和必要支线；成功后修为进下一段，失败后修为不变、历练与灵石照扣。
 set -uo pipefail
+# 服间 gRPC 走明文 HTTP/2（h2c）直连 127.0.0.1。机器上若设了 HTTP(S)_PROXY，
+# .NET 的 HttpClient 会把本地请求也送进代理，报「unable to establish HTTP/2
+# connection」，真库段的建角与战斗服结算会整段假失败。本脚本的 HTTP 全在
+# 本机，gamedb 是 TCP 直连，都不需要代理；curl 段本来就用了 --noproxy '*'。
+unset HTTP_PROXY http_proxy HTTPS_PROXY https_proxy ALL_PROXY all_proxy
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
@@ -16,6 +21,19 @@ CG="--config $ROOT/config/gateway.json"
 HAS_DB="${MMO_P3_1A2_HAS_DB:-0}"
 TMP="$(mktemp -d)"
 PIDS=""
+# Windows 上 dotnet 把 stdout 重定向到管道时走系统 ANSI 代码页（GBK），
+# 而本脚本的中文断言是 UTF-8，第 3 段会整段假失败。按平台选编码：
+# 不能「先试 UTF-8、失败再退 GBK」——GBK 的双字节汉字偶尔恰好是合法
+# UTF-8 序列，会解成一组西里尔字母而不报错（实测「元婴」→「ԪӤ」）。
+# macOS / Linux 本来就是 UTF-8，原样透传。只转编码，不改任何一条断言。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 cleanup() { for p in $PIDS; do stop_pid "$p"; done; rm -rf "$TMP"; }
 trap cleanup EXIT
 
@@ -73,7 +91,7 @@ R("requirement_model", "RealmAdvanceRequirement" in rt and "Requirement(" in rt)
 R("stone_five_tiers", "突破灵石必须是灵石五档" in rt)
 R("success_bound", "success_pct 必须在 0–100" in rt)
 R("missing_requirement", "的突破要求" in rt)
-R("reuse_switch", "CheckAdvance(realm)" in rt and "realm_locked" in rt)
+R("reuse_switch", "CheckAdvance(" in rt and "realm_locked" in rt)
 
 repo = rd(os.path.join(root, "src", "Character", "RealmAdvanceRepository.cs"))
 R("lock_row", "for update" in repo)
@@ -99,6 +117,33 @@ main = rd(os.path.join(root, "db", "character", "character.sql"))
 for name in ("character_quest", "realm_breakthrough", "realm_drill"):
     R("ddl_" + name, name in ddl and name in main)
 R("ddl_drill_column", "ADD COLUMN IF NOT EXISTS drill bigint" in ddl and "ADD COLUMN IF NOT EXISTS drill bigint" in main)
+
+# ---- v1.110 补正：历练与等级经验走同一笔结算，生产链路有写入者 ----
+req = re.search(r"message SettleExpRequest \{(.*?)\n\}", proto, re.S)
+resp = re.search(r"message SettleExpResponse \{(.*?)\n\}", proto, re.S)
+R("link_proto_request", bool(req) and "string dungeon_id = 7" in req.group(1)
+  and "uint32 qualified_kills = 8" in req.group(1))
+R("link_proto_response", bool(resp) and "int64 drill_gain = 15" in resp.group(1)
+  and "int64 drill = 16" in resp.group(1) and "string drill_reason = 17" in resp.group(1))
+R("link_request_no_value", bool(req) and "int64 drill" not in req.group(1)
+  and "drill_gain" not in req.group(1))
+R("link_generated_same",
+  rd(os.path.join(root, "src", "Shared", "Generated", "Character.cs"))
+  == rd(os.path.join(root, "client", "MMOGame", "Assets", "Proto", "Generated", "Character.cs")))
+R("link_keep_cli_entry", "rpc SettleDrill(" in proto)
+exp_repo = rd(os.path.join(root, "src", "Character", "ExpSettlementRepository.cs"))
+R("link_one_transaction", "exp_settlement" in exp_repo and "realm_drill" in exp_repo
+  and "BeginTransactionAsync" in exp_repo)
+R("link_value_from_config", "dungeon.Drill * qualifiedKills" in exp_repo)
+R("link_gate_in_txn", "realms.CheckDungeon(dungeon.Realm, realm)" in exp_repo)
+R("link_duplicate_rolls_back", '0, drillBefore, "duplicate"' in exp_repo)
+exp_settle = rd(os.path.join(root, "src", "Battle", "ExpSettlement.cs"))
+R("link_battle_sends", "DungeonId = dungeonId" in exp_settle
+  and "QualifiedKills = (uint)Math.Max(0, qualifiedKills)" in exp_settle)
+R("link_battle_kills", "_qualifiedKills++" in battle and "_dungeon?.Id" in battle)
+R("link_no_second_writer", "SettleDrill" not in exp_settle and "SettleDrill" not in battle)
+R("link_service_passes", "dungeon, qualifiedKills, realms, context.CancellationToken" in grpc)
+R("link_side_quests_all_empty", all(adv[r]["side_quests"] == [] for r in order[:-1]))
 o.close()
 PY
 while IFS= read -r line; do
@@ -109,7 +154,8 @@ while IFS= read -r line; do
 done < "$TMP/static.txt"
 
 echo "== 3. 只读入口 --realm-table / --dungeon-table =="
-RT="$("$DOTNET" "$CD" --realm-table $CC 2>&1)"; rc=$?
+"$DOTNET" "$CD" --realm-table $CC >"$TMP/rt.raw" 2>&1; rc=$?
+RT="$(utf8 < "$TMP/rt.raw")"
 if [ "$rc" = "0" ] \
    && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=2 realms=11 launch_until=结丹' \
    && printf '%s' "$RT" | grep -q '^advance_req=炼体->筑基 drill=100 stone=stone_1 stone_cost=10 success_pct=70 main_stage=9 side_quests=$' \
@@ -121,7 +167,8 @@ fi
 printf '%s' "$RT" | grep -q '^advance=结丹->元婴:realm_locked' \
   && ok "版本开关仍是 P3-1a1 那一处判定：结丹→元婴关着" || bad "版本开关判定不对"
 
-DT="$("$DOTNET" "$CD" --dungeon-table $CC 2>&1)"
+"$DOTNET" "$CD" --dungeon-table $CC >"$TMP/dt.raw" 2>&1
+DT="$(utf8 < "$TMP/dt.raw")"
 printf '%s' "$DT" | grep -q '^dungeon=abyss .*drill=50' \
   && printf '%s' "$DT" | grep -q '^dungeon=abyss_yuanying .*realm=元婴 drill=200' \
   && ok "副本表带历练值；元婴副本仍带境界门槛" || bad "副本表历练字段不对"
@@ -222,13 +269,17 @@ for name, pct in (("r-100.json", 100), ("r-0.json", 0), ("r-side.json", 100)):
     save("c-" + name, c)
 PY
   C100="--config $TMP/c-r-100.json"; C0="--config $TMP/c-r-0.json"; CSIDE="--config $TMP/c-r-side.json"
-  rawd() { "$DOTNET" "$CD" --raw-drill-write "$1" "$2" $CC 2>&1 | grep -m1 '^raw_drill='; }
+  # 真库是长期存在的，事务号不能写死：第二遍跑会撞上上一遍留下的号，
+  # 所有突破都回 duplicate=true，整段假红。用本次进程号 + 时间戳做前缀，
+  # 同一条断言里重复提交同一个短号仍然会撞（那正是要验的幂等）。
+  TX="p31a2-$$-$(date +%s)"
+  rawd() { "$DOTNET" "$CD" --raw-drill-write "$1" "$2" $CC 2>&1 | utf8 | grep -m1 '^raw_drill='; }
   rawm() { "$DOTNET" "$CD" --raw-main-stage-write "$1" "$2" $CC >/dev/null 2>&1; }
   rawr() { "$DOTNET" "$CD" --raw-realm-write "$1" "$2" $CC >/dev/null 2>&1; }
   qdone() { "$DOTNET" "$CD" --complete-quest "$1" "$2" $CC >/dev/null 2>&1; }
-  bstate() { "$DOTNET" "$CD" --realm-break-state "$1" $CC 2>&1 | grep -m1 '^realm_break_state='; }
-  adv() { local id="$1" txn="$2"; shift 2; "$DOTNET" "$CD" --advance-realm "$id" "$txn" "$@" 2>&1 | grep -m1 '^advance_realm='; }
-  drill() { "$DOTNET" "$CD" --settle-drill "$1" "$2" "$3" $CC 2>&1 | grep -m1 '^settle_drill='; }
+  bstate() { "$DOTNET" "$CD" --realm-break-state "$1" $CC 2>&1 | utf8 | grep -m1 '^realm_break_state='; }
+  adv() { local id="$1" txn="$2"; shift 2; "$DOTNET" "$CD" --advance-realm "$id" "$TX-$txn" "$@" 2>&1 | utf8 | grep -m1 '^advance_realm='; }
+  drill() { "$DOTNET" "$CD" --settle-drill "$1" "$2" "$TX-$3" $CC 2>&1 | utf8 | grep -m1 '^settle_drill='; }
   stone() {
     curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/currency/add?token=$TOK" \
       -H 'Content-Type: application/json' -d "{\"character_id\":$1,\"kind\":\"stone_1\",\"delta\":$2}" >/dev/null
@@ -301,10 +352,74 @@ except Exception:
   printf '%s' "$R" | grep -q "gain=0 drill=50 duplicate=true" \
     && ok "同一场重复结算不加第二次" || bad "历练重复结算：$R"
   R="$(drill "$ID" abyss_yuanying t-trill-b)"
-  printf '%s' "$R" | grep -q 'reason=realm_locked gain=0' \
+  printf '%s' "$R" | grep -q 'reason=realm_locked' \
+    && printf '%s' "$R" | grep -q 'gain=0' \
     && ok "元婴副本关着时结算不给历练" || bad "关着的副本仍给了历练：$R"
   bstate "$ID" | grep -q 'drill=50' \
     && ok "历练值落在角色身上（事实值 50）" || bad "历练值没落库"
+
+  # ---- v1.110 补正：生产链路端到端 ----
+  # 原来只有 --settle-drill 这个 CLI 入口在写 character.drill，战斗服从不调用。
+  # 补正后战斗服通关时把副本编号与击杀数随 SettleExp 一起交给角色服，
+  # 角色服在同一事务里写经验与历练。这一段用真服真库把这条链跑通。
+  echo "== 6. 生产链路：战斗服通关 → 角色服同一笔写历练 =="
+  BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
+  BP="$ROOT/tools/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
+  "$DOTNET" build "$ROOT/tools/probe/BattleProbe/BattleProbe.csproj" -c Release --nologo -v q \
+    >"$TMP/build-probe.log" 2>&1 \
+    && ok "通关探针编译通过" || bad "通关探针编译失败"
+  python3 - "$ROOT" "$TMP" <<'PY'
+import json, os, sys
+root, tmp = sys.argv[1], sys.argv[2]
+b = json.load(open(os.path.join(root, "config", "battle.json"), encoding="utf-8"))
+b["listen"] = "127.0.0.1:60011"
+b["exp_upstream"] = "http://127.0.0.1:62000"
+b["character_upstream"] = "http://127.0.0.1:62000"
+b["settlement_dir"] = os.path.join(tmp, "settlements")
+b["character_dir"] = os.path.join(tmp, "characters")
+for key, name in (("skill_table", "skills.json"), ("class_table", "classes.json"),
+                  ("dungeon_table", "dungeons.json")):
+    b[key] = os.path.join(root, "config", name)
+json.dump(b, open(os.path.join(tmp, "battle-link.json"), "w", encoding="utf-8"),
+          ensure_ascii=False, indent=2)
+PY
+  "$DOTNET" "$BD" --config "$TMP/battle-link.json" >"$TMP/battle-link.log" 2>&1 &
+  PIDS="$PIDS $!"
+  wait_ready "$TMP/battle-link.log" '^listen=' "战斗服" || true
+  rawd "$ID" 0 >/dev/null
+  run_clear() {
+    "$DOTNET" "$BP" --case clear --url "ws://127.0.0.1:60011/battle?$1" \
+      --boss 9001 --ranged 1002 2>&1 | grep -m1 '^verdict=' || true
+  }
+  wait_drill() {
+    for _ in $(seq 1 40); do bstate "$ID" | grep -q "drill=$1 " && return 0; sleep 0.2; done
+    return 1
+  }
+  V="$(run_clear "dungeon=abyss&char=$ID&party=link-a")"
+  printf '%s' "$V" | grep -q '^verdict=ok' \
+    && ok "带副本通关：探针 pass" || bad "带副本通关失败：$V"
+  wait_drill 50 \
+    && ok "战斗服通关后角色服写下历练 50（生产链路通了）" \
+    || bad "历练没从战斗服到角色服：$(bstate "$ID")"
+  grep -qE 'exp_settle=ok .* dungeon=abyss kills=1 drill=50 drill_after=50 drill_reason=$' \
+    "$TMP/battle-link.log" \
+    && ok "同一笔结算回包里带回历练 50" \
+    || bad "战斗服结算日志不对：$(grep -m1 '^exp_settle=' "$TMP/battle-link.log")"
+  V="$(run_clear "dungeon=abyss&char=$ID&party=link-b")"
+  wait_drill 100 \
+    && ok "第二场累计到 100（按击杀累计，不是一次通关固定发一次）" \
+    || bad "第二场历练没累计：$(bstate "$ID")"
+  V="$(run_clear "char=$ID&party=link-solo")"
+  sleep 1
+  bstate "$ID" | grep -q 'drill=100 ' \
+    && ok "不带副本的练习场不计历练" || bad "练习场也给了历练"
+  V="$(run_clear "dungeon=abyss_yuanying&char=$ID&party=link-yy")"
+  sleep 1
+  bstate "$ID" | grep -q 'drill=100 ' \
+    && ok "元婴副本开关关着：结算不给历练" || bad "关着的副本仍给了历练"
+  grep -q 'drill_reason=realm_locked' "$TMP/battle-link.log" \
+    && ok "境界门槛在同一笔事务里判，回 realm_locked" \
+    || bad "没回 realm_locked"
 fi
 
 finish "P3-1a2（角色服 + 网关）"
