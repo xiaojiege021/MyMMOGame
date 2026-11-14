@@ -17,6 +17,12 @@ sealed class PartyConn
     public required WebSocket Socket { get; init; }
     public required SemaphoreSlim Send { get; init; }
     public required Member Member { get; init; }
+
+    /// <summary>
+    /// P3-3a2：这条连接已经收到 BattleOpened。城战名单变化时只给已开场的连接
+    /// 重发同屏档位，免得档位包抢在开场包前面、把客户端的第一条消息顶掉。
+    /// </summary>
+    public bool ViewReady { get; set; }
 }
 
 /// <summary>
@@ -105,6 +111,9 @@ public sealed class BattleServer(
     // 所以也按「队」登记；属性在登记时就已经是全额，不再二次调整。
     readonly Dictionary<string, List<BattlefieldEntry>> _siegeWaits = new(StringComparer.Ordinal);
     readonly object _siegeGate = new();
+
+    // 城战：成员编号 → 队伍编号（0 / 1）。只给同屏表现用，不进技能、伤害与结算。
+    readonly Dictionary<ulong, uint> _siegeTeams = new();
 
     public async Task RunAsync(CancellationToken stopping)
     {
@@ -815,6 +824,20 @@ public sealed class BattleServer(
         try
         {
             await SendAsync(socket, send, new ServerMessage { Opened = party.Encounter.Open(member) }, linked.Token);
+            lock (_gate)
+            {
+                foreach (var conn in party.Connections)
+                {
+                    if (conn.Member == member)
+                    {
+                        conn.ViewReady = true;
+                        break;
+                    }
+                }
+            }
+            // P3-3a2：本场名单由战斗服重新确认，给每条已开场的连接各发一份按自己算的
+            // 同屏档位。先发开场包再刷新，客户端第一条永远是 BattleOpened。
+            await RefreshSiegeViewsAsync(party, linked.Token);
             await BroadcastAsync(party, joined, party.Ticker.Token, exceptSocket: socket);
 
             await ReceiveLoopAsync(socket, send, party, member, linked.Token);
@@ -916,6 +939,19 @@ public sealed class BattleServer(
             }
         }
 
+        // 队伍编号只是表现事实值：同屏超限单位按它显示队伍颜色。
+        // 不进 Encounter、不进技能结算，也不写角色库。
+        lock (_siegeGate)
+        {
+            foreach (var entry in entries)
+            {
+                if (entry.Member is not null)
+                {
+                    _siegeTeams[entry.Member.Id] = (uint)team;
+                }
+            }
+        }
+
         if (created)
         {
             _ = TickLoopAsync(party);
@@ -952,6 +988,62 @@ public sealed class BattleServer(
         };
     }
 
+    /// <summary>
+    /// P3-3a2：城战名单变了，战斗服重新算一遍同屏档位，各发各的那一份。
+    /// 这是这份档位唯一的下发点：档位由服务端按 config/siege.json 的上限确认，
+    /// 客户端表达不了「我想把谁画全」，也不会自己按距离挑人。
+    /// </summary>
+    async Task RefreshSiegeViewsAsync(Party party, CancellationToken token)
+    {
+        if (config.Siege.IsMissing)
+        {
+            return;
+        }
+
+        PartyConn[] conns;
+        lock (_gate)
+        {
+            conns = [.. party.Connections.Where(c => c.ViewReady)];
+        }
+        if (conns.Length == 0)
+        {
+            return;
+        }
+
+        var units = new List<SiegeViewUnit>(conns.Length);
+        lock (_siegeGate)
+        {
+            foreach (var conn in conns)
+            {
+                var m = conn.Member;
+                _siegeTeams.TryGetValue(m.Id, out var team);
+                units.Add(new SiegeViewUnit(m.Id, team, m.X, m.Y, m.Hp, m.HpMax));
+            }
+        }
+
+        var limit = config.Siege.ViewFullModelLimit;
+        foreach (var conn in conns)
+        {
+            var view = SiegeViewTable.Build(
+                party.Encounter.SessionId, conn.Member.Id, limit, units);
+            try
+            {
+                await SendAsync(conn.Socket, conn.Send,
+                    new ServerMessage { SiegeView = view }, token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex) when (ex is WebSocketException or ObjectDisposedException)
+            {
+            }
+
+            Console.WriteLine($"siege_view=session={party.Encounter.SessionId}"
+                + $" viewer={conn.Member.Id} limit={limit} full={view.FullModelCount}"
+                + $" units={view.UnitCount} markers={view.UnitCount - view.FullModelCount}");
+        }
+    }
+
     void Detach(Party party, Member member)
     {
         Party? removed = null;
@@ -967,10 +1059,21 @@ public sealed class BattleServer(
             }
         }
 
+        // 队伍编号只活在这场实例里，人走了就一起清掉，不留在进程内存。
+        lock (_siegeGate)
+        {
+            _siegeTeams.Remove(member.Id);
+        }
+
         if (removed is not null)
         {
             removed.Encounter.Abandon();
             removed.Ticker.Cancel();
+        }
+        else if (party.Key.StartsWith("siege-", StringComparison.Ordinal))
+        {
+            // 城战有人离场：名单少了，剩下的人再收一份服务端确认过的档位。
+            _ = RefreshSiegeViewsAsync(party, party.Ticker.Token);
         }
     }
 

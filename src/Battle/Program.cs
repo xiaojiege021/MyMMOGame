@@ -8,6 +8,8 @@ var battlefieldOnly = false;
 string? battlefieldPath = null;
 var siegeOnly = false;
 string? siegePath = null;
+var siegeViewOnly = false;
+var siegeViewArgs = new List<string>();
 for (var i = 0; i < args.Length; i++)
 {
     switch (args[i])
@@ -39,7 +41,20 @@ for (var i = 0; i < args.Length; i++)
             siegeOnly = true;
             siegePath = args[++i];
             break;
+        // 只读入口：不连库不起服，直接核对城战同屏档位的纯计算。
+        case "--siege-view":
+            siegeViewOnly = true;
+            while (i + 1 < args.Length && !args[i + 1].StartsWith("--"))
+            {
+                siegeViewArgs.Add(args[++i]);
+            }
+            break;
     }
+}
+
+if (siegeViewOnly)
+{
+    return Battle.SiegeViewCli.Run(siegeViewArgs);
 }
 
 if (battlefieldOnly)
@@ -90,7 +105,8 @@ if (siegeOnly)
 
         Console.WriteLine($"siege_table_version={table.Version} mode={table.ModeId}"
             + $" team_size={table.TeamSize} teams={table.Teams}"
-            + $" players={table.Players} balance=none fill_timeout_ms={table.FillTimeoutMs}");
+            + $" players={table.Players} balance=none fill_timeout_ms={table.FillTimeoutMs}"
+            + $" view_full_model_limit={table.ViewFullModelLimit}");
         Console.WriteLine($"siege_equipment=attack_per_level={table.AttackPerLevel}"
             + $" hp_per_level={table.HpPerLevel} mana_per_level={table.ManaPerLevel}"
             + $" heal_per_level={table.HealPerLevel}");

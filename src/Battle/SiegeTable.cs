@@ -10,11 +10,15 @@ namespace Battle;
 /// 算出真实属性后直接进场，不做任何平衡系数，也不套竞技场统一模板。
 /// 这张表里出现 balance / ratio / templates 之类的键直接起不来，
 /// 让「不压缩」成为结构保证，而不是靠运行时忘了调用某段代码。
+///
+/// P3-3a2：view 段是城战同屏完整模型的数量上限（方案 15.1 没给数字，标待定）。
+/// 只放一个上限，表现细节（队伍颜色、血条）由战斗服按档位下发，不进这张配置表。
 /// </summary>
 public sealed class SiegeTable
 {
     SiegeTable(
         int version, string modeId, string name, int teamSize, int teams, int fillTimeoutMs,
+        int viewFullModelLimit,
         long attackPerLevel, long hpPerLevel, long manaPerLevel, long healPerLevel,
         long attackWeight, long hpWeight, long manaWeight, long healWeight, bool missing)
     {
@@ -24,6 +28,7 @@ public sealed class SiegeTable
         TeamSize = teamSize;
         Teams = teams;
         FillTimeoutMs = fillTimeoutMs;
+        ViewFullModelLimit = viewFullModelLimit;
         AttackPerLevel = attackPerLevel;
         HpPerLevel = hpPerLevel;
         ManaPerLevel = manaPerLevel;
@@ -42,6 +47,9 @@ public sealed class SiegeTable
     public int Teams { get; }
     public int Players => TeamSize * Teams;
     public int FillTimeoutMs { get; }
+
+    /// <summary>城战里同时画完整模型的人数上限。只从这里读，代码里不写第二套数字。</summary>
+    public int ViewFullModelLimit { get; }
     public long AttackPerLevel { get; }
     public long HpPerLevel { get; }
     public long ManaPerLevel { get; }
@@ -55,7 +63,7 @@ public sealed class SiegeTable
     public bool IsMissing { get; }
 
     public static SiegeTable Missing() =>
-        new(0, "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, missing: true);
+        new(0, "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, missing: true);
 
     /// <summary>有效战力 = 四项属性各乘权重。只作事实值，不拿来算平衡系数。</summary>
     public long Power(long attack, long hp, long mana, long heal) =>
@@ -84,6 +92,21 @@ public sealed class SiegeTable
             {
                 throw new ConfigException(
                     $"{path}：城战表不许出现 {property.Name}（装备全额生效，不做平衡系数 / 模板）");
+            }
+            if (key == "view" && property.Value.ValueKind == JsonValueKind.Object)
+            {
+                // 方案 15.1：超限单位只留队伍颜色和血条。配置里只放一个上限，
+                // 不许把模型 / 外观 / 颜色 / prefab 写进来，也不许在这里偷偷定档位。
+                foreach (var nested in property.Value.EnumerateObject())
+                {
+                    var nestedKey = nested.Name.ToLowerInvariant();
+                    if (nestedKey is "model" or "models" or "prefab" or "appearance"
+                        or "appearance_tier" or "mesh" or "team_color" or "hp_bar" or "tier")
+                    {
+                        throw new ConfigException(
+                            $"{path}：view 段不许出现 {nested.Name}（只放上限，表现档位由战斗服下发）");
+                    }
+                }
             }
         }
 
@@ -131,6 +154,14 @@ public sealed class SiegeTable
             throw new ConfigException($"{path}：fill_timeout_ms 要在 0..60000 之间");
         }
 
+        // 同屏上限：方案没给数字，只从 view 段读，不给兜底值，也不按人数反推一份。
+        // 上限允许大于本场实际人数（人少时自然一个都不超限），所以不与 players 绑死。
+        var view = wire.View ?? throw new ConfigException($"{path}：没有 view 段（同屏完整模型上限）");
+        if (view.FullModelLimit < 1 || view.FullModelLimit > 100)
+        {
+            throw new ConfigException($"{path}：view.full_model_limit 要在 1..100 之间");
+        }
+
         var equipment = wire.Equipment ?? throw new ConfigException($"{path}：没有 equipment 段");
         if (equipment.AttackPerLevel < 0 || equipment.HpPerLevel < 0
             || equipment.ManaPerLevel < 0 || equipment.HealPerLevel < 0)
@@ -151,7 +182,7 @@ public sealed class SiegeTable
 
         return new SiegeTable(
             wire.Version, mode.Id.Trim(), mode.Name.Trim(), mode.TeamSize, mode.Teams,
-            wire.FillTimeoutMs,
+            wire.FillTimeoutMs, view.FullModelLimit,
             equipment.AttackPerLevel, equipment.HpPerLevel,
             equipment.ManaPerLevel, equipment.HealPerLevel,
             power.AttackWeight, power.HpWeight, power.ManaWeight, power.HealWeight,
@@ -164,8 +195,14 @@ public sealed class SiegeTable
         public int Version { get; init; }
         public ModeWire? Mode { get; init; }
         public int FillTimeoutMs { get; init; }
+        public ViewWire? View { get; init; }
         public EquipmentWire? Equipment { get; init; }
         public PowerWire? Power { get; init; }
+    }
+
+    sealed class ViewWire
+    {
+        public int FullModelLimit { get; init; }
     }
 
     sealed class ModeWire

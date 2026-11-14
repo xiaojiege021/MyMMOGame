@@ -183,6 +183,36 @@ message BossPhase {
   string name = 2;
 }
 
+// P3-3a2 城战同屏档位（方案 15.1）。档位只由战斗服按 config/siege.json 的上限算，
+// 客户端照着画，不能按距离或自己的判断决定谁该画全。
+enum SiegeVisualTier {
+  SIEGE_VISUAL_UNSPECIFIED = 0;
+  // 周围的人：完整模型
+  SIEGE_VISUAL_FULL = 1;
+  // 超出同屏上限：只留队伍颜色和血条，没有完整模型
+  SIEGE_VISUAL_MARKER = 2;
+}
+
+// 一个单位的表现事实值。队伍颜色只用 team 这个编号，血条只用 hp / hp_max；
+// 这里没有模型、外观、prefab、坐标或档位字段——「超限没有完整模型」是结构保证。
+message SiegeUnitVisual {
+  uint64 member_id = 1;
+  uint32 team = 2;
+  int64 hp = 3;
+  int64 hp_max = 4;
+  SiegeVisualTier tier = 5;
+}
+
+// 战斗服给一条连接下发的城战同屏快照。按「看的人」算，名单随开场与进出更新。
+// 请求侧没有对应消息，客户端表达不了「我想把谁画全」。
+message SiegeView {
+  uint64 session_id = 1;
+  uint32 full_model_limit = 2;
+  uint32 full_model_count = 3;
+  uint32 unit_count = 4;
+  repeated SiegeUnitVisual units = 5;
+}
+
 // 一条 WebSocket 上跑多种消息，靠这个信封分辨。
 message ClientMessage {
   oneof body {
@@ -218,6 +248,8 @@ message ServerMessage {
     ReviveScrollUsed scroll_used = 12;
     // 卷轴没用成。不扣卷轴、不扣经验、不写冷却，也不改生命与蓝量。
     ReviveScrollRejected scroll_rejected = 13;
+    // P3-3a2：城战同屏档位，只有城战实例会发；副本 / 练习场 / 竞技场 / 战场都没有这条。
+    SiegeView siege_view = 14;
   }
 }
 

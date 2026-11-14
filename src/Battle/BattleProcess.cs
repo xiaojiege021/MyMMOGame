@@ -94,7 +94,8 @@ public sealed class BattleProcess(string configPath)
                   + $" siege_teams={config.Siege.Teams}"
                   + $" siege_players={config.Siege.Players}"
                   + $" balance=none"
-                  + $" siege_fill_timeout_ms={config.Siege.FillTimeoutMs}"));
+                  + $" siege_fill_timeout_ms={config.Siege.FillTimeoutMs}"
+                  + $" siege_view_limit={config.Siege.ViewFullModelLimit}"));
         // 场次全在内存里，进程一停就没了。重启不恢复、不补发，这句是给核对脚本看的。
         Console.WriteLine("resume=off");
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);

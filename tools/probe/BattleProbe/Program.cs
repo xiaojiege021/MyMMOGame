@@ -30,6 +30,7 @@ internal static class Program
         var second = Arg(args, "--second") ?? "skip";
         var waitMs = int.TryParse(Arg(args, "--wait-ms"), out var wm) ? wm : 0;
         var holdMs = int.TryParse(Arg(args, "--hold-ms"), out var hm) ? hm : 0;
+        var expectUnits = int.TryParse(Arg(args, "--expect-units"), out var eu) ? eu : 0;
         var aChar = ulong.TryParse(Arg(args, "--a-char"), out var ac) ? ac : 1UL;
         var bChar = ulong.TryParse(Arg(args, "--b-char"), out var bc) ? bc : 2UL;
         var partySize = int.TryParse(Arg(args, "--party-size"), out var ps) ? ps : 2;
@@ -49,6 +50,8 @@ internal static class Program
             {
                 "open" => await CaseOpenAsync(url),
                 "battlefield_open" => await CaseBattlefieldOpenAsync(url, holdMs),
+                "siege_view" => await CaseSiegeViewAsync(url, expectUnits, holdMs),
+                "no_siege_view" => await CaseNoSiegeViewAsync(url),
                 "damage" => await CaseDamageAsync(url, boss, ranged),
                 "cooldown" => await CaseCooldownAsync(url, boss, ranged),
                 "casting" => await CaseCastingAsync(url, boss, ranged),
@@ -141,6 +144,64 @@ internal static class Program
         }
 
         return Report(o.CasterHpMax > 0, "case=battlefield_open held_ms=" + holdMs);
+    }
+
+    /// <summary>
+    /// P3-3a2：城战同屏档位。等战斗服确认的那一份快照（可要求至少 expectUnits 人），
+    /// 把每个单位的档位、队伍编号与血条事实值逐行打出来，核对脚本直接数 full / marker。
+    /// </summary>
+    static async Task<int> CaseSiegeViewAsync(string url, int expectUnits, int holdMs)
+    {
+        await using var session = await Session.ConnectAsync(url, skipUntilOpened: true);
+        var found = await session.ReadUntilAsync(
+            m => m.SiegeView is not null
+                 && (expectUnits <= 0 || m.SiegeView.UnitCount >= expectUnits),
+            6000);
+        if (found?.SiegeView is null)
+        {
+            return Fail("case=siege_view 没等到服务端确认的同屏档位");
+        }
+
+        var v = found.SiegeView;
+        var markers = v.Units.Count(u => u.Tier == SiegeVisualTier.SiegeVisualMarker);
+        Console.WriteLine($"case=siege_view caster={session.Opened.CasterId} session={v.SessionId}"
+            + $" limit={v.FullModelLimit} full={v.FullModelCount}"
+            + $" units={v.UnitCount} markers={markers}");
+        foreach (var u in v.Units)
+        {
+            var tier = u.Tier == SiegeVisualTier.SiegeVisualFull ? "full" : "marker";
+            Console.WriteLine($"siege_unit=id={u.MemberId} team={u.Team} tier={tier}"
+                + $" hp={u.Hp} hp_max={u.HpMax}");
+        }
+        if (holdMs > 0)
+        {
+            await Task.Delay(holdMs);
+        }
+
+        var ok = v.UnitCount > 0
+                 && v.FullModelCount <= v.FullModelLimit
+                 && v.FullModelCount + (uint)markers == v.UnitCount
+                 && (expectUnits <= 0 || v.UnitCount >= expectUnits);
+        return Report(ok, $"case=siege_view held_ms={holdMs} expect_units={expectUnits}");
+    }
+
+    /// <summary>老链路（副本 / 练习场 / 竞技场 / 战场）不该收到城战档位包。</summary>
+    static async Task<int> CaseNoSiegeViewAsync(string url)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        for (var i = 0; i < 4; i++)
+        {
+            var message = await session.ReadAsync(300);
+            if (message is null)
+            {
+                break;
+            }
+            if (message.SiegeView is not null)
+            {
+                return Report(false, "case=no_siege_view 老链路收到了城战档位包");
+            }
+        }
+        return Report(true, "case=no_siege_view 老链路没有城战档位包");
     }
 
     static async Task<int> CaseDamageAsync(string url, ulong boss, uint ranged)

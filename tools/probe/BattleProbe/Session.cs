@@ -17,14 +17,24 @@ internal sealed class Session : IAsyncDisposable
 
     public BattleOpened Opened { get; private set; } = null!;
 
-    public static async Task<Session> ConnectAsync(string url)
+    /// <summary>
+    /// skipUntilOpened 只给 P3-3a2 的城战多人用例用：同一场里别人的状态广播、
+    /// 档位刷新或 tick 回包可能比自己的开场包先到，连上后一直读到 BattleOpened。
+    /// 缺省 false，老用例「第一条必须是开场包」的断言一字不变。
+    /// </summary>
+    public static async Task<Session> ConnectAsync(string url, bool skipUntilOpened = false)
     {
         var session = new Session();
         await session._socket.ConnectAsync(new Uri(url), session._cts.Token);
         _ = session.PumpAsync();
 
-        var first = await session.ReadAsync(5000)
-                    ?? throw new InvalidOperationException("连上以后没收到开场消息");
+        var first = skipUntilOpened
+            ? await session.ReadUntilAsync(m => m.Opened is not null, 5000)
+            : await session.ReadAsync(5000);
+        if (first is null)
+        {
+            throw new InvalidOperationException("连上以后没收到开场消息");
+        }
         session.Opened = first.Opened
                          ?? throw new InvalidOperationException("第一条不是 BattleOpened");
         return session;
@@ -47,16 +57,24 @@ internal sealed class Session : IAsyncDisposable
         }
     }
 
-    /// <summary>读一条必须是结算结果的回包，读到拒绝或者超时都算不符合。</summary>
+    /// <summary>
+    /// 读一条必须是结算结果的回包，读到拒绝或者超时都算不符合。
+    /// P3-3a2：城战开场会先推同屏档位包，之后才轮到这一下的结果；
+    /// 这里跳过无关的广播与档位包，不把「第一条不是结果」当成没结算。
+    /// 只放宽读包顺序，不改任何用例的断言，也不碰产品代码。
+    /// </summary>
     public async Task<SkillResult?> ReadResultAsync(int timeoutMs)
     {
-        var message = await ReadAsync(timeoutMs);
+        var message = await ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null, timeoutMs);
         return message?.Result;
     }
 
+    /// <summary>与 ReadResultAsync 对称：城战档位包先到时不把拒绝判定吃掉。</summary>
     public async Task<SkillRejected?> ReadRejectedAsync(int timeoutMs)
     {
-        var message = await ReadAsync(timeoutMs);
+        var message = await ReadUntilAsync(
+            m => m.Result is not null || m.Rejected is not null, timeoutMs);
         return message?.Rejected;
     }
 

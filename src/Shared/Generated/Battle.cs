@@ -62,60 +62,69 @@ namespace Mmo.Proto.Battle {
             "KAQSDwoHY2xlYXJlZBgCIAEoCBIVCg1zZXR0bGVtZW50X2lkGAMgASgJEhAK",
             "CGV4cF9nYWluGAQgASgDIjgKDU1lbWJlclVwZGF0ZWQSJwoGbWVtYmVyGAEg",
             "ASgLMhcubW1vLmJhdHRsZS5QYXJ0eU1lbWJlciIuCglCb3NzUGhhc2USEwoL",
-            "cGhhc2VfaW5kZXgYASABKAUSDAoEbmFtZRgCIAEoCSKHAgoNQ2xpZW50TWVz",
-            "c2FnZRIpCgVza2lsbBgBIAEoCzIYLm1tby5iYXR0bGUuU2tpbGxSZXF1ZXN0",
-            "SAASMAoGY2FuY2VsGAIgASgLMh4ubW1vLmJhdHRsZS5Ta2lsbENhbmNlbFJl",
-            "cXVlc3RIABInCgRtb3ZlGAMgASgLMhcubW1vLmJhdHRsZS5Nb3ZlUmVxdWVz",
-            "dEgAEjIKCHRhbGlzbWFuGAQgASgLMh4ubW1vLmJhdHRsZS5Vc2VUYWxpc21h",
-            "blJlcXVlc3RIABI0CgZzY3JvbGwYBSABKAsyIi5tbW8uYmF0dGxlLlVzZVJl",
-            "dml2ZVNjcm9sbFJlcXVlc3RIAEIGCgRib2R5IpcFCg1TZXJ2ZXJNZXNzYWdl",
-            "EioKBm9wZW5lZBgBIAEoCzIYLm1tby5iYXR0bGUuQmF0dGxlT3BlbmVkSAAS",
-            "KQoGcmVzdWx0GAIgASgLMhcubW1vLmJhdHRsZS5Ta2lsbFJlc3VsdEgAEi0K",
-            "CHJlamVjdGVkGAMgASgLMhkubW1vLmJhdHRsZS5Ta2lsbFJlamVjdGVkSAAS",
-            "LwoJY2FuY2VsbGVkGAQgASgLMhoubW1vLmJhdHRsZS5Ta2lsbENhbmNlbGxl",
-            "ZEgAEigKBWVuZGVkGAUgASgLMhcubW1vLmJhdHRsZS5CYXR0bGVFbmRlZEgA",
-            "EiYKBW1vdmVkGAYgASgLMhUubW1vLmJhdHRsZS5Nb3ZlU3RhdGVIABIzCg5t",
-            "ZW1iZXJfdXBkYXRlZBgHIAEoCzIZLm1tby5iYXR0bGUuTWVtYmVyVXBkYXRl",
-            "ZEgAEisKCmJvc3NfcGhhc2UYCCABKAsyFS5tbW8uYmF0dGxlLkJvc3NQaGFz",
-            "ZUgAEjMKDmVudGVyX3JlamVjdGVkGAkgASgLMhkubW1vLmJhdHRsZS5FbnRl",
-            "clJlamVjdGVkSAASMQoNdGFsaXNtYW5fdXNlZBgKIAEoCzIYLm1tby5iYXR0",
-            "bGUuVGFsaXNtYW5Vc2VkSAASOQoRdGFsaXNtYW5fcmVqZWN0ZWQYCyABKAsy",
-            "HC5tbW8uYmF0dGxlLlRhbGlzbWFuUmVqZWN0ZWRIABIzCgtzY3JvbGxfdXNl",
-            "ZBgMIAEoCzIcLm1tby5iYXR0bGUuUmV2aXZlU2Nyb2xsVXNlZEgAEjsKD3Nj",
-            "cm9sbF9yZWplY3RlZBgNIAEoCzIgLm1tby5iYXR0bGUuUmV2aXZlU2Nyb2xs",
-            "UmVqZWN0ZWRIAEIGCgRib2R5IlMKDUVudGVyUmVqZWN0ZWQSDgoGcmVhc29u",
-            "GAEgASgJEg0KBWxpbWl0GAIgASgNEg8KB2N1cnJlbnQYAyABKA0SEgoKZHVu",
-            "Z2Vvbl9pZBgEIAEoCSI9ChJVc2VUYWxpc21hblJlcXVlc3QSDwoHaXRlbV9p",
-            "ZBgBIAEoCRIWCg5jbGllbnRfdGltZV9tcxgCIAEoAyLgAQoMVGFsaXNtYW5V",
-            "c2VkEhEKCWNhc3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJEg4KBmhl",
-            "YWxlZBgDIAEoAxIQCghocF9hZnRlchgEIAEoAxITCgtjb29sZG93bl9tcxgF",
-            "IAEoDRIWCg5jb29sZG93bl9ncm91cBgGIAEoCRISCgpjb3VudF9sZWZ0GAcg",
-            "ASgDEgwKBHBvb2wYCCABKAkSEAoIcmVzdG9yZWQYCSABKAMSEgoKbWFuYV9h",
-            "ZnRlchgKIAEoAxIVCg1tYW5hX3Jlc3RvcmVkGAsgASgDInEKEFRhbGlzbWFu",
-            "UmVqZWN0ZWQSDwoHaXRlbV9pZBgBIAEoCRIOCgZyZWFzb24YAiABKAkSFgoO",
-            "cmV0cnlfYWZ0ZXJfbXMYAyABKA0SEAoIaHBfYWZ0ZXIYBCABKAMSEgoKbWFu",
-            "YV9hZnRlchgFIAEoAyJBChZVc2VSZXZpdmVTY3JvbGxSZXF1ZXN0Eg8KB2l0",
-            "ZW1faWQYASABKAkSFgoOY2xpZW50X3RpbWVfbXMYAiABKAMizgEKEFJldml2",
-            "ZVNjcm9sbFVzZWQSEQoJY2FzdGVyX2lkGAEgASgEEg8KB2l0ZW1faWQYAiAB",
-            "KAkSEAoIaHBfYWZ0ZXIYAyABKAMSEgoKbWFuYV9hZnRlchgEIAEoAxIQCghl",
-            "eHBfY29zdBgFIAEoAxINCgVsZXZlbBgGIAEoAxIRCglleHBfYWZ0ZXIYByAB",
-            "KAMSEwoLY29vbGRvd25fbXMYCCABKA0SEwoLcmVhZHlfYXRfbXMYCSABKAMS",
-            "EgoKY291bnRfbGVmdBgKIAEoAyJ1ChRSZXZpdmVTY3JvbGxSZWplY3RlZBIP",
-            "CgdpdGVtX2lkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIWCg5yZXRyeV9hZnRl",
-            "cl9tcxgDIAEoDRIQCghocF9hZnRlchgEIAEoAxISCgptYW5hX2FmdGVyGAUg",
-            "ASgDKvYCChFTa2lsbFJlamVjdFJlYXNvbhIcChhTS0lMTF9SRUpFQ1RfVU5T",
-            "UEVDSUZJRUQQABIeChpTS0lMTF9SRUpFQ1RfTk9UX0lOX0JBVFRMRRABEh4K",
-            "GlNLSUxMX1JFSkVDVF9VTktOT1dOX1NLSUxMEAISHAoYU0tJTExfUkVKRUNU",
-            "X1RBUkdFVF9HT05FEAMSHAoYU0tJTExfUkVKRUNUX0NBU1RFUl9ERUFEEAQS",
-            "GQoVU0tJTExfUkVKRUNUX0NPT0xET1dOEAUSHQoZU0tJTExfUkVKRUNUX09V",
-            "VF9PRl9SQU5HRRAGEhgKFFNLSUxMX1JFSkVDVF9DQVNUSU5HEAcSGQoVU0tJ",
-            "TExfUkVKRUNUX1JFQ09WRVJZEAgSGAoUU0tJTExfUkVKRUNUX05PX01BTkEQ",
-            "CRIbChdTS0lMTF9SRUpFQ1RfQkFEX1RBUkdFVBAKEiEKHVNLSUxMX1JFSkVD",
-            "VF9DQU5OT1RfUkVTVVJSRUNUEAtCE6oCEE1tby5Qcm90by5CYXR0bGViBnBy",
-            "b3RvMw=="));
+            "cGhhc2VfaW5kZXgYASABKAUSDAoEbmFtZRgCIAEoCSJ5Cg9TaWVnZVVuaXRW",
+            "aXN1YWwSEQoJbWVtYmVyX2lkGAEgASgEEgwKBHRlYW0YAiABKA0SCgoCaHAY",
+            "AyABKAMSDgoGaHBfbWF4GAQgASgDEikKBHRpZXIYBSABKA4yGy5tbW8uYmF0",
+            "dGxlLlNpZWdlVmlzdWFsVGllciKTAQoJU2llZ2VWaWV3EhIKCnNlc3Npb25f",
+            "aWQYASABKAQSGAoQZnVsbF9tb2RlbF9saW1pdBgCIAEoDRIYChBmdWxsX21v",
+            "ZGVsX2NvdW50GAMgASgNEhIKCnVuaXRfY291bnQYBCABKA0SKgoFdW5pdHMY",
+            "BSADKAsyGy5tbW8uYmF0dGxlLlNpZWdlVW5pdFZpc3VhbCKHAgoNQ2xpZW50",
+            "TWVzc2FnZRIpCgVza2lsbBgBIAEoCzIYLm1tby5iYXR0bGUuU2tpbGxSZXF1",
+            "ZXN0SAASMAoGY2FuY2VsGAIgASgLMh4ubW1vLmJhdHRsZS5Ta2lsbENhbmNl",
+            "bFJlcXVlc3RIABInCgRtb3ZlGAMgASgLMhcubW1vLmJhdHRsZS5Nb3ZlUmVx",
+            "dWVzdEgAEjIKCHRhbGlzbWFuGAQgASgLMh4ubW1vLmJhdHRsZS5Vc2VUYWxp",
+            "c21hblJlcXVlc3RIABI0CgZzY3JvbGwYBSABKAsyIi5tbW8uYmF0dGxlLlVz",
+            "ZVJldml2ZVNjcm9sbFJlcXVlc3RIAEIGCgRib2R5IsQFCg1TZXJ2ZXJNZXNz",
+            "YWdlEioKBm9wZW5lZBgBIAEoCzIYLm1tby5iYXR0bGUuQmF0dGxlT3BlbmVk",
+            "SAASKQoGcmVzdWx0GAIgASgLMhcubW1vLmJhdHRsZS5Ta2lsbFJlc3VsdEgA",
+            "Ei0KCHJlamVjdGVkGAMgASgLMhkubW1vLmJhdHRsZS5Ta2lsbFJlamVjdGVk",
+            "SAASLwoJY2FuY2VsbGVkGAQgASgLMhoubW1vLmJhdHRsZS5Ta2lsbENhbmNl",
+            "bGxlZEgAEigKBWVuZGVkGAUgASgLMhcubW1vLmJhdHRsZS5CYXR0bGVFbmRl",
+            "ZEgAEiYKBW1vdmVkGAYgASgLMhUubW1vLmJhdHRsZS5Nb3ZlU3RhdGVIABIz",
+            "Cg5tZW1iZXJfdXBkYXRlZBgHIAEoCzIZLm1tby5iYXR0bGUuTWVtYmVyVXBk",
+            "YXRlZEgAEisKCmJvc3NfcGhhc2UYCCABKAsyFS5tbW8uYmF0dGxlLkJvc3NQ",
+            "aGFzZUgAEjMKDmVudGVyX3JlamVjdGVkGAkgASgLMhkubW1vLmJhdHRsZS5F",
+            "bnRlclJlamVjdGVkSAASMQoNdGFsaXNtYW5fdXNlZBgKIAEoCzIYLm1tby5i",
+            "YXR0bGUuVGFsaXNtYW5Vc2VkSAASOQoRdGFsaXNtYW5fcmVqZWN0ZWQYCyAB",
+            "KAsyHC5tbW8uYmF0dGxlLlRhbGlzbWFuUmVqZWN0ZWRIABIzCgtzY3JvbGxf",
+            "dXNlZBgMIAEoCzIcLm1tby5iYXR0bGUuUmV2aXZlU2Nyb2xsVXNlZEgAEjsK",
+            "D3Njcm9sbF9yZWplY3RlZBgNIAEoCzIgLm1tby5iYXR0bGUuUmV2aXZlU2Ny",
+            "b2xsUmVqZWN0ZWRIABIrCgpzaWVnZV92aWV3GA4gASgLMhUubW1vLmJhdHRs",
+            "ZS5TaWVnZVZpZXdIAEIGCgRib2R5IlMKDUVudGVyUmVqZWN0ZWQSDgoGcmVh",
+            "c29uGAEgASgJEg0KBWxpbWl0GAIgASgNEg8KB2N1cnJlbnQYAyABKA0SEgoK",
+            "ZHVuZ2Vvbl9pZBgEIAEoCSI9ChJVc2VUYWxpc21hblJlcXVlc3QSDwoHaXRl",
+            "bV9pZBgBIAEoCRIWCg5jbGllbnRfdGltZV9tcxgCIAEoAyLgAQoMVGFsaXNt",
+            "YW5Vc2VkEhEKCWNhc3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJEg4K",
+            "BmhlYWxlZBgDIAEoAxIQCghocF9hZnRlchgEIAEoAxITCgtjb29sZG93bl9t",
+            "cxgFIAEoDRIWCg5jb29sZG93bl9ncm91cBgGIAEoCRISCgpjb3VudF9sZWZ0",
+            "GAcgASgDEgwKBHBvb2wYCCABKAkSEAoIcmVzdG9yZWQYCSABKAMSEgoKbWFu",
+            "YV9hZnRlchgKIAEoAxIVCg1tYW5hX3Jlc3RvcmVkGAsgASgDInEKEFRhbGlz",
+            "bWFuUmVqZWN0ZWQSDwoHaXRlbV9pZBgBIAEoCRIOCgZyZWFzb24YAiABKAkS",
+            "FgoOcmV0cnlfYWZ0ZXJfbXMYAyABKA0SEAoIaHBfYWZ0ZXIYBCABKAMSEgoK",
+            "bWFuYV9hZnRlchgFIAEoAyJBChZVc2VSZXZpdmVTY3JvbGxSZXF1ZXN0Eg8K",
+            "B2l0ZW1faWQYASABKAkSFgoOY2xpZW50X3RpbWVfbXMYAiABKAMizgEKEFJl",
+            "dml2ZVNjcm9sbFVzZWQSEQoJY2FzdGVyX2lkGAEgASgEEg8KB2l0ZW1faWQY",
+            "AiABKAkSEAoIaHBfYWZ0ZXIYAyABKAMSEgoKbWFuYV9hZnRlchgEIAEoAxIQ",
+            "CghleHBfY29zdBgFIAEoAxINCgVsZXZlbBgGIAEoAxIRCglleHBfYWZ0ZXIY",
+            "ByABKAMSEwoLY29vbGRvd25fbXMYCCABKA0SEwoLcmVhZHlfYXRfbXMYCSAB",
+            "KAMSEgoKY291bnRfbGVmdBgKIAEoAyJ1ChRSZXZpdmVTY3JvbGxSZWplY3Rl",
+            "ZBIPCgdpdGVtX2lkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIWCg5yZXRyeV9h",
+            "ZnRlcl9tcxgDIAEoDRIQCghocF9hZnRlchgEIAEoAxISCgptYW5hX2FmdGVy",
+            "GAUgASgDKvYCChFTa2lsbFJlamVjdFJlYXNvbhIcChhTS0lMTF9SRUpFQ1Rf",
+            "VU5TUEVDSUZJRUQQABIeChpTS0lMTF9SRUpFQ1RfTk9UX0lOX0JBVFRMRRAB",
+            "Eh4KGlNLSUxMX1JFSkVDVF9VTktOT1dOX1NLSUxMEAISHAoYU0tJTExfUkVK",
+            "RUNUX1RBUkdFVF9HT05FEAMSHAoYU0tJTExfUkVKRUNUX0NBU1RFUl9ERUFE",
+            "EAQSGQoVU0tJTExfUkVKRUNUX0NPT0xET1dOEAUSHQoZU0tJTExfUkVKRUNU",
+            "X09VVF9PRl9SQU5HRRAGEhgKFFNLSUxMX1JFSkVDVF9DQVNUSU5HEAcSGQoV",
+            "U0tJTExfUkVKRUNUX1JFQ09WRVJZEAgSGAoUU0tJTExfUkVKRUNUX05PX01B",
+            "TkEQCRIbChdTS0lMTF9SRUpFQ1RfQkFEX1RBUkdFVBAKEiEKHVNLSUxMX1JF",
+            "SkVDVF9DQU5OT1RfUkVTVVJSRUNUEAsqXwoPU2llZ2VWaXN1YWxUaWVyEhwK",
+            "GFNJRUdFX1ZJU1VBTF9VTlNQRUNJRklFRBAAEhUKEVNJRUdFX1ZJU1VBTF9G",
+            "VUxMEAESFwoTU0lFR0VfVklTVUFMX01BUktFUhACQhOqAhBNbW8uUHJvdG8u",
+            "QmF0dGxlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Battle.SkillRejectReason), }, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Battle.SkillRejectReason), typeof(global::Mmo.Proto.Battle.SiegeVisualTier), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SkillRequest), global::Mmo.Proto.Battle.SkillRequest.Parser, new[]{ "SkillId", "TargetId", "CastTimeMs" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SkillResult), global::Mmo.Proto.Battle.SkillResult.Parser, new[]{ "CasterId", "SkillId", "TargetId", "Hit", "Damage", "Healing", "StaggerMs", "CooldownMs", "TargetHpAfter", "ManaAfter", "ThreatAfter" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SkillRejected), global::Mmo.Proto.Battle.SkillRejected.Parser, new[]{ "SkillId", "TargetId", "CastTimeMs", "Reason", "RetryAfterMs" }, null, null, null, null),
@@ -130,8 +139,10 @@ namespace Mmo.Proto.Battle {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BattleEnded), global::Mmo.Proto.Battle.BattleEnded.Parser, new[]{ "SessionId", "Cleared", "SettlementId", "ExpGain" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.MemberUpdated), global::Mmo.Proto.Battle.MemberUpdated.Parser, new[]{ "Member" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BossPhase), global::Mmo.Proto.Battle.BossPhase.Parser, new[]{ "PhaseIndex", "Name" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SiegeUnitVisual), global::Mmo.Proto.Battle.SiegeUnitVisual.Parser, new[]{ "MemberId", "Team", "Hp", "HpMax", "Tier" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SiegeView), global::Mmo.Proto.Battle.SiegeView.Parser, new[]{ "SessionId", "FullModelLimit", "FullModelCount", "UnitCount", "Units" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ClientMessage), global::Mmo.Proto.Battle.ClientMessage.Parser, new[]{ "Skill", "Cancel", "Move", "Talisman", "Scroll" }, new[]{ "Body" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected", "TalismanUsed", "TalismanRejected", "ScrollUsed", "ScrollRejected" }, new[]{ "Body" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected", "TalismanUsed", "TalismanRejected", "ScrollUsed", "ScrollRejected", "SiegeView" }, new[]{ "Body" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.EnterRejected), global::Mmo.Proto.Battle.EnterRejected.Parser, new[]{ "Reason", "Limit", "Current", "DungeonId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.UseTalismanRequest), global::Mmo.Proto.Battle.UseTalismanRequest.Parser, new[]{ "ItemId", "ClientTimeMs" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanUsed), global::Mmo.Proto.Battle.TalismanUsed.Parser, new[]{ "CasterId", "ItemId", "Healed", "HpAfter", "CooldownMs", "CooldownGroup", "CountLeft", "Pool", "Restored", "ManaAfter", "ManaRestored" }, null, null, null, null),
@@ -194,6 +205,22 @@ namespace Mmo.Proto.Battle {
     /// P2-4a：这个分支不能复活（诫律）。请求不算错，是这个职业分支没有这条能力。
     /// </summary>
     [pbr::OriginalName("SKILL_REJECT_CANNOT_RESURRECT")] SkillRejectCannotResurrect = 11,
+  }
+
+  /// <summary>
+  /// P3-3a2 城战同屏档位（方案 15.1）。档位只由战斗服按 config/siege.json 的上限算，
+  /// 客户端照着画，不能按距离或自己的判断决定谁该画全。
+  /// </summary>
+  public enum SiegeVisualTier {
+    [pbr::OriginalName("SIEGE_VISUAL_UNSPECIFIED")] SiegeVisualUnspecified = 0,
+    /// <summary>
+    /// 周围的人：完整模型
+    /// </summary>
+    [pbr::OriginalName("SIEGE_VISUAL_FULL")] SiegeVisualFull = 1,
+    /// <summary>
+    /// 超出同屏上限：只留队伍颜色和血条，没有完整模型
+    /// </summary>
+    [pbr::OriginalName("SIEGE_VISUAL_MARKER")] SiegeVisualMarker = 2,
   }
 
   #endregion
@@ -5220,6 +5247,695 @@ namespace Mmo.Proto.Battle {
   }
 
   /// <summary>
+  /// 一个单位的表现事实值。队伍颜色只用 team 这个编号，血条只用 hp / hp_max；
+  /// 这里没有模型、外观、prefab、坐标或档位字段——「超限没有完整模型」是结构保证。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class SiegeUnitVisual : pb::IMessage<SiegeUnitVisual>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<SiegeUnitVisual> _parser = new pb::MessageParser<SiegeUnitVisual>(() => new SiegeUnitVisual());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<SiegeUnitVisual> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[14]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SiegeUnitVisual() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SiegeUnitVisual(SiegeUnitVisual other) : this() {
+      memberId_ = other.memberId_;
+      team_ = other.team_;
+      hp_ = other.hp_;
+      hpMax_ = other.hpMax_;
+      tier_ = other.tier_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SiegeUnitVisual Clone() {
+      return new SiegeUnitVisual(this);
+    }
+
+    /// <summary>Field number for the "member_id" field.</summary>
+    public const int MemberIdFieldNumber = 1;
+    private ulong memberId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong MemberId {
+      get { return memberId_; }
+      set {
+        memberId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "team" field.</summary>
+    public const int TeamFieldNumber = 2;
+    private uint team_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Team {
+      get { return team_; }
+      set {
+        team_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "hp" field.</summary>
+    public const int HpFieldNumber = 3;
+    private long hp_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Hp {
+      get { return hp_; }
+      set {
+        hp_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "hp_max" field.</summary>
+    public const int HpMaxFieldNumber = 4;
+    private long hpMax_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long HpMax {
+      get { return hpMax_; }
+      set {
+        hpMax_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "tier" field.</summary>
+    public const int TierFieldNumber = 5;
+    private global::Mmo.Proto.Battle.SiegeVisualTier tier_ = global::Mmo.Proto.Battle.SiegeVisualTier.SiegeVisualUnspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.SiegeVisualTier Tier {
+      get { return tier_; }
+      set {
+        tier_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as SiegeUnitVisual);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(SiegeUnitVisual other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (MemberId != other.MemberId) return false;
+      if (Team != other.Team) return false;
+      if (Hp != other.Hp) return false;
+      if (HpMax != other.HpMax) return false;
+      if (Tier != other.Tier) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (MemberId != 0UL) hash ^= MemberId.GetHashCode();
+      if (Team != 0) hash ^= Team.GetHashCode();
+      if (Hp != 0L) hash ^= Hp.GetHashCode();
+      if (HpMax != 0L) hash ^= HpMax.GetHashCode();
+      if (Tier != global::Mmo.Proto.Battle.SiegeVisualTier.SiegeVisualUnspecified) hash ^= Tier.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (MemberId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(MemberId);
+      }
+      if (Team != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(Team);
+      }
+      if (Hp != 0L) {
+        output.WriteRawTag(24);
+        output.WriteInt64(Hp);
+      }
+      if (HpMax != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(HpMax);
+      }
+      if (Tier != global::Mmo.Proto.Battle.SiegeVisualTier.SiegeVisualUnspecified) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) Tier);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (MemberId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(MemberId);
+      }
+      if (Team != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(Team);
+      }
+      if (Hp != 0L) {
+        output.WriteRawTag(24);
+        output.WriteInt64(Hp);
+      }
+      if (HpMax != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(HpMax);
+      }
+      if (Tier != global::Mmo.Proto.Battle.SiegeVisualTier.SiegeVisualUnspecified) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) Tier);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (MemberId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(MemberId);
+      }
+      if (Team != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Team);
+      }
+      if (Hp != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Hp);
+      }
+      if (HpMax != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(HpMax);
+      }
+      if (Tier != global::Mmo.Proto.Battle.SiegeVisualTier.SiegeVisualUnspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Tier);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(SiegeUnitVisual other) {
+      if (other == null) {
+        return;
+      }
+      if (other.MemberId != 0UL) {
+        MemberId = other.MemberId;
+      }
+      if (other.Team != 0) {
+        Team = other.Team;
+      }
+      if (other.Hp != 0L) {
+        Hp = other.Hp;
+      }
+      if (other.HpMax != 0L) {
+        HpMax = other.HpMax;
+      }
+      if (other.Tier != global::Mmo.Proto.Battle.SiegeVisualTier.SiegeVisualUnspecified) {
+        Tier = other.Tier;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            MemberId = input.ReadUInt64();
+            break;
+          }
+          case 16: {
+            Team = input.ReadUInt32();
+            break;
+          }
+          case 24: {
+            Hp = input.ReadInt64();
+            break;
+          }
+          case 32: {
+            HpMax = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            Tier = (global::Mmo.Proto.Battle.SiegeVisualTier) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            MemberId = input.ReadUInt64();
+            break;
+          }
+          case 16: {
+            Team = input.ReadUInt32();
+            break;
+          }
+          case 24: {
+            Hp = input.ReadInt64();
+            break;
+          }
+          case 32: {
+            HpMax = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            Tier = (global::Mmo.Proto.Battle.SiegeVisualTier) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 战斗服给一条连接下发的城战同屏快照。按「看的人」算，名单随开场与进出更新。
+  /// 请求侧没有对应消息，客户端表达不了「我想把谁画全」。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class SiegeView : pb::IMessage<SiegeView>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<SiegeView> _parser = new pb::MessageParser<SiegeView>(() => new SiegeView());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<SiegeView> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[15]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SiegeView() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SiegeView(SiegeView other) : this() {
+      sessionId_ = other.sessionId_;
+      fullModelLimit_ = other.fullModelLimit_;
+      fullModelCount_ = other.fullModelCount_;
+      unitCount_ = other.unitCount_;
+      units_ = other.units_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public SiegeView Clone() {
+      return new SiegeView(this);
+    }
+
+    /// <summary>Field number for the "session_id" field.</summary>
+    public const int SessionIdFieldNumber = 1;
+    private ulong sessionId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong SessionId {
+      get { return sessionId_; }
+      set {
+        sessionId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "full_model_limit" field.</summary>
+    public const int FullModelLimitFieldNumber = 2;
+    private uint fullModelLimit_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint FullModelLimit {
+      get { return fullModelLimit_; }
+      set {
+        fullModelLimit_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "full_model_count" field.</summary>
+    public const int FullModelCountFieldNumber = 3;
+    private uint fullModelCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint FullModelCount {
+      get { return fullModelCount_; }
+      set {
+        fullModelCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "unit_count" field.</summary>
+    public const int UnitCountFieldNumber = 4;
+    private uint unitCount_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint UnitCount {
+      get { return unitCount_; }
+      set {
+        unitCount_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "units" field.</summary>
+    public const int UnitsFieldNumber = 5;
+    private static readonly pb::FieldCodec<global::Mmo.Proto.Battle.SiegeUnitVisual> _repeated_units_codec
+        = pb::FieldCodec.ForMessage(42, global::Mmo.Proto.Battle.SiegeUnitVisual.Parser);
+    private readonly pbc::RepeatedField<global::Mmo.Proto.Battle.SiegeUnitVisual> units_ = new pbc::RepeatedField<global::Mmo.Proto.Battle.SiegeUnitVisual>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::Mmo.Proto.Battle.SiegeUnitVisual> Units {
+      get { return units_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as SiegeView);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(SiegeView other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (SessionId != other.SessionId) return false;
+      if (FullModelLimit != other.FullModelLimit) return false;
+      if (FullModelCount != other.FullModelCount) return false;
+      if (UnitCount != other.UnitCount) return false;
+      if(!units_.Equals(other.units_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (SessionId != 0UL) hash ^= SessionId.GetHashCode();
+      if (FullModelLimit != 0) hash ^= FullModelLimit.GetHashCode();
+      if (FullModelCount != 0) hash ^= FullModelCount.GetHashCode();
+      if (UnitCount != 0) hash ^= UnitCount.GetHashCode();
+      hash ^= units_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (SessionId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(SessionId);
+      }
+      if (FullModelLimit != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(FullModelLimit);
+      }
+      if (FullModelCount != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(FullModelCount);
+      }
+      if (UnitCount != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(UnitCount);
+      }
+      units_.WriteTo(output, _repeated_units_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (SessionId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(SessionId);
+      }
+      if (FullModelLimit != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(FullModelLimit);
+      }
+      if (FullModelCount != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(FullModelCount);
+      }
+      if (UnitCount != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(UnitCount);
+      }
+      units_.WriteTo(ref output, _repeated_units_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (SessionId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(SessionId);
+      }
+      if (FullModelLimit != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(FullModelLimit);
+      }
+      if (FullModelCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(FullModelCount);
+      }
+      if (UnitCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(UnitCount);
+      }
+      size += units_.CalculateSize(_repeated_units_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(SiegeView other) {
+      if (other == null) {
+        return;
+      }
+      if (other.SessionId != 0UL) {
+        SessionId = other.SessionId;
+      }
+      if (other.FullModelLimit != 0) {
+        FullModelLimit = other.FullModelLimit;
+      }
+      if (other.FullModelCount != 0) {
+        FullModelCount = other.FullModelCount;
+      }
+      if (other.UnitCount != 0) {
+        UnitCount = other.UnitCount;
+      }
+      units_.Add(other.units_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            SessionId = input.ReadUInt64();
+            break;
+          }
+          case 16: {
+            FullModelLimit = input.ReadUInt32();
+            break;
+          }
+          case 24: {
+            FullModelCount = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            UnitCount = input.ReadUInt32();
+            break;
+          }
+          case 42: {
+            units_.AddEntriesFrom(input, _repeated_units_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            SessionId = input.ReadUInt64();
+            break;
+          }
+          case 16: {
+            FullModelLimit = input.ReadUInt32();
+            break;
+          }
+          case 24: {
+            FullModelCount = input.ReadUInt32();
+            break;
+          }
+          case 32: {
+            UnitCount = input.ReadUInt32();
+            break;
+          }
+          case 42: {
+            units_.AddEntriesFrom(ref input, _repeated_units_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
   /// 一条 WebSocket 上跑多种消息，靠这个信封分辨。
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
@@ -5237,7 +5953,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[14]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[16]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5698,7 +6414,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[15]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[17]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5757,6 +6473,9 @@ namespace Mmo.Proto.Battle {
           break;
         case BodyOneofCase.ScrollRejected:
           ScrollRejected = other.ScrollRejected.Clone();
+          break;
+        case BodyOneofCase.SiegeView:
+          SiegeView = other.SiegeView.Clone();
           break;
       }
 
@@ -5940,6 +6659,21 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "siege_view" field.</summary>
+    public const int SiegeViewFieldNumber = 14;
+    /// <summary>
+    /// P3-3a2：城战同屏档位，只有城战实例会发；副本 / 练习场 / 竞技场 / 战场都没有这条。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.SiegeView SiegeView {
+      get { return bodyCase_ == BodyOneofCase.SiegeView ? (global::Mmo.Proto.Battle.SiegeView) body_ : null; }
+      set {
+        body_ = value;
+        bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.SiegeView;
+      }
+    }
+
     private object body_;
     /// <summary>Enum of possible cases for the "body" oneof.</summary>
     public enum BodyOneofCase {
@@ -5957,6 +6691,7 @@ namespace Mmo.Proto.Battle {
       TalismanRejected = 11,
       ScrollUsed = 12,
       ScrollRejected = 13,
+      SiegeView = 14,
     }
     private BodyOneofCase bodyCase_ = BodyOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6000,6 +6735,7 @@ namespace Mmo.Proto.Battle {
       if (!object.Equals(TalismanRejected, other.TalismanRejected)) return false;
       if (!object.Equals(ScrollUsed, other.ScrollUsed)) return false;
       if (!object.Equals(ScrollRejected, other.ScrollRejected)) return false;
+      if (!object.Equals(SiegeView, other.SiegeView)) return false;
       if (BodyCase != other.BodyCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -6021,6 +6757,7 @@ namespace Mmo.Proto.Battle {
       if (bodyCase_ == BodyOneofCase.TalismanRejected) hash ^= TalismanRejected.GetHashCode();
       if (bodyCase_ == BodyOneofCase.ScrollUsed) hash ^= ScrollUsed.GetHashCode();
       if (bodyCase_ == BodyOneofCase.ScrollRejected) hash ^= ScrollRejected.GetHashCode();
+      if (bodyCase_ == BodyOneofCase.SiegeView) hash ^= SiegeView.GetHashCode();
       hash ^= (int) bodyCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -6092,6 +6829,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(106);
         output.WriteMessage(ScrollRejected);
       }
+      if (bodyCase_ == BodyOneofCase.SiegeView) {
+        output.WriteRawTag(114);
+        output.WriteMessage(SiegeView);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -6154,6 +6895,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(106);
         output.WriteMessage(ScrollRejected);
       }
+      if (bodyCase_ == BodyOneofCase.SiegeView) {
+        output.WriteRawTag(114);
+        output.WriteMessage(SiegeView);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -6202,6 +6947,9 @@ namespace Mmo.Proto.Battle {
       }
       if (bodyCase_ == BodyOneofCase.ScrollRejected) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(ScrollRejected);
+      }
+      if (bodyCase_ == BodyOneofCase.SiegeView) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(SiegeView);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -6293,6 +7041,12 @@ namespace Mmo.Proto.Battle {
             ScrollRejected = new global::Mmo.Proto.Battle.ReviveScrollRejected();
           }
           ScrollRejected.MergeFrom(other.ScrollRejected);
+          break;
+        case BodyOneofCase.SiegeView:
+          if (SiegeView == null) {
+            SiegeView = new global::Mmo.Proto.Battle.SiegeView();
+          }
+          SiegeView.MergeFrom(other.SiegeView);
           break;
       }
 
@@ -6432,6 +7186,15 @@ namespace Mmo.Proto.Battle {
             ScrollRejected = subBuilder;
             break;
           }
+          case 114: {
+            global::Mmo.Proto.Battle.SiegeView subBuilder = new global::Mmo.Proto.Battle.SiegeView();
+            if (bodyCase_ == BodyOneofCase.SiegeView) {
+              subBuilder.MergeFrom(SiegeView);
+            }
+            input.ReadMessage(subBuilder);
+            SiegeView = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -6568,6 +7331,15 @@ namespace Mmo.Proto.Battle {
             ScrollRejected = subBuilder;
             break;
           }
+          case 114: {
+            global::Mmo.Proto.Battle.SiegeView subBuilder = new global::Mmo.Proto.Battle.SiegeView();
+            if (bodyCase_ == BodyOneofCase.SiegeView) {
+              subBuilder.MergeFrom(SiegeView);
+            }
+            input.ReadMessage(subBuilder);
+            SiegeView = subBuilder;
+            break;
+          }
         }
       }
     }
@@ -6593,7 +7365,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[16]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[18]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6912,7 +7684,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[17]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[19]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7150,7 +7922,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[18]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[20]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7745,7 +8517,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[19]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[21]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8106,7 +8878,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[20]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[22]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8345,7 +9117,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[21]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[23]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8885,7 +9657,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[22]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[24]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
