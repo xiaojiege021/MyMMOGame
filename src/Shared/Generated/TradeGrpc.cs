@@ -66,6 +66,14 @@ namespace Mmo.Proto.Trade {
     static readonly grpc::Marshaller<global::Mmo.Proto.Trade.BuyIngotRequest> __Marshaller_mmo_trade_BuyIngotRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.BuyIngotRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Trade.BuyIngotResponse> __Marshaller_mmo_trade_BuyIngotResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.BuyIngotResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Trade.ListStoneAuctionRequest> __Marshaller_mmo_trade_ListStoneAuctionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.ListStoneAuctionRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Trade.ListStoneAuctionResponse> __Marshaller_mmo_trade_ListStoneAuctionResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.ListStoneAuctionResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Trade.BuyStoneAuctionRequest> __Marshaller_mmo_trade_BuyStoneAuctionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.BuyStoneAuctionRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Trade.BuyStoneAuctionResponse> __Marshaller_mmo_trade_BuyStoneAuctionResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Trade.BuyStoneAuctionResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Trade.ListAuctionRequest, global::Mmo.Proto.Trade.ListAuctionResponse> __Method_ListAuction = new grpc::Method<global::Mmo.Proto.Trade.ListAuctionRequest, global::Mmo.Proto.Trade.ListAuctionResponse>(
@@ -98,6 +106,22 @@ namespace Mmo.Proto.Trade {
         "BuyIngot",
         __Marshaller_mmo_trade_BuyIngotRequest,
         __Marshaller_mmo_trade_BuyIngotResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Trade.ListStoneAuctionRequest, global::Mmo.Proto.Trade.ListStoneAuctionResponse> __Method_ListStoneAuction = new grpc::Method<global::Mmo.Proto.Trade.ListStoneAuctionRequest, global::Mmo.Proto.Trade.ListStoneAuctionResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ListStoneAuction",
+        __Marshaller_mmo_trade_ListStoneAuctionRequest,
+        __Marshaller_mmo_trade_ListStoneAuctionResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Trade.BuyStoneAuctionRequest, global::Mmo.Proto.Trade.BuyStoneAuctionResponse> __Method_BuyStoneAuction = new grpc::Method<global::Mmo.Proto.Trade.BuyStoneAuctionRequest, global::Mmo.Proto.Trade.BuyStoneAuctionResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "BuyStoneAuction",
+        __Marshaller_mmo_trade_BuyStoneAuctionRequest,
+        __Marshaller_mmo_trade_BuyStoneAuctionResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -135,6 +159,25 @@ namespace Mmo.Proto.Trade {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Trade.BuyIngotResponse> BuyIngot(global::Mmo.Proto.Trade.BuyIngotRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-2a：任务发放的灵石可以进拍卖。仍用金币标价、仍按同一套销毁税成交；
+      /// 挂单只带档位、数量与标价，灵石从角色服的货币行转移，不进背包。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Trade.ListStoneAuctionResponse> ListStoneAuction(global::Mmo.Proto.Trade.ListStoneAuctionRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Trade.BuyStoneAuctionResponse> BuyStoneAuction(global::Mmo.Proto.Trade.BuyStoneAuctionRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -276,6 +319,78 @@ namespace Mmo.Proto.Trade {
       {
         return CallInvoker.AsyncUnaryCall(__Method_BuyIngot, null, options, request);
       }
+      /// <summary>
+      /// P3-2a：任务发放的灵石可以进拍卖。仍用金币标价、仍按同一套销毁税成交；
+      /// 挂单只带档位、数量与标价，灵石从角色服的货币行转移，不进背包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Trade.ListStoneAuctionResponse ListStoneAuction(global::Mmo.Proto.Trade.ListStoneAuctionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListStoneAuction(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-2a：任务发放的灵石可以进拍卖。仍用金币标价、仍按同一套销毁税成交；
+      /// 挂单只带档位、数量与标价，灵石从角色服的货币行转移，不进背包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Trade.ListStoneAuctionResponse ListStoneAuction(global::Mmo.Proto.Trade.ListStoneAuctionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ListStoneAuction, null, options, request);
+      }
+      /// <summary>
+      /// P3-2a：任务发放的灵石可以进拍卖。仍用金币标价、仍按同一套销毁税成交；
+      /// 挂单只带档位、数量与标价，灵石从角色服的货币行转移，不进背包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Trade.ListStoneAuctionResponse> ListStoneAuctionAsync(global::Mmo.Proto.Trade.ListStoneAuctionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListStoneAuctionAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-2a：任务发放的灵石可以进拍卖。仍用金币标价、仍按同一套销毁税成交；
+      /// 挂单只带档位、数量与标价，灵石从角色服的货币行转移，不进背包。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Trade.ListStoneAuctionResponse> ListStoneAuctionAsync(global::Mmo.Proto.Trade.ListStoneAuctionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ListStoneAuction, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Trade.BuyStoneAuctionResponse BuyStoneAuction(global::Mmo.Proto.Trade.BuyStoneAuctionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyStoneAuction(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Trade.BuyStoneAuctionResponse BuyStoneAuction(global::Mmo.Proto.Trade.BuyStoneAuctionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_BuyStoneAuction, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Trade.BuyStoneAuctionResponse> BuyStoneAuctionAsync(global::Mmo.Proto.Trade.BuyStoneAuctionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyStoneAuctionAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Trade.BuyStoneAuctionResponse> BuyStoneAuctionAsync(global::Mmo.Proto.Trade.BuyStoneAuctionRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_BuyStoneAuction, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override TradeServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -293,7 +408,9 @@ namespace Mmo.Proto.Trade {
           .AddMethod(__Method_ListAuction, serviceImpl.ListAuction)
           .AddMethod(__Method_BuyAuction, serviceImpl.BuyAuction)
           .AddMethod(__Method_ListIngot, serviceImpl.ListIngot)
-          .AddMethod(__Method_BuyIngot, serviceImpl.BuyIngot).Build();
+          .AddMethod(__Method_BuyIngot, serviceImpl.BuyIngot)
+          .AddMethod(__Method_ListStoneAuction, serviceImpl.ListStoneAuction)
+          .AddMethod(__Method_BuyStoneAuction, serviceImpl.BuyStoneAuction).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -307,6 +424,8 @@ namespace Mmo.Proto.Trade {
       serviceBinder.AddMethod(__Method_BuyAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.BuyAuctionRequest, global::Mmo.Proto.Trade.BuyAuctionResponse>(serviceImpl.BuyAuction));
       serviceBinder.AddMethod(__Method_ListIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.ListIngotRequest, global::Mmo.Proto.Trade.ListIngotResponse>(serviceImpl.ListIngot));
       serviceBinder.AddMethod(__Method_BuyIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.BuyIngotRequest, global::Mmo.Proto.Trade.BuyIngotResponse>(serviceImpl.BuyIngot));
+      serviceBinder.AddMethod(__Method_ListStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.ListStoneAuctionRequest, global::Mmo.Proto.Trade.ListStoneAuctionResponse>(serviceImpl.ListStoneAuction));
+      serviceBinder.AddMethod(__Method_BuyStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Trade.BuyStoneAuctionRequest, global::Mmo.Proto.Trade.BuyStoneAuctionResponse>(serviceImpl.BuyStoneAuction));
     }
 
   }

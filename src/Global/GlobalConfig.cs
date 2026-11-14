@@ -4,13 +4,15 @@ using System.Text.Json.Serialization;
 namespace Global;
 
 /// <summary>
-/// 全局服务的启动配置：gRPC 听哪儿、连到哪个角色服、连接池多大。
+/// 全局服务的启动配置：gRPC 听哪儿、连到哪个角色服、连接池多大、灵石档位表在哪。
 /// 连接串不在这里，从环境变量或 /srv/mmo/gamedb.env 读。
 /// 税率不在这里：成交由角色服按 config/auction.json 判定，全局服务不写货币。
 /// </summary>
-public sealed record GlobalConfig(string Listen, int DbPoolMax, string CharacterUpstream)
+public sealed record GlobalConfig(
+    string Listen, int DbPoolMax, string CharacterUpstream, string StoneExchangeTable)
 {
     public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
+    public const string DefaultStoneExchangeTable = "config/stone_exchange.json";
 
     public static GlobalConfig Load(string path)
     {
@@ -50,7 +52,14 @@ public sealed record GlobalConfig(string Listen, int DbPoolMax, string Character
             throw new ConfigException("character_upstream 必须是 http:// 或 https:// 地址：" + character);
         }
 
-        return new GlobalConfig(listen.TrimEnd('/'), pool, character);
+        // P3-2a：挂单校验档位用的表。老卡的临时 global.json 不带这一项时走默认值。
+        var stoneExchangeTable = (wire.StoneExchangeTable ?? DefaultStoneExchangeTable).Trim();
+        if (stoneExchangeTable.Length == 0)
+        {
+            throw new ConfigException("stone_exchange_table 不能为空");
+        }
+
+        return new GlobalConfig(listen.TrimEnd('/'), pool, character, stoneExchangeTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -69,6 +78,9 @@ public sealed record GlobalConfig(string Listen, int DbPoolMax, string Character
 
         [JsonPropertyName("character_upstream")]
         public string? CharacterUpstream { get; init; }
+
+        [JsonPropertyName("stone_exchange_table")]
+        public string? StoneExchangeTable { get; init; }
     }
 }
 

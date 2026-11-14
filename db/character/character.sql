@@ -177,3 +177,76 @@ CREATE TABLE IF NOT EXISTS "角色".realm_drill (
 
 CREATE INDEX IF NOT EXISTS realm_drill_character
     ON "角色".realm_drill (character_id, settled_at DESC);
+
+-- P3-2a：以下三份 DDL 与 db/character/stone_exchange.sql、db/social/city.sql、
+-- db/trade/stone_auction.sql 是同一份，整份追加进主迁移，让只跑主迁移的核对脚本
+-- 也自包含（否则索引会引用到不存在的表）。三个 schema 都只建一次，不新建数据库。
+CREATE SCHEMA IF NOT EXISTS "社交";
+CREATE SCHEMA IF NOT EXISTS "交易";
+
+CREATE TABLE IF NOT EXISTS "角色".stone_exchange_txn (
+    txn_id       text        PRIMARY KEY,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    from_kind    text        NOT NULL,
+    to_kind      text        NOT NULL,
+    from_cost    bigint      NOT NULL CHECK (from_cost > 0),
+    to_gain      bigint      NOT NULL CHECK (to_gain > 0),
+    exchanged_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS stone_exchange_character
+    ON "角色".stone_exchange_txn (character_id, exchanged_at DESC);
+
+CREATE TABLE IF NOT EXISTS "社交".city (
+    city_id     text        PRIMARY KEY,
+    name        text        NOT NULL,
+    vein_id     text        NOT NULL UNIQUE,
+    owner_sect  text,
+    tax_pct     int         NOT NULL CHECK (tax_pct BETWEEN 0 AND 100),
+    created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "社交".city_tax_ledger (
+    txn_id      text        PRIMARY KEY,
+    city_id     text        NOT NULL REFERENCES "社交".city (city_id) ON DELETE CASCADE,
+    source      text        NOT NULL CHECK (source IN ('task_grant', 'mining', 'other')),
+    gross_gold  bigint      NOT NULL CHECK (gross_gold >= 0),
+    tax_gold    bigint      NOT NULL CHECK (tax_gold >= 0),
+    recorded_at timestamptz NOT NULL DEFAULT now(),
+    CHECK (tax_gold <= gross_gold)
+);
+
+CREATE TABLE IF NOT EXISTS "交易".stone_listing (
+    listing_id   bigserial   PRIMARY KEY,
+    list_txn     text        NOT NULL UNIQUE,
+    seller_id    bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    stone_kind   text        NOT NULL,
+    stone_amount bigint      NOT NULL CHECK (stone_amount > 0),
+    price_gold   bigint      NOT NULL CHECK (price_gold > 0),
+    state        text        NOT NULL DEFAULT 'listed'
+                 CHECK (state IN ('listed', 'sold', 'cancelled')),
+    created_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS stone_listing_live_seller
+    ON "交易".stone_listing (seller_id, stone_kind) WHERE state = 'listed';
+
+CREATE TABLE IF NOT EXISTS "交易".stone_auction_txn (
+    txn_id      text        PRIMARY KEY,
+    listing_id  bigint      NOT NULL REFERENCES "交易".stone_listing (listing_id) ON DELETE CASCADE,
+    applied_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "交易".stone_settlement (
+    txn_id       text        PRIMARY KEY REFERENCES "交易".stone_auction_txn (txn_id),
+    listing_id   bigint      NOT NULL REFERENCES "交易".stone_listing (listing_id) ON DELETE CASCADE,
+    buyer_id     bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    seller_id    bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    stone_kind   text        NOT NULL,
+    stone_amount bigint      NOT NULL CHECK (stone_amount > 0),
+    price_gold   bigint      NOT NULL CHECK (price_gold > 0),
+    tax_gold     bigint      NOT NULL CHECK (tax_gold >= 0),
+    net_gold     bigint      NOT NULL CHECK (net_gold >= 0),
+    settled_at   timestamptz NOT NULL DEFAULT now(),
+    CHECK (net_gold + tax_gold = price_gold)
+);

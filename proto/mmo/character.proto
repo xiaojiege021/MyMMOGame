@@ -150,6 +150,16 @@ service CharacterService {
   // 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
   // 同一个事务号再提交不会加第二次。
   rpc SettleDrill(SettleDrillRequest) returns (SettleDrillResponse);
+
+  // P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
+  // 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
+  // 客户端带不进任何数值，也不经过拍卖。
+  rpc ExchangeStone(ExchangeStoneRequest) returns (ExchangeStoneResponse);
+
+  // P3-2a：任务发放的灵石成交结算。全局服务转过来，角色服在一笔事务里
+  // 写双方灵石、买方金币、卖方净额与挂单状态；档位、数量、标价、税率
+  // 与税额全从库和配置读。税仍直接销毁，不进任何角色。
+  rpc SettleStoneAuction(StoneAuctionSettleRequest) returns (StoneAuctionSettleResponse);
 }
 
 message SettleExpRequest {
@@ -950,5 +960,56 @@ message SettleDrillResponse {
   // 这一笔之后的历练值（事实值）。
   int64 drill = 5;
   bool duplicate = 6;
+}
+
+// P3-2a：兑换只带低档币种，比例与产出都在角色服从配置读。
+message ExchangeStoneRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string from_kind = 3;
+  string txn_id = 4;
+}
+
+message ExchangeStoneResponse {
+  bool ok = 1;
+  // unknown_tier / top_tier / unknown_currency / not_enough_stone /
+  // character_not_found / txn_missing / duplicate。
+  string reason = 2;
+  string from_kind = 3;
+  string to_kind = 4;
+  int64 from_cost = 5;
+  int64 to_gain = 6;
+  int64 from_amount = 7;
+  int64 to_amount = 8;
+  int32 ratio = 9;
+  // 最高一档的名字（仙晶），只作展示：它不是元宝，也不参与寄售。
+  string highest_name = 10;
+  bool duplicate = 11;
+}
+
+// P3-2a：灵石成交结算。成交由全局服务转过来，请求里没有档位、数量、标价或税额。
+message StoneAuctionSettleRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint64 listing_id = 3;
+  string txn_id = 4;
+}
+
+message StoneAuctionSettleResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  string stone_kind = 4;
+  int64 stone_amount = 5;
+  int64 price_gold = 6;
+  int64 tax_gold = 7;
+  int64 net_gold = 8;
+  int64 buyer_gold = 9;
+  int64 seller_gold = 10;
+  int64 buyer_stone = 11;
+  int64 seller_stone = 12;
+  int32 tax_rate_pct = 13;
+  string state = 14;
+  bool duplicate = 15;
 }
 

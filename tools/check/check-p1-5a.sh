@@ -295,10 +295,20 @@ w = copy.deepcopy(base); w['tax_recipient'] = 'system'; dump('a-recipient.json',
 w = copy.deepcopy(base); w['note'] = '所有数值均已写定，没有需要说明的项'; dump('a-no-note.json', w)
 w = copy.deepcopy(base); w['schema'] = 'auction-table/2'; dump('a-schema.json', w)
 PY
+# Windows 上 dotnet 把 stdout 重定向到管道时走 GBK，中文坏配置断言按平台转码。
+# 只转编码，不改任何一条断言；非 Windows 原样透传（与 check-p3-1a2.sh 同一做法）。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 config_reject() {
   local label="$1" file="$2" expect="$3" out
   out="$("$DOTNET" "$CHARACTER_DLL" --auction-state --auction-config "$TMP/$file" \
-    --config config/character.json 2>&1)"
+    --config config/character.json 2>&1 | utf8)"
   if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "$label：${out:0:180}"; fi
 }
 config_reject "缺 tax_rate_pct 起不来" a-no-rate.json "config_error=auction.json 缺 tax_rate_pct"

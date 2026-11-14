@@ -309,9 +309,19 @@ w = copy.deepcopy(base); w['nodes'] = [n for n in w['nodes'] if n['kind'] != 'sp
 w = copy.deepcopy(base); w['nodes'][1]['id'] = w['nodes'][0]['id']; dump('bad-dup-id.json', w)
 w = copy.deepcopy(base); w.pop('character_upstream'); dump('bad-no-upstream.json', w)
 PY
+# Windows 上 dotnet 把 stdout 重定向到管道时走 GBK，中文坏配置断言按平台转码。
+# 只转编码，不改任何一条断言；非 Windows 原样透传（与 check-p3-1a2.sh 同一做法）。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 config_reject() {
   local label="$1" file="$2" expect="$3" out
-  out="$("$DOTNET" "$WORLD_DLL" --gather-state --gather-config "$TMP/$file" 2>&1)"
+  out="$("$DOTNET" "$WORLD_DLL" --gather-state --gather-config "$TMP/$file" 2>&1 | utf8)"
   if printf '%s' "$out" | grep -qF "config_error=$expect"; then
     ok "$label"
   else

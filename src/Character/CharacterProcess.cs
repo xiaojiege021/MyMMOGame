@@ -40,6 +40,8 @@ public sealed class CharacterProcess(string configPath)
         ExpBoosterTable boosterTable;
         UnbindTable unbindTable;
         RechargeTable rechargeTable;
+        StoneExchangeTable stoneExchange;
+        CityTable cityTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -93,6 +95,12 @@ public sealed class CharacterProcess(string configPath)
             shopTable = ShopTable.Load(
                 config.ShopTable, currencies, items, enhanceTable, talismanTable,
                 scrollTable, boosterTable, unbindTable);
+            // P3-2a：灵石五档兑换表与城池表。与启动共用同一套 Load：
+            // 档位都要在币种表里、最高一档的中文名要与币种表一致；
+            // 城池的 vein_id 要对应 gather.json 里的 spirit_stone 节点。
+            // 缺一样就起不来，不带着半截配置跑。
+            stoneExchange = StoneExchangeTable.Load(config.StoneExchangeTable, currencies);
+            cityTable = CityTable.Load(config.CityTable);
         }
         catch (ConfigException ex)
         {
@@ -226,6 +234,23 @@ public sealed class CharacterProcess(string configPath)
             + " item=" + boosterTable.ExpBooster.ItemId
             + " duration_ms=" + boosterTable.ExpBooster.DurationMs
             + " gain_pct=" + boosterTable.ExpBooster.GainPct);
+        // P3-2a：灵石五档与比例只在配置里，启动日志能核对到全部事实值。
+        Console.WriteLine("stone_exchange=tiers=" + stoneExchange.Tiers.Count
+            + " ratio=" + stoneExchange.Ratio
+            + " gain=" + stoneExchange.Gain
+            + " highest=" + stoneExchange.HighestKind + "/" + stoneExchange.HighestName
+            + " ingot=" + stoneExchange.IngotKind
+            + " version=" + stoneExchange.Version);
+        // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
+        foreach (var city in cityTable.Cities)
+        {
+            Console.WriteLine("city=" + city.CityId
+                + " vein=" + city.VeinId
+                + " tax_pct=" + city.TaxPct
+                + " owner=" + (city.OwnerSect ?? "")
+                + " city_tax_table=社交.city_tax_ledger"
+                + " auction_tax_table=交易.auction_settlement.tax_gold");
+        }
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -271,6 +296,9 @@ public sealed class CharacterProcess(string configPath)
         // P3-1a2：突破与历练结算的唯一写入点。历练、炼心与灵石都在库里读，
         // 上一段开没开复用同一个 RealmTable。
         var realmAdvances = new RealmAdvanceRepository(dataSource, realms);
+        // P3-2a：灵石相邻档兑换与任务发放的灵石成交，两个写入点各一笔事务。
+        var stoneExchanges = new StoneExchangeRepository(dataSource, currencies, stoneExchange, config);
+        var stoneAuctions = new StoneAuctionRepository(dataSource, auctionTable, stoneExchange, config);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -327,6 +355,10 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(rechargeTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
+        builder.Services.AddSingleton(stoneExchange);
+        builder.Services.AddSingleton(cityTable);
+        builder.Services.AddSingleton(stoneExchanges);
+        builder.Services.AddSingleton(stoneAuctions);
         builder.Services.AddSingleton(social);
         builder.Services.AddSingleton(config);
 

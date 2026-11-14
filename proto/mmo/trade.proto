@@ -13,6 +13,10 @@ service TradeService {
   // P1-5b：元宝寄售。元宝可以换成金币，商城不直接卖金币。
   rpc ListIngot(ListIngotRequest) returns (ListIngotResponse);
   rpc BuyIngot(BuyIngotRequest) returns (BuyIngotResponse);
+  // P3-2a：任务发放的灵石可以进拍卖。仍用金币标价、仍按同一套销毁税成交；
+  // 挂单只带档位、数量与标价，灵石从角色服的货币行转移，不进背包。
+  rpc ListStoneAuction(ListStoneAuctionRequest) returns (ListStoneAuctionResponse);
+  rpc BuyStoneAuction(BuyStoneAuctionRequest) returns (BuyStoneAuctionResponse);
 }
 
 // 挂单只带卖方角色、要挂的格位、数量与金币标价。
@@ -110,4 +114,54 @@ message BuyIngotResponse {
   int32 tax_rate_pct = 12;
   string state = 13;
   bool duplicate = 14;
+}
+
+// P3-2a：灵石挂单。档位必须在 config/stone_exchange.json 的五档里，
+// 数量与金币标价都为正；灵石不在背包，所以没有 slot，也没有 item_id。
+message ListStoneAuctionRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string stone_kind = 3;
+  int64 stone_amount = 4;
+  int64 price_gold = 5;
+  string txn_id = 6;
+}
+
+message ListStoneAuctionResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  uint64 seller_id = 4;
+  string stone_kind = 5;
+  int64 stone_amount = 6;
+  int64 price_gold = 7;
+  string state = 8;
+  bool duplicate = 9;
+}
+
+// 买只带买方角色与挂单号。档位、数量、标价、税率与税额都带不进来。
+message BuyStoneAuctionRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint64 listing_id = 3;
+  string txn_id = 4;
+}
+
+message BuyStoneAuctionResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  string stone_kind = 4;
+  int64 stone_amount = 5;
+  int64 price_gold = 6;
+  // 这笔税直接销毁，和城池税收分开记账。
+  int64 tax_gold = 7;
+  int64 net_gold = 8;
+  int64 buyer_gold = 9;
+  int64 seller_gold = 10;
+  int64 buyer_stone = 11;
+  int64 seller_stone = 12;
+  int32 tax_rate_pct = 13;
+  string state = 14;
+  bool duplicate = 15;
 }

@@ -11,7 +11,8 @@ public sealed record CharacterConfig(
     string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
     string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
-    string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable)
+    string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable,
+    string StoneExchangeTable, string CityTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -27,6 +28,9 @@ public sealed record CharacterConfig(
     public const string DefaultRechargeTable = "config/recharge.json";
     // P3-1a1：十一段境界顺序与版本开关；核对脚本可以指到临时表试坏配置。
     public const string DefaultRealmTable = "config/realms.json";
+    // P3-2a：灵石五档兑换表与城池表，缺省读仓库那两份；核对脚本可以指到临时表试坏配置。
+    public const string DefaultStoneExchangeTable = "config/stone_exchange.json";
+    public const string DefaultCityTable = "config/city.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -175,11 +179,25 @@ public sealed record CharacterConfig(
             throw new ConfigException("realm_table 不能为空");
         }
 
+        // P3-2a：灵石兑换表与城池表也走同一份配置正本；核对脚本可以指到临时表
+        // 试坏配置（改比例、改最高档中文名、把 vein_id 指到不存在的矿脉节点）。
+        var stoneExchangeTable = (wire.StoneExchangeTable ?? DefaultStoneExchangeTable).Trim();
+        if (stoneExchangeTable.Length == 0)
+        {
+            throw new ConfigException("stone_exchange_table 不能为空");
+        }
+
+        var cityTable = (wire.CityTable ?? DefaultCityTable).Trim();
+        if (cityTable.Length == 0)
+        {
+            throw new ConfigException("city_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
-            socialUpstream.TrimEnd('/'), realmTable);
+            socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -240,6 +258,12 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("realm_table")]
         public string? RealmTable { get; init; }
+
+        [JsonPropertyName("stone_exchange_table")]
+        public string? StoneExchangeTable { get; init; }
+
+        [JsonPropertyName("city_table")]
+        public string? CityTable { get; init; }
     }
 }
 

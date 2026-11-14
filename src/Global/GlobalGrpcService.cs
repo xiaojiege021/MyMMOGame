@@ -13,6 +13,8 @@ namespace Global;
 public sealed class GlobalGrpcService(
     AuctionListingRepository listings,
     IngotListingRepository ingots,
+    StoneListingRepository stones,
+    StoneTierTable stoneTiers,
     CharacterService.CharacterServiceClient character,
     ILogger<GlobalGrpcService> logger) : TradeService.TradeServiceBase
 {
@@ -268,6 +270,138 @@ public sealed class GlobalGrpcService(
             SellerGold = settled.SellerGold,
             BuyerIngot = settled.BuyerIngot,
             SellerIngot = settled.SellerIngot,
+            TaxRatePct = settled.TaxRatePct,
+            State = settled.State,
+            Duplicate = settled.Duplicate,
+        };
+    }
+
+    // P3-2a：任务发放的灵石挂单。灵石是货币行、不在背包，所以挂单前不调 CanTrade，
+    // 也不为拍卖另立一套身份数据；归属由网关复核，档位由 StoneTierTable 校验。
+    public override async Task<ListStoneAuctionResponse> ListStoneAuction(
+        ListStoneAuctionRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        var stoneKind = (request.StoneKind ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        if (stoneKind.Length == 0 || !stoneTiers.Contains(stoneKind))
+        {
+            return new ListStoneAuctionResponse { Ok = false, Reason = "unknown_stone" };
+        }
+
+        if (request.StoneAmount <= 0 || request.PriceGold <= 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "listing_invalid"));
+        }
+
+        StoneListingRepository.Created created;
+        try
+        {
+            created = await stones.CreateAsync(
+                (long)request.CharacterId, stoneKind, request.StoneAmount,
+                request.PriceGold, txnId, context.CancellationToken);
+        }
+        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            // (seller_id, stone_kind) WHERE state='listed'：同一卖方这一档已经挂着一单。
+            return new ListStoneAuctionResponse { Ok = false, Reason = "stone_kind_listed" };
+        }
+
+        logger.LogInformation(
+            "stone_list account={Account} seller={Seller} kind={Kind} amount={Amount} "
+            + "price={Price} txn={Txn} duplicate={Duplicate}",
+            account, request.CharacterId, stoneKind, request.StoneAmount,
+            request.PriceGold, txnId, created.Duplicate);
+
+        if (created.Duplicate)
+        {
+            return new ListStoneAuctionResponse { Ok = false, Reason = "duplicate", Duplicate = true };
+        }
+
+        return new ListStoneAuctionResponse
+        {
+            Ok = true,
+            Reason = "",
+            ListingId = (ulong)created.ListingId,
+            SellerId = request.CharacterId,
+            StoneKind = stoneKind,
+            StoneAmount = request.StoneAmount,
+            PriceGold = request.PriceGold,
+            State = "listed",
+        };
+    }
+
+    // P3-2a：买灵石。成交撮合转给角色服：双方灵石、金币、税与到账都在那一笔事务里。
+    // 业务前提不满足（listing_not_found / listing_sold / same_character / gold_insufficient ...）
+    // 是正常回包里的 ok=false + reason，逐字段转成 BuyStoneAuctionResponse；
+    // RpcException 照 BuyAuction 的处理冒泡给网关，不吞掉错误。
+    public override async Task<BuyStoneAuctionResponse> BuyStoneAuction(
+        BuyStoneAuctionRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0 || request.ListingId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var settled = await character.SettleStoneAuctionAsync(
+            new StoneAuctionSettleRequest
+            {
+                Account = account,
+                CharacterId = request.CharacterId,
+                ListingId = request.ListingId,
+                TxnId = txnId,
+            },
+            deadline: DateTime.UtcNow.AddSeconds(5),
+            cancellationToken: context.CancellationToken);
+
+        logger.LogInformation(
+            "stone_buy account={Account} buyer={Buyer} listing={Listing} txn={Txn} "
+            + "ok={Ok} reason={Reason} kind={Kind} price={Price} tax={Tax} net={Net}",
+            account, request.CharacterId, request.ListingId, txnId,
+            settled.Ok, settled.Reason, settled.StoneKind, settled.PriceGold,
+            settled.TaxGold, settled.NetGold);
+
+        return new BuyStoneAuctionResponse
+        {
+            Ok = settled.Ok,
+            Reason = settled.Reason,
+            ListingId = settled.ListingId,
+            StoneKind = settled.StoneKind,
+            StoneAmount = settled.StoneAmount,
+            PriceGold = settled.PriceGold,
+            TaxGold = settled.TaxGold,
+            NetGold = settled.NetGold,
+            BuyerGold = settled.BuyerGold,
+            SellerGold = settled.SellerGold,
+            BuyerStone = settled.BuyerStone,
+            SellerStone = settled.SellerStone,
             TaxRatePct = settled.TaxRatePct,
             State = settled.State,
             Duplicate = settled.Duplicate,

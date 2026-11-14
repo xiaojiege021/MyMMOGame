@@ -170,6 +170,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleDrillRequest> __Marshaller_mmo_character_SettleDrillRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleDrillRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleDrillResponse> __Marshaller_mmo_character_SettleDrillResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleDrillResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ExchangeStoneRequest> __Marshaller_mmo_character_ExchangeStoneRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ExchangeStoneRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ExchangeStoneResponse> __Marshaller_mmo_character_ExchangeStoneResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ExchangeStoneResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.StoneAuctionSettleRequest> __Marshaller_mmo_character_StoneAuctionSettleRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.StoneAuctionSettleRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.StoneAuctionSettleResponse> __Marshaller_mmo_character_StoneAuctionSettleResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.StoneAuctionSettleResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -418,6 +426,22 @@ namespace Mmo.Proto.Character {
         "SettleDrill",
         __Marshaller_mmo_character_SettleDrillRequest,
         __Marshaller_mmo_character_SettleDrillResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse> __Method_ExchangeStone = new grpc::Method<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ExchangeStone",
+        __Marshaller_mmo_character_ExchangeStoneRequest,
+        __Marshaller_mmo_character_ExchangeStoneResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.StoneAuctionSettleRequest, global::Mmo.Proto.Character.StoneAuctionSettleResponse> __Method_SettleStoneAuction = new grpc::Method<global::Mmo.Proto.Character.StoneAuctionSettleRequest, global::Mmo.Proto.Character.StoneAuctionSettleResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SettleStoneAuction",
+        __Marshaller_mmo_character_StoneAuctionSettleRequest,
+        __Marshaller_mmo_character_StoneAuctionSettleResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -818,6 +842,34 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SettleDrillResponse> SettleDrill(global::Mmo.Proto.Character.SettleDrillRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
+      /// 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
+      /// 客户端带不进任何数值，也不经过拍卖。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ExchangeStoneResponse> ExchangeStone(global::Mmo.Proto.Character.ExchangeStoneRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// P3-2a：任务发放的灵石成交结算。全局服务转过来，角色服在一笔事务里
+      /// 写双方灵石、买方金币、卖方净额与挂单状态；档位、数量、标价、税率
+      /// 与税额全从库和配置读。税仍直接销毁，不进任何角色。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.StoneAuctionSettleResponse> SettleStoneAuction(global::Mmo.Proto.Character.StoneAuctionSettleRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2411,6 +2463,118 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_SettleDrill, null, options, request);
       }
+      /// <summary>
+      /// P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
+      /// 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
+      /// 客户端带不进任何数值，也不经过拍卖。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ExchangeStoneResponse ExchangeStone(global::Mmo.Proto.Character.ExchangeStoneRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ExchangeStone(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
+      /// 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
+      /// 客户端带不进任何数值，也不经过拍卖。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ExchangeStoneResponse ExchangeStone(global::Mmo.Proto.Character.ExchangeStoneRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ExchangeStone, null, options, request);
+      }
+      /// <summary>
+      /// P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
+      /// 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
+      /// 客户端带不进任何数值，也不经过拍卖。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ExchangeStoneResponse> ExchangeStoneAsync(global::Mmo.Proto.Character.ExchangeStoneRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ExchangeStoneAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
+      /// 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
+      /// 客户端带不进任何数值，也不经过拍卖。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ExchangeStoneResponse> ExchangeStoneAsync(global::Mmo.Proto.Character.ExchangeStoneRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ExchangeStone, null, options, request);
+      }
+      /// <summary>
+      /// P3-2a：任务发放的灵石成交结算。全局服务转过来，角色服在一笔事务里
+      /// 写双方灵石、买方金币、卖方净额与挂单状态；档位、数量、标价、税率
+      /// 与税额全从库和配置读。税仍直接销毁，不进任何角色。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.StoneAuctionSettleResponse SettleStoneAuction(global::Mmo.Proto.Character.StoneAuctionSettleRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleStoneAuction(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-2a：任务发放的灵石成交结算。全局服务转过来，角色服在一笔事务里
+      /// 写双方灵石、买方金币、卖方净额与挂单状态；档位、数量、标价、税率
+      /// 与税额全从库和配置读。税仍直接销毁，不进任何角色。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.StoneAuctionSettleResponse SettleStoneAuction(global::Mmo.Proto.Character.StoneAuctionSettleRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SettleStoneAuction, null, options, request);
+      }
+      /// <summary>
+      /// P3-2a：任务发放的灵石成交结算。全局服务转过来，角色服在一笔事务里
+      /// 写双方灵石、买方金币、卖方净额与挂单状态；档位、数量、标价、税率
+      /// 与税额全从库和配置读。税仍直接销毁，不进任何角色。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.StoneAuctionSettleResponse> SettleStoneAuctionAsync(global::Mmo.Proto.Character.StoneAuctionSettleRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SettleStoneAuctionAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// P3-2a：任务发放的灵石成交结算。全局服务转过来，角色服在一笔事务里
+      /// 写双方灵石、买方金币、卖方净额与挂单状态；档位、数量、标价、税率
+      /// 与税额全从库和配置读。税仍直接销毁，不进任何角色。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.StoneAuctionSettleResponse> SettleStoneAuctionAsync(global::Mmo.Proto.Character.StoneAuctionSettleRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SettleStoneAuction, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -2455,7 +2619,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_AdvanceBranch, serviceImpl.AdvanceBranch)
           .AddMethod(__Method_CanEquip, serviceImpl.CanEquip)
           .AddMethod(__Method_AdvanceRealm, serviceImpl.AdvanceRealm)
-          .AddMethod(__Method_SettleDrill, serviceImpl.SettleDrill).Build();
+          .AddMethod(__Method_SettleDrill, serviceImpl.SettleDrill)
+          .AddMethod(__Method_ExchangeStone, serviceImpl.ExchangeStone)
+          .AddMethod(__Method_SettleStoneAuction, serviceImpl.SettleStoneAuction).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -2496,6 +2662,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_CanEquip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(serviceImpl.CanEquip));
       serviceBinder.AddMethod(__Method_AdvanceRealm, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse>(serviceImpl.AdvanceRealm));
       serviceBinder.AddMethod(__Method_SettleDrill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleDrillRequest, global::Mmo.Proto.Character.SettleDrillResponse>(serviceImpl.SettleDrill));
+      serviceBinder.AddMethod(__Method_ExchangeStone, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse>(serviceImpl.ExchangeStone));
+      serviceBinder.AddMethod(__Method_SettleStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.StoneAuctionSettleRequest, global::Mmo.Proto.Character.StoneAuctionSettleResponse>(serviceImpl.SettleStoneAuction));
     }
 
   }

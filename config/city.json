@@ -1,0 +1,15 @@
+{
+  "schema": "city-table/1",
+  "version": 1,
+  "note": "方案 9.5、12 章与开发架构 4.2 / 6 节：灵石矿脉归主城辖区，开采权记在城池上，不记成玩家个人采集点；采出的灵石经修炼任务和境界任务发放，掌管方按城池税收抽成，比例走配置。方案没给抽成比例，tax_pct 标待定（0 表示本卡不抽成），不在代码里写死。城池税收账本与拍卖成交销毁的金币分开记账：前者是「社交」.city_tax_ledger，后者是「交易」.auction_settlement.tax_gold。归属变更与抽成写回由 P3-3a4 城战卡做，本卡只登记归属、建账本，不写回、不改税率。C1 主线卡还没做，任务发放复用 P1-1b5 的 ApplyGrant 同一笔事务。",
+  "gather_table": "config/gather.json",
+  "cities": [
+    {
+      "city_id": "qiyun",
+      "name": "栖云城",
+      "vein_id": "spirit_qiyun_1",
+      "owner_sect": null,
+      "tax_pct": 0
+    }
+  ]
+}

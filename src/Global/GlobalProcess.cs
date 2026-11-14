@@ -25,6 +25,21 @@ public sealed class GlobalProcess(string configPath)
         Console.WriteLine("listen=" + config.Listen);
         Console.WriteLine("character_upstream=" + config.CharacterUpstream);
 
+        // P3-2a：挂单时校验灵石档位，加载失败就起不来，不带着半截配置跑。
+        StoneTierTable stoneTiers;
+        try
+        {
+            stoneTiers = StoneTierTable.Load(config.StoneExchangeTable);
+        }
+        catch (ConfigException ex)
+        {
+            Console.WriteLine("config_error=" + ex.Message);
+            return 2;
+        }
+
+        // 档位数与版本都从配置读出来，不在代码里写死。
+        Console.WriteLine("stone_tiers=" + stoneTiers.Count + " version=" + stoneTiers.Version);
+
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
         if (connectionString == null)
@@ -37,6 +52,7 @@ public sealed class GlobalProcess(string configPath)
             DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
         var listings = new AuctionListingRepository(dataSource);
         var ingots = new IngotListingRepository(dataSource);
+        var stones = new StoneListingRepository(dataSource);
 
         // 成交要转给角色服：货币、物品与成交状态都在那一笔角色服事务里。
         var channel = GrpcChannel.ForAddress(config.CharacterUpstream);
@@ -55,6 +71,8 @@ public sealed class GlobalProcess(string configPath)
         builder.Services.AddGrpc();
         builder.Services.AddSingleton(listings);
         builder.Services.AddSingleton(ingots);
+        builder.Services.AddSingleton(stones);
+        builder.Services.AddSingleton(stoneTiers);
         builder.Services.AddSingleton(character);
         builder.Services.AddSingleton(config);
 

@@ -21,6 +21,14 @@ public static class AuctionApi
 
     public sealed record IngotBuyBody(ulong? CharacterId, ulong? ListingId);
 
+    // P3-2a：灵石挂单只带角色、档位、数量与金币标价；税率、税额、档位集合、
+    // 到账与事务号都不在请求体里（事务号由网关生成）。
+    public sealed record StoneListBody(
+        ulong? CharacterId, string? StoneKind, long? StoneAmount, long? PriceGold);
+
+    // 买只带角色与挂单号。
+    public sealed record StoneBuyBody(ulong? CharacterId, ulong? ListingId);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -356,6 +364,179 @@ public static class AuctionApi
             catch (RpcException ex)
             {
                 Console.WriteLine("auction_ingot_buy_error account=" + account + " detail=" + ex.Status.Detail);
+                await WriteAsync(context, 502, new { error = ex.Status.Detail });
+            }
+        });
+
+        // P3-2a：任务发放的灵石挂单。灵石在货币行不在背包，请求只带档位、数量与标价；
+        // 归属沿用角色服只读背包口复核，事务号由网关生成，客户端带不进税率、税额或到账。
+        app.MapPost("/auction/stone/list", async context =>
+        {
+            if (!Authorize(context, tokens, "stone_list", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            StoneListBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<StoneListBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || string.IsNullOrWhiteSpace(body.StoneKind)
+                || body.StoneAmount is null || body.StoneAmount <= 0
+                || body.PriceGold is null || body.PriceGold <= 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "stone_list:" + Guid.NewGuid().ToString("N");
+                var result = await trade.ListStoneAuctionAsync(
+                    new ListStoneAuctionRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        StoneKind = body.StoneKind!.Trim(),
+                        StoneAmount = body.StoneAmount.Value,
+                        PriceGold = body.PriceGold.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("stone_list account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " kind=" + body.StoneKind!.Trim()
+                    + " amount=" + body.StoneAmount.Value
+                    + " price=" + body.PriceGold.Value
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " listing=" + result.ListingId
+                    + " duplicate=" + result.Duplicate);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = result.Ok,
+                    reason = result.Reason,
+                    listing_id = result.ListingId,
+                    seller_id = result.SellerId,
+                    stone_kind = result.StoneKind,
+                    stone_amount = result.StoneAmount,
+                    price_gold = result.PriceGold,
+                    state = result.State,
+                    duplicate = result.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                Console.WriteLine("stone_list_error account=" + account + " detail=" + ex.Status.Detail);
+                await WriteAsync(context, 502, new { error = ex.Status.Detail });
+            }
+        });
+
+        // P3-2a：买灵石。只带买方角色与挂单号；档位、数量、标价、税率与到账都在服务端。
+        app.MapPost("/auction/stone/buy", async context =>
+        {
+            if (!Authorize(context, tokens, "stone_buy", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            StoneBuyBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<StoneBuyBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || body.ListingId is null || body.ListingId == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "stone_buy:" + Guid.NewGuid().ToString("N");
+                var result = await trade.BuyStoneAuctionAsync(
+                    new BuyStoneAuctionRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        ListingId = body.ListingId.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("stone_buy account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " listing=" + body.ListingId.Value
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok
+                    + " reason=" + result.Reason
+                    + " kind=" + result.StoneKind
+                    + " amount=" + result.StoneAmount
+                    + " price=" + result.PriceGold
+                    + " tax=" + result.TaxGold
+                    + " net=" + result.NetGold
+                    + " buyer_stone=" + result.BuyerStone
+                    + " seller_stone=" + result.SellerStone
+                    + " duplicate=" + result.Duplicate);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = result.Ok,
+                    reason = result.Reason,
+                    listing_id = result.ListingId,
+                    stone_kind = result.StoneKind,
+                    stone_amount = result.StoneAmount,
+                    price_gold = result.PriceGold,
+                    tax_gold = result.TaxGold,
+                    net_gold = result.NetGold,
+                    buyer_gold = result.BuyerGold,
+                    seller_gold = result.SellerGold,
+                    buyer_stone = result.BuyerStone,
+                    seller_stone = result.SellerStone,
+                    tax_rate_pct = result.TaxRatePct,
+                    state = result.State,
+                    duplicate = result.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                Console.WriteLine("stone_buy_error account=" + account + " detail=" + ex.Status.Detail);
                 await WriteAsync(context, 502, new { error = ex.Status.Detail });
             }
         });

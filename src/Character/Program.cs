@@ -148,6 +148,19 @@ long ingotBuyerOf = 0;
 long ingotSellerOf = 0;
 long ingotListingOf = 0;
 string? ingotTxnOf = null;
+// P3-2a：灵石兑换表与城池表的只读核对（不连库），坏配置也走这里。
+var stoneExchangeTableState = false;
+string? stoneExchangeTablePath = null;
+string? stoneExchangeCurrencyPath = null;
+var cityTableState = false;
+string? cityTablePath = null;
+// P3-2a：连库核对——走一次兑换、读两档余额与兑换笔数、城池两张税账、挂单状态。
+long exchangeStoneOf = 0;
+string? exchangeStoneKind = null;
+string? exchangeStoneTxn = null;
+long stoneExchangeStateOf = 0;
+var cityState = false;
+var stoneListingState = false;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -534,6 +547,39 @@ for (var i = 0; i < args.Length; i++)
             long.TryParse(args[++i], out ingotListingOf);
             ingotTxnOf = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
                 ? args[++i] : "";
+            break;
+        // P3-2a：灵石兑换表只读核对。与启动共用同一 StoneExchangeTable.Load，
+        // 不连库也不启动进程；--stone-exchange-table-path 指到临时兑换表与币种表验坏配置。
+        case "--stone-exchange-table":
+            stoneExchangeTableState = true;
+            break;
+        case "--stone-exchange-table-path" when i + 2 < args.Length:
+            stoneExchangeTableState = true;
+            stoneExchangeTablePath = args[++i];
+            stoneExchangeCurrencyPath = args[++i];
+            break;
+        // P3-2a：城池表只读核对。与启动共用同一 CityTable.Load，不连库也不启动进程。
+        case "--city-table":
+            cityTableState = true;
+            break;
+        case "--city-table-path" when i + 1 < args.Length:
+            cityTableState = true;
+            cityTablePath = args[++i];
+            break;
+        // P3-2a：连库走一次相邻档兑换（可直接 new repository）。
+        case "--exchange-stone" when i + 3 < args.Length:
+            long.TryParse(args[++i], out exchangeStoneOf);
+            exchangeStoneKind = args[++i];
+            exchangeStoneTxn = args[++i];
+            break;
+        case "--stone-exchange-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out stoneExchangeStateOf);
+            break;
+        case "--city-state":
+            cityState = true;
+            break;
+        case "--stone-listing-state":
+            stoneListingState = true;
             break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
@@ -1085,6 +1131,75 @@ if (weaponRules)
     }
 }
 
+// P3-2a 灵石兑换表只读核对：与启动共用同一 StoneExchangeTable.Load，不连库、
+// 不启动进程。坏配置（缺字段、档位不在币种表、最高一档中文名与币种表不一致、
+// 比例产出越界、最高一档与充值货币混档）在这一步就能看出来。
+if (stoneExchangeTableState)
+{
+    try
+    {
+        var stoneConfig = CharacterConfig.Load(configPath);
+        var stoneCurrencies = CurrencyTable.Load(
+            stoneExchangeCurrencyPath ?? "config/currency.json");
+        var stoneTable = StoneExchangeTable.Load(
+            stoneExchangeTablePath ?? stoneConfig.StoneExchangeTable, stoneCurrencies);
+        Console.WriteLine("stone_exchange_state=ok version=" + stoneTable.Version
+            + " tiers=" + stoneTable.Tiers.Count
+            + " ratio=" + stoneTable.Ratio
+            + " gain=" + stoneTable.Gain
+            + " highest=" + stoneTable.HighestKind + "/" + stoneTable.HighestName
+            + " ingot=" + stoneTable.IngotKind
+            + " tiers_list=" + string.Join(",", stoneTable.Tiers));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
+// P3-2a 城池表只读核对：与启动共用同一 CityTable.Load，不连库、不启动进程。
+// 坏配置（vein_id 对不上 gather.json 的 spirit_stone 节点、gather 里没有矿脉节点、
+// city 里夹带个人采集点或商品字段）在这一步就能看出来。
+if (cityTableState)
+{
+    try
+    {
+        var cityConfig = CharacterConfig.Load(configPath);
+        var cityTable = CityTable.Load(cityTablePath ?? cityConfig.CityTable);
+        Console.WriteLine("city_table_state=ok version=" + cityTable.Version
+            + " cities=" + cityTable.Cities.Count
+            + " gather_table=" + cityTable.GatherTable);
+        foreach (var city in cityTable.Cities)
+        {
+            Console.WriteLine("city=" + city.CityId
+                + " name=" + city.Name
+                + " vein=" + city.VeinId
+                + " tax_pct=" + city.TaxPct
+                + " owner=" + (city.OwnerSect ?? ""));
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || branchStateOf != 0 || advanceBranchId != 0 || canEquipOf != 0
@@ -1102,7 +1217,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || hardEntryStateOf != 0 || shiftEntryWeekOf != 0
     || rechargeStateOf != null || realmStateOf != 0 || rawRealmId != 0
     || rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
-    || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0)
+    || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0
+    || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || stoneListingState)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -2054,6 +2170,134 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " settlements=" + ledger.Settlements
                 + " txn=" + ledger.Txns
                 + " accounts=" + ledger.Accounts);
+        }
+
+        // P3-2a：直接走一次相邻档兑换，不经过网关、也不经过拍卖。
+        if (exchangeStoneOf != 0)
+        {
+            var exchangeConfig = CharacterConfig.Load(configPath);
+            var exchangeCurrencies = CurrencyTable.Load("config/currency.json");
+            var exchangeTable = StoneExchangeTable.Load(
+                exchangeConfig.StoneExchangeTable, exchangeCurrencies);
+            var exchangeRepo = new StoneExchangeRepository(
+                dataSource, exchangeCurrencies, exchangeTable, exchangeConfig);
+            var outcome = await exchangeRepo.ExchangeAsync(
+                exchangeStoneOf, exchangeStoneKind ?? "", exchangeStoneTxn ?? "",
+                CancellationToken.None);
+            if (outcome.Ok)
+            {
+                Console.WriteLine("stone_exchange=ok id=" + exchangeStoneOf
+                    + " from=" + outcome.FromKind
+                    + " to=" + outcome.ToKind
+                    + " from_cost=" + outcome.FromCost
+                    + " to_gain=" + outcome.ToGain
+                    + " from_amount=" + outcome.FromAmount
+                    + " to_amount=" + outcome.ToAmount
+                    + " ratio=" + outcome.Ratio
+                    + " highest=" + outcome.HighestName
+                    + " duplicate=" + (outcome.Duplicate ? "true" : "false"));
+            }
+            else
+            {
+                Console.WriteLine("stone_exchange=" + outcome.Reason);
+            }
+        }
+
+        // P3-2a：从库里独立读回五档余额与兑换笔数，证「兑换不经过拍卖」。
+        if (stoneExchangeStateOf != 0)
+        {
+            var stateMoney = new CurrencyRepository(dataSource);
+            var stateBalances = await stateMoney.AllAsync(
+                stoneExchangeStateOf, CancellationToken.None);
+            var stateConfig = CharacterConfig.Load(configPath);
+            var stateTable = StoneExchangeTable.Load(
+                stateConfig.StoneExchangeTable, CurrencyTable.Load("config/currency.json"));
+            var tiers = string.Join(" ", stateTable.Tiers.Select(
+                t => t + "=" + stateBalances.GetValueOrDefault(t, 0L)));
+            long exchangeTxns;
+            await using (var read = dataSource.CreateCommand(
+                "select count(*) from \"角色\".stone_exchange_txn where character_id = $1"))
+            {
+                read.Parameters.AddWithValue(stoneExchangeStateOf);
+                exchangeTxns = Convert.ToInt64(
+                    await read.ExecuteScalarAsync(CancellationToken.None));
+            }
+
+            Console.WriteLine("stone_exchange_state=ok id=" + stoneExchangeStateOf
+                + " " + tiers
+                + " exchange_txns=" + exchangeTxns);
+        }
+
+        // P3-2a：城池税收账本与拍卖销毁税是分开的两张表，各数各的。
+        if (cityState)
+        {
+            long cityRows;
+            await using (var read = dataSource.CreateCommand(
+                "select count(*) from \"社交\".city"))
+            {
+                cityRows = Convert.ToInt64(await read.ExecuteScalarAsync(CancellationToken.None));
+            }
+
+            long cityTaxRows;
+            await using (var read = dataSource.CreateCommand(
+                "select count(*) from \"社交\".city_tax_ledger"))
+            {
+                cityTaxRows = Convert.ToInt64(await read.ExecuteScalarAsync(CancellationToken.None));
+            }
+
+            long auctionTaxRows;
+            await using (var read = dataSource.CreateCommand(
+                "select count(*) from \"交易\".auction_settlement"))
+            {
+                auctionTaxRows = Convert.ToInt64(await read.ExecuteScalarAsync(CancellationToken.None));
+            }
+
+            long auctionTaxSum;
+            await using (var read = dataSource.CreateCommand(
+                "select coalesce(sum(tax_gold), 0) from \"交易\".auction_settlement"))
+            {
+                auctionTaxSum = Convert.ToInt64(await read.ExecuteScalarAsync(CancellationToken.None));
+            }
+
+            long stoneListingRows;
+            await using (var read = dataSource.CreateCommand(
+                "select count(*) from \"交易\".stone_listing"))
+            {
+                stoneListingRows = Convert.ToInt64(await read.ExecuteScalarAsync(CancellationToken.None));
+            }
+
+            Console.WriteLine("city_state=ok city_rows=" + cityRows
+                + " city_tax_rows=" + cityTaxRows
+                + " auction_tax_rows=" + auctionTaxRows
+                + " auction_tax_sum=" + auctionTaxSum
+                + " stone_listing_rows=" + stoneListingRows);
+        }
+
+        // P3-2a：给核对脚本看「兑换不经过拍卖」——兑换前后挂单数不变。
+        if (stoneListingState)
+        {
+            long listed = 0;
+            long sold = 0;
+            await using (var read = dataSource.CreateCommand(
+                "select state, count(*) from \"交易\".stone_listing group by state"))
+            {
+                await using var reader = await read.ExecuteReaderAsync(CancellationToken.None);
+                while (await reader.ReadAsync(CancellationToken.None))
+                {
+                    var state = reader.GetString(0);
+                    var count = reader.GetInt64(1);
+                    if (string.Equals(state, "listed", StringComparison.Ordinal))
+                    {
+                        listed = count;
+                    }
+                    else if (string.Equals(state, "sold", StringComparison.Ordinal))
+                    {
+                        sold = count;
+                    }
+                }
+            }
+
+            Console.WriteLine("stone_listing=listed listed=" + listed + " sold=" + sold);
         }
 
         if (reportName != null)

@@ -57,6 +57,10 @@ public static class CharacterApi
     // 拆下只带装备格与镶嵌位号，拆下来的结晶由角色服放回背包。
     public sealed record RemoveCrystalBody(ulong? CharacterId, uint? Slot, uint? Socket);
 
+    // P3-2a：灵石相邻档兑换只带角色与低档币种。比例、产出、到账、数值与事务号
+    // 都不在请求体里（事务号由网关生成），客户端改不了「相邻一档换一个」。
+    public sealed record ExchangeStoneBody(ulong? CharacterId, string? FromKind);
+
     static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -1132,6 +1136,88 @@ public static class CharacterApi
             catch (RpcException ex)
             {
                 await WriteRpcErrorAsync(context, "crystal_remove", account, ex);
+            }
+        });
+
+        // P3-2a：灵石相邻档兑换，不经过拍卖。请求只有角色与低档币种，
+        // 比例、产出、最高档名与到账都由角色服从 config/stone_exchange.json 与库读出；
+        // 事务号由网关生成，客户端带不进来，也不带任何数值字段。
+        app.MapPost("/currency/exchange", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "currency_exchange", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            ExchangeStoneBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<ExchangeStoneBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.CharacterId == 0
+                || string.IsNullOrWhiteSpace(body.FromKind))
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                {
+                    await WriteAsync(context, 404, new { error = "character_not_found" });
+                    return;
+                }
+
+                var txnId = "stone_exchange:" + Guid.NewGuid().ToString("N");
+                var result = await client.ExchangeStoneAsync(
+                    new ExchangeStoneRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        FromKind = body.FromKind!.Trim(),
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("currency_exchange account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " from=" + result.FromKind
+                    + " to=" + result.ToKind
+                    + " cost=" + result.FromCost
+                    + " gain=" + result.ToGain
+                    + " reason=" + result.Reason
+                    + " duplicate=" + result.Duplicate
+                    + " txn=" + txnId
+                    + " ok=" + result.Ok);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = result.Ok,
+                    reason = result.Reason,
+                    from_kind = result.FromKind,
+                    to_kind = result.ToKind,
+                    from_cost = result.FromCost,
+                    to_gain = result.ToGain,
+                    from_amount = result.FromAmount,
+                    to_amount = result.ToAmount,
+                    ratio = result.Ratio,
+                    highest_name = result.HighestName,
+                    duplicate = result.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "currency_exchange", account, ex);
             }
         });
     }

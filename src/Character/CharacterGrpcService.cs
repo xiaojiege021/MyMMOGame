@@ -50,8 +50,16 @@ public sealed class CharacterGrpcService(
     RealmAdvanceRepository realmAdvances,
     SocialService.SocialServiceClient social,
     CharacterConfig config,
-    ILogger<CharacterGrpcService> logger) : CharacterService.CharacterServiceBase
+    ILogger<CharacterGrpcService> logger,
+    StoneExchangeTable stoneExchange,
+    StoneExchangeRepository stoneExchanges,
+    StoneAuctionRepository stoneAuctions,
+    CityTable cities) : CharacterService.CharacterServiceBase
 {
+    // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
+    public StoneExchangeTable StoneExchange { get; } = stoneExchange;
+    public CityTable Cities { get; } = cities;
+
     public override async Task<CreateCharacterResponse> CreateCharacter(
         CreateCharacterRequest request,
         ServerCallContext context)
@@ -2669,6 +2677,129 @@ public sealed class CharacterGrpcService(
             DungeonId = outcome.DungeonId,
             DrillGain = outcome.Gain,
             Drill = outcome.Drill,
+            Duplicate = outcome.Duplicate,
+        };
+    }
+
+    /// <summary>
+    /// P3-2a：灵石相邻档兑换。请求只带角色、低档币种与事务号；档位顺序、比例与
+    /// 产出全在 StoneExchangeRepository 按配置判定，不经过拍卖。归属/账号校验沿用
+    /// AddCurrency 的写法，业务前提不满足回 ok=false + reason。
+    /// </summary>
+    public override async Task<ExchangeStoneResponse> ExchangeStone(
+        ExchangeStoneRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var fromKind = (request.FromKind ?? "").Trim();
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await stoneExchanges.ExchangeAsync(
+            characterId, fromKind, txnId, context.CancellationToken);
+
+        logger.LogInformation(
+            "stone_exchange account={Account} id={Id} from={From} txn={Txn} "
+            + "ok={Ok} reason={Reason} to={To} from_cost={FromCost} to_gain={ToGain} "
+            + "from_amount={FromAmount} to_amount={ToAmount} duplicate={Duplicate}",
+            account, characterId, fromKind, txnId, outcome.Ok, outcome.Reason,
+            outcome.ToKind, outcome.FromCost, outcome.ToGain,
+            outcome.FromAmount, outcome.ToAmount, outcome.Duplicate);
+
+        // 逐字段把仓储的事实值填进回包；拒绝时不带任何「这一手生效了」的数值。
+        return new ExchangeStoneResponse
+        {
+            Ok = outcome.Ok,
+            Reason = outcome.Reason,
+            FromKind = outcome.FromKind,
+            ToKind = outcome.ToKind,
+            FromCost = outcome.FromCost,
+            ToGain = outcome.ToGain,
+            FromAmount = outcome.FromAmount,
+            ToAmount = outcome.ToAmount,
+            Ratio = outcome.Ratio,
+            HighestName = outcome.HighestName,
+            Duplicate = outcome.Duplicate,
+        };
+    }
+
+    /// <summary>
+    /// P3-2a：任务发放的灵石成交结算。全局服务转过来时只带买方角色、挂单号与
+    /// 事务号；档位、数量、标价、税率与税额全由 StoneAuctionRepository 从库和
+    /// 配置读。税仍直接销毁，不进任何角色。业务前提不满足是 ok=false + reason。
+    /// </summary>
+    public override async Task<StoneAuctionSettleResponse> SettleStoneAuction(
+        StoneAuctionSettleRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (account.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
+        }
+
+        if (request.CharacterId == 0 || request.ListingId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var outcome = await stoneAuctions.SettleAsync(
+            characterId, (long)request.ListingId, txnId, context.CancellationToken);
+
+        logger.LogInformation(
+            "stone_auction_settle account={Account} buyer={Buyer} listing={Listing} txn={Txn} "
+            + "ok={Ok} reason={Reason} kind={Kind} amount={Amount} price={Price} "
+            + "tax={Tax} net={Net} duplicate={Duplicate}",
+            account, characterId, request.ListingId, txnId, outcome.Ok, outcome.Reason,
+            outcome.StoneKind, outcome.StoneAmount, outcome.PriceGold,
+            outcome.TaxGold, outcome.NetGold, outcome.Duplicate);
+
+        // outcome 与回包一一对应，逐字段填进去。
+        return new StoneAuctionSettleResponse
+        {
+            Ok = outcome.Ok,
+            Reason = outcome.Reason,
+            ListingId = (ulong)outcome.ListingId,
+            StoneKind = outcome.StoneKind,
+            StoneAmount = outcome.StoneAmount,
+            PriceGold = outcome.PriceGold,
+            TaxGold = outcome.TaxGold,
+            NetGold = outcome.NetGold,
+            BuyerGold = outcome.BuyerGold,
+            SellerGold = outcome.SellerGold,
+            BuyerStone = outcome.BuyerStone,
+            SellerStone = outcome.SellerStone,
+            TaxRatePct = outcome.TaxRatePct,
+            State = outcome.State,
             Duplicate = outcome.Duplicate,
         };
     }
