@@ -4,12 +4,16 @@ using World;
 // 配置路径可以指到别处，核对脚本用临时配置跑，不碰仓库里那份。
 var configPath = "config/world.json";
 var gatherConfigPath = "config/gather.json";
+// C2 铺开表是可选表：老卡的临时配置目录里没有它，世界服按 P1-3b 的四个基准点照常启动。
+var gatherSpreadConfigPath = "config/gather_spread.json";
+var gatherSpreadExplicit = false;
 var flightConfigPath = "config/flight.json";
 var worldBossConfigPath = "config/world_boss.json";
 var regionState = false;
 var positionState = false;
 var tierState = false;
 var gatherState = false;
+var gatherSpreadState = false;
 var flightState = false;
 var worldBossState = false;
 var worldBossAtMs = 0L;
@@ -28,6 +32,15 @@ for (var i = 0; i < args.Length; i++)
         // 只给核对用：把读表后的节点与产物打出来，不启动进程。
         case "--gather-state":
             gatherState = true;
+            break;
+        // C2 铺开表单独一份，核对脚本用临时配置跑，不碰仓库里那份。
+        case "--gather-spread-config" when i + 1 < args.Length:
+            gatherSpreadConfigPath = args[++i];
+            gatherSpreadExplicit = true;
+            break;
+        // 只给核对用：把铺开后的节点、境界区域与每块地表的覆盖打出来，不启动进程。
+        case "--gather-spread-state":
+            gatherSpreadState = true;
             break;
         // 飞行与跨区门槛单独一份，核对脚本用临时配置跑，不碰仓库里那份。
         case "--flight-config" when i + 1 < args.Length:
@@ -71,6 +84,19 @@ for (var i = 0; i < args.Length; i++)
     }
 }
 
+// C2 的可选表跟 --config 所在的目录走。老卡用自己的临时配置目录改 flight.json 门槛时，
+// 那份目录里没有 gather_spread.json，就按 P1-3b 四个基准点降级；否则仓库里的产品表
+// 会和临时改过的境界门槛交叉校验失败，把老卡的「改配置重启」整段打成假红。
+// 显式给 --gather-spread-config 时不推导（C2 自己的核对脚本走这条路）。
+if (!gatherSpreadExplicit)
+{
+    var configDir = Path.GetDirectoryName(configPath);
+    if (!string.IsNullOrEmpty(configDir))
+    {
+        gatherSpreadConfigPath = Path.Combine(configDir, "gather_spread.json");
+    }
+}
+
 if (gatherState)
 {
     GatherTable table;
@@ -97,6 +123,55 @@ if (gatherState)
         + " respawn_s=" + ore.RespawnSeconds
         + " forbidden=" + table.Nodes.Count(n => n.Kind == GatherTable.SpiritStone));
     return 0;
+}
+
+if (gatherSpreadState)
+{
+    try
+    {
+        // 与启动同一套校验：地表、飞行门槛、基准采集表都按运行时那样读，
+        // 只读入口不能拿一份更松的规则把坏铺开表放过去。
+        var worldConfig = WorldConfig.Load(configPath);
+        var catalog = WorldCatalog.Load(worldConfig);
+        var regionIds = catalog.Regions.Select(r => r.Id).ToHashSet(StringComparer.Ordinal);
+        var flights = FlightTable.Load(flightConfigPath, regionIds);
+        var baseTable = GatherTable.Load(gatherConfigPath, regionIds);
+        var spread = GatherSpreadTable.LoadIfPresent(
+            gatherSpreadConfigPath, regionIds, flights, baseTable.Nodes);
+        if (spread is null)
+        {
+            Console.WriteLine("gather_spread=missing");
+            return 0;
+        }
+
+        var all = baseTable.WithSpread(spread.Nodes);
+        Console.WriteLine("gather_spread_state=ok nodes=" + spread.Nodes.Count
+            + " regions=" + spread.RegionCount
+            + " realms=" + spread.Realms
+            + " base=" + baseTable.Nodes.Count
+            + " total=" + all.Nodes.Count);
+        foreach (var region in catalog.Regions)
+        {
+            var ore = all.Nodes.Count(n => n.RegionId == region.Id && n.Kind == GatherTable.Ore);
+            var herb = all.Nodes.Count(n => n.RegionId == region.Id && n.Kind == GatherTable.Herb);
+            // 只报事实值：境界门槛来自 flight.json，节点数来自合并后的唯一节点集。
+            Console.WriteLine("region=" + region.Id
+                + " realm=" + (flights.RequiredFor(region.Id) ?? "")
+                + " ore=" + ore + " herb=" + herb);
+        }
+
+        return 0;
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
 }
 
 if (flightState)
@@ -321,5 +396,6 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
     stop.Cancel();
 });
 
-return await new WorldProcess(configPath, gatherConfigPath, flightConfigPath, worldBossConfigPath)
+return await new WorldProcess(
+    configPath, gatherConfigPath, flightConfigPath, worldBossConfigPath, gatherSpreadConfigPath)
     .RunAsync(stop.Token);

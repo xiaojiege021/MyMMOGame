@@ -15,12 +15,17 @@ public sealed record GatherNode(
     string ItemId,
     int Count,
     int BagSlot,
-    int RespawnSeconds);
+    int RespawnSeconds,
+    // C2：铺开节点按地表的境界区域刷新，基准表（P1-3b 的四个点）不带这个字段。
+    // 默认空串让老调用点一字不改，运行时判定不读它，只用来交叉校验配置与打印只读口。
+    string Realm = "");
 
 /// <summary>
-/// 采集节点的唯一配置正本（config/gather.json）。方案只写定「矿脉给矿石、药草给药材、
-/// 灵石矿脉不许个人采、采集不耗疲劳」，每次产量、刷新秒数、产物入哪一格与节点编号都没写定，
-/// 全在这份配置里注明待定，代码里不给兜底。缺字段、编号重复、非法类型或非正数都起不来。
+/// 采集节点的基准配置正本（config/gather.json，P1-3b 的四个点）。方案只写定「矿脉给矿石、
+/// 药草给药材、灵石矿脉不许个人采、采集不耗疲劳」，每次产量、刷新秒数、产物入哪一格与节点编号
+/// 都没写定，全在这份配置里注明待定，代码里不给兜底。缺字段、编号重复、非法类型或非正数都起不来。
+/// C2 铺开的节点在另一份可选表 config/gather_spread.json；运行期由 WithSpread 合并成唯一节点集，
+/// 基准表本身与这里的校验规则保持 P1-3b 原样，不改前面任务卡已经完成的规则。
 /// </summary>
 public sealed class GatherTable
 {
@@ -42,6 +47,28 @@ public sealed class GatherTable
     public IReadOnlyList<GatherNode> Nodes { get; }
 
     public GatherNode? Find(string id) => byId.GetValueOrDefault((id ?? "").Trim());
+
+    /// <summary>
+    /// C2：把铺开节点并进运行期的唯一节点集。基准表四个点仍原样在前面，
+    /// 撞编号直接起不来——两份配置不能各自声称同一个节点发不同产物。
+    /// 世界服的采集判定、回包与角色服发奖链路一个字不改，只是 Find 能找到更多节点。
+    /// </summary>
+    public GatherTable WithSpread(IReadOnlyList<GatherNode> spread)
+    {
+        var all = new List<GatherNode>(Nodes);
+        var seen = new HashSet<string>(byId.Keys, StringComparer.Ordinal);
+        foreach (var node in spread)
+        {
+            if (!seen.Add(node.Id))
+            {
+                throw new ConfigException("采集节点编号重复：" + node.Id);
+            }
+
+            all.Add(node);
+        }
+
+        return new GatherTable(CharacterUpstream, all);
+    }
 
     /// <summary>regions 给定时顺带核对节点确实长在已配置的地表上（启动用）；只读入口可不传。</summary>
     public static GatherTable Load(string path, IReadOnlySet<string>? regions = null)

@@ -1,0 +1,149 @@
+{
+  "schema": "gather-spread/1",
+  "version": 1,
+  "pending": true,
+  "note": "C2 采集节点铺开（开发架构 13 节「主顺序之外」第 628 行、12 节第 410 行「只加内容和配置，不改前面任务卡已经完成的规则」；方案 9.5）。P1-3b 留在 config/gather.json 的四个点仍是基准节点集，本表只补铺开的矿脉与药草，两边按 id 合并成运行期唯一节点集，撞 id 直接起不来。方案 9.5 写定：矿脉给矿石、药草给药材，谁都能学、可以同时学、采集不耗疲劳；节点长在大世界里按地表的境界区域刷新；灵石矿脉归主城辖区，不开放给玩家个人去挖，不进采集背包；矿、药可以玩家交易。所以本表只许有 ore / herb 两种节点，灵石矿脉仍只在 gather.json 的 spirit_qiyun_1 一处。每个节点的 realm 必须等于它所在地表在 config/flight.json 的 region_realms 门槛，且必须落在 flight.json 的 realms（首发三段：炼体 / 筑基 / 结丹）之内——「元婴之后更高一级的矿和药随该大境界的版本一起开放」因此是加载期硬约束：元婴及以后 switches 全关，当前不铺那几档节点，版本开放后按同一 schema 追加即可，不需要改代码。方案没写定产量、刷新秒数、产物入哪一格、节点编号、每块地表铺几个点，也没给不同境界区域的矿药另起名字，所以这些只在本表记一次、标 pending=true，代码 / proto / SQL 里没有第二套数字；更高一级的矿药等元婴版本开放时再按同一 schema 追加，本卡不发明物品编号。物品只引用 config/items.json 里已经是 material 且 bind=none 的 ore_iron / herb_ling（可交易），不改 items.json。旧天城区 / 焦原的 region.open=false 是方案 2.5「第 11 场才开」的主线开放，归 config/region/ 管；本表只按境界区域铺节点，不改剧情进度、不改世界服的采集判定。",
+  "items_config": "config/items.json",
+  "nodes": [
+    {
+      "id": "herb_kulan_1",
+      "kind": "herb",
+      "region_id": "枯岚道",
+      "realm": "炼体",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 4,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_chenglu_1",
+      "kind": "ore",
+      "region_id": "承露门",
+      "realm": "炼体",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 3,
+      "respawn_s": 2
+    },
+    {
+      "id": "herb_chenglu_1",
+      "kind": "herb",
+      "region_id": "承露门",
+      "realm": "炼体",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 4,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_tingyao_1",
+      "kind": "ore",
+      "region_id": "听谣镇",
+      "realm": "炼体",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 3,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_waihuan_1",
+      "kind": "ore",
+      "region_id": "外环隙",
+      "realm": "炼体",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 3,
+      "respawn_s": 2
+    },
+    {
+      "id": "herb_waihuan_1",
+      "kind": "herb",
+      "region_id": "外环隙",
+      "realm": "炼体",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 4,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_qiyun_1",
+      "kind": "ore",
+      "region_id": "栖云城",
+      "realm": "炼体",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 3,
+      "respawn_s": 2
+    },
+    {
+      "id": "herb_qiyun_1",
+      "kind": "herb",
+      "region_id": "栖云城",
+      "realm": "炼体",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 4,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_jiutian_1",
+      "kind": "ore",
+      "region_id": "旧天城区",
+      "realm": "结丹",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 3,
+      "respawn_s": 2
+    },
+    {
+      "id": "herb_jiutian_1",
+      "kind": "herb",
+      "region_id": "旧天城区",
+      "realm": "结丹",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 4,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_jiaoyuan_1",
+      "kind": "ore",
+      "region_id": "焦原",
+      "realm": "结丹",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 3,
+      "respawn_s": 2
+    },
+    {
+      "id": "herb_jiaoyuan_1",
+      "kind": "herb",
+      "region_id": "焦原",
+      "realm": "结丹",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 4,
+      "respawn_s": 2
+    },
+    {
+      "id": "ore_longchao_1",
+      "kind": "ore",
+      "region_id": "龙巢门口",
+      "realm": "结丹",
+      "item_id": "ore_iron",
+      "count": 2,
+      "bag_slot": 3,
+      "respawn_s": 2
+    },
+    {
+      "id": "herb_longchao_1",
+      "kind": "herb",
+      "region_id": "龙巢门口",
+      "realm": "结丹",
+      "item_id": "herb_ling",
+      "count": 3,
+      "bag_slot": 4,
+      "respawn_s": 2
+    }
+  ]
+}

@@ -5,13 +5,15 @@ namespace World;
 
 public sealed class WorldProcess(
     string configPath, string gatherConfigPath, string flightConfigPath,
-    string worldBossConfigPath)
+    string worldBossConfigPath, string gatherSpreadConfigPath)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
         WorldConfig config;
         WorldCatalog catalog;
         GatherTable gather;
+        GatherTable gatherAll;
+        GatherSpreadTable? gatherSpread;
         FlightTable flights;
         WorldBossTable? worldBossTable;
         try
@@ -23,6 +25,12 @@ public sealed class WorldProcess(
             gather = GatherTable.Load(gatherConfigPath, regionIds);
             // 每块已配置地表都必须有境界门槛，漏一块就等于给它开零门槛。
             flights = FlightTable.Load(flightConfigPath, regionIds);
+            // C2 铺开表是可选的：老卡的临时配置目录里没有它，就按 P1-3b 的四个基准点照常跑。
+            // 地表境界区域与已开放段都复用 flight.json，不另起一套境界正本。
+            gatherSpread = GatherSpreadTable.LoadIfPresent(
+                gatherSpreadConfigPath, regionIds, flights, gather.Nodes);
+            // 运行期唯一节点集 = 基准四点 + 铺开节点；采集判定与角色服发奖链路一字不改。
+            gatherAll = gatherSpread is null ? gather : gather.WithSpread(gatherSpread.Nodes);
             // 世界 Boss 是可选表：入口必须长在已经开放的地表上。缺表 / 坏表一律降级成
             // 「没有入口」，不让一份可选配置把分线、采集、飞行这些老链路一起拖垮。
             worldBossTable = LoadWorldBoss(worldBossConfigPath, catalog);
@@ -54,9 +62,16 @@ public sealed class WorldProcess(
             + "," + config.SpawnFacing);
         Console.WriteLine("tier_config=ok near=" + config.TierNearDistance
             + " far=" + config.TierFarDistance);
+        // 这行是 P1-3b / P1-3c 老卡钉住的口径，仍只报基准表，不把铺开节点算进来。
         Console.WriteLine("gather_config=ok nodes=" + gather.Nodes.Count
             + " kinds=" + string.Join(",", gather.Nodes.Select(n => n.Kind).Distinct())
             + " forbidden=" + gather.Nodes.Count(n => n.Kind == GatherTable.SpiritStone));
+        Console.WriteLine(gatherSpread is null
+            ? "gather_spread=missing"
+            : "gather_spread=ok nodes=" + gatherSpread.Nodes.Count
+                + " regions=" + gatherSpread.RegionCount
+                + " realms=" + gatherSpread.Realms
+                + " total=" + gatherAll.Nodes.Count);
         Console.WriteLine("flight_config=ok realms=" + string.Join(",", flights.Realms)
             + " flight_realm=" + flights.FlightRealm
             + " region_realms=" + string.Join(",", catalog.Regions.Select(
@@ -73,7 +88,7 @@ public sealed class WorldProcess(
         var tiers = new AppearanceTierTable(config);
         var hub = new PositionHub(registry, config, tiers);
         var gatherNodes = new GatherNodeRegistry();
-        using var gatherGrants = new GrpcGatherGrant(gather.CharacterUpstream);
+        using var gatherGrants = new GrpcGatherGrant(gatherAll.CharacterUpstream);
         // 境界只在角色服：世界服每次判飞行/跨区都去问，不连角色库，也不自己存境界。
         using var realmReader = new GrpcRealmReader(flights.CharacterUpstream);
         var flightGate = new FlightGate(flights, realmReader, registry, catalog);
@@ -98,7 +113,7 @@ public sealed class WorldProcess(
         builder.Services.AddSingleton(catalog);
         builder.Services.AddSingleton(tiers);
         builder.Services.AddSingleton(hub);
-        builder.Services.AddSingleton(gather);
+        builder.Services.AddSingleton(gatherAll);
         builder.Services.AddSingleton(gatherNodes);
         builder.Services.AddSingleton<IGatherGrant>(gatherGrants);
         builder.Services.AddSingleton(flights);
