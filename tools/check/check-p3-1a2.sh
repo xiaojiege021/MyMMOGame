@@ -401,7 +401,9 @@ PY
   wait_drill 50 \
     && ok "战斗服通关后角色服写下历练 50（生产链路通了）" \
     || bad "历练没从战斗服到角色服：$(bstate "$ID")"
-  grep -qE 'exp_settle=ok .* dungeon=abyss kills=1 drill=50 drill_after=50 drill_reason=$' \
+  # v1.121 起结算日志末尾多一个 source= 字段（世界 Boss 那张卡加的），不再把
+  # drill_reason 钉在行尾；仍然钉住「同一笔结算回包里带回历练 50」这条不变式。
+  grep -qE 'exp_settle=ok .* dungeon=abyss kills=1 drill=50 drill_after=50 drill_reason=' \
     "$TMP/battle-link.log" \
     && ok "同一笔结算回包里带回历练 50" \
     || bad "战斗服结算日志不对：$(grep -m1 '^exp_settle=' "$TMP/battle-link.log")"

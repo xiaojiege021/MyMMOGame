@@ -63,7 +63,9 @@ public sealed class CharacterGrpcService(
     CharacterSlotTable characterSlotTable,
     CharacterSlotRepository characterSlots,
     WardrobeRepository wardrobe,
-    ISeasonSource seasonSource) : CharacterService.CharacterServiceBase
+    ISeasonSource seasonSource,
+    MainlineTable mainlineTable,
+    MainlineRepository mainlines) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
@@ -1961,6 +1963,90 @@ public sealed class CharacterGrpcService(
             Used = state.Used,
             ProductId = state.ProductId,
             PriceYuanbao = state.PriceYuanbao,
+        };
+    }
+
+    /// <summary>
+    /// C1：主线十二场只读口。只回角色库里的剧情进度与下一场编号，十二场内容
+    /// 在 config/mainline.json，不进协议、不发给客户端自己算。
+    /// </summary>
+    public override async Task<DescribeMainlineResponse> DescribeMainline(
+        DescribeMainlineRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var characterId = (long)request.CharacterId;
+        if (account.Length == 0 || characterId <= 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_or_character_missing"));
+        }
+
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var state = await mainlines.StateAsync(characterId, account, context.CancellationToken);
+        if (!state.Found)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var count = mainlineTable.IsMissing ? 0 : mainlineTable.Stages.Count;
+        return new DescribeMainlineResponse
+        {
+            CharacterId = request.CharacterId,
+            Found = true,
+            MainStage = state.MainStage,
+            Alignment = state.Alignment,
+            // 个人线停在第 12 场：走到尽头与配置缺表都回 0，不给客户端自己外推。
+            NextStage = count > 0 && state.MainStage < count ? state.MainStage + 1 : 0,
+            StageCount = count,
+            ConfigMissing = mainlineTable.IsMissing,
+            Level = state.Level,
+            Realm = state.Realm,
+        };
+    }
+
+    /// <summary>
+    /// C1 交任务：一笔事务里抢 P1-1b5 的 grant_txn 号并推进 main_stage
+    /// （第 10 场另写立仙或立魔）。请求带不进奖励、等级、境界与门槛数值。
+    /// </summary>
+    public override async Task<TurnInMainlineResponse> TurnInMainline(
+        TurnInMainlineRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        var characterId = (long)request.CharacterId;
+        if (account.Length == 0 || characterId <= 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_or_character_missing"));
+        }
+
+        if (txnId.Length == 0 || txnId.Length > MainlineRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_id_invalid"));
+        }
+
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var result = await mainlines.TurnInAsync(
+            characterId, account, txnId, request.Stage, request.Alignment ?? "",
+            context.CancellationToken);
+
+        return new TurnInMainlineResponse
+        {
+            Ok = result.Ok,
+            Reason = result.Reason,
+            Duplicate = result.Duplicate,
+            Stage = result.Stage,
+            MainStage = result.MainStage,
+            Alignment = result.Alignment,
+            TxnId = txnId,
         };
     }
 

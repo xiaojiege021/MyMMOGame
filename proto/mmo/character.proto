@@ -180,6 +180,12 @@ service CharacterService {
   // 方案写定「外观收藏可以共享」，装备 / 等级 / 境界不共享；这条口不写库、
   // 不改背包归属、不新建解锁流水。
   rpc DescribeWardrobe(DescribeWardrobeRequest) returns (DescribeWardrobeResponse);
+  // C1 主线十二场：只读口只回角色库里的剧情进度与下一场编号；十二场内容在
+  // config/mainline.json，不进协议、不发给客户端自己算。
+  rpc DescribeMainline(DescribeMainlineRequest) returns (DescribeMainlineResponse);
+  // C1 交任务：请求只带角色号、场号与（第 10 场才有的）立仙或立魔。事务号由网关生成，
+  // 复用 P1-1b5 的 grant_txn；奖励、等级、境界、门槛数值一个都带不进来。
+  rpc TurnInMainline(TurnInMainlineRequest) returns (TurnInMainlineResponse);
 }
 
 message SettleExpRequest {
@@ -1173,4 +1179,47 @@ message DescribeWardrobeResponse {
   bool found = 2;
   // 外观类物品的并集，按物品编号稳定排序。装备 / 强化 / 等级 / 境界一条都不在这里。
   repeated WardrobeEntry entries = 3;
+}
+
+// C1：主线十二场。剧情进度只记在角色上（创建时 main_stage 与 alignment 都为空），
+// 战斗进程不保存剧情进度；下一场由角色服从库里的 main_stage 算，客户端表达不了。
+message DescribeMainlineRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message DescribeMainlineResponse {
+  uint64 character_id = 1;
+  bool found = 2;
+  // coalesce(main_stage, 0)：0 表示一场都还没交。
+  int32 main_stage = 3;
+  string alignment = 4;
+  // 下一场编号。个人线停在第 12 场，走到尽头回 0；配置缺表也回 0。
+  int32 next_stage = 5;
+  int32 stage_count = 6;
+  bool config_missing = 7;
+  // 只读事实值：门槛由服务端判，不在这里给客户端自己算。
+  int32 level = 8;
+  string realm = 9;
+}
+
+message TurnInMainlineRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  // 网关生成的 P1-1b5 幂等号；同一个号再提交，整笔不做。
+  string txn_id = 3;
+  int32 stage = 4;
+  // 只有第 10 场能填「立仙」或「立魔」，其它场必须为空。
+  string alignment = 5;
+}
+
+message TurnInMainlineResponse {
+  bool ok = 1;
+  string reason = 2;
+  bool duplicate = 3;
+  int32 stage = 4;
+  // 库里读回的事实值，不是请求带进来的值。
+  int32 main_stage = 5;
+  string alignment = 6;
+  string txn_id = 7;
 }

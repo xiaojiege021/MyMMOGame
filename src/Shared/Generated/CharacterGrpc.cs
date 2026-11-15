@@ -198,6 +198,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeWardrobeRequest> __Marshaller_mmo_character_DescribeWardrobeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeWardrobeRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeWardrobeResponse> __Marshaller_mmo_character_DescribeWardrobeResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeWardrobeResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeMainlineRequest> __Marshaller_mmo_character_DescribeMainlineRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeMainlineRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeMainlineResponse> __Marshaller_mmo_character_DescribeMainlineResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeMainlineResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.TurnInMainlineRequest> __Marshaller_mmo_character_TurnInMainlineRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TurnInMainlineRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.TurnInMainlineResponse> __Marshaller_mmo_character_TurnInMainlineResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TurnInMainlineResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -502,6 +510,22 @@ namespace Mmo.Proto.Character {
         "DescribeWardrobe",
         __Marshaller_mmo_character_DescribeWardrobeRequest,
         __Marshaller_mmo_character_DescribeWardrobeResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeMainlineRequest, global::Mmo.Proto.Character.DescribeMainlineResponse> __Method_DescribeMainline = new grpc::Method<global::Mmo.Proto.Character.DescribeMainlineRequest, global::Mmo.Proto.Character.DescribeMainlineResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeMainline",
+        __Marshaller_mmo_character_DescribeMainlineRequest,
+        __Marshaller_mmo_character_DescribeMainlineResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.TurnInMainlineRequest, global::Mmo.Proto.Character.TurnInMainlineResponse> __Method_TurnInMainline = new grpc::Method<global::Mmo.Proto.Character.TurnInMainlineRequest, global::Mmo.Proto.Character.TurnInMainlineResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "TurnInMainline",
+        __Marshaller_mmo_character_TurnInMainlineRequest,
+        __Marshaller_mmo_character_TurnInMainlineResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -993,6 +1017,32 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeWardrobeResponse> DescribeWardrobe(global::Mmo.Proto.Character.DescribeWardrobeRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// C1 主线十二场：只读口只回角色库里的剧情进度与下一场编号；十二场内容在
+      /// config/mainline.json，不进协议、不发给客户端自己算。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeMainlineResponse> DescribeMainline(global::Mmo.Proto.Character.DescribeMainlineRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// C1 交任务：请求只带角色号、场号与（第 10 场才有的）立仙或立魔。事务号由网关生成，
+      /// 复用 P1-1b5 的 grant_txn；奖励、等级、境界、门槛数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.TurnInMainlineResponse> TurnInMainline(global::Mmo.Proto.Character.TurnInMainlineRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2946,6 +2996,110 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeWardrobe, null, options, request);
       }
+      /// <summary>
+      /// C1 主线十二场：只读口只回角色库里的剧情进度与下一场编号；十二场内容在
+      /// config/mainline.json，不进协议、不发给客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeMainlineResponse DescribeMainline(global::Mmo.Proto.Character.DescribeMainlineRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeMainline(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// C1 主线十二场：只读口只回角色库里的剧情进度与下一场编号；十二场内容在
+      /// config/mainline.json，不进协议、不发给客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeMainlineResponse DescribeMainline(global::Mmo.Proto.Character.DescribeMainlineRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeMainline, null, options, request);
+      }
+      /// <summary>
+      /// C1 主线十二场：只读口只回角色库里的剧情进度与下一场编号；十二场内容在
+      /// config/mainline.json，不进协议、不发给客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeMainlineResponse> DescribeMainlineAsync(global::Mmo.Proto.Character.DescribeMainlineRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeMainlineAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// C1 主线十二场：只读口只回角色库里的剧情进度与下一场编号；十二场内容在
+      /// config/mainline.json，不进协议、不发给客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeMainlineResponse> DescribeMainlineAsync(global::Mmo.Proto.Character.DescribeMainlineRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeMainline, null, options, request);
+      }
+      /// <summary>
+      /// C1 交任务：请求只带角色号、场号与（第 10 场才有的）立仙或立魔。事务号由网关生成，
+      /// 复用 P1-1b5 的 grant_txn；奖励、等级、境界、门槛数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.TurnInMainlineResponse TurnInMainline(global::Mmo.Proto.Character.TurnInMainlineRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return TurnInMainline(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// C1 交任务：请求只带角色号、场号与（第 10 场才有的）立仙或立魔。事务号由网关生成，
+      /// 复用 P1-1b5 的 grant_txn；奖励、等级、境界、门槛数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.TurnInMainlineResponse TurnInMainline(global::Mmo.Proto.Character.TurnInMainlineRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_TurnInMainline, null, options, request);
+      }
+      /// <summary>
+      /// C1 交任务：请求只带角色号、场号与（第 10 场才有的）立仙或立魔。事务号由网关生成，
+      /// 复用 P1-1b5 的 grant_txn；奖励、等级、境界、门槛数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.TurnInMainlineResponse> TurnInMainlineAsync(global::Mmo.Proto.Character.TurnInMainlineRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return TurnInMainlineAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// C1 交任务：请求只带角色号、场号与（第 10 场才有的）立仙或立魔。事务号由网关生成，
+      /// 复用 P1-1b5 的 grant_txn；奖励、等级、境界、门槛数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.TurnInMainlineResponse> TurnInMainlineAsync(global::Mmo.Proto.Character.TurnInMainlineRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_TurnInMainline, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -2997,7 +3151,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_DescribeSeasonPass, serviceImpl.DescribeSeasonPass)
           .AddMethod(__Method_ClaimSeasonPassReward, serviceImpl.ClaimSeasonPassReward)
           .AddMethod(__Method_DescribeCharacterSlots, serviceImpl.DescribeCharacterSlots)
-          .AddMethod(__Method_DescribeWardrobe, serviceImpl.DescribeWardrobe).Build();
+          .AddMethod(__Method_DescribeWardrobe, serviceImpl.DescribeWardrobe)
+          .AddMethod(__Method_DescribeMainline, serviceImpl.DescribeMainline)
+          .AddMethod(__Method_TurnInMainline, serviceImpl.TurnInMainline).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -3045,6 +3201,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_ClaimSeasonPassReward, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ClaimSeasonPassRequest, global::Mmo.Proto.Character.ClaimSeasonPassResponse>(serviceImpl.ClaimSeasonPassReward));
       serviceBinder.AddMethod(__Method_DescribeCharacterSlots, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeCharacterSlotsRequest, global::Mmo.Proto.Character.DescribeCharacterSlotsResponse>(serviceImpl.DescribeCharacterSlots));
       serviceBinder.AddMethod(__Method_DescribeWardrobe, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeWardrobeRequest, global::Mmo.Proto.Character.DescribeWardrobeResponse>(serviceImpl.DescribeWardrobe));
+      serviceBinder.AddMethod(__Method_DescribeMainline, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeMainlineRequest, global::Mmo.Proto.Character.DescribeMainlineResponse>(serviceImpl.DescribeMainline));
+      serviceBinder.AddMethod(__Method_TurnInMainline, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.TurnInMainlineRequest, global::Mmo.Proto.Character.TurnInMainlineResponse>(serviceImpl.TurnInMainline));
     }
 
   }

@@ -74,6 +74,8 @@ public sealed class GatewayProcess(string configPath)
         PassApi.Map(app, tokens, config);
         // P3-4b：角色位与外观收藏两个账号级只读口，名额与收藏都归角色服回答。
         SlotApi.Map(app, tokens, config);
+        // C1：主线十二场的只读与交任务。事务号由网关生成，进度与门槛全在角色服。
+        MainlineApi.Map(app, tokens, config);
         // P1-5c1：商城只认清单，清单外拒绝且不扣元宝。
         ShopApi.Map(app, tokens, config);
         // P1-5c7：限时经验道具走网关到角色服，扣一张与写到期时刻在同一笔事务里。

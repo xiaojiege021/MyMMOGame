@@ -119,12 +119,24 @@ long shopLedgerOf = 0;
 // 三个连库入口只给核对用：名额现状、账号外观收藏、把名额直推到指定值（种子 / 核对）。
 var monthlyBundleList = false;
 string? monthlyBundlePath = null;
+// C1：主线十二场只读核对。与启动共用同一 MainlineTable.Load，不连库也不启动进程。
+var mainlineList = false;
+string? mainlinePath = null;
 var characterSlotList = false;
 string? characterSlotPath = null;
 string? characterSlotsOf = null;
 string? wardrobeOf = null;
 string? rawSlotAccount = null;
 var rawSlotValue = 0;
+// C1：只给核对用的主线入口——读进度、用固定事务号交任务、注入一条突破成功事实。
+// 正常路径分别走网关 GET /mainline、POST /mainline/turn-in 和 P3-1a2 的突破链路。
+long mainlineStateOf = 0;
+long mainlineTurnInOf = 0;
+var mainlineStage = 0;
+string? mainlineAlignment = null;
+string? mainlineTxn = null;
+long mainlineBreakthroughOf = 0;
+string? mainlineFrom = null;
 // 红符：只读核对用。talismanConfigPath 指向临时表试坏配置，talismanStateOf 连库读张数。
 var talismanList = false;
 string? talismanConfigPath = null;
@@ -365,6 +377,27 @@ for (var i = 0; i < args.Length; i++)
             completeQuestId = args[++i];
             break;
 
+        // C1：只给核对用。固定事务号用来验「同一个号不写第二次」。
+        case "--mainline-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out mainlineStateOf);
+            break;
+        case "--mainline-turn-in" when i + 1 < args.Length:
+            long.TryParse(args[++i], out mainlineTurnInOf);
+            break;
+        case "--mainline-stage" when i + 1 < args.Length:
+            int.TryParse(args[++i], out mainlineStage);
+            break;
+        case "--mainline-alignment" when i + 1 < args.Length:
+            mainlineAlignment = args[++i];
+            break;
+        case "--mainline-txn" when i + 1 < args.Length:
+            mainlineTxn = args[++i];
+            break;
+        case "--mainline-breakthrough" when i + 2 < args.Length:
+            long.TryParse(args[++i], out mainlineBreakthroughOf);
+            mainlineFrom = args[++i];
+            break;
+
         case "--realm-break-state" when i + 1 < args.Length:
             long.TryParse(args[++i], out realmBreakStateOf);
             break;
@@ -517,6 +550,14 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--monthly-bundle-path" when i + 1 < args.Length:
             monthlyBundlePath = args[++i];
+            break;
+        // C1：十二场内容只读。与启动共用同一份 Load（含与 dungeons.json、realms.json
+        // 的交叉校验），塞奖励键 / 改场次 / 换地名在这一步就起不来。
+        case "--mainline-list":
+            mainlineList = true;
+            break;
+        case "--mainline-path" when i + 1 < args.Length:
+            mainlinePath = args[++i];
             break;
         // P3-4b：角色栏表只读。与启动共用同一 CharacterSlotTable.Load（基础位 1、上限 2、
         // 商品必须是 second_slot 且没有假发货物）。
@@ -1066,6 +1107,50 @@ if (seasonPassList)
     return 0;
 }
 
+// C1：主线十二场只读核对。与启动共用同一份 MainlineTable.Load（含与 dungeons.json
+// 的 main、realms.json 的首发三段交叉校验），不连库也不启动进程。
+if (mainlineList)
+{
+    try
+    {
+        var mainlineConfig = CharacterConfig.Load(configPath);
+        var table = LoadMainline(mainlineConfig, mainlinePath);
+        Console.WriteLine("mainline_list_state=ok version=" + table.Version
+            + " pending=" + (table.Pending ? "true" : "false")
+            + " stages=" + table.Stages.Count
+            + " battle_dungeon=" + table.BattleDungeon
+            + " alignments=" + string.Join("+", table.AlignmentChoices)
+            + " places=" + table.Places.Count
+            + " factions=" + table.Factions.Count
+            + " speakers=" + table.Speakers.Count);
+        foreach (var stage in table.Stages)
+        {
+            Console.WriteLine("mainline_stage=" + stage.Stage
+                + " title=" + stage.Title
+                + " regions=" + string.Join("+", stage.Regions)
+                + " faction=" + stage.Faction
+                + " speakers=" + string.Join("+", stage.Speakers)
+                + " dialogue=" + string.Join("+", stage.Dialogue.Select(l => l.Speaker + "@" + l.Chapter))
+                + " level_min=" + stage.LevelMin
+                + " requires_breakthrough=" + stage.RequiresBreakthrough
+                + " alignment_choice=" + (stage.AlignmentChoice ? "true" : "false")
+                + " battle=" + stage.Battle);
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // 拍卖税率只读核对：与启动共用同一套 5%–8% 写定区间校验，不连库也不启动进程。
 if (monthlyBundleList)
 {
@@ -1490,7 +1575,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || stoneListingState
     || siegeResultState || applySiegeResultTxn != null
     || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0
-    || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null)
+    || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null
+    || mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -1597,6 +1683,68 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + " next=" + (advance.Next.Length == 0 ? "none" : advance.Next)
                     + " next_open=" + (advance.NextOpen ? "true" : "false")
                     + " advance=" + (advance.Ok ? "ok" : advance.Reason));
+            }
+        }
+
+        // C1：主线十二场的核对入口。只给核对用；玩法路径走网关与 gRPC。
+        if (mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0)
+        {
+            var mlConfig = CharacterConfig.Load(configPath);
+            var mlCurrencies = CurrencyTable.Load("config/currency.json");
+            var mlDungeons = DungeonTable.Load(mlConfig.DungeonTable);
+            var mlRealms = RealmTable.Load(mlConfig.RealmTable, mlDungeons, mlCurrencies);
+            var mlTable = File.Exists(mlConfig.MainlineTable)
+                ? MainlineTable.Load(mlConfig.MainlineTable, mlDungeons, mlRealms)
+                : MainlineTable.Missing();
+            var mlRepo = new MainlineRepository(dataSource, mlTable);
+
+            if (mainlineBreakthroughOf != 0)
+            {
+                // 注入一条「某段已突破成功」的事实，只用来验第 10/11/12 场的门槛分支。
+                // 正常路径由 P3-1a2 的 AdvanceRealm 写，版本开关与灵石消耗都归它管。
+                await using var seed = dataSource.CreateCommand(
+                    "insert into \"角色\".realm_breakthrough "
+                    + "(txn_id, character_id, from_realm, to_realm, success, drill_cost, stone_kind, stone_cost) "
+                    + "values ($1, $2, $3, $4, true, 0, 'stone_1', 1) "
+                    + "on conflict (txn_id) do nothing");
+                seed.Parameters.AddWithValue("check:break:" + mainlineBreakthroughOf + ":" + mainlineFrom);
+                seed.Parameters.AddWithValue(mainlineBreakthroughOf);
+                seed.Parameters.AddWithValue(mainlineFrom ?? "");
+                seed.Parameters.AddWithValue(mlRealms.Next(mainlineFrom) ?? "");
+                var written = await seed.ExecuteNonQueryAsync(CancellationToken.None);
+                Console.WriteLine("mainline_breakthrough=written id=" + mainlineBreakthroughOf
+                    + " from=" + mainlineFrom + " rows=" + written);
+            }
+
+            if (mainlineTurnInOf != 0)
+            {
+                var result = await mlRepo.TurnInAsync(
+                    mainlineTurnInOf, null, mainlineTxn ?? "", mainlineStage,
+                    mainlineAlignment ?? "", CancellationToken.None);
+                Console.WriteLine("mainline_turn_in=ok=" + (result.Ok ? "true" : "false")
+                    + " reason=" + result.Reason
+                    + " duplicate=" + (result.Duplicate ? "true" : "false")
+                    + " stage=" + result.Stage
+                    + " main_stage=" + result.MainStage
+                    + " alignment=" + result.Alignment
+                    + " txn=" + (mainlineTxn ?? ""));
+            }
+
+            if (mainlineStateOf != 0)
+            {
+                var state = await mlRepo.StateAsync(mainlineStateOf, null, CancellationToken.None);
+                if (!state.Found)
+                {
+                    Console.WriteLine("mainline_state=missing id=" + mainlineStateOf);
+                }
+                else
+                {
+                    Console.WriteLine("mainline_state=ok id=" + mainlineStateOf
+                        + " main_stage=" + state.MainStage
+                        + " alignment=" + state.Alignment
+                        + " level=" + state.Level
+                        + " realm=" + state.Realm);
+                }
             }
         }
 
@@ -2815,6 +2963,16 @@ static (SeasonPassTable Table, ItemTable Items) LoadSeasonPass(CharacterConfig c
     var table = SeasonPassTable.Load(
         path ?? cfg.SeasonPassTable, File.ReadAllText(cfg.SeasonTable), shop, items, enhance);
     return (table, items);
+}
+
+// C1：主线十二场的加载链。与真实启动同一份 MainlineTable.Load：
+// 十二场挂的 main 必须是 1 人 / 不扣疲劳 / 不占份额，等突破的三段必须在首发里。
+static MainlineTable LoadMainline(CharacterConfig cfg, string? path)
+{
+    var currencies = CurrencyTable.Load("config/currency.json");
+    var dungeons = DungeonTable.Load(cfg.DungeonTable);
+    var realms = RealmTable.Load(cfg.RealmTable, dungeons, currencies);
+    return MainlineTable.Load(path ?? cfg.MainlineTable, dungeons, realms);
 }
 
 // P3-4b：月叠表的加载链。与真实启动同一份 MonthlyBundleTable.Load：

@@ -46,6 +46,7 @@ public sealed class CharacterProcess(string configPath)
         SeasonPassTable seasonPassTable;
         MonthlyBundleTable monthlyBundleTable;
         CharacterSlotTable characterSlotTable;
+        MainlineTable mainlineTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -122,6 +123,12 @@ public sealed class CharacterProcess(string configPath)
             // P3-4b：第二角色栏只改「一个账号能建几个角色」。基础位 1、上限 2（方案只写了
             // 「第二」这一种），商品与标价在 shop.json；装备 / 等级 / 境界仍按角色各存一行。
             characterSlotTable = CharacterSlotTable.Load(config.CharacterSlotTable, shopTable);
+            // C1：主线十二场的内容正本。只加内容和配置：加载期与 dungeons.json 的 main
+            // （1 人 / 不扣疲劳 / 不占份额）、realms.json 的首发三段交叉校验。
+            // 老卡的临时配置目录没有这份表时降级成「没有主线内容」，不挡启动。
+            mainlineTable = File.Exists(config.MainlineTable)
+                ? MainlineTable.Load(config.MainlineTable, dungeons, realms)
+                : MainlineTable.Missing();
         }
         catch (ConfigException ex)
         {
@@ -307,6 +314,21 @@ public sealed class CharacterProcess(string configPath)
             + " max_slots=" + characterSlotTable.MaxSlots
             + " table=character_slot");
 
+        // C1：十二场内容只在这里列一遍事实值，定词正文仍只在 config/dialogue。
+        Console.WriteLine("mainline_config=" + (mainlineTable.IsMissing ? "missing" : "ok")
+            + " stages=" + mainlineTable.Stages.Count
+            + " pending=" + (mainlineTable.Pending ? "true" : "false")
+            + " battle_dungeon=" + mainlineTable.BattleDungeon);
+        foreach (var stage in mainlineTable.Stages)
+        {
+            Console.WriteLine("mainline_stage=" + stage.Stage
+                + " title=" + stage.Title
+                + " level_min=" + stage.LevelMin
+                + " requires_breakthrough=" + stage.RequiresBreakthrough
+                + " alignment_choice=" + (stage.AlignmentChoice ? "true" : "false")
+                + " battle=" + stage.Battle);
+        }
+
         // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
         foreach (var city in cityTable.Cities)
         {
@@ -402,6 +424,8 @@ public sealed class CharacterProcess(string configPath)
         var characterSlotsRepo = new CharacterSlotRepository(dataSource, characterSlotTable);
         // P3-4b：外观收藏是账号级只读视图，不写库、不改背包归属。
         var wardrobeRepo = new WardrobeRepository(dataSource, items);
+        // C1：主线进度的唯一写入点。交任务与只读口共用这一份加载过的十二场正本。
+        var mainlines = new MainlineRepository(dataSource, mainlineTable);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -478,6 +502,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(characterSlotTable);
         builder.Services.AddSingleton(characterSlotsRepo);
         builder.Services.AddSingleton(wardrobeRepo);
+        builder.Services.AddSingleton(mainlineTable);
+        builder.Services.AddSingleton(mainlines);
         builder.Services.AddSingleton(seasonSource);
         builder.Services.AddSingleton(config);
 

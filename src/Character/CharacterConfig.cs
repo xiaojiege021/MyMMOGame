@@ -14,7 +14,7 @@ public sealed record CharacterConfig(
     string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable,
     string StoneExchangeTable, string CityTable, string SiegeTerritoryTable,
     string SeasonPassTable, string SeasonTable, string MonthlyBundleTable,
-    string CharacterSlotTable, string GlobalUpstream)
+    string CharacterSlotTable, string GlobalUpstream, string MainlineTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -46,6 +46,9 @@ public sealed record CharacterConfig(
     public const string DefaultCharacterSlotTable = "config/character_slot.json";
     // P3-4a2：当前季是全局服务的事实值；角色服经 DescribeSeason 只读它，不自己认定。
     public const string DefaultGlobalUpstream = "http://127.0.0.1:64000";
+    // C1：主线十二场的内容正本。也不显式登记进 config/character.json：老卡的临时
+    // 配置目录没有这份表时按「默认文件名 + 缺表降级」处理，不拖垮启动。
+    public const string DefaultMainlineTable = "config/mainline.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -253,13 +256,20 @@ public sealed record CharacterConfig(
             throw new ConfigException("global_upstream 必须是 http:// 或 https:// 的地址：" + globalUpstream);
         }
 
+        // C1：主线十二场只加内容和配置，不改既有表。缺表由调用方降级，不在这里抛。
+        var mainlineTable = (wire.MainlineTable ?? DefaultMainlineTable).Trim();
+        if (mainlineTable.Length == 0)
+        {
+            throw new ConfigException("mainline_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
-            characterSlotTable, globalUpstream);
+            characterSlotTable, globalUpstream, mainlineTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -344,6 +354,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("global_upstream")]
         public string? GlobalUpstream { get; init; }
+
+        [JsonPropertyName("mainline_table")]
+        public string? MainlineTable { get; init; }
     }
 }
 
