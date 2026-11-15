@@ -105,6 +105,8 @@ deps_of() {
     u5) echo "u1 p1-4a p1-4d" ;;
     u6) echo "u1 p1-5a p1-5c8 p1-5d" ;;
     u7) echo "u1 p2-1b p2-3b p3-3a2" ;;
+    # U8 界面入口：接 U1–U7 已有屏；依赖 U4 HUD 与 U7 收口（表尾第 78 行）。
+    u8) echo "u1 u4 u5 u6 u7" ;;
     # C1 是主顺序之外的卡，排在第 25 行 P1-2a 之后，不占 1–77 行序号。
     c1) echo "p1-2a p1-1b5 p3-1a2" ;;
     # C2 排在第 33 行 P1-3b 之后：等它能把矿石 / 药材写进背包才派；
@@ -126,7 +128,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 c1 c2 c3"
+u1 u2 u3 u4 u5 u6 u7 u8 c1 c2 c3"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {
@@ -162,7 +164,7 @@ closure() {
 # 报成回归失败，也别假装跑过；它们在本机 Mac 上单独跑。
 client_card_needs_unity() {
   case "$1" in
-    e7|e8|p0-1a|p0-1b|p0-1c|p0-1d|p0-2a|p0-2b|p0-3c|u1|u2|u3|u4|u5|u6|u7) return 0 ;;
+    e7|e8|p0-1a|p0-1b|p0-1c|p0-1d|p0-2a|p0-2b|p0-3c|u1|u2|u3|u4|u5|u6|u7|u8) return 0 ;;
     *) return 1 ;;
   esac
 }

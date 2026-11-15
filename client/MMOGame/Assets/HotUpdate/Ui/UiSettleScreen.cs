@@ -68,7 +68,7 @@ namespace HotUpdate.Ui
 
             var backTop = footTop + m.Px(28f);
             var button = shell.Button(m.Band(pad, backTop + m.Px(96f), m.Px(420f), m.Px(104f)),
-                "返回表世界", () => shell.Toast("表世界入口等 U4 接上"), UiButtonKind.Primary);
+                "返回表世界", () => UiEntryHub.BackToWorld(shell), UiButtonKind.Primary);
 
             flow.BindSettle(state.Label, head.Label, expText.Label, costText.Label, dropText.Label);
 

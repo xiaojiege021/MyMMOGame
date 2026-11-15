@@ -381,6 +381,9 @@ namespace HotUpdate.Ui
             }
         }
 
+        /// <summary>骨架抓手。U8 载入闸门要用，不另建一份。</summary>
+        public UiShell Shell => _shell;
+
         /// <summary>从角色栏进入所选角色。没有服务端确认过的角色就不动。</summary>
         public void EnterChosen()
         {
@@ -391,11 +394,16 @@ namespace HotUpdate.Ui
 
             Debug.Log("u2_roster=enter id=" + Character.CharacterId);
             OpenLoading();
+            // U8：真机玩法下由入口枢纽问世界服；编辑器自检仍直接调 ConfirmServerEntry。
+            if (Application.isPlaying)
+            {
+                UiEntryHub.GateFromLoading(this);
+            }
         }
 
         /// <summary>
         /// 服务端说能不能进世界。这是载入屏唯一的出口：进度条到 100% 也不算数。
-        /// U4 接上世界入口后由它调这里；本卡只把口子留好并验到。
+        /// U8 确认成功后打开表世界 HUD；编辑器自检仍只验 Entered / 进度。
         /// </summary>
         public void ConfirmServerEntry(bool ok, string reason)
         {
@@ -424,6 +432,9 @@ namespace HotUpdate.Ui
                 _loading.SetProgress(1f);
                 _loading.SetTip("已入世");
             }
+
+            UiEntryHub.BindSession(Token, Character.CharacterId);
+            UiEntryHub.EnterWorld(_shell);
         }
 
         // ------------------------------------------------------------------ 每帧

@@ -129,16 +129,17 @@ namespace HotUpdate.Ui
                     label, () => OnAction(flow, shell, index), UiButtonKind.Quiet);
             }
 
-            // 右下功能条：只标名字，点了做什么归后续卡。
+            // 右下功能条：U8 接到已有 U 屏，二级入口由 UiEntryHub 补。
             var funcW = m.Px(196f);
             var funcGap = m.Px(12f);
             var funcCount = UiWorldCodex.HudFunctions.Length;
             var funcStartX = m.Width - pad - funcCount * funcW - (funcCount - 1) * funcGap;
             for (var i = 0; i < funcCount; i++)
             {
+                var index = i;
                 shell.Button(m.Band(funcStartX + i * (funcW + funcGap), actionTop, funcW, m.Px(88f)),
                     UiWorldCodex.HudFunctions[i],
-                    () => shell.Toast("这一格留给后续卡，本卡只画表世界的回包"), UiButtonKind.Quiet);
+                    () => UiEntryHub.OpenHudFunction(shell, flow, index), UiButtonKind.Quiet);
             }
 
             flow.RegisterView(() =>
@@ -183,8 +184,8 @@ namespace HotUpdate.Ui
             }
         }
 
-        // 五个操作签点了去哪：只做已经有的那两屏，其余留给后续卡，
-        // 不给一个「看起来能点但什么都不做」的假入口。
+        // 操作签：采集 / 对白 / 飞行已有屏；切目标仍无屏，不造假入口。
+        // 裂隙在右下功能条（U8），不在这一排。
         static void OnAction(UiWorldFlow flow, UiShell shell, int index)
         {
             switch (index)
@@ -199,7 +200,7 @@ namespace HotUpdate.Ui
                     shell.ShowPage("飞行", s => UiFlightScreen.Build(s, flow));
                     break;
                 default:
-                    shell.Toast("切目标与裂隙入口在别的卡里，这一格先只标名字");
+                    shell.Toast("切目标还没有独立屏，这一格先只标名字");
                     break;
             }
         }

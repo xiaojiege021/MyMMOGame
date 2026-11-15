@@ -243,7 +243,7 @@ namespace HotUpdate.Ui
             "裂隙入口 · 进副本 / 战场的唯一通道",
         };
 
-        /// <summary>B01 右下功能条。只标名字，点了做什么归后续卡。</summary>
+        /// <summary>B01 右下功能条。U8 接到已有 U 屏；点了做什么在 UiEntryHub。</summary>
         public static readonly string[] HudFunctions =
         {
             "角色", "背包", "技能", "宗门", "商城", "裂隙", "世界地图",

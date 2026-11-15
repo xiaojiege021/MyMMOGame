@@ -202,12 +202,17 @@ namespace HotUpdate.Ui
 
         /// <summary>
         /// 进分线。请求里只有角色号与地表编号；分到第几线、这条线满不满都由世界服定。
-        /// 界面不预判结果：按下就是等回包。
+        /// 界面不预判结果：按下就是等回包。可选 <paramref name="done"/> 给 U8 载入闸门用。
         /// </summary>
-        public void SubmitEnter(string regionId)
+        public void SubmitEnter(string regionId, Action done = null)
         {
             if (Busy)
             {
+                if (done != null)
+                {
+                    done();
+                }
+
                 return;
             }
 
@@ -241,6 +246,10 @@ namespace HotUpdate.Ui
                     + " entered=" + (Enter.Entered ? "true" : "false"));
 
                 RefreshViews();
+                if (done != null)
+                {
+                    done();
+                }
             });
         }
 
