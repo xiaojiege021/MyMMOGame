@@ -1,0 +1,15 @@
+{
+  "schema": "homestead-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "C3 洞府摆放的唯一内容正本（方案 12.1「洞府与家园：洞府外观、摆件、家园装饰。只做展示和生活。家园币仍只换外观和便捷」、开发架构 4.4「摆放和访客可见。家园币只换外观和便捷」、12 节第 410 行「只加内容和配置，不改前面任务卡已经完成的规则」、13 节第 629 行「等 P3-4a2 的洞府摆件能发货之后再派」、14 节第 729 行「排在第 68 行之后」）。技术架构 3 节：家园归社交服、不管战斗数值；角色服是背包的唯一写入。技术架构 6 节：宗门 / 邮件放社交 schema，背包放角色 schema。所以本卡只在社交 schema 记「谁的哪一格摆了哪一件」这一份展示事实，摆件本身仍留在角色服背包里（只读问 ListInventory 确认拥有与绑定），不消耗、不扣货币、不发家园币、不加属性、不写角色库。方案没写定格位数、格位名字、允许摆件的编号、摆放是否消耗、访客权限开关，这里全部按「只加内容和配置」处理：格位编号与数量是占位并标 pending=true；允许摆件不另写一份名单，只认 config/items.json 里 kind=home_decor 且 bind=always 的物品（P3-4a2 通行证付费轨发的那三件，发货规则一字未改）；方案没写定的「摆放是否消耗背包」不在本卡编开关，按 14.2 的方式登记为待排缺口，本卡明确不消耗。顶层与条目白名单：reward / drop / loot / gold / exp / equip / fatigue / price / probability / tax / spirit_stone / vein / home_coin / attribute / damage / owner / bind / count / level / realm 一类键长不出来，代码 / proto / SQL 里没有第二套数值。访客可见落成只读口：任何有效令牌都能按洞府主人角色号读摆放事实，但摆 / 撤只对自己的角色生效（网关复核归属）。",
+  "items_config": "config/items.json",
+  "slots": [
+    { "id": "court_1" },
+    { "id": "court_2" },
+    { "id": "hall_1" },
+    { "id": "hall_2" },
+    { "id": "garden_1" },
+    { "id": "garden_2" }
+  ]
+}

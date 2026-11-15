@@ -110,6 +110,9 @@ deps_of() {
     # C2 排在第 33 行 P1-3b 之后：等它能把矿石 / 药材写进背包才派；
     # 地表境界区域复用 P1-3c 的 flight.json，已开放段对照 P3-1a1 的 realms.json。
     c2) echo "p1-3b p1-3c p3-1a1" ;;
+    # C3 排在第 68 行 P3-4a2 之后：等洞府摆件能发货才派；背包归 P1-1b3，
+    # 家园归社交服（P2-1a1 落地的社交 schema / 进程）。
+    c3) echo "p3-4a2 p1-1b3 p2-1a1" ;;
     *) echo "__UNKNOWN__" ;;
   esac
 }
@@ -123,7 +126,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 c1 c2"
+u1 u2 u3 u4 u5 u6 u7 c1 c2 c3"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {

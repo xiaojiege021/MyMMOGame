@@ -194,6 +194,48 @@ message DescribeSectTechResponse {
   int32 tech_level = 5;
 }
 
+// C3 洞府摆放（方案 12.1「洞府与家园：只做展示和生活」、开发架构 4.4「摆放和
+// 访客可见」、12 节第 410 行「只加内容和配置」）。社交服只记「谁的哪一格摆了
+// 哪一件」这一份展示事实；摆件本体仍在角色服背包里，社交服只读 ListInventory
+// 确认拥有与绑定，不消耗、不改角色库、不发家园币、不加属性。
+// account / character_id / txn_id 由网关按令牌与归属复核后填（客户端带不进来），
+// slot_id / item_id 只作格位与物品编号，格位表与可摆物品都在 config/homestead.json
+// 与 config/items.json，请求里带不进格位数、拥有事实、奖励或任何数值。
+message HomesteadRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  string slot_id = 4;
+  string item_id = 5;
+}
+
+// 只读：访客按洞府主人角色号看摆放事实。account 仅作日志上下文，不参与判定。
+message DescribeHomesteadRequest {
+  string account = 1;
+  uint64 owner_character_id = 2;
+}
+
+message HomesteadSlotFact {
+  string slot_id = 1;
+  string item_id = 2;
+}
+
+// 回包全是只读事实值：格位数、当前摆放、这一笔的格位 / 物品 / 事务号。
+// 业务拒绝（homestead_unavailable / request_missing / slot_unknown /
+// item_not_decor / decor_not_owned / inventory_unavailable / item_already_placed /
+// slot_empty / duplicate）是正常回包里的 ok=false + reason，未生效字段给空串 / 0。
+message HomesteadResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 character_id = 3;
+  string slot_id = 4;
+  string item_id = 5;
+  string txn_id = 6;
+  bool duplicate = 7;
+  int32 slot_count = 8;
+  repeated HomesteadSlotFact placements = 9;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
@@ -214,4 +256,9 @@ service SocialService {
   // P3-3a3：只读查一个角色所属宗门的科技等级。战斗服开城战时来读；
   // 社交服只回等级事实值，不算伤害、不给加成系数，没宗门 / 没科技行都给 0。
   rpc DescribeSectTech(DescribeSectTechRequest) returns (DescribeSectTechResponse);
+  // C3：摆一件已经到手的洞府摆件到某一格 / 撤下 / 访客只读。摆件不消耗、
+  // 不改角色库；三个 RPC 都不结算技能、不发奖、不写任何数值。
+  rpc PlaceHomeDecor(HomesteadRequest) returns (HomesteadResponse);
+  rpc RemoveHomeDecor(HomesteadRequest) returns (HomesteadResponse);
+  rpc DescribeHomestead(DescribeHomesteadRequest) returns (HomesteadResponse);
 }

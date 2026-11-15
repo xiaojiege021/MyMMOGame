@@ -9,7 +9,7 @@ namespace Social;
 /// 启动日志把五级上限逐档打出来，与 --sect-config 只读入口同形，改配置重启后
 /// 直接核对得到；配置不对就起不来，不带着半截配置跑。
 /// </summary>
-public sealed class SocialProcess(SocialConfig config, SectTable sect)
+public sealed class SocialProcess(SocialConfig config, SectTable sect, HomesteadTable? homestead)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
@@ -35,6 +35,14 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect)
             sect.Upgrade.Costs.Select(c => c.FromLevel + "->" + c.ToLevel + ":" + c.Cost))
             + " max_level=" + sect.MaxLevel
             + " levels=" + string.Join(",", sect.Levels.Select(l => l.Number + ":" + l.MemberCap)));
+        // C3：可选内容表。老卡的临时配置目录没有 homestead.json 时只打 missing，
+        // 上面 P2-1 的启动日志一行不少（缺表降级不拖垮宗门老链路）。
+        Console.WriteLine(homestead is null
+            ? "homestead=missing"
+            : "homestead_config=ok slots=" + homestead.Slots.Count
+                + " items=" + homestead.ItemIds.Count
+                + " slot_ids=" + homestead.SlotList
+                + " item_ids=" + homestead.ItemList);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -49,6 +57,9 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect)
             DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
         var sects = new SectRepository(dataSource, sect);
         using var founderGrant = new SectFounderGrant(config.CharacterUpstream);
+        // C3：洞府摆放的可选装配。缺表时 Table/Repository 都是 null，三个新 RPC
+        // 回 homestead_unavailable，宗门那批老 RPC 一个字不受影响。
+        using var homes = new HomesteadRuntime(homestead, dataSource, config.CharacterUpstream);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2。
@@ -66,6 +77,7 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect)
         builder.Services.AddSingleton(sect);
         builder.Services.AddSingleton(sects);
         builder.Services.AddSingleton(founderGrant);
+        builder.Services.AddSingleton(homes);
 
         var app = builder.Build();
         app.MapGrpcService<SocialGrpcService>();

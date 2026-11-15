@@ -106,10 +106,14 @@ ck("合并后 8 块地表每块都有 ore 与 herb（铺开是结构保证）",
    all(any(n["region_id"] == r and n["kind"] == k for n in all_nodes)
        for r in world["regions"] for k in ("ore", "herb")))
 
-# 「只加内容和配置」：老配置正本、proto、客户端、采集判定与老脚本一行不动。
+# 「只加内容和配置」：老配置正本、采集相关 proto / 客户端业务代码 / 角色库、采集判定与老脚本一行不动。
+# v1.125 起 C3 洞府摆放合法改了 social.proto、客户端 Social.cs 生成物与 db/social/social.sql，
+# 这些不在 C2 的采集口径里；按「只钉仍成立的不变式」把整目录收紧到下面这些路径，产品代码没动。
 old = subprocess.run(["git", "diff", "--name-only", "HEAD", "--",
     "config/gather.json", "config/items.json", "config/flight.json", "config/realms.json",
-    "config/world.json", "config/region", "proto", "client", "db",
+    "config/world.json", "config/region", "proto/mmo/world.proto",
+    "client/MMOGame/Assets/Net", "client/MMOGame/Assets/HotUpdate", "client/MMOGame/Assets/Editor",
+    "db/character",
     "src/World/WorldGrpcService.cs", "src/World/GatherGrant.cs", "src/World/GatherNodeRegistry.cs",
     "tools/check/check-p1-3b.sh", "tools/check/check-p1-3c.sh", "tools/check/check-p3-2a.sh",
     "tools/check/check-u4.sh"], cwd=root, capture_output=True, text=True).stdout.strip()

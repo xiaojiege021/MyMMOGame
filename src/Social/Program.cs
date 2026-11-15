@@ -32,6 +32,14 @@ long sectConstructionSetTo = -1;
 long sectTechStateOf = 0;
 long sectTechSetOf = 0;
 int sectTechSetTo = -1;
+// C3 洞府摆放：只读配置口、连库只读口、两个只给核对用的固定事务号写入口。
+// 可选表默认跟 --config 所在目录走（老卡的临时配置目录没有它 → 缺表降级）；
+// --homestead-table 指向坏表时，与真实启动走同一份硬校验。
+string? homesteadTablePath = null;
+var homesteadConfig = false;
+long homesteadStateOf = 0;
+string[]? homesteadPlace = null;
+string[]? homesteadRemove = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -115,10 +123,65 @@ for (var i = 0; i < args.Length; i++)
             long.TryParse(args[++i], out sectTechSetOf);
             int.TryParse(args[++i], out sectTechSetTo);
             break;
+        // C3：可选内容表显式路径（坏配置核对用），不显式登记进 config/social.json。
+        case "--homestead-table" when i + 1 < args.Length:
+            homesteadTablePath = args[++i];
+            break;
+        case "--homestead-config":
+            homesteadConfig = true;
+            break;
+        case "--homestead-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out homesteadStateOf);
+            break;
+        // 只给核对用：固定事务号连发两次验幂等。参数 = 账号 角色号 格位 物品 事务号。
+        case "--homestead-place" when i + 5 < args.Length:
+            homesteadPlace = args.Skip(i + 1).Take(5).ToArray();
+            i += 5;
+            break;
+        // 只给核对用：固定事务号撤下。参数 = 角色号 格位 事务号。
+        case "--homestead-remove" when i + 3 < args.Length:
+            homesteadRemove = args.Skip(i + 1).Take(3).ToArray();
+            i += 3;
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
     }
+}
+
+// C3：可选内容表的默认路径跟 --config 所在目录走。老卡的临时配置目录里
+// 没有 homestead.json，社交服照常起来（homestead=missing）；产品正本在
+// config/ 目录里，与 config/social.json 同目录。显式 --homestead-table 优先。
+var homesteadPath = homesteadTablePath
+    ?? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(configPath)) ?? ".", "homestead.json");
+
+// --homestead-config：不连库，逐项打印格位与可摆物品（后者只来自 items.json）。
+// 坏表在这一步就起不来（config_error= + 非 0 退出），与真实启动同一份硬校验。
+if (homesteadConfig)
+{
+    try
+    {
+        var table = HomesteadTable.LoadIfPresent(homesteadPath);
+        Console.WriteLine(table is null
+            ? "homestead_config_state=missing"
+            : "homestead_config_state=ok version=" + HomesteadTable.Version
+                + " pending=" + (table.Pending ? "true" : "false")
+                + " slots=" + table.Slots.Count + " slot_ids=" + table.SlotList
+                + " items=" + table.ItemIds.Count + " item_ids=" + table.ItemList
+                + " items_config=" + table.ItemsConfig);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
 }
 
 // --sect-config：不连库，逐档打印配置正本。坏配置在这一步就起不来
@@ -243,12 +306,20 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
     || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0
     || sectLeadershipStateOf != 0 || sectLeadershipMembersOf != 0 || sectLeaveStateOf != 0
     || sectUpgradeStateOf != 0 || sectUpgradeMembersOf != 0 || sectConstructionSetOf != 0
-    || sectTechStateOf != 0 || sectTechSetOf != 0)
+    || sectTechStateOf != 0 || sectTechSetOf != 0
+    // C3：新增的连库只读 / 核对写入口也必须登记进这条「一次性命令」长条件，
+    // 否则社交服会走正常启动去 bind 65000，核对时表现为 address already in use。
+    || homesteadStateOf != 0 || homesteadPlace is not null || homesteadRemove is not null)
 {
     SectTable table;
+    SocialConfig socialConfig;
+    HomesteadTable? homestead;
     try
     {
-        table = SocialLoader.LoadAll(configPath, sectTablePath).Sect;
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        table = loaded.Sect;
+        socialConfig = loaded.Config;
+        homestead = HomesteadTable.LoadIfPresent(homesteadPath);
     }
     catch (ConfigException ex)
     {
@@ -271,6 +342,8 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
     Console.WriteLine("db_env=" + DbEnv.Source());
     await using var dataSource = NpgsqlDataSource.Create(DbEnv.WithPoolLimit(connectionString, 2));
     var repo = new SectRepository(dataSource, table);
+    // C3：连库核对入口与真实启动共用同一份可选表装配。
+    using var homes = new HomesteadRuntime(homestead, dataSource, socialConfig.CharacterUpstream);
 
     try
     {
@@ -430,6 +503,68 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
             Console.WriteLine("sect_construction_set=" + (changed ? "ok" : "missing")
                 + " sect=" + sectConstructionSetOf + " construction=" + sectConstructionSetTo);
         }
+
+        // ---- C3 洞府摆放：独立读回与固定事务号重放（只给核对用） ----
+        if (homesteadStateOf != 0)
+        {
+            if (homes.Repository is null)
+            {
+                Console.WriteLine("homestead_state=missing table");
+            }
+            else
+            {
+                var rows = await homes.Repository.DescribeAsync(
+                    homesteadStateOf, CancellationToken.None);
+                Console.WriteLine("homestead_state=ok character=" + homesteadStateOf
+                    + " rows=" + rows.Count
+                    + " slots=" + (homestead?.Slots.Count ?? 0)
+                    + " placements=" + string.Join(",",
+                        rows.Select(r => r.SlotId + ":" + r.ItemId)));
+            }
+        }
+
+        if (homesteadPlace is not null)
+        {
+            if (homes.Repository is null)
+            {
+                Console.WriteLine("homestead_place=unavailable");
+            }
+            else
+            {
+                ulong.TryParse(homesteadPlace[1], out var cid);
+                var placed = await homes.Repository.PlaceAsync(
+                    homesteadPlace[0], cid, homesteadPlace[4],
+                    homesteadPlace[2], homesteadPlace[3], CancellationToken.None);
+                Console.WriteLine("homestead_place=state character=" + placed.CharacterId
+                    + " slot=" + placed.SlotId + " item=" + placed.ItemId
+                    + " ok=" + (placed.Ok ? "true" : "false")
+                    + " reason=" + placed.Reason
+                    + " duplicate=" + (placed.Duplicate ? "true" : "false")
+                    + " placements=" + string.Join(",",
+                        placed.Placements.Select(p => p.SlotId + ":" + p.ItemId)));
+            }
+        }
+
+        if (homesteadRemove is not null)
+        {
+            if (homes.Repository is null)
+            {
+                Console.WriteLine("homestead_remove=unavailable");
+            }
+            else
+            {
+                ulong.TryParse(homesteadRemove[0], out var cid);
+                var removed = await homes.Repository.RemoveAsync(
+                    cid, homesteadRemove[2], homesteadRemove[1], CancellationToken.None);
+                Console.WriteLine("homestead_remove=state character=" + removed.CharacterId
+                    + " slot=" + removed.SlotId
+                    + " ok=" + (removed.Ok ? "true" : "false")
+                    + " reason=" + removed.Reason
+                    + " duplicate=" + (removed.Duplicate ? "true" : "false")
+                    + " placements=" + string.Join(",",
+                        removed.Placements.Select(p => p.SlotId + ":" + p.ItemId)));
+            }
+        }
     }
     catch (Exception ex) when (ex is NpgsqlException or IOException)
     {
@@ -442,9 +577,11 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
 
 // 真实启动：与上面所有只读入口共用同一份 Load + 同一组参数。
 (SocialConfig Config, SectTable Sect) startup;
+HomesteadTable? startupHomestead;
 try
 {
     startup = SocialLoader.LoadAll(configPath, sectTablePath);
+    startupHomestead = HomesteadTable.LoadIfPresent(homesteadPath);
 }
 catch (ConfigException ex)
 {
@@ -469,4 +606,4 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
     stop.Cancel();
 });
 
-return await new SocialProcess(startup.Config, startup.Sect).RunAsync(stop.Token);
+return await new SocialProcess(startup.Config, startup.Sect, startupHomestead).RunAsync(stop.Token);

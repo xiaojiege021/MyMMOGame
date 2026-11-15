@@ -107,3 +107,28 @@ CREATE TABLE IF NOT EXISTS "社交".sect_tech (
     level       int         NOT NULL DEFAULT 0 CHECK (level >= 0),
     updated_at  timestamptz NOT NULL DEFAULT now()
 );
+
+-- === C3 homestead.sql（同一份幂等 DDL，追加进主迁移）===
+-- 洞府摆放只有展示事实：谁的哪一格摆了哪一件。家园归社交服（技术架构 3 节），
+-- 摆件本体仍在角色 schema 的背包里，社交服只读、不消耗、不改角色库。
+-- 没有家园币 / 价格 / 概率 / 属性 / 掉落 / 发奖一列。上面 a1–a4、sect_tech
+-- 的表结构一个字不动；CREATE TABLE IF NOT EXISTS + IF NOT EXISTS 索引保证重复跑不报错。
+CREATE TABLE IF NOT EXISTS "社交".homestead_placement (
+    character_id bigint      NOT NULL,
+    slot_id      text        NOT NULL,
+    item_id      text        NOT NULL,
+    txn_id       text        NOT NULL,
+    placed_at    timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, slot_id),
+    CHECK (slot_id <> '' AND item_id <> '')
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS homestead_placement_item
+    ON "社交".homestead_placement (character_id, item_id);
+
+CREATE TABLE IF NOT EXISTS "社交".homestead_txn (
+    txn_id       text        PRIMARY KEY,
+    character_id bigint      NOT NULL,
+    slot_id      text        NOT NULL,
+    created_at   timestamptz NOT NULL DEFAULT now()
+);

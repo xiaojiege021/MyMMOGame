@@ -75,6 +75,12 @@ namespace Mmo.Proto.Social {
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectTechRequest> __Marshaller_mmo_social_DescribeSectTechRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectTechRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectTechResponse> __Marshaller_mmo_social_DescribeSectTechResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectTechResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.HomesteadRequest> __Marshaller_mmo_social_HomesteadRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.HomesteadRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.HomesteadResponse> __Marshaller_mmo_social_HomesteadResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.HomesteadResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeHomesteadRequest> __Marshaller_mmo_social_DescribeHomesteadRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeHomesteadRequest.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse> __Method_CreateSect = new grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse>(
@@ -179,6 +185,30 @@ namespace Mmo.Proto.Social {
         "DescribeSectTech",
         __Marshaller_mmo_social_DescribeSectTechRequest,
         __Marshaller_mmo_social_DescribeSectTechResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse> __Method_PlaceHomeDecor = new grpc::Method<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "PlaceHomeDecor",
+        __Marshaller_mmo_social_HomesteadRequest,
+        __Marshaller_mmo_social_HomesteadResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse> __Method_RemoveHomeDecor = new grpc::Method<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RemoveHomeDecor",
+        __Marshaller_mmo_social_HomesteadRequest,
+        __Marshaller_mmo_social_HomesteadResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.DescribeHomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse> __Method_DescribeHomestead = new grpc::Method<global::Mmo.Proto.Social.DescribeHomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeHomestead",
+        __Marshaller_mmo_social_DescribeHomesteadRequest,
+        __Marshaller_mmo_social_HomesteadResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -290,6 +320,31 @@ namespace Mmo.Proto.Social {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.DescribeSectTechResponse> DescribeSectTech(global::Mmo.Proto.Social.DescribeSectTechRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// C3：摆一件已经到手的洞府摆件到某一格 / 撤下 / 访客只读。摆件不消耗、
+      /// 不改角色库；三个 RPC 都不结算技能、不发奖、不写任何数值。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.HomesteadResponse> PlaceHomeDecor(global::Mmo.Proto.Social.HomesteadRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.HomesteadResponse> RemoveHomeDecor(global::Mmo.Proto.Social.HomesteadRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.HomesteadResponse> DescribeHomestead(global::Mmo.Proto.Social.DescribeHomesteadRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -703,6 +758,98 @@ namespace Mmo.Proto.Social {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeSectTech, null, options, request);
       }
+      /// <summary>
+      /// C3：摆一件已经到手的洞府摆件到某一格 / 撤下 / 访客只读。摆件不消耗、
+      /// 不改角色库；三个 RPC 都不结算技能、不发奖、不写任何数值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.HomesteadResponse PlaceHomeDecor(global::Mmo.Proto.Social.HomesteadRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return PlaceHomeDecor(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// C3：摆一件已经到手的洞府摆件到某一格 / 撤下 / 访客只读。摆件不消耗、
+      /// 不改角色库；三个 RPC 都不结算技能、不发奖、不写任何数值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.HomesteadResponse PlaceHomeDecor(global::Mmo.Proto.Social.HomesteadRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_PlaceHomeDecor, null, options, request);
+      }
+      /// <summary>
+      /// C3：摆一件已经到手的洞府摆件到某一格 / 撤下 / 访客只读。摆件不消耗、
+      /// 不改角色库；三个 RPC 都不结算技能、不发奖、不写任何数值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.HomesteadResponse> PlaceHomeDecorAsync(global::Mmo.Proto.Social.HomesteadRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return PlaceHomeDecorAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// C3：摆一件已经到手的洞府摆件到某一格 / 撤下 / 访客只读。摆件不消耗、
+      /// 不改角色库；三个 RPC 都不结算技能、不发奖、不写任何数值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.HomesteadResponse> PlaceHomeDecorAsync(global::Mmo.Proto.Social.HomesteadRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_PlaceHomeDecor, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.HomesteadResponse RemoveHomeDecor(global::Mmo.Proto.Social.HomesteadRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RemoveHomeDecor(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.HomesteadResponse RemoveHomeDecor(global::Mmo.Proto.Social.HomesteadRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RemoveHomeDecor, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.HomesteadResponse> RemoveHomeDecorAsync(global::Mmo.Proto.Social.HomesteadRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RemoveHomeDecorAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.HomesteadResponse> RemoveHomeDecorAsync(global::Mmo.Proto.Social.HomesteadRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RemoveHomeDecor, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.HomesteadResponse DescribeHomestead(global::Mmo.Proto.Social.DescribeHomesteadRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeHomestead(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.HomesteadResponse DescribeHomestead(global::Mmo.Proto.Social.DescribeHomesteadRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeHomestead, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.HomesteadResponse> DescribeHomesteadAsync(global::Mmo.Proto.Social.DescribeHomesteadRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeHomesteadAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.HomesteadResponse> DescribeHomesteadAsync(global::Mmo.Proto.Social.DescribeHomesteadRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeHomestead, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override SocialServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -729,7 +876,10 @@ namespace Mmo.Proto.Social {
           .AddMethod(__Method_UpgradeSect, serviceImpl.UpgradeSect)
           .AddMethod(__Method_DescribeUpgrade, serviceImpl.DescribeUpgrade)
           .AddMethod(__Method_DescribeCharacterSect, serviceImpl.DescribeCharacterSect)
-          .AddMethod(__Method_DescribeSectTech, serviceImpl.DescribeSectTech).Build();
+          .AddMethod(__Method_DescribeSectTech, serviceImpl.DescribeSectTech)
+          .AddMethod(__Method_PlaceHomeDecor, serviceImpl.PlaceHomeDecor)
+          .AddMethod(__Method_RemoveHomeDecor, serviceImpl.RemoveHomeDecor)
+          .AddMethod(__Method_DescribeHomestead, serviceImpl.DescribeHomestead).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -752,6 +902,9 @@ namespace Mmo.Proto.Social {
       serviceBinder.AddMethod(__Method_DescribeUpgrade, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.UpgradeSectRequest, global::Mmo.Proto.Social.UpgradeResponse>(serviceImpl.DescribeUpgrade));
       serviceBinder.AddMethod(__Method_DescribeCharacterSect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeCharacterSectRequest, global::Mmo.Proto.Social.DescribeCharacterSectResponse>(serviceImpl.DescribeCharacterSect));
       serviceBinder.AddMethod(__Method_DescribeSectTech, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeSectTechRequest, global::Mmo.Proto.Social.DescribeSectTechResponse>(serviceImpl.DescribeSectTech));
+      serviceBinder.AddMethod(__Method_PlaceHomeDecor, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(serviceImpl.PlaceHomeDecor));
+      serviceBinder.AddMethod(__Method_RemoveHomeDecor, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(serviceImpl.RemoveHomeDecor));
+      serviceBinder.AddMethod(__Method_DescribeHomestead, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeHomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(serviceImpl.DescribeHomestead));
     }
 
   }
