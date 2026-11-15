@@ -150,14 +150,16 @@ namespace HotUpdate.Ui
             Report("five", built == 5);
             Debug.Log("u7_self_five=" + built);
 
-            // 家园与图鉴：如实写「尚未接服务端」，不编数字。
+            // 家园：种植仍标尚未接服务端（U9 已接摆放口，种植缺口保留）；
+            // 图鉴：仍标尚未接服务端，不编数字。
             shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
             var home = Text(shell);
             shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
             var codex = Text(shell);
-            Report("unwired", home.Contains("尚未接服务端") && codex.Contains("尚未接服务端")
+            Report("unwired", home.Contains(UiSocialCodex.PlantingGap)
+                && codex.Contains("尚未接服务端")
                 && codex.Contains(UiSocialCodex.CodexNames[0]) && !codex.Contains("100%"));
-            Debug.Log("u7_self_unwired home=" + home.Contains("尚未接服务端")
+            Debug.Log("u7_self_unwired home_planting=" + home.Contains(UiSocialCodex.PlantingGap)
                 + " codex=" + codex.Contains("尚未接服务端"));
 
             // 切皮肤只换颜色：布局与文案一字不差。

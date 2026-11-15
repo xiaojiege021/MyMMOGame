@@ -77,7 +77,9 @@ assert '.SiegeFullCount' in siege and '.SiegeFullLimit' in siege and 'Markers()'
 
 home = open(ui + '/UiHomesteadScreen.cs', encoding='utf-8').read()
 hero = open(ui + '/UiHeroCodexScreen.cs', encoding='utf-8').read()
-assert 'HomesteadGap' in home and 'CodexGap' in hero
+# U9 接了摆放；种植缺口与图鉴仍标尚未接服务端。
+assert ('PlantingGap' in home or 'HomesteadGap' in home) and 'CodexGap' in hero
+assert 'PlantingGap' in open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
 
 # 战斗侧只加一条「收到才处理」的分支；副本链路不发这条消息。
 battle_client = open(assets + '/HotUpdate/BattleClient.cs', encoding='utf-8').read()

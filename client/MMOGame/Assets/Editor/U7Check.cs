@@ -151,8 +151,11 @@ public static class U7Check
 
         var homestead = Read(Path.Combine(ui, "UiHomesteadScreen.cs"));
         var hero = Read(Path.Combine(ui, "UiHeroCodexScreen.cs"));
-        Report("unwired_marked", homestead.Contains("HomesteadGap") && hero.Contains("CodexGap"),
-            "家园 / 图鉴没标尚未接服务端");
+        // U9 接了摆放口；种植 / 家园币与图鉴仍标尚未接服务端。
+        Report("unwired_marked",
+            (homestead.Contains("PlantingGap") || homestead.Contains("HomesteadGap"))
+            && hero.Contains("CodexGap"),
+            "种植缺口 / 图鉴没标尚未接服务端");
     }
 
     static void CheckFlow(string root)

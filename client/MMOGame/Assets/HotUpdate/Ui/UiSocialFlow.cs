@@ -22,8 +22,8 @@ namespace HotUpdate.Ui
     /// U7 社交与组织五屏的流程与唯一判定出口（原型 F01–F05）。
     ///
     /// 只做三件事：发请求、拆回包、把字段交给屏。名册上限、等级、席位、建设、
-    /// 掌门、世界 Boss 归属、城战同屏档位一条都不在这里算——要么来自 `/sect/*`、
-    /// `/world/worldboss`，要么来自战斗服下发的 `SiegeView`。
+    /// 掌门、世界 Boss 归属、城战同屏档位、洞府摆放一条都不在这里算——要么来自
+    /// `/sect/*`、`/world/worldboss`、`/homestead*`，要么来自战斗服下发的 `SiegeView`。
     /// </summary>
     public sealed class UiSocialFlow : MonoBehaviour
     {
@@ -74,6 +74,14 @@ namespace HotUpdate.Ui
         public uint SiegeUnitCount { get; private set; }
 
         public List<SiegeRow> SiegeRows { get; private set; } = new List<SiegeRow>();
+
+        public HomesteadOutcome LastHomestead { get; private set; }
+
+        public bool HasHomestead { get; private set; }
+
+        public BagOutcome HomesteadBag { get; private set; } = BagOutcome.Failure("not_loaded");
+
+        public bool HasHomesteadBag { get; private set; }
 
         public string Error { get; private set; } = string.Empty;
 
@@ -205,6 +213,134 @@ namespace HotUpdate.Ui
 
                 if (done != null) done();
             });
+        }
+
+        // ------------------------------------------------------------------ 洞府摆放（U9 / C3）
+
+        /// <summary>只读洞府摆放。owner 默认本角色；访客可传别人的角色号。</summary>
+        public void LoadHomestead(ulong ownerCharacterId = 0, Action done = null)
+        {
+            var owner = ownerCharacterId != 0 ? ownerCharacterId : _characterId;
+            if (owner == 0)
+            {
+                LastHomestead = HomesteadOutcome.Failure("no_character");
+                HasHomestead = false;
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(HomesteadEntry.DescribePath(owner), string.Empty, _token, (status, text) =>
+            {
+                Busy = false;
+                if (status == 200)
+                {
+                    LastHomestead = HomesteadEntry.Parse(text);
+                    HasHomestead = true;
+                    Error = string.Empty;
+                    Debug.Log("u9_homestead=ok slots=" + LastHomestead.SlotCount
+                        + " placed=" + (LastHomestead.Placements != null ? LastHomestead.Placements.Count : 0)
+                        + " reason=" + LastHomestead.Reason);
+                }
+                else
+                {
+                    LastHomestead = HomesteadOutcome.Failure("http_" + status);
+                    HasHomestead = false;
+                    Error = "洞府没读到：" + status;
+                    Debug.Log("u9_homestead=reject status=" + status);
+                }
+
+                if (done != null) done();
+            });
+        }
+
+        /// <summary>读背包，只为洞府屏挑出可摆的 home_decor。不改背包。</summary>
+        public void LoadHomesteadBag(Action done = null)
+        {
+            if (_characterId == 0)
+            {
+                HomesteadBag = BagOutcome.Failure("no_character");
+                HasHomesteadBag = false;
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(CharacterBag.RequestPath(_characterId), string.Empty, _token, (status, text) =>
+            {
+                Busy = false;
+                if (status == 200)
+                {
+                    HomesteadBag = CharacterBag.Parse(text);
+                    HasHomesteadBag = HomesteadBag.Ok;
+                    Debug.Log("u9_homestead_bag=ok slots="
+                        + (HomesteadBag.Slots != null ? HomesteadBag.Slots.Count : 0));
+                }
+                else
+                {
+                    HomesteadBag = BagOutcome.Failure("http_" + status);
+                    HasHomesteadBag = false;
+                    Debug.Log("u9_homestead_bag=reject status=" + status);
+                }
+
+                if (done != null) done();
+            });
+        }
+
+        public void PlaceDecor(string slotId, string itemId, Action done = null)
+        {
+            Send(HomesteadEntry.PlacePath,
+                HomesteadEntry.PlaceBody(_characterId, slotId, itemId),
+                HomesteadEntry.Parse,
+                outcome =>
+                {
+                    LastHomestead = outcome;
+                    HasHomestead = true;
+                },
+                "u9_homestead_place", done);
+        }
+
+        public void RemoveDecor(string slotId, Action done = null)
+        {
+            Send(HomesteadEntry.RemovePath,
+                HomesteadEntry.RemoveBody(_characterId, slotId),
+                HomesteadEntry.Parse,
+                outcome =>
+                {
+                    LastHomestead = outcome;
+                    HasHomestead = true;
+                },
+                "u9_homestead_remove", done);
+        }
+
+        /// <summary>背包里可摆的洞府摆件编号（与 C3 发货的 decor_s* 对齐）。</summary>
+        public List<string> DecorInBag()
+        {
+            var list = new List<string>();
+            if (!HasHomesteadBag || HomesteadBag.Slots == null)
+            {
+                return list;
+            }
+
+            for (var i = 0; i < HomesteadBag.Slots.Count; i++)
+            {
+                var id = HomesteadBag.Slots[i].ItemId;
+                if (!UiSocialCodex.IsDecorItem(id))
+                {
+                    continue;
+                }
+
+                if (list.Contains(id))
+                {
+                    continue;
+                }
+
+                list.Add(id);
+            }
+
+            return list;
         }
 
         // ------------------------------------------------------------------ 城战同屏

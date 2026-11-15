@@ -64,7 +64,9 @@ namespace HotUpdate.Ui
             // U7 二级：洞府 / 图鉴（仍标尚未接服务端，本卡只开屏）。
             UiEntryHub.OpenSocial(shell, "homestead");
             var home = Text(shell);
-            Report("u7_home", PageTitle(shell) == "家园洞府" && home.Contains("尚未接服务端"));
+            // U9 接了摆放；种植缺口仍标尚未接服务端。
+            Report("u7_home", PageTitle(shell) == "家园洞府"
+                && home.Contains("种植") && home.Contains("尚未接服务端"));
             UiEntryHub.OpenSocial(shell, "codex");
             Report("u7_codex", PageTitle(shell) == "英灵图鉴" && Text(shell).Contains("尚未接服务端"));
 

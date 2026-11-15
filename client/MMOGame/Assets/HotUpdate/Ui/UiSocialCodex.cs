@@ -84,10 +84,48 @@ namespace HotUpdate.Ui
         };
 
         /// <summary>家园的口径。</summary>
-        public const string HomesteadRule = "家园币不换金币、材料、副本次数或任何战力。";
+        public const string HomesteadRule =
+            "摆件只做展示；家园币不换金币、材料、副本次数或任何战力。";
 
-        /// <summary>家园屏的现状。</summary>
-        public const string HomesteadGap = "尚未接服务端：没有家园 / 种植的接口，屏上不编家园币与产量";
+        /// <summary>
+        /// 洞府六格编号（与 C3 产品表同形，只作请求参数与屏上标签；
+        /// 运行期不打开家园配置文件）。
+        /// </summary>
+        public static readonly string[] HomesteadSlots =
+        {
+            "court_1", "court_2", "hall_1", "hall_2", "garden_1", "garden_2",
+        };
+
+        /// <summary>允许摆的摆件编号（与 P3-4a2 / C3 发货的 decor_s* 同形）。</summary>
+        public static readonly string[] DecorItemIds =
+        {
+            "decor_s1", "decor_s2", "decor_s3",
+        };
+
+        /// <summary>种植 / 家园币仍无服务端，屏上如实标。</summary>
+        public const string PlantingGap =
+            "尚未接服务端：种植与家园币没有接口，屏上不编产量与家园币";
+
+        /// <summary>旧名保留给静态搜索；文案指向种植缺口。</summary>
+        public const string HomesteadGap = PlantingGap;
+
+        public static bool IsDecorItem(string itemId)
+        {
+            if (string.IsNullOrEmpty(itemId))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < DecorItemIds.Length; i++)
+            {
+                if (string.Equals(DecorItemIds[i], itemId, System.StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>英灵图鉴的 9 个名字（原型 F05），其余留空。</summary>
         public static readonly string[] CodexNames =
