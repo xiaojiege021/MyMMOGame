@@ -89,13 +89,17 @@ report("item", len(mine) == 1 and mine[0].get("kind") == "consumable"
        and mine[0].get("bind") == "always", str(mine[0]) if mine else "missing")
 
 row = [i for i in shop["items"] if i.get("id") == "shop_unbind_item_1"]
+dlv = (row[0].get("delivery") or {}) if row else {}
 report("shop", shop.get("version", 0) >= 7 and len(shop["items"]) == 18 and bool(row)
-       and row[0].get("delivery_item_id") == item_id and row[0].get("delivery_count") == 1,
+       and dlv.get("item_id") == item_id and dlv.get("count") == 1,
        str(row[0]) if row else "missing")
 
 shop_cs = read(F["shop_cs"])
-report("shop_rules", '"unbind_item"' in shop_cs.split("DeliveredKinds")[1].split("};")[0]
-       and "unbind.item_id" in shop_cs, "DeliveredKinds / 发货物一致性")
+# K1 起「接没接发货」写在配置里每条的 delivery.mode 上，代码没有 DeliveredKinds 表。
+report("shop_rules",
+       any(i.get("category") == "unbind_item"
+           and (i.get("delivery") or {}).get("mode") == "item" for i in shop["items"])
+       and "unbinds.Unbind.ItemId" in shop_cs, "配置 mode / 发货物一致性")
 
 proto = read(F["proto"])
 report("proto", "rpc UseUnbindItem" in proto
@@ -231,7 +235,7 @@ print(next((b.get("amount") for b in d.get("balances", []) if b.get("kind") == "
         "买解绑道具：入包第 ${slot} 格、到账即绑"
   after_money="$(yuanbao_of "$(money)")"
   [ -n "$before_money" ] && [ "$after_money" = "$((before_money - 120))" ] \
-    && ok "元宝少 120（$before_money→$after_money）" || bad "元宝不对：$before_money→$after_money"
+    && ok "元宝少 120（${before_money}→${after_money}）" || bad "元宝不对：${before_money}→$after_money"
   [ "$(count_of "$(bag)")" = "$((before_count + 1))" ] \
     && ok "背包解绑道具 +1" || bad "背包张数不对"
   check "$(can_trade "$slot")" "tradable=false reason=bound_item" "买到的解绑道具不能交易（bound_item）"

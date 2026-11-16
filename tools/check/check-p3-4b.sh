@@ -51,7 +51,7 @@ for proj in src/Shared/Shared.csproj src/Character/Character.csproj src/Gateway/
             src/World/World.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -69,17 +69,17 @@ def ck(name, cond): checks.append((name, bool(cond)))
 mb, slot = cfg("config/monthly_bundle.json"), cfg("config/character_slot.json")
 shop, items_cfg, tal = cfg("config/shop.json"), cfg("config/items.json"), cfg("config/talisman.json")
 items = {i["id"]: i for i in items_cfg["items"]}
-shop_by_kind = {i["kind"]: i for i in shop["items"]}
+shop_by_cat = {i["category"]: i for i in shop["items"]}
 entries = {e["kind"]: e for e in mb["items"]}
 ck("月叠配置 schema / version / days / product 指向月叠商品",
    mb["schema"] == "monthly-bundle-table/1" and mb["version"] > 0 and mb.get("pending") is True
-   and mb["days"] == 30 and mb["product_id"] == shop_by_kind["monthly_bundle"]["id"])
+   and mb["days"] == 30 and mb["product_id"] == shop_by_cat["monthly_bundle"]["id"])
 ck("月叠只有传送符与红符两种，且两条都在",
    set(entries) == {"teleport_talisman", "red_talisman"} and len(mb["items"]) == 2)
 ck("红符就是 talisman.json 那一个编号（不许另立第二种）",
    entries["red_talisman"]["item_id"] == tal["red"]["item_id"])
 ck("传送符就是商城那条传送符商品发的同一件",
-   entries["teleport_talisman"]["item_id"] == shop_by_kind["teleport_talisman"]["delivery_item_id"])
+   entries["teleport_talisman"]["item_id"] == shop_by_cat["teleport_talisman"]["delivery"]["item_id"])
 ck("月叠两件都是消耗品且到账即绑",
    all(items[e["item_id"]]["kind"] == "consumable" and items[e["item_id"]]["bind"] == "always"
        for e in mb["items"]))
@@ -98,19 +98,16 @@ bad_words = ("gold", "stone", "spirit", "crystal", "blue", "revive", "scroll", "
 ck("月叠配置里长不出金币 / 灵石 / 材料 / 装备 / 次数 / 卷轴 / 经验道具这些键",
    not [k for k in keys(mb)
         if k not in ("item_id", "items", "per_day") and any(w in k.lower() for w in bad_words)])
-ck("月叠是「多物品发货」：清单里留空发货物，不进已接发货的种类",
-   shop_by_kind["monthly_bundle"]["delivery_item_id"] == ""
-   and shop_by_kind["monthly_bundle"]["delivery_count"] == 0
-   and "monthly_bundle" not in re.search(
-       r"DeliveredKinds\s*=\s*\{(.*?)\};", src("src/Character/ShopTable.cs"), re.S).group(1))
+ck("月叠是「多物品发货」：清单里写成 monthly_bundle 状态，不许带假发货物",
+   shop_by_cat["monthly_bundle"]["delivery"].get("mode") == "monthly_bundle"
+   and shop_by_cat["monthly_bundle"]["delivery"].get("bundle_id") == "current"
+   and not shop_by_cat["monthly_bundle"]["delivery"].get("item_id"))
 ck("角色栏配置 base 1 / max 2 / product 指向角色栏商品且留空发货物",
    slot["schema"] == "character-slot-table/1" and slot["version"] > 0 and slot.get("pending") is True
    and slot["base_slots"] == 1 and slot["max_slots"] == 2
-   and slot["product_id"] == shop_by_kind["second_slot"]["id"]
-   and shop_by_kind["second_slot"]["delivery_item_id"] == ""
-   and shop_by_kind["second_slot"]["delivery_count"] == 0
-   and "second_slot" not in re.search(
-       r"DeliveredKinds\s*=\s*\{(.*?)\};", src("src/Character/ShopTable.cs"), re.S).group(1))
+   and slot["product_id"] == shop_by_cat["second_slot"]["id"]
+   and shop_by_cat["second_slot"]["delivery"].get("mode") == "second_slot"
+   and not shop_by_cat["second_slot"]["delivery"].get("item_id"))
 table_cs = src("src/Character/MonthlyBundleTable.cs")
 ck("月叠表白名单就是两种符，并点名挡住蓝符 / 卷轴 / 经验道具",
    '"teleport_talisman", "red_talisman"' in table_cs
@@ -173,7 +170,7 @@ echo "== 3. 只读入口与坏配置 =="
 MB_OUT="$("$DOTNET" "$CD" --monthly-bundle-list 2>&1)"; MBRC=$?
 printf '%s' "$MB_OUT" | grep -q "^monthly_bundle_list_state=ok .*product=${MB_ID} .*days=${DAYS} kinds=2" \
   && ok "月叠只读入口从配置现取：商品、标价、天数、两种符" \
-  || bad "月叠只读入口不对（rc=$MBRC）：$(printf '%s' "$MB_OUT" | utf8 | head -2)"
+  || bad "月叠只读入口不对（rc=${MBRC}）：$(printf '%s' "$MB_OUT" | utf8 | head -2)"
 printf '%s' "$MB_OUT" | grep -q "monthly_bundle_item=teleport_talisman item=${TP_ITEM} .*count=${TP_COUNT}" \
   && printf '%s' "$MB_OUT" | grep -q "monthly_bundle_item=red_talisman item=${RED_ITEM} .*count=${RED_COUNT}" \
   && ok "月叠只读入口逐条打出两种符与总张数（${TP_COUNT} / ${RED_COUNT}）" \
@@ -220,14 +217,14 @@ for c in schema version days_zero days_over product blue wrong_red revive exp pe
          per_day_over missing_red top_gold; do
   out="$("$DOTNET" "$CD" --monthly-bundle-list --monthly-bundle-path "$TMP/bad-mb-$c.json" 2>&1)"; rc=$?
   [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error=' \
-    && ok "坏月叠配置 $c：config_error= 且非 0 退出" \
-    || bad "坏月叠配置 $c 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    && ok "坏月叠配置 ${c}：config_error= 且非 0 退出" \
+    || bad "坏月叠配置 $c 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
 done
 for c in schema version base_zero base_two max_three product top_gold top_level; do
   out="$("$DOTNET" "$CD" --character-slot-list --character-slot-path "$TMP/bad-sl-$c.json" 2>&1)"; rc=$?
   [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error=' \
-    && ok "坏角色栏配置 $c：config_error= 且非 0 退出" \
-    || bad "坏角色栏配置 $c 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    && ok "坏角色栏配置 ${c}：config_error= 且非 0 退出" \
+    || bad "坏角色栏配置 $c 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
 done
 
 echo "== 4. 启动日志（不连库也先打出两表事实值）=="

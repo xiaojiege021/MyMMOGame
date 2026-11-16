@@ -175,10 +175,17 @@ public sealed class SeasonPassTable
                     + productId + " kind=" + product.Kind);
             }
 
-            if (product.Deliverable)
+            // K1：通行证在清单里必须是 season_pass 这种发货方式（不看种类字符串）。
+            if (product.Mode != DeliveryMode.SeasonPass)
+            {
+                throw new ConfigException("season_pass.json 的通行证商品 delivery.mode 必须是 "
+                    + "season_pass：" + productId + " mode=" + ShopTable.ModeText(product.Mode));
+            }
+
+            if (product.DeliveryItemId.Length > 0)
             {
                 // 通行证是状态发货：买下即开付费轨，不往背包放东西，不许填一个假发货物。
-                throw new ConfigException("season_pass.json 的通行证商品不许配 delivery_item_id："
+                throw new ConfigException("season_pass.json 的通行证商品不许配发货物："
                     + productId);
             }
 

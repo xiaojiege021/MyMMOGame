@@ -1184,15 +1184,25 @@ if (shopList)
         Console.WriteLine("shop_list_state=ok version=" + table.Version
             + " currency=" + table.Currency
             + " items=" + table.Items.Count
-            + " kinds=" + ShopTable.AllowedKinds.Length
-            + " delivered_kinds=" + ShopTable.DeliveredKinds.Length
+            + " kinds=" + table.Categories.Count
+            + " delivered_kinds=" + table.DeliveredCount
             + " deliverable_items=" + table.Items.Count(i => i.Deliverable));
         foreach (var item in table.Items)
         {
+            // K1：每条都带上它自己的发货方式与限购 / 库存，清单改一条重启就能在这里核对到。
             Console.WriteLine("shop_item=" + item.Id
                 + " kind=" + item.Kind
                 + " price=" + item.PriceYuanbao
-                + " delivery=" + (item.Deliverable ? item.DeliveryItemId + "x" + item.DeliveryCount : "pending")
+                + " mode=" + ShopTable.ModeText(item.Mode)
+                + " delivery=" + (item.Mode switch
+                {
+                    DeliveryMode.Item => item.DeliveryItemId + "x" + item.DeliveryCount,
+                    DeliveryMode.None => "pending",
+                    _ => "state",
+                })
+                + " limit=" + item.LimitPerCharacter + "/" + item.LimitPerDay
+                + " stock=" + item.StockRule + (item.StockCount > 0 ? "x" + item.StockCount : "")
+                + " on_sale=" + (item.OnSale ? "true" : "false")
                 + " name=" + item.Name);
         }
     }

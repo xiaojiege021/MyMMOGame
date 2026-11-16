@@ -47,7 +47,7 @@ for proj in src/Shared/Shared.csproj src/Global/Global.csproj src/Gateway/Gatewa
             src/World/World.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -88,14 +88,15 @@ ck("格位编号不重复、只小写字母数字下划线",
    and all(re.fullmatch(r"[a-z0-9_]+", s["id"]) for s in h["slots"]))
 ck("允许摆件只来自 items.json 的 home_decor + bind=always，且与 P3-4a2 发货的完全一致",
    len(decor) > 0 and decor == pass_decor and all(by_id[i]["kind"] == "home_decor" for i in decor))
-ck("「只加内容和配置」：老配置正本 / character.proto / 角色服 / 客户端业务代码 / 老核对脚本一行未改",
+# K1 起商城清单（config/shop.json）、角色服与 character.proto 都在后续卡里正常改动，
+# 这条只钉「C3 当时没收的那几条链路没被顺手改」：社交 / 扇区 / 网关 / 客户端业务代码。
+ck("「只加内容和配置」：C3 没碰的老配置 / 社交链路 / 客户端业务代码一行未改",
    subprocess.run(["git", "diff", "--name-only", "HEAD", "--",
-     "config/items.json", "config/season_pass.json", "config/shop.json", "config/social.json",
-     "config/sect.json", "config/character.json", "config/gateway.json", "config/mainline.json",
-     "config/gather_spread.json", "proto/mmo/character.proto", "src/Character", "src/World",
-     "src/Battle", "client/MMOGame/Assets/Net", "client/MMOGame/Assets/HotUpdate",
-     "client/MMOGame/Assets/Editor", "db/character",
-     "tools/check/check-p3-4a2.sh", "tools/check/check-p2-1a1.sh", "tools/check/check-u7.sh"],
+     "config/season_pass.json", "config/social.json", "config/sect.json",
+     "config/gateway.json", "config/mainline.json", "config/gather_spread.json",
+     "src/World", "src/Battle", "client/MMOGame/Assets/Net",
+     "client/MMOGame/Assets/HotUpdate", "client/MMOGame/Assets/Editor",
+     "tools/check/check-p2-1a1.sh", "tools/check/check-u7.sh"],
      cwd=root, capture_output=True, text=True).stdout.strip() == "")
 ck("social.proto 只新增三个 RPC 与新消息，旧消息一字未改",
    all(s in src("proto/mmo/social.proto") for s in ("rpc PlaceHomeDecor(", "rpc RemoveHomeDecor(", "rpc DescribeHomestead("))
@@ -144,13 +145,13 @@ if [ "$rc" = "0" ] && printf '%s' "$OUT" | grep -qF "$EXPECT" \
    && printf '%s' "$OUT" | grep -qF 'items=3 item_ids=decor_s1,decor_s2,decor_s3'; then
   ok "--homestead-config：6 格、3 件摆件全从配置现取，pending=true"
 else
-  bad "--homestead-config 输出不对（rc=$rc）：${OUT:0:180}"
+  bad "--homestead-config 输出不对（rc=${rc}）：${OUT:0:180}"
 fi
 cp config/social.json "$TMP/social.json"
 MISS="$("$DOTNET" "$SOCIAL_DLL" --homestead-config --config "$TMP/social.json" 2>&1 | utf8)"; rc=$?
 [ "$rc" = "0" ] && printf '%s' "$MISS" | grep -qF 'homestead_config_state=missing' \
   && ok "缺表降级：临时目录没有 homestead.json，社交服只读口照常工作" \
-  || bad "缺表没有降级（rc=$rc）：${MISS:0:120}"
+  || bad "缺表没有降级（rc=${rc}）：${MISS:0:120}"
 # 改配置后只读口跟着变，证明格位数只在配置里、代码没有第二套。
 python3 - "$ROOT" "$TMP" <<'PY'
 import json, os, sys
@@ -196,9 +197,9 @@ for f in "$TMP"/bad-*.json; do
   want="$(cat "$TMP/$n.expect")"
   out="$("$DOTNET" "$SOCIAL_DLL" --homestead-config --homestead-table "$f" --config config/social.json 2>&1 | utf8)"; rc=$?
   if [ "$rc" != "0" ] && printf '%s' "$out" | grep -qF 'config_error=' && printf '%s' "$out" | grep -qF "$want"; then
-    ok "坏配置 ${n#bad-} 被加载期挡住（rc=$rc）"
+    ok "坏配置 ${n#bad-} 被加载期挡住（rc=${rc}）"
   else
-    bad "坏配置 ${n#bad-} 没挡住（rc=$rc）：$(printf '%s' "$out" | head -2 | tr '\n' ' ')"
+    bad "坏配置 ${n#bad-} 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -2 | tr '\n' ' ')"
   fi
 done
 echo "== 5. 真服真库（MMO_C3_HAS_DB=1 才跑） =="
@@ -247,7 +248,7 @@ else
       -d "{\"name\":\"$CNAME\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
     CID="$(printf '%s' "$(body_of "$CR")" | json_field_stdin character_id)"
     [ -n "$CID" ] || { bad "建角色失败：$(body_of "$CR")"; finish "C3（洞府摆放）"; }
-    ok "登录与建角成功（角色号 $CID，每次唯一）"
+    ok "登录与建角成功（角色号 ${CID}，每次唯一）"
     # 从配置现取当季与付费轨那件洞府摆件，不写死编号。
     read -r CUR DECOR STAGE < <(python3 -c 'import json
 s=json.load(open("config/season.json",encoding="utf-8"))["current"]
@@ -264,7 +265,7 @@ print(s,r[1],r[0])')
       -d "{\"character_id\":$CID,\"track\":\"paid\",\"stage\":$STAGE}")"
     [ "$(printf '%s' "$(body_of "$BUY")" | json_field_stdin state)" = "pass_activated" ] \
       && [ "$(printf '%s' "$(body_of "$CLAIM")" | json_field_stdin item_id)" = "$DECOR" ] \
-      && ok "P3-4a2 发货链路：买 $CUR 付费轨、领第 $STAGE 阶拿到 $DECOR（摆放卡的前置已满足）" \
+      && ok "P3-4a2 发货链路：买 $CUR 付费轨、领第 $STAGE 阶拿到 ${DECOR}（摆放卡的前置已满足）" \
       || bad "摆件没发到背包：buy=$(body_of "$BUY") claim=$(body_of "$CLAIM")"
     bag() { get "http://127.0.0.1:61000/inventory?token=$TOKEN&character_id=$CID" | python3 -c 'import json,os,sys
 try: print(sum(s["count"] for s in json.load(sys.stdin)["slots"] if s["item_id"] == os.environ["ITEM"]))
@@ -282,7 +283,7 @@ except Exception: print("-1")'; }
       IFS=: read -r label item slot want <<<"$case"
       B="$(body_of "$(place "$TOKEN" "{\"character_id\":$CID,\"slot_id\":\"$slot\",\"item_id\":\"$item\"}")")"
       [ "$(printf '%s' "$B" | json_field_stdin reason)" = "$want" ] \
-        && ok "拒绝 $label：$want，且不写任何行" || bad "$label 没被挡：$B"
+        && ok "拒绝 ${label}：${want}，且不写任何行" || bad "$label 没被挡：$B"
     done
     SPOOF="$(body_of "$(place "$TOKEN" "{\"character_id\":$CID,\"slot_id\":\"court_1\",\"item_id\":\"$DECOR\",\"owner\":999,\"txn_id\":\"forged\",\"count\":99,\"home_coin\":999}")")"
     [ "$(expect_json "$SPOOF" ok=true slot_id=court_1 item_id="$DECOR")" = "ok" ] \

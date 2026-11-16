@@ -117,27 +117,31 @@ report("groups_differ",
        bool(red.get("cooldown_group")) and red.get("cooldown_group") != blue.get("cooldown_group"))
 report("items_differ", bool(red.get("item_id")) and red.get("item_id") != blue_item)
 
-blue_shop = [i for i in shop["items"] if i["kind"] == "blue_talisman"]
-red_shop = [i for i in shop["items"] if i["kind"] == "red_talisman"]
+def delivery(i):
+    return i.get("delivery") or {}
+
+blue_shop = [i for i in shop["items"] if i["category"] == "blue_talisman"]
+red_shop = [i for i in shop["items"] if i["category"] == "red_talisman"]
 report("shop_blue_delivery",
        len(blue_shop) == 1
-       and blue_shop[0].get("delivery_item_id") == blue_item
-       and blue_shop[0].get("delivery_count") == 1,
+       and delivery(blue_shop[0]).get("item_id") == blue_item
+       and delivery(blue_shop[0]).get("count") == 1,
        json.dumps(blue_shop, ensure_ascii=False))
 report("shop_red_kept",
-       len(red_shop) == 1 and red_shop[0].get("delivery_item_id") == red.get("item_id"))
+       len(red_shop) == 1 and delivery(red_shop[0]).get("item_id") == red.get("item_id"))
 # 方案 12.1「蓝符不是蓝药」：清单里没有把凝神丹 / 回灵丹当发货物。
 report("shop_no_potion",
-       not any("丹" in (i.get("delivery_item_id") or "") for i in shop["items"])
+       not any("丹" in (delivery(i).get("item_id") or "") for i in shop["items"])
        and blue_item not in ("",) and "talisman" in blue_item)
 
 shop_cs = files["src/Character/ShopTable.cs"]
-kinds = re.search(r"DeliveredKinds\s*=\s*(?:new\s*)?(?:string\[\]\s*)?\{([^}]*)\}", shop_cs)
-kinds_text = kinds.group(1) if kinds else ""
+# K1 起「接没接发货」由配置里每条的 delivery.mode 表达，代码没有 DeliveredKinds 表。
+delivered_code = [i["category"] for i in shop["items"]
+                  if delivery(i).get("mode", "none") != "none"]
 report("delivered_kinds",
-       all(('"' + k + '"') in kinds_text
+       all(k in delivered_code
            for k in ("protect_ticket", "red_talisman", "blue_talisman")),
-       "白名单没接蓝符：" + kinds_text)
+       "配置里没接蓝符：" + ",".join(delivered_code))
 
 table_cs = files["src/Character/TalismanTable.cs"]
 report("table_rejects_over_potion",
@@ -331,7 +335,7 @@ for bad_case in blue_over_potion blue_zero_restore blue_group_heal blue_zero_coo
   if [ "$code" = "2" ] && printf '%s' "$out" | grep -q 'config_error='; then
     ok "坏表 ${bad_case}：起不来（$(printf '%s' "$out" | head -1 | cut -c1-46)…）"
   else
-    bad "坏表 ${bad_case} 没被挡住（exit=$code）：$out"
+    bad "坏表 ${bad_case} 没被挡住（exit=${code}）：$out"
   fi
 done
 

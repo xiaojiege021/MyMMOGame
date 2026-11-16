@@ -106,11 +106,14 @@ report("cooldown_group_heal",
        red.get("cooldown_group") == "heal" and int(red.get("cooldown_ms", 0)) >= 1,
        "group=" + str(red.get("cooldown_group")) + " ms=" + str(red.get("cooldown_ms")))
 
-red_shop = [i for i in shop["items"] if i["kind"] == "red_talisman"]
+def delivery(i):
+    return i.get("delivery") or {}
+
+red_shop = [i for i in shop["items"] if i["category"] == "red_talisman"]
 report("shop_red_delivery",
        len(red_shop) == 1
-       and red_shop[0].get("delivery_item_id") == red_item
-       and red_shop[0].get("delivery_count") == 1,
+       and delivery(red_shop[0]).get("item_id") == red_item
+       and delivery(red_shop[0]).get("count") == 1,
        json.dumps(red_shop, ensure_ascii=False))
 
 table_cs = files["src/Character/TalismanTable.cs"]
@@ -120,13 +123,13 @@ report("table_rejects_over_potion",
        "上限校验不在配置加载里")
 
 shop_cs = read("src/Character/ShopTable.cs")
-# 只钉本卡自己的语义：白名单里接了保护券与红符。后面几张卡会继续往里加种类，
-# 不把「当时正好只有两种」写成事实——P1-5c5 接蓝符时这条不该回退。
-kinds = re.search(r"DeliveredKinds\s*=\s*(?:new\s*)?(?:string\[\]\s*)?\{([^}]*)\}", shop_cs)
-kinds_text = kinds.group(1) if kinds else ""
+# 只钉本卡自己的语义：保护券与红符都接了发货。K1 起「接没接发货」由配置里
+# 每条的 delivery.mode 表达，代码不再有 DeliveredKinds 表。
+delivered_code = [i["category"] for i in shop["items"]
+                  if delivery(i).get("mode", "none") != "none"]
 report("delivered_kinds",
-       '"protect_ticket"' in kinds_text and '"red_talisman"' in kinds_text,
-       "白名单没接红符：" + kinds_text)
+       "protect_ticket" in delivered_code and "red_talisman" in delivered_code,
+       "配置里没接红符：" + ",".join(delivered_code))
 
 # 请求里没有目标：红符只回复自己，客户端连「想治谁」都表达不了。
 battle_proto = files["proto/mmo/battle.proto"]
@@ -197,9 +200,12 @@ report("spend_in_character_only",
        and "delete from" in files["src/Character/TalismanRepository.cs"].lower(),
        "战斗服里出现了写库语句")
 
+# 哨兵：静态段中途抛异常时上面只会打印已跑到的几条，不补这一行看着像「全部通过」。
+print("PASS static_end")
 PY
 cat "$TMP/static.txt" | sed 's/^PASS /  ok   /; s/^FAIL /  FAIL /'
 grep -q '^PASS ' "$TMP/static.txt" || bad "静态断言没跑起来"
+grep -q '^PASS static_end' "$TMP/static.txt" || bad "静态断言没跑完"
 if grep -q '^FAIL ' "$TMP/static.txt"; then
   bad "静态断言有未通过项"
 else
@@ -262,7 +268,7 @@ for bad_case in over_potion group_mana unknown_item not_consumable zero_cooldown
   if [ "$code" = "2" ] && printf '%s' "$out" | grep -q 'config_error='; then
     ok "坏表 ${bad_case}：起不来（$(printf '%s' "$out" | head -1 | cut -c1-46)…）"
   else
-    bad "坏表 ${bad_case} 没被挡住（exit=$code）：$out"
+    bad "坏表 ${bad_case} 没被挡住（exit=${code}）：$out"
   fi
 done
 

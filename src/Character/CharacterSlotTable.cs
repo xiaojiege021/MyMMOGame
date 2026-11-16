@@ -121,10 +121,17 @@ public sealed class CharacterSlotTable
                     + productId + " kind=" + product.Kind);
             }
 
-            if (product.Deliverable)
+            // K1：第二角色栏在清单里必须是 second_slot 这种发货方式（不看种类字符串）。
+            if (product.Mode != DeliveryMode.SecondSlot)
+            {
+                throw new ConfigException("character_slot.json 的角色栏商品 delivery.mode 必须是 "
+                    + "second_slot：" + productId + " mode=" + ShopTable.ModeText(product.Mode));
+            }
+
+            if (product.DeliveryItemId.Length > 0)
             {
                 // 第二角色栏是状态发货：买下即给账号加一个位，不往背包放东西。
-                throw new ConfigException("character_slot.json 的角色栏商品不许配 delivery_item_id："
+                throw new ConfigException("character_slot.json 的角色栏商品不许配发货物："
                     + productId);
             }
 

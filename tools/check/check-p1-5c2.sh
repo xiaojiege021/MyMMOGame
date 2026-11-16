@@ -91,11 +91,14 @@ kinds_121 = ["outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin"
              "red_talisman", "blue_talisman", "revive_scroll", "unbind_item",
              "exp_booster", "monthly_bundle", "second_slot", "season_pass",
              "protect_ticket"]
-allowed = re.findall(r'"([a-z_]+)"', table.split("AllowedKinds")[1].split("}")[0])
-report("kinds_18", allowed == kinds_121,
-       "code=%s" % (",".join(allowed) if len(allowed) < 30 else len(allowed)))
+# 18 类 K1 起只在配置里（config/shop.json 的 categories），代码没有第二份。
+report("kinds_18", shop.get("categories") == kinds_121,
+       "config=%s" % ",".join(shop.get("categories") or []))
 
-item_kinds = [i["kind"] for i in shop["items"]]
+def delivery(i):
+    return i.get("delivery") or {}
+
+item_kinds = [i["category"] for i in shop["items"]]
 report("kinds_cover_121", sorted(item_kinds) == sorted(kinds_121),
        "items=%d uniq=%d" % (len(item_kinds), len(set(item_kinds))))
 
@@ -113,40 +116,43 @@ report("currency_yuanbao", shop["currency"] == "yuanbao" and "yuanbao" in curren
 # 这张卡只接保护券一种发货。后面的卡还会往白名单里加种类、接更多发货，
 # 所以这里只钉「保护券在白名单里 / 有一条保护券发货、且都不重复」，
 # 不写死当时的全集——写死过一次，接到第五种发货就整段假失败。
-delivered_code = re.findall(r'"([a-z_]+)"', table.split("DeliveredKinds")[1].split("}")[0])
+delivered_code = sorted({i["category"] for i in shop["items"] if delivery(i).get("mode", "none") != "none"})
 report("delivered_kinds_scope",
        "protect_ticket" in delivered_code
        and len(delivered_code) == len(set(delivered_code)),
-       "code=%s" % ",".join(delivered_code))
+       "config=%s" % ",".join(delivered_code))
 
-filled = [i["kind"] for i in shop["items"] if (i.get("delivery_item_id") or "")]
+filled = [i["category"] for i in shop["items"] if delivery(i).get("mode") == "item"]
 report("delivery_only_ticket",
        "protect_ticket" in filled and len(filled) == len(set(filled)),
        ",".join(filled))
-half = [i["kind"] for i in shop["items"]
-        if not (i.get("delivery_item_id") or "") and (i.get("delivery_count") or 0) != 0]
+half = [i["category"] for i in shop["items"]
+        if delivery(i).get("mode", "none") == "none"
+        and any(delivery(i).get(k) for k in ("item_id", "pass_id", "bundle_id"))]
 report("no_half_delivery", not half, ",".join(half))
-empty_count = [i["kind"] for i in shop["items"]
-               if (i.get("delivery_item_id") or "") and (i.get("delivery_count") or 0) < 1]
+empty_count = [i["category"] for i in shop["items"]
+               if delivery(i).get("mode") == "item" and (delivery(i).get("count") or 0) < 1]
 report("delivery_count_positive", not empty_count, ",".join(empty_count))
 
 # 方案 9.2 / 12.1：商城与通行证发的是同一种券，所以发货物必须就是 enhance 那个编号。
-ticket = next(i for i in shop["items"] if i["kind"] == "protect_ticket")
+ticket = next(i for i in shop["items"] if i["category"] == "protect_ticket")
 report("ticket_same_coupon",
-       ticket["delivery_item_id"] == enhance["protect_item_id"] == "ticket_protect",
-       "shop=%s enhance=%s" % (ticket["delivery_item_id"], enhance["protect_item_id"]))
-goods = items.get(ticket["delivery_item_id"], {})
+       delivery(ticket)["item_id"] == enhance["protect_item_id"] == "ticket_protect",
+       "shop=%s enhance=%s" % (delivery(ticket)["item_id"], enhance["protect_item_id"]))
+goods = items.get(delivery(ticket)["item_id"], {})
 report("ticket_item_bound",
        goods.get("kind") == "voucher" and goods.get("bind") == "always"
-       and goods.get("stack_max", 0) >= ticket["delivery_count"],
+       and goods.get("stack_max", 0) >= delivery(ticket)["count"],
        "kind=%s bind=%s stack=%s" % (goods.get("kind"), goods.get("bind"), goods.get("stack_max")))
-report("ticket_one_per_buy", ticket["delivery_count"] == 1, "count=%s" % ticket["delivery_count"])
+report("ticket_one_per_buy", delivery(ticket)["count"] == 1, "count=%s" % delivery(ticket)["count"])
 
 # 成交段的边界：扣款与入包在同一笔事务里，别处不许再扣。
 begin = service.find("public override async Task<BuyShopItemResponse> BuyShopItem(")
-end = service.find("BuyShopItemResponse ShopRejected(", begin)
+# 只取 BuyShopItem 本体：到家园币商城那个入口为止（它在通行证 / 月叠 / 角色栏
+# 三个状态发货方法之前，拿 ShopRejected 或通行证当锚点都会把它的扣款圈进来）。
+end = service.find("public override async Task<BuyHomeCoinShopResponse> BuyHomeCoinShopItem(", begin)
 if end < 0:
-    end = service.find("// 拒绝与重放都不带", begin)
+    end = service.find("BuyShopItemResponse ShopRejected(", begin)
 body = service[begin:end] if begin >= 0 and end > begin else ""
 report("section_found", len(body) > 2000, "len=%d" % len(body))
 
@@ -239,7 +245,7 @@ print("ok" if "shop_list_state=ok" in line and d >= 1 and d == v else "bad")')" 
     bad "保护券的发货物不对：$(grep 'shop_protect_ticket_1' "$TMP/list.txt" | head -1)"
   fi
   pending=$(grep -c ' delivery=pending ' "$TMP/list.txt" || true)
-  filled_n=$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(sum(1 for i in d["items"] if i.get("delivery_item_id")))')
+  filled_n=$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(sum(1 for i in d["items"] if (i.get("delivery") or {}).get("mode", "none") != "none"))')
   if [ "$filled_n" -ge 1 ] && [ "$((pending + filled_n))" -eq "$items" ]; then
     ok "清单 ${items} 条 = ${filled_n} 条已接发货 + ${pending} 条 pending（不钉当时的种类数）"
   else
@@ -257,21 +263,21 @@ root, tmp = os.environ["ROOT"], os.environ["TMP"]
 base = json.load(open(os.path.join(root, "config/shop.json"), encoding="utf-8"))
 
 def at(j, kind):
-    return next(i for i, x in enumerate(j["items"]) if x["kind"] == kind)
+    return next(i for i, x in enumerate(j["items"]) if x["category"] == kind)
 
 cases = {
-    "ticket_other_goods": lambda j: j["items"][at(j, "protect_ticket")].__setitem__(
-        "delivery_item_id", "stone_transfer"),
-    "ticket_empty": lambda j: j["items"][at(j, "protect_ticket")].__setitem__(
-        "delivery_item_id", ""),
-    "ticket_count_two": lambda j: j["items"][at(j, "protect_ticket")].__setitem__(
-        "delivery_count", 2),
-    "ticket_unknown_goods": lambda j: j["items"][at(j, "protect_ticket")].__setitem__(
-        "delivery_item_id", "no_such_item"),
-    "red_filled": lambda j: (j["items"][at(j, "red_talisman")].__setitem__(
-        "delivery_item_id", "ticket_protect"), j["items"][at(j, "red_talisman")].__setitem__(
-        "delivery_count", 1)),
-    "outfit_half": lambda j: j["items"][at(j, "outfit")].__setitem__("delivery_count", 1),
+    "ticket_other_goods": lambda j: j["items"][at(j, "protect_ticket")]["delivery"].__setitem__(
+        "item_id", "stone_transfer"),
+    "ticket_empty": lambda j: j["items"][at(j, "protect_ticket")]["delivery"].__setitem__(
+        "item_id", ""),
+    "ticket_count_two": lambda j: j["items"][at(j, "protect_ticket")]["delivery"].__setitem__(
+        "count", 2),
+    "ticket_unknown_goods": lambda j: j["items"][at(j, "protect_ticket")]["delivery"].__setitem__(
+        "item_id", "no_such_item"),
+    "red_filled": lambda j: (j["items"][at(j, "red_talisman")]["delivery"].__setitem__(
+        "item_id", "ticket_protect"), j["items"][at(j, "red_talisman")]["delivery"].__setitem__(
+        "count", 1)),
+    "outfit_half": lambda j: j["items"][at(j, "outfit")]["delivery"].__setitem__("item_id", "stone_transfer"),
 }
 for name, mutate in cases.items():
     doc = copy.deepcopy(base)
@@ -286,7 +292,7 @@ for case in ticket_other_goods ticket_empty ticket_count_two ticket_unknown_good
   if [ "$code" = "2" ] && printf '%s' "$out" | grep -q 'config_error='; then
     ok "坏清单起不来：$case"
   else
-    bad "坏清单没挡住：$case（退出码 $code）"
+    bad "坏清单没挡住：${case}（退出码 ${code}）"
     printf '%s\n' "$out" | head -3 | detail
   fi
 done
@@ -405,7 +411,7 @@ print(d.get("balance", ""))')"
   fi
   if [ -n "$before_yuanbao" ] && [ -n "$after_buy_yuanbao" ] \
      && [ "$after_buy_yuanbao" = "$((before_yuanbao - 50))" ]; then
-    ok "回包余额就是扣完的事实值（$before_yuanbao → $after_buy_yuanbao）"
+    ok "回包余额就是扣完的事实值（$before_yuanbao → ${after_buy_yuanbao}）"
   else
     bad "余额不对：before=${before_yuanbao:-?} reply=${after_buy_yuanbao:-?}"
   fi
@@ -413,7 +419,7 @@ print(d.get("balance", ""))')"
   # 券到手了：背包里多了一张绑定的券
   after_tickets="$(tickets_of "$(bag)")"
   if [ "$before_tickets" -ge 0 ] && [ "$after_tickets" = "$((before_tickets + 1))" ]; then
-    ok "背包里保护券多了一张（$before_tickets → $after_tickets）"
+    ok "背包里保护券多了一张（$before_tickets → ${after_tickets}）"
   else
     bad "背包里券的数量不对：${before_tickets:-?} → ${after_tickets:-?}"
   fi
@@ -462,7 +468,7 @@ print(d.get("balance", ""))')"
     "$DOTNET" "$CHARACTER_DLL" --shop-state "$CHARACTER" > "$TMP/state.txt" 2>&1
     if grep -q "balance=$keep " "$TMP/state.txt" && grep -q "tickets=$after_tickets " "$TMP/state.txt" \
        && grep -q 'ticket_bound=true' "$TMP/state.txt"; then
-      ok "库里独立读回：余额 $keep、券 $after_tickets 张且都是绑定的"
+      ok "库里独立读回：余额 ${keep}、券 $after_tickets 张且都是绑定的"
     else
       bad "库里状态不对：$(head -1 "$TMP/state.txt")"
     fi
@@ -479,7 +485,7 @@ print(d.get("balance", ""))')"
 
   final_yuanbao="$(yuanbao_of "$(money)")"
   if [ -n "$final_yuanbao" ] && [ "$final_yuanbao" = "$((before_yuanbao - 50))" ]; then
-    ok "整段跑完只扣了这一张的 50（$before_yuanbao → $final_yuanbao）"
+    ok "整段跑完只扣了这一张的 50（$before_yuanbao → ${final_yuanbao}）"
   else
     bad "元宝总额不对：before=${before_yuanbao:-?} final=${final_yuanbao:-?}"
   fi

@@ -22,7 +22,7 @@ GATEWAY="${MMO_P1_5C4_GATEWAY:-}"
 TOKEN="${MMO_P1_5C4_TOKEN:-}"
 CHARACTER="${MMO_P1_5C4_CHARACTER:-0}"
 SHOP_ITEM="shop_teleport_talisman_1"
-TALISMAN="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(next(i["delivery_item_id"] for i in d["items"] if i["id"] == "shop_teleport_talisman_1"))')"
+TALISMAN="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(next(i["delivery"]["item_id"] for i in d["items"] if i["id"] == "shop_teleport_talisman_1"))')"
 
 TMP="$(mktemp -d)"
 cleanup() { rm -rf "$TMP"; }
@@ -62,17 +62,22 @@ report("item_always_bound", bool(mine) and mine[0].get("bind") == "always",
        mine[0].get("bind") if mine else "missing")
 
 row = [i for i in shop["items"] if i.get("id") == "shop_teleport_talisman_1"]
-report("shop_delivery", bool(row) and row[0].get("delivery_item_id") == talisman
-       and row[0].get("delivery_count") == 1, str(row[0]) if row else "missing")
+dlv = (row[0].get("delivery") or {}) if row else {}
+report("shop_delivery", bool(row) and dlv.get("item_id") == talisman
+       and dlv.get("count") == 1, str(row[0]) if row else "missing")
 report("shop_items_18", len(shop["items"]) == 18, "items=%d" % len(shop["items"]))
-report("shop_price", bool(row) and row[0].get("price_yuanbao") == 20,
-       str(row[0].get("price_yuanbao")) if row else "missing")
+report("shop_price", bool(row) and row[0].get("price") == 20,
+       str(row[0].get("price")) if row else "missing")
 
-delivered = table_cs.split("DeliveredKinds")[1].split("};")[0]
-report("delivered_kind", '"teleport_talisman"' in delivered, "DeliveredKinds 不含传送符")
-branch = table_cs.split('"teleport_talisman", StringComparison.Ordinal')[1].split("else if")[0] \
-    if '"teleport_talisman", StringComparison.Ordinal' in table_cs else ""
-report("branch", "consumable" in branch and "BindRule.Always" in branch,
+# K1 起「接没接发货」写在配置里每条的 delivery.mode 上，代码没有 DeliveredKinds 表。
+report("delivered_kind", any(i["category"] == "teleport_talisman"
+                             and (i.get("delivery") or {}).get("mode") == "item"
+                             for i in shop["items"]),
+       "配置里传送符没有 item 发货")
+branch = table_cs.split('case "teleport_talisman":')[1].split("break;")[0] \
+    if 'case "teleport_talisman":' in table_cs else ""
+report("branch", "RequireGoods" in branch and "RequireBound" in branch
+       and "BindRule.Always" in table_cs,
        "ShopTable 没校验传送符发货物")
 
 report("single_source", sum(1 for p in ("config/items.json", "config/shop.json")
@@ -116,9 +121,9 @@ def case(name, mutate):
     with open(os.path.join(tmp, "bad-" + name + ".json"), "w", encoding="utf-8") as f:
         json.dump(d, f, ensure_ascii=False)
 
-case("material_delivery", lambda r: r.update(delivery_item_id="ore_iron"))
-case("count_two", lambda r: r.update(delivery_count=2))
-case("no_delivery", lambda r: r.update(delivery_item_id="", delivery_count=0))
+case("material_delivery", lambda r: r["delivery"].update(item_id="ore_iron"))
+case("count_two", lambda r: r["delivery"].update(count=2))
+case("no_delivery", lambda r: r["delivery"].update(mode="none"))
 PY
 
 for bad_case in material_delivery count_two no_delivery; do
@@ -163,7 +168,7 @@ print(next((b.get("amount") for b in d.get("balances", []) if b.get("kind") == "
         "买传送符：入包第 ${slot} 格、到账即绑、扣 20 元宝"
   after_money="$(yuanbao_of "$(money)")"
   [ -n "$before_money" ] && [ "$after_money" = "$((before_money - 20))" ] \
-    && ok "元宝少 20（$before_money→$after_money）" || bad "元宝不对：$before_money→$after_money"
+    && ok "元宝少 20（${before_money}→${after_money}）" || bad "元宝不对：${before_money}→$after_money"
   [ "$(count_of "$(bag)")" = "$((before_count + 1))" ] \
     && ok "背包传送符 +1" || bad "背包张数不对"
 
@@ -181,7 +186,7 @@ print(next((b.get("amount") for b in d.get("balances", []) if b.get("kind") == "
     && ok "背包传送符 +2（可反复购买）" || bad "重复购买张数不对"
   after_money="$(yuanbao_of "$(money)")"
   [ "$after_money" = "$((before_money - 40))" ] \
-    && ok "两张共扣 40 元宝" || bad "两张的扣款不对：$before_money→$after_money"
+    && ok "两张共扣 40 元宝" || bad "两张的扣款不对：${before_money}→$after_money"
 fi
 
 finish "P1-5c4（server）"

@@ -137,27 +137,31 @@ report("base_from_classes",
        and "GetProperty(\"resurrect\")" in files["src/Character/ReviveScrollTable.cs"],
        "比例被抄进卷轴配置，或没从职业表读")
 
-shop_scroll = [i for i in shop["items"] if i["kind"] == "revive_scroll"]
+def delivery(i):
+    return i.get("delivery") or {}
+
+shop_scroll = [i for i in shop["items"] if i["category"] == "revive_scroll"]
 report("shop_scroll_delivery",
        len(shop_scroll) == 1
-       and shop_scroll[0].get("delivery_item_id") == scroll_item
-       and shop_scroll[0].get("delivery_count") == 1,
+       and delivery(shop_scroll[0]).get("item_id") == scroll_item
+       and delivery(shop_scroll[0]).get("count") == 1,
        json.dumps(shop_scroll, ensure_ascii=False))
 report("shop_version", int(shop.get("version", 0)) >= 5)
-# 只钉本卡相关的三种，不把「已接发货全集」写死（以后每种新卡都会加）。
+# 只钉本卡相关的几种，不把「已接发货全集」写死（以后每种新卡都会加）。
+# K1 起「接没接发货」写在配置里每条的 delivery.mode 上，代码没有 DeliveredKinds 表。
 shop_cs = files["src/Character/ShopTable.cs"]
-kinds = re.search(r"DeliveredKinds\s*=\s*(?:new\s*)?(?:string\[\]\s*)?\{([^}]*)\}", shop_cs)
-kinds_text = kinds.group(1) if kinds else ""
+delivered_code = [i["category"] for i in shop["items"]
+                  if delivery(i).get("mode", "none") != "none"]
 report("delivered_kinds",
-       all(('"' + k + '"') in kinds_text
+       all(k in delivered_code
            for k in ("protect_ticket", "red_talisman", "blue_talisman", "revive_scroll")),
-       kinds_text)
+       ",".join(delivered_code))
 report("shop_scroll_check",
        "revive_scroll.json 的 scroll.item_id" in shop_cs
        and "scrolls.ReviveScroll" in shop_cs)
 # 方案 12.1「复活只卖复活卷轴，不另卖复活币」。
 report("shop_no_revive_coin",
-       not any("coin" in (i.get("kind") or "") for i in shop["items"]))
+       not any("coin" in (i.get("category") or "") for i in shop["items"]))
 
 table_cs = files["src/Character/ReviveScrollTable.cs"]
 report("table_rejects_bad_scroll",
@@ -402,7 +406,7 @@ for bad_case in bad_schema zero_version no_scroll empty_item unknown_item \
   if [ "$code" = "2" ] && printf '%s' "$out" | grep -q 'config_error='; then
     ok "坏表 ${bad_case}：起不来（$(printf '%s' "$out" | head -1 | cut -c1-46)…）"
   else
-    bad "坏表 ${bad_case} 没被挡住（exit=$code）：$out"
+    bad "坏表 ${bad_case} 没被挡住（exit=${code}）：$out"
   fi
 done
 
@@ -413,7 +417,7 @@ for bad_case in hp_pct_full exp_pct_zero exp_pct_full no_resurrect; do
   if [ "$code" = "2" ] && printf '%s' "$out" | grep -q 'config_error='; then
     ok "坏职业表 ${bad_case}：起不来（$(printf '%s' "$out" | head -1 | cut -c1-46)…）"
   else
-    bad "坏职业表 ${bad_case} 没被挡住（exit=$code）：$out"
+    bad "坏职业表 ${bad_case} 没被挡住（exit=${code}）：$out"
   fi
 done
 

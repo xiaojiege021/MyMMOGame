@@ -161,10 +161,17 @@ public sealed class MonthlyBundleTable
                     + productId + " kind=" + product.Kind);
             }
 
-            if (product.Deliverable)
+            // K1：月叠在清单里必须是 monthly_bundle 这种发货方式（不看种类字符串）。
+            if (product.Mode != DeliveryMode.MonthlyBundle)
+            {
+                throw new ConfigException("monthly_bundle.json 的月叠商品 delivery.mode 必须是 "
+                    + "monthly_bundle：" + productId + " mode=" + ShopTable.ModeText(product.Mode));
+            }
+
+            if (product.DeliveryItemId.Length > 0)
             {
                 // 月叠一次放两种符进背包，发什么与发多少只在本表；清单里不许填一个发货物。
-                throw new ConfigException("monthly_bundle.json 的月叠商品不许配 delivery_item_id："
+                throw new ConfigException("monthly_bundle.json 的月叠商品不许配发货物："
                     + productId);
             }
 

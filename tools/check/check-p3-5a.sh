@@ -82,7 +82,7 @@ for proj in src/Battle/Battle.csproj src/World/World.csproj src/Gateway/Gateway.
             tools/probe/BattleProbe/BattleProbe.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -189,9 +189,9 @@ while read -r ms want_open want_key; do
   WN="${WN%$'\r'}"; BN="${BN%$'\r'}"
   if [ -n "$WN" ] && [ "$WN" = "$BN" ] && printf '%s' "$WN" | grep -q "open=$want_open key=$want_key " \
      && printf '%s' "$WN" | grep -q "^at=$ms "; then
-    ok "同一时刻（$ms）两端钥匙一致：open=$want_open key=$want_key"
+    ok "同一时刻（${ms}）两端钥匙一致：open=$want_open key=$want_key"
   else
-    bad "两端跑偏（$ms 期望 open=$want_open key=$want_key）：世界服[$WN] 战斗服[$BN]"
+    bad "两端跑偏（$ms 期望 open=$want_open key=${want_key}）：世界服[$WN] 战斗服[$BN]"
   fi
 done < "$TMP/points.txt"
 
@@ -252,7 +252,7 @@ for c in schema version timezone cap0 cap101 no_windows overlap midnight short b
      && printf '%s' "$wout" | grep -q '^config_error=' && printf '%s' "$bout" | grep -q '^config_error='; then
     ok "坏配置 ${c}：两端都打 config_error= 且非 0 退出"
   else
-    bad "坏配置 ${c} 没挡住（世界服 rc=$wrc / 战斗服 rc=$brc）：$(printf '%s' "$wout" | head -1)"
+    bad "坏配置 ${c} 没挡住（世界服 rc=$wrc / 战斗服 rc=${brc}）：$(printf '%s' "$wout" | head -1)"
   fi
 done
 # 入口必须长在已开放的地表上：这条只有世界服知道（战斗服不读地表开放表），
@@ -266,7 +266,7 @@ for c in region_closed region_unknown; do
      && printf '%s' "$bout" | grep -q '^world_boss_table_version='; then
     ok "入口不在已开放地表（${c}）：世界服打 config_error=，战斗服只算窗口不挡进场"
   else
-    bad "入口地段校验不对（${c}）：世界服 rc=$wrc，战斗服[$(printf '%s' "$bout" | head -1)]"
+    bad "入口地段校验不对（${c}）：世界服 rc=${wrc}，战斗服[$(printf '%s' "$bout" | head -1)]"
   fi
 done
 printf '%s' "$("$DOTNET" "$WD" $CW --world-boss-state --world-boss-config "$TMP/none.json" 2>&1 | utf8)" \
@@ -364,25 +364,25 @@ PY
     done
   }
   A="$(mkchar warrior)"; B="$(mkchar priest)"
-  [ -n "$A" ] && [ -n "$B" ] && ok "真服：同一账号造两个角色（$A / $B）" || bad "真服：角色没建出来"
+  [ -n "$A" ] && [ -n "$B" ] && ok "真服：同一账号造两个角色（$A / ${B}）" || bad "真服：角色没建出来"
   SECT="$(post /sect/create "{\"character_id\":$A,\"name\":\"p335_sect_$$\"}" | jget sect_id 2>/dev/null)"
   post /sect/join "{\"character_id\":$B,\"sect_id\":$SECT}" >/dev/null 2>&1
-  [ -n "$SECT" ] && ok "真库：A 建宗门、B 入同一个宗门（sect=$SECT）" || bad "真库：宗门没建出来"
+  [ -n "$SECT" ] && ok "真库：A 建宗门、B 入同一个宗门（sect=${SECT}）" || bad "真库：宗门没建出来"
   # 复活卷轴是商店货，这里按正规路径买一张：核对不自己往库里塞道具。
   # 新角色身上没有元宝，先走「加余额」那条路把够买的元宝记上（只给核对用）。
   SCROLL_ITEM="$(python3 -c 'import json,sys
 d = json.load(open("config/shop.json", encoding="utf-8"))
-print(next(i["id"] for i in d["items"] if i["kind"] == "revive_scroll"))')"
+print(next(i["id"] for i in d["items"] if i["category"] == "revive_scroll"))')"
   PRICE="$(python3 -c 'import json,sys
 d = json.load(open("config/shop.json", encoding="utf-8"))
-print(next(i["price_yuanbao"] for i in d["items"] if i["kind"] == "revive_scroll"))')"
+print(next(i["price"] for i in d["items"] if i["category"] == "revive_scroll"))')"
   ADD="$(post /currency/add "{\"character_id\":$A,\"kind\":\"yuanbao\",\"delta\":$((PRICE * 2))}")"
   BUY="$(curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/shop/buy?token=$TOK" \
     -H 'Content-Type: application/json' \
     -d "{\"character_id\":$A,\"item_id\":\"$SCROLL_ITEM\"}")"
   [ "$(printf '%s' "$BUY" | jget ok)" = "true" ] \
-    && ok "真库：A 从商店买到一张复活卷轴（$SCROLL_ITEM，$PRICE 元宝）" \
-    || bad "卷轴没买到（加余额：$ADD）：$BUY"
+    && ok "真库：A 从商店买到一张复活卷轴（${SCROLL_ITEM}，$PRICE 元宝）" \
+    || bad "卷轴没买到（加余额：${ADD}）：$BUY"
   EXP0="$("$DOTNET" "$CD" $CC --revive-scroll-state "$A" 2>&1 | utf8 \
     | sed -n 's/.*\bexp=\([0-9]*\).*/\1/p' | head -1)"
 
@@ -419,14 +419,14 @@ print(next(i["price_yuanbao"] for i in d["items"] if i["kind"] == "revive_scroll
   EXP1="$("$DOTNET" "$CD" $CC --revive-scroll-state "$A" 2>&1 | utf8 \
     | sed -n 's/.*\bexp=\([0-9]*\).*/\1/p' | head -1)"
   if [ -n "$EXP0" ] && [ -n "$EXP1" ] && [ "$EXP1" -gt "$EXP0" ]; then
-    ok "真库：等级经验从 $EXP0 涨到 $EXP1（结算真落库）"
+    ok "真库：等级经验从 $EXP0 涨到 ${EXP1}（结算真落库）"
   else
     bad "经验没进库：exp0=$EXP0 exp1=$EXP1"
   fi
   RES="$(grep 'worldboss_result=' "$TMP/battle-open.log" | grep -i 'killed=true' | head -1)"
   printf '%s' "$RES" | grep -q "winner_sect=$SECT " && printf '%s' "$RES" | grep -qi 'ok=true' \
     && printf '%s' "$RES" | grep -qi 'entrance_closed=true' \
-    && ok "归属只记名字：伤害最高的宗门是 $SECT，入口随即关闭" \
+    && ok "归属只记名字：伤害最高的宗门是 ${SECT}，入口随即关闭" \
     || bad "归属记录不对：$RES"
   WBJSON="$(curl -s --noproxy '*' "http://127.0.0.1:61000/world/worldboss?token=$TOK")"
   [ "$(printf '%s' "$WBJSON" | jget killed)" = "true" ] \

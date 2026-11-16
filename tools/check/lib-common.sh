@@ -110,8 +110,8 @@ wait_line() {
 #       只读入口遇到坏配置必须打 config_error= 并以非 0 退出；
 #       output 可以是命令输出，也可以是 "退出码 + 输出"（只看 config_error= 行）。
 #   pick_pending_shop_item [shop.json]
-#       打印「id kind」，挑第一条 delivery_item_id 为空的商品；没有则打印空。
-#       不要写死某个编号：后面的卡会陆续接上发货。
+#       打印「id category」，挑第一条 delivery.mode 为 none 的商品；没有则打印空。
+#       不要写死某个编号：后面的卡会陆续接上发货。K1 起发货方式写在 delivery.mode 上。
 #   db_cli <args...>
 #       跑角色服只读入口；调用方须先定义 DOTNET 与 CHARACTER_DLL。
 # ---------------------------------------------------------------------------
@@ -142,8 +142,9 @@ try:
 except Exception:
     print("")
     raise SystemExit
-g = next((i for i in d.get("items", []) if not i.get("delivery_item_id")), None)
-print((g.get("id", "") + " " + g.get("kind", "")) if g else "")' "${1:-config/shop.json}"
+g = next((i for i in d.get("items", [])
+          if (i.get("delivery") or {}).get("mode", "none") == "none"), None)
+print((g.get("id", "") + " " + g.get("category", "")) if g else "")' "${1:-config/shop.json}"
 }
 
 db_cli() {

@@ -41,7 +41,7 @@ for proj in src/Shared/Shared.csproj src/Character/Character.csproj src/Gateway/
             src/World/World.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -90,8 +90,9 @@ ck("保护券就是 enhance.json 的那一件，每阶不超过配置上限",
        and r["count"] <= pass_cfg["protect_per_stage_max"]
        for s, t, r in rewards if r["kind"] == "protect_ticket"))
 ck("通行证在商城里仍是状态发货：没有假发货物",
-   next(i for i in shop["items"] if i["kind"] == "season_pass")["delivery_item_id"] == ""
-   and next(i for i in shop["items"] if i["kind"] == "season_pass")["delivery_count"] == 0)
+   (lambda r: r["delivery"].get("mode") == "season_pass"
+    and not (r["delivery"].get("item_id") or "") and not (r["delivery"].get("count") or 0))(
+       next(i for i in shop["items"] if i["category"] == "season_pass")))
 def keys(o):
     if isinstance(o, dict):
         for k, v in o.items():
@@ -144,7 +145,7 @@ ck("角色服当前季只问全局服务，不从配置自己认定",
    and "DescribeSeasonAsync" in src("src/Character/GlobalSeasonClient.cs")
    and "season.json" not in src("src/Character/SeasonPassRepository.cs"))
 ck("老发货规则没动：保护券发货与券编号一字未改",
-   next(i for i in shop["items"] if i["kind"] == "protect_ticket")["delivery_item_id"]
+   next(i for i in shop["items"] if i["category"] == "protect_ticket")["delivery"]["item_id"]
    == enhance["protect_item_id"])
 for name, cond in checks: print(("OK " if cond else "BAD ") + name)
 PY
@@ -157,7 +158,7 @@ SO="$("$DOTNET" "$CD" --season-pass-list 2>&1)"; SRC=$?
 PASS_SEASONS="$(printf '%s' "$SO" | grep -c '^season_pass_season=')"
 [ "$SRC" = 0 ] && printf '%s' "$SO" | grep -q "^season_pass_list_state=ok .*product=shop_season_pass_1 price=700 protect=ticket_protect" \
   && ok "只读入口从配置现取：商品、标价、券编号、每阶上限" \
-  || bad "只读入口不对（rc=$SRC）：$(printf '%s' "$SO" | utf8 | head -2)"
+  || bad "只读入口不对（rc=${SRC}）：$(printf '%s' "$SO" | utf8 | head -2)"
 [ "$PASS_SEASONS" = "$(printf '%s' "$(python3 -c 'import json;print(len(json.load(open("config/season.json",encoding="utf-8"))["seasons"]))')")" ] \
   && ok "只读入口按 season.json 的季数逐季打出（$PASS_SEASONS 季，脚本不写死）" \
   || bad "通行证表的季数与 season.json 不一致：$PASS_SEASONS"
@@ -188,8 +189,8 @@ PY
 for c in schema version gold season9 missing free_ticket free_equip paid_stone ticket_over two_rewards stage_gap product; do
   out="$("$DOTNET" "$CD" --season-pass-list --season-pass-path "$TMP/bad-$c.json" 2>&1)"; rc=$?
   [ "$rc" -ne 0 ] && printf '%s' "$out" | utf8 | grep -q '^config_error=' \
-    && ok "坏配置 $c：config_error= 且非 0 退出" \
-    || bad "坏配置 $c 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    && ok "坏配置 ${c}：config_error= 且非 0 退出" \
+    || bad "坏配置 $c 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
 done
 
 echo "== 4. 启动日志（不连库也先打出通行证事实值）=="
@@ -240,7 +241,7 @@ PY
   wait_ready "$TMP/global.log" '^ready' "全局服务" || true
   wait_ready "$TMP/gw.log" '^ready' "网关" || true
   grep -q "^season=$CUR" "$TMP/global.log" \
-    && ok "真服：全局服务确认当前季 $CUR（通行证按它取）" \
+    && ok "真服：全局服务确认当前季 ${CUR}（通行证按它取）" \
     || bad "真服：全局服务的当前季不对：$(grep '^season=' "$TMP/global.log" | utf8 | head -1)"
   for _ in $(seq 1 120); do
     code=$(curl -s --noproxy '*' -o /dev/null -w '%{http_code}' -X POST \
@@ -273,7 +274,7 @@ PY
     && [ "$(printf '%s' "$BASE" | jget season_id)" = "$CUR" ] \
     && [ "$(printf '%s' "$BASE" | jget paid)" = "false" ] \
     && [ "$(printf '%s' "$BASE" | jget protect_item_id)" = "ticket_protect" ] \
-    && ok "真服：只读口给出当季 $CUR、没买付费轨、券编号 ticket_protect" \
+    && ok "真服：只读口给出当季 ${CUR}、没买付费轨、券编号 ticket_protect" \
     || bad "真服：只读口回包不对：$BASE"
   # 回包与配置逐条比对：一阶不多、一阶不少，物品与数量完全一致——回包不可能是别的来源。
   printf '%s' "$BASE" | python3 -c 'import json,sys
@@ -306,7 +307,7 @@ print(g["free"][0]["rewards"][0]["item_id"], g["free"][1]["rewards"][0]["item_id
   R="$(claim free 1)"; B="$(body_of "$R")"
   [ "$(printf '%s' "$B" | jget ok)" = "true" ] && [ "$(printf '%s' "$B" | jget item_id)" = "$FREE1" ] \
     && [ "$(printf '%s' "$B" | jget bound)" = "true" ] \
-    && ok "真服：免费轨第 1 阶领到 $FREE1（称号），到账即绑" \
+    && ok "真服：免费轨第 1 阶领到 ${FREE1}（称号），到账即绑" \
     || bad "真服：免费轨领取不对：$B"
   R="$(claim free 1)"; B="$(body_of "$R")"
   [ "$(printf '%s' "$B" | jget reason)" = "already_claimed" ] \
@@ -341,7 +342,7 @@ print(g["free"][0]["rewards"][0]["item_id"], g["free"][1]["rewards"][0]["item_id
     || bad "真服：付费券领取不对：$B"
   R="$(claim free 2)"; B="$(body_of "$R")"
   [ "$(printf '%s' "$B" | jget item_id)" = "$FREE2" ] \
-    && ok "真服：买了付费轨之后免费轨照旧发 $FREE2（外观碎片，两轨互不影响）" \
+    && ok "真服：买了付费轨之后免费轨照旧发 ${FREE2}（外观碎片，两轨互不影响）" \
     || bad "真服：免费轨被付费轨影响：$B"
   # dotnet 在 Windows 上按 \r\n 出工；统一去掉 \r，并剔掉 db_env= 那行，断言只看状态本体。
   STATE="$("$DOTNET" "$CD" --season-pass-state "$CID" --pass-season "$CUR" \

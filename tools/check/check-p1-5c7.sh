@@ -30,7 +30,7 @@ HAS_DB="${MMO_P1_5C7_HAS_DB:-0}"
 BOOSTER="$(python3 -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["item_id"])')"
 DURATION="$(python3 -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["duration_ms"])')"
 GAIN="$(python3 -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["gain_pct"])')"
-PRICE="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(next(i["price_yuanbao"] for i in d["items"] if i["id"]=="shop_exp_booster_1"))')"
+PRICE="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(next(i["price"] for i in d["items"] if i["id"]=="shop_exp_booster_1"))')"
 BASE="$(python3 -c 'import json; print(json.load(open("config/exp.json", encoding="utf-8"))["base_exp"])')"
 ACTIVE=$((BASE * GAIN / 100))
 DELTA=$((ACTIVE - BASE))
@@ -218,15 +218,15 @@ report("settle_route_forwards_facts",
 # 商城：只从商城发，发货物必须就是配置那一个编号。
 report("shop_delivery",
        int(shop.get("version", 0)) >= 6 and entry is not None
-       and entry.get("delivery_item_id") == b.get("item_id")
-       and entry.get("delivery_count") == 1
-       and entry.get("kind") == "exp_booster")
+       and (entry.get("delivery") or {}).get("item_id") == b.get("item_id")
+       and (entry.get("delivery") or {}).get("count") == 1
+       and entry.get("category") == "exp_booster")
 report("shop_kind_whitelist",
        '"exp_booster"' in files["src/Character/ShopTable.cs"]
        and "boosters.ExpBooster" in files["src/Character/ShopTable.cs"]
-       and "booster.ItemId" in files["src/Character/ShopTable.cs"])
+       and "boosters.ExpBooster.ItemId" in files["src/Character/ShopTable.cs"])
 report("shop_others_unchanged",
-       all(any(i.get("id") == k and i.get("delivery_item_id") == v
+       all(any(i.get("id") == k and (i.get("delivery") or {}).get("item_id") == v
                for i in shop["items"])
            for k, v in (("shop_protect_ticket_1", "ticket_protect"),
                         ("shop_red_talisman_1", "talisman_red"),
@@ -235,9 +235,12 @@ report("shop_others_unchanged",
        "接新发货没把前四种带坏")
 
 # 副本 / 任务 / 拍卖 / 月叠 / 通行证不产出，也不留接口：
-# 除 items / shop / exp_booster 三份配置，别的配置里不许出现这个编号。
+# 除 items / shop / home_coin_shop / exp_booster 四份配置，别的配置里不许出现这个编号。
+# home_coin_shop 是家园币商城清单，里面的 forbidden 名单列着这个门类表示「禁止上架」，
+# 不是第二个来源（K1 把白名单 / 黑名单搬进配置后才会出现在那里）。
 others = [p for p in glob.glob(os.path.join(root, "config", "*.json"))
-          if os.path.basename(p) not in ("items.json", "shop.json", "exp_booster.json")]
+          if os.path.basename(p) not in
+          ("items.json", "shop.json", "home_coin_shop.json", "exp_booster.json")]
 report("no_other_sources",
        all(b.get("item_id") not in open(p, encoding="utf-8").read() for p in others),
        "别的配置里出现了道具编号")
@@ -320,7 +323,7 @@ for name, data in cases.items():
 shop = json.load(open(os.path.join(root, "config/shop.json"), encoding="utf-8"))
 for item in shop["items"]:
     if item["id"] == "shop_exp_booster_1":
-        item["delivery_item_id"] = "talisman_red"
+        item["delivery"]["item_id"] = "talisman_red"
 with open(os.path.join(tmp, "bad-shop-delivery.json"), "w", encoding="utf-8") as f:
     json.dump(shop, f, ensure_ascii=False)
 PY
@@ -435,7 +438,7 @@ print(next((s.get("slot") for s in d.get("slots", []) if s.get("item_id")==sys.a
   fi
 
   # 动态挑一条还没接发货的商品，别写死某个编号：后面的卡会陆续接上发货。
-  pending_id="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); g=next((i for i in d["items"] if not i.get("delivery_item_id")), None); print(g["id"] if g else "")')"
+  pending_id="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); g=next((i for i in d["items"] if (i.get("delivery") or {}).get("mode", "none") == "none"), None); print(g["id"] if g else "")')"
   r="$(buy "$pending_id")"
   if [ -n "$pending_id" ] \
      && [ "$(expect_json "$(body_of "$r")" ok=false reason=delivery_pending charged_yuanbao=0)" = "ok" ]; then

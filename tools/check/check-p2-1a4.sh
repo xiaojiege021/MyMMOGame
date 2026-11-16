@@ -68,8 +68,12 @@ report("shop_18_items", len(shop["items"]) == 18, "商城 18 条上架清单未�
 report("shop_no_construction", not bad.search(json.dumps(shop, ensure_ascii=False)), "shop.json 无建设/贡献类商品或发货编号")
 report("items_no_construction", not bad.search(json.dumps(items, ensure_ascii=False)), "items.json 无建设/贡献类物品")
 shoptable = read("src/Character/ShopTable.cs")
-dk = re.search(r"DeliveredKinds\s*=\s*\{(.*?)\}", shoptable, re.S)
-report("delivered_kinds_no_construction", dk is not None and not bad.search(dk.group(1)), "ShopTable.DeliveredKinds 无新增建设/贡献种类")
+# K1 起种类白名单 / 禁售 / 已发货三张表都在配置里（config/shop.json 的
+# categories / forbidden 与每条的 delivery.mode），代码里不再有 DeliveredKinds。
+# 这条断言改成看整份商城清单与加载器：都不许长出建设 / 贡献类。
+report("delivered_kinds_no_construction",
+       not bad.search(json.dumps(shop, ensure_ascii=False)) and not bad.search(shoptable),
+       "商城清单或加载器里长出了建设/贡献种类")
 
 social_src = readdir("src/Social")
 gw = read("src/Gateway/SectApi.cs")
@@ -226,7 +230,7 @@ else
   check_state(){ lab="$1"; lv="$2"; cap="$3"; \
     S="$(ustate "$SECT")"; \
     printf '%s' "$S" | grep -q "level=$lv " && printf '%s' "$S" | grep -q "member_cap=$cap " \
-      && ok "$lab：--sect-upgrade-state level=$lv member_cap=$cap" || bad "$lab：state 不对 $S"; }
+      && ok "${lab}：--sect-upgrade-state level=$lv member_cap=$cap" || bad "${lab}：state 不对 $S"; }
 
   FOUNDER="$CHARACTER"
   start_social && ok "社交服就绪（65000）" || bad "社交服没起来 / 子通道没恢复"
@@ -269,7 +273,7 @@ else
     && ok "construction_after=$AF=before-cost、upgrade_cost=$C1 等于配置那档" || bad "建设扣减不对：$b"
   check_state "--sect-upgrade-state 同值" 2 30
   MC1="$(ustate "$SECT" | grep -oE 'member_count=[0-9]+' | head -1)"
-  [ "$MC0" = "$MC1" ] && ok "升级后名册人数不变（$MC1）" || bad "名册人数被改：$MC0 -> $MC1"
+  [ "$MC0" = "$MC1" ] && ok "升级后名册人数不变（${MC1}）" || bad "名册人数被改：$MC0 -> $MC1"
 
   # ① 升级后第 31 人才能进（成员不踢、上限随等级变）。
   check "$(post "$GATEWAY/sect/join" "{\"character_id\":$(nth "$IDS" 11),\"sect_id\":$SECT}")" "ok=true" "第 11 人（原 sect_full）升级后可进"
@@ -282,7 +286,7 @@ else
   BEFORE_M="$(money)"
   check "$(post "$GATEWAY/shop/buy" "{\"character_id\":$FOUNDER,\"item_id\":\"shop_construction_999\"}")" \
     "ok=false reason=not_in_list charged_yuanbao=0" "清单外建设类编号 not_in_list 且元宝不扣"
-  [ "$(money)" = "$BEFORE_M" ] && ok "升级/清单外购买前后角色库金币/元宝/灵石余额一字未动（$BEFORE_M）" || bad "角色货币被动了"
+  [ "$(money)" = "$BEFORE_M" ] && ok "升级/清单外购买前后角色库金币/元宝/灵石余额一字未动（${BEFORE_M}）" || bad "角色货币被动了"
 
   # ③ 逐档 2→3→4→5，5 级封顶，改配置重启生效。
   UCFG="$("$DOTNET" "$SOCIAL_DLL" --sect-upgrade-config $CFG 2>&1)"
@@ -337,7 +341,7 @@ else
     -H 'Content-Type: application/json' -d "{\"character_id\":$FOUNDER,\"sect_id\":$SECT}" 2>&1)" 401
   http_reject "缺字段" "$(post "$GATEWAY/sect/upgrade" "{\"character_id\":$FOUNDER}")" 400
   http_reject "别人的角色" "$(post "$GATEWAY/sect/upgrade" "{\"character_id\":999999999,\"sect_id\":$SECT}")" 404
-  [ "$(money)" = "$BEFORE_M" ] && ok "升级全程角色库货币余额一字未动（$BEFORE_M）" || bad "角色货币被动了"
+  [ "$(money)" = "$BEFORE_M" ] && ok "升级全程角色库货币余额一字未动（${BEFORE_M}）" || bad "角色货币被动了"
   printf '       （社交服只写 社交 schema 的 sect*：由 UpgradeAsync 的 SQL 静态断言 + 显式读库覆盖）\n'
 
   cp "$TMP/sect.orig.json" "$ROOT/config/sect.json"

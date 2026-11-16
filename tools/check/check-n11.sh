@@ -45,7 +45,7 @@ R("方案口径", "家园种植产出家园币" in html or "家园币" in html)
 R("14节N11", "| 90 | N11 |" in arch and "种植产出家园币" in arch)
 R("currency", any(x.get("id")=="home_coin" for x in cur["currencies"]))
 R("plant_slots", plant["slots"]==["garden_1","garden_2"])
-R("forbid_protect", not any(i.get("kind")=="protect_ticket" for i in hc["items"]))
+R("forbid_protect", not any(i.get("category")=="protect_ticket" for i in hc["items"]))
 R("shop_currency", hc.get("currency")=="home_coin")
 
 soc = open(os.path.join(root,"src/Social/HomesteadPlantRepository.cs"),encoding="utf-8").read()
@@ -67,8 +67,9 @@ import json, os, sys
 root = sys.argv[1]
 hc = json.load(open(os.path.join(root,"config/home_coin_shop.json"),encoding="utf-8"))
 hc["items"].append({
-    "id":"x","kind":"protect_ticket","name":"x",
-    "price_home_coin":1,"delivery_item_id":"ticket_protect","delivery_count":1})
+    "id":"x","category":"protect_ticket","name":"x","price":1,"currency":"home_coin",
+    "delivery":{"mode":"item","item_id":"ticket_protect","count":1},
+    "limit":{"per_character":0,"per_day":0},"stock":{"rule":"unlimited"},"on_sale":True})
 bad = os.path.join(root,"config","home_coin_shop.json")
 bak = bad + ".n11bak"
 open(bak,"w",encoding="utf-8").write(open(bad,encoding="utf-8").read())

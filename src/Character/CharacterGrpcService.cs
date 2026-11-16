@@ -1583,24 +1583,28 @@ public sealed class CharacterGrpcService(
             };
         }
 
-        // P3-4a2：通行证在商城里是「状态发货」——买下即开本季付费轨，不往背包放东西，
-        // 所以它没有 delivery_item_id。这一支先于「还没接发货」判断，按种类分，不靠清单字段。
-        if (string.Equals(item.Kind, "season_pass", StringComparison.Ordinal))
+        // K1：分发只看配置里的 delivery.mode，不再按种类字符串猜。
+        // season_pass / monthly_bundle / second_slot 是三种状态发货（买下不往背包放东西），
+        // 各进自己的仓储；none 是还没接发货，一分不扣；item 走下面的通用扣款 + 落包。
+        switch (item.Mode)
         {
-            return await BuySeasonPassAsync(account, characterId, item, request.TxnId ?? "", context);
+            case DeliveryMode.SeasonPass:
+                return await BuySeasonPassAsync(account, characterId, item, request.TxnId ?? "", context);
+
+            case DeliveryMode.MonthlyBundle:
+                return await BuyMonthlyBundleAsync(account, characterId, item, request.TxnId ?? "", context);
+
+            case DeliveryMode.SecondSlot:
+                return await BuySecondSlotAsync(account, characterId, item, request.TxnId ?? "", context);
         }
 
-        // P3-4b：月叠一次放两种符进背包（发什么、每种几张只在 config/monthly_bundle.json），
-        // 第二角色栏是账号级状态发货（给账号加一个角色位）。两者都不进 DeliveredKinds，
-        // 同通行证一样按种类先分流，不靠清单字段区分。
-        if (string.Equals(item.Kind, "monthly_bundle", StringComparison.Ordinal))
+        // 未上架是运营开关（配置里的 on_sale），与「还没接发货」分开报。
+        if (!item.OnSale)
         {
-            return await BuyMonthlyBundleAsync(account, characterId, item, request.TxnId ?? "", context);
-        }
-
-        if (string.Equals(item.Kind, "second_slot", StringComparison.Ordinal))
-        {
-            return await BuySecondSlotAsync(account, characterId, item, request.TxnId ?? "", context);
+            logger.LogInformation(
+                "shop_buy_reject account={Account} id={Id} item={Item} reason=not_on_sale balance={Balance}",
+                account, characterId, item.Id, balance);
+            return ShopRejected("not_on_sale", item, balance);
         }
 
         if (!item.Deliverable)
@@ -1785,6 +1789,12 @@ public sealed class CharacterGrpcService(
                 Balance = balance,
                 Enough = false,
             };
+        }
+
+        // K1：上架开关与「还没接发货」分开报；家园币商城只有 none / item 两种发货方式。
+        if (!item.OnSale)
+        {
+            return HomeCoinShopRejected("not_on_sale", item, balance);
         }
 
         if (!item.Deliverable)

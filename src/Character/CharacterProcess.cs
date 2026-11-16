@@ -243,8 +243,8 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("shop_table_version=" + shopTable.Version
             + " currency=" + shopTable.Currency
             + " items=" + shopTable.Items.Count
-            + " kinds=" + ShopTable.AllowedKinds.Length
-            + " delivered_kinds=" + ShopTable.DeliveredKinds.Length);
+            + " kinds=" + shopTable.Categories.Count
+            + " delivered_kinds=" + shopTable.DeliveredCount);
         // 与 --talisman-state 只读入口同形：回复值改一条，重启后这里能直接核对到。
         Console.WriteLine("talisman_table_version=" + talismanTable.Version
             + " red_item=" + (talismanTable.RedTalisman?.ItemId ?? "")

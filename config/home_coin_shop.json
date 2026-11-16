@@ -1,27 +1,45 @@
 {
   "schema": "home-coin-shop/1",
-  "version": 1,
+  "version": 2,
   "currency": "home_coin",
-  "pending": true,
-  "note": "N11 家园币商城唯一正本。只许外观与便捷（方案 12.1 洞府与家园口径）；绝不上架金币、材料、副本次数、战力相关种类（与 shop.json 的绝不上架对齐并排除红蓝符、复活、保护券、经验道具等）。标价待定；只接传送符发货作示例，其余 delivery 留空走 delivery_pending。",
+  "note": "N11 家园币商城唯一正本（K1 起 v2，与 shop.json 同一套字段）。只许外观与便捷（方案 12.1 洞府与家园口径）；绝不上架金币、材料、副本次数、战力相关种类——categories 是白名单、forbidden 是黑名单，两张表都在本文件里，代码不再写第二份。与 shop.json 的区别只在币种（家园币）与上架范围（不卖红蓝符、复活、保护券、经验道具、月叠、角色栏、通行证）。delivery.mode 的取值同 shop.json：item 进背包走同一事务；none 表示还没接发货，回 delivery_pending、一分不扣。标价待定；只接传送符发货作示例，服饰外观等其余条目写 none，按 B7+B8 接外观收藏。limit / stock 两个数方案没写定：全填 0 / unlimited，本卡只带字段与加载校验，判定留给 B7+B8。新增一件商品只改这个文件。",
+  "categories": [
+    "outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
+    "home_decor", "guild_display", "bag_expand", "teleport_talisman"
+  ],
+  "forbidden": [
+    "gold", "enhance_stone", "transfer_stone", "crystal", "spirit_stone",
+    "pill", "ore", "herb", "equip_blueprint", "equip", "attr_item",
+    "revive_coin", "fatigue", "dungeon_count", "weekly_share",
+    "realm_speed", "guild_tech", "territory_bonus",
+    "red_talisman", "blue_talisman", "revive_scroll", "unbind_item",
+    "exp_booster", "monthly_bundle", "second_slot", "season_pass",
+    "protect_ticket"
+  ],
   "items": [
     {
       "id": "hc_shop_outfit_1",
-      "kind": "outfit",
       "name": "服饰外观",
-      "price_home_coin": 50,
-      "delivery_item_id": "",
-      "delivery_count": 0,
-      "note": "只改样子；发货另排"
+      "category": "outfit",
+      "price": 50,
+      "currency": "home_coin",
+      "delivery": { "mode": "none" },
+      "limit": { "per_character": 0, "per_day": 0 },
+      "stock": { "rule": "unlimited" },
+      "on_sale": true,
+      "note": "只改样子；发货（进外观收藏）在 B7+B8"
     },
     {
       "id": "hc_shop_teleport_1",
-      "kind": "teleport_talisman",
       "name": "传送符",
-      "price_home_coin": 3,
-      "delivery_item_id": "teleport_talisman",
-      "delivery_count": 1,
-      "note": "绑定，只省路程"
+      "category": "teleport_talisman",
+      "price": 3,
+      "currency": "home_coin",
+      "delivery": { "mode": "item", "item_id": "teleport_talisman", "count": 1 },
+      "limit": { "per_character": 0, "per_day": 0 },
+      "stock": { "rule": "unlimited" },
+      "on_sale": true,
+      "note": "绑定，只省路程；与商城传送符是同一件"
     }
   ]
 }

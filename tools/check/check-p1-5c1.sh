@@ -83,11 +83,18 @@ kinds_121 = ["outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin"
              "red_talisman", "blue_talisman", "revive_scroll", "unbind_item",
              "exp_booster", "monthly_bundle", "second_slot", "season_pass",
              "protect_ticket"]
-allowed = re.findall(r'"([a-z_]+)"', table.split("AllowedKinds")[1].split("}")[0])
-report("kinds_18", allowed == kinds_121,
-       "code=%s" % (",".join(allowed) if len(allowed) < 30 else len(allowed)))
+# 18 类与禁售表 K1 起在配置里（config/shop.json 的 categories / forbidden），
+# 代码不再有第二份；这里比对的就是配置本身与方案正文是否一致。
+report("kinds_18", shop.get("categories") == kinds_121,
+       "config=%s" % ",".join(shop.get("categories") or []))
+report("forbidden_17", shop.get("forbidden") == [
+    "gold", "enhance_stone", "transfer_stone", "crystal", "spirit_stone",
+    "pill", "ore", "herb", "equip_blueprint", "equip", "attr_item",
+    "revive_coin", "fatigue", "dungeon_count", "weekly_share",
+    "realm_speed", "guild_tech", "territory_bonus"],
+       "config=%s" % ",".join(shop.get("forbidden") or []))
 
-item_kinds = [i["kind"] for i in shop["items"]]
+item_kinds = [i["category"] for i in shop["items"]]
 report("kinds_cover_121", sorted(item_kinds) == sorted(kinds_121),
        "items=%d uniq=%d" % (len(item_kinds), len(set(item_kinds))))
 
@@ -106,7 +113,9 @@ report("currency_yuanbao", shop["currency"] == "yuanbao" and "yuanbao" in curren
 
 # 标价只从配置来：服务端只读 item.PriceYuanbao，代码里没有第二套数字。
 begin = service.find("public override async Task<BuyShopItemResponse> BuyShopItem(")
-end = service.find("// 拒绝与重放都不带", begin)
+# 区间到下一个购买入口为止：以「拒绝与重放」注释作锚点在 K1 之后会落到别的函数里
+# （注释在 1430 / 1500 / 3339 各有一处，越过后会把家园币商城的扣款也算进来）。
+end = service.find("public override async Task<BuyHomeCoinShopResponse> BuyHomeCoinShopItem(", begin)
 body = service[begin:end] if begin >= 0 and end > begin else ""
 report("price_from_config", "PriceYuanbao = item.PriceYuanbao" in body, "len=%d" % len(body))
 
@@ -156,6 +165,10 @@ report("readonly_entry",
        '"--shop-list"' in files[program_cs] and '"--shop-state"' in files[program_cs],
        "program")
 report("config_default", "DefaultShopTable" in files[config_cs], "character_config")
+
+# 哨兵：静态段整体崩掉时下面的 PASS/FAIL 循环会一条都读不到，
+# 补这一行才能在「跑到一半抛异常」时立刻报出来（K1 复跑时补）。
+print("PASS static_end")
 PY
 
 grep -q '^FAIL ' "$TMP/static.txt" || true
@@ -167,6 +180,8 @@ while read -r tag key rest; do
 done < "$TMP/static.txt"
 if ! grep -qE '^(PASS|FAIL) ' "$TMP/static.txt"; then
   bad "静态断言没跑起来"; tail -12 "$TMP/static.txt" | detail
+elif ! grep -q '^PASS static_end' "$TMP/static.txt"; then
+  bad "静态断言没跑完"; grep -vE '^(PASS|FAIL) ' "$TMP/static.txt" | tail -6 | detail
 fi
 
 # ---------------------------------------------------------------- 3. 只读入口
@@ -195,10 +210,10 @@ import copy, json, os
 root, tmp = os.environ["ROOT"], os.environ["TMP"]
 base = json.load(open(os.path.join(root, "config/shop.json"), encoding="utf-8"))
 cases = {
-    "kind_unknown": lambda j: j["items"][0].__setitem__("kind", "unknown_kind"),
-    "kind_forbidden": lambda j: j["items"][0].__setitem__("kind", "gold"),
+    "kind_unknown": lambda j: j["items"][0].__setitem__("category", "unknown_kind"),
+    "kind_forbidden": lambda j: j["items"][0].__setitem__("category", "gold"),
     "currency_gold": lambda j: j.__setitem__("currency", "gold"),
-    "price_zero": lambda j: j["items"][0].__setitem__("price_yuanbao", 0),
+    "price_zero": lambda j: j["items"][0].__setitem__("price", 0),
     "dup_id": lambda j: j["items"][1].__setitem__("id", j["items"][0]["id"]),
 }
 for name, mutate in cases.items():
@@ -214,7 +229,7 @@ for case in kind_unknown kind_forbidden currency_gold price_zero dup_id; do
   if [ "$code" = "2" ] && printf '%s' "$out" | grep -q 'config_error='; then
     ok "坏清单起不来：$case"
   else
-    bad "坏清单没挡住：$case（退出码 $code）"
+    bad "坏清单没挡住：${case}（退出码 ${code}）"
     printf '%s\n' "$out" | head -3 | detail
   fi
 done
@@ -293,7 +308,7 @@ else:
     "$GATEWAY/currency?character_id=$CHARACTER" 2>&1)"
   after_yuanbao="$(yuanbao_of "$after")"
   if [ -n "$before_yuanbao" ] && [ "$before_yuanbao" = "$after_yuanbao" ]; then
-    ok "两次请求前后元宝相等（$before_yuanbao）"
+    ok "两次请求前后元宝相等（${before_yuanbao}）"
   else
     bad "元宝被动了：before=${before_yuanbao:-?} after=${after_yuanbao:-?}"
   fi
