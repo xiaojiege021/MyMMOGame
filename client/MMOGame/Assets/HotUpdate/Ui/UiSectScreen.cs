@@ -1,3 +1,5 @@
+using System.Globalization;
+using Mmo.Net;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -7,12 +9,20 @@ namespace HotUpdate.Ui
     /// 宗门（原型 F01）。左边是方案写定的规则，右边是社交服确认过的事实与这一手的请求。
     ///
     /// 名册上限、等级、人数、席位、建设、掌门全部来自 `/sect/*` 回包；没有回包时
-    /// 写「尚未请求」，不拿配置顶格值假装已经确认。逐条名单还没有读接口（社交服
-    /// 只有判定入口），屏上如实写明，不编成员。
+    /// 写「尚未请求」，不拿配置顶格值假装已经确认。逐条名单只来自
+    /// `GET /sect/roster`（N2）：角色号和职位按回包顺序写，不翻译职位、不补人。
+    /// 没有这份回包时，名单处仍写「尚未请求」。
     /// </summary>
     public static class UiSectScreen
     {
         public const string ReadyLog = "u7_sect_screen=ready";
+
+        /// <summary>一截放几行。只由这块面板的高度决定，不是名册上限。</summary>
+        public const int RowsPerPage = 2;
+
+        static int _rosterWindow;
+
+        static string _rosterStamp = string.Empty;
 
         public static void Build(UiShell shell, UiSocialFlow flow)
         {
@@ -104,19 +114,23 @@ namespace HotUpdate.Ui
                     : "—");
             UiUpgradeViews.Result(shell, facts, m.Px(72f), "最近一条", Latest(flow));
 
-            shell.LabelIn(facts.Root, new Rect(m.Px(28f), m.Px(20f), rightW - m.Px(56f), m.Px(44f)),
-                UiSocialCodex.RosterGap, UiTextRole.Warm, shell.Size(20f), TextAnchor.MiddleLeft, false);
-
-            // ---------------------------------------------------------- 右：这一手
-
-            var actsTop = top + m.Px(56f) + m.Px(464f) + gap;
-            var actsH = m.Px(640f);
-            var acts = shell.Panel("这一手", m.Band(rightX, actsTop, rightW, actsH), shell.Size(30f));
-
             // 两个编号是请求参数，不是事实值；用一格数组装住，点了签才算数。
             var sectChoice = new[] { UiSocialCodex.NumberChoices[0] };
             var targetChoice = new[] { UiSocialCodex.NumberChoices[0] };
             var sectId = SectIdOf(flow, sectChoice[0]);
+
+            // ---------------------------------------------------------- 右：逐条名单
+
+            var rosterTop = top + m.Px(56f) + m.Px(464f) + gap;
+            var rosterH = m.Px(248f);
+            var roster = shell.Panel("", m.Band(rightX, rosterTop, rightW, rosterH), shell.Size(30f));
+            DrawRoster(shell, flow, roster, rightW, rosterH, sectChoice);
+
+            // ---------------------------------------------------------- 右：这一手
+
+            var actsTop = rosterTop + rosterH + gap;
+            var actsH = m.Px(640f);
+            var acts = shell.Panel("这一手", m.Band(rightX, actsTop, rightW, actsH), shell.Size(30f));
 
             var sectLine = shell.LabelIn(acts.Root,
                 new Rect(m.Px(28f), m.Px(516f), rightW - m.Px(56f), m.Px(36f)),
@@ -218,6 +232,179 @@ namespace HotUpdate.Ui
             }
 
             return "尚未请求";
+        }
+
+        public static void ResetRosterWindow()
+        {
+            _rosterWindow = 0;
+            _rosterStamp = string.Empty;
+        }
+
+        public static void StepRosterWindow(int delta, int rowCount)
+        {
+            var pages = Pages(rowCount);
+            var next = _rosterWindow + delta;
+            if (next < 0)
+            {
+                next = 0;
+            }
+
+            if (next >= pages)
+            {
+                next = pages - 1;
+            }
+
+            _rosterWindow = next;
+        }
+
+        static void DrawRoster(
+            UiShell shell, UiSocialFlow flow, UiPanel roster, float width, float height, ulong[] sectChoice)
+        {
+            SyncWindow(flow);
+            var m = shell.Metrics;
+            shell.LabelIn(roster.Root,
+                new Rect(m.Px(28f), height - m.Px(44f), width - m.Px(56f), m.Px(36f)),
+                "逐条名单", UiTextRole.Heading, shell.Size(26f), TextAnchor.MiddleLeft, false);
+            shell.LabelIn(roster.Root,
+                new Rect(m.Px(28f), m.Px(168f), width - m.Px(56f), m.Px(32f)),
+                RosterStatus(flow), UiTextRole.Warm, shell.Size(22f), TextAnchor.MiddleLeft, false);
+
+            if (flow.HasRoster && flow.LastRoster.Ok && flow.LastRoster.Members != null)
+            {
+                var members = flow.LastRoster.Members;
+                var start = _rosterWindow * RowsPerPage;
+                if (start >= members.Count)
+                {
+                    start = 0;
+                }
+
+                var shown = 0;
+                for (var i = start; i < members.Count && shown < RowsPerPage; i++, shown++)
+                {
+                    shell.LabelIn(roster.Root,
+                        new Rect(m.Px(28f), m.Px(128f) - shown * m.Px(40f), width - m.Px(56f), m.Px(36f)),
+                        SectGuild.RosterLine(members[i]),
+                        UiTextRole.Body, shell.Size(22f), TextAnchor.MiddleLeft, false);
+                }
+
+                if (members.Count > RowsPerPage)
+                {
+                    var count = members.Count;
+                    shell.ButtonIn(roster.Root,
+                        new Rect(m.Px(320f), m.Px(16f), m.Px(160f), m.Px(64f)),
+                        "上一截",
+                        () =>
+                        {
+                            StepRosterWindow(-1, count);
+                            shell.RefreshPage();
+                        },
+                        UiButtonKind.Quiet);
+                    shell.ButtonIn(roster.Root,
+                        new Rect(m.Px(496f), m.Px(16f), m.Px(160f), m.Px(64f)),
+                        "下一截",
+                        () =>
+                        {
+                            StepRosterWindow(1, count);
+                            shell.RefreshPage();
+                        },
+                        UiButtonKind.Quiet);
+                }
+            }
+
+            shell.ButtonIn(roster.Root,
+                new Rect(m.Px(28f), m.Px(16f), m.Px(280f), m.Px(64f)),
+                "读取名册",
+                () =>
+                {
+                    if (flow.Busy)
+                    {
+                        return;
+                    }
+
+                    flow.LoadRoster(SectIdOf(flow, sectChoice[0]), shell.RefreshPage);
+                },
+                UiButtonKind.Primary);
+
+            var rows = flow.HasRoster && flow.LastRoster.Members != null
+                ? flow.LastRoster.Members.Count
+                : 0;
+            Debug.Log("n3_roster_screen=ready has=" + (flow.HasRoster ? "true" : "false")
+                + " rows=" + rows.ToString(CultureInfo.InvariantCulture));
+        }
+
+        static void SyncWindow(UiSocialFlow flow)
+        {
+            var stamp = RosterStamp(flow);
+            if (stamp == _rosterStamp)
+            {
+                return;
+            }
+
+            _rosterStamp = stamp;
+            _rosterWindow = 0;
+        }
+
+        static string RosterStamp(UiSocialFlow flow)
+        {
+            if (!flow.HasRoster)
+            {
+                return "none";
+            }
+
+            var roster = flow.LastRoster;
+            var n = roster.Members != null ? roster.Members.Count : 0;
+            var first = n > 0 ? roster.Members[0].CharacterId : 0UL;
+            var last = n > 0 ? roster.Members[n - 1].CharacterId : 0UL;
+            return roster.Ok + ":" + roster.Reason + ":" + roster.SectId.ToString(CultureInfo.InvariantCulture)
+                + ":" + n.ToString(CultureInfo.InvariantCulture)
+                + ":" + first.ToString(CultureInfo.InvariantCulture)
+                + ":" + last.ToString(CultureInfo.InvariantCulture);
+        }
+
+        static string RosterStatus(UiSocialFlow flow)
+        {
+            if (!flow.HasRoster)
+            {
+                return "尚未请求";
+            }
+
+            var roster = flow.LastRoster;
+            if (!roster.Ok)
+            {
+                return "被拒：" + (roster.Reason ?? string.Empty);
+            }
+
+            var n = roster.Members != null ? roster.Members.Count : 0;
+            if (n == 0)
+            {
+                return "回包 0 人";
+            }
+
+            var start = _rosterWindow * RowsPerPage;
+            if (start >= n)
+            {
+                start = 0;
+            }
+
+            var end = start + RowsPerPage;
+            if (end > n)
+            {
+                end = n;
+            }
+
+            return "回包 " + n.ToString(CultureInfo.InvariantCulture)
+                + " 人 · 这一截 " + (start + 1).ToString(CultureInfo.InvariantCulture)
+                + "-" + end.ToString(CultureInfo.InvariantCulture);
+        }
+
+        static int Pages(int rowCount)
+        {
+            if (rowCount <= 0)
+            {
+                return 1;
+            }
+
+            return (rowCount + RowsPerPage - 1) / RowsPerPage;
         }
 
         static void Act(UiSocialFlow flow, UiShell shell, int index, ulong sectId, ulong targetId)

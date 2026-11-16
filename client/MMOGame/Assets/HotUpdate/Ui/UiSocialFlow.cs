@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Mmo.Net;
 using Mmo.Proto.Battle;
 using UnityEngine;
@@ -60,6 +61,10 @@ namespace HotUpdate.Ui
         public UpgradeOutcome LastUpgrade { get; private set; }
 
         public bool HasUpgrade { get; private set; }
+
+        public RosterOutcome LastRoster { get; private set; }
+
+        public bool HasRoster { get; private set; }
 
         public WorldBossFacts LastBoss { get; private set; }
 
@@ -188,6 +193,43 @@ namespace HotUpdate.Ui
             Send("/sect/leave", SectGuild.LeaveBody(_characterId, sectId),
                 SectGuild.ParseLeadership, outcome => { LastLeadership = outcome; HasLeadership = true; },
                 "u7_sect_leave", done);
+        }
+
+        /// <summary>
+        /// 读名册。只带宗门编号，走 GET /sect/roster。不任免、不改人数上限、不写库。
+        /// 非 200 不算一份名册回包。
+        /// </summary>
+        public void LoadRoster(ulong sectId, Action done = null)
+        {
+            if (sectId == 0)
+            {
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send("/sect/roster?sect_id=" + sectId.ToString(CultureInfo.InvariantCulture),
+                string.Empty, _token, (status, text) =>
+                {
+                    Busy = false;
+                    if (status == 200)
+                    {
+                        LastRoster = SectGuild.ParseRoster(text);
+                        HasRoster = true;
+                        Error = string.Empty;
+                        var rows = LastRoster.Members != null ? LastRoster.Members.Count : 0;
+                        Debug.Log("n3_roster=ok rows=" + rows.ToString(CultureInfo.InvariantCulture)
+                            + " reason=" + LastRoster.Reason);
+                    }
+                    else
+                    {
+                        HasRoster = false;
+                        Error = "名册没读到：" + status.ToString(CultureInfo.InvariantCulture);
+                        Debug.Log("n3_roster=reject status=" + status.ToString(CultureInfo.InvariantCulture));
+                    }
+
+                    if (done != null) done();
+                });
         }
 
         /// <summary>读世界 Boss 入口的只读事实值。请求体为空，走 GET。</summary>

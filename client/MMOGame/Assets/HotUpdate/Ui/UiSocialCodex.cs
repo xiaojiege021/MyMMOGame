@@ -38,10 +38,6 @@ namespace HotUpdate.Ui
         public const string SectNote =
             "名册上限与席位数字只从 /sect/* 回包读 · 客户端不写死 · 拒绝一律 ok=false + reason";
 
-        /// <summary>名册读接口的现状：社交服只有判定入口，没有读名册的 HTTP 路由。</summary>
-        public const string RosterGap =
-            "名册逐条名单还没有读接口 · 屏上只显示回包给的等级 / 人数 / 上限 / 席位";
-
         /// <summary>三层战力，互不污染。</summary>
         public static readonly string[][] Layers =
         {
