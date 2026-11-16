@@ -1,3 +1,4 @@
+using System;
 using Mmo.Net;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -5,15 +6,20 @@ using Debug = UnityEngine.Debug;
 namespace HotUpdate.Ui
 {
     /// <summary>
-    /// 家园洞府（原型 F04）。左边四段仍是方案口径；右边接 C3 的 `/homestead*`：
-    /// 六格展示服务端摆放事实，摆 / 撤走网关，事务号由网关生成。
-    /// 种植与家园币服务端尚未落地，如实标「尚未接服务端」，不编产量数字。
+    /// 家园洞府（原型 F04）。左四段是方案口径；右三块都接服务端：
+    /// 六格摆放走 C3 的 `/homestead*`，种植与家园币走 N11 的 `/homestead/plants`、
+    /// `/homestead/plant|harvest` 与 `/home-coin/shop/buy`。
+    ///
+    /// 格位熟没熟、这次收了多少、扣了多少、余额多少，全部照抄回包；产量、成长时长、
+    /// 标价都在服务端配置里，这里不读、不算、不编。
     /// </summary>
     public static class UiHomesteadScreen
     {
         public const string ReadyLog = "u7_homestead_screen=ready";
 
         public const string WiredLog = "u9_homestead_wired=ready";
+
+        public const string PlantLog = "u10_homestead_plant=ready";
 
         static string _pickedSlot = string.Empty;
 
@@ -88,22 +94,29 @@ namespace HotUpdate.Ui
                 DrawSlots(shell, flow, facts, rightW, factsH);
             }
 
-            // ---------------------------------------------------------- 种植缺口 + 口径
+            // ---------------------------------------------------------- 右：种植
 
             var plantTop = factsTop + factsH + gap;
-            var plant = shell.Panel("种植与家园币", m.Band(rightX, plantTop, rightW, m.Px(160f)),
-                shell.Size(28f));
-            shell.LabelIn(plant.Root,
-                new Rect(m.Px(24f), m.Px(40f), rightW - m.Px(48f), m.Px(80f)),
-                UiSocialCodex.PlantingGap, UiTextRole.Warm, shell.Size(21f), TextAnchor.UpperLeft, true);
+            var plantH = m.Px(320f);
+            var plant = shell.Panel("种植", m.Band(rightX, plantTop, rightW, plantH), shell.Size(28f));
+            DrawPlants(shell, flow, plant, rightW, plantH);
 
-            var ruleTop = plantTop + m.Px(160f) + gap;
+            // ---------------------------------------------------------- 右：家园币
+
+            var coinTop = plantTop + plantH + gap;
+            var coinH = m.Px(260f);
+            var coin = shell.Panel("家园币", m.Band(rightX, coinTop, rightW, coinH), shell.Size(28f));
+            DrawHomeCoin(shell, flow, coin, rightW);
+
+            // ---------------------------------------------------------- 右：口径
+
+            var ruleTop = coinTop + coinH + gap;
             var rule = shell.Panel("口径", m.Band(rightX, ruleTop, rightW, m.Px(200f)), shell.Size(28f));
             var rules = new[]
             {
                 "摆件不消耗背包、不加属性、不进伤害公式",
-                "家园币只换外观与便捷（接口未接，不编数字）",
-                "访客可只读；摆 / 撤须是洞府主人",
+                "家园币只换外观与便捷：不换金币、材料、副本次数或战力",
+                "访客可只读；种 / 收 / 摆 / 撤须是洞府主人",
             };
             for (var i = 0; i < rules.Length; i++)
             {
@@ -117,6 +130,10 @@ namespace HotUpdate.Ui
                 + " has=" + flow.HasHomestead);
             Debug.Log(WiredLog + " slots=" + UiSocialCodex.HomesteadSlots.Length
                 + " decor=" + UiSocialCodex.DecorItemIds.Length);
+            Debug.Log(PlantLog + " plant_slots=" + UiSocialCodex.PlantSlots.Length
+                + " crops=" + UiSocialCodex.CropIds.Length
+                + " shop=" + UiSocialCodex.HomeCoinShopItemIds.Length
+                + " has_plants=" + flow.HasPlants);
         }
 
         static void DrawSlots(UiShell shell, UiSocialFlow flow, UiPanel facts, float rightW, float factsH)
@@ -210,6 +227,197 @@ namespace HotUpdate.Ui
                     });
                 },
                 canPlace ? UiButtonKind.Primary : UiButtonKind.Quiet);
+        }
+
+        /// <summary>
+        /// 种植块。两格是屏上标签，种没种、什么作物、熟没熟全认 `/homestead/plants` 与
+        /// 种 / 收回包；回包里没有的格显示「空」，不拿配置顶一个状态上去。
+        /// </summary>
+        static void DrawPlants(UiShell shell, UiSocialFlow flow, UiPanel panel, float rightW, float plantH)
+        {
+            var m = shell.Metrics;
+
+            if (!flow.HasPlants)
+            {
+                shell.LabelIn(panel.Root,
+                    new Rect(m.Px(24f), m.Px(192f), rightW - m.Px(48f), m.Px(36f)),
+                    "尚未请求 · 点「读取种植」走 /homestead/plants",
+                    UiTextRole.Muted, shell.Size(21f), TextAnchor.MiddleLeft, true);
+                shell.ButtonIn(panel.Root,
+                    new Rect(m.Px(24f), m.Px(232f), m.Px(220f), m.Px(64f)),
+                    "读取种植",
+                    () => flow.LoadPlants(0, () => shell.RefreshPage()),
+                    UiButtonKind.Primary);
+                return;
+            }
+
+            var plants = flow.LastPlants;
+            shell.ButtonIn(panel.Root,
+                new Rect(m.Px(24f), m.Px(232f), m.Px(220f), m.Px(64f)),
+                "读取种植",
+                () => flow.LoadPlants(0, () => shell.RefreshPage()),
+                UiButtonKind.Quiet);
+            shell.LabelIn(panel.Root,
+                new Rect(m.Px(264f), m.Px(232f), rightW - m.Px(288f), m.Px(64f)),
+                plants.Ok
+                    ? ("回包 " + plants.DisplayText + (plants.Duplicate ? " · 重放" : string.Empty))
+                    : ("服务端：" + plants.Reason),
+                plants.Ok ? UiTextRole.Muted : UiTextRole.Warm,
+                shell.Size(20f), TextAnchor.MiddleLeft, false);
+
+            var crop = UiSocialCodex.CropIds.Length > 0 ? UiSocialCodex.CropIds[0] : string.Empty;
+            shell.LabelIn(panel.Root,
+                new Rect(m.Px(24f), m.Px(160f), rightW - m.Px(48f), m.Px(28f)),
+                "作物 " + crop + " · 编号只作请求参数，产量与时长只认回包",
+                UiTextRole.Faint, shell.Size(17f), TextAnchor.MiddleLeft, false);
+
+            if (!plants.Ok && plants.SlotCount == 0)
+            {
+                // 服务端说这套种植没开：不画格子，也不给「种下」，免得点了必然被拒。
+                shell.LabelIn(panel.Root,
+                    new Rect(m.Px(24f), m.Px(88f), rightW - m.Px(48f), m.Px(52f)),
+                    "服务端未开这套种植（" + plants.Reason + "）",
+                    UiTextRole.Warm, shell.Size(19f), TextAnchor.MiddleLeft, true);
+                return;
+            }
+
+            for (var i = 0; i < UiSocialCodex.PlantSlots.Length; i++)
+            {
+                var slot = UiSocialCodex.PlantSlots[i];
+                var fact = HomesteadPlantEntry.PlantInSlot(plants, slot);
+                var y = m.Px(88f) - i * m.Px(60f);
+                var line = fact == null
+                    ? slot + " · 空"
+                    : slot + " · " + fact.Value.CropId
+                      + (fact.Value.Mature ? " · 已成熟" : " · 生长中 " + ReadyClock(fact.Value.ReadyAtUnix));
+                shell.LabelIn(panel.Root,
+                    new Rect(m.Px(24f), y, rightW * 0.62f, m.Px(52f)),
+                    line, UiTextRole.Body, shell.Size(19f), TextAnchor.MiddleLeft, false);
+
+                var slotCopy = slot;
+                if (fact == null)
+                {
+                    shell.ButtonIn(panel.Root,
+                        new Rect(rightW * 0.66f, y, m.Px(150f), m.Px(52f)),
+                        "种下",
+                        () =>
+                        {
+                            if (flow.Busy || crop.Length == 0)
+                            {
+                                return;
+                            }
+
+                            flow.PlantCrop(slotCopy, crop, () => shell.RefreshPage());
+                        },
+                        UiButtonKind.Primary);
+                }
+                else if (fact.Value.Mature)
+                {
+                    shell.ButtonIn(panel.Root,
+                        new Rect(rightW * 0.66f, y, m.Px(150f), m.Px(52f)),
+                        "收取",
+                        () =>
+                        {
+                            if (flow.Busy)
+                            {
+                                return;
+                            }
+
+                            flow.HarvestCrop(slotCopy, () => shell.RefreshPage());
+                        },
+                        UiButtonKind.Primary);
+                }
+                else
+                {
+                    shell.LabelIn(panel.Root,
+                        new Rect(rightW * 0.66f, y, m.Px(150f), m.Px(52f)),
+                        "未熟",
+                        UiTextRole.Faint, shell.Size(19f), TextAnchor.MiddleLeft, false);
+                }
+            }
+
+            if (flow.HasPlantAction)
+            {
+                var act = flow.LastPlantAction;
+                shell.LabelIn(panel.Root,
+                    new Rect(rightW - m.Px(360f), plantH - m.Px(72f), m.Px(336f), m.Px(40f)),
+                    act.Ok
+                        ? (act.GrantedHomeCoin > 0
+                            ? "本次 +" + act.GrantedHomeCoin + " 家园币"
+                            : "回包：" + act.SlotId)
+                        : ("被拒：" + act.Reason),
+                    act.Ok ? UiTextRole.Jade : UiTextRole.Warm,
+                    shell.Size(19f), TextAnchor.MiddleRight, false);
+            }
+        }
+
+        /// <summary>
+        /// 家园币块。余额只认收取与商城回包带的数；标价、扣多少、有没有发货同样照抄，
+        /// 商城商品编号只作请求参数。
+        /// </summary>
+        static void DrawHomeCoin(UiShell shell, UiSocialFlow flow, UiPanel panel, float rightW)
+        {
+            var m = shell.Metrics;
+            shell.LabelIn(panel.Root,
+                new Rect(m.Px(24f), m.Px(158f), rightW - m.Px(48f), m.Px(36f)),
+                flow.HasHomeCoinBalance
+                    ? ("回包余额 " + flow.HomeCoinBalance + " 家园币")
+                    : "余额：还没有回包带过这个数",
+                UiTextRole.Body, shell.Size(22f), TextAnchor.MiddleLeft, false);
+
+            shell.LabelIn(panel.Root,
+                new Rect(m.Px(24f), m.Px(112f), rightW - m.Px(48f), m.Px(32f)),
+                UiSocialCodex.PlantingNote,
+                UiTextRole.Faint, shell.Size(17f), TextAnchor.MiddleLeft, false);
+
+            shell.LabelIn(panel.Root,
+                new Rect(m.Px(24f), m.Px(62f), rightW - m.Px(48f), m.Px(44f)),
+                flow.HasHomeCoin
+                    ? flow.LastHomeCoin.DisplayText
+                      + (flow.LastHomeCoin.Duplicate ? " · 重放" : string.Empty)
+                    : "尚未购买 · 商品编号只作请求参数",
+                flow.HasHomeCoin && !flow.LastHomeCoin.Ok ? UiTextRole.Warm : UiTextRole.Muted,
+                shell.Size(19f), TextAnchor.MiddleLeft, true);
+
+            for (var i = 0; i < UiSocialCodex.HomeCoinShopItemIds.Length; i++)
+            {
+                var id = UiSocialCodex.HomeCoinShopItemIds[i];
+                shell.ButtonIn(panel.Root,
+                    new Rect(m.Px(24f) + i * m.Px(224f), m.Px(12f), m.Px(200f), m.Px(52f)),
+                    "买 " + id,
+                    () =>
+                    {
+                        if (flow.Busy)
+                        {
+                            return;
+                        }
+
+                        flow.BuyHomeCoinItem(id, () => shell.RefreshPage());
+                    },
+                    UiButtonKind.Normal);
+            }
+        }
+
+        /// <summary>
+        /// 把回包给的成熟时刻排成时:分。成熟与否仍只看回包的 <c>mature</c>，
+        /// 这里只做排版，不按当前时间自己判熟没熟。
+        /// </summary>
+        static string ReadyClock(long readyAtUnix)
+        {
+            if (readyAtUnix <= 0)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return DateTimeOffset.FromUnixTimeSeconds(readyAtUnix)
+                    .ToLocalTime().ToString("HH:mm");
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return string.Empty;
+            }
         }
     }
 }

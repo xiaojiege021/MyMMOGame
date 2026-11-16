@@ -3,7 +3,7 @@
 #
 # 完成标准：五屏齐全可建；名册 / 等级 / 上限 / 席位只认 /sect/* 回包，没回包写「尚未请求」；
 # 城战同屏只按 SiegeView 翻译（超限只留队色与血条）；归属只读 /world/worldboss 的
-# owner_sect_name；竞技场与战场不本地算战力；家园与图鉴如实标「尚未接服务端」；
+# owner_sect_name；竞技场与战场不本地算战力；家园摆放与种植都接了回包、图鉴仍标「尚未接服务端」；
 # 切皮肤只换颜色。
 #
 #   bash tools/check/check-u7.sh
@@ -77,9 +77,9 @@ assert '.SiegeFullCount' in siege and '.SiegeFullLimit' in siege and 'Markers()'
 
 home = open(ui + '/UiHomesteadScreen.cs', encoding='utf-8').read()
 hero = open(ui + '/UiHeroCodexScreen.cs', encoding='utf-8').read()
-# U9 接了摆放；种植缺口与图鉴仍标尚未接服务端。
-assert ('PlantingGap' in home or 'HomesteadGap' in home) and 'CodexGap' in hero
-assert 'PlantingGap' in open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
+# U9 接了摆放、U10 接了种植与家园币；图鉴仍标尚未接服务端。
+assert '读取种植' in home and 'CodexGap' in hero
+assert 'PlantingGap' not in open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
 
 # 战斗侧只加一条「收到才处理」的分支；副本链路不发这条消息。
 battle_client = open(assets + '/HotUpdate/BattleClient.cs', encoding='utf-8').read()

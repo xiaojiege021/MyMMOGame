@@ -88,6 +88,26 @@ namespace HotUpdate.Ui
 
         public bool HasHomesteadBag { get; private set; }
 
+        // ------------------------------------------------------------------ 洞府种植（U10 / N11）
+
+        public HomesteadPlantOutcome LastPlants { get; private set; }
+
+        public bool HasPlants { get; private set; }
+
+        /// <summary>最近一次种下 / 收取的回包。</summary>
+        public HomesteadPlantOutcome LastPlantAction { get; private set; }
+
+        public bool HasPlantAction { get; private set; }
+
+        /// <summary>回包里的家园币余额。只有收取与商城回包带这个数，别的回包不冒充余额。</summary>
+        public long HomeCoinBalance { get; private set; }
+
+        public bool HasHomeCoinBalance { get; private set; }
+
+        public HomeCoinShopOutcome LastHomeCoin { get; private set; }
+
+        public bool HasHomeCoin { get; private set; }
+
         public string Error { get; private set; } = string.Empty;
 
         /// <summary>最近一次回包给的宗门编号。没有回包就是 0，屏上不猜一个。</summary>
@@ -383,6 +403,132 @@ namespace HotUpdate.Ui
             }
 
             return list;
+        }
+
+        // ------------------------------------------------------------------ 洞府种植（U10 / N11）
+
+        /// <summary>只读种植事实。owner 默认本角色；访客可传别人的角色号。</summary>
+        public void LoadPlants(ulong ownerCharacterId = 0, Action done = null)
+        {
+            var owner = ownerCharacterId != 0 ? ownerCharacterId : _characterId;
+            if (owner == 0)
+            {
+                LastPlants = HomesteadPlantOutcome.Failure("no_character");
+                HasPlants = false;
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(HomesteadPlantEntry.DescribePath(owner), string.Empty, _token, (status, text) =>
+            {
+                Busy = false;
+                if (status == 200)
+                {
+                    LastPlants = HomesteadPlantEntry.Parse(text);
+                    HasPlants = true;
+                    Error = string.Empty;
+                    Debug.Log("u10_plants=ok slots=" + LastPlants.SlotCount
+                        + " planted=" + (LastPlants.Plants != null ? LastPlants.Plants.Count : 0)
+                        + " reason=" + LastPlants.Reason);
+                }
+                else
+                {
+                    LastPlants = HomesteadPlantOutcome.Failure("http_" + status);
+                    HasPlants = false;
+                    Error = "种植没读到：" + status;
+                    Debug.Log("u10_plants=reject status=" + status);
+                }
+
+                if (done != null) done();
+            });
+        }
+
+        /// <summary>种下一格。作物编号只作请求参数，产量与时长在服务端配置里。</summary>
+        public void PlantCrop(string slotId, string cropId, Action done = null)
+        {
+            Send(HomesteadPlantEntry.PlantPath,
+                HomesteadPlantEntry.PlantBody(_characterId, slotId, cropId),
+                HomesteadPlantEntry.Parse,
+                outcome =>
+                {
+                    LastPlantAction = outcome;
+                    HasPlantAction = true;
+                    if (outcome.Ok)
+                    {
+                        // 回包带回了整份种植事实，格子照它重画，不再本地改状态。
+                        LastPlants = outcome;
+                        HasPlants = true;
+                    }
+                },
+                "u10_plant", done);
+        }
+
+        /// <summary>收取成熟的一格。收了多少与余额都是回包给的，客户端不乘不加。</summary>
+        public void HarvestCrop(string slotId, Action done = null)
+        {
+            if (_characterId == 0)
+            {
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(HomesteadPlantEntry.HarvestPath,
+                HomesteadPlantEntry.HarvestBody(_characterId, slotId), _token,
+                (status, text) =>
+                {
+                    Busy = false;
+                    if (status == 200)
+                    {
+                        var outcome = HomesteadPlantEntry.Parse(text);
+                        LastPlantAction = outcome;
+                        HasPlantAction = true;
+                        if (outcome.Ok)
+                        {
+                            LastPlants = outcome;
+                            HasPlants = true;
+                            HomeCoinBalance = outcome.HomeCoinBalance;
+                            HasHomeCoinBalance = true;
+                        }
+
+                        Error = string.Empty;
+                        Debug.Log("u10_harvest=ok slot=" + slotId
+                            + " granted=" + outcome.GrantedHomeCoin
+                            + " balance=" + outcome.HomeCoinBalance);
+                    }
+                    else
+                    {
+                        LastPlantAction = HomesteadPlantOutcome.Failure("http_" + status);
+                        HasPlantAction = true;
+                        Error = "收取没回应：" + status;
+                        Debug.Log("u10_harvest=reject status=" + status);
+                    }
+
+                    if (done != null) done();
+                });
+        }
+
+        /// <summary>用家园币买一件外观或便捷。标价、扣多少、有没有发货只认回包。</summary>
+        public void BuyHomeCoinItem(string itemId, Action done = null)
+        {
+            Send(HomeCoinShopEntry.BuyPath,
+                HomeCoinShopEntry.BuyBody(_characterId, itemId),
+                HomeCoinShopEntry.Parse,
+                outcome =>
+                {
+                    LastHomeCoin = outcome;
+                    HasHomeCoin = true;
+                    if (outcome.Reason != "bad_reply")
+                    {
+                        // 回包只要认得出形状，balance 就是角色服算过的余额，照抄；
+                        // 认不出形状（bad_reply）时余额仍是 0，不拿它冒充。
+                        HomeCoinBalance = outcome.Balance;
+                        HasHomeCoinBalance = true;
+                    }
+                },
+                "u10_home_coin_buy", done);
         }
 
         // ------------------------------------------------------------------ 城战同屏

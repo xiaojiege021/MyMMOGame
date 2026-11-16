@@ -9,7 +9,8 @@ using Debug = UnityEngine.Debug;
 namespace HotUpdate.Ui
 {
     /// <summary>
-    /// U9 洞府屏自检：读 /homestead 事实值、摆 / 撤走 Hub、种植仍标尚未接服务端。
+    /// U9 洞府屏自检：读 /homestead 事实值、摆 / 撤走 Hub；种植块由 U10 的
+    /// UiHomesteadPlantSelfCheck 另测，这里只认「尚未请求」与读取入口在。
     /// </summary>
     public static class UiHomesteadSelfCheck
     {
@@ -63,10 +64,10 @@ namespace HotUpdate.Ui
                 done(404, "{}");
             });
 
-            // 尚未请求时有读取按钮，种植缺口在。
+            // 尚未请求时有读取按钮，种植块也如实写「尚未请求」。
             shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
             var pending = Text(shell);
-            Report("pending", pending.Contains("尚未请求") && pending.Contains(UiSocialCodex.PlantingGap));
+            Report("pending", pending.Contains("尚未请求") && pending.Contains("读取种植"));
             Debug.Log("u9_self_pending pending=" + pending.Contains("尚未请求"));
 
             flow.LoadHomestead();
@@ -75,7 +76,7 @@ namespace HotUpdate.Ui
             var empty = Text(shell);
             Report("empty", flow.HasHomestead && flow.LastHomestead.SlotCount == 6
                 && empty.Contains("court_1 · 空") && empty.Contains("hall_1 · 空")
-                && empty.Contains("decor_s2") && empty.Contains(UiSocialCodex.PlantingGap)
+                && empty.Contains("decor_s2") && empty.Contains("读取种植")
                 && !empty.Contains("无接口"));
             Debug.Log("u9_self_empty slots=" + flow.LastHomestead.SlotCount
                 + " bag=" + flow.DecorInBag().Count);

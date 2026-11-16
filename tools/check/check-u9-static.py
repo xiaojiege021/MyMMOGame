@@ -24,11 +24,11 @@ codex = open(os.path.join(ui, "UiSocialCodex.cs"), encoding="utf-8").read()
 entry = open(os.path.join(net, "HomesteadEntry.cs"), encoding="utf-8").read()
 
 assert "u9_homestead_wired=ready" in home
-assert "PlantingGap" in home and "HomesteadEntry.ItemInSlot" in home
+assert "HomesteadEntry.ItemInSlot" in home
 assert "无接口" not in home
 assert "HomesteadEntry.Parse" in flow and "LoadHomestead" in flow
 assert "PlaceDecor" in flow and "RemoveDecor" in flow
-assert "HomesteadSlots" in codex and "DecorItemIds" in codex and "PlantingGap" in codex
+assert "HomesteadSlots" in codex and "DecorItemIds" in codex
 assert "config/" not in home and "config/" not in flow and "config/" not in entry and "config/" not in codex
 assert "DescribePath" in entry and "PlaceBody" in entry
 

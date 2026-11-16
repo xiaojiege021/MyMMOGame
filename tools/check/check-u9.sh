@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # tools/check/check-u9.sh —— U9 洞府摆放屏接 C3（开发架构第 14 节第 79 行）。
 #
-# 完成标准：F04 读 /homestead 展示六格；摆 / 撤走 POST；种植仍标尚未接服务端；
+# 完成标准：F04 读 /homestead 展示六格；摆 / 撤走 POST；种植与家园币由 U10 另测；
 # 不读 config、不动 proto。
 set -uo pipefail
 
@@ -31,7 +31,7 @@ if [ -z "$PYBIN" ]; then
   finish "$TITLE"
 fi
 if ROOT="$ROOT" "$PYBIN" "$ROOT/tools/check/check-u9-static.py" >"$TMP/static.out" 2>&1; then
-  ok "洞府屏接线、种植缺口、总控已挂 U9"
+  ok "洞府屏接线、摆放事实、总控已挂 U9"
 else
   bad "U9 静态断言失败"; cat "$TMP/static.out" | detail
 fi

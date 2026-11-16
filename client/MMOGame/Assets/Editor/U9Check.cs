@@ -87,13 +87,12 @@ public static class U9Check
             "Flow 没接 homestead");
 
         Report("screen_wired", home.Contains("u9_homestead_wired=ready")
-            && home.Contains("PlantingGap")
             && home.Contains("HomesteadEntry.ItemInSlot")
             && !home.Contains("无接口"),
             "屏没接摆放或仍写无接口");
 
         Report("codex_slots", codex.Contains("HomesteadSlots") && codex.Contains("DecorItemIds")
-            && codex.Contains("PlantingGap") && codex.IndexOf("config/", StringComparison.Ordinal) < 0,
+            && codex.IndexOf("config/", StringComparison.Ordinal) < 0,
             "Codex 缺格位或读了 config");
 
         Report("no_config", home.IndexOf("config/", StringComparison.Ordinal) < 0

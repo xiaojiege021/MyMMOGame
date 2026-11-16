@@ -98,12 +98,26 @@ namespace HotUpdate.Ui
             "decor_s1", "decor_s2", "decor_s3",
         };
 
-        /// <summary>种植 / 家园币仍无服务端，屏上如实标。</summary>
-        public const string PlantingGap =
-            "尚未接服务端：种植与家园币没有接口，屏上不编产量与家园币";
+        /// <summary>
+        /// 洞府庭院两格的编号（与 N11 种植配置的格位同形，只作请求参数与屏上标签；
+        /// 运行期不打开家园配置文件，格位熟没熟只认回包）。
+        /// </summary>
+        public static readonly string[] PlantSlots = { "garden_1", "garden_2" };
 
-        /// <summary>旧名保留给静态搜索；文案指向种植缺口。</summary>
-        public const string HomesteadGap = PlantingGap;
+        /// <summary>
+        /// 可以种的作物编号。只作请求参数：产量、成长时长与收多少家园币都在服务端配置，
+        /// 客户端一个数字都不写在这里。
+        /// </summary>
+        public static readonly string[] CropIds = { "crop_spirit_herb" };
+
+        /// <summary>
+        /// 家园币商城的商品编号。只作请求参数：标价、这次扣多少、有没有真发货只认回包。
+        /// </summary>
+        public static readonly string[] HomeCoinShopItemIds = { "hc_shop_outfit_1", "hc_shop_teleport_1" };
+
+        /// <summary>种植与家园币的口径（接口已接，屏上不再写缺口）。</summary>
+        public const string PlantingNote =
+            "种植与家园币只认回包：产量、成熟、这次扣多少与余额都不在客户端算";
 
         public static bool IsDecorItem(string itemId)
         {

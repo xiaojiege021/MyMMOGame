@@ -12,7 +12,7 @@ namespace HotUpdate.Ui
 {
     /// <summary>
     /// U7 五屏自检：名册与席位只认回包、没回包写「尚未请求」、城战只按 SiegeView 翻译、
-    /// 归属只读入口回包、家园与图鉴如实标「尚未接服务端」、切皮肤只换颜色。
+    /// 归属只读入口回包、家园接了摆放与种植而图鉴仍如实标「尚未接服务端」、切皮肤只换颜色。
     /// </summary>
     public static class UiSocialSelfCheck
     {
@@ -150,16 +150,16 @@ namespace HotUpdate.Ui
             Report("five", built == 5);
             Debug.Log("u7_self_five=" + built);
 
-            // 家园：种植仍标尚未接服务端（U9 已接摆放口，种植缺口保留）；
+            // 家园：U9 接了摆放、U10 接了种植与家园币（屏上不再写缺口，改认回包）；
             // 图鉴：仍标尚未接服务端，不编数字。
             shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
             var home = Text(shell);
             shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
             var codex = Text(shell);
-            Report("unwired", home.Contains(UiSocialCodex.PlantingGap)
+            Report("unwired", home.Contains("读取种植")
                 && codex.Contains("尚未接服务端")
                 && codex.Contains(UiSocialCodex.CodexNames[0]) && !codex.Contains("100%"));
-            Debug.Log("u7_self_unwired home_planting=" + home.Contains(UiSocialCodex.PlantingGap)
+            Debug.Log("u7_self_unwired home_planting=" + home.Contains("读取种植")
                 + " codex=" + codex.Contains("尚未接服务端"));
 
             // 切皮肤只换颜色：布局与文案一字不差。
