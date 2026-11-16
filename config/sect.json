@@ -20,7 +20,7 @@
     "founder_gold_kind": "gold",
     "founder_gold_cost": 0,
     "founder_gold_cost_pending": true,
-    "note": "45 级门槛与创建消耗金币按方案 11.1 写定。方案没给金币数字，founder_gold_cost=0 表示待定未启用（founder_gold_cost_pending=true），代码不写死、不自行编一个金币数；数字定了只把这一处改成正数、重启社交服即生效。SectFounderGrant 的扣减链路已经就位：向角色服提交一次 grant_txn 事务（txn_id 由网关生成、用过不能再扣），社交服不碰角色 schema。待定期间创建不实际扣款，角色库一个字不动。"
+    "note": "45 级门槛与创建消耗金币按方案 11.1 写定。方案没给金币数字，founder_gold_cost=0 表示待定未启用（founder_gold_cost_pending=true），代码不写死、不自行编一个金币数；数字定了只把这一处改成正数、重启社交服即生效。SectFounderGrant 的扣减链路已经就位：向角色服提交一次 grant_txn 事务（txn_id 由网关生成、用过不能再扣），社交服不碰角色 schema。待定期间创建不实际扣款，角色库一个字不动。数字后边与其它待定数值一起填；填正数后创建才扣款，pending 标志同步置 false。"
   },
   "transfer": {
     "idempotency": "last_transfer_txn",
