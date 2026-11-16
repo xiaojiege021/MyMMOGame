@@ -9,6 +9,14 @@ var gatherSpreadConfigPath = "config/gather_spread.json";
 var gatherSpreadExplicit = false;
 var flightConfigPath = "config/flight.json";
 var worldBossConfigPath = "config/world_boss.json";
+// N1 地表解锁表：可选表，默认跟 --config 所在目录走（与 gather_spread 同一条经验）。
+var regionUnlockPath = "config/region_unlock.json";
+var regionUnlockExplicit = false;
+var regionUnlockState = false;
+var regionAccessState = false;
+// 只给 --region-access 用：按给定进度与路线验判定，不连角色服、不起进程。
+var accessStage = -1;
+var accessAlignment = "";
 var regionState = false;
 var positionState = false;
 var tierState = false;
@@ -78,6 +86,29 @@ for (var i = 0; i < args.Length; i++)
                 return 64;
             }
             break;
+        // N1 地表解锁表单独一份，核对脚本用临时配置跑，不碰仓库里那份。
+        case "--region-unlock-config" when i + 1 < args.Length:
+            regionUnlockPath = args[++i];
+            regionUnlockExplicit = true;
+            break;
+        // 只给核对用：把解锁条目与每块静态不开放的地表打出来，不启动进程、不连角色服。
+        case "--region-unlock-state":
+            regionUnlockState = true;
+            break;
+        // 只给核对用：按 --main-stage / --alignment 给的进度验判定，纯计算。
+        case "--region-access":
+            regionAccessState = true;
+            break;
+        case "--main-stage" when i + 1 < args.Length:
+            if (!int.TryParse(args[++i], out accessStage) || accessStage < 0 || accessStage > 12)
+            {
+                Console.WriteLine("bad_arg=--main-stage");
+                return 64;
+            }
+            break;
+        case "--alignment" when i + 1 < args.Length:
+            accessAlignment = args[++i];
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -94,6 +125,17 @@ if (!gatherSpreadExplicit)
     if (!string.IsNullOrEmpty(configDir))
     {
         gatherSpreadConfigPath = Path.Combine(configDir, "gather_spread.json");
+    }
+}
+
+// N1 的解锁表同样跟着 --config 所在的目录走：老卡的临时配置目录里没有它，
+// 世界服按 P1-3a1 的静态 open 跑（两块第 11 场才开的地表照旧 region_locked）。
+if (!regionUnlockExplicit)
+{
+    var unlockDir = Path.GetDirectoryName(configPath);
+    if (!string.IsNullOrEmpty(unlockDir))
+    {
+        regionUnlockPath = Path.Combine(unlockDir, "region_unlock.json");
     }
 }
 
@@ -302,6 +344,107 @@ if (regionState)
     return 0;
 }
 
+if (regionUnlockState)
+{
+    WorldCatalog catalog;
+    try
+    {
+        catalog = WorldCatalog.Load(WorldConfig.Load(configPath));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    if (!File.Exists(regionUnlockPath))
+    {
+        // 缺表是合法的降级：世界服按 P1-3a1 的静态 open 跑，两块地表一直锁着。
+        Console.WriteLine("region_unlock=missing path=" + regionUnlockPath);
+        return 0;
+    }
+
+    RegionUnlockTable table;
+    try
+    {
+        table = RegionUnlockTable.Load(regionUnlockPath, catalog);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    foreach (var entry in table.Entries)
+    {
+        Console.WriteLine("region_unlock_entry=region=" + entry.RegionId
+            + " unlock_stage=" + entry.UnlockStage
+            + " alignment=" + entry.Alignment);
+    }
+
+    Console.WriteLine("region_unlock=ok entries=" + table.Entries.Count
+        + " routes=" + table.Routes
+        + " locked=" + string.Join(",", catalog.Regions.Where(r => !r.Open).Select(r => r.Id))
+        + " static_open=" + catalog.Regions.Count(r => r.Open));
+    return 0;
+}
+
+if (regionAccessState)
+{
+    if (accessStage < 0)
+    {
+        Console.WriteLine("bad_arg=--main-stage");
+        return 64;
+    }
+
+    WorldCatalog catalog;
+    RegionUnlockTable? table;
+    try
+    {
+        catalog = WorldCatalog.Load(WorldConfig.Load(configPath));
+        table = RegionUnlockTable.LoadIfPresent(regionUnlockPath, catalog);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    // 纯计算：进度与路线都是命令行给的入参，判定逻辑与运行期是同一份（RegionGate.Evaluate）。
+    var gate = new RegionGate(table, new NoProgressReader());
+    foreach (var region in catalog.Regions.Where(r => !r.Open))
+    {
+        var access = gate.Evaluate(region, accessStage, accessAlignment);
+        Console.WriteLine("region_access=region=" + region.Id
+            + " stage=" + accessStage
+            + " alignment=" + (accessAlignment.Length == 0 ? "none" : accessAlignment)
+            + " ok=" + (access.Ok ? "true" : "false")
+            + " reason=" + (access.Reason.Length == 0 ? "none" : access.Reason)
+            + " unlock_stage=" + access.UnlockStage
+            + " needs_progress=" + (gate.NeedsProgress(region) ? "true" : "false"));
+    }
+
+    Console.WriteLine("region_access_summary=static_open=" + catalog.Regions.Count(r => r.Open)
+        + " checked=" + catalog.Regions.Count(r => !r.Open)
+        + " table=" + (table is null ? "missing" : "ok"));
+    return 0;
+}
+
 if (worldBossState)
 {
     WorldBossTable table;
@@ -397,5 +540,6 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
 });
 
 return await new WorldProcess(
-    configPath, gatherConfigPath, flightConfigPath, worldBossConfigPath, gatherSpreadConfigPath)
+    configPath, gatherConfigPath, flightConfigPath, worldBossConfigPath, gatherSpreadConfigPath,
+    regionUnlockPath)
     .RunAsync(stop.Token);

@@ -5,7 +5,7 @@ namespace World;
 
 public sealed class WorldProcess(
     string configPath, string gatherConfigPath, string flightConfigPath,
-    string worldBossConfigPath, string gatherSpreadConfigPath)
+    string worldBossConfigPath, string gatherSpreadConfigPath, string regionUnlockPath)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
@@ -16,6 +16,7 @@ public sealed class WorldProcess(
         GatherSpreadTable? gatherSpread;
         FlightTable flights;
         WorldBossTable? worldBossTable;
+        RegionUnlockTable? regionUnlocks;
         try
         {
             config = WorldConfig.Load(configPath);
@@ -34,6 +35,9 @@ public sealed class WorldProcess(
             // 世界 Boss 是可选表：入口必须长在已经开放的地表上。缺表 / 坏表一律降级成
             // 「没有入口」，不让一份可选配置把分线、采集、飞行这些老链路一起拖垮。
             worldBossTable = LoadWorldBoss(worldBossConfigPath, catalog);
+            // N1 地表解锁表同样是可选表：老卡的临时目录里没有它，就按 P1-3a1 的静态 open 跑。
+            // 坏表不降级——解锁条件缺一条就会让某块地表永远进不去，宁可引起不来。
+            regionUnlocks = RegionUnlockTable.LoadIfPresent(regionUnlockPath, catalog);
         }
         catch (ConfigException ex)
         {
@@ -78,6 +82,12 @@ public sealed class WorldProcess(
                 r => r.Id + ":" + flights.RequiredFor(r.Id)))
             + " ground_y=" + config.SpawnY);
         Console.WriteLine("world_boss_config=ok " + DescribeWorldBossTable(worldBossTable, worldBossConfigPath));
+        // N1 新加的一行：解锁表在不在、每块静态不开放的地表要哪一场哪一路。老行一字未动。
+        Console.WriteLine(regionUnlocks is null
+            ? "region_unlock=missing path=" + regionUnlockPath
+            : "region_unlock=ok entries=" + regionUnlocks.Entries.Count
+                + " routes=" + regionUnlocks.Routes
+                + " path=" + regionUnlockPath);
         Console.WriteLine("regions=" + string.Join(",", catalog.Regions.Select(r => r.Id)));
         Console.WriteLine("speakers=" + string.Join(",", catalog.Speakers));
         Console.WriteLine("locked=" + string.Join(",", catalog.Regions.Where(r => !r.Open).Select(r => r.Id)));
@@ -91,7 +101,11 @@ public sealed class WorldProcess(
         using var gatherGrants = new GrpcGatherGrant(gatherAll.CharacterUpstream);
         // 境界只在角色服：世界服每次判飞行/跨区都去问，不连角色库，也不自己存境界。
         using var realmReader = new GrpcRealmReader(flights.CharacterUpstream);
-        var flightGate = new FlightGate(flights, realmReader, registry, catalog);
+        // N1：剧情进度与立仙立魔也只在角色服。只有「静态不开放且配了解锁条目」的地表
+        // 才会走这一条跨进程只读调用，老地表进线不问，老卡链路一次都不多花。
+        using var progressReader = new GrpcProgressReader(flights.CharacterUpstream);
+        var regionGate = new RegionGate(regionUnlocks, progressReader);
+        var flightGate = new FlightGate(flights, realmReader, registry, catalog, regionGate);
         // 入口的在线状态只在世界服：“这一刻开没开、这一场打掉没有、名字记的是谁”。
         // 全在进程内存，不落库、不结算技能、不碰任何角色数据。
         var worldBoss = new WorldBossEntrance(worldBossTable);
@@ -117,6 +131,7 @@ public sealed class WorldProcess(
         builder.Services.AddSingleton(gatherNodes);
         builder.Services.AddSingleton<IGatherGrant>(gatherGrants);
         builder.Services.AddSingleton(flights);
+        builder.Services.AddSingleton(regionGate);
         builder.Services.AddSingleton(flightGate);
         builder.Services.AddSingleton(worldBoss);
         builder.Services.AddHostedService<PositionBroadcaster>();

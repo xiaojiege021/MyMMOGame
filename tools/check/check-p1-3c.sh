@@ -290,7 +290,9 @@ sql = open(root + '/db/character/character.sql', encoding='utf-8').read()
 assert "realm       text        NOT NULL DEFAULT '炼体'" in sql, '境界默认炼体由库给，不写在代码里'
 gate = open(root + '/src/World/FlightGate.cs', encoding='utf-8').read()
 assert 'realms.ReadAsync' in gate and 'registry.SetFlight' in gate
-assert 'region_realm_locked' in gate and 'region_locked' in gate
+# N1（v1.128）把「这块地表开没开 / 第 11 场有没有到」的判定搬到 RegionGate 一处，
+# FlightGate 只认它的结论，region_locked 不再出现在这里；境界门槛仍是本卡这条。
+assert 'region_realm_locked' in gate and 'regions.CheckAsync' in gate and 'region_locked' not in gate
 assert 'catalog.Find' in gate and 'target.Neighbors' in gate
 table = open(root + '/src/World/FlightTable.cs', encoding='utf-8').read()
 assert 'WrittenRealms' in table and '缺地点' in table and '方案 8.1' in table

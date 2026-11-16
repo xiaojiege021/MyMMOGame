@@ -12,10 +12,10 @@ namespace World;
 public sealed class WorldGrpcService(
     LineRegistry registry, WorldCatalog catalog, PositionHub hub,
     GatherTable gather, GatherNodeRegistry nodes, IGatherGrant grants,
-    FlightGate flight, WorldBossEntrance worldBoss)
+    FlightGate flight, WorldBossEntrance worldBoss, RegionGate regions)
     : global::Mmo.Proto.World.WorldService.WorldServiceBase
 {
-    public override Task<EnterLineResponse> EnterLine(
+    public override async Task<EnterLineResponse> EnterLine(
         EnterLineRequest request, ServerCallContext context)
     {
         var account = (request.Account ?? "").Trim();
@@ -25,8 +25,17 @@ public sealed class WorldGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "bad_request"));
         }
 
+        // 开放条件在这里先过 RegionGate：静态开放的地表不看剧情，旧天城区 / 焦原这种
+        // 「第 11 场才开 + 立仙立魔分路」的由它去角色服问进度。分线注册表只认结论。
+        var region = catalog.Find(regionId);
+        var access = region is null
+            ? new RegionAccess(false, "", 0, "", 0)
+            : await regions.CheckAsync(account, request.CharacterId, region, context.CancellationToken);
         // 名字是网关复核归属后从角色服取的只读文本，客户端请求体里没有这个字段。
-        var result = registry.Enter(account, request.CharacterId, regionId, request.DisplayName);
+        var result = region is not null && !access.Ok
+            ? new EnterResult(false, access.Reason, "", "", 0, 0, 0, false)
+            : registry.Enter(account, request.CharacterId, regionId, request.DisplayName,
+                unlocked: access.Ok);
         Console.WriteLine("world_enter account=" + account
             + " character=" + request.CharacterId
             + " region=" + regionId
@@ -35,7 +44,10 @@ public sealed class WorldGrpcService(
             + " line=" + result.LineId
             + " size=" + result.LineSize
             + " cap=" + result.Capacity
-            + " duplicate=" + result.Duplicate);
+            + " duplicate=" + result.Duplicate
+            + " stage=" + access.MainStage
+            + " unlock_stage=" + access.UnlockStage
+            + " alignment=" + (access.Alignment.Length == 0 ? "none" : access.Alignment));
 
         var response = new EnterLineResponse
         {
@@ -51,7 +63,6 @@ public sealed class WorldGrpcService(
 
         if (result.Entered)
         {
-            var region = catalog.Find(regionId);
             if (region is not null)
             {
                 response.Neighbors.AddRange(region.Neighbors);
@@ -59,7 +70,7 @@ public sealed class WorldGrpcService(
             }
         }
 
-        return Task.FromResult(response);
+        return response;
     }
 
     public override Task<LeaveLineResponse> LeaveLine(

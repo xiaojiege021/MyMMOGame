@@ -44,7 +44,14 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
     readonly Dictionary<string, Line> lines = new(StringComparer.Ordinal);
     readonly Dictionary<string, string> seats = new(StringComparer.Ordinal);
 
-    public EnterResult Enter(string account, ulong characterId, string regionId, string displayName)
+    /// <summary>
+    /// 进线。unlocked 是 RegionGate 判过的结论：静态开放的地表它恒为 true；
+    /// 剧情解锁的地表只有交完那场、走对那一路才为 true。默认 false 是保守值——
+    /// 调用方忘了传就是维持 P1-3a1 的 region_locked，不会凭空放人进封闭地表。
+    /// 分线号、人数、容量仍在这里定，客户端请求里带不进。
+    /// </summary>
+    public EnterResult Enter(
+        string account, ulong characterId, string regionId, string displayName, bool unlocked = false)
     {
         var region = catalog.Find(regionId);
         if (region is null)
@@ -52,9 +59,10 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
             return Rejected("unknown_region");
         }
 
-        if (!region.Open)
+        if (!region.Open && !unlocked)
         {
-            // 旧天城区与焦原第 11 场才开（方案 2.5）。这里只认配置，不读剧情进度。
+            // 静态不开放、或剧情还没到（方案 2.5 的第 11 场、2.8 的立仙立魔）。这里只认结论，
+            // 不读剧情进度：是不是该开由 RegionGate 一处判，分线注册表不另写一套规则。
             return Rejected("region_locked");
         }
 

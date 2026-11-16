@@ -11,10 +11,12 @@ public sealed record RegionDecision(
 /// 飞行与跨区的唯一判定点。境界只在角色服，世界服每次判定都先问一次；
 /// 不问就没有权限，不缓存一份可以过期的「有权限」结论给自己用。
 /// 不通过就把人留在地面 / 原来那块地表，不在客户端上改权限，也不改角色库。
-/// 相连关系、区域是否开放沿用 P1-3a1 的 WorldCatalog，本卡只加境界门槛。
+/// 相连关系与区域是否开放沿用 P1-3a1 的 WorldCatalog；「第 11 场才开」的解锁
+/// 交给 RegionGate 一处判，跨区这里只认它的结论，不另写一套剧情规则。
 /// </summary>
 public sealed class FlightGate(
-    FlightTable table, IRealmReader realms, LineRegistry registry, WorldCatalog catalog)
+    FlightTable table, IRealmReader realms, LineRegistry registry, WorldCatalog catalog,
+    RegionGate regions)
 {
     public async Task<FlightDecision> FlyAsync(
         string account, ulong characterId, bool wantFly, CancellationToken stopping)
@@ -83,10 +85,12 @@ public sealed class FlightGate(
             return Reject("not_adjacent", "", "", current);
         }
 
-        // 旧天城区与焦原的「第 11 场才开」仍是 P1-3a1 那条，本卡不替剧情开门。
-        if (!target.Open)
+        // 目标地表开不开放由 RegionGate 一处判：静态开放的地表不问角色服；
+        // 旧天城区 / 焦原这种「第 11 场才开 + 立仙立魔分路」的，它去角色服取进度再判。
+        var access = await regions.CheckAsync(account, characterId, target, stopping);
+        if (!access.Ok)
         {
-            return Reject("region_locked", "", "", current);
+            return Reject(access.Reason, "", "", current);
         }
 
         var realm = await realms.ReadAsync(account, characterId, stopping);
@@ -113,8 +117,9 @@ public sealed class FlightGate(
         }
 
         // 够门槛才真正换分线。Enter 会按新区域重建 Member，飞行状态落成地面。
+        // unlocked 传 RegionGate 的结论：静态开放与剧情解锁在这里合成同一个出口。
         var displayName = registry.StateOf(account, characterId)?.DisplayName ?? "";
-        var entered = registry.Enter(account, characterId, targetRegion, displayName);
+        var entered = registry.Enter(account, characterId, targetRegion, displayName, access.Ok);
         if (!entered.Entered)
         {
             return Reject(entered.Reason, realm.Realm, required, current);
