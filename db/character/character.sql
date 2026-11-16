@@ -178,6 +178,26 @@ CREATE TABLE IF NOT EXISTS "角色".realm_drill (
 CREATE INDEX IF NOT EXISTS realm_drill_character
     ON "角色".realm_drill (character_id, settled_at DESC);
 
+-- N10：段内四阶（内容与 db/character/realm_phase.sql 逐条一致）。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS realm_phase smallint NOT NULL DEFAULT 0;
+
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_realm_phase_range;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_realm_phase_range CHECK (realm_phase >= 0 AND realm_phase <= 3);
+
+CREATE TABLE IF NOT EXISTS "角色".realm_phase_promote (
+    txn_id       text        PRIMARY KEY,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    from_phase   smallint    NOT NULL CHECK (from_phase >= 0 AND from_phase <= 3),
+    to_phase     smallint    NOT NULL CHECK (to_phase >= 1 AND to_phase <= 3),
+    promoted_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS realm_phase_promote_character
+    ON "角色".realm_phase_promote (character_id, promoted_at DESC);
+
 -- P3-2a：以下三份 DDL 与 db/character/stone_exchange.sql、db/social/city.sql、
 -- db/trade/stone_auction.sql 是同一份，整份追加进主迁移，让只跑主迁移的核对脚本
 -- 也自包含（否则索引会引用到不存在的表）。三个 schema 都只建一次，不新建数据库。

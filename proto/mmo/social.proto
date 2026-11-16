@@ -236,6 +236,42 @@ message HomesteadResponse {
   repeated HomesteadSlotFact placements = 9;
 }
 
+// N11 种植：crop_id 只作作物编号，时长与产量在 config/homestead_plant.json。
+message HomesteadPlantRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  string slot_id = 4;
+  string crop_id = 5;
+}
+
+message DescribeHomesteadPlantsRequest {
+  string account = 1;
+  uint64 owner_character_id = 2;
+}
+
+message HomesteadPlantFact {
+  string slot_id = 1;
+  string crop_id = 2;
+  int64 planted_at_unix = 3;
+  int64 ready_at_unix = 4;
+  bool mature = 5;
+}
+
+message HomesteadPlantResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 character_id = 3;
+  string slot_id = 4;
+  string crop_id = 5;
+  string txn_id = 6;
+  bool duplicate = 7;
+  int32 slot_count = 8;
+  repeated HomesteadPlantFact plants = 9;
+  int64 granted_home_coin = 10;
+  int64 home_coin_balance = 11;
+}
+
 // N2：名册只读。一条是一个人的角色号和职位，没有席位上限、没有任免。
 // 掌门可以不在 sect_member 里，读的时候按 master_character_id 补上，职位仍是 master。
 message SectRosterMember {
@@ -281,6 +317,10 @@ service SocialService {
   rpc PlaceHomeDecor(HomesteadRequest) returns (HomesteadResponse);
   rpc RemoveHomeDecor(HomesteadRequest) returns (HomesteadResponse);
   rpc DescribeHomestead(DescribeHomesteadRequest) returns (HomesteadResponse);
+  // N11：家园种植只记社交 schema 里的种植事实；成熟收获时经角色服发家园币。
+  rpc PlantHomesteadCrop(HomesteadPlantRequest) returns (HomesteadPlantResponse);
+  rpc HarvestHomesteadCrop(HomesteadPlantRequest) returns (HomesteadPlantResponse);
+  rpc DescribeHomesteadPlants(DescribeHomesteadPlantsRequest) returns (HomesteadPlantResponse);
   // N2：名册逐条只读。不任免、不改人数上限、不写库。
   rpc DescribeSectRoster(DescribeSectRosterRequest) returns (DescribeSectRosterResponse);
 }

@@ -100,6 +100,7 @@ R("ledgers", "realm_breakthrough" in repo and "realm_drill" in repo)
 R("conditional_deduct", "drill >= $2" in repo and "amount >= $3" in repo)
 R("one_roll", "Random.Shared.Next(100) < requirement.SuccessPct" in repo)
 R("failure_keeps_realm", "if (success)" in repo and "realm = $2" in repo)
+R("realm_phase_gate", "realm_phase_not_enough" in repo and "BreakthroughMinIndex" in rt)
 R("gate_dungeon", "CheckDungeon(dungeonRealm, realm)" in repo)
 
 grpc = rd(os.path.join(root, "src", "Character", "CharacterGrpcService.cs"))
@@ -116,6 +117,8 @@ ddl = rd(os.path.join(root, "db", "character", "realm_advance.sql"))
 main = rd(os.path.join(root, "db", "character", "character.sql"))
 for name in ("character_quest", "realm_breakthrough", "realm_drill"):
     R("ddl_" + name, name in ddl and name in main)
+R("ddl_realm_phase_promote", "realm_phase_promote" in main)
+R("ddl_realm_phase", "realm_phase" in main and "character_realm_phase_range" in main)
 R("ddl_drill_column", "ADD COLUMN IF NOT EXISTS drill bigint" in ddl and "ADD COLUMN IF NOT EXISTS drill bigint" in main)
 
 # ---- v1.110 补正：历练与等级经验走同一笔结算，生产链路有写入者 ----
@@ -142,7 +145,7 @@ R("link_battle_sends", "DungeonId = dungeonId" in exp_settle
   and "QualifiedKills = (uint)Math.Max(0, qualifiedKills)" in exp_settle)
 R("link_battle_kills", "_qualifiedKills++" in battle and "_dungeon?.Id" in battle)
 R("link_no_second_writer", "SettleDrill" not in exp_settle and "SettleDrill" not in battle)
-R("link_service_passes", "dungeon, qualifiedKills, realms, context.CancellationToken" in grpc)
+R("link_service_passes", "qualifiedKills, realms, grants" in grpc)
 R("link_side_quests_all_empty", all(adv[r]["side_quests"] == [] for r in order[:-1]))
 o.close()
 PY
@@ -157,7 +160,8 @@ echo "== 3. 只读入口 --realm-table / --dungeon-table =="
 "$DOTNET" "$CD" --realm-table $CC >"$TMP/rt.raw" 2>&1; rc=$?
 RT="$(utf8 < "$TMP/rt.raw")"
 if [ "$rc" = "0" ] \
-   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=2 realms=11 launch_until=结丹' \
+   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=3 realms=11 launch_until=结丹' \
+   && printf '%s' "$RT" | grep -q '^sub_phase=2 name=后期 passive_pct_bps=160' \
    && printf '%s' "$RT" | grep -q '^advance_req=炼体->筑基 drill=100 stone=stone_1 stone_cost=10 success_pct=70 main_stage=9 side_quests=$' \
    && [ "$(printf '%s' "$RT" | grep -c '^advance_req=')" = "10" ]; then
   ok "十段突破要求都在配置里，数值不写死在代码（不连库）"
@@ -276,6 +280,7 @@ PY
   rawd() { "$DOTNET" "$CD" --raw-drill-write "$1" "$2" $CC 2>&1 | utf8 | grep -m1 '^raw_drill='; }
   rawm() { "$DOTNET" "$CD" --raw-main-stage-write "$1" "$2" $CC >/dev/null 2>&1; }
   rawr() { "$DOTNET" "$CD" --raw-realm-write "$1" "$2" $CC >/dev/null 2>&1; }
+  rawp() { "$DOTNET" "$CD" --raw-realm-phase-write "$1" "$2" $CC >/dev/null 2>&1; }
   qdone() { "$DOTNET" "$CD" --complete-quest "$1" "$2" $CC >/dev/null 2>&1; }
   bstate() { "$DOTNET" "$CD" --realm-break-state "$1" $CC 2>&1 | utf8 | grep -m1 '^realm_break_state='; }
   adv() { local id="$1" txn="$2"; shift 2; "$DOTNET" "$CD" --advance-realm "$id" "$TX-$txn" "$@" 2>&1 | utf8 | grep -m1 '^advance_realm='; }
@@ -301,18 +306,27 @@ except Exception:
   printf '%s' "$R" | grep -q 'executed=false duplicate=false success=false from=炼体 next=筑基 realm=炼体 reason=heart_not_done' \
     && ok "主线没走到第 9 场：heart_not_done" || bad "炼心没挡住：$R"
 
+  rawm "$ID" 9; rawp "$ID" 0
+  R="$(adv "$ID" t-phase-1 $CC)"
+  printf '%s' "$R" | grep -q 'reason=realm_phase_not_enough' \
+    && ok "未到后期不能突破大境界" || bad "段内阶没挡住：$R"
+  rawp "$ID" 2
+
   rawm "$ID" 9
+  rawp "$ID" 2
   rawd "$ID" 0 >/dev/null
   R="$(adv "$ID" t-drill-1 $CC)"
   printf '%s' "$R" | grep -q 'reason=drill_not_enough' \
     && ok "历练不够：drill_not_enough，修为不动" || bad "历练没挡住：$R"
 
   rawd "$ID" 100 >/dev/null
+  rawp "$ID" 2
   R="$(adv "$ID" t-stone-1 $CC)"
   printf '%s' "$R" | grep -q 'reason=stone_not_enough' \
     && ok "灵石不够：stone_not_enough，修为不动" || bad "灵石没挡住：$R"
 
   stone "$ID" 10
+  rawp "$ID" 2
   R="$(adv "$ID" t-ok-1 $C100)"
   printf '%s' "$R" | grep -q 'executed=true duplicate=false success=true .*realm=筑基 .*drill=100 drill_required=100 drill_cost=100 drill_after=0 .*stone_left=0' \
     && ok "成功：修为进筑基，历练 100→0、灵石 10→0" || bad "成功路径不对：$R"
@@ -322,23 +336,24 @@ except Exception:
     && ok "同一事务号再提交不掷第二次" || bad "重复事务号没挡住：$R"
   [ "$(stonebalance "$ID")" = "10" ] && ok "重复提交没有多扣灵石" || bad "重复提交扣了灵石"
 
-  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9
+  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9; rawp "$ID" 2
   R="$(adv "$ID" t-fail-1 $C0)"
   printf '%s' "$R" | grep -q 'executed=true duplicate=false success=false from=炼体 next=筑基 realm=炼体 .*drill_after=0 .*stone_left=0' \
     && ok "失败：修为停在炼体，历练与灵石照扣" || bad "失败路径不对：$R"
 
-  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9
+  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9; rawp "$ID" 2
   R="$(adv "$ID" t-side-1 $CSIDE)"
   printf '%s' "$R" | grep -q 'reason=heart_not_done' \
     && ok "必要支线没做完：历练与灵石都够也不能突破" || bad "必要支线没卡住：$R"
   [ "$(stonebalance "$ID")" = "10" ] && [ "$(bstate "$ID")" = "realm_break_state=ok id=$ID realm=炼体 drill=100 main_stage=9 quests=" ] \
     && ok "被炼心挡下的突破一分都没扣" || bad "被挡下仍扣了东西：$(bstate "$ID")"
   qdone "$ID" side_lianxin_p31a2
+  rawp "$ID" 2
   R="$(adv "$ID" t-side-2 $CSIDE)"
   printf '%s' "$R" | grep -q 'success=true .*realm=筑基' \
     && ok "必要支线做完后可以突破" || bad "补完支线仍不能突破：$R"
 
-  rawr "$ID" 结丹; rawd "$ID" 800 >/dev/null; rawm "$ID" 11; setstone "$ID" 80
+  rawr "$ID" 结丹; rawd "$ID" 800 >/dev/null; rawm "$ID" 11; setstone "$ID" 80; rawp "$ID" 2
   BAL="$(stonebalance "$ID")"
   R="$(adv "$ID" t-lock-1 $CC)"
   printf '%s' "$R" | grep -q 'reason=realm_locked' && [ "$(stonebalance "$ID")" = "$BAL" ] \

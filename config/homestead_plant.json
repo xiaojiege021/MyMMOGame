@@ -1,0 +1,16 @@
+{
+  "schema": "homestead-plant/1",
+  "version": 1,
+  "pending": true,
+  "note": "N11 家园种植唯一内容正本（方案：家园种植产出家园币，只换外观和便捷）。格位与作物产量、成长时长方案未给数字，全部占位 pending。种植只占 config/homestead.json 里的庭院格 garden_1/garden_2，与摆件互斥：同一格不能既摆又种。",
+  "slots": ["garden_1", "garden_2"],
+  "crops": [
+    {
+      "id": "crop_spirit_herb",
+      "name": "灵草",
+      "grow_seconds": 120,
+      "yield_home_coin": 5,
+      "pending": true
+    }
+  ]
+}

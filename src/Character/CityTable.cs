@@ -23,16 +23,18 @@ public sealed class CityTable
         ["item_id", "count", "bag_slot", "drop", "price", "slot"];
 
     static readonly string[] RequiredKeys =
-        ["schema", "version", "note", "gather_table", "cities"];
+        ["schema", "version", "note", "gather_table", "task_grant_city_id", "cities"];
 
     public int Version { get; }
     public string GatherTable { get; }
+    public string TaskGrantCityId { get; }
     public IReadOnlyList<CityDef> Cities { get; }
 
-    CityTable(int version, string gatherTable, List<CityDef> cities)
+    CityTable(int version, string gatherTable, string taskGrantCityId, List<CityDef> cities)
     {
         Version = version;
         GatherTable = gatherTable;
+        TaskGrantCityId = taskGrantCityId;
         Cities = cities;
     }
 
@@ -126,6 +128,12 @@ public sealed class CityTable
                 throw new ConfigException("city.json 的 gather_table 不能为空");
             }
 
+            var taskGrantCityId = (wire.TaskGrantCityId ?? "").Trim();
+            if (taskGrantCityId.Length == 0)
+            {
+                throw new ConfigException("city.json 的 task_grant_city_id 不能为空");
+            }
+
             var spiritVeins = ReadSpiritVeins(gatherTable);
             if (spiritVeins.Count == 0)
             {
@@ -178,7 +186,13 @@ public sealed class CityTable
                 cities.Add(new CityDef(cityId, name, veinId, ownerSect, taxPct));
             }
 
-            return new CityTable(version, gatherTable, cities);
+            if (!seen.Contains(taskGrantCityId))
+            {
+                throw new ConfigException(
+                    "city.json 的 task_grant_city_id 必须对应 cities 里的一条：" + taskGrantCityId);
+            }
+
+            return new CityTable(version, gatherTable, taskGrantCityId, cities);
         }
     }
 
@@ -273,6 +287,9 @@ public sealed class CityTable
 
         [JsonPropertyName("gather_table")]
         public string? GatherTable { get; init; }
+
+        [JsonPropertyName("task_grant_city_id")]
+        public string? TaskGrantCityId { get; init; }
 
         [JsonPropertyName("cities")]
         public List<CityWire>? Cities { get; init; }

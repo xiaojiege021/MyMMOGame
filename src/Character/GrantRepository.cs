@@ -26,7 +26,8 @@ public sealed class GrantRepository(
     NpgsqlDataSource dataSource,
     ItemTable items,
     CurrencyTable currencies,
-    CharacterConfig config)
+    CharacterConfig config,
+    CityTaxRepository? cityTax = null)
 {
     public const int MaxTxnLength = 64;
 
@@ -72,6 +73,14 @@ public sealed class GrantRepository(
                 default:
                     throw new GrantException("entry_missing");
             }
+        }
+
+        if (cityTax is not null)
+        {
+            var grossGold = CityTaxRepository.SumPositiveGold(
+                entries, cityTax.GoldKind);
+            await cityTax.RecordTaskGrantInTransactionAsync(
+                connection, transaction, txnId, grossGold, stopping);
         }
 
         // 3. 读回结果再提交：读的是这一笔之后的状态。

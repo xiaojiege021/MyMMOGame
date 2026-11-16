@@ -1,0 +1,27 @@
+{
+  "schema": "home-coin-shop/1",
+  "version": 1,
+  "currency": "home_coin",
+  "pending": true,
+  "note": "N11 家园币商城唯一正本。只许外观与便捷（方案 12.1 洞府与家园口径）；绝不上架金币、材料、副本次数、战力相关种类（与 shop.json 的绝不上架对齐并排除红蓝符、复活、保护券、经验道具等）。标价待定；只接传送符发货作示例，其余 delivery 留空走 delivery_pending。",
+  "items": [
+    {
+      "id": "hc_shop_outfit_1",
+      "kind": "outfit",
+      "name": "服饰外观",
+      "price_home_coin": 50,
+      "delivery_item_id": "",
+      "delivery_count": 0,
+      "note": "只改样子；发货另排"
+    },
+    {
+      "id": "hc_shop_teleport_1",
+      "kind": "teleport_talisman",
+      "name": "传送符",
+      "price_home_coin": 3,
+      "delivery_item_id": "teleport_talisman",
+      "delivery_count": 1,
+      "note": "绑定，只省路程"
+    }
+  ]
+}

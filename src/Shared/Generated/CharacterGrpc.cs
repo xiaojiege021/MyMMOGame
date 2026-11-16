@@ -119,6 +119,10 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyShopItemResponse> __Marshaller_mmo_character_BuyShopItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyShopItemResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyHomeCoinShopRequest> __Marshaller_mmo_character_BuyHomeCoinShopRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyHomeCoinShopRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyHomeCoinShopResponse> __Marshaller_mmo_character_BuyHomeCoinShopResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyHomeCoinShopResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeTalismanRequest> __Marshaller_mmo_character_ConsumeTalismanRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeTalismanRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeTalismanResponse> __Marshaller_mmo_character_ConsumeTalismanResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeTalismanResponse.Parser));
@@ -170,6 +174,18 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleDrillRequest> __Marshaller_mmo_character_SettleDrillRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleDrillRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SettleDrillResponse> __Marshaller_mmo_character_SettleDrillResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SettleDrillResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.PromoteRealmPhaseRequest> __Marshaller_mmo_character_PromoteRealmPhaseRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.PromoteRealmPhaseRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.PromoteRealmPhaseResponse> __Marshaller_mmo_character_PromoteRealmPhaseResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.PromoteRealmPhaseResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeRealmPassiveRequest> __Marshaller_mmo_character_DescribeRealmPassiveRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeRealmPassiveRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeRealmPassiveResponse> __Marshaller_mmo_character_DescribeRealmPassiveResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeRealmPassiveResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeHeroCodexRequest> __Marshaller_mmo_character_DescribeHeroCodexRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeHeroCodexRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeHeroCodexResponse> __Marshaller_mmo_character_DescribeHeroCodexResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeHeroCodexResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ExchangeStoneRequest> __Marshaller_mmo_character_ExchangeStoneRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ExchangeStoneRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
@@ -352,6 +368,14 @@ namespace Mmo.Proto.Character {
         __Marshaller_mmo_character_BuyShopItemResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.BuyHomeCoinShopRequest, global::Mmo.Proto.Character.BuyHomeCoinShopResponse> __Method_BuyHomeCoinShopItem = new grpc::Method<global::Mmo.Proto.Character.BuyHomeCoinShopRequest, global::Mmo.Proto.Character.BuyHomeCoinShopResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "BuyHomeCoinShopItem",
+        __Marshaller_mmo_character_BuyHomeCoinShopRequest,
+        __Marshaller_mmo_character_BuyHomeCoinShopResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse> __Method_ConsumeTalisman = new grpc::Method<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
@@ -454,6 +478,30 @@ namespace Mmo.Proto.Character {
         "SettleDrill",
         __Marshaller_mmo_character_SettleDrillRequest,
         __Marshaller_mmo_character_SettleDrillResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.PromoteRealmPhaseRequest, global::Mmo.Proto.Character.PromoteRealmPhaseResponse> __Method_PromoteRealmPhase = new grpc::Method<global::Mmo.Proto.Character.PromoteRealmPhaseRequest, global::Mmo.Proto.Character.PromoteRealmPhaseResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "PromoteRealmPhase",
+        __Marshaller_mmo_character_PromoteRealmPhaseRequest,
+        __Marshaller_mmo_character_PromoteRealmPhaseResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeRealmPassiveRequest, global::Mmo.Proto.Character.DescribeRealmPassiveResponse> __Method_DescribeRealmPassive = new grpc::Method<global::Mmo.Proto.Character.DescribeRealmPassiveRequest, global::Mmo.Proto.Character.DescribeRealmPassiveResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeRealmPassive",
+        __Marshaller_mmo_character_DescribeRealmPassiveRequest,
+        __Marshaller_mmo_character_DescribeRealmPassiveResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeHeroCodexRequest, global::Mmo.Proto.Character.DescribeHeroCodexResponse> __Method_DescribeHeroCodex = new grpc::Method<global::Mmo.Proto.Character.DescribeHeroCodexRequest, global::Mmo.Proto.Character.DescribeHeroCodexResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeHeroCodex",
+        __Marshaller_mmo_character_DescribeHeroCodexRequest,
+        __Marshaller_mmo_character_DescribeHeroCodexResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse> __Method_ExchangeStone = new grpc::Method<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse>(
@@ -763,6 +811,18 @@ namespace Mmo.Proto.Character {
       }
 
       /// <summary>
+      /// N11：家园币商城。只许外观与便捷，清单与标价在 config/home_coin_shop.json。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.BuyHomeCoinShopResponse> BuyHomeCoinShopItem(global::Mmo.Proto.Character.BuyHomeCoinShopRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
       /// P1-5c3：在战斗里用掉一张符。战斗服发过来，只扣一张、不碰生命与蓝量——
       /// 战斗态在战斗进程里，角色服只负责背包的这一次扣减。回复值与冷却在回包里带回去。
       /// </summary>
@@ -926,6 +986,42 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SettleDrillResponse> SettleDrill(global::Mmo.Proto.Character.SettleDrillRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// N10：段内升一阶。等级门槛与被动百分比都在 config/realms.json；客户端不算。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.PromoteRealmPhaseResponse> PromoteRealmPhase(global::Mmo.Proto.Character.PromoteRealmPhaseRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// N10：只读当前段内阶与配置里的被动万分比（bps），供战斗服等服间读取。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeRealmPassiveResponse> DescribeRealmPassive(global::Mmo.Proto.Character.DescribeRealmPassiveRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// N12：英灵图鉴收集度与配置里的生活协助被动；不做卡组战斗，客户端不算。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeHeroCodexResponse> DescribeHeroCodex(global::Mmo.Proto.Character.DescribeHeroCodexRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1969,6 +2065,54 @@ namespace Mmo.Proto.Character {
         return CallInvoker.AsyncUnaryCall(__Method_BuyShopItem, null, options, request);
       }
       /// <summary>
+      /// N11：家园币商城。只许外观与便捷，清单与标价在 config/home_coin_shop.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuyHomeCoinShopResponse BuyHomeCoinShopItem(global::Mmo.Proto.Character.BuyHomeCoinShopRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyHomeCoinShopItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N11：家园币商城。只许外观与便捷，清单与标价在 config/home_coin_shop.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuyHomeCoinShopResponse BuyHomeCoinShopItem(global::Mmo.Proto.Character.BuyHomeCoinShopRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_BuyHomeCoinShopItem, null, options, request);
+      }
+      /// <summary>
+      /// N11：家园币商城。只许外观与便捷，清单与标价在 config/home_coin_shop.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuyHomeCoinShopResponse> BuyHomeCoinShopItemAsync(global::Mmo.Proto.Character.BuyHomeCoinShopRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyHomeCoinShopItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N11：家园币商城。只许外观与便捷，清单与标价在 config/home_coin_shop.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuyHomeCoinShopResponse> BuyHomeCoinShopItemAsync(global::Mmo.Proto.Character.BuyHomeCoinShopRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_BuyHomeCoinShopItem, null, options, request);
+      }
+      /// <summary>
       /// P1-5c3：在战斗里用掉一张符。战斗服发过来，只扣一张、不碰生命与蓝量——
       /// 战斗态在战斗进程里，角色服只负责背包的这一次扣减。回复值与冷却在回包里带回去。
       /// </summary>
@@ -2637,6 +2781,150 @@ namespace Mmo.Proto.Character {
         return CallInvoker.AsyncUnaryCall(__Method_SettleDrill, null, options, request);
       }
       /// <summary>
+      /// N10：段内升一阶。等级门槛与被动百分比都在 config/realms.json；客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.PromoteRealmPhaseResponse PromoteRealmPhase(global::Mmo.Proto.Character.PromoteRealmPhaseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return PromoteRealmPhase(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N10：段内升一阶。等级门槛与被动百分比都在 config/realms.json；客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.PromoteRealmPhaseResponse PromoteRealmPhase(global::Mmo.Proto.Character.PromoteRealmPhaseRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_PromoteRealmPhase, null, options, request);
+      }
+      /// <summary>
+      /// N10：段内升一阶。等级门槛与被动百分比都在 config/realms.json；客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.PromoteRealmPhaseResponse> PromoteRealmPhaseAsync(global::Mmo.Proto.Character.PromoteRealmPhaseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return PromoteRealmPhaseAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N10：段内升一阶。等级门槛与被动百分比都在 config/realms.json；客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.PromoteRealmPhaseResponse> PromoteRealmPhaseAsync(global::Mmo.Proto.Character.PromoteRealmPhaseRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_PromoteRealmPhase, null, options, request);
+      }
+      /// <summary>
+      /// N10：只读当前段内阶与配置里的被动万分比（bps），供战斗服等服间读取。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeRealmPassiveResponse DescribeRealmPassive(global::Mmo.Proto.Character.DescribeRealmPassiveRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeRealmPassive(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N10：只读当前段内阶与配置里的被动万分比（bps），供战斗服等服间读取。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeRealmPassiveResponse DescribeRealmPassive(global::Mmo.Proto.Character.DescribeRealmPassiveRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeRealmPassive, null, options, request);
+      }
+      /// <summary>
+      /// N10：只读当前段内阶与配置里的被动万分比（bps），供战斗服等服间读取。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeRealmPassiveResponse> DescribeRealmPassiveAsync(global::Mmo.Proto.Character.DescribeRealmPassiveRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeRealmPassiveAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N10：只读当前段内阶与配置里的被动万分比（bps），供战斗服等服间读取。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeRealmPassiveResponse> DescribeRealmPassiveAsync(global::Mmo.Proto.Character.DescribeRealmPassiveRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeRealmPassive, null, options, request);
+      }
+      /// <summary>
+      /// N12：英灵图鉴收集度与配置里的生活协助被动；不做卡组战斗，客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeHeroCodexResponse DescribeHeroCodex(global::Mmo.Proto.Character.DescribeHeroCodexRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeHeroCodex(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N12：英灵图鉴收集度与配置里的生活协助被动；不做卡组战斗，客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeHeroCodexResponse DescribeHeroCodex(global::Mmo.Proto.Character.DescribeHeroCodexRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeHeroCodex, null, options, request);
+      }
+      /// <summary>
+      /// N12：英灵图鉴收集度与配置里的生活协助被动；不做卡组战斗，客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeHeroCodexResponse> DescribeHeroCodexAsync(global::Mmo.Proto.Character.DescribeHeroCodexRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeHeroCodexAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N12：英灵图鉴收集度与配置里的生活协助被动；不做卡组战斗，客户端不算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeHeroCodexResponse> DescribeHeroCodexAsync(global::Mmo.Proto.Character.DescribeHeroCodexRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeHeroCodex, null, options, request);
+      }
+      /// <summary>
       /// P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
       /// 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
       /// 客户端带不进任何数值，也不经过拍卖。
@@ -3132,6 +3420,7 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_SettleAuction, serviceImpl.SettleAuction)
           .AddMethod(__Method_SettleIngot, serviceImpl.SettleIngot)
           .AddMethod(__Method_BuyShopItem, serviceImpl.BuyShopItem)
+          .AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl.BuyHomeCoinShopItem)
           .AddMethod(__Method_ConsumeTalisman, serviceImpl.ConsumeTalisman)
           .AddMethod(__Method_DescribeTalisman, serviceImpl.DescribeTalisman)
           .AddMethod(__Method_DescribeReviveScroll, serviceImpl.DescribeReviveScroll)
@@ -3145,6 +3434,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_CanEquip, serviceImpl.CanEquip)
           .AddMethod(__Method_AdvanceRealm, serviceImpl.AdvanceRealm)
           .AddMethod(__Method_SettleDrill, serviceImpl.SettleDrill)
+          .AddMethod(__Method_PromoteRealmPhase, serviceImpl.PromoteRealmPhase)
+          .AddMethod(__Method_DescribeRealmPassive, serviceImpl.DescribeRealmPassive)
+          .AddMethod(__Method_DescribeHeroCodex, serviceImpl.DescribeHeroCodex)
           .AddMethod(__Method_ExchangeStone, serviceImpl.ExchangeStone)
           .AddMethod(__Method_SettleStoneAuction, serviceImpl.SettleStoneAuction)
           .AddMethod(__Method_ApplySiegeResult, serviceImpl.ApplySiegeResult)
@@ -3181,6 +3473,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_SettleAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionSettleRequest, global::Mmo.Proto.Character.AuctionSettleResponse>(serviceImpl.SettleAuction));
       serviceBinder.AddMethod(__Method_SettleIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse>(serviceImpl.SettleIngot));
       serviceBinder.AddMethod(__Method_BuyShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyShopItemRequest, global::Mmo.Proto.Character.BuyShopItemResponse>(serviceImpl.BuyShopItem));
+      serviceBinder.AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyHomeCoinShopRequest, global::Mmo.Proto.Character.BuyHomeCoinShopResponse>(serviceImpl.BuyHomeCoinShopItem));
       serviceBinder.AddMethod(__Method_ConsumeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse>(serviceImpl.ConsumeTalisman));
       serviceBinder.AddMethod(__Method_DescribeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeTalismanRequest, global::Mmo.Proto.Character.DescribeTalismanResponse>(serviceImpl.DescribeTalisman));
       serviceBinder.AddMethod(__Method_DescribeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse>(serviceImpl.DescribeReviveScroll));
@@ -3194,6 +3487,9 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_CanEquip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(serviceImpl.CanEquip));
       serviceBinder.AddMethod(__Method_AdvanceRealm, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse>(serviceImpl.AdvanceRealm));
       serviceBinder.AddMethod(__Method_SettleDrill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleDrillRequest, global::Mmo.Proto.Character.SettleDrillResponse>(serviceImpl.SettleDrill));
+      serviceBinder.AddMethod(__Method_PromoteRealmPhase, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.PromoteRealmPhaseRequest, global::Mmo.Proto.Character.PromoteRealmPhaseResponse>(serviceImpl.PromoteRealmPhase));
+      serviceBinder.AddMethod(__Method_DescribeRealmPassive, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeRealmPassiveRequest, global::Mmo.Proto.Character.DescribeRealmPassiveResponse>(serviceImpl.DescribeRealmPassive));
+      serviceBinder.AddMethod(__Method_DescribeHeroCodex, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeHeroCodexRequest, global::Mmo.Proto.Character.DescribeHeroCodexResponse>(serviceImpl.DescribeHeroCodex));
       serviceBinder.AddMethod(__Method_ExchangeStone, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ExchangeStoneRequest, global::Mmo.Proto.Character.ExchangeStoneResponse>(serviceImpl.ExchangeStone));
       serviceBinder.AddMethod(__Method_SettleStoneAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.StoneAuctionSettleRequest, global::Mmo.Proto.Character.StoneAuctionSettleResponse>(serviceImpl.SettleStoneAuction));
       serviceBinder.AddMethod(__Method_ApplySiegeResult, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ApplySiegeResultRequest, global::Mmo.Proto.Character.ApplySiegeResultResponse>(serviceImpl.ApplySiegeResult));

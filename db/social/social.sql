@@ -132,3 +132,23 @@ CREATE TABLE IF NOT EXISTS "社交".homestead_txn (
     slot_id      text        NOT NULL,
     created_at   timestamptz NOT NULL DEFAULT now()
 );
+
+-- === N11 homestead_plant.sql（同一份幂等 DDL，追加进主迁移）===
+CREATE TABLE IF NOT EXISTS "社交".homestead_plant (
+    character_id bigint      NOT NULL,
+    slot_id      text        NOT NULL,
+    crop_id      text        NOT NULL,
+    planted_at   timestamptz NOT NULL DEFAULT now(),
+    plant_txn_id text        NOT NULL,
+    PRIMARY KEY (character_id, slot_id),
+    CHECK (slot_id <> '' AND crop_id <> '')
+);
+
+CREATE TABLE IF NOT EXISTS "社交".homestead_plant_txn (
+    txn_id       text        PRIMARY KEY,
+    character_id bigint      NOT NULL,
+    action       text        NOT NULL,
+    slot_id      text        NOT NULL,
+    created_at   timestamptz NOT NULL DEFAULT now(),
+    CHECK (action IN ('plant', 'harvest'))
+);

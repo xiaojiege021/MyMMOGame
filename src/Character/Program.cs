@@ -80,6 +80,14 @@ string? advanceRealmTxn = null;
 long settleDrillOf = 0;
 string? settleDrillDungeon = null;
 string? settleDrillTxn = null;
+// N10：段内四阶核对入口。
+long rawRealmPhaseId = 0;
+var rawRealmPhaseValue = 0;
+long realmPassiveStateOf = 0;
+long heroCodexStateOf = 0;
+string? heroCodexTablePath = null;
+long promoteRealmPhaseOf = 0;
+string? promoteRealmPhaseTxn = null;
 // 只给核对用：读高难本本周已用次数，或把进本记录整体往前挪一周验跨周归零。
 long hardEntryStateOf = 0;
 string? hardEntryDungeon = null;
@@ -203,6 +211,7 @@ string? exchangeStoneKind = null;
 string? exchangeStoneTxn = null;
 long stoneExchangeStateOf = 0;
 var cityState = false;
+string? cityTaxRowTxn = null;
 var stoneListingState = false;
 // P3-3a4：领地表只读、城池写回状态、以及直接走同一笔写回事务的核对入口。
 var siegeTerritoryTableState = false;
@@ -437,6 +446,29 @@ for (var i = 0; i < args.Length; i++)
             settleDrillDungeon = args[++i];
             settleDrillTxn = args[++i];
             break;
+
+        case "--raw-realm-phase-write" when i + 2 < args.Length:
+            long.TryParse(args[++i], out rawRealmPhaseId);
+            int.TryParse(args[++i], out rawRealmPhaseValue);
+            break;
+
+        case "--realm-passive-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out realmPassiveStateOf);
+            break;
+
+        case "--hero-codex-state" when i + 1 < args.Length:
+            long.TryParse(args[++i], out heroCodexStateOf);
+            break;
+
+        case "--hero-codex-table-path" when i + 1 < args.Length:
+            heroCodexTablePath = args[++i];
+            break;
+
+        case "--promote-realm-phase" when i + 2 < args.Length:
+            long.TryParse(args[++i], out promoteRealmPhaseOf);
+            promoteRealmPhaseTxn = args[++i];
+            break;
+
         // 只给核对用：高难本本周已用次数 / 剩余次数，不经过进本逻辑。
         case "--hard-entry-state" when i + 2 < args.Length:
             long.TryParse(args[++i], out hardEntryStateOf);
@@ -740,6 +772,9 @@ for (var i = 0; i < args.Length; i++)
         case "--city-state":
             cityState = true;
             break;
+        case "--city-tax-row" when i + 1 < args.Length:
+            cityTaxRowTxn = args[++i];
+            break;
         // P3-3a4：领地表只读核对（不连库），与启动共用同一份 SiegeTerritoryPolicy.Load。
         case "--siege-territory-table":
             siegeTerritoryTableState = true;
@@ -878,6 +913,14 @@ if (realmTableState)
             realmDungeonPath ?? characterConfig.DungeonTable);
         var currencies = CurrencyTable.Load("config/currency.json");
         var table = RealmTable.Load(realmTablePath ?? characterConfig.RealmTable, dungeons, currencies);
+        var sub = table.SubPhases;
+        for (var pi = 0; pi < RealmSubPhases.PhaseCount; pi++)
+        {
+            Console.WriteLine("sub_phase=" + pi + " name=" + sub.NameAt(pi)
+                + " passive_pct_bps=" + sub.PassiveBpsAt(pi)
+                + " promote_min_level=" + sub.PromoteLevelAt(pi));
+        }
+
         Console.WriteLine("realm_table_state=ok version=" + table.Version
             + " realms=" + table.Realms.Count
             + " launch_until=" + table.LaunchUntil
@@ -1585,7 +1628,8 @@ if (cityTableState)
         var cityTable = CityTable.Load(cityTablePath ?? cityConfig.CityTable);
         Console.WriteLine("city_table_state=ok version=" + cityTable.Version
             + " cities=" + cityTable.Cities.Count
-            + " gather_table=" + cityTable.GatherTable);
+            + " gather_table=" + cityTable.GatherTable
+            + " task_grant_city=" + cityTable.TaskGrantCityId);
         foreach (var city in cityTable.Cities)
         {
             Console.WriteLine("city=" + city.CityId
@@ -1659,7 +1703,10 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || rechargeStateOf != null || realmStateOf != 0 || rawRealmId != 0
     || rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
     || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0
-    || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || stoneListingState
+    || rawRealmPhaseId != 0 || realmPassiveStateOf != 0 || promoteRealmPhaseOf != 0
+    || heroCodexStateOf != 0
+    || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || cityTaxRowTxn != null
+    || stoneListingState
     || siegeResultState || applySiegeResultTxn != null
     || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0
     || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null
@@ -1861,13 +1908,24 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
 
         // P3-1a2：突破与历练结算的核对入口。只给核对用；玩法路径走 gRPC。
         if (rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
-            || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0)
+            || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0
+            || rawRealmPhaseId != 0 || realmPassiveStateOf != 0 || promoteRealmPhaseOf != 0
+            || heroCodexStateOf != 0)
         {
             var realmConfig = CharacterConfig.Load(configPath);
             var realmDungeons = DungeonTable.Load(realmConfig.DungeonTable);
             var realmCurrencies = CurrencyTable.Load("config/currency.json");
             var realmTable = RealmTable.Load(realmConfig.RealmTable, realmDungeons, realmCurrencies);
             var realmAdvances = new RealmAdvanceRepository(dataSource, realmTable);
+            var realmPhases = new RealmPhaseRepository(dataSource, realmTable);
+            var hcMainline = File.Exists(realmConfig.MainlineTable)
+                ? MainlineTable.Load(realmConfig.MainlineTable, realmDungeons, realmTable)
+                : MainlineTable.Missing();
+            var hcPath = string.IsNullOrWhiteSpace(heroCodexTablePath)
+                ? "config/hero_codex.json"
+                : heroCodexTablePath!;
+            var hcTable = HeroCodexTable.Load(hcPath, hcMainline);
+            var heroCodexRepo = new HeroCodexRepository(dataSource, hcTable);
 
             if (rawDrillId != 0)
             {
@@ -1910,6 +1968,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 {
                     Console.WriteLine("realm_break_state=ok id=" + realmBreakStateOf
                         + " realm=" + state.Value.Realm
+                        + " realm_phase=" + state.Value.RealmPhase
                         + " drill=" + state.Value.Drill
                         + " main_stage=" + state.Value.MainStage
                         + " quests=" + string.Join(",", state.Value.Quests));
@@ -1961,6 +2020,76 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                         + " duplicate=" + (outcome.Duplicate ? "true" : "false")
                         + " reason=" + outcome.Reason);
                 }
+            }
+
+            if (rawRealmPhaseId != 0)
+            {
+                try
+                {
+                    await realmPhases.RawWritePhaseAsync(
+                        rawRealmPhaseId, rawRealmPhaseValue, CancellationToken.None);
+                    Console.WriteLine("raw_realm_phase=written id=" + rawRealmPhaseId
+                        + " phase=" + rawRealmPhaseValue);
+                }
+                catch (PostgresException ex) when (ex.SqlState == "23514")
+                {
+                    Console.WriteLine("raw_realm_phase=rejected id=" + rawRealmPhaseId
+                        + " sqlstate=" + ex.SqlState);
+                }
+            }
+
+            if (realmPassiveStateOf != 0)
+            {
+                var snap = await realmPhases.DescribePassiveAsync(
+                    realmPassiveStateOf, CancellationToken.None);
+                if (!snap.Found)
+                {
+                    Console.WriteLine("realm_passive_state=missing id=" + realmPassiveStateOf);
+                }
+                else
+                {
+                    Console.WriteLine("realm_passive_state=ok id=" + realmPassiveStateOf
+                        + " realm=" + snap.Realm
+                        + " realm_phase=" + snap.Phase
+                        + " phase_name=" + snap.PhaseName
+                        + " passive_pct_bps=" + snap.PassivePctBps);
+                }
+            }
+
+            if (heroCodexStateOf != 0)
+            {
+                var snap = await heroCodexRepo.DescribeAsync(
+                    heroCodexStateOf, null, CancellationToken.None);
+                if (!snap.Found)
+                {
+                    Console.WriteLine("hero_codex_state=missing id=" + heroCodexStateOf);
+                }
+                else
+                {
+                    Console.WriteLine("hero_codex_state=ok id=" + heroCodexStateOf
+                        + " main_stage=" + snap.MainStage
+                        + " collected=" + snap.CollectedCount
+                        + "/" + snap.EntryCount
+                        + " collection_pct_bps=" + snap.CollectionPctBps
+                        + " total_passive_pct_bps=" + snap.TotalPassivePctBps
+                        + " passive_kind=" + snap.PassiveKind);
+                }
+            }
+
+            if (promoteRealmPhaseOf != 0)
+            {
+                var outcome = await realmPhases.PromoteAsync(
+                    promoteRealmPhaseOf, null, promoteRealmPhaseTxn!, CancellationToken.None);
+                Console.WriteLine("promote_realm_phase=done id=" + promoteRealmPhaseOf
+                    + " executed=" + (outcome.Executed ? "true" : "false")
+                    + " duplicate=" + (outcome.Duplicate ? "true" : "false")
+                    + " from=" + outcome.FromPhase
+                    + " to=" + outcome.ToPhase
+                    + " phase_name=" + outcome.PhaseName
+                    + " passive_pct_bps=" + outcome.PassivePctBps
+                    + " reason=" + outcome.Reason
+                    + " level=" + outcome.Level
+                    + " level_required=" + outcome.LevelRequired);
             }
         }
 
@@ -2814,6 +2943,28 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                 + " auction_tax_rows=" + auctionTaxRows
                 + " auction_tax_sum=" + auctionTaxSum
                 + " stone_listing_rows=" + stoneListingRows);
+        }
+
+        if (cityTaxRowTxn is not null)
+        {
+            var cfg = CharacterConfig.Load(configPath);
+            var cityTbl = CityTable.Load(cfg.CityTable);
+            var auctionTbl = AuctionTable.Load(
+                cfg.AuctionTable, CurrencyTable.Load("config/currency.json"));
+            var cityTaxRepo = new CityTaxRepository(dataSource, cityTbl, auctionTbl.GoldKind);
+            var row = await cityTaxRepo.ReadRowAsync(cityTaxRowTxn, CancellationToken.None);
+            if (row is null)
+            {
+                Console.WriteLine("city_tax_row=missing txn=" + cityTaxRowTxn);
+            }
+            else
+            {
+                Console.WriteLine("city_tax_row=ok txn=" + row.TxnId
+                    + " city=" + row.CityId
+                    + " source=" + row.Source
+                    + " gross=" + row.GrossGold
+                    + " tax=" + row.TaxGold);
+            }
         }
 
         // P3-3a4：与真实服务共用同一个 Repository，验重放幂等与各类拒绝路径，

@@ -70,9 +70,10 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
         string realm = "";
         long drill = 0;
         var mainStage = 0;
+        var realmPhase = 0;
         var found = false;
         await using (var read = new NpgsqlCommand(
-            "select realm, drill, coalesce(main_stage, 0) from \"角色\".character " + owned,
+            "select realm, drill, coalesce(main_stage, 0), realm_phase from \"角色\".character " + owned,
             connection, transaction))
         {
             read.Parameters.AddWithValue(characterId);
@@ -89,6 +90,7 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                     realm = reader.GetString(0);
                     drill = reader.GetInt64(1);
                     mainStage = reader.GetInt32(2);
+                    realmPhase = reader.GetInt16(3);
                 }
             }
         }
@@ -146,6 +148,17 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                 true, "realm_unknown", false, false, false,
                 gate.From, gate.Next, gate.From, drill, 0, 0, drill,
                 "", 0, 0, mainStage, 0, [], 0);
+        }
+
+        if (realmPhase < realms.SubPhases.BreakthroughMinIndex)
+        {
+            await transaction.RollbackAsync(stopping);
+            return new RealmAdvanceOutcome(
+                true, "realm_phase_not_enough", false, false, false,
+                requirement.From, requirement.Next, requirement.From, drill,
+                requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
+                await StoneBalanceAsync(connection, transaction, characterId, requirement.Stone, stopping),
+                mainStage, requirement.MainStage, [], requirement.SuccessPct);
         }
 
         // 3. 炼心：这一段已经打开的主线场次，以及这一段列出的必要支线。
@@ -261,7 +274,8 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
         if (success)
         {
             await using var write = new NpgsqlCommand(
-                "update \"角色\".character set realm = $2 where id = $1", connection, transaction);
+                "update \"角色\".character set realm = $2, realm_phase = 0 where id = $1",
+                connection, transaction);
             write.Parameters.AddWithValue(characterId);
             write.Parameters.AddWithValue(requirement.Next);
             await write.ExecuteNonQueryAsync(stopping);
@@ -364,11 +378,11 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
     }
 
     /// <summary>只给核对用：读境界、历练、主线场次与已完成的必要支线。</summary>
-    public async Task<(string Realm, long Drill, int MainStage, List<string> Quests)?> StateAsync(
+    public async Task<(string Realm, int RealmPhase, long Drill, int MainStage, List<string> Quests)?> StateAsync(
         long characterId, CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(
-            "select realm, drill, coalesce(main_stage, 0), "
+            "select realm, realm_phase, drill, coalesce(main_stage, 0), "
             + "(select coalesce(json_agg(quest_id order by quest_id)::text, '[]') "
             + " from \"角色\".character_quest q where q.character_id = c.id) "
             + "from \"角色\".character c where c.id = $1");
@@ -379,8 +393,8 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
             return null;
         }
 
-        var quests = System.Text.Json.JsonSerializer.Deserialize<List<string>>(reader.GetString(3)) ?? [];
-        return (reader.GetString(0), reader.GetInt64(1), reader.GetInt32(2), quests);
+        var quests = System.Text.Json.JsonSerializer.Deserialize<List<string>>(reader.GetString(4)) ?? [];
+        return (reader.GetString(0), reader.GetInt16(1), reader.GetInt64(2), reader.GetInt32(3), quests);
     }
 
     /// <summary>只给核对用：直写历练值，验消耗与库层非负 CHECK。</summary>

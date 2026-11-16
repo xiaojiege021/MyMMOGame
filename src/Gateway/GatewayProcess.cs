@@ -87,6 +87,9 @@ public sealed class GatewayProcess(string configPath)
         // C3：洞府摆放（只做展示和生活）。认令牌、复核归属、生成事务号，
         // 摆放事实与拥有判定全在社交服 / 角色服。
         HomesteadApi.Map(app, tokens, config);
+        HomesteadPlantApi.Map(app, tokens, config);
+        HomeCoinShopApi.Map(app, tokens, config);
+        HeroCodexApi.Map(app, tokens, config);
 
         // N5：竞技场与战场的 HTTP 进场口（职业与分支只读角色服，连战斗仍走 /battle）。
         VersusApi.Map(app, tokens, config);

@@ -12,7 +12,8 @@ public sealed class SocialGrpcService(
     SectTable sectTable,
     SectRepository sects,
     SectFounderGrant founderGrant,
-    HomesteadRuntime homes) : SocialService.SocialServiceBase
+    HomesteadRuntime homes,
+    HomesteadPlantRuntime plants) : SocialService.SocialServiceBase
 {
     public override async Task<SectResponse> CreateSect(
         CreateSectRequest request, ServerCallContext context)
@@ -548,6 +549,119 @@ public sealed class SocialGrpcService(
             CharacterId = characterId,
             SlotId = slotId ?? "",
             ItemId = itemId ?? "",
+            TxnId = txnId ?? "",
+        };
+
+    public override async Task<HomesteadPlantResponse> PlantHomesteadCrop(
+        HomesteadPlantRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        var slotId = (request.SlotId ?? "").Trim();
+        var cropId = (request.CropId ?? "").Trim();
+
+        if (plants.Table is null || plants.Repository is null)
+        {
+            return PlantFail("plant_unavailable", request.CharacterId, slotId, cropId, txnId);
+        }
+
+        if (account.Length == 0 || request.CharacterId == 0
+            || txnId.Length == 0 || slotId.Length == 0 || cropId.Length == 0)
+        {
+            return PlantFail("request_missing", request.CharacterId, slotId, cropId, txnId);
+        }
+
+        var outcome = await plants.Repository.PlantAsync(
+            account, request.CharacterId, txnId, slotId, cropId, context.CancellationToken);
+        return PlantBody(outcome);
+    }
+
+    public override async Task<HomesteadPlantResponse> HarvestHomesteadCrop(
+        HomesteadPlantRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        var slotId = (request.SlotId ?? "").Trim();
+
+        if (plants.Table is null || plants.Repository is null)
+        {
+            return PlantFail("plant_unavailable", request.CharacterId, slotId, "", txnId);
+        }
+
+        if (account.Length == 0 || request.CharacterId == 0
+            || txnId.Length == 0 || slotId.Length == 0)
+        {
+            return PlantFail("request_missing", request.CharacterId, slotId, "", txnId);
+        }
+
+        var outcome = await plants.Repository.HarvestAsync(
+            account, request.CharacterId, txnId, slotId, context.CancellationToken);
+        return PlantBody(outcome);
+    }
+
+    public override async Task<HomesteadPlantResponse> DescribeHomesteadPlants(
+        DescribeHomesteadPlantsRequest request, ServerCallContext context)
+    {
+        if (plants.Table is null || plants.Repository is null)
+        {
+            return PlantFail("plant_unavailable", request.OwnerCharacterId, "", "", "");
+        }
+
+        if (request.OwnerCharacterId == 0)
+        {
+            return PlantFail("request_missing", 0, "", "", "");
+        }
+
+        var rows = await plants.Repository.DescribeAsync(
+            (long)request.OwnerCharacterId, context.CancellationToken);
+        return PlantBody(new HomesteadPlantOutcome(true, "", false,
+            (long)request.OwnerCharacterId, "", "", "", rows, 0, 0));
+    }
+
+    HomesteadPlantResponse PlantBody(HomesteadPlantOutcome o)
+    {
+        var response = new HomesteadPlantResponse
+        {
+            Ok = o.Ok,
+            Reason = o.Reason,
+            Duplicate = o.Duplicate,
+            CharacterId = (ulong)o.CharacterId,
+            SlotId = o.SlotId,
+            CropId = o.CropId,
+            TxnId = o.TxnId,
+            SlotCount = plants.Table?.Slots.Count ?? 0,
+            GrantedHomeCoin = o.GrantedHomeCoin,
+            HomeCoinBalance = o.HomeCoinBalance,
+        };
+
+        foreach (var row in o.Plants)
+        {
+            var def = plants.Table?.FindCrop(row.CropId);
+            var ready = def is null
+                ? row.PlantedAt.ToUnixTimeSeconds()
+                : row.PlantedAt.AddSeconds(def.GrowSeconds).ToUnixTimeSeconds();
+            response.Plants.Add(new HomesteadPlantFact
+            {
+                SlotId = row.SlotId,
+                CropId = row.CropId,
+                PlantedAtUnix = row.PlantedAt.ToUnixTimeSeconds(),
+                ReadyAtUnix = ready,
+                Mature = row.Mature,
+            });
+        }
+
+        return response;
+    }
+
+    static HomesteadPlantResponse PlantFail(
+        string reason, ulong characterId, string slotId, string cropId, string txnId) =>
+        new()
+        {
+            Ok = false,
+            Reason = reason,
+            CharacterId = characterId,
+            SlotId = slotId ?? "",
+            CropId = cropId ?? "",
             TxnId = txnId ?? "",
         };
 }

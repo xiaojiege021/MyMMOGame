@@ -1,0 +1,19 @@
+{
+  "schema": "hero-codex/1",
+  "version": 1,
+  "pending": true,
+  "note": "英灵图鉴九位开口的人（方案 2.7 / mainline.json 名单）。收集度由角色 main_stage 与主线首场解锁场次推算；被动只做生活协助加成，不进入伤害公式。数值 pending，只作占位。",
+  "passive_kind": "life_assist",
+  "max_total_passive_pct_bps": 300,
+  "entries": [
+    {"id": "qiao_xiaoman", "name": "乔小满", "passive_pct_bps": 20},
+    {"id": "su_wanzhi", "name": "苏晚织", "passive_pct_bps": 20},
+    {"id": "ruan_qing", "name": "阮青", "passive_pct_bps": 25},
+    {"id": "a_xian", "name": "阿弦", "passive_pct_bps": 25},
+    {"id": "wen_sao", "name": "闻嫂", "passive_pct_bps": 30},
+    {"id": "meng_qi", "name": "孟七", "passive_pct_bps": 30},
+    {"id": "cheng_chuan", "name": "澄川", "passive_pct_bps": 35},
+    {"id": "hui_sheng", "name": "灰生", "passive_pct_bps": 35},
+    {"id": "zhou_wantang", "name": "周晚棠", "passive_pct_bps": 40}
+  ]
+}

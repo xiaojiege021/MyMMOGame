@@ -41,6 +41,7 @@ var homesteadConfig = false;
 long homesteadStateOf = 0;
 string[]? homesteadPlace = null;
 string[]? homesteadRemove = null;
+string? homesteadPlantTablePath = null;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -148,6 +149,9 @@ for (var i = 0; i < args.Length; i++)
             homesteadRemove = args.Skip(i + 1).Take(3).ToArray();
             i += 3;
             break;
+        case "--homestead-plant-table" when i + 1 < args.Length:
+            homesteadPlantTablePath = args[++i];
+            break;
         default:
             Console.WriteLine("unknown_arg=" + args[i]);
             return 64;
@@ -159,6 +163,8 @@ for (var i = 0; i < args.Length; i++)
 // config/ 目录里，与 config/social.json 同目录。显式 --homestead-table 优先。
 var homesteadPath = homesteadTablePath
     ?? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(configPath)) ?? ".", "homestead.json");
+var homesteadPlantPath = homesteadPlantTablePath
+    ?? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(configPath)) ?? ".", "homestead_plant.json");
 
 // --homestead-config：不连库，逐项打印格位与可摆物品（后者只来自 items.json）。
 // 坏表在这一步就起不来（config_error= + 非 0 退出），与真实启动同一份硬校验。
@@ -594,10 +600,12 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
 // 真实启动：与上面所有只读入口共用同一份 Load + 同一组参数。
 (SocialConfig Config, SectTable Sect) startup;
 HomesteadTable? startupHomestead;
+HomesteadPlantTable? startupHomesteadPlant;
 try
 {
     startup = SocialLoader.LoadAll(configPath, sectTablePath);
     startupHomestead = HomesteadTable.LoadIfPresent(homesteadPath);
+    startupHomesteadPlant = HomesteadPlantTable.LoadIfPresent(homesteadPlantPath);
 }
 catch (ConfigException ex)
 {
@@ -622,4 +630,5 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
     stop.Cancel();
 });
 
-return await new SocialProcess(startup.Config, startup.Sect, startupHomestead).RunAsync(stop.Token);
+return await new SocialProcess(
+    startup.Config, startup.Sect, startupHomestead, startupHomesteadPlant).RunAsync(stop.Token);

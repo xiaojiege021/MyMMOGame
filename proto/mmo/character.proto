@@ -105,6 +105,8 @@ service CharacterService {
   rpc SettleIngot(AuctionIngotSettleRequest) returns (AuctionIngotSettleResponse);
   // P1-5c1：商城的第一道闸门。清单外的商品拒绝，清单内的也还没接发货，两条路都不扣元宝。
   rpc BuyShopItem(BuyShopItemRequest) returns (BuyShopItemResponse);
+  // N11：家园币商城。只许外观与便捷，清单与标价在 config/home_coin_shop.json。
+  rpc BuyHomeCoinShopItem(BuyHomeCoinShopRequest) returns (BuyHomeCoinShopResponse);
   // P1-5c3：在战斗里用掉一张符。战斗服发过来，只扣一张、不碰生命与蓝量——
   // 战斗态在战斗进程里，角色服只负责背包的这一次扣减。回复值与冷却在回包里带回去。
   rpc ConsumeTalisman(ConsumeTalismanRequest) returns (ConsumeTalismanResponse);
@@ -150,6 +152,15 @@ service CharacterService {
   // 给多少历练由 config/dungeons.json 的 drill 决定，请求里带不进来。
   // 同一个事务号再提交不会加第二次。
   rpc SettleDrill(SettleDrillRequest) returns (SettleDrillResponse);
+
+  // N10：段内升一阶。等级门槛与被动百分比都在 config/realms.json；客户端不算。
+  rpc PromoteRealmPhase(PromoteRealmPhaseRequest) returns (PromoteRealmPhaseResponse);
+
+  // N10：只读当前段内阶与配置里的被动万分比（bps），供战斗服等服间读取。
+  rpc DescribeRealmPassive(DescribeRealmPassiveRequest) returns (DescribeRealmPassiveResponse);
+
+  // N12：英灵图鉴收集度与配置里的生活协助被动；不做卡组战斗，客户端不算。
+  rpc DescribeHeroCodex(DescribeHeroCodexRequest) returns (DescribeHeroCodexResponse);
 
   // P3-2a：灵石相邻档兑换。请求里只有角色、低档币种与事务号；
   // 档位顺序、相邻比例与每次给多少全在 config/stone_exchange.json，
@@ -352,7 +363,7 @@ message ApplyGrantResponse {
 message AddCurrencyRequest {
   string account = 1;
   uint64 character_id = 2;
-  // gold / stone_1..stone_5 / yuanbao
+  // gold / stone_1..stone_5 / yuanbao / home_coin
   string kind = 3;
   int64 delta = 4;
 }
@@ -667,6 +678,32 @@ message BuyShopItemResponse {
   // P3-4b：第二角色栏买完之后这个账号一共几个角色位（账号级事实值，从库里读回）。
   // 只在 kind=second_slot 这条商品上是有效值：别的商品恒 0，不拿它顶任何数。
   int32 character_slots = 19;
+}
+
+message BuyHomeCoinShopRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string item_id = 3;
+  string txn_id = 4;
+}
+
+message BuyHomeCoinShopResponse {
+  bool ok = 1;
+  string reason = 2;
+  string item_id = 3;
+  string kind = 4;
+  string name = 5;
+  int64 price_home_coin = 6;
+  string currency = 7;
+  int64 balance = 8;
+  bool enough = 9;
+  int64 charged_home_coin = 10;
+  bool delivered = 11;
+  string state = 12;
+  string delivery_item_id = 13;
+  uint32 bag_slot = 14;
+  bool bound = 15;
+  bool duplicate = 16;
 }
 
 // 回复落在哪个池。方案 12.1：红符只回生命、蓝符只回蓝量，两者互不越界。
@@ -1004,6 +1041,64 @@ message SettleDrillResponse {
   // 这一笔之后的历练值（事实值）。
   int64 drill = 5;
   bool duplicate = 6;
+}
+
+// N10：段内升阶。一个事务号只升一阶。
+message PromoteRealmPhaseRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+}
+
+message PromoteRealmPhaseResponse {
+  bool ok = 1;
+  // level_not_enough / realm_phase_max / character_not_found
+  string reason = 2;
+  int32 from_phase = 3;
+  int32 to_phase = 4;
+  string phase_name = 5;
+  int32 passive_pct_bps = 6;
+  int32 level = 7;
+  int32 level_required = 8;
+  bool duplicate = 9;
+}
+
+message DescribeRealmPassiveRequest {
+  uint64 character_id = 1;
+}
+
+message DescribeRealmPassiveResponse {
+  bool ok = 1;
+  string realm = 2;
+  int32 realm_phase = 3;
+  string phase_name = 4;
+  int32 passive_pct_bps = 5;
+}
+
+// N12：九位开口的人的收集度；解锁场次与被动万分比只在 config/hero_codex.json。
+message DescribeHeroCodexRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message HeroCodexEntryFact {
+  string id = 1;
+  string name = 2;
+  int32 unlock_main_stage = 3;
+  bool collected = 4;
+  int32 passive_pct_bps = 5;
+}
+
+message DescribeHeroCodexResponse {
+  bool ok = 1;
+  int32 main_stage = 2;
+  int32 collected_count = 3;
+  int32 entry_count = 4;
+  // 收集度万分比：collected_count / entry_count * 10000。
+  int32 collection_pct_bps = 5;
+  int32 total_passive_pct_bps = 6;
+  string passive_kind = 7;
+  repeated HeroCodexEntryFact entries = 8;
 }
 
 // P3-2a：兑换只带低档币种，比例与产出都在角色服从配置读。

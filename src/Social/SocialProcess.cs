@@ -9,7 +9,8 @@ namespace Social;
 /// 启动日志把五级上限逐档打出来，与 --sect-config 只读入口同形，改配置重启后
 /// 直接核对得到；配置不对就起不来，不带着半截配置跑。
 /// </summary>
-public sealed class SocialProcess(SocialConfig config, SectTable sect, HomesteadTable? homestead)
+public sealed class SocialProcess(
+    SocialConfig config, SectTable sect, HomesteadTable? homestead, HomesteadPlantTable? plantTable)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
@@ -43,6 +44,10 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect, Homestead
                 + " items=" + homestead.ItemIds.Count
                 + " slot_ids=" + homestead.SlotList
                 + " item_ids=" + homestead.ItemList);
+        Console.WriteLine(plantTable is null
+            ? "homestead_plant=missing"
+            : "homestead_plant_config=ok slots=" + plantTable.Slots.Count
+                + " crops=" + plantTable.Crops.Count);
 
         var connectionString = DbEnv.Resolve();
         Console.WriteLine("db_env=" + DbEnv.Source());
@@ -60,6 +65,7 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect, Homestead
         // C3：洞府摆放的可选装配。缺表时 Table/Repository 都是 null，三个新 RPC
         // 回 homestead_unavailable，宗门那批老 RPC 一个字不受影响。
         using var homes = new HomesteadRuntime(homestead, dataSource, config.CharacterUpstream);
+        using var plants = new HomesteadPlantRuntime(plantTable, dataSource, config.CharacterUpstream);
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2。
@@ -78,6 +84,7 @@ public sealed class SocialProcess(SocialConfig config, SectTable sect, Homestead
         builder.Services.AddSingleton(sects);
         builder.Services.AddSingleton(founderGrant);
         builder.Services.AddSingleton(homes);
+        builder.Services.AddSingleton(plants);
 
         var app = builder.Build();
         app.MapGrpcService<SocialGrpcService>();

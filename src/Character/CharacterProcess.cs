@@ -35,6 +35,7 @@ public sealed class CharacterProcess(string configPath)
         CrystalTable crystalTable;
         AuctionTable auctionTable;
         ShopTable shopTable;
+        HomeCoinShopTable homeCoinShopTable;
         TalismanTable talismanTable;
         ReviveScrollTable scrollTable;
         ExpBoosterTable boosterTable;
@@ -47,6 +48,7 @@ public sealed class CharacterProcess(string configPath)
         MonthlyBundleTable monthlyBundleTable;
         CharacterSlotTable characterSlotTable;
         MainlineTable mainlineTable;
+        HeroCodexTable heroCodexTable;
         DungeonDropTable dungeonDropTable;
         MainlineDropTable mainlineDropTable;
         try
@@ -102,6 +104,8 @@ public sealed class CharacterProcess(string configPath)
             shopTable = ShopTable.Load(
                 config.ShopTable, currencies, items, enhanceTable, talismanTable,
                 scrollTable, boosterTable, unbindTable);
+            homeCoinShopTable = HomeCoinShopTable.Load(
+                "config/home_coin_shop.json", currencies, items);
             // P3-2a：灵石五档兑换表与城池表。与启动共用同一套 Load：
             // 档位都要在币种表里、最高一档的中文名要与币种表一致；
             // 城池的 vein_id 要对应 gather.json 里的 spirit_stone 节点。
@@ -131,6 +135,7 @@ public sealed class CharacterProcess(string configPath)
             mainlineTable = File.Exists(config.MainlineTable)
                 ? MainlineTable.Load(config.MainlineTable, dungeons, realms)
                 : MainlineTable.Missing();
+            heroCodexTable = HeroCodexTable.Load("config/hero_codex.json", mainlineTable);
             var dungeonDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
             dungeonDropTable = DungeonDropTable.LoadIfPresent(dungeonDropPath, items, currencies);
@@ -327,6 +332,11 @@ public sealed class CharacterProcess(string configPath)
             + " stages=" + mainlineTable.Stages.Count
             + " pending=" + (mainlineTable.Pending ? "true" : "false")
             + " battle_dungeon=" + mainlineTable.BattleDungeon);
+        Console.WriteLine("hero_codex=version=" + heroCodexTable.Version
+            + " pending=" + (heroCodexTable.Pending ? "true" : "false")
+            + " kind=" + heroCodexTable.PassiveKind
+            + " entries=" + heroCodexTable.Entries.Count
+            + " max_total_passive_pct_bps=" + heroCodexTable.MaxTotalPassivePctBps);
         foreach (var stage in mainlineTable.Stages)
         {
             Console.WriteLine("mainline_stage=" + stage.Stage
@@ -346,6 +356,7 @@ public sealed class CharacterProcess(string configPath)
             + " pending=" + (mainlineDropTable.Pending ? "true" : "false"));
 
         // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
+        Console.WriteLine("task_grant_city=" + cityTable.TaskGrantCityId);
         foreach (var city in cityTable.Cities)
         {
             Console.WriteLine("city=" + city.CityId
@@ -396,7 +407,8 @@ public sealed class CharacterProcess(string configPath)
         var characters = new CharacterRepository(dataSource);
         var inventory = new InventoryRepository(dataSource);
         var currency = new CurrencyRepository(dataSource);
-        var grants = new GrantRepository(dataSource, items, currencies, config);
+        var cityTax = new CityTaxRepository(dataSource, cityTable, auctionTable.GoldKind);
+        var grants = new GrantRepository(dataSource, items, currencies, config, cityTax);
         var dungeonEntries = new DungeonEntryRepository(dataSource);
         // P2-2a：高难本（龙巢）每人每周的次数。只写 dungeon_entry 一行，
         // 不碰疲劳与周份额；次数以库里已写下的进本记录为准。
@@ -426,6 +438,7 @@ public sealed class CharacterProcess(string configPath)
         // P3-1a2：突破与历练结算的唯一写入点。历练、炼心与灵石都在库里读，
         // 上一段开没开复用同一个 RealmTable。
         var realmAdvances = new RealmAdvanceRepository(dataSource, realms);
+        var realmPhases = new RealmPhaseRepository(dataSource, realms);
         // P3-2a：灵石相邻档兑换与任务发放的灵石成交，两个写入点各一笔事务。
         var stoneExchanges = new StoneExchangeRepository(dataSource, currencies, stoneExchange, config);
         var stoneAuctions = new StoneAuctionRepository(dataSource, auctionTable, stoneExchange, config);
@@ -443,6 +456,7 @@ public sealed class CharacterProcess(string configPath)
         // C1：主线进度的唯一写入点。交任务与只读口共用这一份加载过的十二场正本。
         var mainlines = new MainlineRepository(
             dataSource, mainlineTable, mainlineDropTable, grants, items, config);
+        var heroCodex = new HeroCodexRepository(dataSource, heroCodexTable);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -494,6 +508,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(crystals);
         builder.Services.AddSingleton(auctionTable);
         builder.Services.AddSingleton(shopTable);
+        builder.Services.AddSingleton(homeCoinShopTable);
         builder.Services.AddSingleton(talismanTable);
         builder.Services.AddSingleton(scrollTable);
         builder.Services.AddSingleton(boosters);
@@ -502,6 +517,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(unbindTable);
         builder.Services.AddSingleton(recharges);
         builder.Services.AddSingleton(realmAdvances);
+        builder.Services.AddSingleton(realmPhases);
         builder.Services.AddSingleton(rechargeTable);
         builder.Services.AddSingleton(auctions);
         builder.Services.AddSingleton(ingots);
@@ -521,6 +537,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(wardrobeRepo);
         builder.Services.AddSingleton(mainlineTable);
         builder.Services.AddSingleton(mainlines);
+        builder.Services.AddSingleton(heroCodexTable);
+        builder.Services.AddSingleton(heroCodex);
         builder.Services.AddSingleton(dungeonDropTable);
         builder.Services.AddSingleton(mainlineDropTable);
         builder.Services.AddSingleton(seasonSource);

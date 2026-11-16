@@ -84,6 +84,14 @@ public sealed class HomesteadRepository(
             }
         }
 
+        // N11：庭院格种了作物就不能再摆摆件。
+        if (await HomesteadPlantRepository.SlotHasPlantOnConn(
+                connection, transaction, (long)characterId, slot, stopping))
+        {
+            await transaction.RollbackAsync(stopping);
+            return Reject("slot_has_plant", characterId, slot, item, txn);
+        }
+
         // 4. 同格重摆只换展示事实：不消耗背包、不写角色库、不发任何奖励。
         try
         {

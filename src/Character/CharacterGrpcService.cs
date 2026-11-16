@@ -48,6 +48,7 @@ public sealed class CharacterGrpcService(
     RechargeTable rechargeTable,
     RechargeRepository recharges,
     RealmAdvanceRepository realmAdvances,
+    RealmPhaseRepository realmPhases,
     SocialService.SocialServiceClient social,
     CharacterConfig config,
     ILogger<CharacterGrpcService> logger,
@@ -66,7 +67,9 @@ public sealed class CharacterGrpcService(
     ISeasonSource seasonSource,
     MainlineTable mainlineTable,
     MainlineRepository mainlines,
-    DungeonDropTable dungeonDropTable) : CharacterService.CharacterServiceBase
+    DungeonDropTable dungeonDropTable,
+    HomeCoinShopTable homeCoinShopTable,
+    HeroCodexRepository heroCodex) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
@@ -1747,6 +1750,164 @@ public sealed class CharacterGrpcService(
         }
     }
 
+    public override async Task<BuyHomeCoinShopResponse> BuyHomeCoinShopItem(
+        BuyHomeCoinShopRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "item_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var balances = await currency.AllAsync(characterId, context.CancellationToken);
+        var balance = balances.GetValueOrDefault(HomeCoinShopTable.WrittenCurrency, 0L);
+        var item = homeCoinShopTable.Find(itemId);
+        if (item is null)
+        {
+            return new BuyHomeCoinShopResponse
+            {
+                Ok = false,
+                Reason = "not_in_list",
+                ItemId = itemId,
+                Currency = HomeCoinShopTable.WrittenCurrency,
+                Balance = balance,
+                Enough = false,
+            };
+        }
+
+        if (!item.Deliverable)
+        {
+            return HomeCoinShopRejected("delivery_pending", item, balance);
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > GrantRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var goods = items.Find(item.DeliveryItemId);
+        if (goods is null)
+        {
+            return HomeCoinShopRejected("delivery_pending", item, balance);
+        }
+
+        var slots = await inventory.ListAsync(characterId, context.CancellationToken);
+        var slot = FindDeliverySlot(slots, goods, item.DeliveryCount, config.BagSlots);
+        if (slot == 0)
+        {
+            return HomeCoinShopRejected("bag_full", item, balance);
+        }
+
+        if (balance < item.PriceHomeCoin)
+        {
+            return HomeCoinShopRejected("not_enough_home_coin", item, balance);
+        }
+
+        try
+        {
+            var outcome = await grants.ApplyAsync(
+                characterId,
+                txnId,
+                new List<GrantEntry>
+                {
+                    new()
+                    {
+                        Currency = new CurrencyDelta
+                        {
+                            Kind = HomeCoinShopTable.WrittenCurrency,
+                            Delta = -item.PriceHomeCoin,
+                        },
+                    },
+                    new()
+                    {
+                        Item = new ItemDelta
+                        {
+                            Slot = (uint)slot,
+                            ItemId = goods.Id,
+                            Count = item.DeliveryCount,
+                        },
+                    },
+                },
+                context.CancellationToken);
+
+            var after = outcome.Balances.GetValueOrDefault(HomeCoinShopTable.WrittenCurrency, 0L);
+            if (outcome.Duplicate)
+            {
+                return new BuyHomeCoinShopResponse
+                {
+                    Ok = false,
+                    Reason = "duplicate",
+                    ItemId = item.Id,
+                    Kind = item.Kind,
+                    Name = item.Name,
+                    PriceHomeCoin = item.PriceHomeCoin,
+                    Currency = HomeCoinShopTable.WrittenCurrency,
+                    Balance = after,
+                    Enough = true,
+                    Duplicate = true,
+                };
+            }
+
+            return new BuyHomeCoinShopResponse
+            {
+                Ok = true,
+                ItemId = item.Id,
+                Kind = item.Kind,
+                Name = item.Name,
+                PriceHomeCoin = item.PriceHomeCoin,
+                Currency = HomeCoinShopTable.WrittenCurrency,
+                Balance = after,
+                Enough = true,
+                ChargedHomeCoin = item.PriceHomeCoin,
+                Delivered = true,
+                State = "delivered",
+                DeliveryItemId = goods.Id,
+                BagSlot = (uint)slot,
+                Bound = goods.BindsOnArrival,
+            };
+        }
+        catch (GrantException ex)
+        {
+            var reason = ex.Code switch
+            {
+                "insufficient" => "not_enough_home_coin",
+                "slot_occupied" => "bag_full",
+                "stack_overflow" => "bag_full",
+                _ => ex.Code,
+            };
+
+            return HomeCoinShopRejected(reason, item, balance);
+        }
+    }
+
+    BuyHomeCoinShopResponse HomeCoinShopRejected(
+        string reason, HomeCoinShopTable.Item item, long balance) =>
+        new()
+        {
+            Ok = false,
+            Reason = reason,
+            ItemId = item.Id,
+            Kind = item.Kind,
+            Name = item.Name,
+            PriceHomeCoin = item.PriceHomeCoin,
+            Currency = HomeCoinShopTable.WrittenCurrency,
+            Balance = balance,
+            Enough = balance >= item.PriceHomeCoin,
+        };
+
     // ------------------------------------------------------------------ P3-4a2 通行证
 
     /// <summary>
@@ -3320,6 +3481,109 @@ public sealed class CharacterGrpcService(
             Drill = outcome.Drill,
             Duplicate = outcome.Duplicate,
         };
+    }
+
+    public override async Task<PromoteRealmPhaseResponse> PromoteRealmPhase(
+        PromoteRealmPhaseRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > RealmPhaseRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_id_invalid"));
+        }
+
+        var account = (request.Account ?? "").Trim();
+        var outcome = await realmPhases.PromoteAsync(
+            (long)request.CharacterId,
+            account.Length == 0 ? null : account,
+            txnId,
+            context.CancellationToken);
+
+        return new PromoteRealmPhaseResponse
+        {
+            Ok = outcome.Executed,
+            Reason = outcome.Reason,
+            FromPhase = outcome.FromPhase,
+            ToPhase = outcome.ToPhase,
+            PhaseName = outcome.PhaseName,
+            PassivePctBps = outcome.PassivePctBps,
+            Level = outcome.Level,
+            LevelRequired = outcome.LevelRequired,
+            Duplicate = outcome.Duplicate,
+        };
+    }
+
+    public override async Task<DescribeRealmPassiveResponse> DescribeRealmPassive(
+        DescribeRealmPassiveRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var snap = await realmPhases.DescribePassiveAsync(
+            (long)request.CharacterId, context.CancellationToken);
+        if (!snap.Found)
+        {
+            return new DescribeRealmPassiveResponse { Ok = false };
+        }
+
+        return new DescribeRealmPassiveResponse
+        {
+            Ok = true,
+            Realm = snap.Realm,
+            RealmPhase = snap.Phase,
+            PhaseName = snap.PhaseName,
+            PassivePctBps = snap.PassivePctBps,
+        };
+    }
+
+    public override async Task<DescribeHeroCodexResponse> DescribeHeroCodex(
+        DescribeHeroCodexRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var account = (request.Account ?? "").Trim();
+        var snap = await heroCodex.DescribeAsync(
+            (long)request.CharacterId,
+            account.Length == 0 ? null : account,
+            context.CancellationToken);
+        if (!snap.Found)
+        {
+            return new DescribeHeroCodexResponse { Ok = false };
+        }
+
+        var response = new DescribeHeroCodexResponse
+        {
+            Ok = true,
+            MainStage = snap.MainStage,
+            CollectedCount = snap.CollectedCount,
+            EntryCount = snap.EntryCount,
+            CollectionPctBps = snap.CollectionPctBps,
+            TotalPassivePctBps = snap.TotalPassivePctBps,
+            PassiveKind = snap.PassiveKind,
+        };
+        foreach (var row in snap.Entries)
+        {
+            response.Entries.Add(new HeroCodexEntryFact
+            {
+                Id = row.Id,
+                Name = row.Name,
+                UnlockMainStage = row.UnlockMainStage,
+                Collected = row.Collected,
+                PassivePctBps = row.PassivePctBps,
+            });
+        }
+
+        return response;
     }
 
     /// <summary>
