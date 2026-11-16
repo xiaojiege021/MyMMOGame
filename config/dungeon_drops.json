@@ -1,0 +1,29 @@
+{
+  "schema": "dungeon-drops/1",
+  "version": 1,
+  "pending": true,
+  "note": "N6 副本掉落的唯一正本（开发架构第 14 节第 85 行、方案第 9 章与 10.1：副本直接掉落的成品用掉落表里的基准值，不走掷点；具体数量留在配置，不在代码里写死）。战斗服通关后按本表报掉落事实，角色服在同一笔 SettleExp 事务里经 P1-1b5 的 grant_txn 入包；表外物品、灵石币种与五档灵石物品一律拒绝。方案没写定每个副本掉什么，下列数量是占位实数并标 pending=true。顶层与条目白名单，probability / tax / spirit_stone / gold / yuanbao / exp / fatigue / weekly_share 一类键长不出来。",
+  "items_config": "items.json",
+  "entries": [
+    {
+      "dungeon_id": "main",
+      "lines": [
+        { "item_id": "stone_enhance_low", "count": 1 }
+      ]
+    },
+    {
+      "dungeon_id": "abyss",
+      "lines": [
+        { "item_id": "stone_enhance_low", "count": 2 },
+        { "item_id": "crystal_attack", "count": 1 }
+      ]
+    },
+    {
+      "dungeon_id": "lair",
+      "lines": [
+        { "item_id": "stone_enhance_mid", "count": 1 },
+        { "item_id": "stone_transfer", "count": 1 }
+      ]
+    }
+  ]
+}

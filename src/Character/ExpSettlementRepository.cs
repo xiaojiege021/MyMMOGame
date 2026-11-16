@@ -17,7 +17,9 @@ public sealed record ExpSettlementOutcome(
     long BoosterExp,
     long DrillGain,
     long Drill,
-    string DrillReason);
+    string DrillReason,
+    int DropLines = 0,
+    string DropReason = "");
 
 /// <summary>
 /// 等级经验的唯一写入点。活动、副本、任务、竞技场、战场、城战和世界 Boss
@@ -44,6 +46,10 @@ public sealed record ExpSettlementOutcome(
 /// </summary>
 public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
 {
+    public sealed class DropSettlementException(string code) : Exception(code)
+    {
+        public string Code { get; } = code;
+    }
     public const int MaxTxnLength = 128;
     public const int MaxSourceLength = 32;
     public const int MaxDungeonIdLength = 32;
@@ -63,6 +69,10 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         DungeonDef? dungeon,
         int qualifiedKills,
         RealmTable realms,
+        GrantRepository grants,
+        ItemTable items,
+        CharacterConfig config,
+        IReadOnlyList<DropLineDef> drops,
         CancellationToken stopping)
     {
         var baseExp = table.BaseExp;
@@ -114,7 +124,7 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
             await transaction.RollbackAsync(stopping);
             return new ExpSettlementOutcome(
                 false, false, 0, 0, 0, 0, 0, 0, 0, OriginalPct, 0,
-                0, 0, "character_not_found");
+                0, 0, "character_not_found", 0, "");
         }
 
         // 历练只在「这一场确实在一个有资格的副本里、并且有击杀」时才算。
@@ -197,7 +207,36 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
                 // 抢不到号整笔回滚：经验与历练都没有写，回包里的历练是库里的当前事实值。
                 return new ExpSettlementOutcome(
                     true, true, 0, 0, 0, 0, levelBefore, levelBefore, expBefore,
-                    OriginalPct, 0, 0, drillBefore, "duplicate");
+                    OriginalPct, 0, 0, drillBefore, "duplicate", 0, "");
+            }
+        }
+
+        var dropLines = 0;
+        var dropReason = "";
+        if (drops.Count > 0)
+        {
+            if (!await grants.TryClaimTxnInTransactionAsync(
+                    connection, transaction, characterId, txnId, stopping))
+            {
+                await transaction.RollbackAsync(stopping);
+                return new ExpSettlementOutcome(
+                    true, true, 0, 0, 0, 0, levelBefore, levelBefore, expBefore,
+                    OriginalPct, 0, 0, drillBefore, "duplicate", 0, "grant_duplicate");
+            }
+
+            try
+            {
+                var slots = await grants.ReadSlotsForTransactionAsync(
+                    connection, transaction, characterId, stopping);
+                var deltas = GrantRepository.PlanItemDeltas(slots, drops, items, config.BagSlots);
+                await grants.ApplyItemDeltasInTransactionAsync(
+                    connection, transaction, characterId, deltas, stopping);
+                dropLines = drops.Count;
+            }
+            catch (GrantException ex)
+            {
+                await transaction.RollbackAsync(stopping);
+                throw new DropSettlementException(ex.Code);
             }
         }
 
@@ -252,7 +291,7 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
         await transaction.CommitAsync(stopping);
         return new ExpSettlementOutcome(
             true, false, baseExp, partyBonus, sameSectBonus, gain, levelBefore, level, exp,
-            boosterPct, boosterExp, drillGain, drillAfter, drillReason);
+            boosterPct, boosterExp, drillGain, drillAfter, drillReason, dropLines, dropReason);
     }
 
     /// <summary>只给核对用：读等级、当前级经验、结算笔数与累计入账经验。</summary>

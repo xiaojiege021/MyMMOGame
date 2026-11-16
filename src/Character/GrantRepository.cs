@@ -238,6 +238,13 @@ public sealed class GrantRepository(
         return map;
     }
 
+    public Task<List<BagSlot>> ReadSlotsForTransactionAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        CancellationToken stopping) =>
+        ReadSlotsAsync(connection, transaction, characterId, stopping);
+
     async Task<List<BagSlot>> ReadSlotsAsync(
         NpgsqlConnection connection,
         NpgsqlTransaction? transaction,
@@ -282,5 +289,110 @@ public sealed class GrantRepository(
         command.Parameters.AddWithValue(characterId);
         var value = await command.ExecuteScalarAsync(stopping);
         return Convert.ToInt32(value);
+    }
+
+    /// <summary>N6：在已打开的事务里抢 grant_txn。false 表示这个号已经用过。</summary>
+    public async Task<bool> TryClaimTxnInTransactionAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string txnId,
+        CancellationToken stopping)
+    {
+        await using var claim = new NpgsqlCommand(
+            "insert into \"角色\".grant_txn (txn_id, character_id) values ($1, $2) "
+            + "on conflict (txn_id) do nothing returning txn_id",
+            connection, transaction);
+        claim.Parameters.AddWithValue(txnId);
+        claim.Parameters.AddWithValue(characterId);
+        return await claim.ExecuteScalarAsync(stopping) is not null;
+    }
+
+    /// <summary>给一批掉落挑格子并入包，须在已有事务里调用。</summary>
+    public async Task ApplyItemDeltasInTransactionAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        IReadOnlyList<ItemDelta> deltas,
+        CancellationToken stopping)
+    {
+        foreach (var delta in deltas)
+        {
+            await ApplyItemAsync(connection, transaction, characterId, delta, stopping);
+        }
+    }
+
+    /// <summary>先叠未满格，再占空格；失败抛 bag_full / unknown_item。</summary>
+    public static List<ItemDelta> PlanItemDeltas(
+        IReadOnlyList<BagSlot> slots,
+        IReadOnlyList<DropLineDef> lines,
+        ItemTable itemTable,
+        int bagSlots)
+    {
+        var working = slots.Select(s => s).ToList();
+        var result = new List<ItemDelta>();
+        foreach (var line in lines)
+        {
+            var def = itemTable.Find(line.ItemId)
+                ?? throw new GrantException("unknown_item");
+            var slot = FindDeliverySlot(working, def, line.Count, bagSlots);
+            if (slot == 0)
+            {
+                throw new GrantException("bag_full");
+            }
+
+            result.Add(new ItemDelta
+            {
+                Slot = (uint)slot,
+                ItemId = line.ItemId,
+                Count = line.Count,
+            });
+
+            var idx = working.FindIndex(s => s.Slot == slot);
+            if (idx >= 0)
+            {
+                working[idx] = working[idx] with { Count = working[idx].Count + line.Count };
+            }
+            else
+            {
+                working.Add(new BagSlot(slot, line.ItemId, line.Count, def.BindsOnArrival));
+            }
+        }
+
+        return result;
+    }
+
+    static int FindDeliverySlot(
+        IReadOnlyList<BagSlot> slots, ItemDef goods, int count, int bagSlots)
+    {
+        if (count < 1 || count > goods.StackMax)
+        {
+            return 0;
+        }
+
+        foreach (var slot in slots)
+        {
+            if (string.Equals(slot.ItemId, goods.Id, StringComparison.Ordinal)
+                && slot.Count + count <= goods.StackMax)
+            {
+                return slot.Slot;
+            }
+        }
+
+        var used = new HashSet<int>();
+        foreach (var slot in slots)
+        {
+            used.Add(slot.Slot);
+        }
+
+        for (var s = 1; s <= bagSlots; s++)
+        {
+            if (!used.Contains(s))
+            {
+                return s;
+            }
+        }
+
+        return 0;
     }
 }

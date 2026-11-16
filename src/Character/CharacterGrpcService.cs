@@ -65,7 +65,8 @@ public sealed class CharacterGrpcService(
     WardrobeRepository wardrobe,
     ISeasonSource seasonSource,
     MainlineTable mainlineTable,
-    MainlineRepository mainlines) : CharacterService.CharacterServiceBase
+    MainlineRepository mainlines,
+    DungeonDropTable dungeonDropTable) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
@@ -901,10 +902,50 @@ public sealed class CharacterGrpcService(
         // 结算本身（基础 + 组队加成）不能硬依赖社交服，只加经验、不该阻塞。
         var allSameSect = await ComputeAllSameSectAsync(request.MemberIds, context.CancellationToken);
 
-        var outcome = await expSettlements.SettleAsync(
-            (long)request.CharacterId, account.Length == 0 ? null : account,
-            txnId, source, partySize, allSameSect, expTable, boosterTable,
-            dungeon, qualifiedKills, realms, context.CancellationToken);
+        var reportedDrops = new List<DropLineDef>();
+        foreach (var line in request.Drops)
+        {
+            var itemId = (line.ItemId ?? "").Trim();
+            if (itemId.Length == 0 || line.Count < 1)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "drop_line_invalid"));
+            }
+
+            reportedDrops.Add(new DropLineDef(itemId, line.Count));
+        }
+
+        if (dungeonId.Length == 0 && reportedDrops.Count > 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "drop_without_dungeon"));
+        }
+
+        if (reportedDrops.Count > 0)
+        {
+            if (dungeonDropTable.IsMissing)
+            {
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, "drop_table_missing"));
+            }
+
+            if (!dungeonDropTable.MatchesReported(dungeonId, reportedDrops))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "drop_invalid"));
+            }
+        }
+
+        ExpSettlementOutcome outcome;
+        try
+        {
+            outcome = await expSettlements.SettleAsync(
+                (long)request.CharacterId, account.Length == 0 ? null : account,
+                txnId, source, partySize, allSameSect, expTable, boosterTable,
+                dungeon, qualifiedKills, realms, grants, items, config,
+                reportedDrops, context.CancellationToken);
+        }
+        catch (ExpSettlementRepository.DropSettlementException ex)
+        {
+            throw new RpcException(new Status(StatusCode.FailedPrecondition, ex.Code));
+        }
+
         if (!outcome.Found)
         {
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
@@ -916,13 +957,14 @@ public sealed class CharacterGrpcService(
             + "level={LevelBefore}->{Level} exp={Exp} "
             + "booster_pct={BoosterPct} booster_exp={BoosterExp} "
             + "dungeon={Dungeon} kills={Kills} drill_gain={DrillGain} drill={Drill} "
-            + "drill_reason={DrillReason}",
+            + "drill_reason={DrillReason} drop_lines={DropLines} drop_reason={DropReason}",
             account.Length == 0 ? "service" : account, request.CharacterId, txnId, source, partySize,
             outcome.Duplicate, outcome.BaseExp, outcome.PartyBonus, outcome.SameSectBonus, outcome.ExpGain,
             outcome.LevelBefore, outcome.Level, outcome.Exp,
             outcome.BoosterPct, outcome.BoosterExp,
             dungeonId.Length == 0 ? "none" : dungeonId, request.QualifiedKills,
-            outcome.DrillGain, outcome.Drill, outcome.DrillReason);
+            outcome.DrillGain, outcome.Drill, outcome.DrillReason,
+            outcome.DropLines, outcome.DropReason);
 
         return new SettleExpResponse
         {

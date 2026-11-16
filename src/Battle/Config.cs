@@ -394,6 +394,9 @@ public sealed class BattleConfig
     /// <summary>副本表：人数上限与进本时的扣减规则。与角色服读同一份配置。</summary>
     public DungeonTable Dungeons { get; private set; } = null!;
 
+    /// <summary>N6 掉落表。缺表时不报任何掉落行。</summary>
+    public DungeonDropTable DungeonDrops { get; private set; } = null!;
+
     /// <summary>
     /// 竞技场模式与统一属性模板（config/arena_match.json）。注意与上面那个
     /// Arena 区分：Arena 是场地半径和移速，这里是 1v1 / 3v3 与模板属性。
@@ -461,6 +464,7 @@ public sealed class BattleConfig
         var skillPath = Resolve(dir, raw.SkillTable, "skills.json");
         var classPath = Resolve(dir, raw.ClassTable, "classes.json");
         var dungeonPath = Resolve(dir, raw.DungeonTable, "dungeons.json");
+        var dungeonDropPath = Resolve(dir, raw.DungeonDropTable, "dungeon_drops.json");
         var arenaMatchPath = Resolve(dir, raw.ArenaMatchTable, "arena_match.json");
         var battlefieldPath = Resolve(dir, raw.BattlefieldTable, "battlefield.json");
         var siegePath = Resolve(dir, raw.SiegeTable, "siege.json");
@@ -544,6 +548,7 @@ public sealed class BattleConfig
             Skills = SkillTable.Load(skillPath),
             Classes = ClassTable.Load(classPath),
             Dungeons = DungeonTable.Load(dungeonPath),
+            DungeonDrops = DungeonDropTable.LoadIfPresent(dungeonDropPath),
             ArenaMatch = arenaMatch,
             Battlefield = battlefield,
             Siege = siege,
@@ -761,6 +766,7 @@ public sealed class BattleConfig
         public string SkillTable { get; init; } = "skills.json";
         public string ClassTable { get; init; } = "classes.json";
         public string DungeonTable { get; init; } = "dungeons.json";
+        public string DungeonDropTable { get; init; } = "dungeon_drops.json";
         public string ArenaMatchTable { get; init; } = "";
         public string BattlefieldTable { get; init; } = "";
         public string SiegeTable { get; init; } = "";

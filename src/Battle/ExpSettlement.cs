@@ -17,7 +17,8 @@ public interface IExpSettlement : IDisposable
 {
     void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
-        string dungeonId, int qualifiedKills);
+        string dungeonId, int qualifiedKills,
+        IReadOnlyList<(string ItemId, int Count)> drops);
 }
 
 /// <summary>
@@ -28,7 +29,8 @@ public sealed class NoExpSettlement : IExpSettlement
 {
     public void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
-        string dungeonId, int qualifiedKills)
+        string dungeonId, int qualifiedKills,
+        IReadOnlyList<(string ItemId, int Count)> drops)
     {
     }
 
@@ -55,28 +57,33 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
 
     public void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
-        string dungeonId, int qualifiedKills)
+        string dungeonId, int qualifiedKills,
+        IReadOnlyList<(string ItemId, int Count)> drops)
     {
         foreach (var characterId in memberIds)
         {
             var txnId = settlementId + ":" + characterId.ToString("x16");
             try
             {
-                var reply = _client.SettleExp(
-                    new SettleExpRequest
-                    {
-                        CharacterId = characterId,
-                        TxnId = txnId,
-                        Source = source,
-                        PartySize = (uint)partySize,
-                        // P2-1c：把整队成员交给角色服判同宗门；战斗服不解析谁同门。
-                        MemberIds = { memberIds },
-                        // P3-1a2 补正：这一场的副本与有资格击杀数。历练数值由角色服
-                        // 按 config/dungeons.json 算，战斗服只报个数，不报数值。
-                        DungeonId = dungeonId,
-                        QualifiedKills = (uint)Math.Max(0, qualifiedKills),
-                    },
-                    deadline: DateTime.UtcNow.AddSeconds(5));
+                var request = new SettleExpRequest
+                {
+                    CharacterId = characterId,
+                    TxnId = txnId,
+                    Source = source,
+                    PartySize = (uint)partySize,
+                    // P2-1c：把整队成员交给角色服判同宗门；战斗服不解析谁同门。
+                    MemberIds = { memberIds },
+                    // P3-1a2 补正：这一场的副本与有资格击杀数。历练数值由角色服
+                    // 按 config/dungeons.json 算，战斗服只报个数，不报数值。
+                    DungeonId = dungeonId,
+                    QualifiedKills = (uint)Math.Max(0, qualifiedKills),
+                };
+                foreach (var (itemId, count) in drops)
+                {
+                    request.Drops.Add(new SettleDropLine { ItemId = itemId, Count = count });
+                }
+
+                var reply = _client.SettleExp(request, deadline: DateTime.UtcNow.AddSeconds(5));
 
                 Console.WriteLine("exp_settle=ok txn=" + txnId
                     + " character=" + characterId
@@ -91,6 +98,7 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
                     + " drill=" + reply.DrillGain
                     + " drill_after=" + reply.Drill
                     + " drill_reason=" + reply.DrillReason
+                    + " drops=" + drops.Count
                     // P3-5a：来源只追加在串尾，老断言（gain= / bonus= 的顺序）一字不动。
                     + " source=" + source);
             }

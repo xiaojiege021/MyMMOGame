@@ -1325,9 +1325,13 @@ public sealed class Encounter
             var settledSize = _settlementPartySize > 0
                 ? Math.Max(_settlementPartySize, _partySize)
                 : _partySize;
+            var dungeonId = _dungeon?.Id ?? "";
+            var drops = dungeonId.Length > 0 && _bossHp <= 0
+                ? _config.DungeonDrops.LinesFor(dungeonId)
+                : [];
             _expSettlement.SettleParty(
                 _settlementId, SettlementSource, settledSize, _members.Keys.ToArray(),
-                _dungeon?.Id ?? "", _qualifiedKills);
+                dungeonId, _qualifiedKills, drops);
         }
 
         return new BattleEnded

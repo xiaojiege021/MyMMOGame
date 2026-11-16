@@ -210,6 +210,16 @@ message SettleExpRequest {
   // 由角色服在同一事务里算并写入；战斗服只报击杀数，带不进任何历练数值。
   // 0 表示这一场没有可计历练的击杀（例如没通关）。
   uint32 qualified_kills = 8;
+  // N6：战斗服报的掉落事实（物品编号与数量）。角色服逐条对照
+  // config/dungeon_drops.json，表外物品整笔拒绝；与经验、历练同一事务号经 grant_txn 入包。
+  // 非副本结算（dungeon_id 空）不许带掉落行。
+  repeated SettleDropLine drops = 9;
+}
+
+// 一场副本结算里的一条掉落事实。
+message SettleDropLine {
+  string item_id = 1;
+  int32 count = 2;
 }
 
 message SettleExpResponse {

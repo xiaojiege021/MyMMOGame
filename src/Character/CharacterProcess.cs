@@ -47,6 +47,7 @@ public sealed class CharacterProcess(string configPath)
         MonthlyBundleTable monthlyBundleTable;
         CharacterSlotTable characterSlotTable;
         MainlineTable mainlineTable;
+        DungeonDropTable dungeonDropTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -129,6 +130,9 @@ public sealed class CharacterProcess(string configPath)
             mainlineTable = File.Exists(config.MainlineTable)
                 ? MainlineTable.Load(config.MainlineTable, dungeons, realms)
                 : MainlineTable.Missing();
+            var dungeonDropPath = Path.GetFullPath(Path.Combine(
+                Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
+            dungeonDropTable = DungeonDropTable.LoadIfPresent(dungeonDropPath, items, currencies);
         }
         catch (ConfigException ex)
         {
@@ -329,6 +333,10 @@ public sealed class CharacterProcess(string configPath)
                 + " battle=" + stage.Battle);
         }
 
+        Console.WriteLine("dungeon_drops=" + (dungeonDropTable.IsMissing ? "missing" : "ok")
+            + " version=" + dungeonDropTable.Version
+            + " dungeons=" + dungeonDropTable.DungeonCount);
+
         // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
         foreach (var city in cityTable.Cities)
         {
@@ -504,6 +512,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(wardrobeRepo);
         builder.Services.AddSingleton(mainlineTable);
         builder.Services.AddSingleton(mainlines);
+        builder.Services.AddSingleton(dungeonDropTable);
         builder.Services.AddSingleton(seasonSource);
         builder.Services.AddSingleton(config);
 

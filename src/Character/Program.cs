@@ -49,6 +49,11 @@ string? expConfigPath = null;
 // P2-2a：把副本表读出来，不连库、不启动进程，坏配置也走这里（与启动共用同一 DungeonTable.Load）。
 var dungeonTableState = false;
 string? dungeonTablePath = null;
+// N6：掉落表只读核对（与启动共用 DungeonDropTable.Load）。
+var dungeonDropTableState = false;
+string? dungeonDropTablePath = null;
+long itemCountOf = 0;
+string? itemCountItem = null;
 // P3-1a1：把境界表读出来（与启动共用同一 RealmTable.Load），坏配置也走这里。
 var realmTableState = false;
 string? realmTablePath = null;
@@ -341,6 +346,14 @@ for (var i = 0; i < args.Length; i++)
         case "--dungeon-table-path" when i + 1 < args.Length:
             dungeonTableState = true;
             dungeonTablePath = args[++i];
+            break;
+        case "--dungeon-drop-table-path" when i + 1 < args.Length:
+            dungeonDropTableState = true;
+            dungeonDropTablePath = args[++i];
+            break;
+        case "--item-count" when i + 2 < args.Length:
+            long.TryParse(args[++i], out itemCountOf);
+            itemCountItem = args[++i];
             break;
         // P3-1a1：境界表只读核对。与启动共用同一 RealmTable.Load；给两个路径时
         // 第一个是临时境界表、第二个是临时副本表，用来验「旧副本不许写 realm」。
@@ -764,6 +777,44 @@ if (dungeonTableState)
                 + " share=" + (dungeon.TakesWeeklyShare ? "true" : "false")
                 + " realm=" + (dungeon.Realm ?? "none")
                 + " drill=" + dungeon.Drill);
+        }
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
+// N6：掉落表只读核对，坏配置（灵石币种、表外物品）在这里直接被挡住。
+if (dungeonDropTableState)
+{
+    try
+    {
+        var items = ItemTable.Load("config/items.json");
+        var currencies = CurrencyTable.Load("config/currency.json");
+        var path = dungeonDropTablePath
+            ?? Path.GetFullPath(Path.Combine(
+                Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
+        var table = DungeonDropTable.Load(path, items, currencies);
+        Console.WriteLine("dungeon_drop_table_state=ok version=" + table.Version
+            + " dungeons=" + table.DungeonCount);
+        foreach (var id in new[] { "main", "abyss", "lair" })
+        {
+            var lines = table.LinesFor(id);
+            if (lines.Count == 0)
+            {
+                continue;
+            }
+
+            Console.WriteLine("dungeon_drop=" + id + " lines=" + lines.Count);
         }
     }
     catch (ConfigException ex)
@@ -1557,7 +1608,7 @@ if (siegeTerritoryTableState)
 // 只读核对与清理走这里；正常启动不经过（gRPC 服务在下面）。
 if (reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
     || branchStateOf != 0 || advanceBranchId != 0 || canEquipOf != 0
-    || bindingOf != null || rawCurrencyId != 0 || txnCount != null
+    || bindingOf != null || rawCurrencyId != 0 || txnCount != null || itemCountOf != 0
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
@@ -2238,6 +2289,18 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             command.Parameters.AddWithValue(txnCount);
             var value = await command.ExecuteScalarAsync(CancellationToken.None);
             Console.WriteLine("txn_count=" + Convert.ToInt32(value) + " txn=" + txnCount);
+        }
+
+        if (itemCountOf != 0 && itemCountItem != null)
+        {
+            await using var command = dataSource.CreateCommand(
+                "select coalesce(sum(count), 0) from \"角色\".inventory "
+                + "where character_id = $1 and item_id = $2");
+            command.Parameters.AddWithValue(itemCountOf);
+            command.Parameters.AddWithValue(itemCountItem);
+            var value = await command.ExecuteScalarAsync(CancellationToken.None);
+            Console.WriteLine("item_count=" + Convert.ToInt64(value)
+                + " id=" + itemCountOf + " item=" + itemCountItem);
         }
 
         if (reservesOf != 0)
