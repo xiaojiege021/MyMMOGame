@@ -1,0 +1,17 @@
+{
+  "schema": "party-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "Q7/Q8：队伍与分配的唯一正本。方案 11 写定 4 人小队；邀请、准备、分配规则方案没写，全部 pending。代码尚未读取，由 Q7/Q8 接入。",
+  "max_size": 4,
+  "invite_timeout_s": 60,
+  "ready_check_timeout_s": 30,
+  "loot": {
+    "mode": "personal",
+    "roll": "none"
+  },
+  "level_range": {
+    "enabled": false,
+    "max_gap": 20
+  }
+}

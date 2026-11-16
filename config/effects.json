@@ -1,0 +1,109 @@
+{
+  "schema": "effect-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "Q1/Q2：buff、debuff、控制、HoT、DoT、护盾的唯一正本。方案没有写定具体效果与数值；这里只给类型与样例，全部标 pending。代码尚未读取，由 Q1 设计、Q2 接入；伤害管线与叠层规则见 docs/未覆盖排期.md。",
+  "effects": [
+    {
+      "id": "buff_attack_up_1",
+      "name": "锐意",
+      "kind": "buff",
+      "duration_ms": 10000,
+      "max_stacks": 3,
+      "stack_rule": "refresh",
+      "dispel_tags": [
+        "buff"
+      ],
+      "immunity_tags": [],
+      "modifiers": [
+        {
+          "stat": "attack_pct",
+          "value": 10
+        }
+      ],
+      "tick_ms": 0,
+      "pending": true
+    },
+    {
+      "id": "debuff_defense_down_1",
+      "name": "破甲",
+      "kind": "debuff",
+      "duration_ms": 8000,
+      "max_stacks": 1,
+      "stack_rule": "refresh",
+      "dispel_tags": [
+        "debuff"
+      ],
+      "immunity_tags": [],
+      "modifiers": [
+        {
+          "stat": "defense_pct",
+          "value": -15
+        }
+      ],
+      "tick_ms": 0,
+      "pending": true
+    },
+    {
+      "id": "cc_root_1",
+      "name": "定身",
+      "kind": "control",
+      "control": "root",
+      "duration_ms": 2000,
+      "max_stacks": 1,
+      "stack_rule": "refresh",
+      "diminishing": true,
+      "immunity_tags": [
+        "cc_immune"
+      ],
+      "pending": true
+    },
+    {
+      "id": "cc_slow_1",
+      "name": "迟滞",
+      "kind": "control",
+      "control": "slow",
+      "duration_ms": 4000,
+      "max_stacks": 1,
+      "stack_rule": "refresh",
+      "value_pct": -30,
+      "diminishing": true,
+      "immunity_tags": [
+        "cc_immune"
+      ],
+      "pending": true
+    },
+    {
+      "id": "hot_regen_1",
+      "name": "回春",
+      "kind": "hot",
+      "duration_ms": 6000,
+      "tick_ms": 2000,
+      "amount_pct_max_hp": 5,
+      "max_stacks": 1,
+      "stack_rule": "refresh",
+      "pending": true
+    },
+    {
+      "id": "shield_1",
+      "name": "护盾",
+      "kind": "shield",
+      "duration_ms": 8000,
+      "amount_pct_max_hp": 20,
+      "max_stacks": 1,
+      "stack_rule": "refresh",
+      "pending": true
+    },
+    {
+      "id": "cleanse_1",
+      "name": "净化",
+      "kind": "cleanse",
+      "dispel_tags": [
+        "debuff",
+        "control"
+      ],
+      "max_stacks": 1,
+      "pending": true
+    }
+  ]
+}

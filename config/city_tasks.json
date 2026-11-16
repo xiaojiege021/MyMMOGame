@@ -1,0 +1,38 @@
+{
+  "schema": "city-task-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "Q5/J2：主城修炼与境界任务的唯一正本。方案 9.5/12 写定灵石由主城矿脉经修炼任务和境界任务发放；具体任务与数量方案没写，全部 pending。代码尚未读取，由 Q5 接入。",
+  "tasks": [
+    {
+      "id": "qiyun_cultivate_daily",
+      "name": "栖云城·修炼任务",
+      "city_id": "qiyun",
+      "period": "daily",
+      "max_per_period": 1,
+      "require_level": 1,
+      "rewards": [
+        {
+          "currency": "stone_1",
+          "amount": 5
+        }
+      ],
+      "pending": true
+    },
+    {
+      "id": "qiyun_realm_weekly",
+      "name": "栖云城·境界任务",
+      "city_id": "qiyun",
+      "period": "weekly",
+      "max_per_period": 1,
+      "require_realm": "炼体",
+      "rewards": [
+        {
+          "currency": "stone_1",
+          "amount": 20
+        }
+      ],
+      "pending": true
+    }
+  ]
+}

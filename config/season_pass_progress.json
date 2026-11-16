@@ -1,0 +1,31 @@
+{
+  "schema": "season-pass-progress/1",
+  "version": 1,
+  "pending": true,
+  "note": "Q6/J4：通行证进度来源的唯一正本。方案 12.1 只写两轨奖励，没写怎么升阶；这里给点数与来源，全部 pending。代码尚未读取，由 Q6 接入。",
+  "points_per_stage": 100,
+  "sources": [
+    {
+      "id": "abyss_daily",
+      "kind": "dungeon_clear",
+      "dungeon_id": "abyss",
+      "points": 20,
+      "period": "daily",
+      "max_per_period": 1
+    },
+    {
+      "id": "lair_weekly",
+      "kind": "dungeon_clear",
+      "dungeon_id": "lair",
+      "points": 50,
+      "period": "weekly",
+      "max_per_period": 1
+    },
+    {
+      "id": "mainline_once",
+      "kind": "mainline_stage",
+      "points": 10,
+      "period": "once"
+    }
+  ]
+}

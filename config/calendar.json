@@ -1,0 +1,20 @@
+{
+  "schema": "calendar/1",
+  "version": 1,
+  "pending": true,
+  "note": "Q3/G1：日、周、赛季重置与显示时区的唯一正本。方案没写定重置时刻；暂取东八区 05:00 日重置、周一 05:00 周重置，全部 pending。代码尚未读取，由 Q3 接入。",
+  "timezone": "Asia/Shanghai",
+  "daily_reset_hour": 5,
+  "weekly_reset": {
+    "day": "monday",
+    "hour": 5
+  },
+  "season": {
+    "start": "2026-01-05T05:00:00+08:00",
+    "length_days": 90
+  },
+  "world_boss": {
+    "display_timezone": "Asia/Shanghai",
+    "windows_from": "config/world_boss.json"
+  }
+}

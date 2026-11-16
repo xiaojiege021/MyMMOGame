@@ -1,0 +1,12 @@
+{
+  "schema": "name-rules/1",
+  "version": 1,
+  "pending": true,
+  "note": "Q12/K3：角色名规则的唯一正本。方案没写定长度、改名与敏感词；这里只给骨架，全部 pending。代码尚未读取，由 Q12 接入；敏感词表以后单独放，不写进本文件。",
+  "min_length": 2,
+  "max_length": 12,
+  "global_unique": true,
+  "allow_rename": true,
+  "rename_cost_gold": 0,
+  "banned_patterns": []
+}

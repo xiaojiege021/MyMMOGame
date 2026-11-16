@@ -1,0 +1,10 @@
+{
+  "schema": "reconnect/1",
+  "version": 1,
+  "pending": true,
+  "note": "Q9/H4：断线与逃跑惩罚的唯一正本。方案没写定具体时长，全部 pending。代码尚未读取，由 Q9 接入。",
+  "battle_grace_ms": 30000,
+  "reconnect_window_s": 120,
+  "deserter_penalty_s": 300,
+  "penalty_note": "中途退出或超时未回，下一场进入排队延迟。"
+}

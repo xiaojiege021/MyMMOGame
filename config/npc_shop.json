@@ -1,0 +1,54 @@
+{
+  "schema": "npc-shop-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "K2：NPC 商店的唯一正本。城镇卖镐、药锄、背包；宗门卖基础药与辅助。具体商品、价格、库存方案没写，全部 pending；tool_* / bag_basic / pill_* 由 K5、B1 补进 items.json。代码尚未读取，由 K2 接入。",
+  "shops": [
+    {
+      "id": "npc_general_qiyun",
+      "npc_id": "npc_shop_qiyun",
+      "currency": "gold",
+      "refresh": "daily",
+      "items": [
+        {
+          "item_id": "tool_pickaxe",
+          "price": 10,
+          "stock_per_day": 5,
+          "limit_per_character": 1
+        },
+        {
+          "item_id": "tool_hoe",
+          "price": 10,
+          "stock_per_day": 5,
+          "limit_per_character": 1
+        },
+        {
+          "item_id": "bag_basic",
+          "price": 50,
+          "stock_per_day": 1,
+          "limit_per_character": 1
+        }
+      ]
+    },
+    {
+      "id": "npc_sect_supply",
+      "npc_id": "npc_shop_sect",
+      "currency": "gold",
+      "refresh": "daily",
+      "items": [
+        {
+          "item_id": "pill_rejuvenate",
+          "price": 20,
+          "stock_per_day": 20,
+          "limit_per_character": 5
+        },
+        {
+          "item_id": "pill_focus",
+          "price": 20,
+          "stock_per_day": 20,
+          "limit_per_character": 5
+        }
+      ]
+    }
+  ]
+}
