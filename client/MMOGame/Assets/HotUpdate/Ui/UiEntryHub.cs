@@ -7,8 +7,8 @@ namespace HotUpdate.Ui
     /// <summary>
     /// U8 界面入口枢纽：把 HUD 七个功能格接到已有 U 屏，并为 U5 / U6 / U7 补二级入口。
     ///
-    /// 只做导航，不改玩法、不读 config、不新建权威。家园 / 图鉴 / 竞技场匹配仍按各屏
-    /// 原有口径展示（尚未接服务端或无匹配入口），本卡不接 C3 的 HTTP、不造假入口。
+    /// 只做导航，不改玩法、不读 config、不新建权威。家园 / 图鉴 / 竞技场与战场各屏
+    /// 自己接已有的 HTTP（U9–U12），这一层只负责把屏打开。
     /// </summary>
     public static class UiEntryHub
     {

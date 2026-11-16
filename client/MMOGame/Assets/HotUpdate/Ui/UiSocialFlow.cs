@@ -23,9 +23,9 @@ namespace HotUpdate.Ui
     /// U7 社交与组织五屏的流程与唯一判定出口（原型 F01–F05）。
     ///
     /// 只做三件事：发请求、拆回包、把字段交给屏。名册上限、等级、席位、建设、
-    /// 掌门、世界 Boss 归属、城战同屏档位、洞府摆放、图鉴收集度与被动一条都不在这里算——
-    /// 要么来自 `/sect/*`、`/world/worldboss`、`/homestead*`、`/hero-codex`，要么来自
-    /// 战斗服下发的 `SiegeView`。
+    /// 掌门、世界 Boss 归属、城战同屏档位、洞府摆放、图鉴收集度与被动、竞技场与战场的
+    /// 进场路径一条都不在这里算——要么来自 `/sect/*`、`/world/worldboss`、`/homestead*`、
+    /// `/hero-codex`、`/versus/*`，要么来自战斗服下发的 `SiegeView`。
     /// </summary>
     public sealed class UiSocialFlow : MonoBehaviour
     {
@@ -118,6 +118,23 @@ namespace HotUpdate.Ui
 
         /// <summary>这条图鉴口发过请求没有。发过但没拿到 200 时，屏上写回执而不是「尚未请求」。</summary>
         public bool CodexTried { get; private set; }
+
+        // ------------------------------------------------------------------ 竞技场与战场进场（U12 / N5）
+
+        /// <summary>最近一次 `POST /versus/arena/enter` 的回包。进场路径、模式与人数都从这里取。</summary>
+        public VersusOutcome LastArena { get; private set; }
+
+        public bool HasArena { get; private set; }
+
+        /// <summary>竞技场这条口发过请求没有。发过但没拿到 200 时，屏上写回执而不是「尚未请求」。</summary>
+        public bool ArenaTried { get; private set; }
+
+        /// <summary>最近一次 `POST /versus/battlefield/enter` 的回包。场次与队伍都从这里取。</summary>
+        public VersusOutcome LastBattlefield { get; private set; }
+
+        public bool HasBattlefield { get; private set; }
+
+        public bool BattlefieldTried { get; private set; }
 
         public string Error { get; private set; } = string.Empty;
 
@@ -586,6 +603,95 @@ namespace HotUpdate.Ui
 
                 if (done != null) done();
             });
+        }
+
+        // ------------------------------------------------------------------ 竞技场与战场进场（U12 / N5）
+
+        /// <summary>
+        /// 竞技场进场。走 `POST /versus/arena/enter`，请求体只带角色号与模式编号；
+        /// 进场路径、这一场多少人、场次号全认回包，客户端不按 1v1 / 3v3 自己乘。
+        /// </summary>
+        public void EnterArena(string arenaMode, Action done = null)
+        {
+            if (_characterId == 0)
+            {
+                LastArena = VersusOutcome.Failure("no_character");
+                HasArena = false;
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            ArenaTried = true;
+            _send(VersusEntry.ArenaPath, VersusEntry.ArenaBody(_characterId, arenaMode), _token,
+                (status, text) =>
+                {
+                    Busy = false;
+                    if (status == 200)
+                    {
+                        LastArena = VersusEntry.Parse(text);
+                        HasArena = true;
+                        Error = string.Empty;
+                        Debug.Log("u12_arena=ok mode=" + LastArena.ArenaMode
+                            + " party_size=" + LastArena.PartySize
+                            + " battle_path=" + LastArena.BattlePath
+                            + " reason=" + LastArena.Reason);
+                    }
+                    else
+                    {
+                        LastArena = VersusOutcome.Failure("http_" + status);
+                        HasArena = false;
+                        Error = "竞技场进场没回应：" + status;
+                        Debug.Log("u12_arena=reject status=" + status);
+                    }
+
+                    if (done != null) done();
+                });
+        }
+
+        /// <summary>
+        /// 战场进场。走 `POST /versus/battlefield/enter`，`match` 是这一场的场次号、
+        /// `team` 是 a / b，两个都只作请求参数：能不能进、和谁同队由网关与战斗服判。
+        /// </summary>
+        public void EnterBattlefield(string match, string team, Action done = null)
+        {
+            if (_characterId == 0)
+            {
+                LastBattlefield = VersusOutcome.Failure("no_character");
+                HasBattlefield = false;
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            BattlefieldTried = true;
+            _send(VersusEntry.BattlefieldPath,
+                VersusEntry.BattlefieldBody(_characterId, match, team), _token,
+                (status, text) =>
+                {
+                    Busy = false;
+                    if (status == 200)
+                    {
+                        LastBattlefield = VersusEntry.Parse(text);
+                        HasBattlefield = true;
+                        Error = string.Empty;
+                        Debug.Log("u12_battlefield=ok match=" + LastBattlefield.Battlefield
+                            + " team=" + LastBattlefield.Team
+                            + " battle_path=" + LastBattlefield.BattlePath
+                            + " reason=" + LastBattlefield.Reason);
+                    }
+                    else
+                    {
+                        LastBattlefield = VersusOutcome.Failure("http_" + status);
+                        HasBattlefield = false;
+                        Error = "战场进场没回应：" + status;
+                        Debug.Log("u12_battlefield=reject status=" + status);
+                    }
+
+                    if (done != null) done();
+                });
         }
 
         // ------------------------------------------------------------------ 城战同屏

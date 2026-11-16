@@ -62,9 +62,27 @@ namespace HotUpdate.Ui
         public const string VersusNote =
             "本场数值只来自战斗服回包 · 界面不算战力、不乘平衡系数、不读配置";
 
-        /// <summary>匹配入口的现状。</summary>
-        public const string VersusGap =
-            "匹配与进场没有 HTTP 入口（P2-3 只做到战斗服按模板和平衡系数开战）· 本卡不做假入口";
+        /// <summary>
+        /// 进场口径（U12 接了 N5 的 `POST /versus/*` 之后屏上写这一条）。
+        /// 进场路径、这一场多少人、场次与队伍都只认回包；匹配分组与战力换算不在客户端。
+        /// </summary>
+        public const string VersusEnterNote =
+            "进场只认 /versus/* 回包：路径、模式人数、场次与队伍照抄；不本地算战力、不做匹配算法";
+
+        /// <summary>
+        /// 两个竞技场模式编号。只作请求参数（与 `arena_match.json` 的 modes 同形），
+        /// 认不认、这一场多少人由网关与配置判；屏上不按 1v1 / 3v3 自己乘人数。
+        /// </summary>
+        public static readonly string[] ArenaModeIds = { "duel", "trio" };
+
+        /// <summary>
+        /// 战场场次编号。只作请求参数：场次谁来开、和谁同队由网关与战斗服判，
+        /// 客户端不排队、不造匹配。
+        /// </summary>
+        public static readonly string[] BattlefieldMatchIds = { "bf_m1" };
+
+        /// <summary>战场两侧的编号，与网关认的 a / b 一致。</summary>
+        public static readonly string[] BattlefieldTeams = { "a", "b" };
 
         /// <summary>公平竞技的奖励口径。</summary>
         public const string VersusReward =

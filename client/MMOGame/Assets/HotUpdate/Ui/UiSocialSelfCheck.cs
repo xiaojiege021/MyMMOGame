@@ -151,15 +151,19 @@ namespace HotUpdate.Ui
             Report("five", built == 5);
             Debug.Log("u7_self_five=" + built);
 
-            // 家园：U9 接了摆放、U10 接了种植与家园币；图鉴：U11 接了 /hero-codex。
-            // 这里只认「接线后的入口在不在」，不写已接 / 未接这种会过期的话。
+            // 家园：U9 接了摆放、U10 接了种植与家园币；图鉴：U11 接了 /hero-codex；
+            // 竞技场：U12 接了 /versus/*。这里只认「接线后的入口在不在」，不写已接 / 未接这种会过期的话。
             shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
             var home = Text(shell);
             shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
             var codex = Text(shell);
-            Report("wired", home.Contains("读取种植") && codex.Contains("读取图鉴"));
+            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            var arena = Text(shell);
+            Report("wired", home.Contains("读取种植") && codex.Contains("读取图鉴")
+                && arena.Contains("进竞技场") && arena.Contains("B 队"));
             Debug.Log("u7_self_wired home_planting=" + home.Contains("读取种植")
-                + " codex=" + codex.Contains("读取图鉴"));
+                + " codex=" + codex.Contains("读取图鉴")
+                + " arena=" + arena.Contains("进竞技场"));
 
             // 切皮肤只换颜色：布局与文案一字不差。
             shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));

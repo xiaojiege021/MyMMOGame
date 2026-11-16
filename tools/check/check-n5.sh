@@ -65,7 +65,8 @@ R("no_class_in_body", "class_id" not in versus.split("ArenaEnterBody")[1].split(
 R("arena_modes_loader", "arena_match.json" in modes and "team_size" in modes)
 R("gateway_registered", "VersusApi.Map" in proc)
 R("battle_path_response", "battle_path" in versus and '"/battle"' in versus)
-R("ui_no_fake_entry", "无匹配入口" in arena_ui and "VersusApi" not in arena_ui)
+R("ui_no_fake_entry", "VersusApi" not in arena_ui and "无匹配入口" not in arena_ui)
+# 屏不直接调网关类、也不自己编一个进场口：路径与模式只从回包来（U12 接线后仍是这条口径）。
 R("no_proto_change", "versus" not in rd("proto/mmo/battle.proto").lower()
   and "versus" not in rd("proto/mmo/character.proto").lower())
 R("all_cards", "n5)" in allcards and re.search(r"\bn5\b", allcards))
@@ -107,7 +108,14 @@ PY
   wait_ready "$TMP/char.log" '^ready' "角色服" || true
   "$DOTNET" "$BD" --config "$TMP/battle-real.json" >"$TMP/battle.log" 2>&1 &
   PIDS="$PIDS $!"
-  BU="$(grep -oE 'listen=http://127\.0\.0\.1:[0-9]+' "$TMP/battle.log" | tail -1 | sed 's/^listen=//')"
+  # 等 listen 行落盘再抓端口：慢盘 / 冷启动时 dotnet 写第一行比 start 晚几十到几百毫秒，
+  # 立刻 grep 会抓到空串，后面网关上游就成了 ws:///battle（U12 在 ubu 上撞过）。
+  BU=""
+  for _ in $(seq 1 160); do
+    BU="$(grep -oE 'listen=http://127\.0\.0\.1:[0-9]+' "$TMP/battle.log" | tail -1 | sed 's/^listen=//')"
+    [ -n "$BU" ] && break
+    sleep 0.25
+  done
   [ -n "$BU" ] && ok "战斗服就绪" || bad "战斗服没起来"
 
   # 网关战斗上游指向本次战斗服

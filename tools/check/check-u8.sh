@@ -67,7 +67,7 @@ for key in files hud_hub hub_ready entry_gate settle_back enter_done no_toast_pl
   fi
 done
 
-for key in hud seven u5_enhance u5_realm u6_auction u6_pass u7_home u7_codex \
+for key in hud seven u5_enhance u5_realm u6_auction u6_pass u7_home u7_codex u7_arena \
            u3_party back_world settle_back skin_layout skin_copy; do
   if grep -q "u8_self_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "入口自检 u8_self_${key}=ok"

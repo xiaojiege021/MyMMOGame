@@ -1,18 +1,22 @@
+using System;
+using Mmo.Net;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace HotUpdate.Ui
 {
     /// <summary>
-    /// 竞技场与战场（原型 F03）。左边讲三层战力怎么分开，右边是这一卡能提供的入口。
+    /// 竞技场与战场（原型 F03）。左边讲三层战力怎么分开，右边是 N5 已经落地的两条进场口。
     ///
-    /// 界面不算战力、不乘平衡系数、不读配置：数值只来自战斗服回包（P2-3 做到的
-    /// 是按模板与平衡系数开战）。匹配和进场没有 HTTP 入口，所以这一屏只写分层文案，
-    /// 并如实标明「本卡无匹配入口」，不做假按钮。
+    /// 进场走 `POST /versus/arena/enter` 与 `POST /versus/battlefield/enter`：屏上只发
+    /// 角色号、模式编号、场次与队伍，回来的进场路径、这一场多少人、职业分支照抄。
+    /// 界面不算战力、不乘平衡系数、不排队、不做匹配算法，也不读配置。
     /// </summary>
     public static class UiArenaScreen
     {
         public const string ReadyLog = "u7_arena_screen=ready";
+
+        public const string WiredLog = "u12_versus_wired=ready";
 
         public static void Build(UiShell shell, UiSocialFlow flow)
         {
@@ -46,14 +50,18 @@ namespace HotUpdate.Ui
             shell.LabelIn(reward.Root, new Rect(m.Px(28f), m.Px(28f), leftW - m.Px(56f), m.Px(140f)),
                 UiSocialCodex.VersusReward, UiTextRole.Body, shell.Size(23f), TextAnchor.UpperLeft, true);
 
-            var gapTop = rewardTop + m.Px(220f) + gap;
-            var missing = shell.Panel("这一屏的边界", m.Band(pad, gapTop, leftW, m.Px(240f)), shell.Size(30f));
-            shell.LabelIn(missing.Root, new Rect(m.Px(28f), m.Px(28f), leftW - m.Px(56f), m.Px(120f)),
-                UiSocialCodex.VersusGap, UiTextRole.Warm, shell.Size(22f), TextAnchor.UpperLeft, true);
-            shell.Chip(missing.Root, new Rect(m.Px(28f), m.Px(152f), m.Px(240f), m.Px(52f)),
-                "无匹配入口", UiChipKind.Mute);
+            var ruleTop = rewardTop + m.Px(220f) + gap;
+            var rule = shell.Panel("进场口径", m.Band(pad, ruleTop, leftW, m.Px(280f)), shell.Size(30f));
+            shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(152f), leftW - m.Px(56f), m.Px(100f)),
+                UiSocialCodex.VersusEnterNote, UiTextRole.Warm, shell.Size(22f), TextAnchor.UpperLeft, true);
+            shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(96f), leftW - m.Px(56f), m.Px(40f)),
+                "战力与平衡系数只在战斗服；屏上给的是它回过来的数。",
+                UiTextRole.Muted, shell.Size(21f), TextAnchor.MiddleLeft, true);
+            shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(44f), leftW - m.Px(56f), m.Px(40f)),
+                "匹配分组与排队都不在客户端：场次编号只作请求参数。",
+                UiTextRole.Muted, shell.Size(21f), TextAnchor.MiddleLeft, true);
 
-            // ---------------------------------------------------------- 右：三个场
+            // ---------------------------------------------------------- 右：四个入场
 
             var modes = new[]
             {
@@ -73,7 +81,7 @@ namespace HotUpdate.Ui
             var cardH = m.Px(148f);
             var listTitleH = m.Px(56f);
             var listH = cardH * modes.Length + m.Px(28f) + listTitleH;
-            var list = shell.Panel("入口现状", m.Band(rightX, top + m.Px(56f), rightW, listH), shell.Size(30f));
+            var list = shell.Panel("进场口", m.Band(rightX, top + m.Px(56f), rightW, listH), shell.Size(30f));
             for (var i = 0; i < modes.Length; i++)
             {
                 var y = listH - m.Px(84f) - (i + 1) * cardH + m.Px(24f);
@@ -81,22 +89,101 @@ namespace HotUpdate.Ui
                     modes[i], UiTextRole.Body, shell.Size(25f), TextAnchor.MiddleLeft, false);
                 shell.LabelIn(list.Root, new Rect(m.Px(28f), y, rightW - m.Px(56f), m.Px(34f)),
                     notes[i], UiTextRole.Muted, shell.Size(21f), TextAnchor.MiddleLeft, false);
-                shell.Chip(list.Root,
-                    new Rect(rightW - m.Px(28f) - m.Px(170f), y + m.Px(30f), m.Px(170f), m.Px(44f)),
-                    i == 3 ? "看领地层" : "无入口", UiChipKind.Mute);
+
+                var buttonY = y + m.Px(34f);
+                if (i < UiSocialCodex.ArenaModeIds.Length)
+                {
+                    var mode = UiSocialCodex.ArenaModeIds[i];
+                    shell.ButtonIn(list.Root,
+                        new Rect(rightW - m.Px(28f) - m.Px(200f), buttonY, m.Px(200f), m.Px(56f)),
+                        "进竞技场",
+                        () => flow.EnterArena(mode, () => shell.RefreshPage()),
+                        UiButtonKind.Primary);
+                }
+                else if (i == 2)
+                {
+                    var match = UiSocialCodex.BattlefieldMatchIds[0];
+                    for (var t = 0; t < UiSocialCodex.BattlefieldTeams.Length; t++)
+                    {
+                        var team = UiSocialCodex.BattlefieldTeams[t];
+                        shell.ButtonIn(list.Root,
+                            new Rect(rightW - m.Px(28f) - (UiSocialCodex.BattlefieldTeams.Length - t)
+                                     * m.Px(112f) - t * m.Px(12f), buttonY, m.Px(112f), m.Px(56f)),
+                            team.ToUpperInvariant() + " 队",
+                            () => flow.EnterBattlefield(match, team, () => shell.RefreshPage()),
+                            t == 0 ? UiButtonKind.Primary : UiButtonKind.Normal);
+                    }
+                }
+                else
+                {
+                    shell.Chip(list.Root,
+                        new Rect(rightW - m.Px(28f) - m.Px(170f), buttonY + m.Px(6f), m.Px(170f), m.Px(44f)),
+                        "看领地层", UiChipKind.Mute);
+                }
             }
 
-            var liveTop = top + m.Px(56f) + listH + gap;
-            var live = shell.Panel("本场数值", m.Band(rightX, liveTop, rightW, m.Px(220f)), shell.Size(30f));
-            UiUpgradeViews.Result(shell, live, m.Px(120f), "战力来源", "战斗服回包");
-            UiUpgradeViews.Result(shell, live, m.Px(72f), "平衡系数", "由战斗服压，界面不乘");
-            shell.LabelIn(live.Root, new Rect(m.Px(28f), m.Px(20f), rightW - m.Px(56f), m.Px(44f)),
-                "没有回包就不显示数字：这一屏不拿装备面板自己算一份战力顶上去。",
-                UiTextRole.Faint, shell.Size(20f), TextAnchor.MiddleLeft, false);
+            // ---------------------------------------------------------- 右：回包事实
+
+            var factsTop = top + m.Px(56f) + listH + gap;
+            var factsH = m.Px(420f);
+            var facts = shell.Panel("进场回包", m.Band(rightX, factsTop, rightW, factsH), shell.Size(30f));
+            DrawFacts(shell, flow, facts, rightW, factsH);
 
             Debug.Log(ReadyLog + " modes=" + modes.Length
                 + " layers=" + UiSocialCodex.Layers.Length
                 + " requests=" + flow.Requests);
+            Debug.Log(WiredLog + " has_arena=" + flow.HasArena
+                + " has_battlefield=" + flow.HasBattlefield
+                + " arena_tried=" + flow.ArenaTried
+                + " battlefield_tried=" + flow.BattlefieldTried
+                + " arena_mode=" + (flow.HasArena ? flow.LastArena.ArenaMode : string.Empty)
+                + " party_size=" + (flow.HasArena ? flow.LastArena.PartySize : 0)
+                + " battle_path=" + (flow.HasArena ? flow.LastArena.BattlePath
+                    : flow.HasBattlefield ? flow.LastBattlefield.BattlePath : string.Empty));
+        }
+
+        /// <summary>
+        /// 右：两条口各自的回包事实。进场路径、模式人数、场次与队伍、职业分支都照抄；
+        /// 没发过请求写「尚未请求」，发过没拿到 200 写回执，回包 ok=false 就照抄原因。
+        /// </summary>
+        static void DrawFacts(UiShell shell, UiSocialFlow flow, UiPanel panel, float width, float height)
+        {
+            var m = shell.Metrics;
+            var lineH = m.Px(84f);
+
+            var arenaText = flow.HasArena
+                ? "竞技场：" + VersusEntrySummary(flow.LastArena)
+                : (flow.ArenaTried ? "竞技场：" + flow.Error : "竞技场：尚未请求 · 点「进竞技场」走 /versus/arena/enter");
+            var battleText = flow.HasBattlefield
+                ? "战场：" + VersusEntrySummary(flow.LastBattlefield)
+                : (flow.BattlefieldTried ? "战场：" + flow.Error : "战场：尚未请求 · 点「A 队 / B 队」走 /versus/battlefield/enter");
+
+            shell.LabelIn(panel.Root, new Rect(m.Px(28f), height - m.Px(160f), width - m.Px(56f), lineH),
+                arenaText,
+                flow.HasArena && flow.LastArena.Ok ? UiTextRole.Body : UiTextRole.Warm,
+                shell.Size(22f), TextAnchor.UpperLeft, true);
+            shell.LabelIn(panel.Root, new Rect(m.Px(28f), height - m.Px(248f), width - m.Px(56f), lineH),
+                battleText,
+                flow.HasBattlefield && flow.LastBattlefield.Ok ? UiTextRole.Body : UiTextRole.Warm,
+                shell.Size(22f), TextAnchor.UpperLeft, true);
+
+            var latest = flow.HasBattlefield ? flow.LastBattlefield : flow.LastArena;
+            var any = flow.HasArena || flow.HasBattlefield;
+            shell.LabelIn(panel.Root, new Rect(m.Px(28f), m.Px(92f), width - m.Px(56f), m.Px(44f)),
+                any ? VersusEntry.ModeLine(latest) : "这一屏不拿装备面板自己算一份战力顶上去。",
+                UiTextRole.Faint, shell.Size(20f), TextAnchor.MiddleLeft, true);
+
+            var tried = flow.ArenaTried || flow.BattlefieldTried;
+            shell.Chip(panel.Root,
+                new Rect(m.Px(28f), m.Px(24f), m.Px(320f), m.Px(52f)),
+                any ? "已接 /versus/*" : (tried ? "没读到" : "尚未请求"),
+                any ? UiChipKind.Success : (tried ? UiChipKind.Error : UiChipKind.Mute));
+        }
+
+        /// <summary>一条回包的排版：成功的照抄事实，失败的照抄原因。</summary>
+        static string VersusEntrySummary(VersusOutcome outcome)
+        {
+            return VersusEntry.SummaryLine(outcome);
         }
     }
 }
