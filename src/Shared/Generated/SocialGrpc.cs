@@ -81,6 +81,10 @@ namespace Mmo.Proto.Social {
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.HomesteadResponse> __Marshaller_mmo_social_HomesteadResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.HomesteadResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeHomesteadRequest> __Marshaller_mmo_social_DescribeHomesteadRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeHomesteadRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectRosterRequest> __Marshaller_mmo_social_DescribeSectRosterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectRosterRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectRosterResponse> __Marshaller_mmo_social_DescribeSectRosterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectRosterResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse> __Method_CreateSect = new grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse>(
@@ -209,6 +213,14 @@ namespace Mmo.Proto.Social {
         "DescribeHomestead",
         __Marshaller_mmo_social_DescribeHomesteadRequest,
         __Marshaller_mmo_social_HomesteadResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.DescribeSectRosterRequest, global::Mmo.Proto.Social.DescribeSectRosterResponse> __Method_DescribeSectRoster = new grpc::Method<global::Mmo.Proto.Social.DescribeSectRosterRequest, global::Mmo.Proto.Social.DescribeSectRosterResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeSectRoster",
+        __Marshaller_mmo_social_DescribeSectRosterRequest,
+        __Marshaller_mmo_social_DescribeSectRosterResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -345,6 +357,18 @@ namespace Mmo.Proto.Social {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.HomesteadResponse> DescribeHomestead(global::Mmo.Proto.Social.DescribeHomesteadRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// N2：名册逐条只读。不任免、不改人数上限、不写库。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.DescribeSectRosterResponse> DescribeSectRoster(global::Mmo.Proto.Social.DescribeSectRosterRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -850,6 +874,54 @@ namespace Mmo.Proto.Social {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeHomestead, null, options, request);
       }
+      /// <summary>
+      /// N2：名册逐条只读。不任免、不改人数上限、不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.DescribeSectRosterResponse DescribeSectRoster(global::Mmo.Proto.Social.DescribeSectRosterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSectRoster(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N2：名册逐条只读。不任免、不改人数上限、不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.DescribeSectRosterResponse DescribeSectRoster(global::Mmo.Proto.Social.DescribeSectRosterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeSectRoster, null, options, request);
+      }
+      /// <summary>
+      /// N2：名册逐条只读。不任免、不改人数上限、不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.DescribeSectRosterResponse> DescribeSectRosterAsync(global::Mmo.Proto.Social.DescribeSectRosterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSectRosterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// N2：名册逐条只读。不任免、不改人数上限、不写库。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.DescribeSectRosterResponse> DescribeSectRosterAsync(global::Mmo.Proto.Social.DescribeSectRosterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeSectRoster, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override SocialServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -879,7 +951,8 @@ namespace Mmo.Proto.Social {
           .AddMethod(__Method_DescribeSectTech, serviceImpl.DescribeSectTech)
           .AddMethod(__Method_PlaceHomeDecor, serviceImpl.PlaceHomeDecor)
           .AddMethod(__Method_RemoveHomeDecor, serviceImpl.RemoveHomeDecor)
-          .AddMethod(__Method_DescribeHomestead, serviceImpl.DescribeHomestead).Build();
+          .AddMethod(__Method_DescribeHomestead, serviceImpl.DescribeHomestead)
+          .AddMethod(__Method_DescribeSectRoster, serviceImpl.DescribeSectRoster).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -905,6 +978,7 @@ namespace Mmo.Proto.Social {
       serviceBinder.AddMethod(__Method_PlaceHomeDecor, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(serviceImpl.PlaceHomeDecor));
       serviceBinder.AddMethod(__Method_RemoveHomeDecor, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(serviceImpl.RemoveHomeDecor));
       serviceBinder.AddMethod(__Method_DescribeHomestead, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeHomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(serviceImpl.DescribeHomestead));
+      serviceBinder.AddMethod(__Method_DescribeSectRoster, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeSectRosterRequest, global::Mmo.Proto.Social.DescribeSectRosterResponse>(serviceImpl.DescribeSectRoster));
     }
 
   }

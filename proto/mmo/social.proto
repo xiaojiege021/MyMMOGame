@@ -236,6 +236,26 @@ message HomesteadResponse {
   repeated HomesteadSlotFact placements = 9;
 }
 
+// N2：名册只读。一条是一个人的角色号和职位，没有席位上限、没有任免。
+// 掌门可以不在 sect_member 里，读的时候按 master_character_id 补上，职位仍是 master。
+message SectRosterMember {
+  uint64 character_id = 1;
+  string position = 2;
+}
+
+message DescribeSectRosterRequest {
+  string account = 1;
+  uint64 sect_id = 2;
+}
+
+message DescribeSectRosterResponse {
+  bool ok = 1;
+  // sect_not_found / request_missing；空串表示读到了。
+  string reason = 2;
+  uint64 sect_id = 3;
+  repeated SectRosterMember members = 4;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
@@ -261,4 +281,6 @@ service SocialService {
   rpc PlaceHomeDecor(HomesteadRequest) returns (HomesteadResponse);
   rpc RemoveHomeDecor(HomesteadRequest) returns (HomesteadResponse);
   rpc DescribeHomestead(DescribeHomesteadRequest) returns (HomesteadResponse);
+  // N2：名册逐条只读。不任免、不改人数上限、不写库。
+  rpc DescribeSectRoster(DescribeSectRosterRequest) returns (DescribeSectRosterResponse);
 }

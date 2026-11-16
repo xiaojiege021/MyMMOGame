@@ -130,6 +130,38 @@ public sealed class SocialGrpcService(
         };
     }
 
+    // ---- N2：名册逐条只读 ----
+    // 只回角色号和职位。不任免、不改人数上限、不写库。
+    public override async Task<DescribeSectRosterResponse> DescribeSectRoster(
+        DescribeSectRosterRequest request, ServerCallContext context)
+    {
+        if (request.SectId == 0)
+        {
+            return new DescribeSectRosterResponse
+            {
+                Ok = false, Reason = "request_missing", SectId = 0,
+            };
+        }
+
+        var roster = await sects.RosterAsync((long)request.SectId, context.CancellationToken);
+        var reply = new DescribeSectRosterResponse
+        {
+            Ok = roster.Found,
+            Reason = roster.Found ? "" : "sect_not_found",
+            SectId = (ulong)roster.SectId,
+        };
+        foreach (var member in roster.Members)
+        {
+            reply.Members.Add(new SectRosterMember
+            {
+                CharacterId = (ulong)member.CharacterId,
+                Position = member.Position ?? "",
+            });
+        }
+
+        return reply;
+    }
+
     // ---- P3-3a3：只读查一个角色所属宗门的科技等级 ----
     // 战斗服开城战时来读；社交服只回等级事实值，不算伤害、不给加成系数、不写库。
     // 没宗门 / 没科技行都给 0，上游不可达由战斗服降级处理，这里不抛 gRPC 错误。

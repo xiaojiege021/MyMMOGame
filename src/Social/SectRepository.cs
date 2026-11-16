@@ -254,6 +254,57 @@ public sealed class SectRepository(NpgsqlDataSource dataSource, SectTable sectTa
     }
 
     /// <summary>
+    /// N2：名册逐条只读。每行是角色号和职位，按角色号排序。
+    /// 掌门可以不在 sect_member（创建者不入册），这时按 master_character_id 补一条 position=master。
+    /// 已经在册的人沿用库里的 position，这里不改写。不任免、不数席位上限、不写库。
+    /// </summary>
+    public sealed record RosterMember(long CharacterId, string Position);
+
+    public sealed record Roster(bool Found, long SectId, IReadOnlyList<RosterMember> Members);
+
+    public async Task<Roster> RosterAsync(long sectId, CancellationToken stopping)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(stopping);
+        await using var head = new NpgsqlCommand(
+            "select master_character_id from \"社交\".sect where id = $1", connection);
+        head.Parameters.AddWithValue(sectId);
+        var masterObj = await head.ExecuteScalarAsync(stopping);
+        if (masterObj is null or DBNull)
+        {
+            return new Roster(false, sectId, Array.Empty<RosterMember>());
+        }
+
+        var master = Convert.ToInt64(masterObj);
+        var rows = new List<RosterMember>();
+        var seenMaster = false;
+        await using (var read = new NpgsqlCommand(
+            "select character_id, position from \"社交\".sect_member "
+            + "where sect_id = $1 order by character_id", connection))
+        {
+            read.Parameters.AddWithValue(sectId);
+            await using var reader = await read.ExecuteReaderAsync(stopping);
+            while (await reader.ReadAsync(stopping))
+            {
+                var id = reader.GetInt64(0);
+                if (id == master)
+                {
+                    seenMaster = true;
+                }
+
+                rows.Add(new RosterMember(id, reader.GetString(1)));
+            }
+        }
+
+        if (!seenMaster)
+        {
+            rows.Add(new RosterMember(master, "master"));
+            rows.Sort((a, b) => a.CharacterId.CompareTo(b.CharacterId));
+        }
+
+        return new Roster(true, sectId, rows);
+    }
+
+    /// <summary>
     /// P2-1c：只读查一个角色当前归属的宗门编号。建宗门的人不进名册
     /// （册里只有弟子），所以判定要同时看 sect_member.sect_id 与
     /// sect.master_character_id：任一条命中就算在这个宗门。只回宗门编号，

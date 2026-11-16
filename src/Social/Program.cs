@@ -11,6 +11,7 @@ var sectConfig = false;
 var sectList = false;
 long sectStateOf = 0;
 long sectMembersOf = 0;
+long sectRosterOf = 0;
 long sectSetLevelOf = 0;
 var sectSetLevelTo = 0;
 var sectPositionConfig = false;
@@ -68,6 +69,10 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--sect-members" when i + 1 < args.Length:
             long.TryParse(args[++i], out sectMembersOf);
+            break;
+        // N2：名册逐条只读，不写库。
+        case "--sect-roster" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectRosterOf);
             break;
         // 只给核对用：把某个宗门的 level 改到指定档，验上限切换，不做升级逻辑。
         case "--sect-set-level" when i + 2 < args.Length:
@@ -306,7 +311,7 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
     || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0
     || sectLeadershipStateOf != 0 || sectLeadershipMembersOf != 0 || sectLeaveStateOf != 0
     || sectUpgradeStateOf != 0 || sectUpgradeMembersOf != 0 || sectConstructionSetOf != 0
-    || sectTechStateOf != 0 || sectTechSetOf != 0
+    || sectTechStateOf != 0 || sectTechSetOf != 0 || sectRosterOf != 0
     // C3：新增的连库只读 / 核对写入口也必须登记进这条「一次性命令」长条件，
     // 否则社交服会走正常启动去 bind 65000，核对时表现为 address already in use。
     || homesteadStateOf != 0 || homesteadPlace is not null || homesteadRemove is not null)
@@ -381,6 +386,17 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
             Console.WriteLine("sect_members_state=ok sect=" + sectMembersOf
                 + " rows=" + members.Count
                 + " ids=" + string.Join(",", members));
+        }
+
+        if (sectRosterOf != 0)
+        {
+            var roster = await repo.RosterAsync(sectRosterOf, CancellationToken.None);
+            Console.WriteLine(roster.Found
+                ? "sect_roster=ok sect=" + roster.SectId
+                    + " rows=" + roster.Members.Count
+                    + " members=" + string.Join(",", roster.Members.Select(
+                        m => m.CharacterId + ":" + m.Position))
+                : "sect_roster=missing sect=" + sectRosterOf);
         }
 
         if (sectSetLevelOf != 0 && sectSetLevelTo > 0)

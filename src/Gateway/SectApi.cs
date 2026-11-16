@@ -50,6 +50,59 @@ public static class SectApi
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
         var social = new SocialService.SocialServiceClient(socialChannel);
 
+        // N2：名册只读。认令牌后只转发 sect_id，职位和人数上限都在社交服。
+        app.MapGet("/sect/roster", async context =>
+        {
+            if (!Authorize(context, tokens, "sect_roster", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            if (!ulong.TryParse(context.Request.Query["sect_id"].ToString(), out var sectId)
+                || sectId == 0)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var reply = await social.DescribeSectRosterAsync(
+                    new DescribeSectRosterRequest
+                    {
+                        Account = account,
+                        SectId = sectId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("sect_roster account=" + account
+                    + " sect=" + sectId
+                    + " ok=" + reply.Ok
+                    + " reason=" + reply.Reason
+                    + " rows=" + reply.Members.Count);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = reply.Ok,
+                    reason = reply.Reason,
+                    sect_id = reply.SectId,
+                    members = reply.Members.Select(m => new
+                    {
+                        character_id = m.CharacterId,
+                        position = m.Position,
+                    }),
+                });
+            }
+            catch (RpcException ex)
+            {
+                Console.WriteLine("sect_roster_error account=" + account
+                    + " detail=" + ex.Status.Detail);
+                await WriteAsync(context, 502, new { error = ex.Status.Detail });
+            }
+        });
+
         app.MapPost("/sect/create", async context =>
         {
             if (!Authorize(context, tokens, "sect_create", out var account))
