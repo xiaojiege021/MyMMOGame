@@ -2051,8 +2051,7 @@ public sealed class CharacterGrpcService(
     }
 
     /// <summary>
-    /// C1 交任务：一笔事务里抢 P1-1b5 的 grant_txn 号并推进 main_stage
-    /// （第 10 场另写立仙或立魔）。请求带不进奖励、等级、境界与门槛数值。
+    /// N7 交任务：txn_id 须与那场主线 SettleExp 相同；一笔事务里发 mainline_drops 并推进 main_stage。
     /// </summary>
     public override async Task<TurnInMainlineResponse> TurnInMainline(
         TurnInMainlineRequest request,

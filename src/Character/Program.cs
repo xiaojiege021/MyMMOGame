@@ -52,6 +52,10 @@ string? dungeonTablePath = null;
 // N6：掉落表只读核对（与启动共用 DungeonDropTable.Load）。
 var dungeonDropTableState = false;
 string? dungeonDropTablePath = null;
+var mainlineDropTableState = false;
+string? mainlineDropTablePath = null;
+long mainlineSeedSettlementOf = 0;
+string? mainlineSeedSettlementTxn = null;
 long itemCountOf = 0;
 string? itemCountItem = null;
 // P3-1a1：把境界表读出来（与启动共用同一 RealmTable.Load），坏配置也走这里。
@@ -409,6 +413,14 @@ for (var i = 0; i < args.Length; i++)
         case "--mainline-breakthrough" when i + 2 < args.Length:
             long.TryParse(args[++i], out mainlineBreakthroughOf);
             mainlineFrom = args[++i];
+            break;
+        case "--mainline-seed-settlement" when i + 2 < args.Length:
+            long.TryParse(args[++i], out mainlineSeedSettlementOf);
+            mainlineSeedSettlementTxn = args[++i];
+            break;
+        case "--mainline-drop-table-path" when i + 1 < args.Length:
+            mainlineDropTableState = true;
+            mainlineDropTablePath = args[++i];
             break;
 
         case "--realm-break-state" when i + 1 < args.Length:
@@ -793,6 +805,30 @@ if (dungeonTableState)
     return 0;
 }
 
+// N7：主线交任务发奖表只读核对。
+if (mainlineDropTableState)
+{
+    try
+    {
+        var items = ItemTable.Load("config/items.json");
+        var currencies = CurrencyTable.Load("config/currency.json");
+        var path = mainlineDropTablePath
+            ?? Path.GetFullPath(Path.Combine(
+                Path.GetDirectoryName(Path.GetFullPath(configPath))!, "mainline_drops.json"));
+        var table = MainlineDropTable.Load(path, items, currencies);
+        Console.WriteLine("mainline_drop_table_state=ok version=" + table.Version
+            + " stages=" + table.StageCount
+            + " pending=" + (table.Pending ? "true" : "false"));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
 // N6：掉落表只读核对，坏配置（灵石币种、表外物品）在这里直接被挡住。
 if (dungeonDropTableState)
 {
@@ -806,7 +842,7 @@ if (dungeonDropTableState)
         var table = DungeonDropTable.Load(path, items, currencies);
         Console.WriteLine("dungeon_drop_table_state=ok version=" + table.Version
             + " dungeons=" + table.DungeonCount);
-        foreach (var id in new[] { "main", "abyss", "lair" })
+        foreach (var id in new[] { "abyss", "lair" })
         {
             var lines = table.LinesFor(id);
             if (lines.Count == 0)
@@ -1627,7 +1663,8 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
     || siegeResultState || applySiegeResultTxn != null
     || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0
     || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null
-    || mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0)
+    || mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0
+    || mainlineSeedSettlementOf != 0)
 {
     var connectionString = DbEnv.Resolve();
     if (connectionString == null)
@@ -1747,7 +1784,29 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
             var mlTable = File.Exists(mlConfig.MainlineTable)
                 ? MainlineTable.Load(mlConfig.MainlineTable, mlDungeons, mlRealms)
                 : MainlineTable.Missing();
-            var mlRepo = new MainlineRepository(dataSource, mlTable);
+            var mlItems = ItemTable.Load("config/items.json");
+            var mlDropPath = Path.GetFullPath(Path.Combine(
+                Path.GetDirectoryName(Path.GetFullPath(configPath))!, "mainline_drops.json"));
+            var mlDropTable = MainlineDropTable.LoadIfPresent(mlDropPath, mlItems, mlCurrencies);
+            var mlGrants = new GrantRepository(dataSource, mlItems, mlCurrencies, mlConfig);
+            var mlRepo = new MainlineRepository(
+                dataSource, mlTable, mlDropTable, mlGrants, mlItems, mlConfig);
+
+            if (mainlineSeedSettlementOf != 0)
+            {
+                var seedTxn = (mainlineSeedSettlementTxn ?? "").Trim();
+                await using var seed = dataSource.CreateCommand(
+                    "insert into \"角色\".exp_settlement "
+                    + "(txn_id, character_id, source, party_size, base_exp, party_bonus, "
+                    + "same_sect_bonus, exp_gain, level_before, level_after) "
+                    + "values ($1, $2, 'dungeon', 1, 0, 0, 0, 0, 1, 1) "
+                    + "on conflict (txn_id) do nothing");
+                seed.Parameters.AddWithValue(seedTxn);
+                seed.Parameters.AddWithValue(mainlineSeedSettlementOf);
+                var written = await seed.ExecuteNonQueryAsync(CancellationToken.None);
+                Console.WriteLine("mainline_seed_settlement=written id=" + mainlineSeedSettlementOf
+                    + " txn=" + seedTxn + " rows=" + written);
+            }
 
             if (mainlineBreakthroughOf != 0)
             {
@@ -1778,6 +1837,7 @@ if (reportName != null || deleteName != null || stats || migrate || rawLevelWrit
                     + " stage=" + result.Stage
                     + " main_stage=" + result.MainStage
                     + " alignment=" + result.Alignment
+                    + " drop_lines=" + result.DropLines
                     + " txn=" + (mainlineTxn ?? ""));
             }
 

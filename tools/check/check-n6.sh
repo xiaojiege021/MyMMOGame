@@ -131,10 +131,10 @@ PY
     bad "建角失败"
   else
     ok "建角 id=$CID"
-    CLEAR="$("$DOTNET" "$PROBE" --url "${BU}/battle?dungeon=main&party_size=1" \
+    CLEAR="$("$DOTNET" "$PROBE" --url "${BU}/battle?dungeon=abyss&party_size=1" \
       --case n6_clear --boss "$BOSS" --hit "$SKILL" --a-char "$CID" --party-size 1 2>&1)"
   if printf '%s' "$CLEAR" | grep -q '^verdict=ok'; then
-      ok "主线副本通关"
+      ok "深渊副本通关"
     else
       bad "通关失败" && printf '%s\n' "$CLEAR" | head -6 | detail
     fi

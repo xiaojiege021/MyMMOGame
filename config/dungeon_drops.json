@@ -6,12 +6,6 @@
   "items_config": "items.json",
   "entries": [
     {
-      "dungeon_id": "main",
-      "lines": [
-        { "item_id": "stone_enhance_low", "count": 1 }
-      ]
-    },
-    {
       "dungeon_id": "abyss",
       "lines": [
         { "item_id": "stone_enhance_low", "count": 2 },

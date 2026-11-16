@@ -9,7 +9,8 @@ public sealed record MainlineTurnInResult(
     bool Duplicate,
     int Stage,
     int MainStage,
-    string Alignment);
+    string Alignment,
+    int DropLines);
 
 /// <summary>只读：角色上的主线场次、立仙或立魔，以及等级与境界。</summary>
 public sealed record MainlineState(
@@ -20,22 +21,19 @@ public sealed record MainlineState(
     string Realm);
 
 /// <summary>
-/// C1 主线十二场：主线进度的唯一写入点。方案 2.8「主线和支线现在不做成系统，
-/// 角色服先留下这三处。后面的任务只加配置，并提交已经有的那笔发奖事务」；
-/// 开发架构第 627 行「交任务使用 P1-1b5 的事务号」。
-///
-/// 一笔事务里做完：锁角色行 → 抢 "角色".grant_txn 的事务号 → 校验顺序、等级、
-/// 突破门槛与立仙立魔 → 写 character.main_stage（第 10 场另写 alignment）→
-/// 事务内读回 → 提交。同号重放整笔不做（duplicate），任何拒绝都整体回滚，
-/// 已经 insert 的事务号一并退回，不会占号。
-///
-/// 这里不发任何数值奖励：十二场战斗仍走 P1-2a 既有的进本结算（等级经验由
-/// SettleExp 那一笔写），掉落 / 基础装备 / 发奖链路没有承接卡，本卡不发明第二份。
-/// 也不碰境界、疲劳、周份额、背包与货币；境界只用来读第 10/11/12 场的门槛事实。
+/// C1 主线十二场进度 + N7 交任务发奖。N7：与那场主线战斗的 SettleExp 共用 txn_id，
+/// 须先有同号 exp_settlement，再在同一笔数据库事务里抢 grant_txn、按 mainline_drops 入包、
+/// 写 main_stage。表外物品与灵石币种在加载期挡掉。缺 mainline_drops 时退回 C1（不校验收奖、不发物品）。
 /// </summary>
-public sealed class MainlineRepository(NpgsqlDataSource dataSource, MainlineTable table)
+public sealed class MainlineRepository(
+    NpgsqlDataSource dataSource,
+    MainlineTable table,
+    MainlineDropTable dropTable,
+    GrantRepository grants,
+    ItemTable items,
+    CharacterConfig config)
 {
-    public const int MaxTxnLength = 64;
+    public const int MaxTxnLength = ExpSettlementRepository.MaxTxnLength;
 
     public async Task<MainlineState> StateAsync(
         long characterId, string? account, CancellationToken stopping)
@@ -70,10 +68,11 @@ public sealed class MainlineRepository(NpgsqlDataSource dataSource, MainlineTabl
         string alignment,
         CancellationToken stopping)
     {
+        var awardsEnabled = !dropTable.IsMissing;
+
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         await using var transaction = await connection.BeginTransactionAsync(stopping);
 
-        // 1. 锁角色行并核归属。带账号的走网关口径，空账号走服间可信口径。
         var owned = string.IsNullOrEmpty(account)
             ? "where id = $1 for update"
             : "where id = $1 and account = $2 for update";
@@ -109,10 +108,17 @@ public sealed class MainlineRepository(NpgsqlDataSource dataSource, MainlineTabl
         if (!found)
         {
             await transaction.RollbackAsync(stopping);
-            return new MainlineTurnInResult(false, "character_not_found", false, stage, 0, "");
+            return new MainlineTurnInResult(false, "character_not_found", false, stage, 0, "", 0);
         }
 
-        // 2. 抢 P1-1b5 的事务号。这个号已经用过就整笔不做，回滚后用同一连接重读事实值。
+        if (awardsEnabled
+            && !await SettlementExistsAsync(connection, transaction, characterId, txnId, stopping))
+        {
+            await transaction.RollbackAsync(stopping);
+            return new MainlineTurnInResult(
+                false, "settlement_required", false, stage, mainStage, alignmentNow, 0);
+        }
+
         await using (var claim = new NpgsqlCommand(
             "insert into \"角色\".grant_txn (txn_id, character_id) values ($1, $2) "
             + "on conflict (txn_id) do nothing returning txn_id",
@@ -126,34 +132,33 @@ public sealed class MainlineRepository(NpgsqlDataSource dataSource, MainlineTabl
                 await transaction.RollbackAsync(stopping);
                 var state = await ReadStateAsync(connection, null, characterId, stopping);
                 return new MainlineTurnInResult(
-                    true, "", true, stage, state.MainStage, state.Alignment);
+                    true, "", true, stage, state.MainStage, state.Alignment, 0);
             }
         }
 
-        // 3. 判定全部在这一笔事务里，任何一条不满足整笔回滚（含刚抢到的事务号）。
         if (table.IsMissing)
         {
             await transaction.RollbackAsync(stopping);
-            return new MainlineTurnInResult(false, "mainline_missing", false, stage, mainStage, alignmentNow);
+            return new MainlineTurnInResult(false, "mainline_missing", false, stage, mainStage, alignmentNow, 0);
         }
 
         var def = table.Find(stage);
         if (def is null)
         {
             await transaction.RollbackAsync(stopping);
-            return new MainlineTurnInResult(false, "stage_unknown", false, stage, mainStage, alignmentNow);
+            return new MainlineTurnInResult(false, "stage_unknown", false, stage, mainStage, alignmentNow, 0);
         }
 
         if (stage != mainStage + 1)
         {
             await transaction.RollbackAsync(stopping);
-            return new MainlineTurnInResult(false, "stage_out_of_order", false, stage, mainStage, alignmentNow);
+            return new MainlineTurnInResult(false, "stage_out_of_order", false, stage, mainStage, alignmentNow, 0);
         }
 
         if (level < def.LevelMin)
         {
             await transaction.RollbackAsync(stopping);
-            return new MainlineTurnInResult(false, "level_not_enough", false, stage, mainStage, alignmentNow);
+            return new MainlineTurnInResult(false, "level_not_enough", false, stage, mainStage, alignmentNow, 0);
         }
 
         if (def.RequiresBreakthrough.Length > 0
@@ -162,28 +167,50 @@ public sealed class MainlineRepository(NpgsqlDataSource dataSource, MainlineTabl
         {
             await transaction.RollbackAsync(stopping);
             return new MainlineTurnInResult(
-                false, "breakthrough_not_done", false, stage, mainStage, alignmentNow);
+                false, "breakthrough_not_done", false, stage, mainStage, alignmentNow, 0);
         }
 
         var choice = alignment.Trim();
         if (def.AlignmentChoice)
         {
-            // 方案 2.8：立仙或立魔只在第 10 场写入；选择本身不分路、不加属性。
             if (!table.AlignmentChoices.Contains(choice, StringComparer.Ordinal))
             {
                 await transaction.RollbackAsync(stopping);
                 return new MainlineTurnInResult(
-                    false, "alignment_required", false, stage, mainStage, alignmentNow);
+                    false, "alignment_required", false, stage, mainStage, alignmentNow, 0);
             }
         }
         else if (choice.Length > 0)
         {
             await transaction.RollbackAsync(stopping);
             return new MainlineTurnInResult(
-                false, "alignment_not_this_stage", false, stage, mainStage, alignmentNow);
+                false, "alignment_not_this_stage", false, stage, mainStage, alignmentNow, 0);
         }
 
-        // 4. 只写角色上的剧情进度。境界 / 等级 / 疲劳 / 次数 / 背包一个字都不动。
+        var dropLines = 0;
+        if (awardsEnabled)
+        {
+            var drops = dropTable.LinesFor(stage);
+            if (drops.Count > 0)
+            {
+                try
+                {
+                    var slots = await grants.ReadSlotsForTransactionAsync(
+                        connection, transaction, characterId, stopping);
+                    var deltas = GrantRepository.PlanItemDeltas(slots, drops, items, config.BagSlots);
+                    await grants.ApplyItemDeltasInTransactionAsync(
+                        connection, transaction, characterId, deltas, stopping);
+                    dropLines = drops.Count;
+                }
+                catch (GrantException ex)
+                {
+                    await transaction.RollbackAsync(stopping);
+                    return new MainlineTurnInResult(
+                        false, ex.Code, false, stage, mainStage, alignmentNow, 0);
+                }
+            }
+        }
+
         if (def.AlignmentChoice)
         {
             await using var write = new NpgsqlCommand(
@@ -204,14 +231,26 @@ public sealed class MainlineRepository(NpgsqlDataSource dataSource, MainlineTabl
             await write.ExecuteNonQueryAsync(stopping);
         }
 
-        // 5. 事务内读回再提交：回包给的是库里的这一刻，不是请求里带进来的值。
         var after = await ReadStateAsync(connection, transaction, characterId, stopping);
         await transaction.CommitAsync(stopping);
-        return new MainlineTurnInResult(true, "", false, stage, after.MainStage, after.Alignment);
+        return new MainlineTurnInResult(true, "", false, stage, after.MainStage, after.Alignment, dropLines);
     }
 
-    /// <summary>第 10/11/12 场：等对应境界突破成功。判据是角色库里那条成功流水，
-    /// 版本开关仍由 P3-1a2 既有链路管，本卡不改开关、不自己放行。</summary>
+    static async Task<bool> SettlementExistsAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string txnId,
+        CancellationToken stopping)
+    {
+        await using var command = new NpgsqlCommand(
+            "select 1 from \"角色\".exp_settlement where txn_id = $1 and character_id = $2 limit 1",
+            connection, transaction);
+        command.Parameters.AddWithValue(txnId);
+        command.Parameters.AddWithValue(characterId);
+        return await command.ExecuteScalarAsync(stopping) is not null;
+    }
+
     static async Task<bool> BreakthroughDoneAsync(
         NpgsqlConnection connection,
         NpgsqlTransaction transaction,

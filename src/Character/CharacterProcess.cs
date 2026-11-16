@@ -48,6 +48,7 @@ public sealed class CharacterProcess(string configPath)
         CharacterSlotTable characterSlotTable;
         MainlineTable mainlineTable;
         DungeonDropTable dungeonDropTable;
+        MainlineDropTable mainlineDropTable;
         try
         {
             races = RaceTable.Load("config/races.json");
@@ -133,6 +134,9 @@ public sealed class CharacterProcess(string configPath)
             var dungeonDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
             dungeonDropTable = DungeonDropTable.LoadIfPresent(dungeonDropPath, items, currencies);
+            var mainlineDropPath = Path.GetFullPath(Path.Combine(
+                Path.GetDirectoryName(Path.GetFullPath(configPath))!, "mainline_drops.json"));
+            mainlineDropTable = MainlineDropTable.LoadIfPresent(mainlineDropPath, items, currencies);
         }
         catch (ConfigException ex)
         {
@@ -336,6 +340,10 @@ public sealed class CharacterProcess(string configPath)
         Console.WriteLine("dungeon_drops=" + (dungeonDropTable.IsMissing ? "missing" : "ok")
             + " version=" + dungeonDropTable.Version
             + " dungeons=" + dungeonDropTable.DungeonCount);
+        Console.WriteLine("mainline_drops=" + (mainlineDropTable.IsMissing ? "missing" : "ok")
+            + " version=" + mainlineDropTable.Version
+            + " stages=" + mainlineDropTable.StageCount
+            + " pending=" + (mainlineDropTable.Pending ? "true" : "false"));
 
         // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
         foreach (var city in cityTable.Cities)
@@ -433,7 +441,8 @@ public sealed class CharacterProcess(string configPath)
         // P3-4b：外观收藏是账号级只读视图，不写库、不改背包归属。
         var wardrobeRepo = new WardrobeRepository(dataSource, items);
         // C1：主线进度的唯一写入点。交任务与只读口共用这一份加载过的十二场正本。
-        var mainlines = new MainlineRepository(dataSource, mainlineTable);
+        var mainlines = new MainlineRepository(
+            dataSource, mainlineTable, mainlineDropTable, grants, items, config);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -513,6 +522,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(mainlineTable);
         builder.Services.AddSingleton(mainlines);
         builder.Services.AddSingleton(dungeonDropTable);
+        builder.Services.AddSingleton(mainlineDropTable);
         builder.Services.AddSingleton(seasonSource);
         builder.Services.AddSingleton(config);
 

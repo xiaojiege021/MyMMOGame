@@ -9,11 +9,11 @@ namespace Gateway;
 /// C1 主线十二场的 HTTP 入口。网关只认令牌、复核角色归属、生成事务号；
 /// 十二场内容与门槛全在 config/mainline.json 和角色库里，请求带不进奖励、
 /// 等级、境界、门槛数值，也带不进自己想推进到第几场之外的事实值。
-/// 交任务这一笔复用 P1-1b5 的 grant_txn 事务号，同一个号不写第二次。
+/// N7：交任务须带与那场主线战斗 SettleExp 相同的 txn_id，在同一笔 grant_txn 里发奖并推进场次。
 /// </summary>
 public static class MainlineApi
 {
-    public sealed record TurnInBody(ulong? CharacterId, int? Stage, string? Alignment);
+    public sealed record TurnInBody(ulong? CharacterId, int? Stage, string? Alignment, string? TxnId);
 
     static readonly JsonSerializerOptions Json = new()
     {
@@ -78,8 +78,7 @@ public static class MainlineApi
             }
         });
 
-        // 交任务：场号与（仅第 10 场的）立仙或立魔。事务号由网关生成，
-        // 角色服在同一笔事务里抢 grant_txn 号、判门槛、写 main_stage。
+        // 交任务：场号、（仅第 10 场的）立仙或立魔、以及那场战斗结算的 txn_id。
         app.MapPost("/mainline/turn-in", async context =>
         {
             if (!Authorize(context, tokens, "mainline_turn_in", out var account))
@@ -100,7 +99,9 @@ public static class MainlineApi
                 return;
             }
 
-            if (body?.CharacterId is null || body.CharacterId == 0 || body.Stage is null)
+            var txnId = (body?.TxnId ?? "").Trim();
+            if (body?.CharacterId is null || body.CharacterId == 0 || body.Stage is null
+                || txnId.Length == 0)
             {
                 await WriteAsync(context, 400, new { error = "bad_request" });
                 return;
@@ -113,8 +114,6 @@ public static class MainlineApi
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
                 }
-
-                var txnId = "mainline:" + Guid.NewGuid().ToString("N");
                 var reply = await character.TurnInMainlineAsync(
                     new TurnInMainlineRequest
                     {

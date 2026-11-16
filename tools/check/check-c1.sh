@@ -169,9 +169,11 @@ ck("两端生成物都含新 RPC",
 ck("两端 Character.cs 的 sha256 相同",
    sha("src/Shared/Generated/Character.cs") == sha("client/MMOGame/Assets/Proto/Generated/Character.cs"))
 ck("网关注册了 MainlineApi", "MainlineApi.Map(app" in src("src/Gateway/GatewayProcess.cs"))
-ck("网关生成事务号、请求不带数值",
-   '"mainline:" + Guid.NewGuid()' in src("src/Gateway/MainlineApi.cs")
+ck("网关要求请求带 txn_id、由战斗结算号对接",
+   "TxnId" in src("src/Gateway/MainlineApi.cs")
+   and "txnId.Length == 0" in src("src/Gateway/MainlineApi.cs")
    and "reward" not in src("src/Gateway/MainlineApi.cs").lower())
+ck("核对可注入 exp_settlement", "--mainline-seed-settlement" in src("src/Character/Program.cs"))
 ck("check-all.sh 已挂 c1", "c1)" in src("tools/check/check-all.sh") and "c1" in src("tools/check/check-all.sh"))
 ck("凡新增的连库入口都登记进一次性命令长条件",
    "mainlineTurnInOf != 0" in src("src/Character/Program.cs"))
@@ -265,6 +267,8 @@ else
   post() { curl -s --noproxy '*' -X POST "http://127.0.0.1:61000$1?token=$TOK" \
     -H 'Content-Type: application/json' -d "$2"; }
   cli() { "$DOTNET" "$CD" $CC "$@" 2>&1 | utf8; }
+  ml_txn() { echo "${TX}-stg$1"; }
+  ml_seed() { cli --mainline-seed-settlement "$A" "$(ml_txn "$1")" >/dev/null; }
 
   R="$(get /mainline)"
   [ "$(printf '%s' "$R" | jget main_stage)" = "0" ] \
@@ -272,26 +276,30 @@ else
     && [ "$(printf '%s' "$R" | jget stage_count)" = "12" ] \
     && [ "$(printf '%s' "$R" | jget config_missing)" = "false" ] \
     && ok "真库：创角时主线场次为空，下一场是第 1 场，十二场配置在位" || bad "初始主线状态不对：$R"
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":1,\"alignment\":\"立魔\"}")"
+  ml_seed 1
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":1,\"txn_id\":\"$(ml_txn 1)\",\"alignment\":\"立魔\"}")"
   [ "$(printf '%s' "$R" | jget ok)" = "false" ] \
     && [ "$(printf '%s' "$R" | jget reason)" = "alignment_not_this_stage" ] \
     && [ "$(printf '%s' "$R" | jget main_stage)" = "0" ] \
     && ok "真库：立仙立魔只在第 10 场能写，别的场带进来被拒" || bad "选择被写进了别的场：$R"
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":1}")"
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":1,\"txn_id\":\"$(ml_txn 1)\"}")"
   [ "$(printf '%s' "$R" | jget ok)" = "true" ] \
     && [ "$(printf '%s' "$R" | jget main_stage)" = "1" ] \
     && ok "真库：交第 1 场，main_stage 由 0 到 1" || bad "第 1 场没交成：$R"
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":3}")"
+  ml_seed 3
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":3,\"txn_id\":\"$(ml_txn 3)\"}")"
   [ "$(printf '%s' "$R" | jget ok)" = "false" ] \
     && [ "$(printf '%s' "$R" | jget reason)" = "stage_out_of_order" ] \
     && [ "$(printf '%s' "$R" | jget main_stage)" = "1" ] \
     && ok "真库：跳场被拒且进度不变" || bad "跳场没挡住：$R"
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":2}")"
+  ml_seed 2
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":2,\"txn_id\":\"$(ml_txn 2)\"}")"
   [ "$(printf '%s' "$R" | jget reason)" = "level_not_enough" ] \
     && ok "真库：等级不到第 2 场门槛被拒" || bad "等级门槛没挡住：$R"
 
   # 固定事务号重放：第二次整笔不做，进度与 grant_txn 都只算一次。
   cli --raw-level-write "$A" 45 >/dev/null
+  cli --mainline-seed-settlement "$A" "${TX}-s2" >/dev/null
   T1="$(cli --mainline-turn-in "$A" --mainline-stage 2 --mainline-txn "${TX}-s2")"
   T2="$(cli --mainline-turn-in "$A" --mainline-stage 2 --mainline-txn "${TX}-s2")"
   printf '%s' "$T1" | grep -q 'mainline_turn_in=ok=true.*main_stage=2' \
@@ -299,25 +307,29 @@ else
     && ok "真库：同一个 P1-1b5 事务号重放不重复推进（duplicate=true）" \
     || bad "幂等没成立：$T1 / $T2"
   for n in 3 4 5 6 7 8 9; do
+    cli --mainline-seed-settlement "$A" "${TX}-s$n" >/dev/null
     cli --mainline-turn-in "$A" --mainline-stage "$n" --mainline-txn "${TX}-s$n" >/dev/null
   done
   S="$(cli --mainline-state "$A")"
   printf '%s' "$S" | grep -q 'main_stage=9' \
     && ok "真库：按序交完第 1–9 场，main_stage=9" || bad "九场没走完：$S"
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":10,\"alignment\":\"立仙\"}")"
+  ml_seed 10
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":10,\"txn_id\":\"$(ml_txn 10)\",\"alignment\":\"立仙\"}")"
   [ "$(printf '%s' "$R" | jget reason)" = "breakthrough_not_done" ] \
     && ok "真库：炼体没突破成功时第 10 场被拒" || bad "第 10 场门槛没挡住：$R"
   # 注入三条突破成功事实（只给核对用），逐场验第 10/11/12 的门槛与进度。
   for seg in 炼体 筑基 结丹; do cli --mainline-breakthrough "$A" "$seg" >/dev/null; done
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":10,\"alignment\":\"立仙\"}")"
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":10,\"txn_id\":\"$(ml_txn 10)\",\"alignment\":\"立仙\"}")"
   [ "$(printf '%s' "$R" | jget ok)" = "true" ] \
     && [ "$(printf '%s' "$R" | jget alignment)" = "立仙" ] \
     && ok "真库：第 10 场写入立仙" || bad "第 10 场没成：$R"
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":11}")"
+  ml_seed 11
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":11,\"txn_id\":\"$(ml_txn 11)\"}")"
   [ "$(printf '%s' "$R" | jget ok)" = "true" ] \
     && [ "$(printf '%s' "$R" | jget main_stage)" = "11" ] \
     && ok "真库：第 11 场（筑基成功后）可交" || bad "第 11 场没成：$R"
-  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":12}")"
+  ml_seed 12
+  R="$(post /mainline/turn-in "{\"character_id\":$A,\"stage\":12,\"txn_id\":\"$(ml_txn 12)\"}")"
   [ "$(printf '%s' "$R" | jget ok)" = "true" ] \
     && [ "$(printf '%s' "$R" | jget main_stage)" = "12" ] \
     && ok "真库：第 12 场（结丹成功后）可交，个人线停在这里" || bad "第 12 场没成：$R"
