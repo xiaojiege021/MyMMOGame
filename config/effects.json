@@ -1,6 +1,6 @@
 {
   "schema": "effect-table/1",
-  "version": 1,
+  "version": 2,
   "pending": true,
   "note": "Q1/Q2：buff、debuff、控制、HoT、DoT、护盾的唯一正本。方案没有写定具体效果与数值；这里只给类型与样例，全部标 pending。代码尚未读取，由 Q1 设计、Q2 接入；伤害管线与叠层规则见 docs/未覆盖排期.md。",
   "effects": [
@@ -103,6 +103,26 @@
         "control"
       ],
       "max_stacks": 1,
+      "pending": true
+    },
+    {
+      "id": "dot_poison_1",
+      "name": "蚀骨",
+      "kind": "dot",
+      "duration_ms": 6000,
+      "max_stacks": 1,
+      "stack_rule": "refresh",
+      "tick_ms": 2000,
+      "dispel_tags": [
+        "debuff"
+      ],
+      "immunity_tags": [],
+      "modifiers": [
+        {
+          "stat": "hp_pct_per_tick",
+          "value": -3
+        }
+      ],
       "pending": true
     }
   ]
