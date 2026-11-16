@@ -124,6 +124,8 @@ deps_of() {
     n2) echo "p2-1a1 p2-1a2 p2-1b" ;;
     # N3 是第 82 行：F01 逐条名单只接 N2 的回包，屏是 U7 的。
     n3) echo "n2 u7" ;;
+    n4) echo "c2 u4" ;;
+    n5) echo "p2-3a p2-3b" ;;
     *) echo "__UNKNOWN__" ;;
   esac
 }
@@ -137,7 +139,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 c1 c2 c3 n1 n2 n3"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 c1 c2 c3 n1 n2 n3 n4 n5"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {

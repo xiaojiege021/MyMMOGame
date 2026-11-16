@@ -58,6 +58,8 @@ namespace HotUpdate.Ui
 
         public bool HasGather { get; private set; }
 
+        public bool HasGatherNodes { get; private set; }
+
         public bool HasFly { get; private set; }
 
         public bool HasRegion { get; private set; }
@@ -69,6 +71,8 @@ namespace HotUpdate.Ui
         public WorldRegionsOutcome RegionsReply { get; private set; }
 
         public GatherOutcome GatherReply { get; private set; }
+
+        public GatherNodesOutcome GatherNodesReply { get; private set; }
 
         public FlyOutcome FlyReply { get; private set; }
 
@@ -254,6 +258,53 @@ namespace HotUpdate.Ui
         }
 
         /// <summary>读一次地点表。八块地表的邻接、开放与对白编号都以这份回包为准。</summary>
+        /// <summary>节点表以回包为准。没请求前屏上写尚未请求。</summary>
+        public void LoadGatherNodes(Action onDone = null)
+        {
+            if (Busy)
+            {
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            RefreshViews();
+            _send("GET", "/world/gather/nodes", string.Empty, _token, (status, text) =>
+            {
+                Busy = false;
+                GatherNodesReply = WorldGather.ParseList(status, text);
+                HasGatherNodes = status == 200 && GatherNodesReply.Error.Length == 0;
+
+                Debug.Log("u4_gather_nodes=reply status=" + status
+                    + " count=" + GatherNodesReply.Count
+                    + " nodes=" + (GatherNodesReply.Nodes != null ? GatherNodesReply.Nodes.Length : 0)
+                    + " error=" + GatherNodesReply.Error);
+
+                onDone?.Invoke();
+                RefreshViews();
+            });
+        }
+
+        /// <summary>按 kind 筛节点，顺序与回包一致。</summary>
+        public List<GatherNodeRow> NodesOfKind(string kind)
+        {
+            var list = new List<GatherNodeRow>();
+            if (!HasGatherNodes || GatherNodesReply.Nodes == null)
+            {
+                return list;
+            }
+
+            for (var i = 0; i < GatherNodesReply.Nodes.Length; i++)
+            {
+                if (string.Equals(GatherNodesReply.Nodes[i].Kind, kind, StringComparison.Ordinal))
+                {
+                    list.Add(GatherNodesReply.Nodes[i]);
+                }
+            }
+
+            return list;
+        }
+
         public void LoadRegions()
         {
             if (Busy)

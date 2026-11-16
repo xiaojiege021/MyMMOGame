@@ -71,6 +71,8 @@ namespace HotUpdate.Ui
                 shell.ShowPage("对白", s => { speakers = UiDialogueScreen.Build(s, flow); });
                 CheckDialogue(speakers);
 
+                UiGatherScreen.ResetGatherWindows();
+                FeedGatherNodes(flow);
                 var ore = 0;
                 shell.ShowPage("采集", s => { ore = UiGatherScreen.Build(s, flow, "矿脉"); });
                 var herb = 0;
@@ -295,13 +297,53 @@ namespace HotUpdate.Ui
 
         // ------------------------------------------------------------------ B04
 
+        static void FeedGatherNodes(UiWorldFlow flow)
+        {
+            _nextStatus = 200;
+            _nextBody = MockGatherNodesJson();
+            flow.LoadGatherNodes();
+        }
+
+        static string MockGatherNodesJson()
+        {
+            var items = new List<string>();
+            for (var i = 1; i <= 9; i++)
+            {
+                items.Add("{\"node_id\":\"ore_mock_" + i + "\",\"kind\":\"ore\",\"region_id\":\"枯岚道\","
+                    + "\"item_id\":\"ore_iron\",\"count\":2,\"bag_slot\":1,\"respawn_s\":2}");
+            }
+
+            for (var i = 1; i <= 8; i++)
+            {
+                items.Add("{\"node_id\":\"herb_mock_" + i + "\",\"kind\":\"herb\",\"region_id\":\"听谣镇\","
+                    + "\"item_id\":\"herb_ling\",\"count\":3,\"bag_slot\":2,\"respawn_s\":2}");
+            }
+
+            items.Add("{\"node_id\":\"spirit_qiyun_1\",\"kind\":\"spirit_stone\",\"region_id\":\"栖云城\","
+                + "\"item_id\":\"\",\"count\":0,\"bag_slot\":0,\"respawn_s\":0}");
+            return "{\"count\":18,\"nodes\":[" + string.Join(",", items.ToArray()) + "]}";
+        }
+
         static void CheckGather(int ore, int herb, int spirit, UiWorldFlow flow)
         {
-            Report("gather_groups", ore == 2 && herb == 1 && spirit == 1);
+            Report("gather_groups", ore == 9 && herb == 8 && spirit == 1);
+            Report("gather_nodes_path", _lastPath == "/world/gather/nodes" && _lastMethod == "GET");
 
-            // 灵石矿脉只有归属，不许有产物与刷新。
-            UiWorldCodex.GatherNode stone;
-            var found = UiWorldCodex.FindNode("spirit_qiyun_1", out stone);
+            GatherNodeRow stone = default;
+            var found = false;
+            if (flow.GatherNodesReply.Nodes != null)
+            {
+                for (var i = 0; i < flow.GatherNodesReply.Nodes.Length; i++)
+                {
+                    if (flow.GatherNodesReply.Nodes[i].NodeId == "spirit_qiyun_1")
+                    {
+                        stone = flow.GatherNodesReply.Nodes[i];
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
             Report("gather_spirit_forbidden",
                 found && stone.Forbidden && stone.ItemId.Length == 0 && stone.Count == 0 && stone.RespawnSeconds == 0);
 

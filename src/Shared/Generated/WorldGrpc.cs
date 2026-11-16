@@ -64,6 +64,10 @@ namespace Mmo.Proto.World {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.ListRegionsResponse> __Marshaller_mmo_world_ListRegionsResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ListRegionsResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.ListGatherNodesRequest> __Marshaller_mmo_world_ListGatherNodesRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ListGatherNodesRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.ListGatherNodesResponse> __Marshaller_mmo_world_ListGatherNodesResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ListGatherNodesResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldClientFrame> __Marshaller_mmo_world_WorldClientFrame = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldClientFrame.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldServerFrame> __Marshaller_mmo_world_WorldServerFrame = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldServerFrame.Parser));
@@ -111,6 +115,14 @@ namespace Mmo.Proto.World {
         "ListRegions",
         __Marshaller_mmo_world_ListRegionsRequest,
         __Marshaller_mmo_world_ListRegionsResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.ListGatherNodesRequest, global::Mmo.Proto.World.ListGatherNodesResponse> __Method_ListGatherNodes = new grpc::Method<global::Mmo.Proto.World.ListGatherNodesRequest, global::Mmo.Proto.World.ListGatherNodesResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ListGatherNodes",
+        __Marshaller_mmo_world_ListGatherNodesRequest,
+        __Marshaller_mmo_world_ListGatherNodesResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame> __Method_PositionStream = new grpc::Method<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame>(
@@ -184,6 +196,19 @@ namespace Mmo.Proto.World {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.ListRegionsResponse> ListRegions(global::Mmo.Proto.World.ListRegionsRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 只读采集节点表。节点全集由世界服按基准表与铺开表合并后给出；
+      /// 请求是空的，客户端带不进节点编号、产物或数量。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.ListGatherNodesResponse> ListGatherNodes(global::Mmo.Proto.World.ListGatherNodesRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -351,6 +376,58 @@ namespace Mmo.Proto.World {
       public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.ListRegionsResponse> ListRegionsAsync(global::Mmo.Proto.World.ListRegionsRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_ListRegions, null, options, request);
+      }
+      /// <summary>
+      /// 只读采集节点表。节点全集由世界服按基准表与铺开表合并后给出；
+      /// 请求是空的，客户端带不进节点编号、产物或数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.ListGatherNodesResponse ListGatherNodes(global::Mmo.Proto.World.ListGatherNodesRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListGatherNodes(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 只读采集节点表。节点全集由世界服按基准表与铺开表合并后给出；
+      /// 请求是空的，客户端带不进节点编号、产物或数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.ListGatherNodesResponse ListGatherNodes(global::Mmo.Proto.World.ListGatherNodesRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ListGatherNodes, null, options, request);
+      }
+      /// <summary>
+      /// 只读采集节点表。节点全集由世界服按基准表与铺开表合并后给出；
+      /// 请求是空的，客户端带不进节点编号、产物或数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.ListGatherNodesResponse> ListGatherNodesAsync(global::Mmo.Proto.World.ListGatherNodesRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListGatherNodesAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 只读采集节点表。节点全集由世界服按基准表与铺开表合并后给出；
+      /// 请求是空的，客户端带不进节点编号、产物或数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.ListGatherNodesResponse> ListGatherNodesAsync(global::Mmo.Proto.World.ListGatherNodesRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ListGatherNodes, null, options, request);
       }
       /// <summary>
       /// 手机到网关一条 WebSocket，网关到世界服一条 gRPC 双向流。
@@ -633,6 +710,7 @@ namespace Mmo.Proto.World {
           .AddMethod(__Method_EnterLine, serviceImpl.EnterLine)
           .AddMethod(__Method_LeaveLine, serviceImpl.LeaveLine)
           .AddMethod(__Method_ListRegions, serviceImpl.ListRegions)
+          .AddMethod(__Method_ListGatherNodes, serviceImpl.ListGatherNodes)
           .AddMethod(__Method_PositionStream, serviceImpl.PositionStream)
           .AddMethod(__Method_Gather, serviceImpl.Gather)
           .AddMethod(__Method_Fly, serviceImpl.Fly)
@@ -651,6 +729,7 @@ namespace Mmo.Proto.World {
       serviceBinder.AddMethod(__Method_EnterLine, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse>(serviceImpl.EnterLine));
       serviceBinder.AddMethod(__Method_LeaveLine, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.LeaveLineRequest, global::Mmo.Proto.World.LeaveLineResponse>(serviceImpl.LeaveLine));
       serviceBinder.AddMethod(__Method_ListRegions, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.ListRegionsRequest, global::Mmo.Proto.World.ListRegionsResponse>(serviceImpl.ListRegions));
+      serviceBinder.AddMethod(__Method_ListGatherNodes, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.ListGatherNodesRequest, global::Mmo.Proto.World.ListGatherNodesResponse>(serviceImpl.ListGatherNodes));
       serviceBinder.AddMethod(__Method_PositionStream, serviceImpl == null ? null : new grpc::DuplexStreamingServerMethod<global::Mmo.Proto.World.WorldClientFrame, global::Mmo.Proto.World.WorldServerFrame>(serviceImpl.PositionStream));
       serviceBinder.AddMethod(__Method_Gather, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.GatherRequest, global::Mmo.Proto.World.GatherResponse>(serviceImpl.Gather));
       serviceBinder.AddMethod(__Method_Fly, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.FlyRequest, global::Mmo.Proto.World.FlyResponse>(serviceImpl.Fly));

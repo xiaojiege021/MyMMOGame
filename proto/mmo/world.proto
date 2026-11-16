@@ -12,6 +12,10 @@ service WorldService {
   rpc LeaveLine(LeaveLineRequest) returns (LeaveLineResponse);
   rpc ListRegions(ListRegionsRequest) returns (ListRegionsResponse);
 
+  // 只读采集节点表。节点全集由世界服按基准表与铺开表合并后给出；
+  // 请求是空的，客户端带不进节点编号、产物或数量。
+  rpc ListGatherNodes(ListGatherNodesRequest) returns (ListGatherNodesResponse);
+
   // 手机到网关一条 WebSocket，网关到世界服一条 gRPC 双向流。
   // 账号与角色编号由网关放进请求头，客户端帧里带不进身份、分线号或别人的坐标。
   rpc PositionStream(stream WorldClientFrame) returns (stream WorldServerFrame);
@@ -88,6 +92,25 @@ message ListRegionsResponse {
   repeated RegionInfo regions = 2;
   repeated string speakers = 3;
   repeated string factions = 4;
+}
+
+message ListGatherNodesRequest {}
+
+// 一条节点一行：产物、数量、格位与刷新秒数都是配置事实值，由世界服读出；
+// 灵石矿脉 kind=spirit_stone 且没有产物字段，个人采集在世界服一律拒绝。
+message GatherNodeInfo {
+  string node_id = 1;
+  string kind = 2;
+  string region_id = 3;
+  string item_id = 4;
+  int32 count = 5;
+  uint32 bag_slot = 6;
+  int32 respawn_s = 7;
+}
+
+message ListGatherNodesResponse {
+  uint32 count = 1;
+  repeated GatherNodeInfo nodes = 2;
 }
 
 // 一条 WebSocket 上跑位置帧，靠信封分辨。客户端只上报自己的坐标与朝向，

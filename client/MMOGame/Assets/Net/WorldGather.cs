@@ -1,9 +1,33 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace Mmo.Net
 {
     /// <summary>给界面用的展示结果。成功与否就是服务端回包里的 ok，不在本地改。</summary>
+    /// <summary>一条采集节点。只读表回包的事实值，屏上不许再读配置补全。</summary>
+    public struct GatherNodeRow
+    {
+        public string NodeId;
+        public string Kind;
+        public string RegionId;
+        public string ItemId;
+        public int Count;
+        public uint BagSlot;
+        public int RespawnSeconds;
+
+        public bool Forbidden => string.Equals(Kind, "spirit_stone", StringComparison.Ordinal);
+    }
+
+    /// <summary>`GET /world/gather/nodes` 拆装结果。</summary>
+    public struct GatherNodesOutcome
+    {
+        public int HttpStatus;
+        public string Error;
+        public uint Count;
+        public GatherNodeRow[] Nodes;
+    }
+
     public struct GatherOutcome
     {
         public bool Ok;
@@ -32,6 +56,54 @@ namespace Mmo.Net
         {
             // 请求体只有节点编号；身份、产物、数量、格子、事务号都带不进来。
             return "{\"node_id\":\"" + Escape(nodeId ?? string.Empty) + "\"}";
+        }
+
+        public static GatherNodesOutcome ParseList(int status, string json)
+        {
+            if (status != 200)
+            {
+                return new GatherNodesOutcome
+                {
+                    HttpStatus = status,
+                    Error = status == 401 ? "invalid_token" : "network",
+                    Nodes = Array.Empty<GatherNodeRow>(),
+                };
+            }
+
+            if (string.IsNullOrEmpty(json) || Raw(json, "nodes").Length == 0 && json.IndexOf("\"nodes\"", StringComparison.Ordinal) < 0)
+            {
+                return new GatherNodesOutcome
+                {
+                    HttpStatus = status,
+                    Error = "bad_reply",
+                    Nodes = Array.Empty<GatherNodeRow>(),
+                };
+            }
+
+            var blocks = ObjectBlocks(json, "nodes");
+            var rows = new List<GatherNodeRow>(blocks.Count);
+            for (var i = 0; i < blocks.Count; i++)
+            {
+                var one = blocks[i];
+                rows.Add(new GatherNodeRow
+                {
+                    NodeId = Raw(one, "node_id"),
+                    Kind = Raw(one, "kind"),
+                    RegionId = Raw(one, "region_id"),
+                    ItemId = Raw(one, "item_id"),
+                    Count = ReadInt(one, "count"),
+                    BagSlot = ReadUInt(one, "bag_slot"),
+                    RespawnSeconds = ReadInt(one, "respawn_s"),
+                });
+            }
+
+            return new GatherNodesOutcome
+            {
+                HttpStatus = status,
+                Error = string.Empty,
+                Count = ReadUInt(json, "count"),
+                Nodes = rows.ToArray(),
+            };
         }
 
         public static GatherOutcome Parse(string json)
@@ -66,6 +138,117 @@ namespace Mmo.Net
         }
 
         static string Escape(string value) => value.Replace("\\", "\\\\").Replace("\"", "\\\"");
+
+        static string ArrayInner(string json, string key)
+        {
+            var needle = "\"" + key + "\"";
+            var at = json.IndexOf(needle, StringComparison.Ordinal);
+            if (at < 0)
+            {
+                return string.Empty;
+            }
+
+            var open = json.IndexOf('[', at + needle.Length);
+            if (open < 0)
+            {
+                return string.Empty;
+            }
+
+            var depth = 0;
+            var inString = false;
+            for (var i = open; i < json.Length; i++)
+            {
+                var c = json[i];
+                if (inString)
+                {
+                    if (c == '\\')
+                    {
+                        i++;
+                    }
+                    else if (c == '"')
+                    {
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (c == '"')
+                {
+                    inString = true;
+                }
+                else if (c == '[')
+                {
+                    depth++;
+                }
+                else if (c == ']')
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        return json.Substring(open + 1, i - open - 1);
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
+
+        static List<string> ObjectBlocks(string json, string key)
+        {
+            var inner = ArrayInner(json, key);
+            var list = new List<string>();
+            if (inner.Length == 0)
+            {
+                return list;
+            }
+
+            var depth = 0;
+            var start = -1;
+            var inString = false;
+            for (var i = 0; i < inner.Length; i++)
+            {
+                var c = inner[i];
+                if (inString)
+                {
+                    if (c == '\\')
+                    {
+                        i++;
+                    }
+                    else if (c == '"')
+                    {
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (c == '"')
+                {
+                    inString = true;
+                }
+                else if (c == '{')
+                {
+                    if (depth == 0)
+                    {
+                        start = i;
+                    }
+
+                    depth++;
+                }
+                else if (c == '}')
+                {
+                    depth--;
+                    if (depth == 0 && start >= 0)
+                    {
+                        list.Add(inner.Substring(start, i - start + 1));
+                        start = -1;
+                    }
+                }
+            }
+
+            return list;
+        }
 
         static bool ReadBool(string json, string key) =>
             string.Equals(Raw(json, key), "true", StringComparison.OrdinalIgnoreCase);

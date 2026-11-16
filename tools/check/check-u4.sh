@@ -113,11 +113,18 @@ n_dialogue_files = len(glob.glob(os.path.join(root, 'config/dialogue/*.json')))
 say('codex_speakers', ok_speakers and n_dialogue_files == len(speakers),
     'codex=%d config=%d' % (len(speakers), n_dialogue_files))
 
-nodes = ['ore_kulan_1', 'ore_kulan_2', 'herb_tingyao_1', 'spirit_qiyun_1']
-ok_nodes = all(n in gather and ('Id = "%s"' % n) in codex for n in nodes)
-spirit_block = re.search(r'Id = "spirit_qiyun_1"[\s\S]{0,240}?Forbidden = true', codex)
-say('codex_nodes', ok_nodes and bool(spirit_block),
-    'nodes=%d spirit_forbidden=%s' % (len(nodes), bool(spirit_block)))
+flow = client('HotUpdate/Ui/UiWorldFlow.cs')
+gather_ui = client('HotUpdate/Ui/UiGatherScreen.cs')
+net_gather = client('Net/WorldGather.cs')
+no_hardcoded = ('Id = "ore_kulan_1"' not in codex and 'static readonly GatherNode[] Nodes' not in codex)
+wiring = ('LoadGatherNodes' in flow and 'ParseList' in net_gather
+          and '/world/gather/nodes' in flow
+          and 'NodesOfKind' in flow
+          and 'NoGatherNodesYet' in codex
+          and '读取节点表' in gather_ui
+          and 'config/gather.json' not in gather_ui)
+say('codex_nodes', no_hardcoded and wiring,
+    'hardcoded=%s wiring=%s' % (not no_hardcoded, wiring))
 
 realms = ['炼体', '筑基', '结丹']
 ok_realms = ('public const string FlightRealm = "筑基"' in codex) and all(

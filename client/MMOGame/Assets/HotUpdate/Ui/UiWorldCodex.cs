@@ -8,7 +8,7 @@ namespace HotUpdate.Ui
     /// 这里只放**编号、名字、邻接和口径文案**，一个判定都不做：
     /// 能进哪块地表、分到第几线、采到什么、能不能飞，全部来自回包。
     /// 表里的每一条都与 `config/world.json`、`config/region/*.json`、
-    /// `config/dialogue/*.json`、`config/gather.json`、`config/flight.json` 逐条对得上，
+    /// `config/dialogue/*.json`、`config/flight.json` 逐条对得上；采集节点只认世界服节点表回包，
     /// `check-u4.sh` 会拿这五份配置逐项比对，任何一边改了都会对不上。
     ///
     /// 图上坐标只是原型 B02 那张示意图的位置，不是游戏坐标，也不参与档位与距离判定。
@@ -166,46 +166,7 @@ namespace HotUpdate.Ui
         public const string QiaoChapter2 = "它要扑的那一下有前摇。你要么拉开，要么挡住。";
         public const string QiaoChapter2Limit = "送到承露门门口就离开";
 
-        /// <summary>一位采集点的展示口径。产物与数量只在配置里读，屏上算不到。</summary>
-        public struct GatherNode
-        {
-            public string Id;
-            public string Kind;
-            public string Region;
-            public string ItemId;
-            public int Count;
-            public uint BagSlot;
-            public int RespawnSeconds;
-            // 灵石矿脉只登记归属，禁止个人采集，配置里也没有产物与刷新。
-            public bool Forbidden;
-        }
-
-        /// <summary>与 `config/gather.json` 的 nodes 同序同数。</summary>
-        public static readonly GatherNode[] Nodes =
-        {
-            new GatherNode
-            {
-                Id = "ore_kulan_1", Kind = "ore", Region = "枯岚道", ItemId = "ore_iron",
-                Count = 2, BagSlot = 1, RespawnSeconds = 2, Forbidden = false,
-            },
-            new GatherNode
-            {
-                Id = "ore_kulan_2", Kind = "ore", Region = "枯岚道", ItemId = "ore_iron",
-                Count = 2, BagSlot = 1, RespawnSeconds = 2, Forbidden = false,
-            },
-            new GatherNode
-            {
-                Id = "herb_tingyao_1", Kind = "herb", Region = "听谣镇", ItemId = "herb_ling",
-                Count = 3, BagSlot = 2, RespawnSeconds = 2, Forbidden = false,
-            },
-            new GatherNode
-            {
-                Id = "spirit_qiyun_1", Kind = "spirit_stone", Region = "栖云城",
-                ItemId = "", Count = 0, BagSlot = 0, RespawnSeconds = 0, Forbidden = true,
-            },
-        };
-
-        /// <summary>三个采集分组。页签顺序就是配置里出现的顺序。</summary>
+        /// <summary>三个采集分组。页签顺序与原型 B04 一致。</summary>
         public static readonly string[] GatherTabs = { "矿脉", "药草", "灵石矿脉" };
 
         /// <summary>三段大境界，顺序照 `config/flight.json` 的 realms，不另起名字。</summary>
@@ -254,6 +215,7 @@ namespace HotUpdate.Ui
 
         /// <summary>没有回包时屏上写的话。不拿配置顶格值假装已经确认。</summary>
         public const string NoEnterYet = "尚未进分线 · 分线与容量以回包为准";
+        public const string NoGatherNodesYet = "尚未请求 · 节点表以回包为准";
         public const string NoGatherYet = "尚未采集 · 产物与格位以回包为准";
         public const string NoRegionYet = "尚未跨区 · 目标与门槛以回包为准";
         public const string NoFlyYet = "尚未起飞 · 境界与高度以回包为准";
@@ -274,37 +236,7 @@ namespace HotUpdate.Ui
             return false;
         }
 
-        public static bool FindNode(string id, out GatherNode node)
-        {
-            for (var i = 0; i < Nodes.Length; i++)
-            {
-                if (Nodes[i].Id == id)
-                {
-                    node = Nodes[i];
-                    return true;
-                }
-            }
-
-            node = default;
-            return false;
-        }
-
-        /// <summary>同属一块地表的采集点。页签切组就照这个筛。</summary>
-        public static List<GatherNode> NodesOf(string kind)
-        {
-            var list = new List<GatherNode>();
-            for (var i = 0; i < Nodes.Length; i++)
-            {
-                if (Nodes[i].Kind == kind)
-                {
-                    list.Add(Nodes[i]);
-                }
-            }
-
-            return list;
-        }
-
-        /// <summary>采集分组的展示名到配置里的 kind。</summary>
+        /// <summary>采集分组的展示名到世界服 kind 字段。</summary>
         public static string KindOfTab(string tab)
         {
             switch (tab)

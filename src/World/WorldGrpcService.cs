@@ -120,6 +120,27 @@ public sealed class WorldGrpcService(
         return Task.FromResult(response);
     }
 
+    public override Task<ListGatherNodesResponse> ListGatherNodes(
+        ListGatherNodesRequest request, ServerCallContext context)
+    {
+        var response = new ListGatherNodesResponse { Count = (uint)gather.Nodes.Count };
+        foreach (var node in gather.Nodes)
+        {
+            response.Nodes.Add(new GatherNodeInfo
+            {
+                NodeId = node.Id,
+                Kind = node.Kind,
+                RegionId = node.RegionId,
+                ItemId = node.ItemId,
+                Count = node.Count,
+                BagSlot = (uint)node.BagSlot,
+                RespawnS = node.RespawnSeconds,
+            });
+        }
+
+        return Task.FromResult(response);
+    }
+
     /// <summary>
     /// 采矿与采药。方案 9.5：矿脉给矿石、药草给药材，采集不耗疲劳；
     /// 灵石矿脉归主城辖区，不开放给玩家个人去挖，对它的请求一律拒绝。

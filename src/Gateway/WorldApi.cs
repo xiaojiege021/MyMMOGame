@@ -381,6 +381,43 @@ public static class WorldApi
             }
         });
 
+        // 只读：运行期采集节点全集（基准 + 铺开），供 U4 采集屏列出节点。
+        app.MapGet("/world/gather/nodes", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "world_gather_nodes", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            try
+            {
+                var result = await world.ListGatherNodesAsync(
+                    new ListGatherNodesRequest(),
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                await WriteAsync(context, 200, new
+                {
+                    count = result.Count,
+                    nodes = result.Nodes.Select(n => new
+                    {
+                        node_id = n.NodeId,
+                        kind = n.Kind,
+                        region_id = n.RegionId,
+                        item_id = n.ItemId,
+                        count = n.Count,
+                        bag_slot = n.BagSlot,
+                        respawn_s = n.RespawnS,
+                    }).ToArray(),
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "world_gather_nodes", account, ex);
+            }
+        });
+
         // 只读：地点、开口的人与势力的编号，供客户端与核对比对方案 2.5 到 2.7。
         app.MapGet("/world/regions", async context =>
         {

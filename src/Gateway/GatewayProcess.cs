@@ -88,6 +88,9 @@ public sealed class GatewayProcess(string configPath)
         // 摆放事实与拥有判定全在社交服 / 角色服。
         HomesteadApi.Map(app, tokens, config);
 
+        // N5：竞技场与战场的 HTTP 进场口（职业与分支只读角色服，连战斗仍走 /battle）。
+        VersusApi.Map(app, tokens, config);
+
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
         WorldApi.Map(app, tokens, config);
 

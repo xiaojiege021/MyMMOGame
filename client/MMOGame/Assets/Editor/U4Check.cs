@@ -175,18 +175,19 @@ public static class U4Check
         Report("codex_speakers", speakerOk && dialogueFiles == speakers.Length,
             "speakers=" + speakers.Length + " files=" + dialogueFiles);
 
-        // 四个采集点：编号与配置同数，灵石那个必须标成禁止个人采集。
-        var nodes = new[] { "ore_kulan_1", "ore_kulan_2", "herb_tingyao_1", "spirit_qiyun_1" };
-        var nodeOk = true;
-        for (var i = 0; i < nodes.Length; i++)
-        {
-            nodeOk &= gather.Contains(nodes[i]) && codex.Contains("Id = \"" + nodes[i] + "\"");
-        }
-
-        var spiritForbidden = codex.Contains("Id = \"spirit_qiyun_1\"")
-            && Regex.IsMatch(codex, "Id = \"spirit_qiyun_1\"[\\s\\S]{0,200}Forbidden = true");
-        Report("codex_nodes", nodeOk && spiritForbidden,
-            "nodes=" + nodes.Length + " spirit_forbidden=" + spiritForbidden);
+        var flow = Client(root, "HotUpdate/Ui/UiWorldFlow.cs");
+        var gatherUi = Client(root, "HotUpdate/Ui/UiGatherScreen.cs");
+        var netGather = Client(root, "Net/WorldGather.cs");
+        var noHardcoded = !codex.Contains("Id = \"ore_kulan_1\"")
+            && !codex.Contains("static readonly GatherNode[] Nodes");
+        var wiring = flow.Contains("LoadGatherNodes")
+            && netGather.Contains("ParseList")
+            && flow.Contains("/world/gather/nodes")
+            && gatherUi.Contains("读取节点表")
+            && codex.Contains("NoGatherNodesYet")
+            && !gatherUi.Contains("config/gather.json");
+        Report("codex_nodes", noHardcoded && wiring,
+            "hardcoded=" + !noHardcoded + " wiring=" + wiring);
 
         // 三段境界与能飞的那一段，照 flight.json 抄，不另起名字。
         var realms = new[] { "炼体", "筑基", "结丹" };
