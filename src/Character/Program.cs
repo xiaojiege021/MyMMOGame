@@ -842,7 +842,7 @@ if (dungeonDropTableState)
         var table = DungeonDropTable.Load(path, items, currencies);
         Console.WriteLine("dungeon_drop_table_state=ok version=" + table.Version
             + " dungeons=" + table.DungeonCount);
-        foreach (var id in new[] { "abyss", "lair" })
+        foreach (var id in new[] { "abyss", "lair", "world_boss" })
         {
             var lines = table.LinesFor(id);
             if (lines.Count == 0)

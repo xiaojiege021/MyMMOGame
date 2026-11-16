@@ -413,8 +413,9 @@ print(next(i["price_yuanbao"] for i in d["items"] if i["kind"] == "revive_scroll
   printf '%s' "$SETTLE" | grep -q 'party=1' && printf '%s' "$SETTLE" | grep -q 'source=world_boss' \
     && ok "结算来源是 world_boss（世界服不结算这场技能）：$(printf '%s' "$SETTLE" | grep -oE 'gain=[0-9]+')" \
     || bad "结算来源不对：$SETTLE"
-  printf '%s' "$SETTLE" | grep -qi 'duplicate=false' && printf '%s' "$SETTLE" | grep -q 'dungeon=none' \
-    && ok "这场不是副本：dungeon=none，事务不重复" || bad "副本字段不对：$SETTLE"
+  printf '%s' "$SETTLE" | grep -qi 'duplicate=false' && printf '%s' "$SETTLE" | grep -q 'dungeon=world_boss' \
+    && printf '%s' "$SETTLE" | grep -q 'drops=2' \
+    && ok "掉落键 world_boss（不是 dungeons 副本）、报 2 行掉落、事务不重复" || bad "结算字段不对：$SETTLE"
   EXP1="$("$DOTNET" "$CD" $CC --revive-scroll-state "$A" 2>&1 | utf8 \
     | sed -n 's/.*\bexp=\([0-9]*\).*/\1/p' | head -1)"
   if [ -n "$EXP0" ] && [ -n "$EXP1" ] && [ "$EXP1" -gt "$EXP0" ]; then

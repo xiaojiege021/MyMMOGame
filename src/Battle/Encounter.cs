@@ -1326,6 +1326,13 @@ public sealed class Encounter
                 ? Math.Max(_settlementPartySize, _partySize)
                 : _partySize;
             var dungeonId = _dungeon?.Id ?? "";
+            // N8：世界 Boss 不是 dungeons.json 副本，掉落表键固定 world_boss。
+            if (dungeonId.Length == 0
+                && string.Equals(SettlementSource, "world_boss", StringComparison.Ordinal))
+            {
+                dungeonId = "world_boss";
+            }
+
             var drops = dungeonId.Length > 0 && _bossHp <= 0
                 ? _config.DungeonDrops.LinesFor(dungeonId)
                 : [];

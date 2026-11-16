@@ -879,10 +879,14 @@ public sealed class CharacterGrpcService(
         DungeonDef? dungeon = null;
         if (dungeonId.Length > 0)
         {
-            dungeon = dungeons.Find(dungeonId);
-            if (dungeon is null)
+            if (!string.Equals(dungeonId, ExpSettlementRepository.WorldBossDropDungeonId,
+                    StringComparison.Ordinal))
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "dungeon_unknown"));
+                dungeon = dungeons.Find(dungeonId);
+                if (dungeon is null)
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "dungeon_unknown"));
+                }
             }
         }
 

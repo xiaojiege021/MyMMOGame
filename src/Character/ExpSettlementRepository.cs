@@ -54,6 +54,9 @@ public sealed class ExpSettlementRepository(NpgsqlDataSource dataSource)
     public const int MaxSourceLength = 32;
     public const int MaxDungeonIdLength = 32;
 
+    /// <summary>N8：config/dungeon_drops.json 的键，不是 config/dungeons.json 里的副本。</summary>
+    public const string WorldBossDropDungeonId = "world_boss";
+
     /// <summary>没有生效道具时的结算倍率：乘 100/100 就是原倍率，不是配置数值。</summary>
     public const int OriginalPct = 100;
 
