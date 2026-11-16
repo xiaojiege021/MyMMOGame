@@ -3,7 +3,7 @@
 #
 # 完成标准：五屏齐全可建；名册 / 等级 / 上限 / 席位只认 /sect/* 回包，没回包写「尚未请求」；
 # 城战同屏只按 SiegeView 翻译（超限只留队色与血条）；归属只读 /world/worldboss 的
-# owner_sect_name；竞技场与战场不本地算战力；家园摆放与种植都接了回包、图鉴仍标「尚未接服务端」；
+# owner_sect_name；竞技场与战场不本地算战力；家园摆放 / 种植 / 图鉴都接了回包；
 # 切皮肤只换颜色。
 #
 #   bash tools/check/check-u7.sh
@@ -77,9 +77,11 @@ assert '.SiegeFullCount' in siege and '.SiegeFullLimit' in siege and 'Markers()'
 
 home = open(ui + '/UiHomesteadScreen.cs', encoding='utf-8').read()
 hero = open(ui + '/UiHeroCodexScreen.cs', encoding='utf-8').read()
-# U9 接了摆放、U10 接了种植与家园币；图鉴仍标尚未接服务端。
-assert '读取种植' in home and 'CodexGap' in hero
-assert 'PlantingGap' not in open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
+social_codex = open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
+# U9 接了摆放、U10 接了种植与家园币、U11 接了图鉴。这里只认「接线后的入口在不在」，
+# 不写「已接 / 未接」这种会过期的话。
+assert '读取种植' in home and '读取图鉴' in hero
+assert 'PlantingGap' not in social_codex and 'CodexGap' not in social_codex
 
 # 战斗侧只加一条「收到才处理」的分支；副本链路不发这条消息。
 battle_client = open(assets + '/HotUpdate/BattleClient.cs', encoding='utf-8').read()
@@ -113,7 +115,7 @@ else
 fi
 
 for key in files screens no_config no_hardcoded_cap no_power_math codex_clean \
-           sect_fields siege_fields unwired_marked flow_net flow_siege no_proto self; do
+           sect_fields siege_fields wired_entries flow_net flow_siege no_proto self; do
   if grep -q "u7_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "编辑器自检 u7_${key}=ok"
   else
@@ -124,7 +126,7 @@ done
 
 for key in pending facts_sect facts_seat facts facts_second no_hardcoded \
            siege_tiers siege_markers siege_screen owner owner_empty owner_screen \
-           five unwired skin_layout skin_copy; do
+           five wired skin_layout skin_copy; do
   if grep -q "u7_self_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "五屏自检 u7_self_${key}=ok"
   else

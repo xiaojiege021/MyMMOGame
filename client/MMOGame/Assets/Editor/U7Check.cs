@@ -151,10 +151,11 @@ public static class U7Check
 
         var homestead = Read(Path.Combine(ui, "UiHomesteadScreen.cs"));
         var hero = Read(Path.Combine(ui, "UiHeroCodexScreen.cs"));
-        // U9 接了摆放口、U10 接了种植与家园币；图鉴仍标尚未接服务端。
-        Report("unwired_marked",
-            homestead.Contains("读取种植") && hero.Contains("CodexGap"),
-            "种植块没接回包 / 图鉴没标尚未接服务端");
+        // U9 接了摆放口、U10 接了种植与家园币、U11 接了图鉴。这里只认「接线后的入口在不在」，
+        // 不写「已接 / 未接」这种会过期的话。
+        Report("wired_entries",
+            homestead.Contains("读取种植") && hero.Contains("读取图鉴"),
+            "种植块或图鉴块没接回包");
     }
 
     static void CheckFlow(string root)

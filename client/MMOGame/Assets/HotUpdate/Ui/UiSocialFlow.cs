@@ -23,8 +23,9 @@ namespace HotUpdate.Ui
     /// U7 社交与组织五屏的流程与唯一判定出口（原型 F01–F05）。
     ///
     /// 只做三件事：发请求、拆回包、把字段交给屏。名册上限、等级、席位、建设、
-    /// 掌门、世界 Boss 归属、城战同屏档位、洞府摆放一条都不在这里算——要么来自
-    /// `/sect/*`、`/world/worldboss`、`/homestead*`，要么来自战斗服下发的 `SiegeView`。
+    /// 掌门、世界 Boss 归属、城战同屏档位、洞府摆放、图鉴收集度与被动一条都不在这里算——
+    /// 要么来自 `/sect/*`、`/world/worldboss`、`/homestead*`、`/hero-codex`，要么来自
+    /// 战斗服下发的 `SiegeView`。
     /// </summary>
     public sealed class UiSocialFlow : MonoBehaviour
     {
@@ -107,6 +108,16 @@ namespace HotUpdate.Ui
         public HomeCoinShopOutcome LastHomeCoin { get; private set; }
 
         public bool HasHomeCoin { get; private set; }
+
+        // ------------------------------------------------------------------ 英灵图鉴（U11 / N12）
+
+        /// <summary>最近一次 `/hero-codex` 回包。九格名字、收集度与被动万分比都从这里取。</summary>
+        public HeroCodexOutcome LastCodex { get; private set; }
+
+        public bool HasCodex { get; private set; }
+
+        /// <summary>这条图鉴口发过请求没有。发过但没拿到 200 时，屏上写回执而不是「尚未请求」。</summary>
+        public bool CodexTried { get; private set; }
 
         public string Error { get; private set; } = string.Empty;
 
@@ -529,6 +540,52 @@ namespace HotUpdate.Ui
                     }
                 },
                 "u10_home_coin_buy", done);
+        }
+
+        // ------------------------------------------------------------------ 英灵图鉴（U11 / N12）
+
+        /// <summary>
+        /// 只读图鉴。走 `GET /hero-codex`，只带角色号；九位名字、收没收到、每位与合计的被动
+        /// 万分比全来自角色服，屏上照抄不推算。非 200 不算一份图鉴回包。
+        /// </summary>
+        public void LoadHeroCodex(ulong ownerCharacterId = 0, Action done = null)
+        {
+            var owner = ownerCharacterId != 0 ? ownerCharacterId : _characterId;
+            if (owner == 0)
+            {
+                LastCodex = HeroCodexOutcome.Failure("no_character");
+                HasCodex = false;
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            CodexTried = true;
+            _send(HeroCodexEntry.RequestPath(owner), string.Empty, _token, (status, text) =>
+            {
+                Busy = false;
+                if (status == 200)
+                {
+                    LastCodex = HeroCodexEntry.Parse(text);
+                    HasCodex = true;
+                    Error = string.Empty;
+                    Debug.Log("u11_codex=ok entries=" + LastCodex.EntryCount
+                        + " collected=" + LastCodex.CollectedCount
+                        + " total_passive_pct_bps=" + LastCodex.TotalPassivePctBps
+                        + " passive_kind=" + LastCodex.PassiveKind
+                        + " main_stage=" + LastCodex.MainStage);
+                }
+                else
+                {
+                    LastCodex = HeroCodexOutcome.Failure("http_" + status);
+                    HasCodex = false;
+                    Error = "图鉴没读到：" + status;
+                    Debug.Log("u11_codex=reject status=" + status);
+                }
+
+                if (done != null) done();
+            });
         }
 
         // ------------------------------------------------------------------ 城战同屏

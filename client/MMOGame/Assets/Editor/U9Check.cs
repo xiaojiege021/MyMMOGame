@@ -7,7 +7,8 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// U9 编辑器核对：F04 接 C3 `/homestead*`，种植仍标尚未接服务端，不动 proto / config。
+/// U9 编辑器核对：F04 接 C3 `/homestead*`，摆放只读回包，不动 proto / config。
+/// （种植与家园币由 U10 接、图鉴由 U11 接，各自有自己的核对。）
 /// </summary>
 public static class U9Check
 {

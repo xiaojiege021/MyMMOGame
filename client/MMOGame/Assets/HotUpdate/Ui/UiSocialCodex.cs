@@ -137,12 +137,6 @@ namespace HotUpdate.Ui
             return false;
         }
 
-        /// <summary>英灵图鉴的 9 个名字（原型 F05），其余留空。</summary>
-        public static readonly string[] CodexNames =
-        {
-            "乔小满", "苏晚织", "阮青", "阿弦", "闻嫂", "孟七", "澄川", "灰生", "周晚棠",
-        };
-
         /// <summary>图鉴两条口径。</summary>
         public const string CodexRule =
             "收集度与被动只做收集、外观和生活协助，不进入伤害公式；灵兽同理。";
@@ -151,8 +145,13 @@ namespace HotUpdate.Ui
         public const string WardrobeRule =
             "第二角色栏开启后，装备、等级、境界不共享，外观收藏可以共享。";
 
-        /// <summary>图鉴屏的现状。</summary>
-        public const string CodexGap = "尚未接服务端：没有收集度与图鉴的接口，未定的格子留空，不编条目";
+        /// <summary>
+        /// 图鉴口径（U11 接了 N12 的 `GET /hero-codex` 之后屏上写这一条）。
+        /// 九位名字、收没收到、每位与合计的被动万分比都只认回包；这里不写死任何一位，
+        /// 也不把万分比换算成别的数。
+        /// </summary>
+        public const string CodexNote =
+            "九格只认 /hero-codex 回包：名字、收集度、被动 bps 都照抄；未定的格子留空，不补编条目";
 
         /// <summary>建宗时提交的名字。只作请求参数，能不能用由社交服判。</summary>
         public const string DemoSectName = "云锦";

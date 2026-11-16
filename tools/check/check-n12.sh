@@ -62,7 +62,7 @@ for dp, _, fs in os.walk(os.path.join(root,"src/Battle")):
             battle += open(os.path.join(dp,f),encoding="utf-8").read()
 R("no_battle", "HeroCodex" not in battle)
 R("no_deck", "deck" not in open(os.path.join(root,"src/Character/HeroCodexTable.cs"),encoding="utf-8").read().lower())
-R("client_gap", "尚未接服务端" in open(os.path.join(root,"client/MMOGame/Assets/HotUpdate/Ui/UiSocialCodex.cs"),encoding="utf-8").read())
+R("client_note", "CodexNote" in open(os.path.join(root,"client/MMOGame/Assets/HotUpdate/Ui/UiSocialCodex.cs"),encoding="utf-8").read())
 R("all_cards", "n12)" in open(os.path.join(root,"tools/check/check-all.sh"),encoding="utf-8").read())
 PY
 while IFS=: read -r st k; do
