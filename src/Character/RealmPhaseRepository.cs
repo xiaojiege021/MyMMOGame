@@ -22,8 +22,9 @@ public sealed record RealmPassiveSnapshot(
     int PassivePctBps);
 
 /// <summary>
-/// 段内四阶的读写（N10）。升阶与被动百分比都只在角色服、只读配置；
-/// 突破下一大境界仍走 RealmAdvanceRepository，但须在「后期」及以后。
+/// 段内阶的读写（N10，R1 起按境界分）。升阶与被动百分比都只在角色服、只读配置；
+/// 突破下一大境界仍走 RealmAdvanceRepository，但须到该境界配置的
+/// breakthrough_min_index 及以后（炼体第 9 阶、其余后期）。
 /// </summary>
 public sealed class RealmPhaseRepository(NpgsqlDataSource dataSource, RealmTable realms)
 {
@@ -43,7 +44,7 @@ public sealed class RealmPhaseRepository(NpgsqlDataSource dataSource, RealmTable
 
         var realm = reader.GetString(0);
         var phase = reader.GetInt16(1);
-        var sub = realms.SubPhases;
+        var sub = realms.SubPhasesFor(realm);
         return new RealmPassiveSnapshot(
             true, realm, phase, sub.NameAt(phase), sub.PassiveBpsAt(phase));
     }
@@ -91,7 +92,8 @@ public sealed class RealmPhaseRepository(NpgsqlDataSource dataSource, RealmTable
                 false, "character_not_found", false, false, 0, 0, "", 0, 0, 0);
         }
 
-        _ = realms.Normalize(realm);
+        // R1：段内阶按当前境界取——炼体 9 阶、筑基及以后 4 阶。
+        var sub = realms.SubPhasesFor(realm);
 
         await using (var dup = new NpgsqlCommand(
             "select from_phase, to_phase from \"角色\".realm_phase_promote where txn_id = $1",
@@ -105,28 +107,25 @@ public sealed class RealmPhaseRepository(NpgsqlDataSource dataSource, RealmTable
                 var to = reader.GetInt16(1);
                 await reader.DisposeAsync();
                 await transaction.RollbackAsync(stopping);
-                var sub = realms.SubPhases;
                 return new RealmPhasePromoteOutcome(
                     true, "", false, true, from, to, sub.NameAt(to), sub.PassiveBpsAt(to),
                     level, 0);
             }
         }
 
-        if (phase >= RealmSubPhases.PhaseCount - 1)
+        if (phase >= sub.Count - 1)
         {
             await transaction.RollbackAsync(stopping);
-            var sub = realms.SubPhases;
             return new RealmPhasePromoteOutcome(
                 true, "realm_phase_max", false, false, phase, phase,
                 sub.NameAt(phase), sub.PassiveBpsAt(phase), level, 0);
         }
 
         var next = phase + 1;
-        var requiredLevel = realms.SubPhases.PromoteLevelAt(next);
+        var requiredLevel = sub.PromoteLevelAt(next);
         if (level < requiredLevel)
         {
             await transaction.RollbackAsync(stopping);
-            var sub = realms.SubPhases;
             return new RealmPhasePromoteOutcome(
                 true, "level_not_enough", false, false, phase, phase,
                 sub.NameAt(phase), sub.PassiveBpsAt(phase), level, requiredLevel);
@@ -145,7 +144,6 @@ public sealed class RealmPhaseRepository(NpgsqlDataSource dataSource, RealmTable
             if (await claim.ExecuteScalarAsync(stopping) is null)
             {
                 await transaction.RollbackAsync(stopping);
-                var sub = realms.SubPhases;
                 return new RealmPhasePromoteOutcome(
                     true, "", false, true, phase, phase,
                     sub.NameAt(phase), sub.PassiveBpsAt(phase), level, requiredLevel);
@@ -162,10 +160,9 @@ public sealed class RealmPhaseRepository(NpgsqlDataSource dataSource, RealmTable
         }
 
         await transaction.CommitAsync(stopping);
-        var after = realms.SubPhases;
         return new RealmPhasePromoteOutcome(
             true, "", true, false, phase, next,
-            after.NameAt(next), after.PassiveBpsAt(next), level, requiredLevel);
+            sub.NameAt(next), sub.PassiveBpsAt(next), level, requiredLevel);
     }
 
     /// <summary>只给核对用：直写段内阶，验突破门槛与被动读口。</summary>

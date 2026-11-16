@@ -31,14 +31,17 @@ public sealed record RealmAdvanceRequirement(
     int MainStage,
     IReadOnlyList<string> SideQuests);
 
-/// <summary>N10：段内四阶与被动。数值只在 config/realms.json 的 sub_phases 里。</summary>
+/// <summary>
+/// R1：段内阶与被动。阶数按境界配置——炼体 1–9 阶，筑基及以后仍是初/中/后/大圆满。
+/// 数值只在 config/realms.json 的 sub_phases.by_realm 里，代码里不写第二套数。
+/// </summary>
 public sealed record RealmSubPhases(
     IReadOnlyList<string> Names,
     IReadOnlyList<int> PassivePctBps,
     IReadOnlyList<int> PromoteMinLevel,
     int BreakthroughMinIndex)
 {
-    public const int PhaseCount = 4;
+    public int Count => Names.Count;
 
     public string NameAt(int index)
         => index >= 0 && index < Names.Count ? Names[index] : "";
@@ -61,13 +64,22 @@ public sealed class RealmTable
     readonly Dictionary<string, string> _aliases;
     readonly HashSet<string> _open;
     readonly Dictionary<string, RealmAdvanceRequirement> _requirements;
-    readonly RealmSubPhases _subPhases;
+    readonly Dictionary<string, RealmSubPhases> _subPhasesByRealm;
+    readonly RealmSubPhases _defaultSubPhases;
 
     public int Version { get; }
 
     public string LaunchUntil { get; }
 
-    public RealmSubPhases SubPhases => _subPhases;
+    /// <summary>兼容旧访问：返回 * 默认那套（筑基及以后的四阶）。</summary>
+    public RealmSubPhases SubPhases => _defaultSubPhases;
+
+    /// <summary>按境界取段内阶；不认识的境界回 * 默认。</summary>
+    public RealmSubPhases SubPhasesFor(string? realm)
+        => _subPhasesByRealm.GetValueOrDefault(Normalize(realm), _defaultSubPhases);
+
+    /// <summary>配置里显式写出的境界阶集（含 *），只给只读入口展示。</summary>
+    public IReadOnlyDictionary<string, RealmSubPhases> SubPhasesByRealm => _subPhasesByRealm;
 
     public IReadOnlyList<string> Realms => _order;
 
@@ -81,7 +93,8 @@ public sealed class RealmTable
         Dictionary<string, string> aliases,
         HashSet<string> open,
         Dictionary<string, RealmAdvanceRequirement> requirements,
-        RealmSubPhases subPhases,
+        Dictionary<string, RealmSubPhases> subPhasesByRealm,
+        RealmSubPhases defaultSubPhases,
         int version,
         string launchUntil)
     {
@@ -89,7 +102,8 @@ public sealed class RealmTable
         _aliases = aliases;
         _open = open;
         _requirements = requirements;
-        _subPhases = subPhases;
+        _subPhasesByRealm = subPhasesByRealm;
+        _defaultSubPhases = defaultSubPhases;
         Version = version;
         LaunchUntil = launchUntil;
     }
@@ -441,79 +455,143 @@ public sealed class RealmTable
         var sub = wire.SubPhases;
         if (sub is null)
         {
-            throw new ConfigException("realms.json 缺 sub_phases（N10 段内四阶）");
+            throw new ConfigException("realms.json 缺 sub_phases（R1 段内阶按境界配置）");
         }
 
-        var phaseNames = (sub.Names ?? [])
+        if (sub.ByRealm is null || sub.ByRealm.Count == 0)
+        {
+            throw new ConfigException("realms.json 的 sub_phases 缺 by_realm");
+        }
+
+        if (!sub.ByRealm.ContainsKey("*"))
+        {
+            throw new ConfigException("realms.json 的 sub_phases.by_realm 必须含 * 默认");
+        }
+
+        var subPhasesByRealm = new Dictionary<string, RealmSubPhases>(StringComparer.Ordinal);
+        foreach (var pair in sub.ByRealm)
+        {
+            var key = (pair.Key ?? "").Trim();
+            if (key.Length == 0)
+            {
+                throw new ConfigException("realms.json 的 sub_phases.by_realm 里有空名字");
+            }
+
+            if (key != "*" && !order.Contains(key))
+            {
+                throw new ConfigException("realms.json 的 sub_phases.by_realm 不在顺序表里：" + key);
+            }
+
+            if (subPhasesByRealm.ContainsKey(key))
+            {
+                throw new ConfigException("realms.json 的 sub_phases.by_realm 重复：" + key);
+            }
+
+            // R1 结构口径：炼体 9 阶、* 默认 4 阶；其它境界按各自配置，但长度必须自洽。
+            int? expected = key switch
+            {
+                "炼体" => 9,
+                "*" => 4,
+                _ => null,
+            };
+            subPhasesByRealm[key] = ParseSubPhase(key, pair.Value, expected, key == "*");
+        }
+
+        var defaultSubPhases = subPhasesByRealm["*"];
+
+        return new RealmTable(
+            order, aliases, open, requirements, subPhasesByRealm, defaultSubPhases,
+            wire.Version, launch);
+    }
+
+    static RealmSubPhases ParseSubPhase(string key, SubPhaseItem? item, int? expectedCount, bool isDefault)
+    {
+        var label = "realms.json 的 sub_phases.by_realm." + key;
+        if (item is null)
+        {
+            throw new ConfigException(label + " 是空的");
+        }
+
+        var names = (item.Names ?? [])
             .Select(n => (n ?? "").Trim())
             .ToList();
-        if (phaseNames.Count != RealmSubPhases.PhaseCount)
+        var passive = item.PassivePctBps ?? [];
+        var promoteLevel = item.PromoteMinLevel ?? [];
+
+        if (names.Count == 0)
         {
-            throw new ConfigException("realms.json 的 sub_phases.names 必须正好四阶");
+            throw new ConfigException(label + ".names 不能为空");
         }
 
-        if (phaseNames.Any(n => n.Length == 0) || phaseNames.Distinct(StringComparer.Ordinal).Count() != phaseNames.Count)
+        if (names.Count != passive.Count || names.Count != promoteLevel.Count)
         {
-            throw new ConfigException("realms.json 的 sub_phases.names 有空或重复");
+            throw new ConfigException(label + " 的 names / passive_pct_bps / promote_min_level 长度必须一致");
         }
 
-        if (!string.Equals(phaseNames[2], "后期", StringComparison.Ordinal))
+        if (expectedCount is not null && names.Count != expectedCount.Value)
         {
-            throw new ConfigException("realms.json 的 sub_phases.names 第三阶必须是「后期」");
+            throw new ConfigException(
+                label + " 必须正好 " + expectedCount.Value + " 阶，配置里是 " + names.Count);
         }
 
-        var passive = sub.PassivePctBps ?? [];
-        if (passive.Count != RealmSubPhases.PhaseCount)
+        if (names.Any(n => n.Length == 0) || names.Distinct(StringComparer.Ordinal).Count() != names.Count)
         {
-            throw new ConfigException("realms.json 的 sub_phases.passive_pct_bps 必须正好四项");
+            throw new ConfigException(label + ".names 有空或重复");
         }
 
         if (passive.Any(p => p < 0 || p > 500))
         {
-            throw new ConfigException("realms.json 的 sub_phases.passive_pct_bps 每项须在 0–500（0%–5%）");
+            throw new ConfigException(label + ".passive_pct_bps 每项须在 0–500（0%–5%）");
         }
 
         for (var i = 1; i < passive.Count; i++)
         {
             if (passive[i] < passive[i - 1])
             {
-                throw new ConfigException("realms.json 的 sub_phases.passive_pct_bps 须非递减");
+                throw new ConfigException(label + ".passive_pct_bps 须非递减");
             }
-        }
-
-        if (passive[^1] < 200 || passive[^1] > 300)
-        {
-            throw new ConfigException("realms.json 的 sub_phases.passive_pct_bps 大圆满须在 200–300（2%–3%）");
-        }
-
-        var promoteLevel = sub.PromoteMinLevel ?? [];
-        if (promoteLevel.Count != RealmSubPhases.PhaseCount)
-        {
-            throw new ConfigException("realms.json 的 sub_phases.promote_min_level 必须正好四项");
         }
 
         if (promoteLevel.Any(l => l < 1 || l > 100))
         {
-            throw new ConfigException("realms.json 的 sub_phases.promote_min_level 每项须在 1–100");
+            throw new ConfigException(label + ".promote_min_level 每项须在 1–100");
         }
 
         for (var i = 1; i < promoteLevel.Count; i++)
         {
             if (promoteLevel[i] < promoteLevel[i - 1])
             {
-                throw new ConfigException("realms.json 的 sub_phases.promote_min_level 须非递减");
+                throw new ConfigException(label + ".promote_min_level 须非递减");
             }
         }
 
-        var breakthroughMin = sub.BreakthroughMinIndex ?? 2;
-        if (breakthroughMin != 2)
+        if (item.BreakthroughMinIndex is null)
         {
-            throw new ConfigException("realms.json 的 sub_phases.breakthrough_min_index 必须是 2（后期）");
+            throw new ConfigException(label + " 缺 breakthrough_min_index");
         }
 
-        var subPhases = new RealmSubPhases(phaseNames, passive, promoteLevel, breakthroughMin);
+        var breakthroughMin = item.BreakthroughMinIndex.Value;
+        if (breakthroughMin < 0 || breakthroughMin >= names.Count)
+        {
+            throw new ConfigException(
+                label + ".breakthrough_min_index 必须落在 0.." + (names.Count - 1));
+        }
 
-        return new RealmTable(order, aliases, open, requirements, subPhases, wire.Version, launch);
+        // * 默认仍是方案 8.1 的四阶：第三阶「后期」、大圆满给满该段 2%–3%。
+        if (isDefault)
+        {
+            if (!string.Equals(names[2], "后期", StringComparison.Ordinal))
+            {
+                throw new ConfigException(label + ".names 第三阶必须是「后期」");
+            }
+
+            if (passive[^1] < 200 || passive[^1] > 300)
+            {
+                throw new ConfigException(label + ".passive_pct_bps 大圆满须在 200–300（2%–3%）");
+            }
+        }
+
+        return new RealmSubPhases(names, passive, promoteLevel, breakthroughMin);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -547,6 +625,18 @@ public sealed class RealmTable
     }
 
     sealed record SubPhasesItem
+    {
+        [JsonPropertyName("pending")]
+        public bool? Pending { get; init; }
+
+        [JsonPropertyName("note")]
+        public string? Note { get; init; }
+
+        [JsonPropertyName("by_realm")]
+        public Dictionary<string, SubPhaseItem?>? ByRealm { get; init; }
+    }
+
+    sealed record SubPhaseItem
     {
         [JsonPropertyName("names")]
         public List<string?>? Names { get; init; }

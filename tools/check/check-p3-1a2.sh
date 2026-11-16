@@ -160,8 +160,8 @@ echo "== 3. 只读入口 --realm-table / --dungeon-table =="
 "$DOTNET" "$CD" --realm-table $CC >"$TMP/rt.raw" 2>&1; rc=$?
 RT="$(utf8 < "$TMP/rt.raw")"
 if [ "$rc" = "0" ] \
-   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=3 realms=11 launch_until=结丹' \
-   && printf '%s' "$RT" | grep -q '^sub_phase=2 name=后期 passive_pct_bps=160' \
+   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=4 realms=11 launch_until=结丹' \
+   && printf '%s' "$RT" | grep -q '^sub_phase=\*:2 name=后期 passive_pct_bps=160' \
    && printf '%s' "$RT" | grep -q '^advance_req=炼体->筑基 drill=100 stone=stone_1 stone_cost=10 success_pct=70 main_stage=9 side_quests=$' \
    && [ "$(printf '%s' "$RT" | grep -c '^advance_req=')" = "10" ]; then
   ok "十段突破要求都在配置里，数值不写死在代码（不连库）"
@@ -302,6 +302,9 @@ except Exception:
   rawd "$ID" -1 | grep -q 'raw_drill=rejected .*sqlstate=23514' \
     && ok "历练直写负数被库的 CHECK 拒（23514）" || bad "历练负数没被库挡住"
 
+  # 炼心用例要在「段内阶已够」的前提下测：R1 起炼体要满第 9 阶（index 8），
+  # 否则 phase 门槛会先于 heart 触发，测不到炼心。
+  rawp "$ID" 8
   R="$(adv "$ID" t-heart-1 $CC)"
   printf '%s' "$R" | grep -q 'executed=false duplicate=false success=false from=炼体 next=筑基 realm=炼体 reason=heart_not_done' \
     && ok "主线没走到第 9 场：heart_not_done" || bad "炼心没挡住：$R"
@@ -309,24 +312,24 @@ except Exception:
   rawm "$ID" 9; rawp "$ID" 0
   R="$(adv "$ID" t-phase-1 $CC)"
   printf '%s' "$R" | grep -q 'reason=realm_phase_not_enough' \
-    && ok "未到后期不能突破大境界" || bad "段内阶没挡住：$R"
-  rawp "$ID" 2
+    && ok "炼体未到九阶不能突破筑基" || bad "段内阶没挡住：$R"
+  rawp "$ID" 8
 
   rawm "$ID" 9
-  rawp "$ID" 2
+  rawp "$ID" 8
   rawd "$ID" 0 >/dev/null
   R="$(adv "$ID" t-drill-1 $CC)"
   printf '%s' "$R" | grep -q 'reason=drill_not_enough' \
     && ok "历练不够：drill_not_enough，修为不动" || bad "历练没挡住：$R"
 
   rawd "$ID" 100 >/dev/null
-  rawp "$ID" 2
+  rawp "$ID" 8
   R="$(adv "$ID" t-stone-1 $CC)"
   printf '%s' "$R" | grep -q 'reason=stone_not_enough' \
     && ok "灵石不够：stone_not_enough，修为不动" || bad "灵石没挡住：$R"
 
   stone "$ID" 10
-  rawp "$ID" 2
+  rawp "$ID" 8
   R="$(adv "$ID" t-ok-1 $C100)"
   printf '%s' "$R" | grep -q 'executed=true duplicate=false success=true .*realm=筑基 .*drill=100 drill_required=100 drill_cost=100 drill_after=0 .*stone_left=0' \
     && ok "成功：修为进筑基，历练 100→0、灵石 10→0" || bad "成功路径不对：$R"
@@ -336,19 +339,20 @@ except Exception:
     && ok "同一事务号再提交不掷第二次" || bad "重复事务号没挡住：$R"
   [ "$(stonebalance "$ID")" = "10" ] && ok "重复提交没有多扣灵石" || bad "重复提交扣了灵石"
 
-  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9; rawp "$ID" 2
+  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9; rawp "$ID" 8
   R="$(adv "$ID" t-fail-1 $C0)"
   printf '%s' "$R" | grep -q 'executed=true duplicate=false success=false from=炼体 next=筑基 realm=炼体 .*drill_after=0 .*stone_left=0' \
     && ok "失败：修为停在炼体，历练与灵石照扣" || bad "失败路径不对：$R"
 
-  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9; rawp "$ID" 2
+  rawr "$ID" 炼体; rawd "$ID" 100 >/dev/null; setstone "$ID" 10; rawm "$ID" 9; rawp "$ID" 8
   R="$(adv "$ID" t-side-1 $CSIDE)"
   printf '%s' "$R" | grep -q 'reason=heart_not_done' \
     && ok "必要支线没做完：历练与灵石都够也不能突破" || bad "必要支线没卡住：$R"
-  [ "$(stonebalance "$ID")" = "10" ] && [ "$(bstate "$ID")" = "realm_break_state=ok id=$ID realm=炼体 drill=100 main_stage=9 quests=" ] \
+  # N10 起 --realm-break-state 多了 realm_phase 字段，R1 后炼体是 8；期望串跟上实际输出。
+  [ "$(stonebalance "$ID")" = "10" ] && [ "$(bstate "$ID")" = "realm_break_state=ok id=$ID realm=炼体 realm_phase=8 drill=100 main_stage=9 quests=" ] \
     && ok "被炼心挡下的突破一分都没扣" || bad "被挡下仍扣了东西：$(bstate "$ID")"
   qdone "$ID" side_lianxin_p31a2
-  rawp "$ID" 2
+  rawp "$ID" 8
   R="$(adv "$ID" t-side-2 $CSIDE)"
   printf '%s' "$R" | grep -q 'success=true .*realm=筑基' \
     && ok "必要支线做完后可以突破" || bad "补完支线仍不能突破：$R"

@@ -913,12 +913,41 @@ if (realmTableState)
             realmDungeonPath ?? characterConfig.DungeonTable);
         var currencies = CurrencyTable.Load("config/currency.json");
         var table = RealmTable.Load(realmTablePath ?? characterConfig.RealmTable, dungeons, currencies);
-        var sub = table.SubPhases;
-        for (var pi = 0; pi < RealmSubPhases.PhaseCount; pi++)
+        // R1：段内阶按境界分——先看炼体 9 阶，再看 * 默认 4 阶，其余显式配置的排后面。
+        var groups = new List<string>();
+        if (table.SubPhasesByRealm.ContainsKey("炼体"))
         {
-            Console.WriteLine("sub_phase=" + pi + " name=" + sub.NameAt(pi)
-                + " passive_pct_bps=" + sub.PassiveBpsAt(pi)
-                + " promote_min_level=" + sub.PromoteLevelAt(pi));
+            groups.Add("炼体");
+        }
+
+        if (!groups.Contains("*"))
+        {
+            groups.Add("*");
+        }
+
+        foreach (var key in table.SubPhasesByRealm.Keys.OrderBy(k => k, StringComparer.Ordinal))
+        {
+            if (!groups.Contains(key))
+            {
+                groups.Add(key);
+            }
+        }
+
+        foreach (var key in groups)
+        {
+            if (!table.SubPhasesByRealm.TryGetValue(key, out var group))
+            {
+                continue;
+            }
+
+            Console.WriteLine("sub_phase_group=" + key + " count=" + group.Count
+                + " breakthrough_min_index=" + group.BreakthroughMinIndex);
+            for (var pi = 0; pi < group.Count; pi++)
+            {
+                Console.WriteLine("sub_phase=" + key + ":" + pi + " name=" + group.NameAt(pi)
+                    + " passive_pct_bps=" + group.PassiveBpsAt(pi)
+                    + " promote_min_level=" + group.PromoteLevelAt(pi));
+            }
         }
 
         Console.WriteLine("realm_table_state=ok version=" + table.Version

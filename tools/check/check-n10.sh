@@ -43,12 +43,17 @@ def rd(p):
 
 realms = json.load(open(os.path.join(root, "config/realms.json"), encoding="utf-8"))
 sub = realms.get("sub_phases", {})
-names = sub.get("names", [])
-passive = sub.get("passive_pct_bps", [])
-R("sub_names", names == ["初期", "中期", "后期", "大圆满"])
-R("passive_full", len(passive) == 4 and 200 <= passive[-1] <= 300)
-R("breakthrough_index", sub.get("breakthrough_min_index") == 2)
-R("version", realms.get("version", 0) >= 3)
+by = sub.get("by_realm", {})
+lian = by.get("炼体", {})
+default = by.get("*", {})
+R("sub_names", lian.get("names") == ["一阶", "二阶", "三阶", "四阶", "五阶", "六阶", "七阶", "八阶", "九阶"]
+  and default.get("names") == ["初期", "中期", "后期", "大圆满"])
+R("passive_full", len(lian.get("passive_pct_bps", [])) == 9
+  and len(default.get("passive_pct_bps", [])) == 4
+  and 200 <= default.get("passive_pct_bps", [0])[-1] <= 300)
+R("breakthrough_index", lian.get("breakthrough_min_index") == 8
+  and default.get("breakthrough_min_index") == 2)
+R("version", realms.get("version", 0) >= 4)
 
 phase = rd("src/Character/RealmPhaseRepository.cs")
 adv = rd("src/Character/RealmAdvanceRepository.cs")
@@ -78,7 +83,7 @@ BAD="$TMP/bad-realms.json"
 python3 - "$ROOT/config/realms.json" "$BAD" <<'PY'
 import copy, json, sys
 j = json.load(open(sys.argv[1], encoding="utf-8"))
-j["sub_phases"]["passive_pct_bps"] = [0, 50, 100, 500]
+j["sub_phases"]["by_realm"]["*"]["passive_pct_bps"] = [0, 50, 100, 500]
 json.dump(j, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
 PY
 OUT="$("$DOTNET" "$CD" --realm-table-path "$BAD" "$ROOT/config/dungeons.json" $CC 2>&1)" || true
@@ -136,13 +141,13 @@ ID="$(curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/character?token=$TOK
 [ -n "$ID" ] && ok "建角 id=$ID" || { bad "建角失败"; finish "$TITLE"; exit 1; }
 
 PS="$("$DOTNET" "$CD" --realm-passive-state "$ID" $CC 2>&1 | grep -m1 '^realm_passive_state=')"
-printf '%s' "$PS" | grep -q "realm_phase=0 phase_name=初期 passive_pct_bps=0" \
-  && ok "新建角色段内阶=初期、被动 0" || bad "被动读口不对：$PS"
+printf '%s' "$PS" | grep -q "realm=炼体 realm_phase=0 phase_name=一阶 passive_pct_bps=0" \
+  && ok "新建角色炼体一阶、被动 0" || bad "被动读口不对：$PS"
 
-"$DOTNET" "$CD" --raw-level-write "$ID" 5 $CC >/dev/null
+"$DOTNET" "$CD" --raw-level-write "$ID" 6 $CC >/dev/null
 P1="$("$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-p1" $CC 2>&1 | grep -m1 '^promote_realm_phase=')"
-printf '%s' "$P1" | grep -q 'executed=true .*to=1 phase_name=中期 passive_pct_bps=80' \
-  && ok "升到中期" || bad "升阶失败：$P1"
+printf '%s' "$P1" | grep -q 'executed=true .*to=1 phase_name=二阶 passive_pct_bps=30' \
+  && ok "升到炼体二阶" || bad "升阶失败：$P1"
 
 Pdup="$("$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-p1" $CC 2>&1 | grep -m1 '^promote_realm_phase=')"
 printf '%s' "$Pdup" | grep -q 'duplicate=true' \
@@ -152,12 +157,12 @@ printf '%s' "$Pdup" | grep -q 'duplicate=true' \
 "$DOTNET" "$CD" --raw-drill-write "$ID" 100 $CC >/dev/null
 ADV0="$("$DOTNET" "$CD" --advance-realm "$ID" "$TX-adv0" $CC 2>&1 | grep -m1 '^advance_realm=')"
 printf '%s' "$ADV0" | grep -q 'reason=realm_phase_not_enough' \
-  && ok "中期不能突破大境界" || bad "突破门槛不对：$ADV0"
+  && ok "炼体二阶不能突破筑基" || bad "突破门槛不对：$ADV0"
 
-"$DOTNET" "$CD" --raw-level-write "$ID" 10 $CC >/dev/null
+"$DOTNET" "$CD" --raw-level-write "$ID" 11 $CC >/dev/null
 "$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-p2" $CC >/dev/null
 PS2="$("$DOTNET" "$CD" --realm-passive-state "$ID" $CC 2>&1 | grep -m1 '^realm_passive_state=')"
-printf '%s' "$PS2" | grep -q 'realm_phase=2 phase_name=后期 passive_pct_bps=160' \
-  && ok "到后期被动 160bps" || bad "后期被动不对：$PS2"
+printf '%s' "$PS2" | grep -q 'realm_phase=2 phase_name=三阶 passive_pct_bps=60' \
+  && ok "到炼体三阶被动 60bps" || bad "三阶被动不对：$PS2"
 
 finish "$TITLE"

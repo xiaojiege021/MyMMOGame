@@ -150,14 +150,19 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                 "", 0, 0, mainStage, 0, [], 0);
         }
 
-        if (realmPhase < realms.SubPhases.BreakthroughMinIndex)
+        // R1：突破门槛按当前境界取——炼体要满第 9 阶（index 8），其余要后期（index 2）。
+        if (realmPhase < realms.SubPhasesFor(realm).BreakthroughMinIndex)
         {
+            // 拒绝路径要先读余额再回滚：回滚后这个事务不能再用，拿它构造命令会抛
+            // 「Transaction is already completed」，把一次正常的业务拒绝变成进程崩。
+            var stoneAtGate = await StoneBalanceAsync(
+                connection, transaction, characterId, requirement.Stone, stopping);
             await transaction.RollbackAsync(stopping);
             return new RealmAdvanceOutcome(
                 true, "realm_phase_not_enough", false, false, false,
                 requirement.From, requirement.Next, requirement.From, drill,
                 requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
-                await StoneBalanceAsync(connection, transaction, characterId, requirement.Stone, stopping),
+                stoneAtGate,
                 mainStage, requirement.MainStage, [], requirement.SuccessPct);
         }
 
