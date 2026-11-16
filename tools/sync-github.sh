@@ -256,7 +256,12 @@ for e in "${PRIV_EMAILS[@]:-}"; do
   [ -z "$e" ] && continue
   SCAN+=("$e"); SCAN+=("$(esc "$e")")
   host_frag="$(printf '%s' "$e" | sed 's/.*@//; s/\..*//')"
-  if [ -n "$host_frag" ]; then
+  # 域名片段不足 4 个字符时不入扫描集（v1.128 N1 起）。三字符的邮箱域名（纯数字那种）
+  # 单凭它定位不到任何人，却会在任何数字、时间戳、AB 二进制里随手命中——
+  # 实测它把 docs 原型 HTML、场景、ProjectSettings、本脚本自己都算成了「私人串」，
+  # GitHub 镜像因此从 11-13 起一直推不出去。**完整邮箱与 IP 仍然照扫，二进制也扫**，
+  # 只是不再用这种三字符片段当判据。
+  if [ -n "$host_frag" ] && [ "${#host_frag}" -ge 4 ]; then
     SCAN+=("$host_frag"); SCAN+=("$(esc "$host_frag")")
   fi
 done
