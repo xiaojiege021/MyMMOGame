@@ -49,6 +49,7 @@ public sealed class CharacterProcess(string configPath)
         CharacterSlotTable characterSlotTable;
         MainlineTable mainlineTable;
         HeroCodexTable heroCodexTable;
+        RecipeTable recipeTable;
         DungeonDropTable dungeonDropTable;
         MainlineDropTable mainlineDropTable;
         try
@@ -136,6 +137,9 @@ public sealed class CharacterProcess(string configPath)
                 ? MainlineTable.Load(config.MainlineTable, dungeons, realms)
                 : MainlineTable.Missing();
             heroCodexTable = HeroCodexTable.Load("config/hero_codex.json", mainlineTable);
+            // K3：生产 / 配方的唯一正本。四个副职、每条配方的材料 / 产出 / 费用 /
+            // 成功率 / 耗时 / 解锁等级都在这一份文件里；加一个配方不改代码。
+            recipeTable = RecipeTable.Load(config.RecipeTable, items, currencies);
             var dungeonDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
             dungeonDropTable = DungeonDropTable.LoadIfPresent(
@@ -335,6 +339,16 @@ public sealed class CharacterProcess(string configPath)
             + " stages=" + mainlineTable.Stages.Count
             + " pending=" + (mainlineTable.Pending ? "true" : "false")
             + " battle_dungeon=" + mainlineTable.BattleDungeon);
+        Console.WriteLine("recipe_table_version=" + recipeTable.Version
+            + " recipes=" + recipeTable.Recipes.Count
+            + " professions=" + recipeTable.Professions.Count
+            + " pending=" + (recipeTable.Pending ? "true" : "false"));
+        foreach (var profession in recipeTable.Professions)
+        {
+            Console.WriteLine("recipe_profession=" + profession.Id
+                + " name=" + profession.Name
+                + " recipes=" + recipeTable.ForProfession(profession.Id).Count);
+        }
         Console.WriteLine("hero_codex=version=" + heroCodexTable.Version
             + " pending=" + (heroCodexTable.Pending ? "true" : "false")
             + " kind=" + heroCodexTable.PassiveKind
@@ -413,6 +427,10 @@ public sealed class CharacterProcess(string configPath)
         var currency = new CurrencyRepository(dataSource);
         var cityTax = new CityTaxRepository(dataSource, cityTable, auctionTable.GoldKind);
         var grants = new GrantRepository(dataSource, items, currencies, config, cityTax);
+        // K3：制作的两笔事务（start 扣材料 / 费用、finish 掷点入包）都在这一个仓储里；
+        // 产出入包复用 grants 的同一条 SQL，钱只用 grants 的货币写法。
+        var crafts = new CraftRepository(
+            dataSource, recipeTable, items, config, grants, inventory);
         var dungeonEntries = new DungeonEntryRepository(dataSource);
         // P2-2a：高难本（龙巢）每人每周的次数。只写 dungeon_entry 一行，
         // 不碰疲劳与周份额；次数以库里已写下的进本记录为准。
@@ -543,6 +561,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(mainlines);
         builder.Services.AddSingleton(heroCodexTable);
         builder.Services.AddSingleton(heroCodex);
+        builder.Services.AddSingleton(recipeTable);
+        builder.Services.AddSingleton(crafts);
         builder.Services.AddSingleton(dungeonDropTable);
         builder.Services.AddSingleton(mainlineDropTable);
         builder.Services.AddSingleton(seasonSource);

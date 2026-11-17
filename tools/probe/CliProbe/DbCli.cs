@@ -38,6 +38,9 @@ internal static class DbCli
             code = await RealmCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await CraftCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await EnhanceCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -65,7 +68,7 @@ internal static class DbCli
         return reportName != null || deleteName != null || stats || migrate || schemaStatus
     || rawLevelWrite != 0 || levelOf != 0
     || branchStateOf != 0 || advanceBranchId != 0 || canEquipOf != 0
-    || bindingOf != null || rawCurrencyId != 0 || txnCount != null || itemCountOf != 0
+    || bindingOf != null || rawCurrencyId != 0 || rawCurrencyAddId != 0 || txnCount != null || itemCountOf != 0
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
@@ -88,6 +91,8 @@ internal static class DbCli
     || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0
     || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null
     || mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0
-    || mainlineSeedSettlementOf != 0;
+    || mainlineSeedSettlementOf != 0
+    || craftStartOf != 0 || craftFinishOf != 0 || craftStateOf != 0
+    || rawItemWriteId != 0;
     }
 }

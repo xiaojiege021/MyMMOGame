@@ -27,9 +27,7 @@ internal static class CliParser
             case "--delete-character" when i + 1 < args.Length:
                 deleteName = args[++i];
                 break;
-            case "--character-stats":
-                stats = true;
-                break;
+            case "--character-stats": stats = true; break;
             // 只给核对用：绕过接口直写库，验库层 CHECK。不能当运维手段用。
             case "--raw-level-write" when i + 2 < args.Length:
                 long.TryParse(args[++i], out rawLevelWrite);
@@ -47,9 +45,9 @@ internal static class CliParser
             // 只给核对用：NPC / 怪物两张内容表，不连库；坏配置也走这里。
             case "--content-list": contentList = true; break;
             // 只给核对用：把物品表的品阶 / 套装 / 图标 / 说明打出来，不连库。坏配置也走这里。
-            case "--item-list":
-                itemList = true;
-                break;
+            case "--item-list": itemList = true; break;
+            // K3：配方与制作的核对 flag 解析器在 CraftCli.Parse（一个文件一个类型 / 行数闸门）。
+            case "--recipe-list": case "--recipe-table-path": case "--craft-start": case "--craft-finish": case "--craft-state": case "--craft-txn": case "--raw-item-write": case "--raw-currency-add": CraftCli.Parse(args, ref i); break;
             // 只给核对用：把武器锁与职业可用兵器打出来，不连库。坏配置也走这里。
             case "--weapon-rules":
                 weaponRules = true;

@@ -172,4 +172,100 @@ public sealed class InventoryRepository(NpgsqlDataSource dataSource)
 
         return (reader.GetBoolean(0), reader.GetBoolean(1));
     }
+
+    /// <summary>
+    /// 归属与等级一次读出，只给 K3 的配方目录标「解锁 / 未解锁」用。
+    /// 不是这个账号的角色回 null，和 DisplayNameAsync 同一套归属条件。
+    /// </summary>
+    public async Task<int?> LevelAsync(string account, long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select level from \"角色\".character where id = $1 and account = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(account);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        return await reader.ReadAsync(stopping) ? reader.GetInt32(0) : null;
+    }
+
+    /// <summary>
+    /// K3：在一笔已打开的事务里扣掉若干件同一种物品，跨格扣、扣到 0 就删行。
+    /// 返回 false 表示总数不够——这时**一行都没改**，事务由调用方整笔回滚
+    /// （材料、费用、活三样要么全有、要么全无）。
+    /// 先锁这一物品的全部格再算总数，同角色的两笔制作不会各自按旧数量通过。
+    /// </summary>
+    public async Task<bool> ConsumeInTransactionAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string itemId,
+        int count,
+        CancellationToken stopping)
+    {
+        if (count < 1)
+        {
+            return true;
+        }
+
+        var rows = new List<(short Slot, int Count)>();
+        await using (var read = new NpgsqlCommand(
+            "select slot, count from \"角色\".inventory "
+            + "where character_id = $1 and item_id = $2 order by slot for update",
+            connection, transaction))
+        {
+            read.Parameters.AddWithValue(characterId);
+            read.Parameters.AddWithValue(itemId);
+            await using var reader = await read.ExecuteReaderAsync(stopping);
+            while (await reader.ReadAsync(stopping))
+            {
+                rows.Add((reader.GetInt16(0), reader.GetInt32(1)));
+            }
+        }
+
+        var total = 0;
+        foreach (var row in rows)
+        {
+            total += row.Count;
+        }
+
+        if (total < count)
+        {
+            return false;
+        }
+
+        var left = count;
+        foreach (var row in rows)
+        {
+            if (left == 0)
+            {
+                break;
+            }
+
+            var take = Math.Min(left, row.Count);
+            if (take == row.Count)
+            {
+                // inventory.count 有 CHECK (count > 0)：扣光必须先删行。
+                await using var remove = new NpgsqlCommand(
+                    "delete from \"角色\".inventory where character_id = $1 and slot = $2",
+                    connection, transaction);
+                remove.Parameters.AddWithValue(characterId);
+                remove.Parameters.AddWithValue(row.Slot);
+                await remove.ExecuteNonQueryAsync(stopping);
+            }
+            else
+            {
+                await using var consume = new NpgsqlCommand(
+                    "update \"角色\".inventory set count = count - $3 "
+                    + "where character_id = $1 and slot = $2",
+                    connection, transaction);
+                consume.Parameters.AddWithValue(characterId);
+                consume.Parameters.AddWithValue(row.Slot);
+                consume.Parameters.AddWithValue(take);
+                await consume.ExecuteNonQueryAsync(stopping);
+            }
+
+            left -= take;
+        }
+
+        return true;
+    }
 }

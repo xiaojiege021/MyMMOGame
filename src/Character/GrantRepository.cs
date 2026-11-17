@@ -98,20 +98,37 @@ public sealed class GrantRepository(
         CurrencyDelta delta,
         CancellationToken stopping)
     {
-        var kind = (delta.Kind ?? "").Trim();
+        await ApplyCurrencyDeltaInTransactionAsync(
+            connection, transaction, characterId, delta.Kind ?? "", delta.Delta, stopping);
+    }
+
+    /// <summary>
+    /// K3：在一笔已打开的事务里加减一个币种。与 ApplyGrant 共用同一条 SQL：
+    /// 加走 upsert，减走带余额条件的 update，扣成负数就抛 insufficient，
+    /// 调用方整笔回滚。钱的写入口只这一处，制作不另开一条 UPDATE。
+    /// </summary>
+    public async Task ApplyCurrencyDeltaInTransactionAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string kind,
+        long delta,
+        CancellationToken stopping)
+    {
+        kind = (kind ?? "").Trim();
         if (currencies.Find(kind) is null)
         {
             throw new GrantException("unknown_currency");
         }
 
-        if (delta.Delta == 0)
+        if (delta == 0)
         {
             throw new GrantException("delta_zero");
         }
 
         // 与 P1-1b4 同一套写法：加走 upsert，减走带余额条件的 update。
         // 合成一条 upsert 会让负数插入值先撞 CHECK，轮不到 DO UPDATE。
-        var sql = delta.Delta > 0
+        var sql = delta > 0
             ? """
               insert into "角色".currency (character_id, kind, amount)
               values ($1, $2, $3)
@@ -133,7 +150,7 @@ public sealed class GrantRepository(
         await using var command = new NpgsqlCommand(sql, connection, transaction);
         command.Parameters.AddWithValue(characterId);
         command.Parameters.AddWithValue(kind);
-        command.Parameters.AddWithValue(delta.Delta);
+        command.Parameters.AddWithValue(delta);
 
         var amount = await command.ExecuteScalarAsync(stopping);
         if (amount is null)

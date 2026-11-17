@@ -1,0 +1,108 @@
+{
+  "schema": "recipe-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "K3 生产 / 配方的唯一内容正本。四个副职按方案 12 章的「炼丹 → 铁匠 → 裁缝 → 巧匠」；unlock_level 是角色等级（B3 接副职等级时另加字段，不改这一格的含义）。材料 / 产出 / 费用 / 成功率 / 制作耗时 / 解锁全部只在这份文件里：加一个配方 = 加一条，代码不动。方案只写定「药给炼丹、矿给铁匠」，没给裁缝 / 巧匠的材料来源与任何具体配方；本表 8 条都是 K3 的占位，success_pct 与 craft_time_s 是暂取值，整表 pending 摘掉之前不当作方案数。grade_roll 是 B3「胚子做成装备时掷一次」的位置，K3 不接：配置里写了会起不来，免得静默忽略一次随机。",
+  "professions": [
+    { "id": "alchemy", "name": "炼丹" },
+    { "id": "blacksmith", "name": "铁匠" },
+    { "id": "tailor", "name": "裁缝" },
+    { "id": "jeweler", "name": "巧匠" }
+  ],
+  "recipes": [
+    {
+      "id": "recipe_pill_rejuvenate",
+      "profession": "alchemy",
+      "unlock_level": 1,
+      "inputs": [{ "item_id": "herb_ling", "count": 2 }],
+      "fee": { "gold": 10 },
+      "output": { "item_id": "pill_rejuvenate", "count": 1 },
+      "success_pct": 100,
+      "craft_time_s": 5,
+      "note": "最基础的回复丹。药材与成功率是 K3 占位，B1 定真实数值。"
+    },
+    {
+      "id": "recipe_pill_focus",
+      "profession": "alchemy",
+      "unlock_level": 5,
+      "inputs": [{ "item_id": "herb_ling", "count": 3 }],
+      "fee": { "gold": 12 },
+      "output": { "item_id": "pill_focus", "count": 1 },
+      "success_pct": 80,
+      "craft_time_s": 8,
+      "note": "凝神丹。成功率与耗时是 K3 占位，B1 定。"
+    },
+    {
+      "id": "recipe_sword_trial",
+      "profession": "blacksmith",
+      "unlock_level": 10,
+      "inputs": [{ "item_id": "ore_iron", "count": 3 }],
+      "fee": { "gold": 20 },
+      "output": { "item_id": "sword_trial", "count": 1 },
+      "success_pct": 100,
+      "craft_time_s": 10,
+      "note": "十级试炼长剑。方案写定矿给铁匠，具体件数 / 费用是 K3 占位。"
+    },
+    {
+      "id": "recipe_staff_trade",
+      "profession": "blacksmith",
+      "unlock_level": 15,
+      "inputs": [
+        { "item_id": "ore_iron", "count": 6 },
+        { "item_id": "stone_enhance_low", "count": 1 }
+      ],
+      "fee": { "gold": 60 },
+      "output": { "item_id": "staff_trade", "count": 1 },
+      "success_pct": 75,
+      "craft_time_s": 20,
+      "note": "十五级行商法杖。产出编号沿用 items.json，不另造装备。"
+    },
+    {
+      "id": "recipe_bag_basic",
+      "profession": "tailor",
+      "unlock_level": 1,
+      "inputs": [{ "item_id": "herb_ling", "count": 5 }],
+      "fee": { "gold": 30 },
+      "output": { "item_id": "bag_basic", "count": 1 },
+      "success_pct": 90,
+      "craft_time_s": 15,
+      "note": "粗布背包。方案没给布料来源，先用灵草占位；B3 换成布料后只改这一条。"
+    },
+    {
+      "id": "recipe_robe_trial",
+      "profession": "tailor",
+      "unlock_level": 10,
+      "inputs": [{ "item_id": "herb_ling", "count": 4 }],
+      "fee": { "gold": 20 },
+      "output": { "item_id": "robe_trial", "count": 1 },
+      "success_pct": 100,
+      "craft_time_s": 10,
+      "note": "十级试炼法袍。方案没给裁缝材料，先用灵草占位；B3 换。"
+    },
+    {
+      "id": "recipe_ring_trial",
+      "profession": "jeweler",
+      "unlock_level": 10,
+      "inputs": [
+        { "item_id": "ore_iron", "count": 1 },
+        { "item_id": "crystal_utility", "count": 1 }
+      ],
+      "fee": { "gold": 30 },
+      "output": { "item_id": "ring_trial", "count": 1 },
+      "success_pct": 90,
+      "craft_time_s": 12,
+      "note": "十级试炼指环。方案没给巧匠材料，先用矿石 + 功能结晶占位；B3 换。"
+    },
+    {
+      "id": "recipe_unbind_stone",
+      "profession": "jeweler",
+      "unlock_level": 10,
+      "inputs": [{ "item_id": "stone_transfer", "count": 1 }],
+      "fee": { "gold": 20 },
+      "output": { "item_id": "unbind_stone", "count": 1 },
+      "success_pct": 100,
+      "craft_time_s": 10,
+      "note": "解绑石。方案只写巧匠做生活产出，没给配方；这是 K3 占位。"
+    }
+  ]
+}

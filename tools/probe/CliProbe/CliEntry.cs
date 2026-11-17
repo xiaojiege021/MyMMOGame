@@ -26,6 +26,9 @@ internal static class CliEntry
         code = ConfigTableCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = CraftCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = EnhanceCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

@@ -222,6 +222,22 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.TurnInMainlineRequest> __Marshaller_mmo_character_TurnInMainlineRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TurnInMainlineRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.TurnInMainlineResponse> __Marshaller_mmo_character_TurnInMainlineResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.TurnInMainlineResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeRecipesRequest> __Marshaller_mmo_character_DescribeRecipesRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeRecipesRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeRecipesResponse> __Marshaller_mmo_character_DescribeRecipesResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeRecipesResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.StartCraftRequest> __Marshaller_mmo_character_StartCraftRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.StartCraftRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.StartCraftResponse> __Marshaller_mmo_character_StartCraftResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.StartCraftResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.FinishCraftRequest> __Marshaller_mmo_character_FinishCraftRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.FinishCraftRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.FinishCraftResponse> __Marshaller_mmo_character_FinishCraftResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.FinishCraftResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeCraftRequest> __Marshaller_mmo_character_DescribeCraftRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeCraftRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeCraftResponse> __Marshaller_mmo_character_DescribeCraftResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeCraftResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -574,6 +590,38 @@ namespace Mmo.Proto.Character {
         "TurnInMainline",
         __Marshaller_mmo_character_TurnInMainlineRequest,
         __Marshaller_mmo_character_TurnInMainlineResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeRecipesRequest, global::Mmo.Proto.Character.DescribeRecipesResponse> __Method_DescribeRecipes = new grpc::Method<global::Mmo.Proto.Character.DescribeRecipesRequest, global::Mmo.Proto.Character.DescribeRecipesResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeRecipes",
+        __Marshaller_mmo_character_DescribeRecipesRequest,
+        __Marshaller_mmo_character_DescribeRecipesResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.StartCraftRequest, global::Mmo.Proto.Character.StartCraftResponse> __Method_StartCraft = new grpc::Method<global::Mmo.Proto.Character.StartCraftRequest, global::Mmo.Proto.Character.StartCraftResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "StartCraft",
+        __Marshaller_mmo_character_StartCraftRequest,
+        __Marshaller_mmo_character_StartCraftResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.FinishCraftRequest, global::Mmo.Proto.Character.FinishCraftResponse> __Method_FinishCraft = new grpc::Method<global::Mmo.Proto.Character.FinishCraftRequest, global::Mmo.Proto.Character.FinishCraftResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "FinishCraft",
+        __Marshaller_mmo_character_FinishCraftRequest,
+        __Marshaller_mmo_character_FinishCraftResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeCraftRequest, global::Mmo.Proto.Character.DescribeCraftResponse> __Method_DescribeCraft = new grpc::Method<global::Mmo.Proto.Character.DescribeCraftRequest, global::Mmo.Proto.Character.DescribeCraftResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeCraft",
+        __Marshaller_mmo_character_DescribeCraftRequest,
+        __Marshaller_mmo_character_DescribeCraftResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -1139,6 +1187,56 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.TurnInMainlineResponse> TurnInMainline(global::Mmo.Proto.Character.TurnInMainlineRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// K3：配方目录。只读；材料 / 产出 / 费用 / 成功率 / 耗时 / 解锁等级只从
+      /// config/recipes.json 读，这里只回事实值，不让客户端自己算。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeRecipesResponse> DescribeRecipes(global::Mmo.Proto.Character.DescribeRecipesRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// K3：开始制作。扣材料与费用、写一件进行中的活；ready_at 由 craft_time_s 算。
+      /// 请求只带配方编号，数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.StartCraftResponse> StartCraft(global::Mmo.Proto.Character.StartCraftRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// K3：收取。只有过了 ready_at 才掷 success_pct；失败也写流水、不返材料。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.FinishCraftResponse> FinishCraft(global::Mmo.Proto.Character.FinishCraftRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// K3：当前有没有活、还差几秒。只读。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeCraftResponse> DescribeCraft(global::Mmo.Proto.Character.DescribeCraftRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -3388,6 +3486,206 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_TurnInMainline, null, options, request);
       }
+      /// <summary>
+      /// K3：配方目录。只读；材料 / 产出 / 费用 / 成功率 / 耗时 / 解锁等级只从
+      /// config/recipes.json 读，这里只回事实值，不让客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeRecipesResponse DescribeRecipes(global::Mmo.Proto.Character.DescribeRecipesRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeRecipes(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：配方目录。只读；材料 / 产出 / 费用 / 成功率 / 耗时 / 解锁等级只从
+      /// config/recipes.json 读，这里只回事实值，不让客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeRecipesResponse DescribeRecipes(global::Mmo.Proto.Character.DescribeRecipesRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeRecipes, null, options, request);
+      }
+      /// <summary>
+      /// K3：配方目录。只读；材料 / 产出 / 费用 / 成功率 / 耗时 / 解锁等级只从
+      /// config/recipes.json 读，这里只回事实值，不让客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeRecipesResponse> DescribeRecipesAsync(global::Mmo.Proto.Character.DescribeRecipesRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeRecipesAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：配方目录。只读；材料 / 产出 / 费用 / 成功率 / 耗时 / 解锁等级只从
+      /// config/recipes.json 读，这里只回事实值，不让客户端自己算。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeRecipesResponse> DescribeRecipesAsync(global::Mmo.Proto.Character.DescribeRecipesRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeRecipes, null, options, request);
+      }
+      /// <summary>
+      /// K3：开始制作。扣材料与费用、写一件进行中的活；ready_at 由 craft_time_s 算。
+      /// 请求只带配方编号，数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.StartCraftResponse StartCraft(global::Mmo.Proto.Character.StartCraftRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return StartCraft(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：开始制作。扣材料与费用、写一件进行中的活；ready_at 由 craft_time_s 算。
+      /// 请求只带配方编号，数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.StartCraftResponse StartCraft(global::Mmo.Proto.Character.StartCraftRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_StartCraft, null, options, request);
+      }
+      /// <summary>
+      /// K3：开始制作。扣材料与费用、写一件进行中的活；ready_at 由 craft_time_s 算。
+      /// 请求只带配方编号，数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.StartCraftResponse> StartCraftAsync(global::Mmo.Proto.Character.StartCraftRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return StartCraftAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：开始制作。扣材料与费用、写一件进行中的活；ready_at 由 craft_time_s 算。
+      /// 请求只带配方编号，数值一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.StartCraftResponse> StartCraftAsync(global::Mmo.Proto.Character.StartCraftRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_StartCraft, null, options, request);
+      }
+      /// <summary>
+      /// K3：收取。只有过了 ready_at 才掷 success_pct；失败也写流水、不返材料。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.FinishCraftResponse FinishCraft(global::Mmo.Proto.Character.FinishCraftRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return FinishCraft(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：收取。只有过了 ready_at 才掷 success_pct；失败也写流水、不返材料。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.FinishCraftResponse FinishCraft(global::Mmo.Proto.Character.FinishCraftRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_FinishCraft, null, options, request);
+      }
+      /// <summary>
+      /// K3：收取。只有过了 ready_at 才掷 success_pct；失败也写流水、不返材料。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.FinishCraftResponse> FinishCraftAsync(global::Mmo.Proto.Character.FinishCraftRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return FinishCraftAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：收取。只有过了 ready_at 才掷 success_pct；失败也写流水、不返材料。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.FinishCraftResponse> FinishCraftAsync(global::Mmo.Proto.Character.FinishCraftRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_FinishCraft, null, options, request);
+      }
+      /// <summary>
+      /// K3：当前有没有活、还差几秒。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeCraftResponse DescribeCraft(global::Mmo.Proto.Character.DescribeCraftRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeCraft(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：当前有没有活、还差几秒。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeCraftResponse DescribeCraft(global::Mmo.Proto.Character.DescribeCraftRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeCraft, null, options, request);
+      }
+      /// <summary>
+      /// K3：当前有没有活、还差几秒。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeCraftResponse> DescribeCraftAsync(global::Mmo.Proto.Character.DescribeCraftRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeCraftAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K3：当前有没有活、还差几秒。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeCraftResponse> DescribeCraftAsync(global::Mmo.Proto.Character.DescribeCraftRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeCraft, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -3445,7 +3743,11 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_DescribeCharacterSlots, serviceImpl.DescribeCharacterSlots)
           .AddMethod(__Method_DescribeWardrobe, serviceImpl.DescribeWardrobe)
           .AddMethod(__Method_DescribeMainline, serviceImpl.DescribeMainline)
-          .AddMethod(__Method_TurnInMainline, serviceImpl.TurnInMainline).Build();
+          .AddMethod(__Method_TurnInMainline, serviceImpl.TurnInMainline)
+          .AddMethod(__Method_DescribeRecipes, serviceImpl.DescribeRecipes)
+          .AddMethod(__Method_StartCraft, serviceImpl.StartCraft)
+          .AddMethod(__Method_FinishCraft, serviceImpl.FinishCraft)
+          .AddMethod(__Method_DescribeCraft, serviceImpl.DescribeCraft).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -3499,6 +3801,10 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DescribeWardrobe, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeWardrobeRequest, global::Mmo.Proto.Character.DescribeWardrobeResponse>(serviceImpl.DescribeWardrobe));
       serviceBinder.AddMethod(__Method_DescribeMainline, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeMainlineRequest, global::Mmo.Proto.Character.DescribeMainlineResponse>(serviceImpl.DescribeMainline));
       serviceBinder.AddMethod(__Method_TurnInMainline, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.TurnInMainlineRequest, global::Mmo.Proto.Character.TurnInMainlineResponse>(serviceImpl.TurnInMainline));
+      serviceBinder.AddMethod(__Method_DescribeRecipes, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeRecipesRequest, global::Mmo.Proto.Character.DescribeRecipesResponse>(serviceImpl.DescribeRecipes));
+      serviceBinder.AddMethod(__Method_StartCraft, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.StartCraftRequest, global::Mmo.Proto.Character.StartCraftResponse>(serviceImpl.StartCraft));
+      serviceBinder.AddMethod(__Method_FinishCraft, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.FinishCraftRequest, global::Mmo.Proto.Character.FinishCraftResponse>(serviceImpl.FinishCraft));
+      serviceBinder.AddMethod(__Method_DescribeCraft, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeCraftRequest, global::Mmo.Proto.Character.DescribeCraftResponse>(serviceImpl.DescribeCraft));
     }
 
   }

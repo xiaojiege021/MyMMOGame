@@ -109,6 +109,19 @@ internal static class ProgressCli
                   + " bound=" + found.Value.Bound + " bound_at_present=" + found.Value.BoundAtPresent);
         }
 
+        if (rawCurrencyAddId != 0 && rawCurrencyAddKind != null)
+        {
+            var money = new CurrencyRepository(dataSource);
+            var amount = await money.AddAsync(
+                rawCurrencyAddId, rawCurrencyAddKind, rawCurrencyAddDelta, CancellationToken.None);
+            Console.WriteLine(amount is null
+                ? "raw_currency_add=rejected id=" + rawCurrencyAddId
+                  + " kind=" + rawCurrencyAddKind + " delta=" + rawCurrencyAddDelta
+                : "raw_currency_add=ok id=" + rawCurrencyAddId
+                  + " kind=" + rawCurrencyAddKind + " delta=" + rawCurrencyAddDelta
+                  + " amount=" + amount);
+        }
+
         if (rawCurrencyId != 0 && rawCurrencyKind != null)
         {
             var money = new CurrencyRepository(dataSource);

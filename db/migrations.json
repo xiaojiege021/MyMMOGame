@@ -27,7 +27,8 @@
         { "version": 18, "file": "db/character/siege_result.sql" },
         { "version": 19, "file": "db/character/branch_step.sql" },
         { "version": 20, "file": "db/character/realm_advance.sql" },
-        { "version": 21, "file": "db/character/realm_phase.sql" }
+        { "version": 21, "file": "db/character/realm_phase.sql" },
+        { "version": 22, "file": "db/character/craft.sql" }
       ]
     },
     {

@@ -14,7 +14,8 @@ public sealed record CharacterConfig(
     string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable,
     string StoneExchangeTable, string CityTable, string SiegeTerritoryTable,
     string SeasonPassTable, string SeasonTable, string MonthlyBundleTable,
-    string CharacterSlotTable, string GlobalUpstream, string MainlineTable)
+    string CharacterSlotTable, string GlobalUpstream, string MainlineTable,
+    string RecipeTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -49,6 +50,9 @@ public sealed record CharacterConfig(
     // C1：主线十二场的内容正本。也不显式登记进 config/character.json：老卡的临时
     // 配置目录没有这份表时按「默认文件名 + 缺表降级」处理，不拖垮启动。
     public const string DefaultMainlineTable = "config/mainline.json";
+    // K3：生产 / 配方的正本。同样不显式登记进 character.json：老卡的临时配置目录里
+    // 没有这份表时走默认文件名，仓库根的那一份照常可读。
+    public const string DefaultRecipeTable = "config/recipes.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -266,13 +270,20 @@ public sealed record CharacterConfig(
             throw new ConfigException("mainline_table 不能为空");
         }
 
+        // K3：生产 / 配方表。老配置不写这一项也照常起（走默认文件名）。
+        var recipeTable = (wire.RecipeTable ?? DefaultRecipeTable).Trim();
+        if (recipeTable.Length == 0)
+        {
+            throw new ConfigException("recipe_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
-            characterSlotTable, globalUpstream, mainlineTable);
+            characterSlotTable, globalUpstream, mainlineTable, recipeTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -360,5 +371,8 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("mainline_table")]
         public string? MainlineTable { get; init; }
+
+        [JsonPropertyName("recipe_table")]
+        public string? RecipeTable { get; init; }
     }
 }

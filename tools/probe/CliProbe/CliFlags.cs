@@ -36,6 +36,20 @@ internal static class CliFlags
     public static bool contentList = false;
     // K5：把物品表的 grade / set_id / desc 读出来，不连库、不启动进程（icon 不进配置，见第 17 节 17.1）。
     public static bool itemList = false;
+    // K3：把配方表读出来（与启动共用同一 RecipeTable.Load），不连库、不启动进程；坏配置也走这里。
+    public static bool recipeList = false;
+    public static string? recipeTablePath = null;
+    // K3：连库核对。start / finish 各一笔事务，state 只读；事务号不传就自己生成。
+    public static long craftStartOf = 0;
+    public static string? craftStartRecipe = null;
+    public static long craftFinishOf = 0;
+    public static long craftStateOf = 0;
+    public static string? craftTxn = null;
+    // K3：核对用的原始背包写入（绕过业务规则，只给造料 / 清格用，与 --raw-currency-write 同口径）。
+    public static long rawItemWriteId = 0;
+    public static int rawItemSlot = 0;
+    public static string? rawItemId = null;
+    public static int rawItemCount = 0;
     public static bool weaponRules = false;
     public static string? weaponRulesBranchPath = null;
     public static string? weaponRulesItemPath = null;
@@ -44,6 +58,11 @@ internal static class CliFlags
     public static long rawCurrencyId = 0;
     public static string? rawCurrencyKind = null;
     public static long rawCurrencyAmount = 0L;
+    // K3：核对用的货币加数（走 CurrencyRepository.AddAsync，行不存在会建），
+    // 与 --raw-currency-write 的「只改已有行」分开，只为造金币 / 灵石。
+    public static long rawCurrencyAddId = 0;
+    public static string? rawCurrencyAddKind = null;
+    public static long rawCurrencyAddDelta = 0L;
     public static string? txnCount = null;
     public static long reservesOf = 0;
     public static long entryCountOf = 0;

@@ -197,6 +197,16 @@ service CharacterService {
   // C1 交任务：请求只带角色号、场号与（第 10 场才有的）立仙或立魔。事务号由网关生成，
   // 复用 P1-1b5 的 grant_txn；奖励、等级、境界、门槛数值一个都带不进来。
   rpc TurnInMainline(TurnInMainlineRequest) returns (TurnInMainlineResponse);
+  // K3：配方目录。只读；材料 / 产出 / 费用 / 成功率 / 耗时 / 解锁等级只从
+  // config/recipes.json 读，这里只回事实值，不让客户端自己算。
+  rpc DescribeRecipes(DescribeRecipesRequest) returns (DescribeRecipesResponse);
+  // K3：开始制作。扣材料与费用、写一件进行中的活；ready_at 由 craft_time_s 算。
+  // 请求只带配方编号，数值一个都带不进来。
+  rpc StartCraft(StartCraftRequest) returns (StartCraftResponse);
+  // K3：收取。只有过了 ready_at 才掷 success_pct；失败也写流水、不返材料。
+  rpc FinishCraft(FinishCraftRequest) returns (FinishCraftResponse);
+  // K3：当前有没有活、还差几秒。只读。
+  rpc DescribeCraft(DescribeCraftRequest) returns (DescribeCraftResponse);
 }
 
 message SettleExpRequest {
@@ -1331,4 +1341,123 @@ message TurnInMainlineResponse {
   int32 main_stage = 5;
   string alignment = 6;
   string txn_id = 7;
+}
+
+// K3：一条配方的材料。物品编号与件数只从 config/recipes.json 来；请求里没有这两个字段。
+message RecipeInput {
+  string item_id = 1;
+  int32 count = 2;
+}
+
+// K3：一条配方的产出。
+message RecipeOutput {
+  string item_id = 1;
+  int32 count = 2;
+}
+
+// K3：一条配方的费用。币种必须在 currency.json；数量是非负整数。
+message RecipeFeeLine {
+  string kind = 1;
+  int64 amount = 2;
+}
+
+// K3：目录里的一条配方。unlocked 是按角色当前等级算的展示事实，
+// 判定仍在角色服；客户端不拿它自己算能不能做。
+message RecipeFact {
+  string id = 1;
+  string profession = 2;
+  int32 unlock_level = 3;
+  bool unlocked = 4;
+  repeated RecipeInput inputs = 5;
+  repeated RecipeFeeLine fee = 6;
+  RecipeOutput output = 7;
+  double success_pct = 8;
+  int32 craft_time_s = 9;
+  string note = 10;
+}
+
+message DescribeRecipesRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+// K3：副职编号与名字。名字只在 recipes.json，代码不写第二份。
+message RecipeProfession {
+  string id = 1;
+  string name = 2;
+}
+
+message DescribeRecipesResponse {
+  bool ok = 1;
+  string reason = 2;
+  int32 table_version = 3;
+  bool pending = 4;
+  // 角色当前等级；只用于给 unlocked 一个可核对的口径，不参与请求。
+  int32 level = 5;
+  repeated RecipeProfession professions = 6;
+  repeated RecipeFact recipes = 7;
+}
+
+message StartCraftRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string recipe_id = 3;
+  // 网关生成，同一笔不会扣两次材料。
+  string txn_id = 4;
+}
+
+message StartCraftResponse {
+  // 业务前提不满足（unknown_recipe / level_too_low / material_insufficient /
+  // fee_insufficient / bag_full / craft_in_progress / duplicate）是正常回包里的
+  // ok=false + reason；身份与参数错才走 gRPC 错误码。拒绝时下面的事实值一律留 0 / 空串。
+  bool ok = 1;
+  string reason = 2;
+  bool duplicate = 3;
+  string recipe_id = 4;
+  string profession = 5;
+  int32 craft_time_s = 6;
+  int64 started_at_unix = 7;
+  int64 ready_at_unix = 8;
+  int32 remaining_s = 9;
+}
+
+message FinishCraftRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  // 网关生成；同一个号再提交，一笔不做。
+  string txn_id = 3;
+}
+
+message FinishCraftResponse {
+  // 业务前提不满足（no_craft / craft_not_ready / bag_full / recipe_unknown / duplicate）
+  // 是 ok=false；真的做了但掷点失败是 ok=true + success=false（材料照扣、产出为 0）。
+  bool ok = 1;
+  string reason = 2;
+  bool duplicate = 3;
+  string recipe_id = 4;
+  string profession = 5;
+  bool success = 6;
+  string output_item_id = 7;
+  int32 output_count = 8;
+  // 只作展示：这一手按配置的成功率，客户端不拿它算结果。
+  double success_pct = 9;
+  int32 craft_time_s = 10;
+  int64 ready_at_unix = 11;
+}
+
+message DescribeCraftRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message DescribeCraftResponse {
+  bool ok = 1;
+  string reason = 2;
+  bool active = 3;
+  string recipe_id = 4;
+  string profession = 5;
+  int32 craft_time_s = 6;
+  int64 started_at_unix = 7;
+  int64 ready_at_unix = 8;
+  int32 remaining_s = 9;
 }
