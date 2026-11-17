@@ -143,6 +143,42 @@ else
   printf '%s\n' "$policy_out" | grep '^HIT ' | head -12 | detail
 fi
 
+# ---------------------------------------------------------------------------
+# 闸门 6：不可逆点声明（软性，D15）。
+# 背景：审查预算只够看四类改坏了修不回来的地方（docs/不可逆点清单.md）。
+#       这里不改文件、不硬失败，只在本次改动碰到时提醒「收尾要在日志里写判定结论」，
+#       免得四类改动静悄悄进仓库，等发现时已经要洗数据了。
+# ---------------------------------------------------------------------------
+echo "-- 6. 不可逆点声明 --"
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  warn "不是 git 仓库，跳过不可逆点检查"
+else
+  changed="$(git status --porcelain 2>/dev/null | awk '{print $NF}' | sort -u)"
+  if [ -z "$changed" ]; then
+    warn "工作区没有改动，无可逆点可查（已提交的改动请在日志里自行写声明）"
+  else
+    hit1=0; hit2=0; hit3=0; hit4=0
+    for f in $changed; do
+      case "$f" in db/*|*.sql|*migrations.json) hit1=1 ;; esac
+      case "$f" in
+        config/currency.json|config/auction.json|config/enhance.json|config/crystal.json) hit2=1 ;;
+        *inventory*|*ExpSettlement*) hit2=1 ;;
+      esac
+      case "$f" in src/Gateway/*|proto/*) hit3=1 ;; esac
+      case "$f" in src/Shared.Domain/*) hit4=1 ;; esac
+    done
+    if [ $((hit1 + hit2 + hit3 + hit4)) -eq 0 ]; then
+      ok "本次改动不触碰四类不可逆点（其余交给断言与 CI）"
+    else
+      [ "$hit1" = "1" ] && warn "触碰第 1 类 schema 与迁移顺序：日志里写「空库 / 老库都跑过」与版本是追加"
+      [ "$hit2" = "1" ] && warn "触碰第 2 类 钱的写入口：日志里写「唯一写入口 / 同一事务 / 拒绝时数值不动」"
+      [ "$hit3" = "1" ] && warn "触碰第 3 类 协议拒绝码：日志里写「200 + ok=false / 未生效数值 0 / 客户端失败文案」"
+      [ "$hit4" = "1" ] && warn "触碰第 4 类 跨进程口径：日志里写「谁是唯一写入方 / 是否共用同一份表」"
+      warn "四类判据见 docs/不可逆点清单.md；收尾可跑 tools/check/mutate.sh --card <卡>"
+    fi
+  fi
+fi
+
 echo "----------------------------------------"
 echo "前置闸门：$PASS 项通过，$FAIL 项失败"
 [ "$FAIL" = "0" ] || exit 1

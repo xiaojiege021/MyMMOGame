@@ -1,0 +1,22 @@
+{
+  "card": "d8",
+  "note": "D8 迁移版本表。改坏清单：版本跳号、主迁移丢掉 reapply。两条都该被 check-d8.sh 的无库段抓住。",
+  "mutations": [
+    {
+      "id": "版本号跳号",
+      "file": "db/migrations.json",
+      "kind": "text-replace",
+      "find": "{ \"version\": 4, \"file\": \"db/character/inventory.sql\" }",
+      "replace": "{ \"version\": 40, \"file\": \"db/character/inventory.sql\" }",
+      "expect": "check-d8.sh 应报版本不连续（角色 schema 从 4 跳到 40）"
+    },
+    {
+      "id": "主迁移丢掉 reapply",
+      "file": "db/migrations.json",
+      "kind": "text-replace",
+      "find": "{ \"version\": 3, \"file\": \"db/character/character.sql\", \"reapply\": true }",
+      "replace": "{ \"version\": 3, \"file\": \"db/character/character.sql\" }",
+      "expect": "check-d8.sh 应报主迁移必须 reapply（老库补列会失效）"
+    }
+  ]
+}
