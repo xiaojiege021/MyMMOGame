@@ -113,11 +113,15 @@ old = subprocess.run(["git", "diff", "--name-only", "HEAD", "--",
     "config/gather.json", "config/items.json", "config/flight.json", "config/realms.json",
     "config/world.json", "config/region", "proto/mmo/world.proto",
     "client/MMOGame/Assets/Net", "client/MMOGame/Assets/HotUpdate", "client/MMOGame/Assets/Editor",
-    "db/character",
     "src/World/WorldGrpcService.cs", "src/World/GatherGrant.cs", "src/World/GatherNodeRegistry.cs",
     "tools/check/check-p1-3b.sh", "tools/check/check-p1-3c.sh", "tools/check/check-p3-2a.sh",
     "tools/check/check-u4.sh"], cwd=root, capture_output=True, text=True).stdout.strip()
 ck("老配置 / proto / 客户端 / 采集判定 / 老核对脚本一行未改", old == "")
+# D5 口径：不再用整目录 diff 证明「没动库」。C2 真正要守的是「采集不建表、不进角色库」，
+# D8 补主迁移会合法改 db/character，所以把这一条换成内容断言。
+import glob as _glob
+_db_character = "".join(open(p, encoding="utf-8").read() for p in _glob.glob("db/character/*.sql"))
+ck("角色库里没有采集表 / 采集列（采集只在世界服与配置里）", "gather" not in _db_character.lower())
 ck("gather.json 仍是 P1-3b 的四个节点、灵石矿脉一个",
    len(base["nodes"]) == 4 and sum(n["kind"] == "spirit_stone" for n in base["nodes"]) == 1)
 ck("老卡写死的 nodes=4 断言仍在（本卡没有去改老脚本）",

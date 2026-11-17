@@ -12,6 +12,14 @@ internal static class CliFlags
     // 不连库、不启动进程。台账表 E 的「改配置重启生效」用它取证。
     public static bool configShow = false;
     public static string sqlPath = "db/character/character.sql";
+    // D8：--sql 是不是显式给的。给了就还是「只跑这一份」的老行为；
+    // 没给时 --migrate 按迁移清单走版本表。
+    public static bool sqlGiven = false;
+    public static string migrationsPath = "db/migrations.json";
+    // all / character / social / trade。只影响这一次迁移选哪个 schema，不改清单本身。
+    public static string schemaFilter = "all";
+    // 只读版本表：打印每个 schema 已应用到第几版，不建表、不迁移。
+    public static bool schemaStatus = false;
     public static string? reportName = null;
     public static string? deleteName = null;
     public static bool stats = false;

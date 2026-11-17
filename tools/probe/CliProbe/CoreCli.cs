@@ -14,10 +14,34 @@ internal static class CoreCli
         var characters = ctx.Characters;
         if (migrate)
         {
-            var sql = File.ReadAllText(sqlPath);
-            await using var command = dataSource.CreateCommand(sql);
-            await command.ExecuteNonQueryAsync(CancellationToken.None);
-            Console.WriteLine("migrate=ok sql=" + sqlPath);
+            if (sqlGiven)
+            {
+                // 老行为：只跑指定的一份 SQL，不写版本表。核对脚本仍按这条路建单表。
+                var sql = File.ReadAllText(sqlPath);
+                await using var command = dataSource.CreateCommand(sql);
+                await command.ExecuteNonQueryAsync(CancellationToken.None);
+                Console.WriteLine("migrate=ok sql=" + sqlPath);
+            }
+            else
+            {
+                // D8：按 db/migrations.json 的顺序走版本表。新库一条命令建齐；
+                // 老库先补建 schema_version，再把幂等主迁移重跑一遍，分卡迁移只记一次。
+                var code = await MigrationCli.RunAsync(dataSource, migrationsPath, schemaFilter, false);
+                if (code != 0)
+                {
+                    return code;
+                }
+            }
+        }
+
+        if (schemaStatus)
+        {
+            // 只读：打印每个 schema 已应用到第几版，不建表、不迁移。
+            var code = await MigrationCli.RunAsync(dataSource, migrationsPath, schemaFilter, true);
+            if (code != 0)
+            {
+                return code;
+            }
         }
 
         if (scrollResetOf != 0)

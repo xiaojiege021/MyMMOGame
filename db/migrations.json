@@ -1,0 +1,60 @@
+{
+  "schema": "migration-manifest/1",
+  "version": 1,
+  "note": "D8 唯一迁移顺序。reapply=true 的是幂等主迁移：每次 --migrate 都重跑一遍，老库补列 / 补约束不用另开文件；reapply=false 的是按版本只跑一次的分卡迁移，记 sha256，已应用的版本不许原地改，要改就新开一条。三个 schema 的先后是 角色 → 社交 → 交易：交易的三张表带 角色.character 外键，必须最后建。",
+  "schemas": [
+    {
+      "key": "character",
+      "name": "角色",
+      "entries": [
+        { "version": 1, "file": "db/character/schema.sql", "reapply": true },
+        { "version": 2, "file": "db/character/account.sql" },
+        { "version": 3, "file": "db/character/character.sql", "reapply": true },
+        { "version": 4, "file": "db/character/inventory.sql" },
+        { "version": 5, "file": "db/character/currency.sql" },
+        { "version": 6, "file": "db/character/enhance.sql" },
+        { "version": 7, "file": "db/character/transaction.sql" },
+        { "version": 8, "file": "db/character/transfer.sql" },
+        { "version": 9, "file": "db/character/exp_settlement.sql" },
+        { "version": 10, "file": "db/character/revive_scroll.sql" },
+        { "version": 11, "file": "db/character/crystal.sql" },
+        { "version": 12, "file": "db/character/dungeon_entry.sql" },
+        { "version": 13, "file": "db/character/exp_booster.sql" },
+        { "version": 14, "file": "db/character/recharge.sql" },
+        { "version": 15, "file": "db/character/season_pass.sql" },
+        { "version": 16, "file": "db/character/character_slot.sql" },
+        { "version": 17, "file": "db/character/stone_exchange.sql" },
+        { "version": 18, "file": "db/character/siege_result.sql" },
+        { "version": 19, "file": "db/character/branch_step.sql" },
+        { "version": 20, "file": "db/character/realm_advance.sql" },
+        { "version": 21, "file": "db/character/realm_phase.sql" }
+      ]
+    },
+    {
+      "key": "social",
+      "name": "社交",
+      "entries": [
+        { "version": 1, "file": "db/social/schema.sql", "reapply": true },
+        { "version": 2, "file": "db/social/social.sql", "reapply": true },
+        { "version": 3, "file": "db/social/sect.sql" },
+        { "version": 4, "file": "db/social/sect_position.sql" },
+        { "version": 5, "file": "db/social/sect_transfer.sql" },
+        { "version": 6, "file": "db/social/sect_upgrade.sql" },
+        { "version": 7, "file": "db/social/sect_tech.sql" },
+        { "version": 8, "file": "db/social/city.sql" },
+        { "version": 9, "file": "db/social/homestead.sql" },
+        { "version": 10, "file": "db/social/homestead_plant.sql" }
+      ]
+    },
+    {
+      "key": "trade",
+      "name": "交易",
+      "entries": [
+        { "version": 1, "file": "db/trade/schema.sql", "reapply": true },
+        { "version": 2, "file": "db/trade/auction.sql" },
+        { "version": 3, "file": "db/trade/ingot.sql" },
+        { "version": 4, "file": "db/trade/stone_auction.sql" }
+      ]
+    }
+  ]
+}

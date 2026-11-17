@@ -15,11 +15,12 @@ internal static class CliParser
                 configPath = args[++i];
                 break;
             case "--sql" when i + 1 < args.Length:
-                sqlPath = args[++i];
+                sqlPath = args[++i]; sqlGiven = true;
                 break;
-            case "--migrate":
-                migrate = true;
-                break;
+            case "--migrate": migrate = true; break;
+            case "--migrations" when i + 1 < args.Length: migrationsPath = args[++i]; break;
+            case "--schema" when i + 1 < args.Length: schemaFilter = args[++i]; break;
+            case "--schema-status": schemaStatus = true; break;
             case "--character-report" when i + 1 < args.Length:
                 reportName = args[++i];
                 break;

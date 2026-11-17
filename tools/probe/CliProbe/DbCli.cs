@@ -62,7 +62,8 @@ internal static class DbCli
 
     private static bool AnyDbFlag()
     {
-        return reportName != null || deleteName != null || stats || migrate || rawLevelWrite != 0 || levelOf != 0
+        return reportName != null || deleteName != null || stats || migrate || schemaStatus
+    || rawLevelWrite != 0 || levelOf != 0
     || branchStateOf != 0 || advanceBranchId != 0 || canEquipOf != 0
     || bindingOf != null || rawCurrencyId != 0 || txnCount != null || itemCountOf != 0
     || reservesOf != 0 || entryCountOf != 0 || fatigueStateOf != 0 || setFatigueDay != null

@@ -152,3 +152,56 @@ CREATE TABLE IF NOT EXISTS "社交".homestead_plant_txn (
     created_at   timestamptz NOT NULL DEFAULT now(),
     CHECK (action IN ('plant', 'harvest'))
 );
+
+-- === D8：主迁移补全量 ===
+-- 以下两份 DDL 与 db/social/city.sql、db/character/siege_result.sql 是同一份，
+-- 整份追加进主迁移：主迁移原来缺 社交.city / city_tax_ledger / siege_result。
+-- 顺序按外键：先 city，再 city_tax_ledger 与 siege_result。
+-- 幂等：CREATE TABLE IF NOT EXISTS + ALTER ... SET DEFAULT，老库重复跑不报错。
+
+-- === P3-2a city.sql（同一份幂等 DDL，追加进主迁移）===
+-- P3-2a：城池与城池税收账本。只建表，不建数据库、不新建 schema 属主。
+--
+-- 开发架构 4.2 / 6 节：灵石矿脉归属记在城池上，不做成玩家个人采集点；
+-- 开采权变更写在城池数据里。城池税收与拍卖成交销毁的金币分开记账：
+-- 这里是「社交」.city_tax_ledger，拍卖销毁税是「交易」.auction_settlement.tax_gold。
+-- 归属变更与抽成写回留给 P3-3a4 城战卡；本卡只登记归属、建账本，不写回。
+-- K7：config/city.json 只留 city_id / name / vein_id；归属与税率是会变的运行时事实，
+-- 只写这张库表（owner_sect 默认 null、tax_pct 默认 0），城战写回也只写库，不回写配置。
+CREATE TABLE IF NOT EXISTS "社交".city (
+    city_id     text        PRIMARY KEY,
+    name        text        NOT NULL,
+    vein_id     text        NOT NULL UNIQUE,
+    -- 掌管方（宗门编号）。库里的运行时事实，默认 null；城战写回只写这一列。
+    owner_sect  text        DEFAULT NULL,
+    -- 抽成比例（整数百分比）。库里的运行时事实，默认 0；配置不再带这个值。
+    tax_pct     int         NOT NULL DEFAULT 0 CHECK (tax_pct BETWEEN 0 AND 100),
+    created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+-- K7：老库的 tax_pct 是无默认值建出来的，这里补 0（幂等）；新建表已带 DEFAULT 0。
+ALTER TABLE "社交".city ALTER COLUMN tax_pct SET DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS "社交".city_tax_ledger (
+    txn_id      text        PRIMARY KEY,
+    city_id     text        NOT NULL REFERENCES "社交".city (city_id) ON DELETE CASCADE,
+    source      text        NOT NULL CHECK (source IN ('task_grant', 'mining', 'other')),
+    gross_gold  bigint      NOT NULL CHECK (gross_gold >= 0),
+    tax_gold    bigint      NOT NULL CHECK (tax_gold >= 0),
+    recorded_at timestamptz NOT NULL DEFAULT now(),
+    CHECK (tax_gold <= gross_gold)
+);
+
+-- === P3-3a4 siege_result.sql（同一份幂等 DDL，追加进主迁移）===
+-- P3-3a4：城战胜负写回流水。只记这一场由服务端确认过的胜方事实值，
+-- 不记税率之外的任何数值，也不发奖。city 表的 owner_sect / tax_pct 由同一笔事务更新。
+-- 同一份 DDL 整份追加进 db/character/character.sql 主迁移，让只跑主迁移的核对脚本自包含。
+CREATE TABLE IF NOT EXISTS "社交".siege_result (
+    txn_id       text        PRIMARY KEY,
+    city_id      text        NOT NULL REFERENCES "社交".city (city_id) ON DELETE CASCADE,
+    match_id     text        NOT NULL,
+    winner_team  int         NOT NULL CHECK (winner_team BETWEEN 0 AND 1),
+    winner_sect  text        NOT NULL,
+    tax_pct      int         NOT NULL CHECK (tax_pct BETWEEN 0 AND 100),
+    recorded_at  timestamptz NOT NULL DEFAULT now()
+);
