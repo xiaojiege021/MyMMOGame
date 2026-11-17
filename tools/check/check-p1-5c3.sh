@@ -129,7 +129,7 @@ delivered_code = [i["category"] for i in shop["items"]
                   if delivery(i).get("mode", "none") != "none"]
 report("delivered_kinds",
        "protect_ticket" in delivered_code and "red_talisman" in delivered_code,
-       "配置里没接红符：" + ",".join(delivered_code))
+       "配置里没有红符发货：" + ",".join(delivered_code))
 
 # 请求里没有目标：红符只回复自己，客户端连「想治谁」都表达不了。
 battle_proto = files["proto/mmo/battle.proto"]

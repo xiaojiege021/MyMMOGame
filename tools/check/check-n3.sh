@@ -50,7 +50,7 @@ assert "member_cap" not in parse and "seat_cap" not in parse, "名册拆装读�
 assert "character_id" in parse and "position" in parse, "名册拆装没读角色号或职位"
 assert "RosterLine" in guild, "没有逐行原文"
 
-assert '"/sect/roster?sect_id="' in flow and "SectGuild.ParseRoster" in flow, "流程没接只读名册"
+assert '"/sect/roster?sect_id="' in flow and "SectGuild.ParseRoster" in flow, "流程没走只读名册"
 assert "LoadRoster" in flow and "HasRoster" in flow
 
 assert "尚未请求" in sect, "没回包时没写尚未请求"

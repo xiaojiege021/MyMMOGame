@@ -62,7 +62,7 @@ for path in files:
 else:
     report("dialogue_file_id", True)
 
-report("dialogue_speakers", len(files) == 9 and len(speakers) == 9
+report("dialogue_speakers", len(files) >= 9 and len(speakers) >= 9
        and all(s in docs for s in speakers)
        and set(docs) == set(speakers),
        "files=%d speakers=%d" % (len(files), len(speakers)))
@@ -86,7 +86,7 @@ for name in speakers:
             bad_fields.append(name + ":region")
         lines.append((chapter, line.get("region") or "",
                       line.get("text") or "", line.get("limit") or ""))
-report("dialogue_lines", not bad_fields and len(lines) == 14,
+report("dialogue_lines", not bad_fields and len(lines) >= 14,
        "lines=%d bad=%s" % (len(lines), ",".join(bad_fields[:6])))
 
 # ---------------------------------------------------------------- 2. 生成物逐条比对
@@ -238,11 +238,18 @@ subprocess.check_call([sys.executable, os.path.join(root, "tools/gen/gen-ui-cont
                       stdout=subprocess.DEVNULL)
 
 body = open(out, encoding="utf-8").read()
+# 基准条数从临时配置现数：以后内容卡加台词，这个演练不用再改「15」。
+before_n = 0
+for name in os.listdir(os.path.join(tmp_root, "config/dialogue")):
+    if name.endswith(".json"):
+        before_n += len(json.load(open(os.path.join(tmp_root, "config/dialogue", name),
+                                       encoding="utf-8")).get("lines") or [])
+after_n = body.count("new UiWorldCodex.SpeakerLine")
 assert "C5 演练：这一句只在临时配置里" in body, "改过的第一句没进生成表"
 assert old not in body, "旧的第一句还在生成表里"
 assert "C5 演练：新加的一条" in body, "新加的一条没进生成表"
-assert body.count("new UiWorldCodex.SpeakerLine") == 15, "加一条后应是 15 条"
-print("ok changed_line_added_line=1 count=15")
+assert after_n == before_n, "加一条后应是 %d 条，实际 %d" % (before_n, after_n)
+print("ok changed_line_added_line=1 count=%d" % after_n)
 PY
 then
   ok "只改临时 config，生成表就换成了新句子 / 新条数（屏读的是这张表）"

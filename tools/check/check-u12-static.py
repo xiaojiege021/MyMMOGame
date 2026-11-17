@@ -67,7 +67,8 @@ for k in ("pending", "arena", "body_only", "no_local_multiply", "reason", "rejec
 
 allcards = open(os.path.join(root, "tools", "check", "check-all.sh"), encoding="utf-8").read()
 assert "u12) echo" in allcards and re.search(r"\bu12\b", allcards)
-assert "u12)" in allcards.split("client_card_needs_unity", 1)[1], "总控没把 u12 标成客户端卡"
+# 只钉「u12 在客户端卡名单里」，不钉名单写在同一行的哪个位置（D5 口径）。
+assert re.search(r"\bu12\b", allcards[allcards.find("client_card_needs_unity"):]), "总控没把 u12 标成客户端卡"
 
 arch = open(os.path.join(root, "docs", "开发架构.md"), encoding="utf-8").read()
 assert "| 95 | U12 |" in arch and "竞技场与战场进场屏" in arch

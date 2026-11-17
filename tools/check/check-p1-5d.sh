@@ -102,7 +102,7 @@ report("repo_settle", "for update of o" in repo and "status = 'paid', paid_at = 
 report("repo_duplicate", "duplicate" in repo and "paid" in repo, "已 paid 要回 duplicate")
 report("readonly", all(k in program for k in
        ("--recharge-list", "--recharge-config", "--recharge-state")), "只读 / 核对入口")
-report("config_wired", "recharge_table" in read("src/Character/CharacterConfig.cs"), "没接配置")
+report("config_wired", "recharge_table" in read("src/Character/CharacterConfig.cs"), "CharacterConfig 缺 recharge_table")
 report("gateway", '"/recharge/order"' in api and '"/recharge/callback"' in api
        and "RechargeApi.Map" in gateway, "路由 / 注册")
 

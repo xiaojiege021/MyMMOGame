@@ -72,13 +72,14 @@ assert "n4)" in allcards
 
 spread = json.load(open(os.path.join(root, "config/gather_spread.json"), encoding="utf-8"))
 base = json.load(open(os.path.join(root, "config/gather.json"), encoding="utf-8"))
-assert len(base["nodes"]) == 4
-assert len(spread["nodes"]) == 14
-assert len(base["nodes"]) + len(spread["nodes"]) == 18
-print("n4_static=ok nodes=18")
+# 节点会随内容卡增加，只写下限与 base+spread=total 的结构关系（D5 口径）。
+assert len(base["nodes"]) >= 4
+assert len(spread["nodes"]) >= 14
+assert len(base["nodes"]) + len(spread["nodes"]) >= 18
+print("n4_static=ok nodes=%d" % (len(base["nodes"]) + len(spread["nodes"])))
 PY
   if grep -q n4_static=ok "$TMP/static.out"; then
-    ok "节点表接线、客户端不读配置、总节点 18"
+    ok "节点表接线、客户端不读配置、总节点不少于 18"
   else
     bad "N4 静态断言失败"
     cat "$TMP/static.out" | detail

@@ -89,7 +89,7 @@ for p in glob.glob(root + '/proto/**/*.proto', recursive=True):
 # reason 词表只展示，不造词：每个都要在服务端代码里真实存在。
 catalog = open(ui + '/UiReasonCatalog.cs', encoding='utf-8').read()
 tokens = re.findall(r'"([a-z][a-z_]+)"', catalog)
-assert len(tokens) == 36, 'tokens=%d' % len(tokens)
+assert len(tokens) >= 36, 'tokens=%d' % len(tokens)
 server = ''
 for p in glob.glob(root + '/src/**/*.cs', recursive=True):
     server += open(p, encoding='utf-8').read()

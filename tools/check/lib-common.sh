@@ -134,6 +134,33 @@ assert_bad_config() {
   fi
 }
 
+# assert_interface <file> <regex> <msg>
+#   钉「接口 / 字段 / 入口存在」，不钉「已接 / 未接」（D5 口径）。
+#   文件不存在或正则不命中都算失败；比 `git diff --quiet` 稳：后一张卡
+#   改别的配置 / proto 不会把这张卡打红。
+assert_interface() {
+  local file="$1" pattern="$2" msg="$3"
+  if [ -f "$file" ] && grep -qE -- "$pattern" "$file"; then
+    ok "$msg"
+  else
+    bad "${msg}（找不到 ${pattern}）"
+  fi
+}
+
+# assert_floor <actual> <min> <msg>
+#   会随卡增长的集合只写下限（D5 口径）：新卡追加条目，老卡不用改。
+assert_floor() {
+  local actual="$1" min="$2" msg="$3"
+  case "$actual" in
+    ''|*[!0-9]*) bad "${msg}（实际值不是数字：${actual}）"; return ;;
+  esac
+  if [ "$actual" -ge "$min" ]; then
+    ok "${msg}（${actual} ≥ ${min}）"
+  else
+    bad "${msg}（${actual} < ${min}）"
+  fi
+}
+
 pick_pending_shop_item() {
   python3 -c 'import json, sys
 path = sys.argv[1] if len(sys.argv) > 1 else "config/shop.json"

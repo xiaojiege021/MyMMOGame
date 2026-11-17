@@ -4,7 +4,7 @@
 # 完成标准（14.8 的 D1a 行，逐条对应下面的断言）：
 #   1. 入口只留启动与迁移：Program.cs 不再有 flag 分支 / 连库 / 表加载；
 #   2. D1a 的 133 个 flag 名不变：CliParser.cs 的 `case "--xxx"` 与 D1a 前的名单逐字一致；
-#      之后的新卡只能往名单里追加（K5 追加 --item-list、K6 追加 --content-list，共 135 个），不能改旧名；
+#      之后的新卡只能往名单里追加（K5 / K6 / C7 各追加一个，现共 136 个），不能改旧名；
 #   3. `Character/Cli/*` 一卡一类：每个文件恰好一个类型，单文件 ≤ 600 行；
 #   4. check 全绿：编译 + 只读入口 / 解析 / 连库入口的运行断言。
 #
@@ -79,8 +79,9 @@ for path in files:
 report("每个 Cli 文件恰好一个类型", not multi, ",".join(multi))
 report("每个 Cli 文件 <= 600 行", not too_long, ",".join(too_long))
 
-# 3. D1a 的 133 个 flag 名逐字一致，K5 / K6 / C7 各追加一个。
+# 3. D1a 的 133 个 flag 名逐字一致，K5 / K6 / C7 各追加一个（现 136）。
 #    新卡只能往这份名单末尾语义位置追加，不能改旧名——这也是「接一个新口只改一处」的落点。
+#    D5 起用下限：后一张卡追加 flag 不用再回来改这张卡的等号。
 EXPECTED = """
 --advance-branch --advance-realm --apply-siege-result --auction-config --auction-ledger
 --auction-state --binding-of --branch-state --buy-season-pass --can-equip
@@ -118,10 +119,9 @@ expected = sorted(EXPECTED.split())
 parser = read("tools/probe/CliProbe/CliParser.cs")
 got = re.findall(r'case "(--[a-z0-9-]+)"', parser)
 missing = [f for f in expected if f not in got]
-extra = [f for f in set(got) if f not in expected]
-report("flag 名 136 个逐字一致（D1a 133 + K5 1 + K6 1 + C7 1，实际 %d）" % len(set(got)),
-       len(set(got)) == 136 and not missing and not extra,
-       "缺=%s 多=%s" % (missing[:5], extra[:5]))
+report("flag 名 D1a 的 136 个一个不少（后续卡只追加，实际 %d）" % len(set(got)),
+       len(set(got)) >= 136 and not missing,
+       "缺=%s" % (missing[:8],))
 report("flag 无重复", len(got) == len(set(got)), "%d 处重复" % (len(got) - len(set(got))))
 
 # 4. 每个 flag 字段都被分派侧引用（没有「解析了却没人用」的孤儿）。

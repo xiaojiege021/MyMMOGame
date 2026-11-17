@@ -192,18 +192,23 @@ fi
 
 echo "== 3. 只读入口与坏清单 =="
 if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
-  # 只钉这一张卡的事实：十八条、只收元宝。版本号与「已接发货几种」会随后面的卡往上走，
-  # 写死在这里会让老卡被新卡打挂。
+  # 只钉这一张卡的事实：商品与种类不少于 18、只收元宝。版本号与发货种数会随后面的卡往上走，
+  # 写死等号会让老卡被新卡打挂（D5 口径：会增长的集合只写下限）。
   if grep -q 'shop_list_state=ok' "$TMP/list.txt" \
-     && grep -q 'currency=yuanbao' "$TMP/list.txt" \
-     && grep -q 'items=18 ' "$TMP/list.txt" \
-     && grep -q 'kinds=18' "$TMP/list.txt"; then
-    ok "清单读得出来：18 种、只收元宝"
+     && grep -q 'currency=yuanbao' "$TMP/list.txt"; then
+    ITEMS_N=$(grep -oE 'items=[0-9]+' "$TMP/list.txt" | head -1 | cut -d= -f2)
+    KINDS_N=$(grep -oE 'kinds=[0-9]+' "$TMP/list.txt" | head -1 | cut -d= -f2)
+    if [ "${ITEMS_N:-0}" -ge 18 ] && [ "${KINDS_N:-0}" -ge 18 ]; then
+      ok "清单读得出来：商品 ${ITEMS_N} 条 / ${KINDS_N} 种、只收元宝"
+    else
+      bad "清单条数少于 18：items=${ITEMS_N:-?} kinds=${KINDS_N:-?}"
+    fi
   else
     bad "清单头部不对：$(head -1 "$TMP/list.txt")"
   fi
   items=$(grep -c '^shop_item=' "$TMP/list.txt" || true)
-  [ "$items" = "18" ] && ok "清单 18 条商品" || bad "清单商品条数不是 18：$items"
+  [ "$items" -ge 18 ] && ok "清单商品不少于 18 条（实际 ${items}）" \
+    || bad "清单商品条数少于 18：$items"
 else
   bad "清单读取失败"; tail -5 "$TMP/list.txt" | detail
 fi
@@ -302,7 +307,7 @@ else:
   body="$(body_of "$resp")"
   if [ -n "$pending_id" ] \
      && [ "$(expect_json "$body" ok=false reason=delivery_pending kind="$pending_kind" charged_yuanbao=0 delivered=false)" = "ok" ]; then
-    ok "清单内商品（${pending_id}）：还没接发货，拒绝且不扣（delivery_pending）"
+    ok "清单内空发货商品（${pending_id}）：delivery.mode=none，拒绝且不扣（delivery_pending）"
   else
     bad "清单内商品回包不对：$body"
   fi

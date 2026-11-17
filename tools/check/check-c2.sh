@@ -155,8 +155,14 @@ done <"$TMP/static.out"
 
 echo "== 3. 只读入口（与启动共用同一份 Load） =="
 OUT="$("$DOTNET" "$WORLD_DLL" --gather-spread-state 2>&1 | utf8)"; rc=$?
-if [ "$rc" = "0" ] && printf '%s' "$OUT" | grep -qF 'gather_spread_state=ok nodes=14 regions=8 realms=炼体,结丹 base=4 total=18'; then
-  ok "--gather-spread-state：14 个铺开节点 / 8 块地表 / 基准 4 / 合计 18"
+SPREAD_N=$(printf '%s' "$OUT" | grep -oE 'nodes=[0-9]+' | head -1 | cut -d= -f2)
+BASE_N=$(printf '%s' "$OUT" | grep -oE 'base=[0-9]+' | head -1 | cut -d= -f2)
+TOTAL_N=$(printf '%s' "$OUT" | grep -oE 'total=[0-9]+' | head -1 | cut -d= -f2)
+if [ "$rc" = "0" ] && printf '%s' "$OUT" | grep -q 'gather_spread_state=ok' \
+   && [ "${SPREAD_N:-0}" -ge 14 ] && [ "${BASE_N:-0}" -ge 4 ] \
+   && [ "${TOTAL_N:-0}" -eq "$(( ${SPREAD_N:-0} + ${BASE_N:-0} ))" ] \
+   && printf '%s' "$OUT" | grep -q 'regions=8'; then
+  ok "--gather-spread-state：铺开 ${SPREAD_N} 个（≥14）/ 基准 ${BASE_N} 个（≥4）/ 合计 ${TOTAL_N}"
 else
   bad "--gather-spread-state 输出不对（rc=${rc}）：${OUT:0:180}"
 fi
@@ -222,9 +228,14 @@ d["nodes"].append(dict(d["nodes"][0], id="ore_chenglu_extra"))
 json.dump(d, open(os.path.join(tmp, "spread-hot.json"), "w", encoding="utf-8"), ensure_ascii=False)
 PY
 HOT="$("$DOTNET" "$WORLD_DLL" --gather-spread-state --gather-spread-config "$TMP/spread-hot.json" 2>&1 | utf8)"
-printf '%s' "$HOT" | grep -qF 'nodes=15' && printf '%s' "$HOT" | grep -qF 'total=19' \
-  && ok "改配置热更：只读口从 14/18 变 15/19，代码里没有写死节点数" \
-  || bad "改配置没被读到：${HOT:0:150}"
+HOT_N=$(printf '%s' "$HOT" | grep -oE 'nodes=[0-9]+' | head -1 | cut -d= -f2)
+HOT_TOTAL=$(printf '%s' "$HOT" | grep -oE 'total=[0-9]+' | head -1 | cut -d= -f2)
+if [ "${HOT_N:-0}" -eq "$(( ${SPREAD_N:-0} + 1 ))" ] \
+   && [ "${HOT_TOTAL:-0}" -eq "$(( ${TOTAL_N:-0} + 1 ))" ]; then
+  ok "改配置热更：铺开 ${SPREAD_N}→${HOT_N}、合计 ${TOTAL_N}→${HOT_TOTAL}，代码里没有写死节点数"
+else
+  bad "改配置没被读到：${HOT:0:150}"
+fi
 
 echo "== 5. 真服真库（MMO_C2_HAS_DB=1 才跑） =="
 if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then
@@ -263,10 +274,13 @@ PY
     else
       bad "真服没起来"; finish "C2（采集节点铺开）"
     fi
-    if grep -qaF 'gather_config=ok nodes=4 kinds=ore,herb,spirit_stone forbidden=1' "$TMP/world.log" \
-       && grep -qaF 'gather_spread=ok nodes=14 regions=8' "$TMP/world.log" \
-       && grep -qaF 'total=18' "$TMP/world.log"; then
-      ok "启动日志：老行仍 nodes=4，新行铺开 14 个、合计 18 个节点"
+    B_N=$(grep -aoE 'gather_config=ok nodes=[0-9]+' "$TMP/world.log" | grep -oE '[0-9]+$' | head -1)
+    S_N=$(grep -aoE 'gather_spread=ok nodes=[0-9]+' "$TMP/world.log" | grep -oE '[0-9]+$' | head -1)
+    T_N=$(grep -aoE ' total=[0-9]+' "$TMP/world.log" | grep -oE '[0-9]+' | head -1)
+    if [ "${B_N:-0}" -ge 4 ] && [ "${S_N:-0}" -ge 14 ] \
+       && [ "${T_N:-0}" -eq "$(( ${B_N:-0} + ${S_N:-0} ))" ] \
+       && grep -qaE 'gather_spread=ok nodes=[0-9]+ regions=8' "$TMP/world.log"; then
+      ok "启动日志：老行基准 ${B_N} 个（≥4），新行铺开 ${S_N} 个（≥14）、合计 ${T_N}"
     else
       bad "启动日志的采集配置不对"; grep -aE '^(gather_|config_error)' "$TMP/world.log" | detail
     fi

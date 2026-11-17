@@ -94,7 +94,7 @@ report("item", len(mine) == 1 and mine[0].get("kind") == "consumable"
 
 row = [i for i in shop["items"] if i.get("id") == "shop_unbind_item_1"]
 dlv = (row[0].get("delivery") or {}) if row else {}
-report("shop", shop.get("version", 0) >= 7 and len(shop["items"]) == 18 and bool(row)
+report("shop", shop.get("version", 0) >= 7 and len(shop["items"]) >= 18 and bool(row)
        and dlv.get("item_id") == item_id and dlv.get("count") == 1,
        str(row[0]) if row else "missing")
 
@@ -131,7 +131,7 @@ report("readonly", all(k in program for k in
        "只读 / 核对入口")
 report("load_shared", program.count("UnbindTable.Load") >= 2
        and read(F["process"]).count("UnbindTable.Load") >= 1, "没共用 Load")
-report("config_wired", "unbind_table" in read(F["config_cs"]), "CharacterConfig 没接")
+report("config_wired", "unbind_table" in read(F["config_cs"]), "CharacterConfig 缺 unbind_table")
 
 code = read(F["table"]) + repo + svc + read(F["api"])
 report("no_hardcoded", not re.search(r"\b(720|168)\b", code)

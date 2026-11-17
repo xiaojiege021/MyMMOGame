@@ -141,7 +141,7 @@ delivered_code = [i["category"] for i in shop["items"]
 report("delivered_kinds",
        all(k in delivered_code
            for k in ("protect_ticket", "red_talisman", "blue_talisman")),
-       "配置里没接蓝符：" + ",".join(delivered_code))
+       "配置里没有蓝符发货：" + ",".join(delivered_code))
 
 table_cs = files["src/Character/TalismanTable.cs"]
 report("table_rejects_over_potion",

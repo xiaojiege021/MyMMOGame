@@ -446,9 +446,9 @@ print(next((s.get("slot") for s in d.get("slots", []) if s.get("item_id")==sys.a
   r="$(buy "$pending_id")"
   if [ -n "$pending_id" ] \
      && [ "$(expect_json "$(body_of "$r")" ok=false reason=delivery_pending charged_yuanbao=0)" = "ok" ]; then
-    ok "清单内还没接发货的种类（${pending_id}）：delivery_pending，一分不扣"
+    ok "清单内空发货种类（${pending_id}）：delivery.mode=none，delivery_pending，一分不扣"
   else
-    bad "未接发货的种类没拒干净：$r"
+    bad "空发货种类没拒干净：$r"
   fi
 
   # 买第一张：扣款、入包、到账即绑；这一格不能交易、不能上架。

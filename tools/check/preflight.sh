@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# tools/check/preflight.sh —— 提交前/开工前置闸门：把最容易返工的四类问题在写码那一刻拦住。
+# tools/check/preflight.sh —— 提交前/开工前置闸门：把最容易返工的五类问题在写码那一刻拦住。
 #
-# 用途：bootstrap.sh 开工体检之外，再挡四道「人眼容易漏、漏了必返工」的闸：
+# 用途：bootstrap.sh 开工体检之外，再挡五道「人眼容易漏、漏了必返工」的闸：
 #   1. meta GUID 闸门：任何 .meta 的 guid 必须正好 32 位十六进制（图标那次就是多一位）。
 #   2. 静态断言收窄提示：核对脚本里对客户端/服务端文件的 grep 若扫到注释/文档里的裸词，
 #      会误伤（JsonUtility 那次）；这里只提示存在疑似窄断言，不硬失败。
@@ -9,8 +9,10 @@
 #      和同一组参数（flight-state 漏传 regions 那次）；这里检测 state 入口是否调用 Load。
 #   4. 老卡断言不写死「当时的发货种数」：delivered_kinds=数字、把「还没接发货」绑死在某
 #      一个编号上，都会在新卡接发货时假失败（c1 那次闭包首跑 21/22、c7 现在的 5 种）。
+#   5. 断言只钉接口存在（D5）：已接/未接措辞、可变集合写死条数、git diff 钉整目录，
+#      都会让后一张卡把老卡打红；规则与实现同 tools/check/assert-policy.py。
 #
-# 退出码：0=通过；1=有硬性失败（GUID 非法，或老卡断言写死发货种数）。
+# 退出码：0=通过；1=有硬性失败（GUID 非法、老卡断言写死发货种数、断言政策命中）。
 # 本脚本只读，不改任何文件，不改玩法规则。
 set -uo pipefail
 
@@ -86,7 +88,7 @@ fi
 # ---------------------------------------------------------------------------
 echo "-- 4. 老卡断言不写死当时的发货种数 --"
 gate_hits="$(python3 - <<'PY'
-import glob, re, sys
+import glob, os, re, sys
 
 num = re.compile(r"delivered_kinds=[0-9]")
 phrase = re.compile(r"(没接发货|未接发货|delivery_pending)")
@@ -95,6 +97,9 @@ quoted = re.compile(r"[\"'](?:shop|talisman|scroll|protect|ticket|ore|sword|exp)
 
 hits = 0
 for path in sorted(glob.glob("tools/check/check-*.sh")):
+    # check-d5.sh 的扫描器自检要故意写坏样本，别把样本当违规。
+    if os.path.basename(path) == "check-d5.sh":
+        continue
     for lineno, line in enumerate(open(path, encoding="utf-8"), 1):
         text = line.strip()
         if text.startswith("#"):
@@ -113,10 +118,29 @@ PY
 if [ "$gate_ok" = "1" ]; then
   ok "老卡断言没有写死发货种数 / 未接发货编号"
 else
-  while IFS=: read -r gate_file gate_line gate_why; do
-    [ -n "$gate_file" ] || continue
-    bad "${gate_file}:${gate_line} ${gate_why}"
-  done <<< "$gate_hits"
+  if [ -z "$gate_hits" ]; then
+    bad "发货种数扫描器没跑起来（0 行输出）"
+  else
+    while IFS=: read -r gate_file gate_line gate_why; do
+      [ -n "$gate_file" ] || continue
+      bad "${gate_file}:${gate_line} ${gate_why}"
+    done <<< "$gate_hits"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# 闸门 5：断言只钉接口存在（硬性，D5）。
+# 背景：U10/U11/U12 曾用 `git diff --quiet -- config proto` 证明「本卡没动配置」，
+#       后一张卡改任何配置都会把老卡打红；v1.142–v1.144 连续三张卡各改 4–5 处老断言。
+# 规则与实现同一份：tools/check/assert-policy.py（check-d5.sh 也跑它）。
+# ---------------------------------------------------------------------------
+echo "-- 5. 断言只钉接口存在 --"
+policy_out="$(python3 tools/check/assert-policy.py 2>&1)" && policy_rc=0 || policy_rc=$?
+if [ "$policy_rc" = "0" ]; then
+  ok "老卡断言只钉接口存在（没有 已接/未接、delivered_kinds 写死数字、整目录 diff）"
+else
+  bad "断言政策扫描有命中（见下；规则：tools/check/assert-policy.py）"
+  printf '%s\n' "$policy_out" | grep '^HIT ' | head -12 | detail
 fi
 
 echo "----------------------------------------"

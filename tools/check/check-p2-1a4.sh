@@ -60,11 +60,11 @@ report("levels_vs_plan", [(l["level"], l["member_cap"]) for l in cfg["levels"]] 
 report("positions_vs_plan", {p["id"]: p["seat_cap"] for p in cfg["positions"]} == {"master":1,"vice_master":1,"elder":4,"steward":12}, "四席位一字未改")
 report("transfer_config", cfg["transfer"].get("idempotency") == "last_transfer_txn" and cfg["transfer"].get("old_master_position") == "disciple", "传位段一字未改")
 
-# 商城买不到建设：shop.json 18 条清单、items.json、ShopTable.DeliveredKinds
+# 商城买不到建设：清单不少于 18 条、items.json、ShopTable.DeliveredKinds
 shop = json.loads(read("config/shop.json"))
 items = json.loads(read("config/items.json"))
 bad = re.compile(r"建设|贡献|construction|contribution", re.I)
-report("shop_18_items", len(shop["items"]) == 18, "商城 18 条上架清单未变")
+report("shop_items_floor", len(shop["items"]) >= 18, "商城上架清单不少于 18 条（实际 %d）" % len(shop["items"]))
 report("shop_no_construction", not bad.search(json.dumps(shop, ensure_ascii=False)), "shop.json 无建设/贡献类商品或发货编号")
 report("items_no_construction", not bad.search(json.dumps(items, ensure_ascii=False)), "items.json 无建设/贡献类物品")
 shoptable = read("src/Character/ShopTable.cs")

@@ -71,10 +71,15 @@ if data.get("schema") == "skill-table/3" and data.get("version") == 3:
 else:
     bad("技能表 schema / version 不是 skill-table/3：%r %r" % (data.get("schema"), data.get("version")))
 
-if len(skills) == 15:
-    ok("技能仍是 15 条（编号一个没动）")
+# 15 条基础技能是 S1 的交付；觉醒 / 后续卡可以往表里追加，所以只钉「这 15 个编号在 + 至少 15 条」。
+base_ids = {1001, 1002, 1003, 1101, 1102, 1103, 1201, 1202, 1203,
+            1301, 1302, 1303, 1401, 1402, 1403}
+got_ids = {s.get("id") for s in skills}
+missing_base = sorted(base_ids - got_ids)
+if len(skills) >= 15 and not missing_base:
+    ok("基础 15 条技能一条不少（后续卡可追加，实际 %d 条）" % len(skills))
 else:
-    bad("技能条数变了：%d" % len(skills))
+    bad("基础技能缺编号：%s（现有 %d 条）" % (missing_base, len(skills)))
 
 # ② 两派都在，名字与传授方对得上方案 2.1 / 2.3
 tiandi = schools.get("tiandi")
@@ -93,7 +98,7 @@ else:
 names = [s["name"] for s in skills]
 missing = [s["id"] for s in skills if not s.get("name") or not s.get("school") or not s.get("tier")]
 if not missing:
-    ok("15 条技能都写了名字 / 门派 / 阶")
+    ok("每条技能都写了名字 / 门派 / 阶")
 else:
     bad("这些技能缺名字 / 门派 / 阶：%s" % missing)
 
@@ -201,16 +206,22 @@ else
   bad "客户端 Net 层出现了 skills 配置引用"
 fi
 
-step "4. 只读入口：--skill-list 打出的 15 行"
+step "4. 只读入口：--skill-list 打出的基础 15 行"
 "$DOTNET" "$BATTLE_DLL" --skill-list --config config/battle.json >"$TMP/skill-list.txt" 2>&1
 LIST="$TMP/skill-list.txt"
-assert_file_contains "$LIST" '^skill_table_version=3 skills=15 schools=2$' "只读入口报到 3 / 15 条 / 两派"
+SKILLS_N=$(grep -oE 'skills=[0-9]+' "$LIST" | head -1 | cut -d= -f2)
+if grep -qE '^skill_table_version=3 ' "$LIST" && [ "${SKILLS_N:-0}" -ge 15 ] \
+   && grep -qE ' schools=2$' "$LIST"; then
+  ok "只读入口报到 skill-table/3、技能不少于 15 条（实际 ${SKILLS_N}）、两派"
+else
+  bad "只读入口头部不对：$(head -1 "$LIST")"
+fi
 
 ROWS="$(grep -c '^skill_row=' "$LIST" || true)"
-if [ "$ROWS" = "15" ]; then
-  ok "打出 15 行技能（每行带门派 / 阶 / 分支）"
+if [ "$ROWS" -ge 15 ]; then
+  ok "打出不少于 15 行技能（实际 ${ROWS}，每行带门派 / 阶 / 分支）"
 else
-  bad "打出的技能行数不对：${ROWS}"
+  bad "打出的技能行数少于 15：${ROWS}"
 fi
 
 WANT="$(python3 - <<'PY'

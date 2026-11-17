@@ -237,12 +237,13 @@ def f(k):
     return int(m.group(1)) if m else -1
 d, v = f("delivered_kinds"), f("deliverable_items")
 print("ok" if "shop_list_state=ok" in line and d >= 1 and d == v else "bad")')" = "ok" ]; then
-    ok "清单读得出来：已接发货种类与可发货物一一对应"
+    ok "清单读得出来：有发货方式的种类与可发货物一一对应"
   else
     bad "清单头部不对：$(head -1 "$TMP/list.txt")"
   fi
   items=$(grep -c '^shop_item=' "$TMP/list.txt" || true)
-  [ "$items" = "18" ] && ok "清单 18 条商品" || bad "清单商品条数不是 18：$items"
+  [ "$items" -ge 18 ] && ok "清单商品不少于 18 条（实际 ${items}）" \
+    || bad "清单商品条数少于 18：$items"
   if grep -q 'shop_item=shop_protect_ticket_1 .* delivery=ticket_protectx1 ' "$TMP/list.txt"; then
     ok "保护券的发货物是同一种券、一次一张"
   else
@@ -251,9 +252,9 @@ print("ok" if "shop_list_state=ok" in line and d >= 1 and d == v else "bad")')" 
   pending=$(grep -c ' delivery=pending ' "$TMP/list.txt" || true)
   filled_n=$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(sum(1 for i in d["items"] if (i.get("delivery") or {}).get("mode", "none") != "none"))')
   if [ "$filled_n" -ge 1 ] && [ "$((pending + filled_n))" -eq "$items" ]; then
-    ok "清单 ${items} 条 = ${filled_n} 条已接发货 + ${pending} 条 pending（不钉当时的种类数）"
+    ok "清单 ${items} 条 = ${filled_n} 条有发货 + ${pending} 条 pending（不钉当时的种类数）"
   else
-    bad "pending 与已接发货对不上：pending=$pending filled=$filled_n items=$items"
+    bad "pending 与有发货种类对不上：pending=$pending filled=$filled_n items=$items"
   fi
 else
   bad "清单读取失败"; tail -5 "$TMP/list.txt" | detail
@@ -387,9 +388,9 @@ print(n)'
   body="$(body_of "$resp")"
   if [ -n "$pending_id" ] \
      && [ "$(expect_json "$body" ok=false reason=delivery_pending kind="$pending_kind" charged_yuanbao=0 delivered=false)" = "ok" ]; then
-    ok "未接发货的种类（${pending_id}）：delivery_pending，不扣不发"
+    ok "空发货种类（${pending_id}）：delivery.mode=none，delivery_pending，不扣不发"
   else
-    bad "未接发货的种类回包不对：$body"
+    bad "空发货种类的回包不对：$body"
   fi
 
   # 买一张保护券：扣 50、入包一张、到账即绑

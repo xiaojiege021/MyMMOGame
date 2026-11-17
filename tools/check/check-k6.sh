@@ -175,7 +175,14 @@ no_monster = [r for r in region_ids
               if not any((x.get("spawn") or {}).get("region") == r for x in mons)]
 report("every_region_has_monster", not no_monster, ",".join(sorted(no_monster)))
 bosses = [x.get("id") for x in mons if x.get("tier") == "boss"]
-report("four_dungeon_bosses", len(bosses) == 4, "boss=%s" % ",".join(bosses))
+# 四个副本 Boss 是 K6 的交付；B15 之后会加内容 Boss，所以只钉「这四条在 + 至少四条」，
+# 不把数量钉成等号（D5 口径）。
+required_bosses = ("boss_abyss_warden", "boss_lair_matriarch",
+                   "boss_sect_guardian", "boss_dragon_warden")
+missing_boss = [b for b in required_bosses if b not in bosses]
+report("dungeon_bosses", len(bosses) >= 4 and not missing_boss
+       and len(bosses) == len(set(bosses)),
+       "boss=%s missing=%s" % (",".join(bosses), ",".join(missing_boss)))
 report("world_boss_not_duplicated", all(not (x.get("tier") == "world_boss") for x in mons),
        "世界 Boss 的数值只在 world_boss.json，不在怪物表写第二份")
 

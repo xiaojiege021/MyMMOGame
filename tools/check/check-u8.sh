@@ -34,7 +34,7 @@ if [ -z "$PYBIN" ]; then
   finish "$TITLE"
 fi
 if ROOT="$ROOT" "$PYBIN" "$ROOT/tools/check/check-u8-static.py" >"$TMP/static.out" 2>&1; then
-  ok "入口枢纽齐全、HUD 已接线、总控已挂 U8"
+  ok "入口枢纽齐全、HUD 接线在、总控已挂 U8"
 else
   bad "U8 静态断言失败"; cat "$TMP/static.out" | detail
 fi

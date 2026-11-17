@@ -83,16 +83,12 @@ else
   bad "没有接线就绪行"
 fi
 
-echo "== 5. 不做项 =="
-if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-  if git -C "$ROOT" diff --quiet -- config proto 2>/dev/null; then
-    ok "config/ 与 proto/ 一行未改"
-  else
-    bad "这张卡改了 config/ 或 proto/"
-    git -C "$ROOT" diff --name-only -- config proto | detail
-  fi
-else
-  echo "  skip 不是 git 仓库，跳过改动比对"
-fi
+echo "== 5. 接口仍在（D5：只钉入口存在，不钉整目录未改） =="
+assert_interface src/Gateway/VersusApi.cs 'MapPost\("/versus/arena/enter"' "竞技场进场口在网关"
+assert_interface src/Gateway/VersusApi.cs 'MapPost\("/versus/battlefield/enter"' "战场进场口在网关"
+assert_interface client/MMOGame/Assets/HotUpdate/Ui/UiArenaScreen.cs \
+  'VersusEntry\.SummaryLine' "屏仍按 Net 拆装件摆进场卡"
+assert_interface client/MMOGame/Assets/HotUpdate/Ui/UiSocialFlow.cs 'EnterArena' "Flow 仍有竞技场进场入口"
+assert_interface client/MMOGame/Assets/Net/VersusEntry.cs 'ArenaPath' "Net 拆装件仍带竞技场路径"
 
 finish "$TITLE"

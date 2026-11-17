@@ -71,16 +71,11 @@ for key in pending entries collected passive advance no_entries reject skin_layo
   fi
 done
 
-echo "== 4. 不做项 =="
-if git -C "$ROOT" diff --quiet -- config proto 2>/dev/null; then
-  ok "config/ 与 proto/ 一行未改"
-else
-  if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-    bad "这张卡改了 config/ 或 proto/"
-    git -C "$ROOT" diff --name-only -- config proto | detail
-  else
-    echo "  skip 不是 git 仓库，跳过改动比对"
-  fi
-fi
+echo "== 4. 接口仍在（D5：只钉入口存在，不钉整目录未改） =="
+assert_interface src/Gateway/HeroCodexApi.cs 'MapGet\("/hero-codex"' "图鉴只读口在网关"
+assert_interface client/MMOGame/Assets/HotUpdate/Ui/UiHeroCodexScreen.cs \
+  'HeroCodexEntry\.EntryAt' "屏仍按 Net 拆装件摆九格"
+assert_interface client/MMOGame/Assets/HotUpdate/Ui/UiSocialFlow.cs 'LoadHeroCodex' "Flow 仍有图鉴读入口"
+assert_interface client/MMOGame/Assets/Net/HeroCodexEntry.cs 'RequestPath' "Net 拆装件仍有只读路径"
 
 finish "$TITLE"

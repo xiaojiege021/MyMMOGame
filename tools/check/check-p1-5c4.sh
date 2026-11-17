@@ -65,7 +65,7 @@ row = [i for i in shop["items"] if i.get("id") == "shop_teleport_talisman_1"]
 dlv = (row[0].get("delivery") or {}) if row else {}
 report("shop_delivery", bool(row) and dlv.get("item_id") == talisman
        and dlv.get("count") == 1, str(row[0]) if row else "missing")
-report("shop_items_18", len(shop["items"]) == 18, "items=%d" % len(shop["items"]))
+report("shop_items_floor", len(shop["items"]) >= 18, "items=%d" % len(shop["items"]))
 report("shop_price", bool(row) and row[0].get("price") == 20,
        str(row[0].get("price")) if row else "missing")
 

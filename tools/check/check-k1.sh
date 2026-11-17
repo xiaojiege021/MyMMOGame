@@ -225,13 +225,14 @@ echo "== 3. 只读入口 =="
 if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
   head1="$(head -1 "$TMP/list.txt")"
   case "$head1" in
-    "shop_list_state=ok version=11 "*) ok "清单读得出来：v11、18 条、只收元宝" ;;
+    "shop_list_state=ok version=11 "*) ok "清单读得出来：v11、只收元宝" ;;
     *) bad "清单头部不对：$head1" ;;
   esac
   rows=$(grep -c '^shop_item=' "$TMP/list.txt" || true)
-  [ "$rows" = "18" ] && ok "清单 18 条商品" || bad "清单商品条数不是 18：$rows"
+  [ "$rows" -ge 18 ] && ok "清单商品不少于 18 条（实际 ${rows}）" \
+    || bad "清单商品条数少于 18：$rows"
   # 每条都要有 mode / limit / stock / on_sale 四段（这是「带字段」的可核对形态）。
-  if [ "$(grep -cE '^shop_item=.* mode=(none|item|season_pass|monthly_bundle|second_slot) .* limit=[0-9]+/[0-9]+ stock=(unlimited|daily|weekly).* on_sale=(true|false) ' "$TMP/list.txt")" = "18" ]; then
+  if [ "$(grep -cE '^shop_item=.* mode=(none|item|season_pass|monthly_bundle|second_slot) .* limit=[0-9]+/[0-9]+ stock=(unlimited|daily|weekly).* on_sale=(true|false) ' "$TMP/list.txt")" = "$rows" ]; then
     ok "每条都带 mode / limit / stock / on_sale"
   else
     bad "有条目缺字段：$(grep -vE ' mode=.* limit=.* stock=.* on_sale=' "$TMP/list.txt" | head -2 | tr '\n' ' ')"

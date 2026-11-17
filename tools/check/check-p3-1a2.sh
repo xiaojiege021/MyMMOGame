@@ -109,7 +109,10 @@ proto = rd(os.path.join(root, "proto", "mmo", "character.proto"))
 R("proto_rpcs", "rpc AdvanceRealm(" in proto and "rpc SettleDrill(" in proto)
 R("proto_no_numbers", "int64 drill_cost = 9" in proto and "int32 success_pct = 17" in proto)
 gw = rd(os.path.join(root, "src", "Gateway", "Program.cs"))
-R("no_gateway_route", "AdvanceRealm" not in gw and "advance-realm" not in gw)
+# P3-1a2 的边界是「网关不本地算境界规则」；客户端入口是后续卡的活，
+# 不写「网关还没有 advance-realm 路由」这种会过期的话（D5 口径）。
+R("gateway_no_local_rules", "SuccessPct" not in gw and "BreakthroughMinIndex" not in gw,
+  "网关不本地算突破成功率 / 阶位门槛")
 battle = rd(os.path.join(root, "src", "Battle", "Server.cs")) + rd(os.path.join(root, "src", "Battle", "Encounter.cs"))
 R("drill_only_in_character", "realm_breakthrough" not in battle and "realm_drill" not in battle)
 

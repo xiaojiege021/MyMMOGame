@@ -71,16 +71,12 @@ for key in pending empty plant mature harvest buy buy_pending unavailable skin_l
   fi
 done
 
-echo "== 4. 不做项 =="
-if git -C "$ROOT" diff --quiet -- config proto 2>/dev/null; then
-  ok "config/ 与 proto/ 一行未改"
-else
-  if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-    bad "这张卡改了 config/ 或 proto/"
-    git -C "$ROOT" diff --name-only -- config proto | detail
-  else
-    echo "  skip 不是 git 仓库，跳过改动比对"
-  fi
-fi
+echo "== 4. 接口仍在（D5：只钉入口存在，不钉整目录未改） =="
+assert_interface src/Gateway/HomesteadPlantApi.cs 'MapGet\("/homestead/plants"' "种植只读口在网关"
+assert_interface src/Gateway/HomeCoinShopApi.cs 'MapPost\("/home-coin/shop/buy"' "家园币购买口在网关"
+assert_interface client/MMOGame/Assets/HotUpdate/Ui/UiHomesteadScreen.cs \
+  'HomesteadPlantEntry\.PlantInSlot' "屏仍按 Net 拆装件摆种植块"
+assert_interface client/MMOGame/Assets/HotUpdate/Ui/UiSocialFlow.cs 'LoadPlants' "Flow 仍有种植读入口"
+assert_interface client/MMOGame/Assets/Net/HomesteadPlantEntry.cs 'DescribePath' "Net 拆装件仍有只读路径"
 
 finish "$TITLE"

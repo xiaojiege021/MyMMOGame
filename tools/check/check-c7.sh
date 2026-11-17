@@ -52,18 +52,21 @@ while read -r b; do
 done < <(grep -oE '^\| `[a-z_0-9]+\.json`' "$LEDGER" | sed 's/^| `//; s/`$//' | sort -u)
 [ "$stale" -eq 0 ] && ok "台账里的文件名在 config 下都存在"
 
-# 两个子目录按份数核：目录本身不能凭空少文件
+# 两个子目录按份数核：目录本身不能凭空少文件。份数从台账现取，
+# 不把「9 份 / 8 份」再写第二遍——加一份配置只改台账，不用改这张脚本（D5 口径）。
 d_n=$(ls config/dialogue/*.json 2>/dev/null | wc -l | tr -d ' ')
 r_n=$(ls config/region/*.json 2>/dev/null | wc -l | tr -d ' ')
-if grep -qF 'dialogue/` 9 份' "$LEDGER" && [ "$d_n" -eq 9 ]; then
-  ok "config/dialogue 9 份，与台账一致"
+d_ledger=$(grep -oE 'dialogue/` [0-9]+ 份' "$LEDGER" | grep -oE '[0-9]+' | head -1)
+r_ledger=$(grep -oE 'region/` [0-9]+ 份' "$LEDGER" | grep -oE '[0-9]+' | head -1)
+if [ -n "${d_ledger:-}" ] && [ "$d_n" -eq "$d_ledger" ]; then
+  ok "config/dialogue ${d_n} 份，与台账一致"
 else
-  bad "config/dialogue 现 ${d_n} 份，台账写 9 份"
+  bad "config/dialogue 现 ${d_n} 份，台账写 ${d_ledger:-缺}"
 fi
-if grep -qF 'region/` 8 份' "$LEDGER" && [ "$r_n" -eq 8 ]; then
-  ok "config/region 8 份，与台账一致"
+if [ -n "${r_ledger:-}" ] && [ "$r_n" -eq "$r_ledger" ]; then
+  ok "config/region ${r_n} 份，与台账一致"
 else
-  bad "config/region 现 ${r_n} 份，台账写 8 份"
+  bad "config/region 现 ${r_n} 份，台账写 ${r_ledger:-缺}"
 fi
 
 # ---------- 2. 表 B 与配置里的 pending 双向相等 ----------

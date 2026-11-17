@@ -57,7 +57,7 @@ for n in screens:
 arena = open(ui + '/UiArenaScreen.cs', encoding='utf-8').read()
 assert '1.3' not in arena and '0.7' not in arena, 'power math in arena screen'
 # U12 接了 N5 的两条进场口。这里只认「接线后的入口在不在」，不写「无匹配入口」这种会过期的话。
-assert '进竞技场' in arena and 'EnterBattlefield' in arena, 'arena screen 没接进场口'
+assert '进竞技场' in arena and 'EnterBattlefield' in arena, 'arena screen 缺进场入口'
 
 codex = open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
 assert 'config/' not in codex, 'config read in codex'
@@ -87,7 +87,7 @@ assert 'VersusGap' not in social_codex, '竞技场缺口文案还留着'
 
 # 战斗侧只加一条「收到才处理」的分支；副本链路不发这条消息。
 battle_client = open(assets + '/HotUpdate/BattleClient.cs', encoding='utf-8').read()
-assert 'BodyOneofCase.SiegeView' in battle_client, '战斗客户端没接 SiegeView'
+assert 'BodyOneofCase.SiegeView' in battle_client, '战斗客户端缺 SiegeView 分支'
 assert 'UiSocialFlow.Feed' in battle_client, 'SiegeView 没交给社交屏'
 
 for proto in ('social.proto', 'battle.proto'):

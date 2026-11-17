@@ -160,6 +160,8 @@ deps_of() {
     d1b) echo "d1a" ;;
     # D4 是 14.6 表第 2 行：最小 CI，前置 D1b。
     d4) echo "d1b" ;;
+    # D5 是 14.6 表第 3 行：断言只钉接口存在，前置 D4（CI 已能跑无库段）。
+    d5) echo "d4" ;;
     # C6/D12 是 14.6 表第 5 行 / 14.8 表第 3 行：抽共享域，无功能卡前置。
     c6) echo "" ;;
     # K4 是 14.7 表第 2 行：实物引用审计，前置 K1 的商城配置化。
@@ -188,7 +190,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k4 k5 k6 k7 c2-realm c5 d1a d1b d4 c6 s1 c7"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k4 k5 k6 k7 c2-realm c5 d1a d1b d4 d5 c6 s1 c7"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {
