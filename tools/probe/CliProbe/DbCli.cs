@@ -21,6 +21,16 @@ internal static class DbCli
             return 3;
         }
 
+        if (!string.IsNullOrWhiteSpace(dbOverride))
+        {
+            // D17：只给核对用——同一个库实例上的临时库（造违反那一例），不进玩法路径。
+            connectionString = new NpgsqlConnectionStringBuilder(connectionString)
+            {
+                Database = dbOverride,
+            }.ConnectionString;
+            Console.WriteLine("db_override=" + dbOverride);
+        }
+
         Console.WriteLine("db_env=" + DbEnv.Source());
         await using var dataSource = NpgsqlDataSource.Create(DbEnv.WithPoolLimit(connectionString, 2));
         var characters = new CharacterRepository(dataSource);
@@ -53,6 +63,9 @@ internal static class DbCli
             code = await EconomyCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await InvariantCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
         }
         catch (Exception ex) when (ex is NpgsqlException or IOException)
         {
@@ -65,7 +78,8 @@ internal static class DbCli
 
     private static bool AnyDbFlag()
     {
-        return reportName != null || deleteName != null || stats || migrate || schemaStatus
+        return invariants || dbOverride != null
+    || reportName != null || deleteName != null || stats || migrate || schemaStatus
     || rawLevelWrite != 0 || levelOf != 0
     || branchStateOf != 0 || advanceBranchId != 0 || canEquipOf != 0
     || bindingOf != null || rawCurrencyId != 0 || rawCurrencyAddId != 0 || txnCount != null || itemCountOf != 0

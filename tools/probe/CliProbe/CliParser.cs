@@ -585,6 +585,8 @@ internal static class CliParser
             case "--stone-listing-state":
                 stoneListingState = true;
                 break;
+            case "--invariants": invariants = true; break;
+            case "--db" when i + 1 < args.Length: dbOverride = args[++i]; break;
             default:
                 Console.WriteLine("unknown_arg=" + args[i]);
                 return 64;

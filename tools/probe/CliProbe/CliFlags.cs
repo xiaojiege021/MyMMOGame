@@ -260,4 +260,8 @@ internal static class CliFlags
     public static string applySiegeResultMatch = "";
     public static uint applySiegeResultTeam = 0;
     public static ulong applySiegeResultSect = 0;
+    // D17：只读不变量核对。--db 只给核对用：把连接串里的 Database 换到临时库，
+    // 用来在「故意造一条违反」的临时库上验核对器还灵，不改主库。
+    public static bool invariants = false;
+    public static string? dbOverride = null;
 }

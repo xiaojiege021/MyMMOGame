@@ -169,6 +169,9 @@ deps_of() {
     # D16 是 14.11.3：契约闸（proto 清单 + 队列风险列）。脚本按 14.11.3 叫 check-contract.sh，
     # 所以卡名用 contract；前置 D15（四类判据与变异器）与 D8（清单只追加的口径）。
     contract) echo "d8 d15" ;;
+    # D17 是 14.11.4：不变量核对。脚本按 14.11.4 叫 check-invariants.sh，所以卡名用 invariants；
+    # 前置 D8（schema_version 与清单）与 D15（四类判据 / 变异器）。
+    invariants) echo "d8 d15" ;;
     # C6/D12 是 14.6 表第 5 行 / 14.8 表第 3 行：抽共享域，无功能卡前置。
     c6) echo "" ;;
     # K4 是 14.7 表第 2 行：实物引用审计，前置 K1 的商城配置化。
@@ -199,7 +202,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 d1a d1b d4 d5 d8 d15 c6 s1 c7 contract"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 d1a d1b d4 d5 d8 d15 c6 s1 c7 contract invariants"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {

@@ -309,8 +309,14 @@ report("queue_k3_done",
 # 只钉「NEXT 有值」——队列没有停在空处，派工能继续。
 report("queue_next_present", re.search(r"^NEXT=\S+$", queue, re.M) is not None,
        "任务队列 NEXT 没填（收口后应指向下一张）")
-report("queue_current_empty", re.search(r"^CURRENT=—$", queue, re.M) is not None,
-       "CURRENT 没清空")
+# CURRENT 是队列的瞬时状态，不是 K3 的承诺：D17 在跑时它必然不是 —。
+# 只钉「自洽」：要么没有进行中的卡，要么 CURRENT 指向的那一行确实标着进行中。
+current_match = re.search(r"^CURRENT=(\S+)$", queue, re.M)
+current = current_match.group(1) if current_match else ""
+report("queue_current_consistent",
+       current == "—"
+       or re.search(r"\|\s*" + re.escape(current) + r"\s*\|[^\n]*\|\s*进行中\s*\|", queue) is not None,
+       "CURRENT 既不是 —，也不是队列表里标进行中的卡")
 
 config_doc = read("docs/配置设计.md")
 report("config_doc_k3",
