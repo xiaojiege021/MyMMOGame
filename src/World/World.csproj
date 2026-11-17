@@ -10,5 +10,11 @@
     <!-- 服与服走 gRPC（技术架构第 2 节）。分线是在线状态，放进程内存，不连角色库。 -->
     <PackageReference Include="Grpc.AspNetCore" Version="2.85.0" />
     <ProjectReference Include="../Shared/Shared.csproj" />
+    <!-- C6/D12：世界 Boss 表与战斗服读同一份共享域解析器。 -->
+    <ProjectReference Include="../Shared.Domain/Shared.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- 共享域的类型按原短名直接用：WorldBossTable / ConfigException。 -->
+    <Using Include="Mmo.Shared.Domain" />
   </ItemGroup>
 </Project>

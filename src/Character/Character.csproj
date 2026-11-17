@@ -11,6 +11,13 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.85.0" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <ProjectReference Include="../Shared/Shared.csproj" />
+    <!-- C6/D12：副本 / 掉落 / 世界 Boss 三张表只有共享域一份，角色服不再自己解析。 -->
+    <ProjectReference Include="../Shared.Domain/Shared.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 共享域的类型按原短名直接用：DungeonTable / DungeonDropTable / ConfigException。 -->
+    <Using Include="Mmo.Shared.Domain" />
   </ItemGroup>
 
   <!-- D1b：核对入口在 tools/probe/CliProbe。角色服编译时顺手把 probe 编出来，

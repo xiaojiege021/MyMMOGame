@@ -17,5 +17,12 @@
     <PackageReference Include="Grpc.Net.Client" Version="2.85.0" />
     <!-- 技能请求和结果的类型来自 proto 生成物，和客户端同一份。 -->
     <ProjectReference Include="../Shared/Shared.csproj" />
+    <!-- C6/D12：副本 / 掉落 / 世界 Boss 三张表只有共享域一份，战斗服不再自己解析。 -->
+    <ProjectReference Include="../Shared.Domain/Shared.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 共享域的类型按原短名直接用：DungeonTable / WorldBossTable / ConfigException。 -->
+    <Using Include="Mmo.Shared.Domain" />
   </ItemGroup>
 </Project>

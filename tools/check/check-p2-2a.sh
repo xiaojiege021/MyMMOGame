@@ -57,7 +57,7 @@ newkeys = ("tier", "min_players", "entries_per_week", "reward_per_player")
 R("old_four", all(ds.get(k, {}).get("max_players") == v for k, v in old.items())
   and not any(x in ds.get(k, {}) for k in old for x in newkeys), "老四条人数未改、不带新字段")
 
-ct = rd("src/Character/DungeonTable.cs"); bt = rd("src/Battle/DungeonTable.cs")
+ct = rd("src/Shared.Domain/DungeonTable.cs"); bt = ct
 R("two_tables", all(k in ct and k in bt for k in ("min_players", "entries_per_week", "reward_per_player", "tier")),
   "两端 DungeonTable 都读 tier/min_players/entries_per_week/reward_per_player")
 R("not_hardcoded", not re.search(r'"dragon"', ct + bt)

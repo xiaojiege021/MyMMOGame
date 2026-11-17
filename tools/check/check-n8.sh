@@ -54,7 +54,7 @@ R("encounter_drop_key", '"world_boss"' in rd("src/Battle/Encounter.cs")
     and "SettlementSource" in rd("src/Battle/Encounter.cs"))
 R("drop_dungeon_not_real", "WorldBossDropDungeonId" in rd("src/Character/ExpSettlementRepository.cs")
     and "dungeon_unknown" in rd("src/Character/CharacterGrpcService.cs"))
-R("n6_path", "MatchesReported" in rd("src/Character/DungeonDropTable.cs")
+R("n6_path", "MatchesReported" in rd("src/Shared.Domain/DungeonDropTable.cs")
     and "SettleDropLine" in rd("src/Battle/ExpSettlement.cs"))
 R("no_world_boss_in_dungeons",
     "world_boss" not in rd("config/dungeons.json") or '"id": "world_boss"' not in rd("config/dungeons.json"))

@@ -12,5 +12,10 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="../../../src/Character/Character.csproj" />
+    <!-- C6/D12：核对入口直接读共享域的表，与两个服共用同一个解析器。 -->
+    <ProjectReference Include="../../../src/Shared.Domain/Shared.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Mmo.Shared.Domain" />
   </ItemGroup>
 </Project>

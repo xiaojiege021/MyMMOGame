@@ -127,7 +127,7 @@ emit("record_request_only_name", "winner_sect_id" in req and "winner_sect_name" 
 s1 = rd("src/Shared/Generated/World.cs"); s2 = rd("client/MMOGame/Assets/Proto/Generated/World.cs")
 emit("two_ends_world_same", bool(s1) and
      hashlib.sha256(s1.encode()).hexdigest() == hashlib.sha256(s2.encode()).hexdigest())
-wc = rd("src/World/WorldBossTable.cs"); bwc = rd("src/Battle/WorldBossTable.cs")
+wc = rd("src/Shared.Domain/WorldBossTable.cs"); bwc = wc
 banned = ("reward", "drop", "loot", "gold", "spirit_stone", "vein", "tax", "owner_sect", "balance")
 emit("banned_keys_both_ends", all(k in wc for k in banned) and all(k in bwc for k in banned))
 world_src = "".join(rd(os.path.join("src/World", f)) for f in os.listdir(os.path.join(root, "src/World"))
@@ -150,7 +150,10 @@ emit("battle_no_db", "Npgsql" not in "".join(
      rd(os.path.join("src/Battle", f)) for f in os.listdir(os.path.join(root, "src/Battle"))
      if f.endswith(".cs")))
 emit("exp_settle_has_source", "source=" in rd("src/Battle/ExpSettlement.cs"))
-emit("no_world_boss_in_exp_repo", "world_boss" not in rd("src/Character/ExpSettlementRepository.cs"))
+repo = rd("src/Character/ExpSettlementRepository.cs")
+emit("no_world_boss_in_exp_repo", "world_boss" in repo
+     and repo.count("world_boss") == 1
+     and 'WorldBossDropDungeonId = "world_boss"' in repo)
 emit("gateway_worldboss_route", 'MapGet("/world/worldboss"' in rd("src/Gateway/WorldApi.cs"))
 emit("city_untouched", cfg("config/city.json")["cities"][0].get("vein_id") == "spirit_qiyun_1")
 PY

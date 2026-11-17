@@ -138,7 +138,10 @@ public sealed class CharacterProcess(string configPath)
             heroCodexTable = HeroCodexTable.Load("config/hero_codex.json", mainlineTable);
             var dungeonDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
-            dungeonDropTable = DungeonDropTable.LoadIfPresent(dungeonDropPath, items, currencies);
+            dungeonDropTable = DungeonDropTable.LoadIfPresent(
+                dungeonDropPath,
+                items.All.Select(item => item.Id),
+                currencies.All.Select(currency => currency.Id));
             var mainlineDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "mainline_drops.json"));
             mainlineDropTable = MainlineDropTable.LoadIfPresent(mainlineDropPath, items, currencies);

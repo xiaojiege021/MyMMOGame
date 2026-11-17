@@ -359,5 +359,3 @@ public sealed record CharacterConfig(
         public string? MainlineTable { get; init; }
     }
 }
-
-public sealed class ConfigException(string message) : Exception(message);

@@ -3,58 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace Battle;
 
-/// <summary>配置有问题时抛这个，启动直接失败，不带着半截配置跑。</summary>
-public sealed class ConfigException(string message) : Exception(message);
-
-public sealed class PointConfig
-{
-    public int X { get; init; }
-    public int Y { get; init; }
-}
-
 public sealed class CasterConfig
 {
     public ulong Id { get; init; }
 
     /// <summary>出生点。生命上限不在这里：体力是所有人的生命，数值在职业表。</summary>
     public PointConfig SpawnMm { get; init; } = new();
-}
-
-public sealed class BossConfig
-{
-    public ulong Id { get; init; }
-    public string Name { get; init; } = "";
-    public long HpMax { get; init; }
-    public PointConfig SpawnMm { get; init; } = new();
-    public long ExpOnClear { get; init; }
-
-    /// <summary>
-    /// Boss 的攻击。P0 里 Boss 只做「按间隔打仇恨最高的那个人」这一种，
-    /// 读招时间就是 foreswing_ms。不配这一段 Boss 就不出手——单人核对
-    /// 还是老样子，不会平白多掉血。
-    /// </summary>
-    public BossAttackConfig? Attack { get; init; }
-
-    /// <summary>
-    /// 阶段表。每段一个血线区间和自己的攻击参数，到线就切。
-    /// 不配就是单阶段（用 attack 那段）。不设霸体条和破防窗口。
-    /// </summary>
-    public List<PhaseConfig>? Phases { get; init; }
-}
-
-public sealed class BossAttackConfig
-{
-    public long Damage { get; init; }
-    public int IntervalMs { get; init; }
-    public int ForeswingMs { get; init; }
-}
-
-public sealed class PhaseConfig
-{
-    public string Name { get; init; } = "";
-    public int HpPctFrom { get; init; }
-    public int HpPctTo { get; init; }
-    public BossAttackConfig? Attack { get; init; }
 }
 
 /// <summary>

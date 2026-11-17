@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- C6/D12：两服（以及世界服）共用的领域模型与配置加载。
+       只放跨进程同一口径的纯领域代码，不引用任何服务工程，也不碰库、HTTP、proto。 -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Mmo.Shared.Domain</RootNamespace>
+  </PropertyGroup>
+
+</Project>

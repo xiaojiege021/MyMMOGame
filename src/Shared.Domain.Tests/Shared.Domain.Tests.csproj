@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- C6/D12：共享域的配置加载单测。不连库、不起服、不读网络，
+       CI 与本地跑的都是同一份。 -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Mmo.Shared.Domain.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Shared.Domain/Shared.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Mmo.Shared.Domain" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 正本配置随测试输出一起带过去：单测读的就是仓库里那一份，不另造一份数字。 -->
+    <None Include="../../config/dungeons.json" Link="config/dungeons.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../config/dungeon_drops.json" Link="config/dungeon_drops.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../config/world_boss.json" Link="config/world_boss.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../config/items.json" Link="config/items.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../config/currency.json" Link="config/currency.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

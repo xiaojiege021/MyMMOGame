@@ -81,7 +81,10 @@ internal static class ConfigTableCli
                 var path = dungeonDropTablePath
                     ?? Path.GetFullPath(Path.Combine(
                         Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
-                var table = DungeonDropTable.Load(path, items, currencies);
+                var table = DungeonDropTable.Load(
+                    path,
+                    items.All.Select(item => item.Id),
+                    currencies.All.Select(currency => currency.Id));
                 Console.WriteLine("dungeon_drop_table_state=ok version=" + table.Version
                     + " dungeons=" + table.DungeonCount);
                 foreach (var id in new[] { "abyss", "lair", "world_boss" })

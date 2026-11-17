@@ -1335,7 +1335,7 @@ public sealed class Encounter
 
             var drops = dungeonId.Length > 0 && _bossHp <= 0
                 ? _config.DungeonDrops.LinesFor(dungeonId)
-                : [];
+                : (IReadOnlyList<DropLineDef>)[];
             _expSettlement.SettleParty(
                 _settlementId, SettlementSource, settledSize, _members.Keys.ToArray(),
                 dungeonId, _qualifiedKills, drops);

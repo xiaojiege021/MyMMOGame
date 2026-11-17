@@ -193,5 +193,3 @@ public sealed record WorldConfig(
         [JsonPropertyName("factions")] public List<string>? Factions { get; init; }
     }
 }
-
-public sealed class ConfigException(string message) : Exception(message);

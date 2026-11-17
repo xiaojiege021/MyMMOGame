@@ -1,7 +1,6 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Character;
+namespace Mmo.Shared.Domain;
 
 /// <summary>
 /// 一个副本：编号、名字、难度档、人数区间、进本时扣不扣疲劳与周份额。
@@ -11,6 +10,10 @@ namespace Character;
 /// P2-2a：tier=hard 的高难本（龙巢）另有三条口径——至少 MinPlayers 人、
 /// 每人每周 EntriesPerWeek 次、进一次得 RewardPerPlayer 份（不乘人数）。
 /// 普通本这三项固定为 1 / 0 / 0，由 DungeonTable.Load 填，不另存一套。
+///
+/// C6/D12：这份定义从角色服与战斗服各一份合并到这里，两服引用同一个类型。
+/// Realm / Drill 以前只在角色服那一份里有，现在也留在这里：战斗服读同一份表、
+/// 拿到同样的字段，不再出现「一边认识 realm、一边不认识」的分叉。
 /// </summary>
 public sealed record DungeonDef(
     string Id,
@@ -30,8 +33,8 @@ public sealed record DungeonDef(
 }
 
 /// <summary>
-/// 副本表。与战斗服读同一份 config/dungeons.json：战斗服按它开本，
-/// 角色服按它校验人数与扣减，不各存一套。
+/// 副本表。战斗服与角色服读同一份 config/dungeons.json：战斗服按它开本，
+/// 角色服按它校验人数与扣减，不各存一套。C6/D12 起解析器也只有这一份。
 /// </summary>
 public sealed class DungeonTable
 {
@@ -83,16 +86,7 @@ public sealed class DungeonTable
             throw new ConfigException("找不到副本表：" + path);
         }
 
-        Wire wire;
-        try
-        {
-            wire = JsonSerializer.Deserialize<Wire>(File.ReadAllText(path), JsonOptions)
-                ?? throw new ConfigException("副本表是空的：" + path);
-        }
-        catch (JsonException ex)
-        {
-            throw new ConfigException("副本表不是合法 JSON：" + ex.Message);
-        }
+        var wire = ConfigJson.Read<Wire>(path);
 
         var cap = wire.FatigueDailyCap ?? 6000;
         if (cap < 1 || cap > 1_000_000)
@@ -261,12 +255,6 @@ public sealed class DungeonTable
 
         return new DungeonTable(map, wire.Version, cap, recovery, weeklyCap, hpScale, damageScale);
     }
-
-    static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) },
-    };
 
     sealed record Wire
     {

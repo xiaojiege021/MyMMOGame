@@ -1,12 +1,16 @@
 using System.Text.Json;
 
-namespace Character;
+namespace Mmo.Shared.Domain;
 
 public sealed record DropLineDef(string ItemId, int Count);
 
 /// <summary>
 /// config/dungeon_drops.json。战斗服按它报事实，角色服按它验收，
 /// 两服读同一份，不各存一套。缺表降级：不报、不收任何掉落行。
+///
+/// C6/D12：解析器从两服各一份合并到这里。需要校验「物品在 items 表里、
+/// 掉落不许含灵石币种」的进程（角色服）把两张表的编号集合传进来；战斗服
+/// 只报事实，不传集合，只做结构与白名单校验。这是同一个加载器，不是第二套规则。
 /// </summary>
 public sealed class DungeonDropTable
 {
@@ -58,11 +62,24 @@ public sealed class DungeonDropTable
 
     public static DungeonDropTable Missing() => new([], 0, false, missing: true);
 
-    public static DungeonDropTable LoadIfPresent(string path, ItemTable items, CurrencyTable currencies)
-        => File.Exists(path) ? Load(path, items, currencies) : Missing();
+    /// <summary>
+    /// 表存在就读、不存在就降级。knownItemIds / currencyIds 由调用方决定传不传：
+    /// 角色服传（表外物品、灵石币种在加载期就挡住），战斗服不传（只报事实）。
+    /// </summary>
+    public static DungeonDropTable LoadIfPresent(
+        string path,
+        IEnumerable<string>? knownItemIds = null,
+        IEnumerable<string>? currencyIds = null)
+        => File.Exists(path) ? Load(path, knownItemIds, currencyIds) : Missing();
 
-    public static DungeonDropTable Load(string path, ItemTable items, CurrencyTable currencies)
+    public static DungeonDropTable Load(
+        string path,
+        IEnumerable<string>? knownItemIds = null,
+        IEnumerable<string>? currencyIds = null)
     {
+        var items = knownItemIds?.ToHashSet(StringComparer.Ordinal);
+        var currencies = currencyIds?.ToHashSet(StringComparer.Ordinal);
+
         JsonDocument doc;
         try
         {
@@ -143,12 +160,12 @@ public sealed class DungeonDropTable
                         throw new ConfigException(path + "：count 无效 item=" + itemId);
                     }
 
-                    if (currencies.Find(itemId) is not null || SpiritStoneCurrency.Contains(itemId))
+                    if (currencies?.Contains(itemId) == true || SpiritStoneCurrency.Contains(itemId))
                     {
                         throw new ConfigException(path + "：掉落不许含灵石币种 item=" + itemId);
                     }
 
-                    if (items.Find(itemId) is null)
+                    if (items is not null && !items.Contains(itemId))
                     {
                         throw new ConfigException(path + "：物品不在 items 表 item=" + itemId);
                     }

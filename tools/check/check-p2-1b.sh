@@ -69,7 +69,7 @@ R("sect_levels_caps", caps == [10, 30, 60, 100, 200], "sect.json 五档名册上
 R("two_calibers", caps[-1] == 200 and byid["sect"]["max_players"] == 4 and caps[-1] != 4, "member_cap=200 与 sect.max_players=4 两份口径")
 R("no_200_as_limit", all(r.get("max_players") != 200 for r in rows), "dungeons.json 无 200 作为进本上限")
 svc = rd("src/Character/CharacterGrpcService.cs"); bsrv = rd("src/Battle/Server.cs")
-ctbl = rd("src/Character/DungeonTable.cs"); btbl = rd("src/Battle/DungeonTable.cs")
+ctbl = rd("src/Shared.Domain/DungeonTable.cs"); btbl = ctbl
 judge = svc + bsrv + ctbl + btbl
 R("no_200_in_code", not re.search(r"(?:MaxPlayers|max_players|limit|partySize|party_size)[^\n]{0,24}\b200\b|\b200\b[^\n]{0,24}(?:MaxPlayers|max_players|limit|partySize|party_size)", judge), "判定/副本表源码里不出现 200 作为进本上限")
 social = "\n".join(rd(p) for p in sorted(glob.glob("src/Social/*.cs")))

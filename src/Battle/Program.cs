@@ -115,7 +115,7 @@ if (sectTechOnly)
             + $" level=max {table.Factor(table.MaxLevel):0.###}");
         return 0;
     }
-    catch (Battle.ConfigException ex)
+    catch (ConfigException ex)
     {
         Console.WriteLine("config_error=" + ex.Message);
         return 2;
@@ -153,7 +153,7 @@ if (siegeTerritoryOnly)
             + $" unknown={table.CityOf("not-a-city")?.CityId ?? "-"}");
         return 0;
     }
-    catch (Battle.ConfigException ex)
+    catch (ConfigException ex)
     {
         Console.WriteLine("config_error=" + ex.Message);
         return 2;
@@ -164,9 +164,9 @@ if (worldBossOnly)
 {
     try
     {
-        Battle.WorldBossTable table = worldBossPath is null
+        WorldBossTable table = worldBossPath is null
             ? Battle.BattleConfig.Load(configPath).WorldBoss
-            : Battle.WorldBossTable.Load(worldBossPath);
+            : WorldBossTable.Load(worldBossPath);
 
         if (table.IsMissing)
         {
@@ -203,7 +203,7 @@ if (worldBossOnly)
             + $" next_starts_at_ms={slot.NextStartsAtMs}");
         return 0;
     }
-    catch (Battle.ConfigException ex)
+    catch (ConfigException ex)
     {
         Console.WriteLine("config_error=" + ex.Message);
         return 2;
@@ -240,7 +240,7 @@ if (battlefieldOnly)
             + $" heal_weight={table.HealWeight}");
         return 0;
     }
-    catch (Battle.ConfigException ex)
+    catch (ConfigException ex)
     {
         Console.WriteLine("config_error=" + ex.Message);
         return 2;
@@ -273,7 +273,7 @@ if (siegeOnly)
             + $" heal_weight={table.HealWeight}");
         return 0;
     }
-    catch (Battle.ConfigException ex)
+    catch (ConfigException ex)
     {
         Console.WriteLine("config_error=" + ex.Message);
         return 2;
@@ -307,7 +307,7 @@ if (arenaOnly)
 
         return 0;
     }
-    catch (Battle.ConfigException ex)
+    catch (ConfigException ex)
     {
         Console.WriteLine("config_error=" + ex.Message);
         return 2;

@@ -18,7 +18,7 @@ public interface IExpSettlement : IDisposable
     void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
         string dungeonId, int qualifiedKills,
-        IReadOnlyList<(string ItemId, int Count)> drops);
+        IReadOnlyList<DropLineDef> drops);
 }
 
 /// <summary>
@@ -30,7 +30,7 @@ public sealed class NoExpSettlement : IExpSettlement
     public void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
         string dungeonId, int qualifiedKills,
-        IReadOnlyList<(string ItemId, int Count)> drops)
+        IReadOnlyList<DropLineDef> drops)
     {
     }
 
@@ -58,7 +58,7 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
     public void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
         string dungeonId, int qualifiedKills,
-        IReadOnlyList<(string ItemId, int Count)> drops)
+        IReadOnlyList<DropLineDef> drops)
     {
         foreach (var characterId in memberIds)
         {
@@ -78,9 +78,9 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
                     DungeonId = dungeonId,
                     QualifiedKills = (uint)Math.Max(0, qualifiedKills),
                 };
-                foreach (var (itemId, count) in drops)
+                foreach (var drop in drops)
                 {
-                    request.Drops.Add(new SettleDropLine { ItemId = itemId, Count = count });
+                    request.Drops.Add(new SettleDropLine { ItemId = drop.ItemId, Count = drop.Count });
                 }
 
                 var reply = _client.SettleExp(request, deadline: DateTime.UtcNow.AddSeconds(5));
