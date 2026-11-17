@@ -30,6 +30,12 @@ trap 'rm -rf "$TMP"' EXIT
 
 FAIL=0
 step() { printf '\n== %s ==\n' "$1"; }
+# GitHub Actions 里把失败卡与第一行断言写成 annotation：日志下载要仓库权限，
+# annotation 是公开的，红的时候能直接看到是哪张卡、哪条断言。
+gh_error() {
+  [ -n "${GITHUB_ACTIONS:-}" ] || return 0
+  printf '::error::%s\n' "$(printf '%s' "$1" | tr '\n' ' ' | cut -c1-600)"
+}
 
 step "1. 编译（服务端 sln，Release）"
 if "$DOTNET" build src/MMOGame.sln -c Release --nologo -v q >"$TMP/build.log" 2>&1; then
@@ -37,6 +43,7 @@ if "$DOTNET" build src/MMOGame.sln -c Release --nologo -v q >"$TMP/build.log" 2>
 else
   echo "  FAIL 编译失败"
   tail -20 "$TMP/build.log" | sed 's/^/       /'
+  gh_error "CI build failed: $(tail -3 "$TMP/build.log" | tr '\n' ' ')"
   exit 1
 fi
 
@@ -49,6 +56,7 @@ for c in $CHECKS; do
   else
     echo "  FAIL $c"
     grep -E '^  FAIL' "$log" | head -6 | sed 's/^/       /'
+    gh_error "CI $c failed: $(grep -E '^  FAIL' "$log" | head -3 | tr '\n' ' ')"
     FAIL=$((FAIL + 1))
   fi
 done
