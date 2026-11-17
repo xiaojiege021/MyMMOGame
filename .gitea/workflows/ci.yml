@@ -1,0 +1,17 @@
+# D4 最小 CI：每次 push / PR 编译服务端并跑无库段核对。
+# 需要真库、网关、Unity 或平板的段不在这里跑，见 docs/开发架构.md 14.6 的 D4 行。
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: build + 无库段核对
+        run: bash tools/check/ci.sh
