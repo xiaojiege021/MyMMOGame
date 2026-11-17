@@ -87,6 +87,12 @@ public sealed class ItemTable
             {
                 throw new ConfigException("武器 " + id + " 必须写 require_level，不写就是任意等级都能穿");
             }
+            if (map.ContainsKey(id))
+            {
+                // 配置设计 10.1：同一文件内 id 唯一。重复时以前是后者覆盖前者，
+                // 看起来能起来、实际少一件，属于 K4 要拦的「引用对不上」。
+                throw new ConfigException("items.json 的物品编号重复：" + id);
+            }
             map[id] = new ItemDef(
                 id, (item.Name ?? id).Trim(), (item.Kind ?? "material").Trim(), stackMax,
                 item.Bind.Value, weaponKind, requireLevel);
