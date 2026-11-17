@@ -65,6 +65,25 @@ public sealed class InventoryRepository(NpgsqlDataSource dataSource)
         return await reader.ReadAsync(stopping) ? reader.GetString(0) : null;
     }
 
+    /// <summary>
+    /// 复核归属的同时读出境界与立仙 / 立魔，只给展示名用（C2）。库里的 realm 仍是顺序表
+    /// 规范名；这里的 alignment 只决定第十段显示成金仙还是散仙，不参与任何判定。
+    /// 和 RealmAsync 同一套归属条件，不是这个账号的角色回 null。
+    /// </summary>
+    public async Task<(string Realm, string Alignment)?> RealmFactsAsync(
+        string account, long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select realm, coalesce(alignment, '') from \"角色\".character "
+            + "where id = $1 and account = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(account);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        return await reader.ReadAsync(stopping)
+            ? (reader.GetString(0), reader.GetString(1))
+            : null;
+    }
+
     public async Task<BagSlot?> GetSlotAsync(long characterId, int slot, CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(

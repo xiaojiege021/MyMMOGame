@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Mmo.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -55,8 +56,19 @@ namespace HotUpdate.Ui
             flow.Bind("selftest-token", 7);
             flow.LoadBag();
             Report("bag", flow.HasBag && flow.Bag.Slots.Count == 2
-                && flow.Bag.CharacterName == "自检角色" && flow.Bag.Realm == "炼体");
+                && flow.Bag.CharacterName == "自检角色" && flow.Bag.Realm == "炼体"
+                && flow.Bag.DisplayRealm == "炼体");
             Debug.Log("u5_self_bag slots=" + (flow.HasBag ? flow.Bag.Slots.Count : -1));
+
+            // C2：第十段立魔按服务端给的展示名显示散仙，规范名仍是金仙；老回包没这一格时退回规范名。
+            var demon = CharacterBag.Parse(
+                "{\"slots\":[],\"bag_slots\":20,\"realm\":\"金仙\",\"realm_display\":\"散仙\"}");
+            var old = CharacterBag.Parse(
+                "{\"slots\":[],\"bag_slots\":20,\"realm\":\"金仙\"}");
+            Report("realm_display", demon.Ok && demon.Realm == "金仙" && demon.DisplayRealm == "散仙"
+                && old.DisplayRealm == "金仙");
+            Debug.Log("u5_self_realm_display realm=" + demon.Realm
+                + " display=" + demon.DisplayRealm + " fallback=" + old.DisplayRealm);
 
             // 七屏都能建起来。
             var built = 0;
@@ -172,7 +184,8 @@ namespace HotUpdate.Ui
         const string BagJson =
             "{\"slots\":[{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true}," +
             "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true}]," +
-            "\"bag_slots\":40,\"character_name\":\"自检角色\",\"realm\":\"炼体\"}";
+            "\"bag_slots\":40,\"character_name\":\"自检角色\",\"realm\":\"炼体\"," +
+            "\"realm_display\":\"炼体\"}";
 
         const string EnhanceOkJson =
             "{\"ok\":true,\"reason\":\"\",\"level_before\":3,\"level\":4,\"max_level\":12," +

@@ -25,6 +25,11 @@ namespace Mmo.Net
         public int BagSlots;
         public string CharacterName;
         public string Realm;
+        public string RealmDisplay;
+
+        /// <summary>屏上显示的境界名：优先用服务端给的展示名，老回包没有这一格时退回规范名。</summary>
+        public string DisplayRealm =>
+            !string.IsNullOrEmpty(RealmDisplay) ? RealmDisplay : Realm;
 
         public static BagOutcome Failure(string reason) => new BagOutcome
         {
@@ -95,6 +100,7 @@ namespace Mmo.Net
                 BagSlots = (int)ReadLong(json, "bag_slots"),
                 CharacterName = ReadRaw(json, "character_name"),
                 Realm = ReadRaw(json, "realm"),
+                RealmDisplay = ReadRaw(json, "realm_display"),
             };
         }
 

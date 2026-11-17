@@ -5,6 +5,7 @@ namespace HotUpdate.Ui
 {
     /// <summary>
     /// 角色与装备（原型 D01）。名号、境界、背包容量都来自 `/inventory` 回包；
+    /// 境界显示用 `realm_display`（立仙金仙 / 立魔散仙），规范名与世界服门槛仍只认 `realm`。
     /// 四个部位只是位置示意，装备与部位归属以服务端背包为准，界面不本地判。
     /// </summary>
     public static class UiCharacterScreen
@@ -25,7 +26,7 @@ namespace HotUpdate.Ui
             var card = shell.Panel("角色", m.Band(pad, top + m.Px(56f), leftW, cardH), shell.Size(36f));
 
             var name = flow.HasBag ? flow.Bag.CharacterName : "";
-            var realm = flow.HasBag ? flow.Bag.Realm : "";
+            var realm = flow.HasBag ? flow.Bag.DisplayRealm : "";
             UiUpgradeViews.Rows(shell, card,
                 new[] { "名号", "境界", "背包", "角色号" },
                 new[]

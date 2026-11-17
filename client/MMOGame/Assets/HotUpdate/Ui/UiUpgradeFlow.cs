@@ -133,7 +133,8 @@ namespace HotUpdate.Ui
                         + " slots=" + (Bag.Slots != null ? Bag.Slots.Count : 0)
                         + " bag=" + Bag.BagSlots
                         + " name=" + Bag.CharacterName
-                        + " realm=" + Bag.Realm);
+                        + " realm=" + Bag.Realm
+                        + " realm_display=" + Bag.DisplayRealm);
                 }
 
                 if (done != null) done();

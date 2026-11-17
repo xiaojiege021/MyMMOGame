@@ -317,13 +317,17 @@ public sealed class CharacterGrpcService(
 
         // 名字牌文本也在这里读：同一份归属条件下取角色名，网关拿不到别人的名字。
         // 境界同样是只读的，世界服判飞行与跨区时来问；客户端提交不了这个值。
+        // C2：realm 仍是顺序表规范名（旧数据里的散仙也归一成金仙），realm_display 才按
+        // 第十场的立仙 / 立魔决定显示金仙还是散仙；世界服只读 realm，不认展示名。
         var displayName = await inventory.DisplayNameAsync(account, characterId, context.CancellationToken);
-        var realm = await inventory.RealmAsync(account, characterId, context.CancellationToken);
+        var facts = await inventory.RealmFactsAsync(account, characterId, context.CancellationToken);
+        var realm = realms.Normalize(facts?.Realm ?? "");
         var response = new ListInventoryResponse
         {
             BagSlots = (uint)config.BagSlots,
             CharacterName = displayName ?? "",
-            Realm = realm ?? "",
+            Realm = realm,
+            RealmDisplay = realms.DisplayName(realm, facts?.Alignment ?? ""),
         };
         foreach (var slot in await inventory.ListAsync(characterId, context.CancellationToken))
         {

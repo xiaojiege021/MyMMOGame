@@ -119,6 +119,36 @@ public sealed class RealmTable
         return _aliases.TryGetValue(value, out var canonical) ? canonical : value;
     }
 
+    /// <summary>
+    /// 方案 8.1 的展示名：第十段按第十场选的路显示——立仙仍显示金仙，立魔显示别名散仙；
+    /// 其余境界原样显示顺序表规范名。别名只在这里做展示兼容，库里的 realm 与世界服门槛
+    /// 仍用 <see cref="Normalize"/> 后的规范名，不写回配置、不按展示名判定。
+    /// </summary>
+    public string DisplayName(string? realm, string? alignment)
+    {
+        var canonical = Normalize(realm);
+        if (canonical.Length == 0)
+        {
+            return "";
+        }
+
+        // 第十段是极境之前那一段；别名表里散仙=金仙，只在立魔这一条路显示别名。
+        if (_order.Count >= 2
+            && string.Equals(canonical, _order[^2], StringComparison.Ordinal)
+            && string.Equals((alignment ?? "").Trim(), "立魔", StringComparison.Ordinal))
+        {
+            foreach (var pair in _aliases)
+            {
+                if (string.Equals(pair.Value, canonical, StringComparison.Ordinal))
+                {
+                    return pair.Key;
+                }
+            }
+        }
+
+        return canonical;
+    }
+
     /// <summary>在十一段里的序号，从 1 开始；不认识的是 -1。</summary>
     public int Rank(string? realm) => _order.IndexOf(Normalize(realm)) + 1;
 

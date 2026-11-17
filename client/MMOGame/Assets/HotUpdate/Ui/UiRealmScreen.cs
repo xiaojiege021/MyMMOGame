@@ -4,8 +4,8 @@ using UnityEngine.UI;
 namespace HotUpdate.Ui
 {
     /// <summary>
-    /// 境界突破（原型 D07）。当前境界只读 `/inventory` 回包里的 realm；
-    /// 突破接口在后面的卡，这一屏不提供按钮，也不本地推境界。
+    /// 境界突破（原型 D07）。当前境界只读 `/inventory` 回包的 `realm_display`
+    /// （立仙第十段显示金仙、立魔显示散仙）；突破接口在后面的卡，这一屏不提供按钮，也不本地推境界。
     /// </summary>
     public static class UiRealmScreen
     {
@@ -23,7 +23,7 @@ namespace HotUpdate.Ui
             var cardH = m.Px(520f);
 
             var current = shell.Panel("当前", m.Band(pad, top + m.Px(56f), leftW, cardH), shell.Size(34f));
-            var realm = flow.HasBag ? flow.Bag.Realm : "";
+            var realm = flow.HasBag ? flow.Bag.DisplayRealm : "";
             UiUpgradeViews.Rows(shell, current,
                 new[] { "境界", "等级", "突破" },
                 new[]

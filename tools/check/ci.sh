@@ -18,7 +18,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 # 无库段可跑的卡（新增卡只有在「无 gamedb 也能全绿」时才往这里加）。
-CHECKS="c5 c6 d1a d1b k1 k4 k5 k6 k7 n6 n7 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a"
+CHECKS="c2-realm c5 c6 d1a d1b k1 k4 k5 k6 k7 n6 n7 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a"
 
 if [ "${1:-}" = "--list" ]; then
   printf '%s\n' $CHECKS

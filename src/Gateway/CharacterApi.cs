@@ -314,6 +314,8 @@ public static class CharacterApi
                 await WriteAsync(context, 200, new
                 {
                     bag_slots = list.BagSlots,
+                    realm = list.Realm,
+                    realm_display = list.RealmDisplay,
                     slots = list.Slots.Select(s => new
                     {
                         slot = s.Slot,

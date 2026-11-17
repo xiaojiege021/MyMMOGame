@@ -174,7 +174,19 @@ internal static class ConfigTableCli
                 foreach (var pair in table.Aliases)
                 {
                     Console.WriteLine("alias=" + pair.Key + "=" + pair.Value);
+                    // C2：第十段按立仙 / 立魔显示；别名本身也要归一后再按分路显示。
+                    Console.WriteLine("realm_display=" + pair.Value
+                        + " immortal=" + table.DisplayName(pair.Value, "立仙")
+                        + " demon=" + table.DisplayName(pair.Value, "立魔")
+                        + " none=" + table.DisplayName(pair.Value, ""));
+                    Console.WriteLine("realm_display_alias=" + pair.Key
+                        + " immortal=" + table.DisplayName(pair.Key, "立仙")
+                        + " demon=" + table.DisplayName(pair.Key, "立魔"));
                 }
+                // 非第十段不因立魔改显示名；选一段首发境界作对照。
+                Console.WriteLine("realm_display_other=" + table.LaunchUntil
+                    + " immortal=" + table.DisplayName(table.LaunchUntil, "立仙")
+                    + " demon=" + table.DisplayName(table.LaunchUntil, "立魔"));
                 // P3-1a2：每段的突破要求，数值全部来自配置。
                 foreach (var requirement in table.Requirements)
                 {
