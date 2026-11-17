@@ -56,6 +56,48 @@ public sealed class RegionGate(RegionUnlockTable? unlocks, IProgressReader progr
     }
 
     /// <summary>
+    /// N14：一次读进度、把一批地表判一遍，给列表口用。
+    /// 静态开放与没有解锁条目的地表不问角色服；需要进度的共用同一次读取，
+    /// 不让「列八块地表」变成八次跨进程调用。进度读不到时，需要进度的地表照没解锁拒，
+    /// 静态开放的不受影响——一条读不到不该把整张表都标成关着。
+    /// 判定本身仍只有 <see cref="Evaluate"/> 一份，这里只负责取事实值和分发。
+    /// </summary>
+    public async Task<IReadOnlyList<RegionAccess>> EvaluateManyAsync(
+        string account, ulong characterId, IReadOnlyList<RegionDef> regions, CancellationToken stopping)
+    {
+        var needsProgress = regions.Any(NeedsProgress);
+        // 局部变量别叫 progress：那是构造注入的读取器，同名会把 ReadAsync 读成本地变量。
+        ProgressResult? facts = needsProgress
+            ? await progress.ReadAsync(account, characterId, stopping)
+            : null;
+
+        var list = new List<RegionAccess>(regions.Count);
+        foreach (var region in regions)
+        {
+            list.Add(EvaluateOne(region, facts));
+        }
+
+        return list;
+    }
+
+    RegionAccess EvaluateOne(RegionDef region, ProgressResult? facts)
+    {
+        if (!NeedsProgress(region))
+        {
+            // 静态开放的直接放行；没有解锁条目的地形照 P1-3a1 的老口径只锁着。
+            return Evaluate(region, 0, "");
+        }
+
+        var unlockStage = unlocks!.Find(region.Id)!.UnlockStage;
+        if (facts is null || !facts.Ok)
+        {
+            return new RegionAccess(false, facts?.Reason ?? "region_locked", 0, "", unlockStage);
+        }
+
+        return Evaluate(region, facts.MainStage, facts.Alignment);
+    }
+
+    /// <summary>
     /// 运行期判定。只有「静态不开放且配了解锁条目」的地表才去问角色服；
     /// 问不到（角色服没起来、归属不对、读不出进度）一律按没解锁拒。
     /// </summary>

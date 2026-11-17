@@ -75,7 +75,12 @@ message LeaveLineResponse {
   uint32 line_size = 3;
 }
 
-message ListRegionsRequest {}
+// N14：两个字段都空着时只读静态表（老口径，老卡与老屏照旧）；
+// 带了角色就按 RegionGate 的结论逐块回「这一刻开没开」。
+message ListRegionsRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
 
 message RegionInfo {
   string id = 1;
@@ -84,6 +89,13 @@ message RegionInfo {
   repeated string neighbors = 4;
   repeated string dialogue_ids = 5;
   bool open = 6;
+  // N14：open=false 时给原因（region_locked / region_route_mismatch），
+  // 开放时是空串。判定仍只在世界服的 RegionGate 一处，网关与客户端都照抄。
+  string reason = 7;
+  // 剧情解锁要求交完第几场（静态开放与只锁着的地表是 0），只在配置里有条目时非 0。
+  int32 unlock_stage = 8;
+  // 判定用的主线场次事实值（没带角色号时是 0）。
+  int32 main_stage = 9;
 }
 
 // 地点与开口的人的编号都从方案正文 2.5 到 2.7 读出来，供客户端与核对比对。

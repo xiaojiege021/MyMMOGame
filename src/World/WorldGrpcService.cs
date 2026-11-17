@@ -97,17 +97,37 @@ public sealed class WorldGrpcService(
         });
     }
 
-    public override Task<ListRegionsResponse> ListRegions(
+    public override async Task<ListRegionsResponse> ListRegions(
         ListRegionsRequest request, ServerCallContext context)
     {
         var response = new ListRegionsResponse { Version = (uint)catalog.Version };
-        foreach (var region in catalog.Regions)
+
+        // N14：带了角色就按 RegionGate 的结论逐块回「这一刻开没开」；
+        // 两个字段都空着时只读静态表，老卡与老屏一个字不用改。
+        var account = (request.Account ?? "").Trim();
+        var withCharacter = account.Length > 0 && request.CharacterId != 0;
+        var access = withCharacter
+            ? await regions.EvaluateManyAsync(
+                account, request.CharacterId, catalog.Regions, context.CancellationToken)
+            : null;
+
+        for (var i = 0; i < catalog.Regions.Count; i++)
         {
+            var region = catalog.Regions[i];
+            var one = access is null
+                ? region.Open
+                    ? new RegionAccess(true, "", 0, "", 0)
+                    : new RegionAccess(false, "region_locked", 0, "", 0)
+                : access[i];
+
             var info = new RegionInfo
             {
                 Id = region.Id,
                 Name = region.Name,
-                Open = region.Open,
+                Open = one.Ok,
+                Reason = one.Reason,
+                UnlockStage = one.UnlockStage,
+                MainStage = one.MainStage,
             };
             info.Chapters.AddRange(region.Chapters.Select(c => (uint)c));
             info.Neighbors.AddRange(region.Neighbors);
@@ -115,9 +135,32 @@ public sealed class WorldGrpcService(
             response.Regions.Add(info);
         }
 
+        if (withCharacter)
+        {
+            var open = 0;
+            var locked = new List<string>();
+            for (var i = 0; i < catalog.Regions.Count; i++)
+            {
+                if (access![i].Ok)
+                {
+                    open++;
+                }
+                else
+                {
+                    locked.Add(catalog.Regions[i].Id + ":" + access[i].Reason);
+                }
+            }
+
+            Console.WriteLine("world_regions account=" + account
+                + " character=" + request.CharacterId
+                + " regions=" + catalog.Regions.Count
+                + " open=" + open
+                + " locked=" + (locked.Count == 0 ? "none" : string.Join(",", locked)));
+        }
+
         response.Speakers.AddRange(catalog.Speakers);
         response.Factions.AddRange(catalog.Factions);
-        return Task.FromResult(response);
+        return response;
     }
 
     public override Task<ListGatherNodesResponse> ListGatherNodes(

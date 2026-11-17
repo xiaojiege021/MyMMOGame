@@ -85,15 +85,26 @@ for key in realm_pending realm_phase promote_ok promote_reject promote_body; do
 done
 
 echo "== 4. 不做项 =="
-if git -C "$ROOT" diff --quiet -- config proto src 2>/dev/null; then
-  ok "config/ 与 proto/、src/ 一行未改"
-else
-  if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-    bad "这张卡改了 config/ 或 proto/ 或 src/"
-    git -C "$ROOT" diff --name-only -- config proto src | detail
+# 这一条守的是「境界子阶这条链不许改配置与玩法」：配置目录整份不动；
+# proto 与 src 别的卡会各自改（N14 就动了 world.proto），所以不按整目录比对，
+# 改成断言本卡依赖的两条 rpc 与网关路径仍在（更稳，也不会被后一张卡扫红）。
+if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+  if git -C "$ROOT" diff --quiet -- config 2>/dev/null; then
+    ok "config/ 一行未改"
   else
-    echo "  skip 不是 git 仓库，跳过改动比对"
+    bad "这张卡改了 config/"
+    git -C "$ROOT" diff --name-only -- config | detail
   fi
+else
+  echo "  skip 不是 git 仓库，跳过改动比对"
+fi
+if grep -q "rpc PromoteRealmPhase" "$ROOT/proto/mmo/character.proto" \
+   && grep -q "rpc DescribeRealmPassive" "$ROOT/proto/mmo/character.proto" \
+   && grep -q 'MapGet("/realm/phase"' "$ROOT/src/Gateway/RealmPhaseApi.cs" \
+   && grep -q 'MapPost("/realm/phase/promote"' "$ROOT/src/Gateway/RealmPhaseApi.cs"; then
+  ok "境界子阶两条 rpc 与网关两条路径都在（proto / 服务端没被这条链改掉）"
+else
+  bad "境界子阶的 rpc 或网关路径不见了"
 fi
 
 echo "== 5. 真网关段 =="

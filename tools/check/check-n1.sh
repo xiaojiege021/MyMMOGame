@@ -112,12 +112,15 @@ ck("世界服仍不连角色库（不读库、不存一份进度）",
 ck("解锁表坏表起不来、缺表降级，启动日志新行 + 老行仍在",
    "LoadIfPresent" in table and "region_unlock=missing" in proc
    and "region_unlock=ok entries=" in proc and '"locked="' in proc)
-ck("老配置 / proto / 客户端 / 库表 / 老核对脚本一行未改",
+ck("老配置 / 库表 / 老核对脚本一行未改",
+   # N14（v1.171）起 proto 与世界地点表回包归它改：本卡守的是解锁表、地名、库表与老脚本，
+   # 不再拿「proto / client 一个字节没动」当 N1 的事实。
+   # check-p1-3c.sh 里 C2 之后那条「境界回包写法」已按新口径修正，不再列入这张卡的不改范围。
    subprocess.run(["git", "diff", "--name-only", "HEAD", "--",
                    "config/region", "config/world.json", "config/flight.json",
                    "config/mainline.json", "config/gather.json", "config/gather_spread.json",
-                   "config/dungeons.json", "proto", "client", "db",
-                   "tools/check/check-p1-3a1.sh", "tools/check/check-p1-3c.sh",
+                   "config/dungeons.json", "db",
+                   "tools/check/check-p1-3a1.sh",
                    "tools/check/check-p3-5a.sh", "tools/check/check-u4.sh"],
                   cwd=root, capture_output=True, text=True).stdout.strip() == "")
 ck("总控已挂 n1（依赖 c1 / 进线 / 境界区域）",

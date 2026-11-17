@@ -83,6 +83,18 @@ namespace HotUpdate.Ui
             }
         }
 
+        /// <summary>
+        /// 换掉下面那行小字。只给「回包到了以后把状态补上」用（例如地表开没开以
+        /// `/world/regions` 回包为准）；选中态仍只改颜色，不动位置尺寸。
+        /// </summary>
+        public void SetSub(string text)
+        {
+            if (_sub != null)
+            {
+                _sub.text = text == null ? string.Empty : text;
+            }
+        }
+
         public void Apply(UiPalette palette)
         {
             if (Selected)

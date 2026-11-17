@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Mmo.Net;
 using Mmo.Proto.World;
 using UnityEngine;
@@ -258,6 +259,68 @@ namespace HotUpdate.Ui
                 !flow.RegionReply.Ok
                 && flow.RegionLine().Contains("连不上网关")
                 && flow.RegionId == "承露门");
+
+            CheckRegionOpen(flow);
+        }
+
+        // ------------------------------------------------------------------ N14 地点表的开放
+
+        static void CheckRegionOpen(UiWorldFlow flow)
+        {
+            // 还没读过地点表：屏上退回配置静态，状态取不到回包。
+            Report("regions_before_reply", !flow.TryRegionState("焦原", out _, out _));
+
+            _nextStatus = 200;
+            _nextBody = RegionsJson;
+            flow.LoadRegions();
+
+            // 带角色号去读：进度与路线都在服务端，客户端只带角色号。
+            Report("regions_path",
+                _lastPath.IndexOf("character_id=77", StringComparison.Ordinal) >= 0);
+
+            // 静态 open=false 的旧天城区，回包说开就是开——屏上不再按配置标死。
+            UiWorldCodex.Region codexOld;
+            var staticLocked = UiWorldCodex.FindRegion("旧天城区", out codexOld) && !codexOld.Open;
+            Report("regions_from_reply",
+                staticLocked
+                && flow.TryRegionState("旧天城区", out var oldOpen, out var oldText)
+                && oldOpen && oldText == "已开");
+
+            // 路线不匹配是「这条路不开」，不是「还没到」，两种回包写两种字。
+            Report("regions_route_mismatch",
+                flow.TryRegionState("焦原", out var jyOpen, out var jyText)
+                && !jyOpen && jyText == "这条路不开");
+            Report("regions_locked_stage",
+                WorldEntry.RegionStateText(new WorldRegionRow
+                {
+                    Open = false,
+                    Reason = "region_locked",
+                    UnlockStage = 11,
+                }) == "第 11 场才开");
+
+            // 屏上：卡片小字与底部说明都跟着回包改，写死第 11 场那句不再出现。
+            flow.ClearViews();
+            var shell = UiShell.Ensure();
+            shell.ShowPage("世界地图", s => UiWorldMapScreen.Build(s, flow));
+            var copy = Text(shell);
+            Report("regions_screen_from_reply",
+                copy.Contains("旧天城区") && copy.Contains("已开")
+                && copy.Contains("这条路不开")
+                && copy.Contains("开放以 /world/regions 回包为准")
+                && !copy.Contains("未开的是第 11 场主线开放")
+                && !copy.Contains("（配置）"));
+        }
+
+        static string Text(UiShell shell)
+        {
+            var builder = new StringBuilder();
+            var labels = shell.GetComponentsInChildren<Text>(true);
+            for (var i = 0; i < labels.Length; i++)
+            {
+                builder.Append(labels[i].text).Append(';');
+            }
+
+            return builder.ToString();
         }
 
         // ------------------------------------------------------------------ B03
@@ -453,6 +516,31 @@ namespace HotUpdate.Ui
         }
 
         // ------------------------------------------------------------------ 断言
+
+        /// <summary>
+        /// N14 的地点表回包，八块都给：旧天城区静态 open=false，回包按主线进度说开；
+        /// 焦原是路线不匹配（立仙的人走不到）；其余照旧开着。
+        /// </summary>
+        const string RegionsJson =
+            "{\"version\":1,\"character_id\":77,\"regions\":[" +
+            "{\"id\":\"枯岚道\",\"name\":\"枯岚道\",\"chapters\":[1],\"neighbors\":[\"承露门\"]," +
+            "\"dialogue_ids\":[],\"open\":true,\"reason\":\"\",\"unlock_stage\":0,\"main_stage\":0}," +
+            "{\"id\":\"承露门\",\"name\":\"承露门\",\"chapters\":[1],\"neighbors\":[\"枯岚道\"]," +
+            "\"dialogue_ids\":[],\"open\":true,\"reason\":\"\",\"unlock_stage\":0,\"main_stage\":0}," +
+            "{\"id\":\"听谣镇\",\"name\":\"听谣镇\",\"chapters\":[2],\"neighbors\":[\"承露门\"]," +
+            "\"dialogue_ids\":[],\"open\":true,\"reason\":\"\",\"unlock_stage\":0,\"main_stage\":0}," +
+            "{\"id\":\"外环隙\",\"name\":\"外环隙\",\"chapters\":[3],\"neighbors\":[\"听谣镇\"]," +
+            "\"dialogue_ids\":[],\"open\":true,\"reason\":\"\",\"unlock_stage\":0,\"main_stage\":0}," +
+            "{\"id\":\"栖云城\",\"name\":\"栖云城\",\"chapters\":[5],\"neighbors\":[\"外环隙\"]," +
+            "\"dialogue_ids\":[],\"open\":true,\"reason\":\"\",\"unlock_stage\":0,\"main_stage\":0}," +
+            "{\"id\":\"旧天城区\",\"name\":\"旧天城区\",\"chapters\":[11],\"neighbors\":[\"栖云城\"]," +
+            "\"dialogue_ids\":[],\"open\":true,\"reason\":\"\",\"unlock_stage\":11,\"main_stage\":11}," +
+            "{\"id\":\"焦原\",\"name\":\"焦原\",\"chapters\":[11],\"neighbors\":[\"栖云城\"]," +
+            "\"dialogue_ids\":[],\"open\":false,\"reason\":\"region_route_mismatch\"," +
+            "\"unlock_stage\":11,\"main_stage\":11}," +
+            "{\"id\":\"龙巢门口\",\"name\":\"龙巢门口\",\"chapters\":[9],\"neighbors\":[\"栖云城\"]," +
+            "\"dialogue_ids\":[],\"open\":true,\"reason\":\"\",\"unlock_stage\":0,\"main_stage\":0}]," +
+            "\"speakers\":[],\"factions\":[]}";
 
         static void Report(string name, bool ok)
         {

@@ -14,6 +14,8 @@ var regionUnlockPath = "config/region_unlock.json";
 var regionUnlockExplicit = false;
 var regionUnlockState = false;
 var regionAccessState = false;
+// N14 的列表口：按给定进度与路线打一遍「ListRegions 会回什么」，纯计算。
+var regionListState = false;
 // 只给 --region-access 用：按给定进度与路线验判定，不连角色服、不起进程。
 var accessStage = -1;
 var accessAlignment = "";
@@ -98,6 +100,10 @@ for (var i = 0; i < args.Length; i++)
         // 只给核对用：按 --main-stage / --alignment 给的进度验判定，纯计算。
         case "--region-access":
             regionAccessState = true;
+            break;
+        // 只给核对用：N14 的列表口会回什么（八块地表逐块 open / reason / 门槛）。
+        case "--region-list":
+            regionListState = true;
             break;
         case "--main-stage" when i + 1 < args.Length:
             if (!int.TryParse(args[++i], out accessStage) || accessStage < 0 || accessStage > 12)
@@ -441,6 +447,63 @@ if (regionAccessState)
 
     Console.WriteLine("region_access_summary=static_open=" + catalog.Regions.Count(r => r.Open)
         + " checked=" + catalog.Regions.Count(r => !r.Open)
+        + " table=" + (table is null ? "missing" : "ok"));
+    return 0;
+}
+
+if (regionListState)
+{
+    if (accessStage < 0)
+    {
+        Console.WriteLine("bad_arg=--main-stage");
+        return 64;
+    }
+
+    WorldCatalog catalog;
+    RegionUnlockTable? table;
+    try
+    {
+        catalog = WorldCatalog.Load(WorldConfig.Load(configPath));
+        table = RegionUnlockTable.LoadIfPresent(regionUnlockPath, catalog);
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    // 与运行期同一个判定：静态开放与没有解锁条目的地表不问进度（进度传 0、路线传空），
+    // 需要进度的才用 --main-stage / --alignment 这两个事实值。列表口在世界服里就是这么分的。
+    var gate = new RegionGate(table, new NoProgressReader());
+    var opened = 0;
+    foreach (var region in catalog.Regions)
+    {
+        var needs = gate.NeedsProgress(region);
+        var access = needs
+            ? gate.Evaluate(region, accessStage, accessAlignment)
+            : gate.Evaluate(region, 0, "");
+        if (access.Ok)
+        {
+            opened++;
+        }
+
+        Console.WriteLine("region_list=id=" + region.Id
+            + " open=" + (access.Ok ? "true" : "false")
+            + " reason=" + (access.Reason.Length == 0 ? "none" : access.Reason)
+            + " unlock_stage=" + access.UnlockStage
+            + " main_stage=" + access.MainStage
+            + " needs_progress=" + (needs ? "true" : "false"));
+    }
+
+    Console.WriteLine("region_list_summary=regions=" + catalog.Regions.Count
+        + " open=" + opened
+        + " stage=" + accessStage
+        + " alignment=" + (accessAlignment.Length == 0 ? "none" : accessAlignment)
         + " table=" + (table is null ? "missing" : "ok"));
     return 0;
 }

@@ -49,8 +49,7 @@ namespace HotUpdate.Ui
                 var col = i % cols;
                 var row = i / cols;
                 var rect = m.Band(pad + col * (cellW + m.Px(20f)), gridTop + row * (rowH + rowGap), cellW, rowH);
-                var sub = region.Realm + (region.Open ? " · 已开" : " · 未开")
-                    + " · 连 " + region.Neighbors.Length + " 块";
+                var sub = SubText(flow, region);
                 var option = new UiOption(
                     shell.Content, rect, region.Id, region.Name, sub,
                     UiOptionKind.Card, shell.Size(32f), shell.Size(22f));
@@ -61,18 +60,8 @@ namespace HotUpdate.Ui
             }
 
             var noteTop = gridTop + 4 * (rowH + rowGap) + m.Px(12f);
-            var lockedNames = new List<string>();
-            for (var i = 0; i < UiWorldCodex.Regions.Length; i++)
-            {
-                if (!UiWorldCodex.Regions[i].Open)
-                {
-                    lockedNames.Add(UiWorldCodex.Regions[i].Name);
-                }
-            }
-
-            shell.Label(new Rect(pad, m.Height - noteTop - m.Px(48f), leftW, m.Px(48f)),
-                "未开的是第 11 场主线开放（" + string.Join(" / ", lockedNames) + "），本卡不改剧情进度。",
-                UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
+            var openNote = shell.Label(new Rect(pad, m.Height - noteTop - m.Px(48f), leftW, m.Px(48f)),
+                OpenNote(flow), UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 右：跨区
 
@@ -123,13 +112,18 @@ namespace HotUpdate.Ui
                         options[i].Selected = selected;
                         options[i].Apply(shell.Palette);
                     }
+
+                    // 回包到了就把状态补到卡片下面；没到之前仍写配置的静态值。
+                    options[i].SetSub(SubText(flow, UiWorldCodex.Regions[i]));
                 }
+
+                openNote.Label.text = OpenNote(flow);
 
                 UiWorldCodex.Region region;
                 if (UiWorldCodex.FindRegion(flow.ChosenRegion, out region))
                 {
                     targetText.Label.text = region.Name + " · " + region.Realm
-                        + (region.Open ? " · 已开" : " · 未开");
+                        + " · " + StateText(flow, region);
                     neighbors.Label.text = "相邻：" + string.Join(" / ", region.Neighbors)
                         + "\n" + region.Position;
                 }
@@ -147,6 +141,34 @@ namespace HotUpdate.Ui
                 + " reject_steps=" + UiWorldCodex.RegionRejectOrder.Split('→').Length);
 
             return options.Count;
+        }
+
+        /// <summary>
+        /// 一块地表的开放状态。有 `/world/regions` 回包就照回包的 `open` / `reason` 写，
+        /// 没回包才退回配置的静态 `open` 并注明是配置值——屏上不自己按主线进度判。
+        /// </summary>
+        static string StateText(UiWorldFlow flow, UiWorldCodex.Region region)
+        {
+            if (flow.TryRegionState(region.Id, out _, out var fromReply))
+            {
+                return fromReply;
+            }
+
+            return region.Open ? "已开（配置）" : "未开（配置）";
+        }
+
+        static string SubText(UiWorldFlow flow, UiWorldCodex.Region region)
+        {
+            return region.Realm + " · " + StateText(flow, region)
+                + " · 连 " + region.Neighbors.Length + " 块";
+        }
+
+        /// <summary>底部那行：读到回包就以回包为准，没读到就明说这一屏现在按配置标。</summary>
+        static string OpenNote(UiWorldFlow flow)
+        {
+            return flow.HasRegions
+                ? "开放以 /world/regions 回包为准：主线第几场、走立仙还是立魔都由世界服的 RegionGate 判。"
+                : "还没读地点表：下面按配置里的静态 open 标，读过之后以回包为准。";
         }
     }
 }

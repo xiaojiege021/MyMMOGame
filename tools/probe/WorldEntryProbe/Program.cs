@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Mmo.Net;
@@ -77,6 +78,9 @@ namespace WorldEntryProbe
                     Console.WriteLine("kind=" + outcome.Kind);
                     Console.WriteLine("version=" + outcome.Version);
                     Console.WriteLine("regions=" + (outcome.Regions == null ? 0 : outcome.Regions.Length));
+                    // N14：开放状态与原因都由回包带进来，探针只念不改。
+                    Console.WriteLine("regions_open=" + CountOpen(outcome));
+                    Console.WriteLine("locked=" + LockedText(outcome));
                     Console.WriteLine("speakers=" + (outcome.Speakers == null ? 0 : outcome.Speakers.Length));
                     Console.WriteLine("factions=" + (outcome.Factions == null ? 0 : outcome.Factions.Length));
                     Console.WriteLine("error=" + outcome.Error);
@@ -87,6 +91,47 @@ namespace WorldEntryProbe
                     Console.WriteLine("usage=unknown " + args[0]);
                     return 2;
             }
+        }
+
+        /// <summary>开着的地表有几块。回包没给就 0，不拿配置补。</summary>
+        static int CountOpen(WorldRegionsOutcome outcome)
+        {
+            if (outcome.Regions == null)
+            {
+                return 0;
+            }
+
+            var open = 0;
+            for (var i = 0; i < outcome.Regions.Length; i++)
+            {
+                if (outcome.Regions[i].Open)
+                {
+                    open++;
+                }
+            }
+
+            return open;
+        }
+
+        /// <summary>关着的地表与原因，一条一行拼成串（`旧天城区:region_route_mismatch`）。</summary>
+        static string LockedText(WorldRegionsOutcome outcome)
+        {
+            if (outcome.Regions == null)
+            {
+                return "none";
+            }
+
+            var parts = new List<string>();
+            for (var i = 0; i < outcome.Regions.Length; i++)
+            {
+                var row = outcome.Regions[i];
+                if (!row.Open)
+                {
+                    parts.Add(row.Id + ":" + (row.Reason.Length == 0 ? "none" : row.Reason));
+                }
+            }
+
+            return parts.Count == 0 ? "none" : string.Join(",", parts);
         }
 
         /// <summary>回包正文可以直接给，也可以写 `@文件名` 从文件读——回包里带中文与引号，

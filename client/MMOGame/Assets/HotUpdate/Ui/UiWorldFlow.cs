@@ -316,7 +316,7 @@ namespace HotUpdate.Ui
             Requests++;
             RefreshViews();
 
-            _send("GET", "/world/regions", string.Empty, _token, (status, text) =>
+            _send("GET", WorldEntry.RegionsPath(_characterId), string.Empty, _token, (status, text) =>
             {
                 Busy = false;
                 RegionsReply = WorldEntry.ParseRegions(status, text);
@@ -324,12 +324,52 @@ namespace HotUpdate.Ui
 
                 Debug.Log("u4_regions=reply status=" + status
                     + " kind=" + RegionsReply.Kind
+                    + " character=" + _characterId
                     + " regions=" + (RegionsReply.Regions != null ? RegionsReply.Regions.Length : 0)
+                    + " open=" + CountOpenRegions(RegionsReply)
                     + " speakers=" + (RegionsReply.Speakers != null ? RegionsReply.Speakers.Length : 0)
                     + " version=" + RegionsReply.Version);
 
                 RefreshViews();
             });
+        }
+
+        /// <summary>
+        /// 一块地表这一刻开没开，只由 `/world/regions` 回包说：有这一条就用回包的 open 与 reason，
+        /// 没有回包就 false（屏上退回配置静态标并写明「还没读地点表」）。
+        /// 这里不算门槛、不看主线进度——进度在服务端，客户端带不进来也猜不出来。
+        /// </summary>
+        public bool TryRegionState(string regionId, out bool open, out string text)
+        {
+            if (HasRegions && WorldEntry.TryRegion(RegionsReply, regionId, out var row))
+            {
+                open = row.Open;
+                text = WorldEntry.RegionStateText(row);
+                return true;
+            }
+
+            open = false;
+            text = string.Empty;
+            return false;
+        }
+
+        static int CountOpenRegions(WorldRegionsOutcome outcome)
+        {
+            if (outcome.Regions == null)
+            {
+                return 0;
+            }
+
+            var open = 0;
+            for (var i = 0; i < outcome.Regions.Length; i++)
+            {
+                if (outcome.Regions[i].Open)
+                {
+                    open++;
+                }
+            }
+
+            return open;
         }
 
         /// <summary>在世界地图上换一个目标。只动选中态，不发请求——发不发由「跨过去」决定。</summary>

@@ -313,7 +313,9 @@ assert 'FlightTable.Load(' in proc and 'GrpcRealmReader' in proc and 'flight_con
 inv = open(root + '/src/Character/InventoryRepository.cs', encoding='utf-8').read()
 assert 'select realm from' in inv and 'RealmAsync' in inv
 grpc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
-assert 'Realm = realm ?? ""' in grpc
+# C2（v1.168）起 /inventory 同时回规范名与展示名（立魔第十段是散仙），
+# 这里断言的是「境界从库里读出来直接回」，不再钉当时那一行写法。
+assert 'Realm = realm,' in grpc and 'RealmDisplay = realms.DisplayName(realm' in grpc
 for path in ['src/World/WorldProcess.cs', 'src/World/WorldGrpcService.cs',
              'src/World/FlightGate.cs', 'src/World/FlightTable.cs',
              'src/World/RealmReader.cs', 'src/World/LineRegistry.cs']:

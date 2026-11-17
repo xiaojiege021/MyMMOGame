@@ -65,6 +65,15 @@ namespace Mmo.Net
         public string[] Neighbors;
         public string[] DialogueIds;
         public bool Open;
+
+        /// <summary>N14：不开放时的原因（`region_locked` / `region_route_mismatch`），开放时是空串。</summary>
+        public string Reason;
+
+        /// <summary>N14：剧情解锁要求交完第几场；静态开放与只锁着的地表由服务端给 0。</summary>
+        public int UnlockStage;
+
+        /// <summary>N14：判定用的主线场次（服务端在这一刻读到的事实值）。</summary>
+        public int MainStage;
     }
 
     /// <summary>`/world/regions` 只读回包：地点、开口的人、势力三张编号表。</summary>
@@ -96,6 +105,16 @@ namespace Mmo.Net
             return "{\"character_id\":" + characterId.ToString(CultureInfo.InvariantCulture)
                 + ",\"region_id\":" + Quote(regionId ?? string.Empty) + "}";
         }
+
+        /// <summary>
+        /// 地点表的路由。带角色号时世界服按这个角色的主线进度与立仙 / 立魔逐块判「这一刻开没开」；
+        /// 角色号为 0 时只读静态表（老口径，屏上照配置的 open 标）。
+        /// 进度与路线都不在客户端手里，这里也带不进去。
+        /// </summary>
+        public static string RegionsPath(ulong characterId) =>
+            characterId == 0
+                ? "/world/regions"
+                : "/world/regions?character_id=" + characterId.ToString(CultureInfo.InvariantCulture);
 
         public static WorldEnterOutcome ParseEnter(int status, string json)
         {
@@ -182,6 +201,9 @@ namespace Mmo.Net
                     Neighbors = ReadStringArray(one, "neighbors"),
                     DialogueIds = ReadStringArray(one, "dialogue_ids"),
                     Open = ReadBool(one, "open"),
+                    Reason = Raw(one, "reason"),
+                    UnlockStage = ReadInt(one, "unlock_stage"),
+                    MainStage = ReadInt(one, "main_stage"),
                 });
             }
 
@@ -194,6 +216,51 @@ namespace Mmo.Net
                 Factions = ReadStringArray(json, "factions"),
                 Error = string.Empty,
             };
+        }
+
+        /// <summary>按编号取一条回包。没有这一条就 false，不补一条默认行。</summary>
+        public static bool TryRegion(WorldRegionsOutcome outcome, string regionId, out WorldRegionRow row)
+        {
+            row = default;
+            if (outcome.Regions == null || string.IsNullOrEmpty(regionId))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < outcome.Regions.Length; i++)
+            {
+                if (string.Equals(outcome.Regions[i].Id, regionId, StringComparison.Ordinal))
+                {
+                    row = outcome.Regions[i];
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 回包说的开放状态，一句话。原因与门槛都照抄服务端的 reason / unlock_stage：
+        /// 「这条路不开」和「第几场才开」是两件事，屏上不能写成一句。
+        /// </summary>
+        public static string RegionStateText(WorldRegionRow row)
+        {
+            if (row.Open)
+            {
+                return "已开";
+            }
+
+            if (string.Equals(row.Reason, "region_route_mismatch", StringComparison.Ordinal))
+            {
+                return "这条路不开";
+            }
+
+            if (string.Equals(row.Reason, "region_locked", StringComparison.Ordinal) && row.UnlockStage > 0)
+            {
+                return "第 " + row.UnlockStage + " 场才开";
+            }
+
+            return "未开";
         }
 
         /// <summary>HTTP 状态到档位的唯一映射。0 是没有建立连接，不算「服务端拒绝」。</summary>
@@ -248,6 +315,12 @@ namespace Mmo.Net
         static uint ReadUInt(string json, string key)
         {
             uint.TryParse(Raw(json, key), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value);
+            return value;
+        }
+
+        static int ReadInt(string json, string key)
+        {
+            int.TryParse(Raw(json, key), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value);
             return value;
         }
 
