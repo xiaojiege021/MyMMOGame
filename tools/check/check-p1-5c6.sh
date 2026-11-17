@@ -63,6 +63,10 @@ import json, os, re, sys
 root = os.environ["ROOT"]
 def read(p):
     p = os.path.join(root, p)
+    if p.endswith("src/Character/Program.cs"):
+        # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 def report(key, cond, info=""):
@@ -298,7 +302,7 @@ for base, _, names in os.walk(os.path.join(root, "src")):
                 if "delete from" in line and "revive_scroll_cooldown" in line:
                     hits.append(os.path.relpath(p, root))
                     break
-report("reset_only_for_check", hits == ["src/Character/Program.cs"], ",".join(hits))
+report("reset_only_for_check", hits == ["src/Character/Cli/CoreCli.cs"], ",".join(hits))
 
 # 卷轴编号不硬编码在源码里；网关不开用卷轴的路由。
 hits = []

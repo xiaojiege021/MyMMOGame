@@ -290,7 +290,9 @@ api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
 assert 'public sealed record TransferBody(ulong? CharacterId, uint? FromSlot, uint? ToSlot)' in api
 assert 'MapPost("/character/transfer"' in api and 'OwnsAsync(client, account' in api
 assert 'Guid.NewGuid()' in api and 'Npgsql' not in api
-program = open(root + '/src/Character/Program.cs', encoding='utf-8').read()
+program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
+    open(p, encoding='utf-8').read()
+    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--transfer-state"' in program and 'case "--transfer-level"' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。

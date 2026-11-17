@@ -259,7 +259,9 @@ assert 'MapPost("/auction/list"' in api and 'MapPost("/auction/buy"' in api
 assert 'OwnsAsync(' in api and 'Guid.NewGuid()' in api and 'Npgsql' not in api
 gl = open(root + '/src/Global/GlobalGrpcService.cs', encoding='utf-8').read()
 assert 'CanTradeAsync' in gl and 'SettleAuctionAsync' in gl
-program = open(root + '/src/Character/Program.cs', encoding='utf-8').read()
+program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
+    open(p, encoding='utf-8').read()
+    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--auction-state"' in program and 'case "--auction-ledger"' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。收窄到拍卖那两段

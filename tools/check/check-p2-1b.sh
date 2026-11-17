@@ -35,7 +35,12 @@ python3 - "$TMP/static.txt" <<'PY'
 import glob, json, os, re, sys
 o = open(sys.argv[1], "w", encoding="utf-8")
 def R(k, c, i=""): o.write(("PASS " if c else "FAIL ") + k + ("" if c else "  " + i) + "\n")
-def rd(p): return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
+def rd(p):
+    if p.endswith("src/Character/Program.cs"):
+        # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
+    return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 cfg = json.loads(rd("config/dungeons.json")); sect = json.loads(rd("config/sect.json"))
 rows = cfg.get("dungeons", []); byid = {r.get("id"): r for r in rows}
 # 只钉「本卡确实升过版本、确实在三条后追加了 sect」，不写死 version=5 / 正好四条：

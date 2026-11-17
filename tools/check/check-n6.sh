@@ -45,6 +45,10 @@ def R(k, c, i=""):
     out.write(("PASS " if c else "FAIL ") + k + ("" if c else "  " + i) + "\n")
 
 def rd(p):
+    if p.endswith("src/Character/Program.cs"):
+        # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [os.path.join(root, p)] + sorted(__import__("glob").glob(os.path.join(root, "src/Character/Cli/*.cs"))))
     return open(os.path.join(root, p), encoding="utf-8").read() if os.path.exists(os.path.join(root, p)) else ""
 
 drop_cfg = rd("config/dungeon_drops.json")

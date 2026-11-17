@@ -309,7 +309,9 @@ assert 'public sealed record RemoveCrystalBody(' in api
 assert 'MapPost("/character/crystal/install"' in api
 assert 'MapPost("/character/crystal/remove"' in api
 assert 'OwnsAsync(client, account' in api and 'Guid.NewGuid()' in api and 'Npgsql' not in api
-program = open(root + '/src/Character/Program.cs', encoding='utf-8').read()
+program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
+    open(p, encoding='utf-8').read()
+    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--crystal-state"' in program and 'case "--crystal-sockets"' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。
@@ -373,8 +375,11 @@ config_reject "结晶类别不在写定三类里起不来" c-crystal-category.js
 config_reject "固定值写成 0 起不来" c-zero-value.json "config_error=crystal.json 的结晶 fixed_value 必须大于 0"
 config_reject "功能类一颗结晶都没有起不来" c-missing-utility.json "config_error=crystal.json 的 utility 类一颗结晶都没有"
 config_reject "结晶编号重复起不来" c-duplicate-crystal.json "config_error=crystal.json 的结晶编号重复"
-if "$DOTNET" "$CHARACTER_DLL" --crystal-state --config config/character.json 2>&1 \
-    | grep -qF 'crystal_table_state=ok version=1 crystal_sockets=2 crystal_categories=attack,defense,utility'; then
+# 只钉「三类 / 两个镶嵌位」这两个事实，不钉版本号：crystal.json 后来升过版（P2-4a → v2），
+# 写死 version=1 会变成假红（D1a 收尾时按「老卡断言别写死当时的事实」同步）。
+CRYSTAL_OUT="$("$DOTNET" "$CHARACTER_DLL" --crystal-state --config config/character.json 2>&1)"
+if grep -q 'crystal_table_state=ok version=' <<< "$CRYSTAL_OUT" \
+    && grep -qF 'crystal_sockets=2 crystal_categories=attack,defense,utility' <<< "$CRYSTAL_OUT"; then
   ok "只读入口与启动共用同一套校验：好配置读出三类与两个镶嵌位"
 else
   bad "好配置的只读入口没输出三类信息"

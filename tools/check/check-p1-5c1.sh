@@ -62,6 +62,10 @@ config_cs = os.path.join(root, "src/Character/CharacterConfig.cs")
 gateway_cs = os.path.join(root, "src/Gateway/GatewayProcess.cs")
 
 def read(p):
+    if p.endswith("src/Character/Program.cs"):
+        # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 def report(key, cond, info=""):

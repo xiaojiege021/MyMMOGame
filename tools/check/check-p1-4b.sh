@@ -259,7 +259,9 @@ api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
 assert 'bool? UseCoupon' in api and 'UseCoupon = body.UseCoupon ?? false' in api
 assert 'MapPost("/character/enhance"' in api and 'OwnsAsync(client, account' in api
 assert 'Guid.NewGuid()' in api and 'Npgsql' not in api
-program = open(root + '/src/Character/Program.cs', encoding='utf-8').read()
+program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
+    open(p, encoding='utf-8').read()
+    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--coupon-count"' in program and 'CouponCountAsync' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。

@@ -267,7 +267,9 @@ gl = open(root + '/src/Global/GlobalGrpcService.cs', encoding='utf-8').read()
 assert 'ListIngot(' in gl and 'BuyIngot(' in gl and 'SettleIngotAsync' in gl
 listing = open(root + '/src/Global/IngotListingRepository.cs', encoding='utf-8').read()
 assert 'auction_ingot_listing' in listing and 'on conflict (list_txn)' in listing
-program = open(root + '/src/Character/Program.cs', encoding='utf-8').read()
+program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
+    open(p, encoding='utf-8').read()
+    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--ingot-ledger"' in program and 'new IngotRepository(' in process
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。收窄到拍卖那两段

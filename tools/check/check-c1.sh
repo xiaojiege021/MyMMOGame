@@ -49,7 +49,11 @@ echo "== 2. 静态断言（内容正本 / 结构保证 / 老卡不改） =="
 python3 - "$ROOT" >"$TMP/static.out" 2>&1 <<'PY'
 import glob, hashlib, json, os, re, sys
 root = sys.argv[1]
-def src(p): return open(os.path.join(root, p), encoding="utf-8").read()
+def src(p):
+    if p.endswith("src/Character/Program.cs"):
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [os.path.join(root, p)] + sorted(__import__("glob").glob(os.path.join(root, "src/Character/Cli/*.cs"))))
+    return open(os.path.join(root, p), encoding="utf-8").read()
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
 def sha(p): return hashlib.sha256(open(os.path.join(root, p), "rb").read()).hexdigest()
 checks = []
