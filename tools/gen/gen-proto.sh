@@ -103,4 +103,11 @@ if [ -n "$INTO" ]; then
 else
   run "$SERVER_OUT" 1
   run "$CLIENT_OUT" 0
+  # D16：生成之后把「输入 proto / 两端生成物」的 sha256 与 protoc 版本写进 proto/manifest.json。
+  # 只加清单输出，不改上面的生成逻辑；核对见 tools/check/check-contract.sh。
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$ROOT/tools/gen/gen-proto-manifest.py" --protoc-version "$PROTOC_VERSION"
+  else
+    echo "没有 python3：跳过 proto/manifest.json（改动前的清单会与生成物对不上，check-contract.sh 会报红）" >&2
+  fi
 fi

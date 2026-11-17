@@ -205,6 +205,8 @@ API="$ROOT/src/Gateway/CharacterApi.cs"
 
 RECOVERY="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["hot_spring_recovery"])' "$CFG")"
 CAP="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["fatigue_daily_cap"])' "$CFG")"
+# C7 把库层 CHECK 从 6000 松成宽上限（方案现值只在配置里），这里只钉「库层上限不低于配置」，不钉数字。
+CAP_DB="$(grep -oE 'CHECK \(fatigue <= [0-9]+\)' "$SQL" | grep -oE '[0-9]+' | head -1 || true)"
 PER_PLAYER="$(python3 -c 'import json,sys
 d=json.load(open(sys.argv[1],encoding="utf-8"))
 print([x["fatigue_per_player"] for x in d["dungeons"] if x["id"]=="abyss"][0])' "$CFG")"
@@ -260,10 +262,10 @@ fi
 if grep -q 'if (after < 0)' "$REPO" && grep -q 'recovered = before - after' "$REPO" \
    && grep -q 'fatigue_day <> current_date' "$REPO" \
    && grep -q 'CHECK (fatigue >= 0)' "$SQL" \
-   && grep -q 'CHECK (fatigue <= 6000)' "$SQL"; then
-  ok "下限 0、跨天归零都在，库层两道 CHECK 仍挡负数与超日上限"
+   && [ -n "$CAP_DB" ] && [ "$CAP_DB" -ge "$CAP" ]; then
+  ok "下限 0、跨天归零都在；库层上限 ${CAP_DB} 不低于配置日上限 ${CAP}，不钉方案现值"
 else
-  bad "疲劳可能被恢复成负数，或者跨天还留着昨天的账"
+  bad "疲劳可能被恢复成负数，或者跨天还留着昨天的账：config=${CAP:-缺} db=${CAP_DB:-缺}"
 fi
 
 if grep -q 'if (!dungeon.ChargesFatigue)' "$SVC" \

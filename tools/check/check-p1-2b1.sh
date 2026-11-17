@@ -194,12 +194,13 @@ else
   bad "深渊的人数或扣减规则不在配置里"
 fi
 
-if grep -q '"fatigue_daily_cap": 6000' "$CFG" \
-   && grep -q 'fatigue <= 6000' "$SQL" \
+CAP_CFG="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["fatigue_daily_cap"])' "$CFG" 2>/dev/null || true)"
+CAP_DB="$(grep -oE 'CHECK \(fatigue <= [0-9]+\)' "$SQL" | grep -oE '[0-9]+' | head -1 || true)"
+if [ -n "$CAP_CFG" ] && [ -n "$CAP_DB" ] && [ "$CAP_DB" -ge "$CAP_CFG" ] \
    && grep -q 'fatigue_day date NOT NULL DEFAULT CURRENT_DATE' "$SQL"; then
-  ok "日上限 6000 在配置与库层，日界 fatigue_day 在角色表"
+  ok "日上限 ${CAP_CFG} 只在配置里，库层上限 ${CAP_DB} 只作兜底且不低于配置；日界 fatigue_day 在角色表"
 else
-  bad "日上限或日界没有两道闸"
+  bad "日上限或日界没有两道闸：config=${CAP_CFG:-缺} db=${CAP_DB:-缺}"
 fi
 
 if grep -q 'FatiguePerPlayer \* partySize' "$ENTRY_REPO"; then

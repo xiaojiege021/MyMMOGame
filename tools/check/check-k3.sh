@@ -305,8 +305,10 @@ queue = read("docs/任务队列.md")
 report("queue_k3_done",
        re.search(r"\| 19 \| 1 \| K3 \|[^\n]*\| 完成 \|", queue) is not None,
        "任务队列 K3 行还没标完成")
-report("queue_next_d16", re.search(r"^NEXT=D16$", queue, re.M) is not None,
-       "任务队列 NEXT 不是 D16")
+# 不钉「下一张是谁」：K3 收口时是 D16，但每张卡收口都会改 NEXT（D16 这次就撞红过）。
+# 只钉「NEXT 有值」——队列没有停在空处，派工能继续。
+report("queue_next_present", re.search(r"^NEXT=\S+$", queue, re.M) is not None,
+       "任务队列 NEXT 没填（收口后应指向下一张）")
 report("queue_current_empty", re.search(r"^CURRENT=—$", queue, re.M) is not None,
        "CURRENT 没清空")
 
