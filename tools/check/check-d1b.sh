@@ -68,8 +68,10 @@ missing_flags = [f for f in ("--weapon-rules", "--shop-list", "--season-pass-lis
                              "--migrate", "--config") if f not in flags]
 report("probe 仍是 D1b 的 133 个 flag（+K5/K6 两个只读入口，共 %d）" % len(set(flags)),
        len(set(flags)) >= 135 and not missing_flags, str(missing_flags))
-report("probe 仍是 15 个源文件",
-       len(glob.glob(os.path.join(root, "tools/probe/CliProbe/*.cs"))) == 16,
+# 文件数只增不减：D1a 拆出 16 个（含 Program.cs），C7 加 ConfigCli 一个 = 17。
+# 钉死等号的话后一张卡加文件就红；钉下限则表达「拆开的文件不许被合并回大文件」。
+report("probe 源文件只增不减（现 %d 个，下限 17）" % len(glob.glob(os.path.join(root, "tools/probe/CliProbe/*.cs"))),
+       len(glob.glob(os.path.join(root, "tools/probe/CliProbe/*.cs"))) >= 17,
        str(len(glob.glob(os.path.join(root, "tools/probe/CliProbe/*.cs")))))
 
 # 3. 核对脚本改调 probe：不再有指向角色服 dll 的核对路径。

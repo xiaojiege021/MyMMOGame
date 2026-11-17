@@ -8,6 +8,9 @@ namespace Character.Cli;
 internal static class CliFlags
 {
     public static string configPath = "config/character.json";
+    // C7 数值台账：把角色服启动配置的现值打出来（listen / db_pool_max / bag_slots / 表路径），
+    // 不连库、不启动进程。台账表 E 的「改配置重启生效」用它取证。
+    public static bool configShow = false;
     public static string sqlPath = "db/character/character.sql";
     public static string? reportName = null;
     public static string? deleteName = null;

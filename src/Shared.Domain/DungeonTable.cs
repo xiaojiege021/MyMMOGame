@@ -88,7 +88,9 @@ public sealed class DungeonTable
 
         var wire = ConfigJson.Read<Wire>(path);
 
-        var cap = wire.FatigueDailyCap ?? 6000;
+        // 日上限同样只有这一份配置，缺字段就起不来（C7 数值台账：代码里不留第二份）。
+        var cap = wire.FatigueDailyCap
+            ?? throw new ConfigException("dungeons.json 缺 fatigue_daily_cap");
         if (cap < 1 || cap > 1_000_000)
         {
             throw new ConfigException("fatigue_daily_cap 必须在 1 到 1000000 之间，现在是 " + cap);

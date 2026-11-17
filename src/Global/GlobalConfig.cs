@@ -41,7 +41,8 @@ public sealed record GlobalConfig(
             throw new ConfigException("listen 必须是 http:// 或 https:// 的地址：" + listen);
         }
 
-        var pool = wire.DbPoolMax ?? 8;
+        var pool = wire.DbPoolMax
+            ?? throw new ConfigException("global.json 缺 db_pool_max");
         if (pool < 1 || pool > 20)
         {
             throw new ConfigException("db_pool_max 必须在 1 到 20 之间，现在是 " + pool);

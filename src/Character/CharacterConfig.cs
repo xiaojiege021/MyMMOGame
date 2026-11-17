@@ -77,14 +77,17 @@ public sealed record CharacterConfig(
             throw new ConfigException("listen 必须是 http:// 或 https:// 的地址：" + listen);
         }
 
-        var pool = wire.DbPoolMax ?? 8;
+        // 连接池与背包格数都必须写在配置里，不在代码里给默认值：缺了就起不来，
+        // 免得两处各记一个数字（C7 数值台账：值只在 config/，代码没有第二份）。
+        var pool = wire.DbPoolMax
+            ?? throw new ConfigException("character.json 缺 db_pool_max");
         if (pool < 1 || pool > 20)
         {
             throw new ConfigException("db_pool_max 必须在 1 到 20 之间，现在是 " + pool);
         }
 
-        // 背包格子数走配置：扩容道具留给后面的行，这一行只认这个默认值。
-        var bagSlots = wire.BagSlots ?? 40;
+        var bagSlots = wire.BagSlots
+            ?? throw new ConfigException("character.json 缺 bag_slots");
         if (bagSlots < 1 || bagSlots > 200)
         {
             throw new ConfigException("bag_slots 必须在 1 到 200 之间，现在是 " + bagSlots);

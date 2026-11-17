@@ -181,7 +181,8 @@ cat > "$TMP/character.json" <<JSON
 {
   "schema": "character-config/1",
   "listen": "http://127.0.0.1:${CHAR_PORT}",
-  "db_pool_max": 4
+  "db_pool_max": 4,
+  "bag_slots": 40
 }
 JSON
 

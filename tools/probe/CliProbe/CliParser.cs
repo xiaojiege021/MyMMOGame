@@ -147,9 +147,7 @@ internal static class CliParser
                 dungeonTableState = true;
                 break;
             case "--dungeon-table-path" when i + 1 < args.Length:
-                dungeonTableState = true;
-                dungeonTablePath = args[++i];
-                break;
+                dungeonTableState = true; dungeonTablePath = args[++i]; break;
             case "--dungeon-drop-table-path" when i + 1 < args.Length:
                 dungeonDropTableState = true;
                 dungeonDropTablePath = args[++i];
@@ -335,9 +333,10 @@ internal static class CliParser
             case "--auction-state":
                 auctionState = true;
                 break;
+            // C7：把角色服启动配置的现值读出来，不连库、坏配置也走这里。
+            case "--config-show": configShow = true; break;
             case "--auction-config" when i + 1 < args.Length:
-                auctionConfigPath = args[++i];
-                break;
+                auctionConfigPath = args[++i]; break;
             // 只给核对用：把商城清单读出来，不连库也不启动进程。坏清单也走这里。
             case "--shop-list":
                 shopList = true;

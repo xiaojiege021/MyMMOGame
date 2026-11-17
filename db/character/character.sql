@@ -44,8 +44,11 @@ ALTER TABLE "角色".character
     ADD COLUMN IF NOT EXISTS fatigue_day date NOT NULL DEFAULT CURRENT_DATE;
 ALTER TABLE "角色".character
     DROP CONSTRAINT IF EXISTS character_fatigue_daily_cap;
+-- C7：这一条只作最后一道闸，挡负数与荒谬值。日上限是多少由 config/dungeons.json
+-- 的 fatigue_daily_cap 说了算（代码按它拦，改配置重启生效）；库里不钉方案现值，
+-- 免得把上限调大时被库反过来卡住。
 ALTER TABLE "角色".character
-    ADD CONSTRAINT character_fatigue_daily_cap CHECK (fatigue <= 6000);
+    ADD CONSTRAINT character_fatigue_daily_cap CHECK (fatigue <= 1000000);
 
 -- P1-2c：周份额是「这一周」的，记最后一次结算落在哪一个周首。
 -- 周界按数据库 date_trunc('week', current_date)（周一为一周之始），不另设时区配置。

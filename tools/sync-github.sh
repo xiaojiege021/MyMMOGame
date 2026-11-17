@@ -160,27 +160,28 @@ p = 'tools/env/bootstrap.sh'
 s = open(p, encoding='utf-8').read()
 pat = re.compile(r'echo "== 9\. 提交作者身份 ==".*?\nfi\n', re.DOTALL)
 assert pat.search(s), "bootstrap 第 9 步块未找到，可能文件结构已变，请人工核对"
-new_block = (
-    'echo "== 9. 提交作者身份 ==",\n'
-).replace('"', '"') if False else (
-    'echo "== 9. 提交作者身份 ==\\n'
-    '# 开源协作：不替你写死邮箱。若本地还没配 git 身份，提示自行设置，\\n'
-    '# 或读取可选环境变量 MMO_GIT_EMAIL 作为仓库级邮箱；不覆盖已选定的身份。\\n'
-    'CUR_MAIL="$(git -C "$ROOT" config --local user.email 2>/dev/null || true)"\\n'
-    'if [ -z "$CUR_MAIL" ]; then\\n'
-    '  if [ -n "$MMO_GIT_EMAIL" ]; then\\n'
-    '    git -C "$ROOT" config --local user.email "$MMO_GIT_EMAIL"\\n'
-    '    ok "已用环境变量 MMO_GIT_EMAIL 补上仓库级提交邮箱"\\n'
-    '  else\\n'
-    '    warn "尚未配置 git 提交邮箱；本仓库是开源协作，请用你自己的身份："\\n'
-    '    warn "  git config --local user.name "你的名字""\\n'
-    '    warn "  git config --local user.email "you@example.com""\\n'
-    '  fi\\n'
-    'else\\n'
-    '  ok "提交身份已配置：$CUR_MAIL"\\n'
-    'fi\\n'
-)
-s = pat.sub(new_block, s, count=1)
+# 用真换行的三引号写这段，不要用 '...\\n' 拼：re.sub 会把替换串里的 \n 当转义吃成换行，
+# 上一版就是这样把首行的结束引号吃掉的（生成 `echo "== 9. 提交作者身份 ==` 且没有闭合引号），
+# 镜像里的 bootstrap.sh 从 v1.173 起是语法坏的一次性文件。替换用 lambda 传给 re.sub，
+# 避免替换串被当模板再解释一次。
+new_block = '''echo "== 9. 提交作者身份 =="
+# 开源协作：不替你写死邮箱。若本地还没配 git 身份，提示自行设置，
+# 或读取可选环境变量 MMO_GIT_EMAIL 作为仓库级邮箱；不覆盖已选定的身份。
+CUR_MAIL="$(git -C "$ROOT" config --local user.email 2>/dev/null || true)"
+if [ -z "$CUR_MAIL" ]; then
+  if [ -n "$MMO_GIT_EMAIL" ]; then
+    git -C "$ROOT" config --local user.email "$MMO_GIT_EMAIL"
+    ok "已用环境变量 MMO_GIT_EMAIL 补上仓库级提交邮箱"
+  else
+    warn "尚未配置 git 提交邮箱；本仓库是开源协作，请用你自己的身份："
+    warn '  git config --local user.name "你的名字"'
+    warn '  git config --local user.email "you@example.com"'
+  fi
+else
+  ok "提交身份已配置：$CUR_MAIL"
+fi
+'''
+s = pat.sub(lambda _: new_block, s, count=1)
 open(p, 'w', encoding='utf-8').write(s)
 print("   bootstrap.sh 已中性化")
 PY

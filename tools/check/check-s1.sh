@@ -181,16 +181,24 @@ printf '%s\n' "$STATIC_OUT" | grep -v '^COUNTS '
 PASS=$((PASS + $(printf '%s\n' "$STATIC_OUT" | sed -n 's/^COUNTS \([0-9]*\) [0-9]*$/\1/p')))
 FAIL=$((FAIL + $(printf '%s\n' "$STATIC_OUT" | sed -n 's/^COUNTS [0-9]* \([0-9]*\)$/\1/p')))
 
-step "3. 本卡不改 proto / 库 / 客户端"
-if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  CHANGED="$(git diff --name-only HEAD 2>/dev/null; git diff --name-only 2>/dev/null)"
-  if printf '%s\n' "$CHANGED" | grep -qE '^(proto/|db/|client/)'; then
-    bad "本卡动了 proto / db / client：$(printf '%s\n' "$CHANGED" | grep -E '^(proto/|db/|client/)' | head -3 | tr '\n' ' ')"
-  else
-    ok "proto / db / client 一处未改"
-  fi
+step "3. 本卡不改 proto / 库 / 客户端（按内容核，不看工作树 diff）"
+# 原来是「git diff 里不许出现 proto/ db/ client/」——那是把当时的事实写死：后一张卡
+# （C7 改 db 的 CHECK 约束）一动手就把它撞红。改成三条内容断言，永久成立：
+# S1 只改配置，所以 proto 里不该长出技能 rpc、库里不该长出 skills 表、客户端不该读这份配置。
+if ! grep -rqE '^[[:space:]]*rpc[[:space:]]+[A-Za-z]*Skill' proto/mmo/*.proto 2>/dev/null; then
+  ok "proto 里没有技能相关 rpc（S1 只改配置）"
 else
-  ok "不是 git 仓库，跳过改动范围断言"
+  bad "proto 里长出了技能 rpc"
+fi
+if ! grep -rqiE 'create table.*skill' db/ 2>/dev/null; then
+  ok "db 里没有 skills 表（S1 不建表）"
+else
+  bad "db 里长出了 skills 表"
+fi
+if ! grep -rq "skills" client/MMOGame/Assets/Net 2>/dev/null; then
+  ok "客户端 Net 层不读 skills 配置（名字来自开战回包）"
+else
+  bad "客户端 Net 层出现了 skills 配置引用"
 fi
 
 step "4. 只读入口：--skill-list 打出的 15 行"
@@ -294,7 +302,8 @@ fi
 
 step "7. 新卡挂进总控与 CI"
 assert_file_contains "$ROOT/tools/check/check-all.sh" 's1\) echo ' "check-all 的依赖表挂了 s1"
-assert_file_contains "$ROOT/tools/check/check-all.sh" 'c6 s1"$' "check-all 的卡片清单含 s1"
+# 卡片清单这条不钉行尾：后一张卡（C7）会往清单末尾追加，钉 'c6 s1"$' 就等于把当时的事实写死。
+assert_file_contains "$ROOT/tools/check/check-all.sh" '[ "]s1[ "]' "check-all 的卡片清单含 s1"
 assert_file_contains "$ROOT/tools/check/ci.sh" 'CHECKS=.* s1"$' "ci.sh 的无库段含 s1"
 
 finish "S1"

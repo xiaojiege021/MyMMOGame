@@ -18,7 +18,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 # 无库段可跑的卡（新增卡只有在「无 gamedb 也能全绿」时才往这里加）。
-CHECKS="c2-realm c5 c6 d1a d1b k1 k4 k5 k6 k7 n6 n7 n13 n14 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a s1"
+CHECKS="c2-realm c5 c6 c7 d1a d1b k1 k4 k5 k6 k7 n6 n7 n13 n14 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a s1"
 
 if [ "${1:-}" = "--list" ]; then
   printf '%s\n' $CHECKS
@@ -38,12 +38,18 @@ gh_error() {
 }
 
 step "1. 编译（服务端 sln，Release）"
+# 先打一行环境：GitHub runner 上的 SDK 与本机不同，编不过时第一眼要看的就是它。
+"$DOTNET" --version 2>&1 | sed 's/^/       sdk /'
 if "$DOTNET" build src/MMOGame.sln -c Release --nologo -v q >"$TMP/build.log" 2>&1; then
   echo "  ok   编译通过"
 else
   echo "  FAIL 编译失败"
-  tail -20 "$TMP/build.log" | sed 's/^/       /'
-  gh_error "CI build failed: $(tail -3 "$TMP/build.log" | tr '\n' ' ')"
+  # 带错误码的那一行（error CS0103 / error NU1102）比最后那句 "N Error(s)" 有用得多：
+  # annotation 只留前几条，日志里留前 30 条。
+  ERRS="$(grep -E '(error|错误) [A-Z]{2,4}[0-9]{3,4}' "$TMP/build.log" | head -30)"
+  [ -n "$ERRS" ] || ERRS="$(tail -30 "$TMP/build.log")"
+  printf '%s\n' "$ERRS" | sed 's/^/       /'
+  gh_error "CI build failed: $(printf '%s' "$ERRS" | head -4 | tr '\n' ' | ' | cut -c1-900)"
   exit 1
 fi
 
