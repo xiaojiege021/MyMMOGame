@@ -16,7 +16,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 SOCIAL_DLL="$ROOT/src/Social/bin/Release/net10.0/Social.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 HAS_DB="${MMO_P2_1A1_HAS_DB:-0}"
 GATEWAY="${MMO_P2_1A1_GATEWAY:-}"
 TOKEN="${MMO_P2_1A1_TOKEN:-}"
@@ -239,7 +239,7 @@ PY
     [ -n "$id" ] && IDS="$IDS $id"
   done
   [ "$(printf '%s\n' "$IDS" | wc -w | tr -d ' ')" -ge 12 ] \
-    && ok "12 个测试角色就位" || bad "角色不足 12 个（$IDS）"
+    && ok "12 个测试角色就位" || bad "角色不足 12 个（${IDS}）"
 
   NAME="p2a1_sect_$$_$(date +%s)"
   r="$(post "$GATEWAY/sect/create" "{\"character_id\":$CHARACTER,\"name\":\"$NAME\"}")"
@@ -267,7 +267,7 @@ PY
   done
   [ "$wins" = "1" ] && [ "$full" = "1" ] \
     && ok "并发抢第 10 席：只有一笔成功、另一笔 sect_full" \
-    || bad "并发不对：wins=$wins full=$full（$(cat "$TMP/c1" "$TMP/c2")）"
+    || bad "并发不对：wins=$wins full=${full}（$(cat "$TMP/c1" "$TMP/c2")）"
 
   # 第 11 人：HTTP 200 + ok=false reason=sect_full、未生效数值 0。
   r="$(post "$GATEWAY/sect/join" "{\"character_id\":$(nth "$IDS" 12),\"sect_id\":$SECT}")"
@@ -289,12 +289,12 @@ PY
               "sect_not_found:$(nth "$IDS" 12):999999999"; do
     reason="${spec%%:*}"; rest="${spec#*:}"; cid="${rest%%:*}"; sid="${rest##*:}"
     r="$(post "$GATEWAY/sect/join" "{\"character_id\":$cid,\"sect_id\":$sid}")"
-    check "$r" "ok=false reason=$reason" "拒绝路径 $reason：回包"
+    check "$r" "ok=false reason=$reason" "拒绝路径 ${reason}：回包"
     [ "$(read_rows "$SECT")" = "$before" ] \
-      && ok "拒绝路径 $reason：显式读库 rows 没动" || bad "拒绝路径 $reason 写了库"
+      && ok "拒绝路径 ${reason}：显式读库 rows 没动" || bad "拒绝路径 $reason 写了库"
   done
   [ -n "$EMPTY" ] && [ "$(read_rows "$EMPTY")" = "rows=0" ] \
-    && ok "already_member 目标宗门显式读库 rows=0" || bad "空宗门被写脏（EMPTY=$EMPTY）"
+    && ok "already_member 目标宗门显式读库 rows=0" || bad "空宗门被写脏（EMPTY=${EMPTY}）"
   # 无令牌 401 / 别人的角色 404 / 缺字段 400：网关都在写库之前挡下。
   r="$(curl -sS --noproxy '*' -m 10 -w '\n%{http_code}' -X POST "$GATEWAY/sect/join" \
        -H 'Content-Type: application/json' \

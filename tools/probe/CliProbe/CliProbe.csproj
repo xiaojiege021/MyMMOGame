@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Character.Cli</RootNamespace>
+    <!-- D1b：角色服的 133 个核对 flag 与只读 / 连库入口搬到这个独立进程。
+         引用 Character 工程只为复用同一份仓储、表加载与 CharacterProcess，
+         不复制任何玩法或配置校验。 -->
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../../../src/Character/Character.csproj" />
+  </ItemGroup>
+</Project>

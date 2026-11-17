@@ -18,7 +18,7 @@ source "$ROOT/tools/check/lib-common.sh"
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 TMP="$(mktemp -d)"
 TITLE="K1（server）"
 trap 'rm -rf "$TMP"' EXIT

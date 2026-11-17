@@ -10,7 +10,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 PROBE="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 CC="--config $ROOT/config/character.json"
 HAS_DB="${MMO_P2_3A_HAS_DB:-0}"
@@ -286,14 +286,14 @@ else
     # 先把库里的强化等级写成 3，再写成 7：库这一列确实变了，场上数值不该跟着动。
     ew 3
     grep -q '^raw_enhance=written' "$TMP/raw.log" && [ "$(elvl)" = "3" ] \
-      && ok "库里强化等级写成 3（读回一致，角色 $CHAR 槽 $SLOT）" \
+      && ok "库里强化等级写成 3（读回一致，角色 $CHAR 槽 ${SLOT}）" \
       || bad "强化等级没写成 3：$(head -2 "$TMP/raw.log")"
     D4="$(dmg "$WURL/battle?class=warrior&branch=pojun&arena_mode=duel&party_size=2")"
     ew 7
     [ "$(elvl)" = "7" ] && ok "库里强化等级 3 → 7（读回一致）" || bad "强化等级没改成 7"
     D5="$(dmg "$WURL/battle?class=warrior&branch=pojun&arena_mode=duel&party_size=2")"
     [ "$D4" = "$D5" ] && [ "$D5" = "$D3" ] \
-      && ok "换装（强化 3→7）后竞技场伤害仍是 $D5，等于模板算出来的 $D3" \
+      && ok "换装（强化 3→7）后竞技场伤害仍是 ${D5}，等于模板算出来的 $D3" \
       || bad "换装后竞技场伤害变了：$D4 / $D5 / 模板 $D3"
     ew "$L0"
     [ "$(elvl)" = "$L0" ] && ok "强化等级已还原（${L0}）" || bad "强化等级没还原"

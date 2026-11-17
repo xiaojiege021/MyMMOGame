@@ -10,7 +10,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 SD="$ROOT/src/Social/bin/Release/net10.0/Social.dll"
@@ -39,7 +39,7 @@ def rd(p):
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
         return "".join(open(x, encoding="utf-8").read() for x in
-                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(p))), "tools/probe/CliProbe/*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 cfg = json.loads(rd("config/exp.json"))
 R("schema_version", cfg.get("schema") == "exp-table/1" and cfg.get("version") == 1, "exp-table/1 version=1")
@@ -187,7 +187,7 @@ except Exception: print("")')"; [ -n "$id" ] && { printf '%s' "$id"; return 0; }
   SECT="$(json_field "$(body_of "$r")" sect_id)"
   r="$(post "$GATEWAY/sect/join" "{\"character_id\":$B,\"sect_id\":$SECT}")"
   [ "$(expect_json "$(body_of "$r")" ok=true)" = "ok" ] && ok "B 加入同一宗门（进名册）" || bad "B 加入失败：$r"
-  LB="$(lead)"; printf '%s' "$LB" | grep -q "master_character_id=$CH" && ok "掌门权威 = CH（$LB）" || bad "掌门不是 CH：$LB"
+  LB="$(lead)"; printf '%s' "$LB" | grep -q "master_character_id=$CH" && ok "掌门权威 = CH（${LB}）" || bad "掌门不是 CH：$LB"
   MB="$(mem)"; printf '%s' "$MB" | grep -qE "ids=[0-9,]*\b$B\b" && ok "名册含 B：$MB" || bad "名册缺 B：$MB"
   printf '%s' "$MB" | grep -qE "ids=[0-9,]*\b$CH\b" && bad "创建者被塞进名册（破坏 a1 语义）：$MB" || ok "创建者 CH 不在名册（a1 语义不动）"
   echo "-- ① 同门两人 vs 混合门两人 --"
@@ -199,7 +199,7 @@ except Exception: print("")')"; [ -n "$id" ] && { printf '%s' "$id"; return 0; }
   [ "$(expect_json "$(body_of "$r2")" exp_gain=132 party_bonus=12 same_sect_bonus=0)" = "ok" ] \
     && ok "混合门两人：exp_gain=132（P1-2d 原值不动、无同门加成）" || bad "混合门结算不对：$r2"
   G1="$(json_field "$(body_of "$r1")" exp_gain)"; G2="$(json_field "$(body_of "$r2")" exp_gain)"
-  [ "${G1:-0}" -gt "${G2:-0}" ] && ok "同门 $G1 > 混合门 $G2（同门两人经验更多）" || bad "同门未更多：$G1 vs $G2"
+  [ "${G1:-0}" -gt "${G2:-0}" ] && ok "同门 $G1 > 混合门 ${G2}（同门两人经验更多）" || bad "同门未更多：$G1 vs $G2"
   echo "-- ② 单人无加成 --"
   r3="$(settle "{\"character_id\":$CH,\"txn_id\":\"p21c_one_$$_3\",\"source\":\"dungeon\",\"party_size\":1,\"member_ids\":[$CH]}")"
   [ "$(expect_json "$(body_of "$r3")" exp_gain=120 party_bonus=0 same_sect_bonus=0)" = "ok" ] \
@@ -207,7 +207,7 @@ except Exception: print("")')"; [ -n "$id" ] && { printf '%s' "$id"; return 0; }
   echo "-- ③ 只加经验：流水增 3 行、货币/疲劳/份额不动 --"
   E1="$(expstate)"; M1="$(money)"; R1="$(resv)"
   ROWS0="$(printf '%s' "$E0" | grep -oE 'rows=[0-9]+' | cut -d= -f2)"; ROWS1="$(printf '%s' "$E1" | grep -oE 'rows=[0-9]+' | cut -d= -f2)"
-  [ $((ROWS1 - ROWS0)) -eq 3 ] && ok "exp_settlement 增 3 行（$ROWS0→$ROWS1）" || bad "流水行数不对：$ROWS0→$ROWS1"
+  [ $((ROWS1 - ROWS0)) -eq 3 ] && ok "exp_settlement 增 3 行（${ROWS0}→${ROWS1}）" || bad "流水行数不对：${ROWS0}→$ROWS1"
   [ "$M1" = "$M0" ] && ok "货币余额一字未动：$M1" || bad "动了货币：$M0 → $M1"
   [ "$R1" = "$R0" ] && ok "疲劳/周份额不变：$R1" || bad "动了疲劳/份额：$R0 → $R1"
   echo "-- ④ 幂等重放 + 拒绝路径（每条前后显式读库）--"

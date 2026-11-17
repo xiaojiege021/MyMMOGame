@@ -12,4 +12,16 @@
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <ProjectReference Include="../Shared/Shared.csproj" />
   </ItemGroup>
+
+  <!-- D1b：核对入口在 tools/probe/CliProbe。角色服编译时顺手把 probe 编出来，
+       让核对脚本拿到的 probe 与角色服是同一份源码与同一次构建的 Character.dll。
+       用独立进程构建并带 SkipCliProbe，避开 probe→Character→probe 的递归。 -->
+  <Target Name="BuildCliProbe" AfterTargets="Build" Condition="'$(SkipCliProbe)' != 'true'">
+    <!-- IDE / MSBuild 直接构建时 DOTNET_HOST_PATH 可能为空，回落到 PATH 里的 dotnet。 -->
+    <PropertyGroup>
+      <_CliProbeDotnet Condition="'$(DOTNET_HOST_PATH)' != ''">$(DOTNET_HOST_PATH)</_CliProbeDotnet>
+      <_CliProbeDotnet Condition="'$(DOTNET_HOST_PATH)' == ''">dotnet</_CliProbeDotnet>
+    </PropertyGroup>
+    <Exec Command="&quot;$(_CliProbeDotnet)&quot; build &quot;$(MSBuildThisFileDirectory)../../tools/probe/CliProbe/CliProbe.csproj&quot; -c $(Configuration) --nologo -v q -p:SkipCliProbe=true" />
+  </Target>
 </Project>

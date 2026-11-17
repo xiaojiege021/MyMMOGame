@@ -1,5 +1,27 @@
-using Character.Cli;
+using System.Runtime.InteropServices;
+using Character;
 
-// 入口只留启动与迁移：flag 解析、只读核对与连库入口都在 Character/Cli/*（D1a）。
-// 133 个 flag 名与回包一行未改，核对脚本仍按原命令调。
-return await CliEntry.RunAsync(args);
+// 角色服进程只保留纯启动：读 --config → 构造 CharacterProcess → 注册 SIGTERM/SIGINT → RunAsync。
+// 133 个核对 flag 的解析与只读 / 连库核对链已迁到 tools/probe/CliProbe（D1b）。
+var configPath = "config/character.json";
+for (var i = 0; i < args.Length; i++)
+{
+    if (args[i] == "--config" && i + 1 < args.Length)
+    {
+        configPath = args[++i];
+    }
+}
+
+using var stop = new CancellationTokenSource();
+PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
+{
+    context.Cancel = true;
+    stop.Cancel();
+});
+PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
+{
+    context.Cancel = true;
+    stop.Cancel();
+});
+
+return await new CharacterProcess(configPath).RunAsync(stop.Token);

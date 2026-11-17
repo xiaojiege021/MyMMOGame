@@ -11,7 +11,7 @@ source "$ROOT/tools/check/lib-common.sh"
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 CC="--config $ROOT/config/character.json"
 HAS_DB="${MMO_N7_HAS_DB:-0}"
@@ -46,7 +46,7 @@ def rd(p):
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
         return "".join(open(x, encoding="utf-8").read() for x in
-                       [os.path.join(root, p)] + sorted(__import__("glob").glob(os.path.join(root, "src/Character/Cli/*.cs"))))
+                       [os.path.join(root, p)] + sorted(__import__("glob").glob(os.path.join(root, "tools/probe/CliProbe/*.cs"))))
     return open(os.path.join(root, p), encoding="utf-8").read() if os.path.exists(os.path.join(root, p)) else ""
 
 ml_drop = rd("config/mainline_drops.json")

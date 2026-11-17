@@ -12,7 +12,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 GL="$ROOT/src/Global/bin/Release/net10.0/Global.dll"
 WD="$ROOT/src/World/bin/Release/net10.0/World.dll"
@@ -45,7 +45,7 @@ for proj in src/Shared/Shared.csproj src/Character/Character.csproj src/Global/G
             src/Social/Social.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -144,7 +144,7 @@ badcfg() {
   "$@" >"$TMP/bad.out" 2>&1; local rc=$?
   local out; out="$(utf8 <"$TMP/bad.out")"
   [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q 'config_error=' \
-    && ok "$desc：config_error= 且非 0 退出" || bad "$desc 没挡住（rc=$rc）：$out"
+    && ok "${desc}：config_error= 且非 0 退出" || bad "$desc 没挡住（rc=${rc}）：$out"
 }
 for f in s-miss s-dup s-ratio s-gain s-ingot s-top s-unknown; do
   badcfg "坏兑换表 $f" "$DOTNET" "$CD" --stone-exchange-table-path "$TMP/$f.json" "$ROOT/config/currency.json" $CC
@@ -185,7 +185,7 @@ else
     done
   }
   A="$(mkchar)"; B="$(mkchar)"
-  [ -n "$A" ] && [ -n "$B" ] && [ "$A" != "$B" ] && ok "造两个角色（$A / $B）" || bad "角色没建成：A=$A B=$B"
+  [ -n "$A" ] && [ -n "$B" ] && [ "$A" != "$B" ] && ok "造两个角色（$A / ${B}）" || bad "角色没建成：A=$A B=$B"
   TX="p32a-$$-$(date +%s)"
   post() { curl -s --noproxy '*' -X POST "http://127.0.0.1:61000$1?token=$TOK" -H 'Content-Type: application/json' -d "$2"; }
   grant() { post /grant "{\"character_id\":$1,\"txn_id\":\"$TX-$2\",\"entries\":[{\"currency\":{\"kind\":\"$3\",\"delta\":$4}}]}" >/dev/null; }
@@ -232,7 +232,7 @@ else
   R="$(post /auction/stone/list "{\"character_id\":$A,\"stone_kind\":\"stone_2\",\"stone_amount\":2,\"price_gold\":1000}")"
   LID="$(printf '%s' "$R" | jget listing_id)"
   [ "$(printf '%s' "$R" | jget ok)" = "true" ] && [ -n "$LID" ] && [ "$LID" != "0" ] \
-    && ok "任务发的灵石挂上拍卖（listing=$LID）" || bad "挂单失败：$R"
+    && ok "任务发的灵石挂上拍卖（listing=${LID}）" || bad "挂单失败：$R"
   R="$(post /auction/stone/list "{\"character_id\":$A,\"stone_kind\":\"yuanbao\",\"stone_amount\":1,\"price_gold\":10}")"
   [ "$(printf '%s' "$R" | jget reason)" = "unknown_stone" ] && ok "元宝不是灵石档，挂单被拒" || bad "坏档位没挡住：$R"
   R="$(post /auction/stone/buy "{\"character_id\":$B,\"listing_id\":$LID}")"

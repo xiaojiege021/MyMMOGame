@@ -19,7 +19,7 @@ except Exception:
     print("")' "$1"; }
 DOTNET="${DOTNET:-}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 SOCIAL_DLL="$ROOT/src/Social/bin/Release/net10.0/Social.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GLOBAL_DLL="$ROOT/src/Global/bin/Release/net10.0/Global.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 ACCOUNT="c3_$$"; CNAME="c3a_$$"; VISITOR="c3v_$$"

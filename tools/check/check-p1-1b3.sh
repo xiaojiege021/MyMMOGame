@@ -23,7 +23,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 
 CHAR_PORT=${MMO_P11B3_CHAR_PORT:-62095}
 GATEWAY_PORT=${MMO_P11B3_GATEWAY_PORT:-61096}

@@ -19,7 +19,7 @@ UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/Ma
 MODE="${MMO_P13A3_MODE:-server}"
 
 WORLD_DLL="$ROOT/src/World/bin/Release/net10.0/World.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 PROBE_DLL="$ROOT/tools/probe/WorldProbe/bin/Release/net10.0/WorldProbe.dll"
 
@@ -383,7 +383,7 @@ for name in p13a3_a p13a3_b p13a3_c p13a3_d; do
 done
 if create_char "$OTHER_TOKEN" "p13a3_other"; then OTHER_ID="$NEW_ID"; else bad "建别人账号的角色失败"; fi
 [ "${#IDS[@]}" = "4" ] && [ -n "${OTHER_ID:-}" ] || finish
-ok "主账号四个角色、别人账号一个角色就绪（${IDS[*]} / $OTHER_ID）"
+ok "主账号四个角色、别人账号一个角色就绪（${IDS[*]} / ${OTHER_ID}）"
 
 echo "== 4. 网关鉴权与归属复核（沿用前卡）=="
 BASE_HTTP="http://127.0.0.1:${GATEWAY_PORT}/world/stream"

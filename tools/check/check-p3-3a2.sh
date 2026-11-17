@@ -12,7 +12,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 PROBE="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 CC="--config $ROOT/config/character.json"
@@ -53,7 +53,7 @@ for proj in src/Battle/Battle.csproj src/Character/Character.csproj src/Gateway/
             src/World/World.csproj tools/probe/BattleProbe/BattleProbe.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -131,7 +131,7 @@ sha2="$(sha256sum "$ROOT/client/MMOGame/Assets/Proto/Generated/Battle.cs" | awk 
 echo "== 3. 只读入口、坏配置与纯计算 =="
 SO="$("$DOTNET" "$BD" --siege-table 2>&1)"; SRC=$?
 [ "$SRC" = 0 ] && printf '%s' "$SO" | grep -q "view_full_model_limit=$LIMIT" \
-  && ok "城战表只读入口带同屏上限（从配置现取 $LIMIT）" || bad "只读入口没有上限（rc=$SRC）"
+  && ok "城战表只读入口带同屏上限（从配置现取 ${LIMIT}）" || bad "只读入口没有上限（rc=${SRC}）"
 printf '%s' "$SO" | grep -q 'team_size=40 teams=2 players=80 balance=none' \
   && ok "40 对 40 与全额生效口径未变" || bad "老规模口径被改了"
 mk_bad() {
@@ -154,7 +154,7 @@ for c in no_view zero negative big model tier; do
   if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error='; then
     ok "坏配置 ${c}：config_error= 且非 0 退出"
   else
-    bad "坏配置 ${c} 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    bad "坏配置 ${c} 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
   fi
 done
 UNITS="7:0:0:0:1200:1200 8:0:6000:0:1200:1200 9:1:100000:0:900:1200"
@@ -191,14 +191,14 @@ PY
 "$DOTNET" "$BD" --config "$TMP/fake.json" >"$TMP/fake.log" 2>&1 & PIDS="$PIDS $!"
 U="$(listen_of "$TMP/fake.log")"
 [ -n "$U" ] && grep -q "siege_view_limit=$LIMIT" "$TMP/fake.log" \
-  && ok "假服启动日志带同屏上限（siege_view_limit=$LIMIT）" || bad "假服没起来或没打上限"
+  && ok "假服启动日志带同屏上限（siege_view_limit=${LIMIT}）" || bad "假服没起来或没打上限"
 WU="ws${U#http}"
 "$DOTNET" "$PROBE" --url "$WU/battle?class=warrior" --case no_siege_view >"$TMP/plain.log" 2>&1
 grep -q 'verdict=ok' "$TMP/plain.log" && ok "练习场没有城战档位包（老链路不回退）" \
   || bad "练习场收到档位包：$(head -2 "$TMP/plain.log" | detail)"
 C="$(reject_line "$U/battle?siege=m1&team=a&char=1&class=warrior")"
 [ "$C" = "400" ] && grep -q 'join_reject=battle_profile_missing' "$TMP/fake.log" \
-  && ok "没有角色库仍按 P3-3a1 拒绝，不编一份档位出来" || bad "城战进场拒绝口径回退（$C）"
+  && ok "没有角色库仍按 P3-3a1 拒绝，不编一份档位出来" || bad "城战进场拒绝口径回退（${C}）"
 
 echo "== 5. 真服真库（本节全部需要真服；跳过时只算静态证据）=="
 if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then

@@ -211,7 +211,7 @@ else
       bad "401 回包拆得不对"; cat "$TMP/p401.out" | detail
     fi
   else
-    bad "真网关没回 401（拿到 $code）"
+    bad "真网关没回 401（拿到 ${code}）"
   fi
 
   # 连不上：换一个没人听的端口，拆装要认成 network，不能当成口令错。
@@ -238,7 +238,7 @@ else
         bad "200 回包没拆出令牌"; cat "$TMP/p200.out" | detail
       fi
     else
-      bad "真网关没回 200（拿到 $code）"
+      bad "真网关没回 200（拿到 ${code}）"
       head -3 "$TMP/login200.json" | detail
     fi
   else

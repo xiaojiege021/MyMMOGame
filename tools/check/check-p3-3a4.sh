@@ -12,7 +12,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 SD="$ROOT/src/Social/bin/Release/net10.0/Social.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 WD="$ROOT/src/World/bin/Release/net10.0/World.dll"
@@ -51,7 +51,7 @@ for proj in src/Battle/Battle.csproj src/Social/Social.csproj src/Character/Char
             tools/probe/BattleProbe/BattleProbe.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -131,7 +131,7 @@ TAX="$(python3 -c 'import json;print(json.load(open("config/siege_territory.json
 [ "$SRC" = 0 ] && printf '%s' "$SO" | grep -q "pending=true cities=1" \
   && printf '%s' "$SO" | grep -q "timeout_ms=$TO tax_pct=$TAX" \
   && ok "战斗服领地表只读入口从配置现取（$TO / $TAX / pending=true）" \
-  || bad "战斗服只读入口不对（rc=$SRC）：$(printf '%s' "$SO" | utf8 | head -2)"
+  || bad "战斗服只读入口不对（rc=${SRC}）：$(printf '%s' "$SO" | utf8 | head -2)"
 printf '%s' "$SO" | grep -q 'siege_territory_match=prefix=qiyun city=qiyun unknown=-' \
   && ok "纯计算：哪场打哪座城只按服务端前缀，匹配不上不写回" \
   || bad "城池前缀匹配不对"
@@ -139,7 +139,7 @@ CO="$("$DOTNET" "$CD" $CC --siege-territory-table 2>&1 | utf8)"; CRC=$?
 [ "$CRC" = 0 ] && printf '%s' "$CO" | grep -q "siege_territory_table_state=ok .*pending=true" \
   && printf '%s' "$CO" | grep -q "tax_pct=$TAX" \
   && ok "角色服读同一份领地表，抽成比例只从配置来" \
-  || bad "角色服只读入口不对（rc=$CRC）：$(printf '%s' "$CO" | head -2)"
+  || bad "角色服只读入口不对（rc=${CRC}）：$(printf '%s' "$CO" | head -2)"
 mk_bad() {
   python3 - "$ROOT/config/siege_territory.json" "$TMP/bad-$1.json" "$1" <<'PY'
 import json, sys
@@ -164,7 +164,7 @@ for c in schema version timeout0 timeout_big tax101 no_cities bad_city balance o
   out="$("$DOTNET" "$BD" --siege-territory-table-path "$TMP/bad-$c.json" 2>&1)"; rc=$?
   [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error=' \
     && ok "坏配置 ${c}：config_error= 且非 0 退出" \
-    || bad "坏配置 ${c} 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    || bad "坏配置 ${c} 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
 done
 
 echo "== 4. 假服：缺表降级与老口径不回退 =="
@@ -265,9 +265,9 @@ PY
     done
   }
   A="$(mkchar warrior)"; B="$(mkchar priest)"
-  [ -n "$A" ] && [ -n "$B" ] && ok "真服：造两个角色（$A / $B）" || bad "真服：角色没建出来"
+  [ -n "$A" ] && [ -n "$B" ] && ok "真服：造两个角色（$A / ${B}）" || bad "真服：角色没建出来"
   SECT="$(post /sect/create "{\"character_id\":$A,\"name\":\"p334_sect_$$\"}" | jget sect_id 2>/dev/null)"
-  [ -n "$SECT" ] && ok "真库：A 建了宗门（sect=$SECT）" || bad "真库：宗门没建出来"
+  [ -n "$SECT" ] && ok "真库：A 建了宗门（sect=${SECT}）" || bad "真库：宗门没建出来"
   BEFORE="$("$DOTNET" "$CD" $CR --siege-result-state 2>&1 | utf8 | grep -m1 '^siege_result_city=')"
   ok "真库：写回前城池状态 $BEFORE"
   BOSS="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1],encoding="utf-8"))["boss"]["id"])' "$ROOT/config/battle.json")"

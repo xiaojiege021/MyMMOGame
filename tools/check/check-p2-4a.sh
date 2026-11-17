@@ -11,7 +11,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 PROBE="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 CC="--config $ROOT/config/character.json"
@@ -116,7 +116,7 @@ done < "$TMP/static.txt"
 echo "== 3. 只读入口 --weapon-rules =="
 wr="$("$DOTNET" "$CD" --weapon-rules 2>&1)"; wrc=$?
 [ "$wrc" = "0" ] && printf '%s' "$wr" | grep -q '^weapon_lock_level=15' \
-  && ok "武器锁等级 15（不连库也能读）" || bad "只读入口不对（rc=$wrc）"
+  && ok "武器锁等级 15（不连库也能读）" || bad "只读入口不对（rc=${wrc}）"
 printf '%s' "$wr" | grep -q 'weapon=sword_trial kind=sword require_level=10' \
   && ok "sword_trial 是 10 级剑（不到 15 级，全职业可装备）" || bad "sword_trial 不对"
 printf '%s' "$wr" | grep -q 'class=warrior kinds=.*sword' \
@@ -149,7 +149,7 @@ for c in lock_level lock_missing weapon_no_level; do
   if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error='; then
     ok "坏配置 ${c}：起不来（config_error=）"
   else
-    bad "坏配置 ${c} 没挡住（rc=$rc）：$(printf '%s' "$out" | head -2)"
+    bad "坏配置 ${c} 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -2)"
   fi
 done
 

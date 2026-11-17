@@ -88,7 +88,7 @@ else
       ok "客户端序列化通过"
       CLIENT_DONE=1
     else
-      bad "客户端序列化失败（Unity 退出码 $UNITY_EXIT）"
+      bad "客户端序列化失败（Unity 退出码 ${UNITY_EXIT}）"
       grep -E "error CS|will not be loaded|proto_fail=" "$TMP/unity.log" | head -5
       CLIENT_DONE=0
     fi

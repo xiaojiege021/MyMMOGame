@@ -17,7 +17,7 @@ source "$ROOT/tools/check/lib-common.sh"
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY="${MMO_P1_5D_GATEWAY:-}"
 TOKEN="${MMO_P1_5D_TOKEN:-}"
 CHARACTER="${MMO_P1_5D_CHARACTER:-0}"
@@ -62,7 +62,7 @@ def read(p):
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
         return "".join(open(x, encoding="utf-8").read() for x in
-                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(p))), "tools/probe/CliProbe/*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 cfg = json.loads(read("config/recharge.json"))
@@ -190,13 +190,13 @@ print(next((b.get("amount") for b in d.get("balances", []) if b.get("kind") == "
   r="$(create "$PRODUCT")"; body="$(body_of "$r")"; order="$(json_field "$body" order_id)"
   check "$r" "ok=true status=pending yuanbao=$AMOUNT product_id=$PRODUCT" "建单：pending、$AMOUNT 元宝"
   [ "$(yuanbao_of "$(money)")" = "$before" ] \
-    && ok "建单不动余额（$before）" || bad "建单就把钱加了"
+    && ok "建单不动余额（${before}）" || bad "建单就把钱加了"
 
   # ② 回调：元宝 +60，订单变 paid，paid_at 有值。
   r="$(callback "$order")"
   check "$r" "ok=true status=paid yuanbao=$AMOUNT duplicate=false" "回调：发 $AMOUNT 元宝、订单 paid"
   [ "$(yuanbao_of "$(money)")" = "$((before + AMOUNT))" ] \
-    && ok "余额 +$AMOUNT（$before→$((before + AMOUNT))）" || bad "余额不对：$(yuanbao_of "$(money)")"
+    && ok "余额 +${AMOUNT}（${before}→$((before + AMOUNT))）" || bad "余额不对：$(yuanbao_of "$(money)")"
   st="$(state "$order")"
   [ "$(field_of "$st" status)" = "paid" ] && [ "$(field_of "$st" paid)" = "true" ] \
     && ok "订单状态从库里读回：paid / paid=true" || bad "订单状态不对：$st"

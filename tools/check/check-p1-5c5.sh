@@ -25,7 +25,7 @@ source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY="${MMO_P1_5C5_GATEWAY:-}"
 TOKEN="${MMO_P1_5C5_TOKEN:-}"
 CHARACTER="${MMO_P1_5C5_CHARACTER:-0}"

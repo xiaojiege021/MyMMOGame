@@ -21,7 +21,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 CC="--config $ROOT/config/character.json"
 CG="--config $ROOT/config/gateway.json"
@@ -108,7 +108,7 @@ if [ "$rc" = "0" ] \
    && printf '%s' "$RT" | grep -q '^alias=散仙=金仙'; then
   ok "十一段顺序、首发到结丹、元婴起全部关着（不连库）"
 else
-  bad "境界表只读口径不对（rc=$rc）"
+  bad "境界表只读口径不对（rc=${rc}）"
 fi
 printf '%s' "$RT" | grep -q '^advance=炼体->筑基:ok' \
   && printf '%s' "$RT" | grep -q '^advance=结丹->元婴:realm_locked' \
@@ -202,7 +202,7 @@ except Exception: print("")' 2>/dev/null)"
 try: print(json.load(sys.stdin).get(sys.argv[1],""))
 except Exception: print("")' "$2"; }
 
-  ID="$(mkchar)"; [ -n "$ID" ] && ok "造一个角色（$ID）" || bad "角色没建成"
+  ID="$(mkchar)"; [ -n "$ID" ] && ok "造一个角色（${ID}）" || bad "角色没建成"
   raw "$ID" 结丹
   r="$(rstate "$ID")"
   printf '%s' "$r" | grep -q 'realm=结丹 rank=3 next=元婴 next_open=false advance=realm_locked' \
@@ -216,7 +216,7 @@ except Exception: print("")' "$2"; }
   else
     bad "元婴副本没被拒：HTTP $C $B"
   fi
-  [ "$(entries "$ID")" = "$E0" ] && ok "被拒的进本没有留下记录（$E0）" || bad "被拒也写了进本记录"
+  [ "$(entries "$ID")" = "$E0" ] && ok "被拒的进本没有留下记录（${E0}）" || bad "被拒也写了进本记录"
 
   R="$(enter "$ID" abyss 1)"; B="$(body "$R")"; C="${R##*$'\n'}"
   if [ "$C" = "200" ] && [ "$(field "$B" allowed)" = "True" ]; then

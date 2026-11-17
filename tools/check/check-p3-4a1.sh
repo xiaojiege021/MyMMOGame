@@ -12,7 +12,7 @@ source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 GL="$ROOT/src/Global/bin/Release/net10.0/Global.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 HAS_DB="${MMO_P3_4A1_HAS_DB:-0}"
 TMP="$(mktemp -d)"
 PIDS=""
@@ -37,7 +37,7 @@ for proj in src/Shared/Shared.csproj src/Global/Global.csproj src/Gateway/Gatewa
             src/World/World.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -148,8 +148,8 @@ print(s["current"], r[i]["target_dungeon"], (r[i-1]["id"] if i else ""),
       (n["id"] if n else ""), (n["target_dungeon"] if n else ""))')
 EOF
 [ "$SRC" = 0 ] && printf '%s' "$SO" | grep -q "season_current=$CUR target=$TGT previous=$PREV previous_target=$PREV_T" \
-  && ok "只读入口从配置现取当前季与上一季（$CUR/$TGT ← $PREV/$PREV_T）" \
-  || bad "只读入口不对（rc=$SRC）：$(printf '%s' "$SO" | utf8 | head -2)"
+  && ok "只读入口从配置现取当前季与上一季（$CUR/$TGT ← $PREV/${PREV_T}）" \
+  || bad "只读入口不对（rc=${SRC}）：$(printf '%s' "$SO" | utf8 | head -2)"
 CNT="$(python3 -c 'import json;print(len(json.load(open("config/season.json",encoding="utf-8"))["seasons"]))')"
 printf '%s' "$SO" | grep -q "season_table_state=ok .*count=$CNT" \
   && ok "只读入口报出的季数从配置现取（$CNT 季，脚本不写死）" \
@@ -180,14 +180,14 @@ for c in schema version current one same target realm reward item pass dup missi
   out="$("$DOTNET" "$GL" --season-table-path "$TMP/bad-$c.json" \
        "$ROOT/config/dungeons.json" "$ROOT/config/realms.json" 2>&1)"; rc=$?
   [ "$rc" -ne 0 ] && printf '%s' "$out" | utf8 | grep -q '^config_error=' \
-    && ok "坏配置 $c：config_error= 且非 0 退出" \
-    || bad "坏配置 $c 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    && ok "坏配置 ${c}：config_error= 且非 0 退出" \
+    || bad "坏配置 $c 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
 done
 NO="$("$DOTNET" "$GL" --season-table-path "$TMP/next-season.json" \
      "$ROOT/config/dungeons.json" "$ROOT/config/realms.json" 2>&1)"; NRC=$?
 [ "$NRC" = 0 ] && printf '%s' "$NO" | grep -q "season_current=$LAST target=$LAST_T" \
   && [ "$LAST_T" != "$TGT" ] \
-  && ok "换季后只读口给出不同目标（$TGT → $LAST_T）" \
+  && ok "换季后只读口给出不同目标（$TGT → ${LAST_T}）" \
   || bad "换季后目标没变：$(printf '%s' "$NO" | utf8 | head -2)"
 
 echo "== 4. 假服：缺表降级与老日志不回退 =="
@@ -271,7 +271,7 @@ PY
     && [ "$(printf '%s' "$BASE" | jget target_dungeon)" = "$TGT" ] \
     && [ "$(printf '%s' "$BASE" | jget season_id)" = "$CUR" ] \
     && [ "$(printf '%s' "$BASE" | jget previous_target_dungeon)" = "$PREV_T" ] \
-    && ok "真服：当前季 $CUR 目标 $TGT，上一季目标 $PREV_T（来自服务端）" \
+    && ok "真服：当前季 $CUR 目标 ${TGT}，上一季目标 ${PREV_T}（来自服务端）" \
     || bad "真服：赛季回包不对：$BASE"
   SPOOF="$(curl -s --noproxy '*' \
     "http://127.0.0.1:61000/season/current?token=$TOK&season_id=hack&target_dungeon=dragon&reward=gold&item_id=x")"
@@ -298,7 +298,7 @@ PY
   [ "$(printf '%s' "$NEXT" | jget season_id)" = "$LAST" ] \
     && [ "$(printf '%s' "$NEXT" | jget target_dungeon)" = "$LAST_T" ] \
     && [ "$LAST_T" != "$TGT" ] \
-    && ok "真服：配置热载换季后目标 $TGT → $LAST_T，与上一季不同" \
+    && ok "真服：配置热载换季后目标 $TGT → ${LAST_T}，与上一季不同" \
     || bad "真服：换季没生效：$NEXT"
   printf '%s' "$NEXT" | jget previous_target_dungeon | grep -qx "$TGT" \
     && ok "真服：换季回包的 previous_target_dungeon 就是换季前的目标 $TGT" \
@@ -338,7 +338,7 @@ PY
   BACK="$(wait_target "$TGT")"
   [ "$(printf '%s' "$BACK" | jget season_id)" = "$CUR" ] \
     && [ "$(printf '%s' "$BACK" | jget previous_target_dungeon)" = "$PREV_T" ] \
-    && ok "真服：恢复产品正本后回到 $CUR/$TGT，上一季目标 $PREV_T" \
+    && ok "真服：恢复产品正本后回到 $CUR/${TGT}，上一季目标 $PREV_T" \
     || bad "真服：恢复后回包不对：$BACK"
 fi
 

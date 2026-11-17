@@ -19,7 +19,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity}"
 MODE="${MMO_P14A_MODE:-server}"
 
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 
 CHAR_PORT=${MMO_P14A_CHAR_PORT:-62112}
@@ -162,7 +162,7 @@ enhance_state() {
 expect_state() {
   local want="$1 $2 $3 $4 $5" label="$6" got
   got="$(enhance_state)"
-  if [ "$got" = "$want" ]; then ok "$label"; else bad "$label：state=[$got] 期望=[$want]"; fi
+  if [ "$got" = "$want" ]; then ok "$label"; else bad "${label}：state=[$got] 期望=[$want]"; fi
 }
 
 wait_ready() {
@@ -348,7 +348,7 @@ PY
 config_reject() {
   local label="$1" file="$2" expect="$3" out
   out="$("$DOTNET" "$CHARACTER_DLL" --enhance-state --enhance-config "$TMP/$file" --config config/character.json 2>&1)"
-  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "$label：${out:0:160}"; fi
+  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "${label}：${out:0:160}"; fi
 }
 config_reject "缺 max_level 起不来" bad-no-max.json "config_error=enhance.json 缺 max_level"
 config_reject "把 +12 改成 +20 起不来" bad-max.json "config_error=enhance.json 的 max_level 必须是方案写定的 12"

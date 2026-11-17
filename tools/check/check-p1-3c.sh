@@ -21,7 +21,7 @@ UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/Ma
 MODE="${MMO_P13C_MODE:-server}"
 
 WORLD_DLL="$ROOT/src/World/bin/Release/net10.0/World.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 PROBE_DLL="$ROOT/tools/probe/WorldProbe/bin/Release/net10.0/WorldProbe.dll"
 
@@ -345,7 +345,7 @@ config_reject() {
   if printf '%s' "$out" | grep -qF "$expect"; then
     ok "$label"
   else
-    bad "$label：${out:0:150}"
+    bad "${label}：${out:0:150}"
   fi
 }
 config_reject "缺 flight_realm 起不来" bad-no-flight-realm.json "config_error=flight.json 的 flight_realm 不在 realms 里："
@@ -465,7 +465,7 @@ for name in p13c_a p13c_b; do
 done
 if create_char "$OTHER_TOKEN" "p13c_other"; then OTHER_ID="$NEW_ID"; else bad "建别人账号的角色失败"; fi
 [ "${#IDS[@]}" = "2" ] && [ -n "${OTHER_ID:-}" ] || finish
-ok "主账号两个角色、别人账号一个角色就绪（${IDS[*]} / $OTHER_ID）"
+ok "主账号两个角色、别人账号一个角色就绪（${IDS[*]} / ${OTHER_ID}）"
 
 for id in "${IDS[@]}"; do
   resp="$(world_enter "$TOKEN" "$id" "栖云城")"

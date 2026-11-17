@@ -14,7 +14,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 CC="--config $ROOT/config/character.json"
 CG="--config $ROOT/config/gateway.json"
@@ -166,7 +166,7 @@ if [ "$rc" = "0" ] \
    && [ "$(printf '%s' "$RT" | grep -c '^advance_req=')" = "10" ]; then
   ok "十段突破要求都在配置里，数值不写死在代码（不连库）"
 else
-  bad "境界表只读口径不对（rc=$rc）"
+  bad "境界表只读口径不对（rc=${rc}）"
 fi
 printf '%s' "$RT" | grep -q '^advance=结丹->元婴:realm_locked' \
   && ok "版本开关仍是 P3-1a1 那一处判定：结丹→元婴关着" || bad "版本开关判定不对"
@@ -249,7 +249,7 @@ try: print(json.load(sys.stdin).get("character_id",""))
 except Exception: print("")' 2>/dev/null)"
     [ -n "$ID" ] && break; sleep 0.5
   done
-  [ -n "$ID" ] && ok "造一个角色（$ID）" || bad "角色没建成"
+  [ -n "$ID" ] && ok "造一个角色（${ID}）" || bad "角色没建成"
 
   # 临时配置：成功率 100 / 0 / 带一条必要支线。只用配置指路，不改仓库里的那份。
   python3 - "$ROOT" "$TMP" <<'PY'

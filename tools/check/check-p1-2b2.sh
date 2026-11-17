@@ -21,7 +21,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BATTLE_DLL="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 PROBE_DLL="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 
@@ -446,7 +446,7 @@ CREATED=1
 for name in "${CHAR_NAMES[@]}"; do
   if ! create_char "$TOKEN" "$name"; then
     CREATED=0
-    bad "角色没建出来：$name（HTTP ${CODE}）"
+    bad "角色没建出来：${name}（HTTP ${CODE}）"
   fi
   case "$name" in
     "$NAME_SPRING")     ID_SPRING="$NEW_ID" ;;
@@ -509,7 +509,7 @@ for expected in 1500 3000 4500 6000; do
   if [ "$CODE" != "200" ] || [ "$(json_field "$BODY" allowed)" != "True" ] \
      || [ "$(fatigue_of "$STATE")" != "$expected" ]; then
     CAP_OK=0
-    bad "打到上限这一步不对（期望 $expected）：HTTP ${CODE} ${STATE} ${BODY}"
+    bad "打到上限这一步不对（期望 ${expected}）：HTTP ${CODE} ${STATE} ${BODY}"
   fi
 done
 if [ "$CAP_OK" = "1" ]; then
@@ -656,7 +656,7 @@ TOTAL=$(( ${R1:-0} + ${R2:-0} ))
 if [ "$C_1" = "200" ] && [ "$C_2" = "200" ] \
    && [ "$TOTAL" = "1500" ] \
    && [ "$(fatigue_of "$(fatigue_state "$ID_CONCURRENT")")" = "0" ]; then
-  ok "并发两笔：恢复量合计 1500（$R1 + $R2），疲劳停在 0"
+  ok "并发两笔：恢复量合计 1500（$R1 + ${R2}），疲劳停在 0"
 else
   bad "并发两笔多恢复了或减成负数：$C_1 $A1 / $C_2 $A2 / $(fatigue_state "$ID_CONCURRENT")"
 fi

@@ -20,7 +20,7 @@ UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/Ma
 MODE="${MMO_P13B_MODE:-server}"
 
 WORLD_DLL="$ROOT/src/World/bin/Release/net10.0/World.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 
 WORLD_PORT=${MMO_P13B_WORLD_PORT:-63094}
@@ -325,7 +325,7 @@ config_reject() {
   if printf '%s' "$out" | grep -qF "config_error=$expect"; then
     ok "$label"
   else
-    bad "$label：${out:0:150}"
+    bad "${label}：${out:0:150}"
   fi
 }
 config_reject "缺 count 起不来" bad-missing-count.json "gather.json 节点 ore_kulan_1 缺 count"
@@ -434,7 +434,7 @@ for name in p13b_a p13b_b p13b_c; do
 done
 if create_char "$OTHER_TOKEN" "p13b_other"; then OTHER_ID="$NEW_ID"; else bad "建别人账号的角色失败"; fi
 [ "${#IDS[@]}" = "3" ] && [ -n "${OTHER_ID:-}" ] || finish
-ok "主账号三个角色、别人账号一个角色就绪（${IDS[*]} / $OTHER_ID）"
+ok "主账号三个角色、别人账号一个角色就绪（${IDS[*]} / ${OTHER_ID}）"
 
 resp="$(world_enter "$TOKEN" "${IDS[0]}" "枯岚道")"
 if [ "$(code_of "$resp")" = "200" ] \

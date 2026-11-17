@@ -21,7 +21,7 @@ UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/Ma
 MODE="${MMO_P13A1_MODE:-server}"
 
 WORLD_DLL="$ROOT/src/World/bin/Release/net10.0/World.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 
 WORLD_PORT=${MMO_P13A1_WORLD_PORT:-63091}
@@ -431,7 +431,7 @@ for name in p13a1_a p13a1_b p13a1_c p13a1_d p13a1_e; do
 done
 if create_char "$OTHER_TOKEN" "p13a1_other"; then OTHER_ID="$NEW_ID"; else bad "建别人账号的角色失败"; fi
 [ "${#IDS[@]}" = "5" ] && [ -n "${OTHER_ID:-}" ] || finish
-ok "主账号五个角色、别人账号一个角色就绪（${IDS[*]} / $OTHER_ID）"
+ok "主账号五个角色、别人账号一个角色就绪（${IDS[*]} / ${OTHER_ID}）"
 
 echo "== 4. 人能进入一条分线 =="
 resp="$(world_enter "" "${IDS[0]}" "枯岚道")"

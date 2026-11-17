@@ -78,7 +78,7 @@ fi
 
 DOTNET=$(command -v dotnet || true)
 if [ -n "$DOTNET" ] && "$DOTNET" --version >/dev/null 2>&1; then
-  ok "dotnet：$DOTNET（$("$DOTNET" --version)）"
+  ok "dotnet：${DOTNET}（$("$DOTNET" --version)）"
 else
   bad "找不到 dotnet，先按 E1 装 SDK 10.0.403"
   exit 1
@@ -92,9 +92,9 @@ else
 fi
 
 if [ -f "$ENV_FILE" ]; then
-  ok "环境文件在位：$ENV_FILE（$(stat -c '%a' "$ENV_FILE")）"
+  ok "环境文件在位：${ENV_FILE}（$(stat -c '%a' "$ENV_FILE")）"
 else
-  info "环境文件不在：$ENV_FILE（空进程不读库，不影响本行核对）"
+  info "环境文件不在：${ENV_FILE}（空进程不读库，不影响本行核对）"
 fi
 
 # ---------- 1 单元 ----------

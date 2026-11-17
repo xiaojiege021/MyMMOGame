@@ -25,7 +25,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity}"
 MODE="${MMO_P14C_MODE:-server}"
 
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 
 CHAR_PORT=${MMO_P14C_CHAR_PORT:-62116}
@@ -292,7 +292,7 @@ assert 'MapPost("/character/transfer"' in api and 'OwnsAsync(client, account' in
 assert 'Guid.NewGuid()' in api and 'Npgsql' not in api
 program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
     open(p, encoding='utf-8').read()
-    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
+    for p in sorted(__import__('glob').glob(root + '/tools/probe/CliProbe/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--transfer-state"' in program and 'case "--transfer-level"' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。
@@ -327,7 +327,7 @@ config_reject() {
   local label="$1" file="$2" expect="$3" out
   out="$("$DOTNET" "$CHARACTER_DLL" --transfer-state --transfer-config "$TMP/$file" \
     --config config/character.json 2>&1)"
-  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "$label：${out:0:180}"; fi
+  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "${label}：${out:0:180}"; fi
 }
 config_reject "缺 stone_item_id 起不来" t-no-stone.json "config_error=transfer.json 缺 stone_item_id"
 config_reject "转移石编号不在物品表里起不来" t-stone-missing.json "config_error=transfer.json 的 stone_item_id 不在 items.json 里"

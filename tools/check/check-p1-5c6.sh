@@ -23,7 +23,7 @@ source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY="${MMO_P1_5C6_GATEWAY:-}"
 TOKEN="${MMO_P1_5C6_TOKEN:-}"
 CHARACTER="${MMO_P1_5C6_CHARACTER:-0}"
@@ -66,7 +66,7 @@ def read(p):
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
         return "".join(open(x, encoding="utf-8").read() for x in
-                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(p))), "tools/probe/CliProbe/*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 def report(key, cond, info=""):
@@ -291,18 +291,19 @@ report("reject_paths",
        all(('"' + r + '"') in body for r in (
            "not_in_battle", "left_battle", "not_down", "cooldown", "no_scroll")))
 
-# 冷却只有角色服能写；核对用的清冷却入口只在只读/核对程序里。
+# 冷却只有角色服能写；核对用的清冷却入口只在只读/核对程序里（D1b 后在 tools/probe/CliProbe）。
 hits = []
-for base, _, names in os.walk(os.path.join(root, "src")):
-    for n in names:
-        if n.endswith(".cs") and not n.endswith(".g.cs"):
-            p = os.path.join(base, n)
-            # C# 里的 SQL 是 \"角色\" 转义文本，别按裸引号去比对；逐行找同一条语句。
-            for line in open(p, encoding="utf-8"):
-                if "delete from" in line and "revive_scroll_cooldown" in line:
-                    hits.append(os.path.relpath(p, root))
-                    break
-report("reset_only_for_check", hits == ["src/Character/Cli/CoreCli.cs"], ",".join(hits))
+for base_dir in ("src", "tools/probe/CliProbe"):
+    for base, _, names in os.walk(os.path.join(root, base_dir)):
+        for n in names:
+            if n.endswith(".cs") and not n.endswith(".g.cs"):
+                p = os.path.join(base, n)
+                # C# 里的 SQL 是 \"角色\" 转义文本，别按裸引号去比对；逐行找同一条语句。
+                for line in open(p, encoding="utf-8"):
+                    if "delete from" in line and "revive_scroll_cooldown" in line:
+                        hits.append(os.path.relpath(p, root))
+                        break
+report("reset_only_for_check", hits == ["tools/probe/CliProbe/CoreCli.cs"], ",".join(hits))
 
 # 卷轴编号不硬编码在源码里；网关不开用卷轴的路由。
 hits = []

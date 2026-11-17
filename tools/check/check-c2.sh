@@ -19,7 +19,7 @@ except Exception:
     print("")' "$1"; }
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 WORLD_DLL="$ROOT/src/World/bin/Release/net10.0/World.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 WORLD_PORT=${MMO_C2_WORLD_PORT:-63095}
 CHAR_PORT=${MMO_C2_CHAR_PORT:-62110}
@@ -47,7 +47,7 @@ for proj in src/Shared/Shared.csproj src/Global/Global.csproj src/Gateway/Gatewa
             src/World/World.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -158,7 +158,7 @@ OUT="$("$DOTNET" "$WORLD_DLL" --gather-spread-state 2>&1 | utf8)"; rc=$?
 if [ "$rc" = "0" ] && printf '%s' "$OUT" | grep -qF 'gather_spread_state=ok nodes=14 regions=8 realms=炼体,结丹 base=4 total=18'; then
   ok "--gather-spread-state：14 个铺开节点 / 8 块地表 / 基准 4 / 合计 18"
 else
-  bad "--gather-spread-state 输出不对（rc=$rc）：${OUT:0:180}"
+  bad "--gather-spread-state 输出不对（rc=${rc}）：${OUT:0:180}"
 fi
 MISSING=""
 while IFS= read -r want; do
@@ -203,15 +203,15 @@ for f in "$TMP"/bad-*.json; do
   want="$(cat "$TMP/$n.expect")"
   out="$("$DOTNET" "$WORLD_DLL" --gather-spread-state --gather-spread-config "$f" 2>&1 | utf8)"; rc=$?
   if [ "$rc" != "0" ] && printf '%s' "$out" | grep -qF 'config_error=' && printf '%s' "$out" | grep -qF "$want"; then
-    ok "坏配置 ${n#bad-} 被加载期挡住（rc=$rc）"
+    ok "坏配置 ${n#bad-} 被加载期挡住（rc=${rc}）"
   else
-    bad "坏配置 ${n#bad-} 没挡住（rc=$rc）：$(printf '%s' "$out" | head -2 | tr '\n' ' ')"
+    bad "坏配置 ${n#bad-} 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -2 | tr '\n' ' ')"
   fi
 done
 MISS_OUT="$("$DOTNET" "$WORLD_DLL" --gather-spread-state --gather-spread-config "$TMP/no-such-table.json" 2>&1 | utf8)"; rc=$?
 [ "$rc" = "0" ] && printf '%s' "$MISS_OUT" | grep -qF 'gather_spread=missing' \
   && ok "缺表降级：世界服仍按 P1-3b 四个基准点启动（老卡临时目录没有这份表）" \
-  || bad "缺表没有降级（rc=$rc）：${MISS_OUT:0:120}"
+  || bad "缺表没有降级（rc=${rc}）：${MISS_OUT:0:120}"
 # 改配置后只读口跟着变，证明节点与数值只在配置里、代码没有第二套。
 python3 - "$ROOT" "$TMP" <<'PY'
 import json, os, sys

@@ -21,7 +21,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BATTLE_DLL="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 PROBE_DLL="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 

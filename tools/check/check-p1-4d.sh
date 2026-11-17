@@ -20,7 +20,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity}"
 MODE="${MMO_P14D_MODE:-server}"
 
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 
 CHAR_PORT=${MMO_P14D_CHAR_PORT:-62118}
@@ -311,7 +311,7 @@ assert 'MapPost("/character/crystal/remove"' in api
 assert 'OwnsAsync(client, account' in api and 'Guid.NewGuid()' in api and 'Npgsql' not in api
 program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
     open(p, encoding='utf-8').read()
-    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
+    for p in sorted(__import__('glob').glob(root + '/tools/probe/CliProbe/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--crystal-state"' in program and 'case "--crystal-sockets"' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。
@@ -354,7 +354,7 @@ config_reject() {
   local label="$1" file="$2" expect="$3" out
   out="$("$DOTNET" "$CHARACTER_DLL" --crystal-state --crystal-config "$TMP/$file" \
     --config config/character.json 2>&1)"
-  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "$label：${out:0:180}"; fi
+  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "${label}：${out:0:180}"; fi
 }
 config_reject "缺 categories 起不来" c-no-categories.json "config_error=crystal.json 缺 categories"
 config_reject "少一类结晶起不来" c-short-categories.json "config_error=crystal.json 的 categories 必须正好是方案写定的"

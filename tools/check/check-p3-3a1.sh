@@ -12,7 +12,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 WD="$ROOT/src/World/bin/Release/net10.0/World.dll"
 PROBE="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
@@ -55,7 +55,7 @@ for proj in src/Battle/Battle.csproj src/Character/Character.csproj src/Gateway/
             src/World/World.csproj tools/probe/BattleProbe/BattleProbe.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -138,7 +138,7 @@ done < "$TMP/static.txt"
 echo "== 3. 只读入口与坏配置 =="
 SO="$("$DOTNET" "$BD" --siege-table 2>&1)"; SRC=$?
 [ "$SRC" = 0 ] && printf '%s' "$SO" | grep -q 'team_size=40 teams=2 players=80 balance=none' \
-  && ok "只读入口：40 对 40、players=80、balance=none" || bad "只读入口不对（rc=$SRC）"
+  && ok "只读入口：40 对 40、players=80、balance=none" || bad "只读入口不对（rc=${SRC}）"
 printf '%s' "$SO" | grep -q '^siege_equipment=attack_per_level=' && ok "只读入口：每级强化全额折算" || bad "折算没打出来"
 printf '%s' "$SO" | grep -q '^siege_power=attack_weight=' && ok "只读入口：战力权重" || bad "权重没打出来"
 mk_bad() {
@@ -166,7 +166,7 @@ for c in version schema team_size teams too_many timeout equipment weight no_mod
   if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error='; then
     ok "坏配置 ${c}：config_error= 且非 0 退出"
   else
-    bad "坏配置 ${c} 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    bad "坏配置 ${c} 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
   fi
 done
 
@@ -201,7 +201,7 @@ check_reject() {
   local url="$1" reason="$2" label="$3" c
   c="$(reject_line "$U/battle?$url")"
   [ "$c" = "400" ] && grep -q "join_reject=$reason" "$TMP/noprof.log" \
-    && ok "$label：400 + $reason" || bad "$label 没拒（$c / $reason）"
+    && ok "${label}：400 + $reason" || bad "$label 没拒（$c / ${reason}）"
 }
 check_reject 'siege=m1&team=a&char=1&class=warrior' battle_profile_missing \
   "没有角色库不编一份属性出来"
@@ -221,7 +221,7 @@ U2="$(listen_of "$TMP/notable.log")"
   && ok "缺城战表能起、日志标 siege=missing" || bad "缺表没降级"
 C="$(reject_line "$U2/battle?siege=m1&team=a&char=1&class=warrior")"
 [ "$C" = "400" ] && grep -q 'join_reject=siege_table_missing' "$TMP/notable.log" \
-  && ok "缺表时城战一律拒：400 + siege_table_missing" || bad "缺表还放进去了（$C）"
+  && ok "缺表时城战一律拒：400 + siege_table_missing" || bad "缺表还放进去了（${C}）"
 WU2="ws${U2#http}"
 "$DOTNET" "$PROBE" --url "$WU2/battle?class=warrior" --case open >"$TMP/plain2.log" 2>&1
 grep -q 'verdict=ok' "$TMP/plain2.log" && ok "缺表时老卡副本/练习场照跑" || bad "缺表把练习场挡住了"
@@ -294,7 +294,7 @@ PY
     done
   }
   A="$(mkchar warrior)"; B="$(mkchar priest)"; C="$(mkchar warrior)"
-  [ -n "$A" ] && [ -n "$B" ] && [ -n "$C" ] && ok "真服：造三个角色（$A / $B / $C）" || bad "真服：角色没建出来"
+  [ -n "$A" ] && [ -n "$B" ] && [ -n "$C" ] && ok "真服：造三个角色（$A / $B / ${C}）" || bad "真服：角色没建出来"
   curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/inventory/add?token=$TOK" \
     -H 'Content-Type: application/json' -d "{\"character_id\":$A,\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1}" >/dev/null
   "$DOTNET" "$CD" --raw-enhance-write "$A" 1 12 $CC >"$TMP/ew.log" 2>&1 || true
@@ -342,7 +342,7 @@ PY
     --case damage --boss "$BOSS" --ranged 1002 >"$TMP/cast.log" 2>&1
   DMG="$(grep -oE 'damage=[0-9]+' "$TMP/cast.log" | head -1)"
   grep -q 'verdict=ok' "$TMP/cast.log" && [ -n "$DMG" ] \
-    && ok "真服：城战技能由战斗服结算（--case damage → $DMG，含目标血量与冷却）" \
+    && ok "真服：城战技能由战斗服结算（--case damage → ${DMG}，含目标血量与冷却）" \
     || bad "真服：城战技能没结算：$(head -2 "$TMP/cast.log" | detail)"
   # 网关 /battle 原样透传 query：经网关再进一次同一场。
   "$DOTNET" "$PROBE" --url "ws://127.0.0.1:61000/battle?token=$TOK&siege=gw&team=a&char=$A&class=warrior" \

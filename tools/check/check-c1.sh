@@ -12,7 +12,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 CC="--config config/character.json"
 HAS_DB="${MMO_C1_HAS_DB:-0}"
@@ -39,7 +39,7 @@ for proj in src/Shared/Shared.csproj src/Global/Global.csproj src/Gateway/Gatewa
             src/World/World.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -52,7 +52,7 @@ root = sys.argv[1]
 def src(p):
     if p.endswith("src/Character/Program.cs"):
         return "".join(open(x, encoding="utf-8").read() for x in
-                       [os.path.join(root, p)] + sorted(__import__("glob").glob(os.path.join(root, "src/Character/Cli/*.cs"))))
+                       [os.path.join(root, p)] + sorted(__import__("glob").glob(os.path.join(root, "tools/probe/CliProbe/*.cs"))))
     return open(os.path.join(root, p), encoding="utf-8").read()
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
 def sha(p): return hashlib.sha256(open(os.path.join(root, p), "rb").read()).hexdigest()
@@ -238,7 +238,7 @@ for f in "$TMP"/bad-*.json; do
   out="$("$DOTNET" "$CD" $CC --mainline-list --mainline-path "$f" 2>&1 | utf8)"; rc=$?
   [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error=' \
     && ok "坏配置 ${n#bad-}：config_error= 且非 0 退出" \
-    || bad "坏配置 ${n#bad-} 没挡住（rc=$rc）：$(printf '%s' "$out" | head -2)"
+    || bad "坏配置 ${n#bad-} 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -2)"
 done
 
 echo "== 5. 真服真库（MMO_C1_HAS_DB=1 才跑） =="
@@ -266,7 +266,7 @@ else
       -H 'Content-Type: application/json' -d "{\"name\":\"$CNAME\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
     A="$(printf '%s' "$o" | jget character_id)"; [ -n "$A" ] && break; sleep 0.5
   done
-  [ -n "$A" ] && ok "真库：建出一名角色（$A）" || bad "真库：角色没建出来"
+  [ -n "$A" ] && ok "真库：建出一名角色（${A}）" || bad "真库：角色没建出来"
   get() { curl -s --noproxy '*' "http://127.0.0.1:61000$1?token=$TOK&character_id=$A"; }
   post() { curl -s --noproxy '*' -X POST "http://127.0.0.1:61000$1?token=$TOK" \
     -H 'Content-Type: application/json' -d "$2"; }

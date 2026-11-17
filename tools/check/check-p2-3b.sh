@@ -10,7 +10,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 PROBE="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 CC="--config $ROOT/config/character.json"
@@ -112,7 +112,7 @@ done < "$TMP/static.txt"
 echo "== 3. 只读入口 --battlefield-table =="
 bt="$("$DOTNET" "$BD" --battlefield-table 2>&1)"; brc=$?
 [ "$brc" = "0" ] && printf '%s' "$bt" | grep -q 'team_size=10 teams=2 players=20' \
-  && ok "只读入口：战场 10 对 10（players=20）" || bad "只读入口不对（rc=$brc）：$(printf '%s' "$bt" | head -2)"
+  && ok "只读入口：战场 10 对 10（players=20）" || bad "只读入口不对（rc=${brc}）：$(printf '%s' "$bt" | head -2)"
 printf '%s' "$bt" | grep -q 'ratio=1.3' && ok "只读入口：同队 1.3 倍" || bad "比例没打出来"
 printf '%s' "$bt" | grep -q 'battlefield_equipment=attack_per_level=' && ok "只读入口：每级强化折算" || bad "折算没打出来"
 printf '%s' "$bt" | grep -q 'battlefield_power=attack_weight=' && ok "只读入口：战力权重" || bad "权重没打出来"
@@ -146,7 +146,7 @@ for c in version team_size teams ratio weight equipment no_mode; do
   if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error='; then
     ok "坏配置 ${c}：起不来（config_error=）"
   else
-    bad "坏配置 ${c} 没挡住（rc=$rc）：$(printf '%s' "$out" | head -2)"
+    bad "坏配置 ${c} 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -2)"
   fi
 done
 
@@ -190,13 +190,13 @@ U="$(listen_of "$TMP/noprof.log")"
 [ -n "$U" ] && ok "假服就绪（有战场表、无角色服上游）" || bad "假服没起来"
 C="$(reject_line "$U/battle?battlefield=m1&team=a&char=1&class=warrior")"
 [ "$C" = "400" ] && grep -q 'join_reject=battle_profile_missing' "$TMP/noprof.log" \
-  && ok "没有角色库：400 + battle_profile_missing（不编一份属性出来）" || bad "无上游没被拒（$C）"
+  && ok "没有角色库：400 + battle_profile_missing（不编一份属性出来）" || bad "无上游没被拒（${C}）"
 C="$(reject_line "$U/battle?battlefield=m1&team=z&char=1&class=warrior")"
 [ "$C" = "400" ] && grep -q 'join_reject=battlefield_team_invalid' "$TMP/noprof.log" \
-  && ok "队伍只认 a / b：400 + battlefield_team_invalid" || bad "非法队伍没被拒（$C）"
+  && ok "队伍只认 a / b：400 + battlefield_team_invalid" || bad "非法队伍没被拒（${C}）"
 C="$(reject_line "$U/battle?battlefield=m1&team=a&char=1&class=warrior&dungeon=abyss")"
 [ "$C" = "400" ] && grep -q 'join_reject=battlefield_with_other_mode' "$TMP/noprof.log" \
-  && ok "战场与副本混用：400 + battlefield_with_other_mode" || bad "混用没被拒（$C）"
+  && ok "战场与副本混用：400 + battlefield_with_other_mode" || bad "混用没被拒（${C}）"
 
 mk_cfg notable no
 "$DOTNET" "$BD" --config "$TMP/notable.json" >"$TMP/notable.log" 2>&1 &
@@ -206,7 +206,7 @@ U2="$(listen_of "$TMP/notable.log")"
 printf '%s' "$(cat "$TMP/notable.log")" | grep -q 'battlefield=missing' && ok "启动日志标 battlefield=missing" || bad "缺表没标 missing"
 C="$(reject_line "$U2/battle?battlefield=m1&team=a&char=1&class=warrior")"
 [ "$C" = "400" ] && grep -q 'join_reject=battlefield_table_missing' "$TMP/notable.log" \
-  && ok "缺表时战场一律拒：400 + battlefield_table_missing" || bad "缺表还放进去了（$C）"
+  && ok "缺表时战场一律拒：400 + battlefield_table_missing" || bad "缺表还放进去了（${C}）"
 
 echo "== 6. 真库：造两个角色，验同队 1.3 倍 =="
 if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then

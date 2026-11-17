@@ -38,7 +38,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity}"
 MODE="${MMO_P14B_MODE:-server}"
 
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 
 CHAR_PORT=${MMO_P14B_CHAR_PORT:-62114}
@@ -146,7 +146,7 @@ state_line() {
 expect_state() {
   local want="$1 $2 $3 $4 $5 $6" label="$7" got
   got="$(state_line)"
-  if [ "$got" = "$want" ]; then ok "$label"; else bad "$label：state=[$got] 期望=[$want]"; fi
+  if [ "$got" = "$want" ]; then ok "$label"; else bad "${label}：state=[$got] 期望=[$want]"; fi
 }
 
 TITLE="P1-4b（${MODE}）"
@@ -261,7 +261,7 @@ assert 'MapPost("/character/enhance"' in api and 'OwnsAsync(client, account' in 
 assert 'Guid.NewGuid()' in api and 'Npgsql' not in api
 program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
     open(p, encoding='utf-8').read()
-    for p in sorted(__import__('glob').glob(root + '/src/Character/Cli/*.cs')))
+    for p in sorted(__import__('glob').glob(root + '/tools/probe/CliProbe/*.cs')))
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'case "--coupon-count"' in program and 'CouponCountAsync' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。
@@ -296,7 +296,7 @@ config_reject() {
   # Windows 上 dotnet 重定向输出走 GBK；中文断言必须按平台转码，不能「先试 UTF-8 再退 GBK」
   # （GBK 双字节偶尔恰好是合法 UTF-8 序列，不报错但比不对，见 check-p3-1a1.sh）。
   out="$("$DOTNET" "$CHARACTER_DLL" --enhance-state --enhance-config "$TMP/$file" --config config/character.json 2>&1 | utf8)"
-  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "$label：${out:0:160}"; fi
+  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "${label}：${out:0:160}"; fi
 }
 config_reject "缺 protect_item_id 起不来" bad-no-coupon.json "config_error=enhance.json 缺 protect_item_id"
 config_reject "券编号不在物品表里起不来" bad-coupon-missing.json "config_error=enhance.json 的 protect_item_id 不在 items.json 里"

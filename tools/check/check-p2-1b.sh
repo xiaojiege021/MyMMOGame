@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 SD="$ROOT/src/Social/bin/Release/net10.0/Social.dll"
@@ -39,7 +39,7 @@ def rd(p):
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
         return "".join(open(x, encoding="utf-8").read() for x in
-                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(p))), "tools/probe/CliProbe/*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 cfg = json.loads(rd("config/dungeons.json")); sect = json.loads(rd("config/sect.json"))
 rows = cfg.get("dungeons", []); byid = {r.get("id"): r for r in rows}
@@ -50,10 +50,13 @@ R("schema_version", cfg.get("schema") == "dungeon-table/1" and isinstance(VER, i
   "version 已按约定升过（>=5）")
 R("four_ids", [r.get("id") for r in rows][:4] == ["main", "abyss", "lair", "sect"], "前三条后追加第四条 sect")
 R("ids_unique", len(byid) == len(rows) and len(rows) >= 4, "编号不重复、至少四条")
-R("main_unchanged", byid.get("main") == {"id":"main","name":"主线","max_players":1,"charges_fatigue":False,"takes_weekly_share":False}, "main 一字未改")
-R("abyss_unchanged", byid.get("abyss") == {"id":"abyss","name":"深渊","max_players":4,"charges_fatigue":True,"takes_weekly_share":False,"fatigue_per_player":1500}, "abyss 一字未改")
-R("lair_unchanged", byid.get("lair") == {"id":"lair","name":"巢穴","max_players":4,"charges_fatigue":False,"takes_weekly_share":True}, "lair 一字未改")
-R("sect_entry", byid.get("sect") == {"id":"sect","name":"宗门秘境","max_players":4,"charges_fatigue":False,"takes_weekly_share":False}, "sect 宗门秘境 1–4 人、不扣疲劳不占份额")
+def subset(row, want):
+    # 只钉本卡关心的口径；后面的卡会给同一条目追加 tier / entries_per_week 等字段，不算改动。
+    return all((row or {}).get(k) == v for k, v in want.items())
+R("main_unchanged", subset(byid.get("main"), {"id":"main","name":"主线","max_players":1,"charges_fatigue":False,"takes_weekly_share":False}), "main 口径被改")
+R("abyss_unchanged", subset(byid.get("abyss"), {"id":"abyss","name":"深渊","max_players":4,"charges_fatigue":True,"takes_weekly_share":False,"fatigue_per_player":1500}), "abyss 口径被改")
+R("lair_unchanged", subset(byid.get("lair"), {"id":"lair","name":"巢穴","max_players":4,"charges_fatigue":False,"takes_weekly_share":True}), "lair 口径被改")
+R("sect_entry", subset(byid.get("sect"), {"id":"sect","name":"宗门秘境","max_players":4,"charges_fatigue":False,"takes_weekly_share":False}), "sect 宗门秘境 1–4 人、不扣疲劳不占份额")
 R("global_caps", all(cfg.get(k) == v for k, v in {"fatigue_daily_cap":6000,"hot_spring_recovery":1500,"weekly_share_cap":12,"monster_hp_scale_per_player":1.0,"monster_damage_scale_per_player":1.0}.items()), "6000/1500/12 与缩放系数一字未改")
 note = cfg.get("note", "")
 R("note_playbook", all(s in note for s in ["宗门秘境","高级本","1–4 人","个人活跃","宗门贡献","科技材料","稀有外观","按人数倍增","组织荣誉"]), "note 写明方案 10 章表格玩法")
@@ -96,7 +99,7 @@ printf '%s' "$CONF" | grep -q '^sect_config_state=ok' && printf '%s' "$CONF" | g
 DUMP="$(python3 -c 'import json;d=json.load(open("config/dungeons.json",encoding="utf-8"));print("version=%d ids=%s"%(d["version"],",".join("%s:%d"%(r["id"],r["max_players"]) for r in d["dungeons"])))')"
 # 只钉本卡追加的 sect 与前三条的进本人数；版本号与总条数从配置现取，不写死。
 printf '%s' "$DUMP" | grep -q 'ids=main:1,abyss:4,lair:4,sect:4' \
-  && ok "只读打印四条进本人数：main:1 abyss:4 lair:4 sect:4（$DUMP）" || bad "副本表四条不对：$DUMP"
+  && ok "只读打印四条进本人数：main:1 abyss:4 lair:4 sect:4（${DUMP}）" || bad "副本表四条不对：$DUMP"
 CAP5="$(python3 -c 'import json;print(json.load(open("config/sect.json",encoding="utf-8"))["levels"][-1]["member_cap"])')"
 SMAX="$(python3 -c 'import json;print([x["max_players"] for x in json.load(open("config/dungeons.json",encoding="utf-8"))["dungeons"] if x["id"]=="sect"][0])')"
 [ "$CAP5" = "200" ] && [ "$SMAX" = "4" ] && [ "$CAP5" != "$SMAX" ] \
@@ -122,7 +125,8 @@ base = {"main":{"id":"main","name":"主线","max_players":1,"charges_fatigue":Fa
         "abyss":{"id":"abyss","name":"深渊","max_players":4,"charges_fatigue":True,"takes_weekly_share":False,"fatigue_per_player":1500},
         "lair":{"id":"lair","name":"巢穴","max_players":4,"charges_fatigue":False,"takes_weekly_share":True}}
 for k, w in base.items():
-    if byid[k] != w: fail("旧副本 " + k + " 口径被改")
+    for f, v in w.items():
+        if byid[k].get(f) != v: fail("旧副本 " + k + "." + f + " 口径被改")
 for k, v in {"id":"sect","name":"宗门秘境","max_players":4,"charges_fatigue":False,"takes_weekly_share":False}.items():
     if byid["sect"].get(k) != v: fail("sect." + k + " 不对或缺失")
 for r in rows:  # 与两端 DungeonTable.Load 的逐条硬校验同形
@@ -243,7 +247,7 @@ PY
   EXP_COUNT="$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1],encoding="utf-8"))["dungeons"]))' "$ROOT/config/dungeons.json")"
   EXP_VER="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["version"])' "$ROOT/config/dungeons.json")"
   printf '%s' "$DG" | grep -q "dungeons=$EXP_COUNT " && printf '%s' "$DG" | grep -q "dungeon_table_version=$EXP_VER" \
-    && ok "角色服启动日志 $DG" || bad "角色服启动日志与配置不一致（配置 $EXP_COUNT 条 v$EXP_VER）：$DG"
+    && ok "角色服启动日志 $DG" || bad "角色服启动日志与配置不一致（配置 $EXP_COUNT 条 v${EXP_VER}）：$DG"
   grep -q '^config=' "$TMP/harness/battle.log" && ok "战斗服启动日志打印它加载的配置（dungeon_table 指向同一份表）" || bad "战斗服启动日志缺 config= 行"
   TOK="$TOKEN"; [ -z "$TOK" ] && TOK="$(harness_login 61000 "$ACCOUNT" "$PASSWORD")"
   [ -n "$TOK" ] && ok "登录拿到令牌" || bad "登录没拿到令牌"
@@ -266,7 +270,7 @@ except Exception: print("")')"
   ST="$("$DOTNET" "$SD" --sect-state "$SECT" $CS 2>&1 | grep -m1 '^sect_state=')"
   CCONF="$("$DOTNET" "$SD" --sect-config 2>&1 | grep -m1 '^sect_config_state=')"
   printf '%s' "$ST" | grep -q 'level=5 member_cap=200' && printf '%s' "$CCONF" | grep -q '5:200' \
-    && ok "仅核对用 --sect-set-level 改到 5 级：$ST（--sect-config 含 5:200）" || bad "5 级 200 读不回：$ST / $CCONF"
+    && ok "仅核对用 --sect-set-level 改到 5 级：${ST}（--sect-config 含 5:200）" || bad "5 级 200 读不回：$ST / $CCONF"
   echo "-- ① 1/2/3/4 人可进、5 人被拒 --"
   RB="$(reserves)"
   for n in 1 2 3 4; do
@@ -341,7 +345,7 @@ PY
   cp "$TMP/dungeons.badstart.json" "$ROOT/config/dungeons.json"
   "$DOTNET" "$CD" $CC >"$TMP/harness/badstart.log" 2>&1; BRC=$?
   assert_bad_config "$(cat "$TMP/harness/badstart.log")" "坏表（sect.max_players=0）真角色服起不来：$(head -1 "$TMP/harness/badstart.log" | cut -c1-56)"
-  [ "$BRC" -ne 0 ] && ok "坏表真角色服以非 0 退出（rc=$BRC）" || bad "坏表真角色服以 0 退出"
+  [ "$BRC" -ne 0 ] && ok "坏表真角色服以非 0 退出（rc=${BRC}）" || bad "坏表真角色服以 0 退出"
   cp "$TMP/dungeons.orig.json" "$ROOT/config/dungeons.json"
   harness_cleanup
 fi

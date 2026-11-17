@@ -13,7 +13,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 SD="$ROOT/src/Social/bin/Release/net10.0/Social.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 WD="$ROOT/src/World/bin/Release/net10.0/World.dll"

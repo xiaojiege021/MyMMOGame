@@ -11,7 +11,7 @@ source "$ROOT/tools/check/lib-common.sh"
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 CC="--config $ROOT/config/character.json"
 HAS_DB="${MMO_R1_HAS_DB:-0}"
 TITLE="R1"

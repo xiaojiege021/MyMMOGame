@@ -12,7 +12,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 SD="$ROOT/src/Social/bin/Release/net10.0/Social.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 WD="$ROOT/src/World/bin/Release/net10.0/World.dll"
@@ -51,7 +51,7 @@ for proj in src/Battle/Battle.csproj src/Social/Social.csproj src/Character/Char
             tools/probe/BattleProbe/BattleProbe.csproj; do
   n="$(basename "$proj" .csproj)"
   if "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1; then
-    ok "编译 $n：0 错误 0 警告"
+    ok "编译 ${n}：0 错误 0 警告"
   else
     bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail
   fi
@@ -135,7 +135,7 @@ SO="$("$DOTNET" "$BD" --sect-tech-table 2>&1)"; SRC=$?
 PCT="$(python3 -c 'import json;print(json.load(open("config/sect_tech.json",encoding="utf-8"))["bonus"]["power_pct_per_level"])')"
 MAX="$(python3 -c 'import json;print(json.load(open("config/sect_tech.json",encoding="utf-8"))["bonus"]["max_level"])')"
 [ "$SRC" = 0 ] && printf '%s' "$SO" | grep -q "power_pct_per_level=$PCT max_level=$MAX pending=true" \
-  && ok "科技表只读入口从配置现取（$PCT / $MAX / pending=true）" || bad "只读入口不对（rc=$SRC）"
+  && ok "科技表只读入口从配置现取（$PCT / $MAX / pending=true）" || bad "只读入口不对（rc=${SRC}）"
 F0="$(printf '%s' "$SO" | grep -oE 'level=0 [0-9.]+' | awk '{print $2}')"
 F1="$(printf '%s' "$SO" | grep -oE 'level=1 [0-9.]+' | awk '{print $2}')"
 FM="$(printf '%s' "$SO" | grep -oE 'level=max [0-9.]+' | awk '{print $2}')"
@@ -172,7 +172,7 @@ for c in schema version pct0 pct101 max0 no_bonus balance templates shop model; 
   if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error='; then
     ok "坏配置 ${c}：config_error= 且非 0 退出"
   else
-    bad "坏配置 ${c} 没挡住（rc=$rc）：$(printf '%s' "$out" | utf8 | head -2)"
+    bad "坏配置 ${c} 没挡住（rc=${rc}）：$(printf '%s' "$out" | utf8 | head -2)"
   fi
 done
 
@@ -268,11 +268,11 @@ PY
     done
   }
   A="$(mkchar warrior)"; B="$(mkchar priest)"
-  [ -n "$A" ] && [ -n "$B" ] && ok "真服：造两个角色（$A / $B）" || bad "真服：角色没建出来"
+  [ -n "$A" ] && [ -n "$B" ] && ok "真服：造两个角色（$A / ${B}）" || bad "真服：角色没建出来"
   SECT="$(curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/sect/create?token=$TOK" \
     -H "Authorization: Bearer $TOK" -H 'Content-Type: application/json' \
     -d "{\"character_id\":$A,\"name\":\"p333_sect_$$\"}" | jget sect_id 2>/dev/null)"
-  [ -n "$SECT" ] && ok "真库：A 建了宗门（sect=$SECT）" || bad "真库：宗门没建出来"
+  [ -n "$SECT" ] && ok "真库：A 建了宗门（sect=${SECT}）" || bad "真库：宗门没建出来"
   BOSS="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1],encoding="utf-8"))["boss"]["id"])' "$ROOT/config/battle.json")"
   set_tech() {
     "$DOTNET" "$SD" --raw-sect-tech-write "$SECT" "$1" $CS >"$TMP/tech-write.log" 2>&1
@@ -295,10 +295,10 @@ PY
   set_tech 3
   D3="$(damage "$WU/battle?siege=cast3&team=a&char=$A&class=warrior" siege3)"
   P3="$(damage "$WU/battle?char=$A&class=warrior&party=p333daily3" daily3)"
-  [ "${D3:-0}" -gt "${D0:-0}" ] && ok "真服：城战加成让伤害提高（$D0 → $D3）" \
+  [ "${D3:-0}" -gt "${D0:-0}" ] && ok "真服：城战加成让伤害提高（$D0 → ${D3}）" \
     || bad "城战没有加成：$D0 → $D3"
   [ "${P3:-0}" = "${P0:-0}" ] && [ "${P3:-0}" -gt 0 ] \
-    && ok "真服：日常副本伤害不变（$P0 → $P3），没有这份加成" \
+    && ok "真服：日常副本伤害不变（$P0 → ${P3}），没有这份加成" \
     || bad "日常副本被加成污染：$P0 → $P3"
   # 两队同一 match：A 有科技、B 无宗门，开场日志逐行核对。
   M="p333m-$$-$(date +%s)"

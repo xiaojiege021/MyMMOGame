@@ -27,7 +27,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BATTLE_DLL="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 PROBE_DLL="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 
@@ -502,7 +502,7 @@ CREATED=1
 for name in "${CHAR_NAMES[@]}"; do
   if ! create_char "$TOKEN" "$name"; then
     CREATED=0
-    bad "角色没建出来：$name（HTTP ${CODE}）"
+    bad "角色没建出来：${name}（HTTP ${CODE}）"
   fi
   case "$name" in
     "$NAME_LEDGER")     ID_LEDGER="$NEW_ID" ;;
@@ -741,7 +741,7 @@ PD2_DMG="$(printf '%s' "$PD2" | grep -o 'damage=[0-9]*' | head -1 | cut -d= -f2)
 if [ -n "$PD1_DMG" ] && [ "$PD1_DMG" = "$PD2_DMG" ] && [ "$PD1_DMG" = "$CLEAR_DMG" ] \
    && printf '%s' "$PD1" | grep -q '^verdict=ok' \
    && printf '%s' "$PD2" | grep -q '^verdict=ok'; then
-  ok "玩家技能伤害 1 人、2 人、两人清场都是 $PD1_DMG，只加经验不改伤害"
+  ok "玩家技能伤害 1 人、2 人、两人清场都是 ${PD1_DMG}，只加经验不改伤害"
 else
   bad "技能伤害被人数改动：$PD1 / $PD2 / clear=$CLEAR_DMG"
 fi

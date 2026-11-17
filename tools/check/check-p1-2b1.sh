@@ -22,7 +22,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BATTLE_DLL="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 PROBE_DLL="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 
@@ -404,7 +404,7 @@ CREATED=1
 for name in "${CHAR_NAMES[@]}"; do
   if ! create_char "$TOKEN" "$name"; then
     CREATED=0
-    bad "角色没建出来：$name（HTTP ${CODE}）"
+    bad "角色没建出来：${name}（HTTP ${CODE}）"
   fi
   case "$name" in
     "$NAME_MAIN") ID_MAIN="$NEW_ID" ;;
@@ -526,7 +526,7 @@ for expected in 1500 3000 4500 6000; do
   if [ "$CODE" != "200" ] || [ "$(json_field "$BODY" allowed)" != "True" ] \
      || [ "$(fatigue_of "$STATE")" != "$expected" ]; then
     CAP_OK=0
-    bad "累计这一步不对（期望 $expected）：HTTP ${CODE} ${STATE} ${BODY}"
+    bad "累计这一步不对（期望 ${expected}）：HTTP ${CODE} ${STATE} ${BODY}"
   fi
 done
 if [ "$CAP_OK" = "1" ]; then

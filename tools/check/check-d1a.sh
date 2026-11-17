@@ -18,7 +18,7 @@ source "$ROOT/tools/check/lib-common.sh"
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 TMP="$(mktemp -d)"
 TITLE="D1a（server）"
 trap 'rm -rf "$TMP"' EXIT
@@ -37,7 +37,7 @@ ROOT="$ROOT" python3 - > "$TMP/static.txt" 2>&1 <<'PY'
 import glob, os, re
 
 root = os.environ["ROOT"]
-cli_dir = os.path.join(root, "src/Character/Cli")
+cli_dir = os.path.join(root, "tools/probe/CliProbe")
 
 def read(p):
     p = os.path.join(root, p)
@@ -49,16 +49,21 @@ def report(key, cond, info=""):
 program = read("src/Character/Program.cs")
 program_lines = len(program.rstrip("\n").split("\n")) if program else 0
 
-# 1. 入口只留启动与迁移。
+# 1. 入口只留启动与迁移；核对入口在 tools/probe/CliProbe（D1b 后）。
 report("入口 < 300 行（实际 %d）" % program_lines, 0 < program_lines < 300)
-report("入口无 flag 分支", 'case "' not in program and '"--' not in program)
+report("入口只认 --config", [f.strip('"') for f in re.findall(r'"--[a-z-]+"', program)] == ["--config"],
+       str(re.findall(r'"--[a-z-]+"', program)[:6]))
 report("入口无控制台输出", "Console." not in program)
-report("入口只转 CliEntry", "CliEntry.RunAsync(args)" in program)
+report("入口不带核对入口", "CliEntry" not in program and "CliParser" not in program)
+probe_entry = read("tools/probe/CliProbe/Program.cs")
+report("probe 入口转 CliEntry", "CliEntry.RunAsync(args)" in probe_entry)
 report("入口不碰库 / 配置表 / 文件",
        not any(t in program for t in ["Npgsql", "DungeonTable", "CharacterRepository", "File.ReadAllText"]))
+report("probe 工程引用角色服", "Character.csproj" in read("tools/probe/CliProbe/CliProbe.csproj"))
 
-# 2. Cli/* 一卡一类。
-files = sorted(glob.glob(os.path.join(cli_dir, "*.cs")))
+# 2. Cli 类一卡一类（probe 的 Program.cs 是入口，不算命令类）。
+files = sorted(f for f in glob.glob(os.path.join(cli_dir, "*.cs"))
+               if not f.endswith("Program.cs"))
 report("Cli 类文件 >= 8（实际 %d）" % len(files), len(files) >= 8)
 multi = []
 too_long = []
@@ -108,7 +113,7 @@ EXPECTED = """
 --unbind-state --wardrobe --weapon-rules --weapon-rules-path
 """
 expected = sorted(EXPECTED.split())
-parser = read("src/Character/Cli/CliParser.cs")
+parser = read("tools/probe/CliProbe/CliParser.cs")
 got = re.findall(r'case "(--[a-z0-9-]+)"', parser)
 missing = [f for f in expected if f not in got]
 extra = [f for f in set(got) if f not in expected]
@@ -117,7 +122,7 @@ report("flag 名 133 个逐字一致（实际 %d）" % len(set(got)), len(set(go
 report("flag 无重复", len(got) == len(set(got)), "%d 处重复" % (len(got) - len(set(got))))
 
 # 4. 每个 flag 字段都被分派侧引用（没有「解析了却没人用」的孤儿）。
-flags_text = read("src/Character/Cli/CliFlags.cs")
+flags_text = read("tools/probe/CliProbe/CliFlags.cs")
 fields = re.findall(r"public static [\w?]+ (\w+) =", flags_text)
 others = "".join(open(p, encoding="utf-8").read() for p in files
                  if not p.endswith("CliFlags.cs"))
@@ -125,9 +130,9 @@ orphans = [f for f in fields if not re.search(r"\b" + f + r"\b", others)]
 report("flag 字段无孤儿（%d 个）" % len(fields), bool(fields) and not orphans, ",".join(orphans[:6]))
 
 # 5. 启动与迁移仍在。
-report("迁移入口仍在 CoreCli", "migrate=ok" in read("src/Character/Cli/CoreCli.cs"))
-report("启动仍在 CliEntry", "new CharacterProcess(configPath)" in read("src/Character/Cli/CliEntry.cs"))
-report("连库总入口按域分发", read("src/Character/Cli/DbCli.cs").count(".TryRunDbAsync(ctx)") >= 6)
+report("迁移入口仍在 CoreCli", "migrate=ok" in read("tools/probe/CliProbe/CoreCli.cs"))
+report("启动仍在 CliEntry", "new CharacterProcess(configPath)" in read("tools/probe/CliProbe/CliEntry.cs"))
+report("连库总入口按域分发", read("tools/probe/CliProbe/DbCli.cs").count(".TryRunDbAsync(ctx)") >= 6)
 PY
 while IFS= read -r line; do
   case "$line" in

@@ -24,7 +24,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BATTLE_DLL="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 PROBE_DLL="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
 
@@ -511,7 +511,7 @@ CREATED=1
 for name in "${CHAR_NAMES[@]}"; do
   if ! create_char "$TOKEN" "$name"; then
     CREATED=0
-    bad "角色没建出来：$name（HTTP ${CODE}）"
+    bad "角色没建出来：${name}（HTTP ${CODE}）"
   fi
   case "$name" in
     "$NAME_TEAM")       ID_TEAM="$NEW_ID" ;;
@@ -724,7 +724,7 @@ if [ "$CODE" = "200" ] && [ "$(json_field "$BODY" allowed)" = "True" ] \
    && [ "$(json_field "$BODY" weekly_share_remaining)" = "8" ] \
    && [ "$(used_of "$STATE")" = "4" ] \
    && [ "$(week_of "$STATE")" = "$THIS_MONDAY" ]; then
-  ok "新的一周又能按 12 份进本，周界刷成本周周首（$THIS_MONDAY）"
+  ok "新的一周又能按 12 份进本，周界刷成本周周首（${THIS_MONDAY}）"
 else
   bad "跨周后进本不对：HTTP ${CODE} ${BODY} / ${STATE}"
 fi
@@ -803,7 +803,7 @@ print("ok" if hp1 > 0 and dmg1 > 0
 PY
 )"
 if [ "$SCALE_VERDICT" = "ok" ]; then
-  ok "1 人与 4 人对比：Boss 生命 $HP1 → $HP4、伤害 $DMG1 → $DMG4，按配置倍率缩放"
+  ok "1 人与 4 人对比：Boss 生命 $HP1 → ${HP4}、伤害 $DMG1 → ${DMG4}，按配置倍率缩放"
 else
   bad "怪物缩放不对：1 人 $ONE / 4 人 $FOUR"
 fi
@@ -817,7 +817,7 @@ PD4_DMG="$(printf '%s' "$PD4" | grep -o 'damage=[0-9]*' | head -1 | cut -d= -f2)
 if [ -n "$PD1_DMG" ] && [ "$PD1_DMG" = "$PD4_DMG" ] \
    && printf '%s' "$PD1" | grep -q '^verdict=ok' \
    && printf '%s' "$PD4" | grep -q '^verdict=ok'; then
-  ok "玩家技能伤害 1 人与 4 人都是 $PD1_DMG，机制没随人数改，结算经验也没动"
+  ok "玩家技能伤害 1 人与 4 人都是 ${PD1_DMG}，机制没随人数改，结算经验也没动"
 else
   bad "玩家技能伤害被人数改动：$PD1 / $PD4"
 fi

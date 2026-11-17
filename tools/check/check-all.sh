@@ -146,6 +146,8 @@ deps_of() {
     k1) echo "" ;;
     # D1a 是 14.8 表第 1 行：拆 Program.cs 的 CLI；前置 K1 是配置卡，挂了 k1 跑它。
     d1a) echo "k1" ;;
+    # D1b 是 14.8 表第 2 行：CLI 迁出到 tools/probe，前置 D1a。
+    d1b) echo "d1a" ;;
     *) echo "__UNKNOWN__" ;;
   esac
 }
@@ -159,7 +161,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 r1 k1 d1a"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 r1 k1 d1a d1b"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {
@@ -269,7 +271,7 @@ echo "== 核对总控（${MODE}）=="
 
 if [ "$MODE" = "card" ]; then
   if [ "$(deps_of "$CARD")" = "__UNKNOWN__" ]; then
-    echo "未知卡号：$CARD（用 --list 看已知卡）" >&2
+    echo "未知卡号：${CARD}（用 --list 看已知卡）" >&2
     exit 2
   fi
   echo "目标卡：$CARD"

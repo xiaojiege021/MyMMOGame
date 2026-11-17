@@ -10,7 +10,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
-CD="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 CC="--config $ROOT/config/character.json"
@@ -40,7 +40,7 @@ def rd(p):
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
         return "".join(open(x, encoding="utf-8").read() for x in
-                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Cli/*.cs"))))
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(p))), "tools/probe/CliProbe/*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 cfg = json.loads(rd("config/dungeons.json"))
@@ -219,7 +219,7 @@ except Exception: print("")')"
   if [ "$(code_of "$r")" = "200" ] && [ "$(expect_json "$(body_of "$r")" allowed=false reason=party_too_small reward_shares=0 entry_id=0)" = "ok" ]; then
     ok "单人进龙巢：HTTP 200 allowed=false reason=party_too_small，0 份、无记录"
   else bad "单人没被拒：$r"; fi
-  [ "$(ecount "$SOLO")" = "$E0" ] && ok "单人被拒前后 entry_count 不变（$E0）" || bad "单人被拒也留了记录"
+  [ "$(ecount "$SOLO")" = "$E0" ] && ok "单人被拒前后 entry_count 不变（${E0}）" || bad "单人被拒也留了记录"
 
   echo "-- ② 8 人各进一次，每人 1 份 --"
   TEAM_OK=1; SUMS=0
@@ -229,7 +229,7 @@ except Exception: print("")')"
     s="$(shares "$id")"; SUMS=$((SUMS + ${s:-0}))
   done
   [ "$TEAM_OK" = "1" ] && [ "$SUMS" = "8" ] && [ "$(shares "$N1")" = "1" ] \
-    && ok "8 人各 1 次：8×reward_shares=1，累计 8 份（不是 64），每人只 1 份" || bad "8 人账不对：累计 $SUMS，N1=$(shares "$N1")"
+    && ok "8 人各 1 次：8×reward_shares=1，累计 8 份（不是 64），每人只 1 份" || bad "8 人账不对：累计 ${SUMS}，N1=$(shares "$N1")"
 
   echo "-- ③ 这周不能再进 --"
   E1="$(ecount "$N1")"
@@ -237,7 +237,7 @@ except Exception: print("")')"
   if [ "$(code_of "$r")" = "200" ] && [ "$(expect_json "$(body_of "$r")" allowed=false reason=hard_entries_exhausted hard_entries_remaining=0)" = "ok" ]; then
     ok "同一角色本周再进：hard_entries_exhausted、剩余 0"
   else bad "本周还能再进：$r"; fi
-  [ "$(ecount "$N1")" = "$E1" ] && ok "被拒不写第二次进本记录（$E1）" || bad "被拒也加了记录"
+  [ "$(ecount "$N1")" = "$E1" ] && ok "被拒不写第二次进本记录（${E1}）" || bad "被拒也加了记录"
 
   echo "-- ④ 2 人也只扣 1 次 --"
   r="$(enter "$P2" dragon 2)"
@@ -289,7 +289,7 @@ except Exception: print("")')"
   if ok8 "$r"; then ok "崩溃前已进本：次数在角色服落下（reward_shares=1）" || true
   else bad "崩溃前没进成：$r"; fi
   E1="$(ecount "$CRASH")"; HS="$(hstate "$CRASH" dragon)"
-  [ $((E1 - E0)) -eq 1 ] && ok "进本记录 +1（$E0→$E1），次数以角色服记录为准" || bad "进本记录没加：$E0→$E1"
+  [ $((E1 - E0)) -eq 1 ] && ok "进本记录 +1（${E0}→${E1}），次数以角色服记录为准" || bad "进本记录没加：${E0}→$E1"
   printf '%s' "$HS" | grep -qE 'used=1 .*remaining=0' && ok "崩溃前 hard_entry_state: $HS" || bad "次数没扣：$HS"
   [ -n "$BPID" ] && kill -9 "$BPID" 2>/dev/null; sleep 0.5
   kill -0 "$BPID" 2>/dev/null && bad "战斗服没被 kill -9 掉" || ok "战斗服已 kill -9（这次不结算奖励）"
@@ -298,7 +298,7 @@ except Exception: print("")')"
   if [ "$(code_of "$r")" = "200" ] && [ "$(expect_json "$(body_of "$r")" allowed=false reason=hard_entries_exhausted hard_entries_remaining=0)" = "ok" ]; then
     ok "崩溃后本周不能再进：hard_entries_exhausted、剩余 0（次数不退回）"
   else bad "崩溃后次数退回了：$r"; fi
-  [ "$(ecount "$CRASH")" = "$E2" ] && ok "崩溃后重进被拒：entry_count 不变（$E2）" || bad "被拒又加记录"
+  [ "$(ecount "$CRASH")" = "$E2" ] && ok "崩溃后重进被拒：entry_count 不变（${E2}）" || bad "被拒又加记录"
 
   echo "-- ⑧ 跨周归零 --"
   r="$(enter "$WEEK" dragon 2)"; HS="$(hstate "$WEEK" dragon)"

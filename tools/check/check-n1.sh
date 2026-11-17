@@ -13,7 +13,7 @@ cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 WORLD_DLL="$ROOT/src/World/bin/Release/net10.0/World.dll"
-CHARACTER_DLL="$ROOT/src/Character/bin/Release/net10.0/Character.dll"
+CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 HAS_DB="${MMO_N1_HAS_DB:-0}"
 TMP="$(mktemp -d)"; TMP="${TMP//\\//}"
@@ -210,7 +210,7 @@ for f in "$TMP"/bad-*.json; do
   out="$("$DOTNET" "$WORLD_DLL" --region-unlock-state --region-unlock-config "$f" 2>&1 | utf8)"; rc=$?
   [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error=' \
     && ok "坏配置 ${n}：config_error= 且非 0 退出" \
-    || bad "坏配置 ${n} 没挡住（rc=$rc）：$(printf '%s' "$out" | head -1)"
+    || bad "坏配置 ${n} 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -1)"
 done
 
 echo "== 5. 真服真库（MMO_N1_HAS_DB=1 才跑） =="
@@ -287,7 +287,7 @@ else
     && ok "真库：在旧天城区采到 C2 铺的矿（节点本来就有，只是进不去）" || bad "旧天城区的矿采不了：$R"
   F2="$(fatigue_of "$A")"
   [ -n "$F1" ] && [ "$F1" = "$F2" ] \
-    && ok "真库读回：采集前后疲劳都是 $F1（表世界采集不耗疲劳）" || bad "采集改了疲劳：$F1 → $F2"
+    && ok "真库读回：采集前后疲劳都是 ${F1}（表世界采集不耗疲劳）" || bad "采集改了疲劳：$F1 → $F2"
   cross "$A" 栖云城 >/dev/null
   R="$(cross "$A" 旧天城区)"
   [ "$(printf '%s' "$R" | jget reason)" = "region_realm_locked" ] \
