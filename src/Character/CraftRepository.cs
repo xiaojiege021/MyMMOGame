@@ -205,9 +205,13 @@ public sealed class CraftRepository(
         }
 
         // 2. 锁这一件活。没有活就拒绝；没过 ready_at 也拒绝，且不掷点。
+        //    先把 reader 关掉再回滚：Npgsql 不允许 reader 未关就 RollbackAsync，
+        //    那样会抛 NpgsqlOperationInProgressException，返给网关的是 db_error 而不是
+        //    no_craft，客户端拿不到一条可判定的业务拒绝。
         string recipeId;
         DateTimeOffset readyAt;
         int remaining;
+        bool jobFound;
         await using (var read = new NpgsqlCommand(
             "select recipe_id, ready_at, "
             + "greatest(0, ceil(extract(epoch from ready_at - now())))::int "
@@ -216,15 +220,26 @@ public sealed class CraftRepository(
         {
             read.Parameters.AddWithValue(characterId);
             await using var reader = await read.ExecuteReaderAsync(stopping);
-            if (!await reader.ReadAsync(stopping))
+            jobFound = await reader.ReadAsync(stopping);
+            if (jobFound)
             {
-                await transaction.RollbackAsync(stopping);
-                throw new CraftException("no_craft");
+                recipeId = reader.GetString(0);
+                readyAt = reader.GetFieldValue<DateTimeOffset>(1);
+                remaining = reader.GetInt32(2);
             }
+            else
+            {
+                // 没有活时这三个值用不到；显式给默认值，别让「读没读到」靠异常表达。
+                recipeId = "";
+                readyAt = default;
+                remaining = 0;
+            }
+        }
 
-            recipeId = reader.GetString(0);
-            readyAt = reader.GetFieldValue<DateTimeOffset>(1);
-            remaining = reader.GetInt32(2);
+        if (!jobFound)
+        {
+            await transaction.RollbackAsync(stopping);
+            throw new CraftException("no_craft");
         }
 
         if (remaining > 0)
