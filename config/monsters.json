@@ -1,0 +1,375 @@
+{
+  "schema": "monster-table/1",
+  "version": 1,
+  "note": "K6：怪物实体的唯一正本。level / tier / stats / skills / drops / spawn 全在这里；tier 只认 normal / elite / boss / world_boss，normal / elite 必须有 spawn，boss 的入口在副本表，spawn 里的 region 必须在 config/region/*.json 里，drops 的 item_id 必须在 config/items.json 里，skills 必须是 config/skills.json 里已有的编号。八块地表的普通 / 精英怪各一条，四个副本 Boss 各一条；世界 Boss 的数值仍在 config/world_boss.json，本表不写第二份。数值（血量 / 攻击 / 防御 / 掉率 / 刷新）是 K6 的占位，方案没写定，B15 按内容层再定；代码只读。",
+  "monsters": [
+    {
+      "id": "mob_kulan_beast",
+      "name": "枯岚凶兽",
+      "level": 5,
+      "tier": "normal",
+      "stats": {
+        "hp": 500,
+        "attack": 30,
+        "defense": 10
+      },
+      "skills": [
+        1001
+      ],
+      "drops": [
+        {
+          "item_id": "ore_iron",
+          "count": 1,
+          "chance_pct": 30
+        },
+        {
+          "item_id": "herb_ling",
+          "count": 1,
+          "chance_pct": 20
+        }
+      ],
+      "spawn": {
+        "region": "枯岚道",
+        "x": 20,
+        "y": 0,
+        "z": 30,
+        "respawn_s": 60
+      },
+      "note": "第 2 场挡路的兽；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_chenglu_dummy",
+      "name": "承露试炼傀儡",
+      "level": 8,
+      "tier": "normal",
+      "stats": {
+        "hp": 800,
+        "attack": 40,
+        "defense": 20
+      },
+      "skills": [
+        1002
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_low",
+          "count": 1,
+          "chance_pct": 25
+        }
+      ],
+      "spawn": {
+        "region": "承露门",
+        "x": 30,
+        "y": 0,
+        "z": 20,
+        "respawn_s": 90
+      },
+      "note": "门派试炼用的傀儡；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_tingyao_night_rat",
+      "name": "听谣夜鼠",
+      "level": 6,
+      "tier": "normal",
+      "stats": {
+        "hp": 400,
+        "attack": 35,
+        "defense": 8
+      },
+      "skills": [
+        1001
+      ],
+      "drops": [
+        {
+          "item_id": "herb_ling",
+          "count": 1,
+          "chance_pct": 35
+        }
+      ],
+      "spawn": {
+        "region": "听谣镇",
+        "x": 40,
+        "y": 0,
+        "z": 24,
+        "respawn_s": 45
+      },
+      "note": "镇外夜行的鼠；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_waihuan_wisp",
+      "name": "外环游魂",
+      "level": 12,
+      "tier": "normal",
+      "stats": {
+        "hp": 1200,
+        "attack": 80,
+        "defense": 30
+      },
+      "skills": [
+        1101
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_low",
+          "count": 1,
+          "chance_pct": 30
+        },
+        {
+          "item_id": "herb_ling",
+          "count": 1,
+          "chance_pct": 15
+        }
+      ],
+      "spawn": {
+        "region": "外环隙",
+        "x": 12,
+        "y": 0,
+        "z": 26,
+        "respawn_s": 75
+      },
+      "note": "外环隙的游魂；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_qiyun_dummy",
+      "name": "栖云演武桩",
+      "level": 15,
+      "tier": "normal",
+      "stats": {
+        "hp": 1500,
+        "attack": 60,
+        "defense": 40
+      },
+      "skills": [
+        1002
+      ],
+      "drops": [
+        {
+          "item_id": "ore_iron",
+          "count": 1,
+          "chance_pct": 20
+        }
+      ],
+      "spawn": {
+        "region": "栖云城",
+        "x": 30,
+        "y": 0,
+        "z": 14,
+        "respawn_s": 120
+      },
+      "note": "演武场木桩；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_jiutian_shade",
+      "name": "旧天残影",
+      "level": 40,
+      "tier": "elite",
+      "stats": {
+        "hp": 6000,
+        "attack": 300,
+        "defense": 120
+      },
+      "skills": [
+        1201
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_mid",
+          "count": 1,
+          "chance_pct": 25
+        },
+        {
+          "item_id": "crystal_attack",
+          "count": 1,
+          "chance_pct": 5
+        }
+      ],
+      "spawn": {
+        "region": "旧天城区",
+        "x": 16,
+        "y": 0,
+        "z": 34,
+        "respawn_s": 180
+      },
+      "note": "旧天城区的残影；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_jiaoyuan_fire_beast",
+      "name": "焦原火兽",
+      "level": 40,
+      "tier": "elite",
+      "stats": {
+        "hp": 6500,
+        "attack": 350,
+        "defense": 100
+      },
+      "skills": [
+        1202
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_mid",
+          "count": 1,
+          "chance_pct": 30
+        },
+        {
+          "item_id": "crystal_defense",
+          "count": 1,
+          "chance_pct": 5
+        }
+      ],
+      "spawn": {
+        "region": "焦原",
+        "x": 18,
+        "y": 0,
+        "z": 44,
+        "respawn_s": 180
+      },
+      "note": "焦原的火兽；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_longchao_whelp",
+      "name": "龙巢幼兽",
+      "level": 45,
+      "tier": "elite",
+      "stats": {
+        "hp": 8000,
+        "attack": 400,
+        "defense": 150
+      },
+      "skills": [
+        1203
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_high",
+          "count": 1,
+          "chance_pct": 20
+        },
+        {
+          "item_id": "crystal_utility",
+          "count": 1,
+          "chance_pct": 5
+        }
+      ],
+      "spawn": {
+        "region": "龙巢门口",
+        "x": 10,
+        "y": 0,
+        "z": 20,
+        "respawn_s": 240
+      },
+      "note": "龙巢门口的幼兽；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "boss_abyss_warden",
+      "name": "深渊镇守",
+      "level": 30,
+      "tier": "boss",
+      "stats": {
+        "hp": 20000,
+        "attack": 500,
+        "defense": 200
+      },
+      "skills": [
+        1101,
+        1102
+      ],
+      "drops": [
+        {
+          "item_id": "crystal_attack",
+          "count": 1,
+          "chance_pct": 100
+        },
+        {
+          "item_id": "stone_enhance_mid",
+          "count": 2,
+          "chance_pct": 100
+        }
+      ],
+      "note": "深渊副本 Boss；入口在 dungeons.json 的 abyss，数值为 K6 占位。"
+    },
+    {
+      "id": "boss_lair_matriarch",
+      "name": "巢穴主母",
+      "level": 25,
+      "tier": "boss",
+      "stats": {
+        "hp": 18000,
+        "attack": 450,
+        "defense": 180
+      },
+      "skills": [
+        1102,
+        1103
+      ],
+      "drops": [
+        {
+          "item_id": "crystal_defense",
+          "count": 1,
+          "chance_pct": 100
+        },
+        {
+          "item_id": "stone_enhance_low",
+          "count": 3,
+          "chance_pct": 100
+        }
+      ],
+      "note": "巢穴副本 Boss；入口在 dungeons.json 的 lair，数值为 K6 占位。"
+    },
+    {
+      "id": "boss_sect_guardian",
+      "name": "宗门秘境守",
+      "level": 35,
+      "tier": "boss",
+      "stats": {
+        "hp": 24000,
+        "attack": 600,
+        "defense": 220
+      },
+      "skills": [
+        1201,
+        1202
+      ],
+      "drops": [
+        {
+          "item_id": "crystal_utility",
+          "count": 1,
+          "chance_pct": 100
+        },
+        {
+          "item_id": "stone_enhance_mid",
+          "count": 2,
+          "chance_pct": 100
+        }
+      ],
+      "note": "宗门秘境 Boss；入口在 dungeons.json 的 sect，数值为 K6 占位。"
+    },
+    {
+      "id": "boss_dragon_warden",
+      "name": "龙巢守",
+      "level": 50,
+      "tier": "boss",
+      "stats": {
+        "hp": 30000,
+        "attack": 800,
+        "defense": 260
+      },
+      "skills": [
+        1203
+      ],
+      "drops": [
+        {
+          "item_id": "stone_transfer",
+          "count": 1,
+          "chance_pct": 100
+        },
+        {
+          "item_id": "stone_enhance_high",
+          "count": 2,
+          "chance_pct": 100
+        }
+      ],
+      "note": "龙巢高难本 Boss；入口在 dungeons.json 的 dragon，数值为 K6 占位。"
+    }
+  ]
+}

@@ -69,6 +69,9 @@ public sealed class BattleProcess(string configPath)
         Console.WriteLine("character_dir=" + characters.Dir);
         Console.WriteLine($"skills={config.Skills.All.Count} skill_table_version={config.Skills.Version}");
         Console.WriteLine($"classes={config.Classes.All.Count} class_table_version={config.Classes.Version} default_class={config.DefaultClass}");
+        Console.WriteLine(config.Monsters is null
+            ? "monster_table=missing"
+            : $"monster_table=ok version={config.Monsters.Version} monsters={config.Monsters.All.Count}");
         // 副本表的难度档与人数上下限打出来：高难本至少 2 人，普通本 min_players 是 1。
         Console.WriteLine($"dungeons={config.Dungeons.All.Count} dungeon_table_version={config.Dungeons.Version}");
         Console.WriteLine("dungeon_drops="

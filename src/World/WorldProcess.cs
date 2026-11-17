@@ -14,6 +14,7 @@ public sealed class WorldProcess(
         GatherTable gather;
         GatherTable gatherAll;
         GatherSpreadTable? gatherSpread;
+        NpcTable? npcTable;
         FlightTable flights;
         WorldBossTable? worldBossTable;
         RegionUnlockTable? regionUnlocks;
@@ -24,6 +25,31 @@ public sealed class WorldProcess(
             var regionIds = catalog.Regions.Select(r => r.Id).ToHashSet(StringComparer.Ordinal);
             // 节点必须长在已经配置的地表上；采集表坏掉同样不带半截配置跑。
             gather = GatherTable.Load(gatherConfigPath, regionIds);
+            // K6：NPC 表是可选的。正本在 config/npc.json；老卡临时目录没有它时降级成 missing，
+            // 不把分线 / 采集 / 飞行这些老链路拖垮。有表就逐条查地表、势力、对话编号。
+            npcTable = File.Exists(config.NpcTable)
+                ? NpcTable.Load(
+                    config.NpcTable, regionIds, config.Factions, config.Speakers)
+                : null;
+            if (npcTable is not null)
+            {
+                // 九位开口的人与 NPC 的 dialogue_id 必须一一对上：少一位，屏上就少一个人。
+                var withDialogue = npcTable.All
+                    .Where(n => n.DialogueId.Length > 0)
+                    .Select(n => n.DialogueId)
+                    .ToHashSet(StringComparer.Ordinal);
+                var missing = config.Speakers.Where(s => !withDialogue.Contains(s)).ToList();
+                if (missing.Count > 0)
+                {
+                    throw new ConfigException("npc.json 漏了开口的人：" + string.Join(",", missing));
+                }
+                var extra = withDialogue.Where(s => !config.Speakers.Contains(s, StringComparer.Ordinal)).ToList();
+                if (extra.Count > 0)
+                {
+                    throw new ConfigException("npc.json 的 dialogue_id 不在 world.json 的 speakers 里："
+                        + string.Join(",", extra));
+                }
+            }
             // 每块已配置地表都必须有境界门槛，漏一块就等于给它开零门槛。
             flights = FlightTable.Load(flightConfigPath, regionIds);
             // C2 铺开表是可选的：老卡的临时配置目录里没有它，就按 P1-3b 的四个基准点照常跑。
@@ -58,6 +84,12 @@ public sealed class WorldProcess(
             + " dialogues=" + catalog.Dialogues.Count
             + " speakers=" + catalog.Speakers.Count
             + " factions=" + catalog.Factions.Count);
+        Console.WriteLine(npcTable is null
+            ? "npc_table=missing"
+            : "npc_table=ok version=" + npcTable.Version
+                + " npcs=" + npcTable.All.Count
+                + " with_dialogue=" + npcTable.All.Count(n => n.DialogueId.Length > 0)
+                + " with_shop=" + npcTable.All.Count(n => n.ShopId.Length > 0));
         Console.WriteLine("line_capacity=" + config.LineCapacity
             + " max_lines_per_region=" + config.MaxLinesPerRegion);
         Console.WriteLine("position_config=ok sync_hz=" + config.SyncHz

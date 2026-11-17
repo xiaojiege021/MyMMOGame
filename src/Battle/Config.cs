@@ -321,6 +321,7 @@ public sealed class BattleConfig
     public string CharacterDir { get; init; } = "";
     public string SkillTablePath { get; init; } = "";
     public string ClassTablePath { get; init; } = "";
+    public string MonsterTablePath { get; init; } = "";
     public string ArenaMatchTablePath { get; init; } = "";
     public string BattlefieldTablePath { get; init; } = "";
     public string SiegeTablePath { get; init; } = "";
@@ -344,6 +345,12 @@ public sealed class BattleConfig
     public ArenaConfig Arena { get; init; } = new();
     public SkillTable Skills { get; private set; } = null!;
     public ClassTable Classes { get; private set; } = null!;
+
+    /// <summary>
+    /// K6 怪物表（config/monsters.json）。可选表：老卡临时配置目录没有它时为 null，
+    /// 副本 / 竞技场 / 战场 / 城战照跑；显式写了路径却缺文件照样起不来。
+    /// </summary>
+    public MonsterTable? Monsters { get; private set; }
 
     /// <summary>副本表：人数上限与进本时的扣减规则。与角色服读同一份配置。</summary>
     public DungeonTable Dungeons { get; private set; } = null!;
@@ -416,6 +423,7 @@ public sealed class BattleConfig
         var dir = Path.GetDirectoryName(full)!;
 
         var skillPath = Resolve(dir, raw.SkillTable, "skills.json");
+        var monsterPath = Resolve(dir, raw.MonsterTable, "monsters.json");
         var classPath = Resolve(dir, raw.ClassTable, "classes.json");
         var dungeonPath = Resolve(dir, raw.DungeonTable, "dungeons.json");
         var dungeonDropPath = Resolve(dir, raw.DungeonDropTable, "dungeon_drops.json");
@@ -473,6 +481,15 @@ public sealed class BattleConfig
                 ? WorldBossTable.Missing()
                 : throw new ConfigException($"{path}：world_boss_table 指的 {worldBossPath} 不存在");
 
+        // K6：怪物表的技能编号要落在这份技能表里。缺表按「没有怪物」处理，
+        // 老卡的临时配置目录不受影响；显式写了路径却缺文件仍然起不来。
+        var skills = SkillTable.Load(skillPath);
+        var monsters = File.Exists(monsterPath)
+            ? MonsterTable.Load(monsterPath, skills.All.Select(x => x.Id.ToString()).ToList())
+            : string.IsNullOrWhiteSpace(raw.MonsterTable)
+                ? null
+                : throw new ConfigException($"{path}：monster_table 指的 {monsterPath} 不存在");
+
         var config = new BattleConfig
         {
             Listen = raw.Listen,
@@ -482,6 +499,7 @@ public sealed class BattleConfig
             CharacterDir = Path.GetFullPath(raw.CharacterDir),
             SkillTablePath = skillPath,
             ClassTablePath = classPath,
+            MonsterTablePath = monsterPath,
             ArenaMatchTablePath = arenaMatchPath,
             SiegeTablePath = siegePath,
             SectTechTablePath = sectTechPath,
@@ -499,8 +517,9 @@ public sealed class BattleConfig
             Boss = raw.Boss,
             Arena = raw.Arena,
             SourcePath = full,
-            Skills = SkillTable.Load(skillPath),
+            Skills = skills,
             Classes = ClassTable.Load(classPath),
+            Monsters = monsters,
             Dungeons = DungeonTable.Load(dungeonPath),
             DungeonDrops = DungeonDropTable.LoadIfPresent(dungeonDropPath),
             ArenaMatch = arenaMatch,
@@ -719,6 +738,8 @@ public sealed class BattleConfig
         public string CharacterDir { get; init; } = "var/battle/characters";
         public string SkillTable { get; init; } = "skills.json";
         public string ClassTable { get; init; } = "classes.json";
+        /// <summary>K6 怪物表；留空时按默认文件名找，找不到就降级为没有怪物。</summary>
+        public string MonsterTable { get; init; } = "";
         public string DungeonTable { get; init; } = "dungeons.json";
         public string DungeonDropTable { get; init; } = "dungeon_drops.json";
         public string ArenaMatchTable { get; init; } = "";

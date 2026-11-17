@@ -61,8 +61,17 @@ namespace HotUpdate.Ui
             }
 
             var noteTop = gridTop + 4 * (rowH + rowGap) + m.Px(12f);
+            var lockedNames = new List<string>();
+            for (var i = 0; i < UiWorldCodex.Regions.Length; i++)
+            {
+                if (!UiWorldCodex.Regions[i].Open)
+                {
+                    lockedNames.Add(UiWorldCodex.Regions[i].Name);
+                }
+            }
+
             shell.Label(new Rect(pad, m.Height - noteTop - m.Px(48f), leftW, m.Px(48f)),
-                "两块未开的是第 11 场主线开放（旧天城区 / 焦原），本卡不改剧情进度。",
+                "未开的是第 11 场主线开放（" + string.Join(" / ", lockedNames) + "），本卡不改剧情进度。",
                 UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 右：跨区

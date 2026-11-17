@@ -352,7 +352,7 @@ namespace HotUpdate.Ui
                 }
             }
 
-            return "枯岚道";
+            return UiContentTable.Regions[0].Id;
         }
     }
 }

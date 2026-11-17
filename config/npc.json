@@ -1,0 +1,183 @@
+{
+  "schema": "npc-table/1",
+  "version": 1,
+  "note": "K6：NPC 实体的唯一正本。id / name / region / pos / facing / faction / role / dialogue_id / shop_id / note 全在这里；region 必须在 config/region/*.json 里，faction 必须在 config/world.json 的 factions 里，dialogue_id 必须对应 config/dialogue/<人名>.json，shop_id 必须对应 config/npc_shop.json 的商店。pos / facing 是 K6 的占位值：方案 2.5 没给世界坐标，B15 接场景后按美术摆点替换，代码不写第二套坐标。九位开口的人各有一条；npc_shop_qiyun / npc_shop_sect 是 K2 两个 NPC 商店的执事，先落实体与商店引用，商品、价格、库存仍只在 npc_shop.json。",
+  "npcs": [
+    {
+      "id": "npc_qiao_xiaoman",
+      "name": "乔小满",
+      "region": "枯岚道",
+      "pos": {
+        "x": 12,
+        "y": 0,
+        "z": 8
+      },
+      "facing": 180,
+      "faction": "",
+      "role": "quest",
+      "dialogue_id": "乔小满",
+      "shop_id": "",
+      "note": "第 1、2 场在枯岚道教锁定；不加入后面的队伍。"
+    },
+    {
+      "id": "npc_su_wanzhi",
+      "name": "苏晚织",
+      "region": "承露门",
+      "pos": {
+        "x": 26,
+        "y": 0,
+        "z": 10
+      },
+      "facing": 180,
+      "faction": "承露门",
+      "role": "trainer",
+      "dialogue_id": "苏晚织",
+      "shop_id": "",
+      "note": "代表承露门收徒，不替玩家选职业。"
+    },
+    {
+      "id": "npc_wen_sao",
+      "name": "闻嫂",
+      "region": "听谣镇",
+      "pos": {
+        "x": 18,
+        "y": 0,
+        "z": 14
+      },
+      "facing": 180,
+      "faction": "",
+      "role": "innkeeper",
+      "dialogue_id": "闻嫂",
+      "shop_id": "",
+      "note": "听谣镇落脚与传闻；不卖突破材料。"
+    },
+    {
+      "id": "npc_ruan_qing",
+      "name": "阮青",
+      "region": "外环隙",
+      "pos": {
+        "x": 8,
+        "y": 0,
+        "z": 22
+      },
+      "facing": 90,
+      "faction": "",
+      "role": "quest",
+      "dialogue_id": "阮青",
+      "shop_id": "",
+      "note": "第 4 场同行；第 6 场在外环隙确认秘境没有无尽灵气。"
+    },
+    {
+      "id": "npc_a_xian",
+      "name": "阿弦",
+      "region": "听谣镇",
+      "pos": {
+        "x": 34,
+        "y": 0,
+        "z": 18
+      },
+      "facing": 270,
+      "faction": "",
+      "role": "flavor",
+      "dialogue_id": "阿弦",
+      "shop_id": "",
+      "note": "第 4 场同行。方案 2.5 没写定固定地点，暂放听谣镇，B15 接场景再定。"
+    },
+    {
+      "id": "npc_meng_qi",
+      "name": "孟七",
+      "region": "栖云城",
+      "pos": {
+        "x": 20,
+        "y": 0,
+        "z": 12
+      },
+      "facing": 180,
+      "faction": "续仙盟",
+      "role": "flavor",
+      "dialogue_id": "孟七",
+      "shop_id": "",
+      "note": "受雇于续仙盟，第 8 场出现；方案没写定固定地点，暂放栖云城。"
+    },
+    {
+      "id": "npc_cheng_chuan",
+      "name": "澄川",
+      "region": "旧天城区",
+      "pos": {
+        "x": 10,
+        "y": 0,
+        "z": 30
+      },
+      "facing": 180,
+      "faction": "明霄圣地",
+      "role": "quest",
+      "dialogue_id": "澄川",
+      "shop_id": "",
+      "note": "立仙短章带过旧天城区。"
+    },
+    {
+      "id": "npc_hui_sheng",
+      "name": "灰生",
+      "region": "焦原",
+      "pos": {
+        "x": 12,
+        "y": 0,
+        "z": 40
+      },
+      "facing": 180,
+      "faction": "焦原的修士",
+      "role": "quest",
+      "dialogue_id": "灰生",
+      "shop_id": "",
+      "note": "立魔短章带过焦原。"
+    },
+    {
+      "id": "npc_zhou_wantang",
+      "name": "周晚棠",
+      "region": "龙巢门口",
+      "pos": {
+        "x": 8,
+        "y": 0,
+        "z": 16
+      },
+      "facing": 180,
+      "faction": "栖云城",
+      "role": "quest",
+      "dialogue_id": "周晚棠",
+      "shop_id": "",
+      "note": "第 12 场在龙巢门口交接入口守护与税收。"
+    },
+    {
+      "id": "npc_shop_qiyun",
+      "name": "栖云坊市执事",
+      "region": "栖云城",
+      "pos": {
+        "x": 24,
+        "y": 0,
+        "z": 8
+      },
+      "facing": 180,
+      "faction": "栖云城",
+      "role": "merchant",
+      "dialogue_id": "",
+      "shop_id": "npc_general_qiyun",
+      "note": "K2 商店的执事；商品、价格、库存只在 npc_shop.json。"
+    },
+    {
+      "id": "npc_shop_sect",
+      "name": "宗门库房执事",
+      "region": "承露门",
+      "pos": {
+        "x": 20,
+        "y": 0,
+        "z": 6
+      },
+      "facing": 180,
+      "faction": "承露门",
+      "role": "merchant",
+      "dialogue_id": "",
+      "shop_id": "npc_sect_supply",
+      "note": "K2 宗门供给商店的执事；商品、价格、库存只在 npc_shop.json。"
+    }
+  ]
+}

@@ -30,58 +30,34 @@ namespace HotUpdate.Ui
             public float MapY;
         }
 
-        /// <summary>与 `config/world.json` 的 regions 同序同数，境界门槛取自 `config/flight.json`。</summary>
-        public static readonly Region[] Regions =
+        /// <summary>八块地表，顺序与 `config/world.json` 的 regions 一致；内容由 config/ 生成。</summary>
+        public static readonly Region[] Regions = UiContentTable.Regions;
+
+        /// <summary>开口人的元数据（名字 / 出身 / 场次），由 config/ 生成；台词在 C5 前仍留本文件。</summary>
+        public struct SpeakerMeta
         {
-            new Region
-            {
-                Id = "枯岚道", Name = "枯岚道", Chapters = new[] { 1, 2 },
-                Neighbors = new[] { "承露门" }, Open = true, Realm = "炼体",
-                Position = "起点。连着承露门", MapX = 14f, MapY = 62f,
-            },
-            new Region
-            {
-                Id = "承露门", Name = "承露门", Chapters = new[] { 3 },
-                Neighbors = new[] { "枯岚道", "听谣镇" }, Open = true, Realm = "炼体",
-                Position = "枯岚道尽头。连着听谣镇", MapX = 30f, MapY = 54f,
-            },
-            new Region
-            {
-                Id = "听谣镇", Name = "听谣镇", Chapters = new[] { 5 },
-                Neighbors = new[] { "承露门", "栖云城", "外环隙" }, Open = true, Realm = "炼体",
-                Position = "承露门和栖云城之间", MapX = 46f, MapY = 66f,
-            },
-            new Region
-            {
-                Id = "外环隙", Name = "外环隙", Chapters = new[] { 6 },
-                Neighbors = new[] { "听谣镇" }, Open = true, Realm = "炼体",
-                Position = "听谣镇外侧的一道地表入口", MapX = 30f, MapY = 80f,
-            },
-            new Region
-            {
-                Id = "栖云城", Name = "栖云城", Chapters = new[] { 12 },
-                Neighbors = new[] { "听谣镇", "旧天城区", "焦原", "龙巢门口" }, Open = true, Realm = "炼体",
-                Position = "这片密区的主城。听谣镇能走到", MapX = 64f, MapY = 46f,
-            },
-            new Region
-            {
-                Id = "旧天城区", Name = "旧天城区", Chapters = new[] { 11 },
-                Neighbors = new[] { "栖云城" }, Open = false, Realm = "结丹",
-                Position = "从栖云城走出的短支路。高空航路下面，第 11 场才开", MapX = 82f, MapY = 34f,
-            },
-            new Region
-            {
-                Id = "焦原", Name = "焦原", Chapters = new[] { 11 },
-                Neighbors = new[] { "栖云城" }, Open = false, Realm = "结丹",
-                Position = "从栖云城走出的另一条短支路。第 11 场才开", MapX = 82f, MapY = 68f,
-            },
-            new Region
-            {
-                Id = "龙巢门口", Name = "龙巢门口", Chapters = new[] { 12 },
-                Neighbors = new[] { "栖云城" }, Open = true, Realm = "结丹",
-                Position = "栖云城外缘，能看见", MapX = 64f, MapY = 78f,
-            },
-        };
+            public string Name;
+            public string Origin;
+            public int LineCount;
+            public int FirstChapter;
+            public string FirstRegion;
+        }
+
+        /// <summary>一位 NPC 实体（K6）。站位与职能照 `config/npc.json`，名字不手写。</summary>
+        public struct NpcMeta
+        {
+            public string Id;
+            public string Name;
+            public string Region;
+            public string Role;
+            public string Faction;
+            public string DialogueId;
+            public string ShopId;
+            public float X;
+            public float Y;
+            public float Z;
+            public float Facing;
+        }
 
         /// <summary>一位开口的人。定词与边界照抄 `config/dialogue/&lt;姓名&gt;.json` 的第一场。</summary>
         public struct Speaker
@@ -99,66 +75,92 @@ namespace HotUpdate.Ui
             public string SecondLimit;
         }
 
-        /// <summary>与 `config/world.json` 的 speakers 同序同数，九条定词逐字照抄配置。</summary>
-        public static readonly Speaker[] Speakers =
+        /// <summary>只放台词的文本表，与 UiContentTable.Speakers 同序同数；C5 再把台词搬进 config/。</summary>
+        struct SpeakerText
         {
-            new Speaker
+            public string Text;
+            public string Limit;
+            public string SecondText;
+            public string SecondLimit;
+        }
+
+        static readonly SpeakerText[] SpeakerTexts =
+        {
+            new SpeakerText
             {
-                Name = "乔小满", Origin = "尘民", LineCount = 2, FirstChapter = 1, FirstRegion = "枯岚道",
                 Text = "灵气这么薄，先把眼前这只选中。选不中，后面的招式没有用。",
                 Limit = "只在枯岚道教锁定。不加入后面的队伍",
                 SecondText = "它要扑的那一下有前摇。你要么拉开，要么挡住。",
                 SecondLimit = "送到承露门门口就离开",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "苏晚织", Origin = "尘民", LineCount = 2, FirstChapter = 3, FirstRegion = "承露门",
                 Text = "承露门只教天地玄黄。外面说秘境灵气无尽，能帮人破境。这句话是传的，门派自己没进去过。",
                 Limit = "代表门派收徒，不替玩家选职业",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "阮青", Origin = "脉裔", LineCount = 4, FirstChapter = 4, FirstRegion = "",
                 Text = "我家的脉一年比一年细。我出来是找那处秘境，不是找一个救主。",
                 Limit = "同行之一。四种出身都能遇见他",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "阿弦", Origin = "岚民", LineCount = 1, FirstChapter = 4, FirstRegion = "",
                 Text = "旧天路断了。我跟着走一段，走到入口就知道传闻真不真。",
                 Limit = "同行之一。创角时不能飞，他也不能",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "闻嫂", Origin = "", LineCount = 1, FirstChapter = 5, FirstRegion = "听谣镇",
                 Text = "住店、听传闻，都按天算。突破的东西这里不卖。",
                 Limit = "不卖灵石、丹药和装备",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "孟七", Origin = "", LineCount = 1, FirstChapter = 8, FirstRegion = "",
                 Text = "续仙盟按人头给钱。认得出承露门的衣服。我是受雇的。",
                 Limit = "这场之后不再出场",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "澄川", Origin = "", LineCount = 1, FirstChapter = 11, FirstRegion = "旧天城区",
                 Text = "不顺着续仙盟走，只是不顺着他们。承露门对过的事，这里不替它认。",
                 Limit = "只在旧天城区出现。不加副本次数",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "灰生", Origin = "", LineCount = 1, FirstChapter = 11, FirstRegion = "焦原",
                 Text = "用这里的力量往下走，不是去续仙盟报到。",
                 Limit = "只在焦原出现。选他这条不是加入续仙盟",
             },
-            new Speaker
+            new SpeakerText
             {
-                Name = "周晚棠", Origin = "", LineCount = 1, FirstChapter = 12, FirstRegion = "栖云城",
                 Text = "入口太多，这座城守不住。守护和税收包给宗门。个人的路停在龙巢门口。",
                 Limit = "不要求玩家单独拯救栖云城",
             },
         };
+
+        /// <summary>九位开口的人：名字 / 出身 / 场次来自生成表，台词与边界来自上面的文本表。</summary>
+        public static readonly Speaker[] Speakers = BuildSpeakers();
+
+        static Speaker[] BuildSpeakers()
+        {
+            var meta = UiContentTable.Speakers;
+            var list = new Speaker[meta.Length];
+            for (var i = 0; i < meta.Length; i++)
+            {
+                var text = SpeakerTexts[i];
+                list[i] = new Speaker
+                {
+                    Name = meta[i].Name,
+                    Origin = meta[i].Origin,
+                    LineCount = meta[i].LineCount,
+                    FirstChapter = meta[i].FirstChapter,
+                    FirstRegion = meta[i].FirstRegion,
+                    Text = text.Text,
+                    Limit = text.Limit,
+                    SecondText = text.SecondText,
+                    SecondLimit = text.SecondLimit,
+                };
+            }
+
+            return list;
+        }
 
         /// <summary>乔小满第 1、2 场的定词，字字照抄 `config/dialogue/乔小满.json`。</summary>
         public const string QiaoChapter1 = "灵气这么薄，先把眼前这只选中。选不中，后面的招式没有用。";
@@ -169,11 +171,11 @@ namespace HotUpdate.Ui
         /// <summary>三个采集分组。页签顺序与原型 B04 一致。</summary>
         public static readonly string[] GatherTabs = { "矿脉", "药草", "灵石矿脉" };
 
-        /// <summary>三段大境界，顺序照 `config/flight.json` 的 realms，不另起名字。</summary>
-        public static readonly string[] Realms = { "炼体", "筑基", "结丹" };
+        /// <summary>三段大境界，顺序照 `config/flight.json` 的 realms，由生成表带过来。</summary>
+        public static readonly string[] Realms = UiContentTable.Realms;
 
-        /// <summary>能飞的起点境界。数值在 `config/flight.json` 的 flight_realm，这里照抄只作说明。</summary>
-        public const string FlightRealm = "筑基";
+        /// <summary>能飞的起点境界，照 `config/flight.json` 的 flight_realm。</summary>
+        public const string FlightRealm = UiContentTable.FlightRealm;
 
         /// <summary>同屏三档的展示名。档位本身来自回包的 AppearanceTier，不在这里判。</summary>
         public static readonly string[] TierLabels = { "完整模型", "简模", "只留名字" };
@@ -199,7 +201,7 @@ namespace HotUpdate.Ui
         /// <summary>B01 左下「附近」三条。</summary>
         public static readonly string[] HudNearby =
         {
-            "乔小满 · 开口的人 · 枯岚道",
+            Speakers[0].Name + " · 开口的人 · " + Speakers[0].FirstRegion,
             "矿脉 · 可采集 · 不耗疲劳",
             "裂隙入口 · 进副本 / 战场的唯一通道",
         };

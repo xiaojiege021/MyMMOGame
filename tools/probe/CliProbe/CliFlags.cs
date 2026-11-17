@@ -21,6 +21,8 @@ internal static class CliFlags
     public static string? advanceBranchTo = null;
     public static long canEquipOf = 0;
     public static string? canEquipItem = null;
+    // K6：把 NPC / 怪物两张内容表读出来，不连库、不启动进程。坏配置也走这里。
+    public static bool contentList = false;
     // K5：把物品表的 grade / set_id / icon / desc 读出来，不连库、不启动进程。
     public static bool itemList = false;
     public static bool weaponRules = false;

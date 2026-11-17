@@ -109,7 +109,7 @@ public sealed class HeroCodexTable
                 throw new ConfigException("英灵图鉴第 " + (i + 1) + " 条 id 与 name 不能为空");
             }
 
-            var written = MainlineTable.WrittenSpeakers[i];
+            var written = mainline.Speakers[i];
             if (!string.Equals(name, written, StringComparison.Ordinal))
             {
                 throw new ConfigException("英灵图鉴第 " + (i + 1) + " 条须是 " + written);

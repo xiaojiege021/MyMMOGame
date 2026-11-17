@@ -45,17 +45,9 @@ public sealed class MainlineTable
     public const int StageCount = 12;
     public const string MainDungeon = "main";
 
-    // 方案 2.5 的八块首发地表、2.6 的五个势力、2.7 的九个开口的人。名字一个都不另起。
-    public static readonly string[] WrittenPlaces =
-    [
-        "枯岚道", "承露门", "听谣镇", "外环隙", "栖云城", "旧天城区", "焦原", "龙巢门口",
-    ];
-    public static readonly string[] WrittenFactions =
-        ["承露门", "栖云城", "续仙盟", "明霄圣地", "焦原的修士"];
-    public static readonly string[] WrittenSpeakers =
-    [
-        "乔小满", "苏晚织", "阮青", "阿弦", "闻嫂", "孟七", "澄川", "灰生", "周晚棠",
-    ];
+    // K6：地名 / 势力 / 开口的人不再写死在代码里。顶层三份名单只在 mainline.json 存一次，
+    // 再用同目录的 world.json 逐项交叉校验（真实配置一定在同一目录；老卡的临时单文件
+    // 副本没有 world.json 时只做名单内部一致性校验，不误报）。
     public static readonly string[] WrittenAlignments = ["立仙", "立魔"];
 
     // 第 10/11/12 场分别等这三段突破成功（开发架构第 627 行的原文）。
@@ -189,10 +181,11 @@ public sealed class MainlineTable
                     + " 必须是 1 人、不扣疲劳、不占周份额");
             }
 
-            var places = ReadNames(wire.Places, WrittenPlaces, "places");
-            var factions = ReadNames(wire.Factions, WrittenFactions, "factions");
-            var speakers = ReadNames(wire.Speakers, WrittenSpeakers, "speakers");
-            var alignments = ReadNames(wire.AlignmentChoices, WrittenAlignments, "alignment_choices");
+            var places = ReadNames(wire.Places, "places");
+            var factions = ReadNames(wire.Factions, "factions");
+            var speakers = ReadNames(wire.Speakers, "speakers");
+            var alignments = ReadNames(wire.AlignmentChoices, "alignment_choices");
+            CheckAgainstWorld(path, places, factions, speakers);
 
             var array = root.GetProperty("stages");
             if (array.ValueKind != JsonValueKind.Array || array.GetArrayLength() != StageCount)
@@ -329,19 +322,64 @@ public sealed class MainlineTable
         }
     }
 
-    static IReadOnlyList<string> ReadNames(
-        List<string?>? raw, IReadOnlyList<string> written, string field)
+    static IReadOnlyList<string> ReadNames(List<string?>? raw, string field)
     {
         var names = (raw ?? []).Select(n => (n ?? "").Trim()).Where(n => n.Length > 0).ToList();
-        if (names.Count != written.Count
-            || names.Distinct(StringComparer.Ordinal).Count() != names.Count
-            || written.Any(w => !names.Contains(w, StringComparer.Ordinal)))
+        if (names.Count == 0 || names.Distinct(StringComparer.Ordinal).Count() != names.Count)
         {
-            throw new ConfigException("mainline.json 的 " + field
-                + " 必须逐字照方案正文，不多不少、不另起名字");
+            throw new ConfigException("mainline.json 的 " + field + " 不能为空、也不能重复");
         }
 
         return names;
+    }
+
+    /// <summary>
+    /// K6：mainline.json 的三份名单与同目录 world.json 逐项一致。world.json 是地名 / 势力 /
+    /// 开口人的正本；临时目录里没有 world.json 时跳过（只做名单内部一致性校验）。
+    /// </summary>
+    static void CheckAgainstWorld(
+        string path, IReadOnlyList<string> places, IReadOnlyList<string> factions,
+        IReadOnlyList<string> speakers)
+    {
+        var dir = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var worldPath = Path.Combine(dir, "world.json");
+        if (!File.Exists(worldPath))
+        {
+            return;
+        }
+
+        WorldNames world;
+        try
+        {
+            world = JsonSerializer.Deserialize<WorldNames>(File.ReadAllText(worldPath), JsonOptions)
+                ?? throw new ConfigException("world.json 是空的");
+        }
+        catch (JsonException ex)
+        {
+            throw new ConfigException("world.json 字段类型不对：" + ex.Message);
+        }
+
+        Same("places", places, world.Regions, "world.json 的 regions");
+        Same("factions", factions, world.Factions, "world.json 的 factions");
+        Same("speakers", speakers, world.Speakers, "world.json 的 speakers");
+
+        static void Same(string field, IReadOnlyList<string> actual,
+            List<string>? expected, string source)
+        {
+            var want = (expected ?? []).Select(n => (n ?? "").Trim())
+                .Where(n => n.Length > 0).ToList();
+            if (want.Count != actual.Count || want.Any(n => !actual.Contains(n, StringComparer.Ordinal)))
+            {
+                throw new ConfigException("mainline.json 的 " + field + " 与 " + source + " 对不上");
+            }
+        }
+    }
+
+    sealed class WorldNames
+    {
+        public List<string>? Regions { get; init; }
+        public List<string>? Factions { get; init; }
+        public List<string>? Speakers { get; init; }
     }
 
     static void RejectUnknownKeys(JsonElement element, IReadOnlyList<string> allowed, string where)

@@ -14,6 +14,7 @@ public sealed record WorldConfig(
     int Version,
     string RegionDir,
     string DialogueDir,
+    string NpcTable,
     int LineCapacity,
     int MaxLinesPerRegion,
     int SyncHz,
@@ -71,6 +72,14 @@ public sealed record WorldConfig(
             throw new ConfigException("world.json 缺 dialogue_dir");
         }
 
+        // K6：NPC 实体表的路径。老卡的临时配置目录没有这份文件时走「缺表」降级；
+        // 正本 config/npc.json 在仓库里，路径相对当前工作目录，与 region_dir / dialogue_dir 一致。
+        var npcTable = (wire.NpcTable ?? "config/npc.json").Trim();
+        if (npcTable.Length == 0)
+        {
+            throw new ConfigException("world.json 的 npc_table 不能为空");
+        }
+
         var capacity = wire.LineCapacity ?? throw new ConfigException("world.json 缺 line_capacity");
         if (capacity < 1 || capacity > 10_000)
         {
@@ -107,7 +116,7 @@ public sealed record WorldConfig(
         }
 
         return new WorldConfig(
-            listen, version, regionDir, dialogueDir, capacity, maxLines,
+            listen, version, regionDir, dialogueDir, npcTable, capacity, maxLines,
             syncHz, maxSpeed,
             Coord(wire.SpawnX, "spawn_x"),
             Coord(wire.SpawnY, "spawn_y"),
@@ -178,6 +187,8 @@ public sealed record WorldConfig(
         [JsonPropertyName("version")] public int? Version { get; init; }
         [JsonPropertyName("region_dir")] public string? RegionDir { get; init; }
         [JsonPropertyName("dialogue_dir")] public string? DialogueDir { get; init; }
+
+        [JsonPropertyName("npc_table")] public string? NpcTable { get; init; }
         [JsonPropertyName("line_capacity")] public int? LineCapacity { get; init; }
         [JsonPropertyName("max_lines_per_region")] public int? MaxLinesPerRegion { get; init; }
         [JsonPropertyName("sync_hz")] public int? SyncHz { get; init; }

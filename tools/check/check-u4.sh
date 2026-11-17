@@ -75,6 +75,7 @@ def say(key, ok, detail=''):
 files = [
     'Net/WorldEntry.cs',
     'HotUpdate/Ui/UiWorldCodex.cs',
+    'HotUpdate/Ui/UiContentTable.cs',
     'HotUpdate/Ui/UiWorldFlow.cs',
     'HotUpdate/Ui/UiWorldHudScreen.cs',
     'HotUpdate/Ui/UiWorldMapScreen.cs',
@@ -97,18 +98,19 @@ for f in files:
 say('meta', not bad_meta, ('bad=' + ','.join(bad_meta)) if bad_meta else 'guid32=%d' % len(files))
 
 codex = client('HotUpdate/Ui/UiWorldCodex.cs')
+content = client('HotUpdate/Ui/UiContentTable.cs')
 world = repo('config/world.json')
 gather = repo('config/gather.json')
 flight = repo('config/flight.json')
 
 regions = ['枯岚道', '承露门', '听谣镇', '外环隙', '栖云城', '旧天城区', '焦原', '龙巢门口']
-ok_regions = all(('"%s"' % r) in world and ('Id = "%s"' % r) in codex for r in regions)
+ok_regions = all(('"%s"' % r) in world and ('Id = "%s"' % r) in content for r in regions)
 n_region_files = len(glob.glob(os.path.join(root, 'config/region/*.json')))
 say('codex_regions', ok_regions and n_region_files == len(regions),
     'codex=%d config=%d' % (len(regions), n_region_files))
 
 speakers = ['乔小满', '苏晚织', '阮青', '阿弦', '闻嫂', '孟七', '澄川', '灰生', '周晚棠']
-ok_speakers = all(('"%s"' % s) in world and ('Name = "%s"' % s) in codex for s in speakers)
+ok_speakers = all(('"%s"' % s) in world and ('Name = "%s"' % s) in content for s in speakers)
 n_dialogue_files = len(glob.glob(os.path.join(root, 'config/dialogue/*.json')))
 say('codex_speakers', ok_speakers and n_dialogue_files == len(speakers),
     'codex=%d config=%d' % (len(speakers), n_dialogue_files))
@@ -127,8 +129,8 @@ say('codex_nodes', no_hardcoded and wiring,
     'hardcoded=%s wiring=%s' % (not no_hardcoded, wiring))
 
 realms = ['炼体', '筑基', '结丹']
-ok_realms = ('public const string FlightRealm = "筑基"' in codex) and all(
-    ('"%s"' % r) in flight and ('"%s"' % r) in codex for r in realms)
+ok_realms = ('public const string FlightRealm = "筑基"' in content) and ('UiContentTable.FlightRealm' in codex) and all(
+    ('"%s"' % r) in flight and ('"%s"' % r) in content for r in realms)
 say('codex_realms', ok_realms, 'realms=%d flight_realm=%s' % (len(realms), 'FlightRealm' in codex))
 
 flow = client('HotUpdate/Ui/UiWorldFlow.cs')

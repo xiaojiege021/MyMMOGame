@@ -1,3 +1,4 @@
+using Mmo.Shared.Domain;
 using Npgsql;
 
 using static Character.Cli.CliFlags;
@@ -251,6 +252,73 @@ internal static class ConfigTableCli
             return 0;
         }
 
+        // K6：NPC / 怪物两张内容表只读核对。与真实启动共用同一份 NpcTable / MonsterTable.Load：
+        // 地表、势力、对话、商店、技能、掉落、刷怪点任何一处对不上都报 config_error。
+        if (contentList)
+        {
+            try
+            {
+                var items = ItemTable.Load("config/items.json");
+                var world = ConfigJson.Read<ContentWorldWire>("config/world.json");
+                var skills = ConfigJson.Read<ContentSkillWire>("config/skills.json");
+                var shops = ConfigJson.Read<ContentShopWire>("config/npc_shop.json");
+                var regions = world.Regions ?? [];
+                var npcs = NpcTable.Load(
+                    "config/npc.json", regions, world.Factions ?? [], world.Speakers ?? [],
+                    (shops.Shops ?? []).Select(s => (s.Id ?? "").Trim())
+                        .Where(s => s.Length > 0).ToList());
+                var monsters = MonsterTable.Load(
+                    "config/monsters.json",
+                    (skills.Skills ?? []).Select(s => s.Id.ToString()).ToList(),
+                    items.All.Select(i => i.Id).ToList(), regions);
+
+                Console.WriteLine("content_table=ok npcs=" + npcs.All.Count
+                    + " monsters=" + monsters.All.Count
+                    + " npc_version=" + npcs.Version
+                    + " monster_version=" + monsters.Version);
+                foreach (var npc in npcs.All.OrderBy(n => n.Id, StringComparer.Ordinal))
+                {
+                    Console.WriteLine("npc=" + npc.Id
+                        + " name=" + npc.Name
+                        + " region=" + npc.Region
+                        + " role=" + npc.Role
+                        + " faction=" + (npc.Faction.Length == 0 ? "-" : npc.Faction)
+                        + " dialogue=" + (npc.DialogueId.Length == 0 ? "-" : npc.DialogueId)
+                        + " shop=" + (npc.ShopId.Length == 0 ? "-" : npc.ShopId)
+                        + " pos=" + npc.X + "," + npc.Y + "," + npc.Z
+                        + " facing=" + npc.Facing);
+                }
+                foreach (var monster in monsters.All.OrderBy(m => m.Id, StringComparer.Ordinal))
+                {
+                    Console.WriteLine("monster=" + monster.Id
+                        + " name=" + monster.Name
+                        + " tier=" + monster.Tier
+                        + " level=" + monster.Level
+                        + " hp=" + monster.Hp
+                        + " attack=" + monster.Attack
+                        + " defense=" + monster.Defense
+                        + " skills=" + (monster.Skills.Count == 0 ? "-" : string.Join(",", monster.Skills))
+                        + " drops=" + (monster.Drops.Count == 0 ? "-" : string.Join(",", monster.Drops
+                            .Select(d => d.ItemId + ":" + d.Count + ":" + d.ChancePct)))
+                        + " spawn=" + (monster.Spawn is null
+                            ? "-"
+                            : monster.Spawn.Region + "@" + monster.Spawn.X + "," + monster.Spawn.Y
+                              + "," + monster.Spawn.Z + "+" + monster.Spawn.RespawnS + "s"));
+                }
+                return 0;
+            }
+            catch (ConfigException ex)
+            {
+                Console.WriteLine("config_error=" + ex.Message);
+                return 2;
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("config_error=" + ex.Message);
+                return 2;
+            }
+        }
+
         if (itemList)
         {
             try
@@ -419,4 +487,31 @@ internal static class ConfigTableCli
         return null;
     }
 
+
+    sealed record ContentWorldWire
+    {
+        public List<string>? Regions { get; init; }
+        public List<string>? Speakers { get; init; }
+        public List<string>? Factions { get; init; }
+    }
+
+    sealed record ContentSkillWire
+    {
+        public List<ContentSkillItem>? Skills { get; init; }
+    }
+
+    sealed record ContentSkillItem
+    {
+        public uint Id { get; init; }
+    }
+
+    sealed record ContentShopWire
+    {
+        public List<ContentShopItem>? Shops { get; init; }
+    }
+
+    sealed record ContentShopItem
+    {
+        public string? Id { get; init; }
+    }
 }

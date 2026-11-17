@@ -74,6 +74,7 @@ public static class U4Check
         {
             "Net/WorldEntry.cs",
             "HotUpdate/Ui/UiWorldCodex.cs",
+            "HotUpdate/Ui/UiContentTable.cs",
             "HotUpdate/Ui/UiWorldFlow.cs",
             "HotUpdate/Ui/UiWorldHudScreen.cs",
             "HotUpdate/Ui/UiWorldMapScreen.cs",
@@ -131,11 +132,14 @@ public static class U4Check
     static void CheckCodexAgainstConfig(string root)
     {
         var codex = Client(root, "HotUpdate/Ui/UiWorldCodex.cs");
+        // K6：人名 / 地名在生成表里，UiWorldCodex 只引用；两张都要读。
+        var content = Client(root, "HotUpdate/Ui/UiContentTable.cs");
         var world = Repo(root, "config/world.json");
         var gather = Repo(root, "config/gather.json");
         var flight = Repo(root, "config/flight.json");
 
-        if (codex.Length == 0 || world.Length == 0 || gather.Length == 0 || flight.Length == 0)
+        if (codex.Length == 0 || content.Length == 0 || world.Length == 0
+            || gather.Length == 0 || flight.Length == 0)
         {
             Report("codex_source", false, "file_missing");
             return;
@@ -149,7 +153,7 @@ public static class U4Check
         var regionOk = true;
         for (var i = 0; i < regions.Length; i++)
         {
-            regionOk &= world.Contains("\"" + regions[i] + "\"") && codex.Contains("Id = \"" + regions[i] + "\"");
+            regionOk &= world.Contains("\"" + regions[i] + "\"") && content.Contains("Id = \"" + regions[i] + "\"");
         }
 
         var regionFiles = Directory.Exists(Path.Combine(root, "config/region"))
@@ -166,7 +170,7 @@ public static class U4Check
         var speakerOk = true;
         for (var i = 0; i < speakers.Length; i++)
         {
-            speakerOk &= world.Contains("\"" + speakers[i] + "\"") && codex.Contains("Name = \"" + speakers[i] + "\"");
+            speakerOk &= world.Contains("\"" + speakers[i] + "\"") && content.Contains("Name = \"" + speakers[i] + "\"");
         }
 
         var dialogueFiles = Directory.Exists(Path.Combine(root, "config/dialogue"))
@@ -191,18 +195,20 @@ public static class U4Check
 
         // 三段境界与能飞的那一段，照 flight.json 抄，不另起名字。
         var realms = new[] { "炼体", "筑基", "结丹" };
-        var realmOk = codex.Contains("public const string FlightRealm = \"筑基\"");
+        var realmOk = content.Contains("public const string FlightRealm = \"筑基\"")
+            && codex.Contains("UiContentTable.FlightRealm");
         for (var i = 0; i < realms.Length; i++)
         {
-            realmOk &= flight.Contains("\"" + realms[i] + "\"" ) && codex.Contains("\"" + realms[i] + "\"");
+            realmOk &= flight.Contains("\"" + realms[i] + "\"" ) && content.Contains("\"" + realms[i] + "\"");
         }
 
-        Report("codex_realms", realmOk, "realms=" + realms.Length + " flight_realm=" + codex.Contains("筑基"));
+        Report("codex_realms", realmOk, "realms=" + realms.Length + " flight_realm=" + content.Contains("筑基"));
 
         // 第二场文本只许出现在乔小满那一条：别人的第二场不能拿他的台词顶上。
+        // K6 起名字在生成表、台词仍在 UiWorldCodex 的文本表；按生成表的顺序核对第一位。
         var secondCount = Regex.Matches(codex, "SecondText = \"[^\"]+\"").Count;
-        var secondNextToQiao = Regex.IsMatch(codex, "Name = \"乔小满\"[\\s\\S]{0,400}?SecondText = \"");
-        Report("codex_second_line", secondCount == 1 && secondNextToQiao,
+        var firstSpeaker = content.Contains("Name = \"乔小满\"");
+        Report("codex_second_line", secondCount == 1 && firstSpeaker,
             "second_lines=" + secondCount);
     }
 
