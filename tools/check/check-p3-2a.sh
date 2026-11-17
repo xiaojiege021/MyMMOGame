@@ -59,7 +59,10 @@ checks = []
 def ck(name, cond): checks.append((name, bool(cond)))
 se, cu, ci, ga, au = cfg("config/stone_exchange.json"), cfg("config/currency.json"), cfg("config/city.json"), cfg("config/gather.json"), cfg("config/auction.json")
 ids = [x["id"] for x in cu["currencies"]]
-ck("币种表仍是七个 id（不新增币种）", set(ids) == {"gold", "stone_1", "stone_2", "stone_3", "stone_4", "stone_5", "yuanbao"})
+# K1 后来加了家园币 home_coin；它不参与灵石兑换，这里只看兑换用的七种。
+ck("灵石兑换只认七种币种（home_coin 不参与）",
+   set(ids) - {"home_coin"} == {"gold", "stone_1", "stone_2", "stone_3", "stone_4", "stone_5", "yuanbao"}
+   and "home_coin" not in se["tiers"])
 ck("兑换表五档顺序与配置一致", se["tiers"] == ["stone_1", "stone_2", "stone_3", "stone_4", "stone_5"])
 ck("相邻比例 10000:1 写在配置里", se["ratio"] == 10000 and se["gain"] == 1)
 ck("仙晶是最高档且不是元宝", se["highest_kind"] == "stone_5" and se["highest_name"] == "仙晶"
@@ -72,7 +75,10 @@ veins = [x["id"] for x in ga["nodes"] if x["kind"] == "spirit_stone"]
 ck("城池矿脉归属指向 gather 里的 spirit_stone 节点", len(veins) == 1 and ci["cities"][0]["vein_id"] == veins[0])
 ck("城池登记里没有个人采集点/商品字段", all(not any(k in c for k in
    ("item_id", "count", "bag_slot", "drop", "price", "slot")) for c in ci["cities"]))
-ck("城池抽成比例标待定、不写死", "待定" in ci["note"] and all(0 <= c["tax_pct"] <= 100 for c in ci["cities"]))
+# K7：城池归属 / 税率是会变的运行时事实，只在「社交」.city；配置只留静态三列。
+ck("城池表只留静态三列（K7）", all(set(c) <= {"city_id", "name", "vein_id"} for c in ci["cities"]))
+ck("归属与税率不在配置里（K7）",
+   all(k not in c for c in ci["cities"] for k in ("owner_sect", "tax_pct")))
 ck("gather.json 仍是四节点、灵石矿脉一个（不撞 p1-3b）", len(ga["nodes"]) == 4 and len(veins) == 1)
 ck("auction.json 税率与版本没动（不撞 p1-5a）", 5 <= au["tax_rate_pct"] <= 8 and au["gold_kind"] == "gold" and au["version"] == 1)
 mig = src("db/character/character.sql")
@@ -103,8 +109,8 @@ printf '%s' "$out" | grep -q 'stone_exchange_state=ok .*ratio=10000 .*highest=st
   && ok "只读入口读到五档、10000:1 与仙晶/元宝隔离" || bad "兑换表只读入口不对：$out"
 out="$("$DOTNET" "$CD" --city-table $CC 2>&1 | utf8)"
 printf '%s' "$out" | grep -q 'city_table_state=ok' \
-  && printf '%s' "$out" | grep -q 'city=qiyun .*vein=spirit_qiyun_1 tax_pct=0' \
-  && ok "城池表只读入口读到归属与待定税率" || bad "城池表只读入口不对：$out"
+  && printf '%s' "$out" | grep -q 'city=qiyun .*vein=spirit_qiyun_1 owner_sect=db tax_pct=db' \
+  && ok "城池表只读入口只回静态三列（归属 / 税率标 db）" || bad "城池表只读入口不对：$out"
 python3 - "$ROOT" "$TMP" <<'PY'
 import copy, json, os, sys
 root, tmp = sys.argv[1], sys.argv[2]
@@ -134,7 +140,8 @@ def city(fn):
 ccases = {
  "c-vein.json": city(lambda x: x["cities"][0].update(vein_id="not_a_node")),
  "c-item.json": city(lambda x: x["cities"][0].update(item_id="stone_1")),
- "c-tax.json": city(lambda x: x["cities"][0].update(tax_pct=101)),
+ "c-tax.json": city(lambda x: x["cities"][0].update(tax_pct=0)),
+ "c-owner.json": city(lambda x: x["cities"][0].update(owner_sect="sect-1")),
  "c-miss.json": {k: v for k, v in ci.items() if k != "gather_table"},
 }
 for n, v in ccases.items(): save(n, v)
@@ -150,7 +157,7 @@ for f in s-miss s-dup s-ratio s-gain s-ingot s-top s-unknown; do
   badcfg "坏兑换表 $f" "$DOTNET" "$CD" --stone-exchange-table-path "$TMP/$f.json" "$ROOT/config/currency.json" $CC
 done
 badcfg "最高档中文名与币种表不符" "$DOTNET" "$CD" --stone-exchange-table-path "$ROOT/config/stone_exchange.json" "$TMP/currency-bad.json" $CC
-for f in c-vein c-item c-tax c-miss; do
+for f in c-vein c-item c-tax c-owner c-miss; do
   badcfg "坏城池表 $f" "$DOTNET" "$CD" --city-table-path "$TMP/$f.json" $CC
 done
 

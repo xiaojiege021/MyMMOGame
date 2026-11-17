@@ -1,16 +1,14 @@
 {
   "schema": "city-table/1",
-  "version": 1,
-  "note": "方案 9.5、12 章与开发架构 4.2 / 6 节：灵石矿脉归主城辖区，开采权记在城池上，不记成玩家个人采集点；采出的灵石经修炼任务和境界任务发放，掌管方按城池税收抽成，比例走配置。启动只补建缺行，已有 tax_pct（含城战写回）不覆盖。task_grant_city_id 指定任务发放记哪一种城池税。N9 在 P1-1b5 ApplyGrant 同事务里按运行时 city.tax_pct 写 city_tax_ledger（只记账、不从玩家钱包扣）；商城 shop_buy: 前缀不记。城池税收账本与拍卖销毁税分开记账。",
+  "version": 2,
+  "note": "方案 9.5、12 章与开发架构 4.2 / 6 节：灵石矿脉归主城辖区，开采权记在城池上，不记成玩家个人采集点；采出的灵石经修炼任务和境界任务发放，掌管方按城池税收抽成，比例走配置。K7：这份表只留静态定义——city_id / name / vein_id；owner_sect（归属）与 tax_pct（税率）是会变的运行时事实，只写库（「社交」.city，owner_sect 默认 null、tax_pct 默认 0），城战写回也只写库，配置里出现 owner_sect / tax_pct 加载期就起不来。启动只把缺的城池行补进库，不覆盖已有归属与税率。task_grant_city_id 指定任务发放记哪一种城池税。N9 在 P1-1b5 ApplyGrant 同事务里按运行时 city.tax_pct 写 city_tax_ledger（只记账、不从玩家钱包扣）；商城 shop_buy: 前缀不记。城池税收账本与拍卖销毁税分开记账。赛季当前季是运营开关，仍留 config/season.json 的 current；玩家领到哪一阶写库。",
   "gather_table": "config/gather.json",
   "task_grant_city_id": "qiyun",
   "cities": [
     {
       "city_id": "qiyun",
       "name": "栖云城",
-      "vein_id": "spirit_qiyun_1",
-      "owner_sect": null,
-      "tax_pct": 0
+      "vein_id": "spirit_qiyun_1"
     }
   ]
 }

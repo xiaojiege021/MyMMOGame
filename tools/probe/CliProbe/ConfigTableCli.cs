@@ -362,11 +362,12 @@ internal static class ConfigTableCli
                     + " task_grant_city=" + cityTable.TaskGrantCityId);
                 foreach (var city in cityTable.Cities)
                 {
+                    // K7：归属与税率在库，配置只回静态三列。
                     Console.WriteLine("city=" + city.CityId
                         + " name=" + city.Name
                         + " vein=" + city.VeinId
-                        + " tax_pct=" + city.TaxPct
-                        + " owner=" + (city.OwnerSect ?? ""));
+                        + " owner_sect=db"
+                        + " tax_pct=db");
                 }
             }
             catch (ConfigException ex)

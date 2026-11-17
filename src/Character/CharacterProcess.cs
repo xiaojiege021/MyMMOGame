@@ -358,14 +358,15 @@ public sealed class CharacterProcess(string configPath)
             + " stages=" + mainlineDropTable.StageCount
             + " pending=" + (mainlineDropTable.Pending ? "true" : "false"));
 
-        // 城池只登记归属：城池税收账本与拍卖销毁税是分开的两张表。
+        // 城池只登记静态定义（编号 / 名字 / 矿脉）；归属与税率是库里的运行时事实（技术架构 6.1）。
+        // 城池税收账本与拍卖销毁税是分开的两张表。
         Console.WriteLine("task_grant_city=" + cityTable.TaskGrantCityId);
         foreach (var city in cityTable.Cities)
         {
             Console.WriteLine("city=" + city.CityId
                 + " vein=" + city.VeinId
-                + " tax_pct=" + city.TaxPct
-                + " owner=" + (city.OwnerSect ?? "")
+                + " owner_sect=db"
+                + " tax_pct=db"
                 + " city_tax_table=社交.city_tax_ledger"
                 + " auction_tax_table=交易.auction_settlement.tax_gold");
         }
@@ -387,17 +388,17 @@ public sealed class CharacterProcess(string configPath)
         // 把配置里登记的城池补进库；已存在的行（含城战写回过的 owner / tax_pct）
         // 一律不覆盖，免得每次重启把归属改回空。只跑分表迁移的老卡环境可能还没有
         // 这张表，那就跳过，不让启动被拖垮。
+        // K7：只插静态三列，owner_sect / tax_pct 走库默认（null / 0），配置不再带这两个值。
         try
         {
             foreach (var city in cityTable.Cities)
             {
                 await using var seed = dataSource.CreateCommand(
-                    "insert into \"社交\".city (city_id, name, vein_id, tax_pct) "
-                    + "values ($1, $2, $3, $4) on conflict (city_id) do nothing");
+                    "insert into \"社交\".city (city_id, name, vein_id) "
+                    + "values ($1, $2, $3) on conflict (city_id) do nothing");
                 seed.Parameters.AddWithValue(city.CityId);
                 seed.Parameters.AddWithValue(city.Name);
                 seed.Parameters.AddWithValue(city.VeinId);
-                seed.Parameters.AddWithValue(city.TaxPct);
                 await seed.ExecuteNonQueryAsync(stopping);
             }
             Console.WriteLine("city_seed=ok cities=" + cityTable.Cities.Count);

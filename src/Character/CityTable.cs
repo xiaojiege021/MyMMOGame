@@ -3,16 +3,16 @@ using System.Text.Json.Serialization;
 
 namespace Character;
 
-/// <summary>一座城池：灵石矿脉归属记在城上，不做成玩家个人采集点。</summary>
-public sealed record CityDef(
-    string CityId, string Name, string VeinId, string? OwnerSect, int TaxPct);
+/// <summary>一座城池的静态定义：编号、名字、矿脉。归属与税率是会变的运行时事实，不在这里。</summary>
+public sealed record CityDef(string CityId, string Name, string VeinId);
 
 /// <summary>
-/// 城池表的唯一正本（方案 9.5、12 章与开发架构 4.2 / 6 节）。
+/// 城池表的唯一正本（方案 9.5、12 章与开发架构 4.2 / 6 节、技术架构 6.1）。
 /// vein_id 必须对应 gather.json 里 kind == spirit_stone 的节点；gather.json 用
 /// System.Text.Json 直接读，不引用 World 工程。
-/// 城池税收账本（社交.city_tax_ledger）与拍卖销毁税（交易.auction_settlement.tax_gold）
-/// 是分开的两张表，本卡只登记归属、建账本，不写回、不改税率。
+/// K7：配置只放静态定义；owner_sect / tax_pct 由「社交」.city 默认 null / 0 并只由城战写回，
+/// 配置里出现这类运行期字段加载期就起不来。城池税收账本（社交.city_tax_ledger）与
+/// 拍卖销毁税（交易.auction_settlement.tax_gold）是分开的两张表。
 /// </summary>
 public sealed class CityTable
 {
@@ -21,6 +21,13 @@ public sealed class CityTable
     // 「个人采集点或商品」字样：城池只登记归属，出现任何一个都直接起不来。
     static readonly string[] ForbiddenKeys =
         ["item_id", "count", "bag_slot", "drop", "price", "slot"];
+
+    // K7：库里的事实不许回写配置。城池归属与税率只由城战写库；配置里出现就起不来。
+    static readonly string[] RuntimeKeys =
+    [
+        "owner_sect", "tax_pct", "sold_today", "stock_now", "bought_today",
+        "claimed", "current_owner",
+    ];
 
     static readonly string[] RequiredKeys =
         ["schema", "version", "note", "gather_table", "task_grant_city_id", "cities"];
@@ -67,7 +74,18 @@ public sealed class CityTable
                 }
             }
 
-            // 用 JsonDocument 逐条扫 cities 的键：矿脉归属不能夹带个人采集点或商品字段。
+            // 顶层也不许夹带运行期字段：城池归属 / 税率只在库。
+            foreach (var property in root.EnumerateObject())
+            {
+                if (RuntimeKeys.Contains(property.Name, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new ConfigException(
+                        "city.json 不许出现运行期字段：" + property.Name + "（归属与税率只写库）");
+                }
+            }
+
+            // 用 JsonDocument 逐条扫 cities 的键：矿脉归属不能夹带个人采集点或商品字段，
+            // 也不能把库里的 owner_sect / tax_pct 抄回配置。
             if (!root.TryGetProperty("cities", out var cityArray)
                 || cityArray.ValueKind != JsonValueKind.Array)
             {
@@ -83,6 +101,12 @@ public sealed class CityTable
 
                 foreach (var property in cityElement.EnumerateObject())
                 {
+                    if (RuntimeKeys.Contains(property.Name, StringComparer.OrdinalIgnoreCase))
+                    {
+                        throw new ConfigException(
+                            "city.json 的 cities 不许出现运行期字段：" + property.Name + "（归属与税率只写库）");
+                    }
+
                     foreach (var forbidden in ForbiddenKeys)
                     {
                         if (property.Name.Contains(forbidden, StringComparison.OrdinalIgnoreCase))
@@ -173,17 +197,7 @@ public sealed class CityTable
                         + "spirit_stone 节点：" + veinId);
                 }
 
-                var taxPct = city.TaxPct ?? -1;
-                if (taxPct < 0 || taxPct > 100)
-                {
-                    throw new ConfigException("city.json 的 tax_pct 必须在 0 到 100 之间：" + cityId);
-                }
-
-                var ownerSect = string.IsNullOrWhiteSpace(city.OwnerSect)
-                    ? null
-                    : city.OwnerSect.Trim();
-
-                cities.Add(new CityDef(cityId, name, veinId, ownerSect, taxPct));
+                cities.Add(new CityDef(cityId, name, veinId));
             }
 
             if (!seen.Contains(taskGrantCityId))
@@ -305,11 +319,5 @@ public sealed class CityTable
 
         [JsonPropertyName("vein_id")]
         public string? VeinId { get; init; }
-
-        [JsonPropertyName("owner_sect")]
-        public string? OwnerSect { get; init; }
-
-        [JsonPropertyName("tax_pct")]
-        public int? TaxPct { get; init; }
     }
 }

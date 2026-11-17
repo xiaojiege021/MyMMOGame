@@ -80,7 +80,9 @@ emit("territory_no_owner_or_shop", not any(k in t for k in
      ("owner_sect", "winner", "reward", "shop", "price", "balance", "ratio")))
 emit("territory_rule_keys", set(rule) <= {"city_id", "match_prefix", "battle_timeout_ms", "tax_pct_on_capture"})
 emit("city_ids_cross_checked", rule.get("city_id") in [c["city_id"] for c in city["cities"]])
-emit("city_json_untouched", city["cities"][0].get("owner_sect") is None
+# K7：归属 / 税率只在库，city.json 连键都不许有。
+emit("city_json_untouched", "owner_sect" not in city["cities"][0]
+     and "tax_pct" not in city["cities"][0]
      and city["cities"][0].get("vein_id") == "spirit_qiyun_1")
 emit("siege_scale_unchanged", sg["mode"]["team_size"] == 40 and sg["mode"]["teams"] == 2
      and sg["mode"]["team_size"] * sg["mode"]["teams"] == 80)

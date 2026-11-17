@@ -218,14 +218,18 @@ CREATE TABLE IF NOT EXISTS "角色".stone_exchange_txn (
 CREATE INDEX IF NOT EXISTS stone_exchange_character
     ON "角色".stone_exchange_txn (character_id, exchanged_at DESC);
 
+-- K7：城市只静态三列；归属 / 税率是会变的运行时事实，库默认 null / 0，配置不带。
 CREATE TABLE IF NOT EXISTS "社交".city (
     city_id     text        PRIMARY KEY,
     name        text        NOT NULL,
     vein_id     text        NOT NULL UNIQUE,
-    owner_sect  text,
-    tax_pct     int         NOT NULL CHECK (tax_pct BETWEEN 0 AND 100),
+    owner_sect  text        DEFAULT NULL,
+    tax_pct     int         NOT NULL DEFAULT 0 CHECK (tax_pct BETWEEN 0 AND 100),
     created_at  timestamptz NOT NULL DEFAULT now()
 );
+
+-- K7：老库的 tax_pct 是无默认值建出来的，这里补 0（幂等）；新建表已带 DEFAULT 0。
+ALTER TABLE "社交".city ALTER COLUMN tax_pct SET DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS "社交".city_tax_ledger (
     txn_id      text        PRIMARY KEY,
