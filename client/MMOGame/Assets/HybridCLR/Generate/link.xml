@@ -16,6 +16,7 @@
     <type fullname="Mmo.Net.CharacterCrystal" preserve="all" />
     <type fullname="Mmo.Net.CharacterCurrency" preserve="all" />
     <type fullname="Mmo.Net.CharacterEnhance" preserve="all" />
+    <type fullname="Mmo.Net.CharacterRealmPhase" preserve="all" />
     <type fullname="Mmo.Net.CharacterRecharge" preserve="all" />
     <type fullname="Mmo.Net.CharacterShop" preserve="all" />
     <type fullname="Mmo.Net.CharacterTransfer" preserve="all" />
@@ -28,15 +29,32 @@
     <type fullname="Mmo.Net.EnterOutcome" preserve="all" />
     <type fullname="Mmo.Net.EntryKind" preserve="all" />
     <type fullname="Mmo.Net.FlyOutcome" preserve="all" />
+    <type fullname="Mmo.Net.GatherNodeRow" preserve="all" />
+    <type fullname="Mmo.Net.GatherNodesOutcome" preserve="all" />
     <type fullname="Mmo.Net.GatherOutcome" preserve="all" />
+    <type fullname="Mmo.Net.HeroCodexEntry" preserve="all" />
+    <type fullname="Mmo.Net.HeroCodexEntryView" preserve="all" />
+    <type fullname="Mmo.Net.HeroCodexOutcome" preserve="all" />
+    <type fullname="Mmo.Net.HomeCoinShopEntry" preserve="all" />
+    <type fullname="Mmo.Net.HomeCoinShopOutcome" preserve="all" />
+    <type fullname="Mmo.Net.HomesteadEntry" preserve="all" />
+    <type fullname="Mmo.Net.HomesteadOutcome" preserve="all" />
+    <type fullname="Mmo.Net.HomesteadPlacementView" preserve="all" />
+    <type fullname="Mmo.Net.HomesteadPlantEntry" preserve="all" />
+    <type fullname="Mmo.Net.HomesteadPlantOutcome" preserve="all" />
+    <type fullname="Mmo.Net.HomesteadPlantView" preserve="all" />
     <type fullname="Mmo.Net.IngotOutcome" preserve="all" />
+    <type fullname="Mmo.Net.JsonField" preserve="all" />
     <type fullname="Mmo.Net.LeadershipOutcome" preserve="all" />
     <type fullname="Mmo.Net.LoginOutcome" preserve="all" />
     <type fullname="Mmo.Net.PeerVisual" preserve="all" />
     <type fullname="Mmo.Net.PositionOutcome" preserve="all" />
+    <type fullname="Mmo.Net.RealmPhaseOutcome" preserve="all" />
     <type fullname="Mmo.Net.RechargeOrderOutcome" preserve="all" />
     <type fullname="Mmo.Net.RechargeSettleOutcome" preserve="all" />
     <type fullname="Mmo.Net.RegionOutcome" preserve="all" />
+    <type fullname="Mmo.Net.RosterMember" preserve="all" />
+    <type fullname="Mmo.Net.RosterOutcome" preserve="all" />
     <type fullname="Mmo.Net.SectGuild" preserve="all" />
     <type fullname="Mmo.Net.SectOutcome" preserve="all" />
     <type fullname="Mmo.Net.ShopOutcome" preserve="all" />
@@ -45,6 +63,8 @@
     <type fullname="Mmo.Net.SiegeVisualSpec" preserve="all" />
     <type fullname="Mmo.Net.TransferOutcome" preserve="all" />
     <type fullname="Mmo.Net.UpgradeOutcome" preserve="all" />
+    <type fullname="Mmo.Net.VersusEntry" preserve="all" />
+    <type fullname="Mmo.Net.VersusOutcome" preserve="all" />
     <type fullname="Mmo.Net.WorldBossEntry" preserve="all" />
     <type fullname="Mmo.Net.WorldBossFacts" preserve="all" />
     <type fullname="Mmo.Net.WorldEnterKind" preserve="all" />
@@ -155,6 +175,7 @@
     <type fullname="System.Action" preserve="all" />
     <type fullname="System.Action`1" preserve="all" />
     <type fullname="System.Action`2" preserve="all" />
+    <type fullname="System.ArgumentOutOfRangeException" preserve="all" />
     <type fullname="System.Array" preserve="all" />
     <type fullname="System.AsyncCallback" preserve="all" />
     <type fullname="System.Boolean" preserve="all" />
@@ -168,6 +189,7 @@
     <type fullname="System.ComponentModel.EditorBrowsableAttribute" preserve="all" />
     <type fullname="System.ComponentModel.EditorBrowsableState" preserve="all" />
     <type fullname="System.Convert" preserve="all" />
+    <type fullname="System.DateTimeOffset" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute/DebuggingModes" preserve="all" />
     <type fullname="System.Diagnostics.DebuggerHiddenAttribute" preserve="all" />
@@ -178,8 +200,10 @@
     <type fullname="System.Func`1" preserve="all" />
     <type fullname="System.Func`2" preserve="all" />
     <type fullname="System.Func`3" preserve="all" />
+    <type fullname="System.Globalization.CultureInfo" preserve="all" />
     <type fullname="System.IAsyncResult" preserve="all" />
     <type fullname="System.IDisposable" preserve="all" />
+    <type fullname="System.IFormatProvider" preserve="all" />
     <type fullname="System.Int32" preserve="all" />
     <type fullname="System.Int64" preserve="all" />
     <type fullname="System.Linq.Enumerable" preserve="all" />
@@ -202,6 +226,7 @@
     <type fullname="System.Runtime.CompilerServices.RuntimeHelpers" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.TaskAwaiter" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.TaskAwaiter`1" preserve="all" />
+    <type fullname="System.Runtime.CompilerServices.TupleElementNamesAttribute" preserve="all" />
     <type fullname="System.RuntimeFieldHandle" preserve="all" />
     <type fullname="System.RuntimeTypeHandle" preserve="all" />
     <type fullname="System.Single" preserve="all" />
@@ -209,12 +234,14 @@
     <type fullname="System.StringComparison" preserve="all" />
     <type fullname="System.StringSplitOptions" preserve="all" />
     <type fullname="System.Text.Encoding" preserve="all" />
+    <type fullname="System.Text.StringBuilder" preserve="all" />
     <type fullname="System.Threading.Tasks.Task" preserve="all" />
     <type fullname="System.Threading.Tasks.Task`1" preserve="all" />
     <type fullname="System.TimeSpan" preserve="all" />
     <type fullname="System.Type" preserve="all" />
     <type fullname="System.UInt32" preserve="all" />
     <type fullname="System.UInt64" preserve="all" />
+    <type fullname="System.ValueTuple`2" preserve="all" />
     <type fullname="System.ValueType" preserve="all" />
   </assembly>
 </linker>

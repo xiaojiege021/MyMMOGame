@@ -60,6 +60,17 @@ namespace HotUpdate.Ui
 
         public bool HasCrystal { get; private set; }
 
+        /// <summary>U13：段内阶只读回包（N13 的 `GET /realm/phase`）。</summary>
+        public RealmPhaseOutcome LastRealmPhase { get; private set; } = RealmPhaseOutcome.Failure("not_loaded");
+
+        /// <summary>发过只读请求没有。屏上用它区分「尚未请求」与「没读到」。</summary>
+        public bool RealmPhaseRequested { get; private set; }
+
+        /// <summary>U13：升一阶回包（`POST /realm/phase/promote`）。</summary>
+        public RealmPhaseOutcome LastPromote { get; private set; } = RealmPhaseOutcome.Failure("not_loaded");
+
+        public bool HasPromote { get; private set; }
+
         /// <summary>最近一条失败说明（没到网关 / 令牌失效 / 服务端 5xx）。</summary>
         public string Error { get; private set; } = string.Empty;
 
@@ -267,6 +278,112 @@ namespace HotUpdate.Ui
                 HasCrystal = true;
                 if (done != null) done();
             });
+        }
+
+        // ------------------------------------------------------------------ 境界段内阶
+
+        /// <summary>
+        /// 读段内阶与被动。进境界屏时调一次；阶名、被动万分比、门槛全看回包，
+        /// 客户端不认阶名表、不按等级自己判「能不能升」。
+        /// </summary>
+        public void LoadRealmPhase(Action done = null)
+        {
+            RealmPhaseRequested = true;
+            if (_characterId == 0)
+            {
+                LastRealmPhase = RealmPhaseOutcome.Failure("no_character");
+                Error = "还没有角色";
+                Debug.Log("u13_realm_phase=reject reason=no_character");
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(CharacterRealmPhase.ReadQuery(_characterId), string.Empty, _token, (status, text) =>
+            {
+                Busy = false;
+                if (status != 200)
+                {
+                    LastRealmPhase = RealmPhaseOutcome.Failure("status_" + status);
+                    Error = "段内阶没读到：" + status;
+                    Debug.Log("u13_realm_phase=reject status=" + status);
+                }
+                else
+                {
+                    LastRealmPhase = CharacterRealmPhase.Parse(text);
+                    Error = LastRealmPhase.Ok ? string.Empty : "段内阶回包读不出来";
+                    Debug.Log("u13_realm_phase=" + (LastRealmPhase.Ok ? "ok" : "reject")
+                        + " realm=" + LastRealmPhase.Realm
+                        + " phase=" + LastRealmPhase.Phase
+                        + " phase_name=" + LastRealmPhase.PhaseName
+                        + " passive_pct_bps=" + LastRealmPhase.PassivePctBps
+                        + " reason=" + LastRealmPhase.Reason);
+                }
+
+                if (done != null) done();
+            });
+        }
+
+        /// <summary>
+        /// 段内升一阶。请求体只有角色号（事务号由网关生成），门槛与被动全在角色服；
+        /// 成了就把回包里的新阶名与新被动抄进屏上那份，不自己推下一阶。
+        /// </summary>
+        public void PromoteRealmPhase(Action done = null)
+        {
+            if (_characterId == 0)
+            {
+                LastPromote = RealmPhaseOutcome.Failure("no_character");
+                HasPromote = true;
+                Debug.Log("u13_promote=reject reason=no_character");
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(CharacterRealmPhase.PromotePath, CharacterRealmPhase.PromoteBody(_characterId), _token,
+                (status, text) =>
+                {
+                    Busy = false;
+                    if (status != 200)
+                    {
+                        LastPromote = RealmPhaseOutcome.Failure("status_" + status);
+                        Error = "升阶没发出去：" + status;
+                        Debug.Log("u13_promote=reject status=" + status);
+                    }
+                    else
+                    {
+                        LastPromote = CharacterRealmPhase.Parse(text);
+                        Error = LastPromote.Ok ? string.Empty : "被拒：" + LastPromote.Reason;
+                        Debug.Log("u13_promote=" + (LastPromote.Ok ? "ok" : "reject")
+                            + " from=" + LastPromote.FromPhase
+                            + " to=" + LastPromote.ToPhase
+                            + " phase_name=" + LastPromote.PhaseName
+                            + " passive_pct_bps=" + LastPromote.PassivePctBps
+                            + " level=" + LastPromote.Level
+                            + " level_required=" + LastPromote.LevelRequired
+                            + " reason=" + LastPromote.Reason);
+                    }
+
+                    if (LastPromote.Ok)
+                    {
+                        // 只抄回包：新阶序号、新阶名、新被动都是服务端给的。
+                        var shown = LastRealmPhase;
+                        shown.Ok = true;
+                        shown.Reason = string.Empty;
+                        shown.CharacterId = _characterId;
+                        shown.Phase = LastPromote.ToPhase;
+                        shown.PhaseName = LastPromote.PhaseName;
+                        shown.PassivePctBps = LastPromote.PassivePctBps;
+                        shown.DisplayText = LastPromote.PhaseName + " · 被动 " + LastPromote.PassivePctBps + " bps";
+                        LastRealmPhase = shown;
+                        RealmPhaseRequested = true;
+                    }
+
+                    HasPromote = true;
+                    if (done != null) done();
+                });
         }
 
         // ------------------------------------------------------------------ 真机发送

@@ -21,10 +21,16 @@ namespace HotUpdate.Ui
 
         static int _enhanceCalls;
 
+        static int _promoteCalls;
+
+        static string _promoteBody = string.Empty;
+
         public static bool Run()
         {
             _failed = false;
             _enhanceCalls = 0;
+            _promoteCalls = 0;
+            _promoteBody = string.Empty;
 
             UiSkinStore.Reset();
             var shell = UiShell.Ensure();
@@ -47,6 +53,21 @@ namespace HotUpdate.Ui
                 if (path.IndexOf("/character/transfer", StringComparison.Ordinal) >= 0)
                 {
                     done(200, TransferRejectJson);
+                    return;
+                }
+
+                // U13：升阶口在前，别被只读口的前缀先吃掉。
+                if (path.IndexOf(CharacterRealmPhase.PromotePath, StringComparison.Ordinal) >= 0)
+                {
+                    _promoteCalls++;
+                    _promoteBody = body;
+                    done(200, _promoteCalls == 1 ? PromoteOkJson : PromoteRejectJson);
+                    return;
+                }
+
+                if (path.IndexOf(CharacterRealmPhase.ReadPath, StringComparison.Ordinal) >= 0)
+                {
+                    done(200, RealmPhaseJson);
                     return;
                 }
 
@@ -110,6 +131,37 @@ namespace HotUpdate.Ui
             Report("crystal_reject", !c.Ok && c.Reason == "wrong_part"
                 && c.Filled == 0 && c.EnhanceLevel == 0 && c.Gold == 0 && !c.Bound);
             Debug.Log("u5_self_crystal reason=" + c.Reason + " filled=" + c.Filled);
+
+            // U13：段内阶只读回包，升一阶只发角色号，门槛照回包写、被拒不改屏上那一阶。
+            Report("realm_pending",
+                CharacterRealmPhase.PhaseLine(false, default(RealmPhaseOutcome)) == "尚未请求");
+
+            flow.LoadRealmPhase();
+            var rp = flow.LastRealmPhase;
+            Report("realm_phase", flow.RealmPhaseRequested && rp.Ok && rp.Realm == "炼体"
+                && rp.Phase == 0 && rp.PhaseName == "一阶" && rp.PassivePctBps == 0);
+            Debug.Log("u5_self_realm_phase phase=" + rp.Phase + " name=" + rp.PhaseName
+                + " bps=" + rp.PassivePctBps);
+
+            flow.PromoteRealmPhase();
+            var po = flow.LastPromote;
+            Report("promote_ok", po.Ok && po.FromPhase == 0 && po.ToPhase == 1
+                && po.PhaseName == "二阶" && po.PassivePctBps == 30
+                && flow.LastRealmPhase.Phase == 1 && flow.LastRealmPhase.PassivePctBps == 30);
+            Debug.Log("u5_self_promote_ok from=" + po.FromPhase + " to=" + po.ToPhase
+                + " name=" + po.PhaseName + " bps=" + po.PassivePctBps);
+
+            flow.PromoteRealmPhase();
+            var pr = flow.LastPromote;
+            Report("promote_reject", !pr.Ok && pr.Reason == "level_not_enough"
+                && pr.Level == 3 && pr.LevelRequired == 11 && flow.LastRealmPhase.Phase == 1);
+            Debug.Log("u5_self_promote_reject reason=" + pr.Reason + " level=" + pr.Level
+                + " required=" + pr.LevelRequired + " kept=" + flow.LastRealmPhase.Phase);
+
+            // 请求体只有角色号：事务号由网关生成，客户端带不进任何数值。
+            Report("promote_body", _promoteBody == "{\"character_id\":7}"
+                && _promoteBody.IndexOf("txn", StringComparison.OrdinalIgnoreCase) < 0);
+            Debug.Log("u5_self_promote_body " + _promoteBody);
 
             // 切皮肤只换颜色：布局与文案一字不差。
             shell.ShowPage("强化", s => UiEnhanceScreen.Build(s, flow));
@@ -210,6 +262,20 @@ namespace HotUpdate.Ui
             "\"crystal_item\":\"\",\"category\":\"\",\"part\":\"\",\"socket_count\":0," +
             "\"filled_before\":0,\"filled\":0,\"crystal_left\":0,\"gold\":0,\"enhance_level\":0," +
             "\"bound\":false,\"duplicate\":false}";
+
+        const string RealmPhaseJson =
+            "{\"ok\":true,\"character_id\":7,\"realm\":\"炼体\",\"realm_phase\":0," +
+            "\"phase_name\":\"一阶\",\"passive_pct_bps\":0}";
+
+        const string PromoteOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"txn_id\":\"realm_phase:selftest-a\",\"character_id\":7," +
+            "\"from_phase\":0,\"to_phase\":1,\"phase_name\":\"二阶\",\"passive_pct_bps\":30," +
+            "\"level\":6,\"level_required\":11,\"duplicate\":false}";
+
+        const string PromoteRejectJson =
+            "{\"ok\":false,\"reason\":\"level_not_enough\",\"txn_id\":\"realm_phase:selftest-b\"," +
+            "\"character_id\":7,\"from_phase\":1,\"to_phase\":1,\"phase_name\":\"二阶\"," +
+            "\"passive_pct_bps\":30,\"level\":3,\"level_required\":11,\"duplicate\":false}";
     }
 }
 #endif

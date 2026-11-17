@@ -35,12 +35,6 @@ namespace HotUpdate.Ui
             "镇岳（守护）", "古雷（法师）", "破军（战士）", "仙真（牧师）", "穿杨（弓手）",
         };
 
-        /// <summary>境界阶。突破接口在后面的卡，这一屏只显示角色服给的当前境界。</summary>
-        public static readonly string[] Realms =
-        {
-            "炼体", "筑基", "金丹", "元婴", "化神", "炼虚", "合体", "大乘", "渡劫", "散仙", "金仙",
-        };
-
         public const string EnhanceNote =
             "上限 +12 · 失败只掉 1 级、不碎、不清零 · 成功率与费用由服务端按配置算，界面只显示回包";
 
@@ -54,7 +48,7 @@ namespace HotUpdate.Ui
             "技能与分支由服务端下发；界面只列名字，不排技能、不算伤害。";
 
         public const string RealmNote =
-            "突破由服务端判定，本卡没有突破接口；这里只显示角色服给的当前境界。";
+            "段内阶名与被动由角色服按配置算，界面只显示回包；升一阶的门槛（等级）也在服务端，被拒时照回包写还差几级。";
 
         /// <summary>四个装备部位（原型 D01）。</summary>
         public static readonly string[] Parts = { "兵器", "衣甲", "饰品", "结晶位" };
