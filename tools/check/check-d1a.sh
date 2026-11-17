@@ -3,7 +3,8 @@
 #
 # 完成标准（14.8 的 D1a 行，逐条对应下面的断言）：
 #   1. 入口只留启动与迁移：Program.cs 不再有 flag 分支 / 连库 / 表加载；
-#   2. 133 个 flag 名不变：Cli/CliParser.cs 的 `case "--xxx"` 与 D1a 前的名单逐字一致；
+#   2. D1a 的 133 个 flag 名不变：CliParser.cs 的 `case "--xxx"` 与 D1a 前的名单逐字一致；
+#      之后的新卡只能往名单里追加（K5 追加 --item-list，共 134 个），不能改旧名；
 #   3. `Character/Cli/*` 一卡一类：每个文件恰好一个类型，单文件 ≤ 600 行；
 #   4. check 全绿：编译 + 只读入口 / 解析 / 连库入口的运行断言。
 #
@@ -78,7 +79,7 @@ for path in files:
 report("每个 Cli 文件恰好一个类型", not multi, ",".join(multi))
 report("每个 Cli 文件 <= 600 行", not too_long, ",".join(too_long))
 
-# 3. 133 个 flag 名与 D1a 前逐字一致。
+# 3. D1a 的 133 个 flag 名逐字一致，K5 追加 --item-list。
 EXPECTED = """
 --advance-branch --advance-realm --apply-siege-result --auction-config --auction-ledger
 --auction-state --binding-of --branch-state --buy-season-pass --can-equip
@@ -91,7 +92,7 @@ EXPECTED = """
 --exp-booster-config --exp-booster-expire --exp-booster-list --exp-booster-reset
 --exp-booster-state --exp-config --exp-config-path --exp-state --fatigue-state
 --hard-entry-state --hero-codex-state --hero-codex-table-path --ingot-ledger
---item-count --level-of --mainline-alignment --mainline-breakthrough
+--item-count --item-list --level-of --mainline-alignment --mainline-breakthrough
 --mainline-drop-table-path --mainline-list --mainline-path --mainline-seed-settlement
 --mainline-stage --mainline-state --mainline-turn-in --mainline-txn --migrate
 --monthly-bundle-list --monthly-bundle-path --pass-buy-txn --pass-claim-txn
@@ -117,7 +118,8 @@ parser = read("tools/probe/CliProbe/CliParser.cs")
 got = re.findall(r'case "(--[a-z0-9-]+)"', parser)
 missing = [f for f in expected if f not in got]
 extra = [f for f in set(got) if f not in expected]
-report("flag 名 133 个逐字一致（实际 %d）" % len(set(got)), len(set(got)) == 133 and not missing and not extra,
+report("flag 名 134 个逐字一致（D1a 133 + K5 1，实际 %d）" % len(set(got)),
+       len(set(got)) == 134 and not missing and not extra,
        "缺=%s 多=%s" % (missing[:5], extra[:5]))
 report("flag 无重复", len(got) == len(set(got)), "%d 处重复" % (len(got) - len(set(got))))
 

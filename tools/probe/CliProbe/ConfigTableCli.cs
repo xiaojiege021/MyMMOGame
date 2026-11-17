@@ -251,6 +251,37 @@ internal static class ConfigTableCli
             return 0;
         }
 
+        if (itemList)
+        {
+            try
+            {
+                var table = ItemTable.Load("config/items.json");
+                Console.WriteLine("item_table_state=ok version=" + table.Version
+                    + " items=" + table.All.Count);
+                foreach (var item in table.All.OrderBy(i => i.Id, StringComparer.Ordinal))
+                {
+                    Console.WriteLine("item=" + item.Id
+                        + " kind=" + item.Kind
+                        + " grade=" + (item.HasGrade ? item.Grade : "-")
+                        + " set=" + (item.SetId.Length == 0 ? "-" : item.SetId)
+                        + " icon=" + item.Icon
+                        + " name=" + item.Name
+                        + " desc=" + item.Desc);
+                }
+                return 0;
+            }
+            catch (ConfigException ex)
+            {
+                Console.WriteLine("config_error=" + ex.Message);
+                return 2;
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("config_error=" + ex.Message);
+                return 2;
+            }
+        }
+
         if (weaponRules)
         {
             try

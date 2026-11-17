@@ -43,6 +43,10 @@ internal static class CliParser
                 long.TryParse(args[++i], out advanceBranchId);
                 advanceBranchTo = args[++i];
                 break;
+            // 只给核对用：把物品表的品阶 / 套装 / 图标 / 说明打出来，不连库。坏配置也走这里。
+            case "--item-list":
+                itemList = true;
+                break;
             // 只给核对用：把武器锁与职业可用兵器打出来，不连库。坏配置也走这里。
             case "--weapon-rules":
                 weaponRules = true;

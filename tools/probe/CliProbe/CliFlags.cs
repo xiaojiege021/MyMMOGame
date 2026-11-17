@@ -1,8 +1,9 @@
 namespace Character.Cli;
 
 /// <summary>
-/// 133 个核对 flag 的共享状态。拆文件前它们是 Program 的顶层局部变量；
-/// D1a 只把声明搬到这里，名字、默认值与含义一行未改，各 CLI 类用 using static 引用。
+/// 核对 flag 的共享状态。拆文件前它们是 Program 的顶层局部变量；
+/// D1a 只把 133 个声明搬到这里，名字、默认值与含义一行未改；K5 追加 --item-list。
+/// 各 CLI 类用 using static 引用。
 /// </summary>
 internal static class CliFlags
 {
@@ -20,6 +21,8 @@ internal static class CliFlags
     public static string? advanceBranchTo = null;
     public static long canEquipOf = 0;
     public static string? canEquipItem = null;
+    // K5：把物品表的 grade / set_id / icon / desc 读出来，不连库、不启动进程。
+    public static bool itemList = false;
     public static bool weaponRules = false;
     public static string? weaponRulesBranchPath = null;
     public static string? weaponRulesItemPath = null;

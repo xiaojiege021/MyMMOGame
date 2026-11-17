@@ -60,7 +60,9 @@ trade = by.get("sword_trade", {})
 staff = by.get("staff_trade", {})
 R("low_weapon_below_lock", trial.get("weapon_kind") == "sword" and trial.get("require_level") == 10,
   str(trial))
-R("high_weapon_at_lock", trade.get("weapon_kind") == "sword" and trade.get("require_level") == 15,
+# K5 把 sword_trade 从 15 级剑改成 15 级长刀（weapon_kind=saber，编号不变）；
+# 战士（破军）仍同时有 saber / sword，武器锁语义没变，这里只跟着改兵器种类。
+R("high_weapon_at_lock", trade.get("weapon_kind") == "saber" and trade.get("require_level") == 15,
   str(trade))
 R("staff_needs_15", staff.get("weapon_kind") == "staff" and staff.get("require_level") == 15,
   str(staff))
@@ -256,7 +258,7 @@ except Exception: print("")' 2>/dev/null)"
   equip "$W12" sword_trade | grep -q 'reason=level_not_enough' \
     && ok "12 级战士装 15 级剑：level_not_enough" || bad "12 级能装 15 级剑"
   lv "$W45" 45; lv "$M45" 45
-  equip "$W45" sword_trade | grep -q 'ok=true' && ok "45 级战士能装 15 级剑" || bad "45 级战士装不了剑"
+  equip "$W45" sword_trade | grep -q 'ok=true' && ok "45 级战士能装 15 级长刀" || bad "45 级战士装不了长刀"
   equip "$W45" staff_trade | grep -q 'reason=class_mismatch' \
     && ok "战士装 15 级法杖：class_mismatch（15 级起只能用本职业兵器）" || bad "战士装上了法杖"
   equip "$M45" staff_trade | grep -q 'ok=true' && ok "法师能装同一根法杖" || bad "法师装不了法杖"

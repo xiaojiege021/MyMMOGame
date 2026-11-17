@@ -154,6 +154,8 @@ deps_of() {
     c6) echo "" ;;
     # K4 是 14.7 表第 2 行：实物引用审计，前置 K1 的商城配置化。
     k4) echo "k1" ;;
+    # K5 是 14.7 表第 3 行：物品表扩展，前置 K1（K4 已收口，不重复挂）。
+    k5) echo "k1" ;;
     *) echo "__UNKNOWN__" ;;
   esac
 }
@@ -167,7 +169,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 r1 k1 k4 d1a d1b d4 c6"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 r1 k1 k4 k5 d1a d1b d4 c6"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {

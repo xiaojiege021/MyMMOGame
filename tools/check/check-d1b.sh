@@ -3,7 +3,8 @@
 #
 # 完成标准（14.8 的 D1b 行，逐条对应下面的断言）：
 #   1. 角色服进程不再带核对入口：Program.cs 只认 --config，--shop-list 之类不再跑核对；
-#   2. 脚本改调 probe：tools/probe/CliProbe 存在、133 个 flag 与入口都在那边，
+#   2. 脚本改调 probe：tools/probe/CliProbe 存在、D1b 迁出的 133 个 flag（K5 又加
+#      --item-list，共 134）与入口都在那边，
 #      tools/check/*.sh 里已经没有指向角色服 dll 的核对调用；
 #   3. 真机 59 项不回退：由 check-p0-3c.sh 单独验（本脚本不重复出包）。
 #
@@ -56,13 +57,17 @@ report("角色服入口不含 CliEntry / CliParser",
        "CliEntry" not in program and "CliParser" not in program)
 report("角色服编译时带 probe 构建钩子", "BuildCliProbe" in read("src/Character/Character.csproj"))
 
-# 2. probe 侧完整：工程、入口、133 个 flag、15 个类文件。
+# 2. probe 侧完整：工程、入口、D1b 的 133 个 flag（K5 追加 1 个）、15 个类文件。
 probe_csproj = read("tools/probe/CliProbe/CliProbe.csproj")
 report("probe 工程引用角色服", "../../../src/Character/Character.csproj" in probe_csproj)
 report("probe 入口转 CliEntry", "CliEntry.RunAsync(args)" in read("tools/probe/CliProbe/Program.cs"))
 parser = read("tools/probe/CliProbe/CliParser.cs")
 flags = re.findall(r'case "(--[a-z0-9-]+)"', parser)
-report("probe 仍是 133 个 flag", len(set(flags)) == 133, str(len(set(flags))))
+# K5 加了 --item-list；断言「D1b 的 133 个一个不少，最多再加后续卡的」。
+missing_flags = [f for f in ("--weapon-rules", "--shop-list", "--season-pass-list",
+                             "--migrate", "--config") if f not in flags]
+report("probe 仍是 D1b 的 133 个 flag（+K5 的 --item-list，共 %d）" % len(set(flags)),
+       len(set(flags)) >= 133 and not missing_flags, str(missing_flags))
 report("probe 仍是 15 个源文件",
        len(glob.glob(os.path.join(root, "tools/probe/CliProbe/*.cs"))) == 16,
        str(len(glob.glob(os.path.join(root, "tools/probe/CliProbe/*.cs")))))
