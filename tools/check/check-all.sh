@@ -139,6 +139,8 @@ deps_of() {
     n10) echo "p3-1a2" ;;
     n11) echo "c3" ;;
     n12) echo "n10" ;;
+    # N13 是第 96 行：境界子阶只读 HTTP，依赖 N10 的 gRPC 与 U5 的境界入口。
+    n13) echo "n10 u5" ;;
     # R1 是 14.5 表第 0 行：炼体 1–9 阶，依赖 N10 的段内阶与被动。
     r1) echo "n10" ;;
     # K1 是 14.7 表第 1 行：商城 / 家园币商城配置化，前置 X1 是文档卡、没有核对脚本，
@@ -178,7 +180,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 r1 k1 k4 k5 k6 k7 c2-realm c5 d1a d1b d4 c6"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 r1 k1 k4 k5 k6 k7 c2-realm c5 d1a d1b d4 c6"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {

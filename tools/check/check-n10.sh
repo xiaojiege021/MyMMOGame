@@ -59,7 +59,19 @@ phase = rd("src/Character/RealmPhaseRepository.cs")
 adv = rd("src/Character/RealmAdvanceRepository.cs")
 rt = rd("src/Character/RealmTable.cs")
 proto = rd("proto/mmo/character.proto")
-gw = rd("src/Gateway/Program.cs")
+gwsrc = ""
+for dp, _, fs in os.walk(os.path.join(root, "src/Gateway")):
+    if "/obj" in dp or "/bin" in dp:
+        continue
+    for f in fs:
+        if not f.endswith(".cs"):
+            continue
+        for line in open(os.path.join(dp, f), encoding="utf-8").read().splitlines():
+            s = line.strip()
+            # 注释里写「不读 config/realms.json」这类说明不算读配置。
+            if s.startswith("//") or s.startswith("*") or s.startswith("/*"):
+                continue
+            gwsrc += line + "\n"
 allcards = rd("tools/check/check-all.sh")
 
 R("ledger", "realm_phase_promote" in phase)
@@ -67,7 +79,7 @@ R("promote_gate", "level_not_enough" in phase and "realm_phase_max" in phase)
 R("advance_gate", "realm_phase_not_enough" in adv and "realm_phase = 0" in adv)
 R("sub_model", "RealmSubPhases" in rt and "PassivePctBps" in rt)
 R("proto", "rpc PromoteRealmPhase" in proto and "rpc DescribeRealmPassive" in proto)
-R("no_gateway", "PromoteRealmPhase" not in gw and "promote-realm-phase" not in gw)
+R("gateway_no_local_passive", "realms.json" not in gwsrc and "RealmSubPhases" not in gwsrc)
 R("no_client_passive", "passive_pct" not in rd("client/MMOGame/Assets/HotUpdate/Ui/UiEntrySelfCheck.cs"))
 R("all_cards", "n10)" in allcards and re.search(r"\bn10\b", allcards))
 PY
