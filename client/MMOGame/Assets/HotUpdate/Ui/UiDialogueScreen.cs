@@ -22,8 +22,10 @@ namespace HotUpdate.Ui
         {
             public UiText Head;
             public UiText Meta;
+            public Text FirstTitle;
             public UiText FirstText;
             public UiText FirstLimit;
+            public Text SecondTitle;
             public UiText SecondText;
             public UiText SecondLimit;
         }
@@ -77,6 +79,7 @@ namespace HotUpdate.Ui
                 string.Empty, UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             var first = shell.Panel("第 1 场", m.Band(rightX, m.Px(320f), rightW, m.Px(400f)), shell.Size(26f));
+            parts.FirstTitle = first.Title;
             parts.FirstText = shell.LabelIn(first.Root,
                 new Rect(m.Px(28f), m.Px(120f), rightW - m.Px(56f), m.Px(230f)),
                 string.Empty, UiTextRole.Body, shell.Size(27f), TextAnchor.UpperLeft, true);
@@ -85,6 +88,7 @@ namespace HotUpdate.Ui
                 string.Empty, UiTextRole.Faint, shell.Size(22f), TextAnchor.UpperLeft, true);
 
             var second = shell.Panel("第 2 场", m.Band(rightX, m.Px(740f), rightW, m.Px(400f)), shell.Size(26f));
+            parts.SecondTitle = second.Title;
             parts.SecondText = shell.LabelIn(second.Root,
                 new Rect(m.Px(28f), m.Px(120f), rightW - m.Px(56f), m.Px(230f)),
                 string.Empty, UiTextRole.Body, shell.Size(27f), TextAnchor.UpperLeft, true);
@@ -93,7 +97,8 @@ namespace HotUpdate.Ui
                 string.Empty, UiTextRole.Faint, shell.Size(22f), TextAnchor.UpperLeft, true);
 
             shell.Label(new Rect(rightX, m.Height - m.Px(1220f), rightW, m.Px(48f)),
-                "十四条定词不改写；对白只留配置，不进场景脚本。",
+                "共 " + UiWorldCodex.TotalDialogueLines
+                + " 条定词逐字照 config/dialogue；对白只留配置，不进场景脚本。",
                 UiTextRole.Muted, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             Show(shell, parts, options, UiWorldCodex.Speakers[0].Name);
@@ -129,24 +134,23 @@ namespace HotUpdate.Ui
                 + (speaker.FirstRegion.Length > 0 ? " · " + speaker.FirstRegion : string.Empty)
                 + " · 共 " + speaker.LineCount + " 场";
 
+            parts.FirstTitle.text = "第 " + speaker.Lines[0].Chapter + " 场"
+                + (speaker.Lines[0].Region.Length > 0 ? " · " + speaker.Lines[0].Region : string.Empty);
             parts.FirstText.Label.text = "「" + speaker.Text + "」";
             parts.FirstLimit.Label.text = "限制：" + speaker.Limit;
 
-            // 第二块只放配置里真有的那一段。原型 B03 要展示乔小满的两场，
-            // 别的多场角色这里不拿他的台词顶上，只写明「还有几场在配置里」。
-            if (!string.IsNullOrEmpty(speaker.SecondText))
+            // 第二块放配置里的下一条；一位只有一场时如实写「没有第 2 场」，
+            // 不拿别人的台词顶上。多场角色的其余几条仍只在配置里。
+            if (speaker.Lines.Length > 1)
             {
+                parts.SecondTitle.text = "第 " + speaker.Lines[1].Chapter + " 场"
+                    + (speaker.Lines[1].Region.Length > 0 ? " · " + speaker.Lines[1].Region : string.Empty);
                 parts.SecondText.Label.text = "「" + speaker.SecondText + "」";
                 parts.SecondLimit.Label.text = "限制：" + speaker.SecondLimit;
             }
-            else if (speaker.LineCount > 1)
-            {
-                parts.SecondText.Label.text = "这一位在配置里还有 " + (speaker.LineCount - 1)
-                    + " 场，本屏只按原型展示第一场。";
-                parts.SecondLimit.Label.text = "不补台词、不串用别人的定词";
-            }
             else
             {
+                parts.SecondTitle.text = "第 2 场";
                 parts.SecondText.Label.text = "这一位只有一场，没有第 2 场。";
                 parts.SecondLimit.Label.text = "不加台词、不补戏";
             }

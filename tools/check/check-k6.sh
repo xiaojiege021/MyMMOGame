@@ -12,7 +12,8 @@
 #     dialogue/*.json（台词）、world.json（地表顺序 / 势力 / 开口人顺序）。
 #   - 客户端的人名 / 地名来自 tools/gen/gen-ui-content.py 生成的 UiContentTable.cs；
 #     生成物逐字比对，手写代码里不许再出现 Name = "某人" / Id = "某地" 这类内容初始化。
-#     台词仍是 C5 的事，本卡不动 UiWorldCodex.SpeakerTexts。
+#     本卡只核对开口人的元数据；定词由 C5 一起搬进生成表（SpeakerDialogue），
+#     正本仍是 config/dialogue/*.json，C5 的 check-c5.sh 逐条比对。
 #   - npc.json 的九位开口人必须与 world.json 的 speakers 一一对上；商店引用必须落在
 #     npc_shop.json；怪物技能必须落在 skills.json、掉落必须落在 items.json。
 #

@@ -203,7 +203,7 @@ PY
     fi
 
     # 编辑器段自己的静态断言：任一条 fail 都要单独列出来，别只报一个总判。
-    for key in files meta codex_regions codex_speakers codex_nodes codex_realms codex_second_line tier_translate tier_no_distance no_config_read no_resources_load verdict_from_reply fly_height_from_reply fly_trail_from_reply fly_body_scope battle_hud_untouched; do
+    for key in files meta codex_regions codex_speakers codex_nodes codex_realms codex_dialogue_source tier_translate tier_no_distance no_config_read no_resources_load verdict_from_reply fly_height_from_reply fly_trail_from_reply fly_body_scope battle_hud_untouched; do
       if grep -q "u4_${key}=ok" "$TMP/u4.log" 2>/dev/null; then
         ok "编辑器自检 u4_${key}=ok"
       elif grep -q "u4_${key}=fail" "$TMP/u4.log" 2>/dev/null; then

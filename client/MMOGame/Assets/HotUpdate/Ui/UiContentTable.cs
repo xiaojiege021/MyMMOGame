@@ -3,15 +3,15 @@
 //   config/world.json / config/region/*.json / config/flight.json
 //   config/npc.json / config/dialogue/*.json / tools/gen/ui_map_layout.json
 // 重新生成：python3 tools/gen/gen-ui-content.py
-// 核对：bash tools/check/check-k6.sh（重跑生成器并逐字比对）
+// 核对：bash tools/check/check-k6.sh / bash tools/check/check-c5.sh（重跑生成器并逐字比对）
 // </auto-generated>
 
 namespace HotUpdate.Ui
 {
-    /// <summary>客户端唯一的内容表：人名、地名、势力、开口人的元数据都从 config/ 生成。</summary>
+    /// <summary>客户端唯一的内容表：人名、地名、势力、开口人的元数据与全部定词都从 config/ 生成。</summary>
     public static class UiContentTable
     {
-        public const int Version = 1;
+        public const int Version = 2;
 
         /// <summary>三段大境界，顺序与 config/flight.json 一致。</summary>
         public static readonly string[] Realms = new[] { "炼体", "筑基", "结丹" };
@@ -110,6 +110,108 @@ namespace HotUpdate.Ui
             new UiWorldCodex.SpeakerMeta
             {
                 Name = "周晚棠", Origin = "", LineCount = 1, FirstChapter = 12, FirstRegion = "栖云城",
+            },
+        };
+
+        /// <summary>九位开口人的全部定词（C5），顺序与 Speakers 一致，逐条照 config/dialogue。</summary>
+        public static readonly UiWorldCodex.SpeakerLine[][] SpeakerDialogue =
+        {
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 1, Region = "枯岚道",
+                    Text = "灵气这么薄，先把眼前这只选中。选不中，后面的招式没有用。", Limit = "只在枯岚道教锁定。不加入后面的队伍",
+                },
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 2, Region = "枯岚道",
+                    Text = "它要扑的那一下有前摇。你要么拉开，要么挡住。", Limit = "送到承露门门口就离开",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 3, Region = "承露门",
+                    Text = "承露门只教天地玄黄。外面说秘境灵气无尽，能帮人破境。这句话是传的，门派自己没进去过。", Limit = "代表门派收徒，不替玩家选职业",
+                },
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 10, Region = "",
+                    Text = "引路帖是续仙盟写的。承露门只是跟着说。跟着说，也不等于门派永远对。", Limit = "说完进入立仙或立魔的选择，选择本身不分路",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 4, Region = "",
+                    Text = "我家的脉一年比一年细。我出来是找那处秘境，不是找一个救主。", Limit = "同行之一。四种出身都能遇见他",
+                },
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 6, Region = "外环隙",
+                    Text = "里面没有无尽灵气。有凶物，有机关。", Limit = "不在这场发境界",
+                },
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 7, Region = "",
+                    Text = "矿石和丹药带出来了。境界没动。", Limit = "不把材料说成灵石",
+                },
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 9, Region = "",
+                    Text = "玩家若先告诉他：那也按这个办法破。破完再查是谁写的。", Limit = "照做或不说，都能突破，都没有额外属性",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 4, Region = "",
+                    Text = "旧天路断了。我跟着走一段，走到入口就知道传闻真不真。", Limit = "同行之一。创角时不能飞，他也不能",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 5, Region = "听谣镇",
+                    Text = "住店、听传闻，都按天算。突破的东西这里不卖。", Limit = "不卖灵石、丹药和装备",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 8, Region = "",
+                    Text = "续仙盟按人头给钱。认得出承露门的衣服。我是受雇的。", Limit = "这场之后不再出场",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 11, Region = "旧天城区",
+                    Text = "不顺着续仙盟走，只是不顺着他们。承露门对过的事，这里不替它认。", Limit = "只在旧天城区出现。不加副本次数",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 11, Region = "焦原",
+                    Text = "用这里的力量往下走，不是去续仙盟报到。", Limit = "只在焦原出现。选他这条不是加入续仙盟",
+                },
+            },
+            new[]
+            {
+                new UiWorldCodex.SpeakerLine
+                {
+                    Chapter = 12, Region = "栖云城",
+                    Text = "入口太多，这座城守不住。守护和税收包给宗门。个人的路停在龙巢门口。", Limit = "不要求玩家单独拯救栖云城",
+                },
             },
         };
 

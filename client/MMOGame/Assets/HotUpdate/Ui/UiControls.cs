@@ -149,6 +149,12 @@ namespace HotUpdate.Ui
             _title = title;
         }
 
+        /// <summary>卡片标题。定词屏按配置里的场次改它，不另建一张卡片。</summary>
+        public Text Title
+        {
+            get { return _title; }
+        }
+
         /// <summary>加一条边。接缝在卡片内侧，布局由调用方给。</summary>
         public void AddEdge(Image edge)
         {

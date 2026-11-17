@@ -266,33 +266,55 @@ namespace HotUpdate.Ui
         {
             Report("dialogue_speakers", speakers == 9 && UiWorldCodex.Speakers.Length == 9);
 
-            // 九条定词逐字来自配置，不许在屏上改写。
+            // 每一条定词都来自生成的配置表（config/dialogue），本屏不再有写死的文本；
+            // 这里只核对「生成表 → 展示表」没有丢行、没有改写。
             var qiao = UiWorldCodex.Speakers[0];
             Report("dialogue_qiao",
                 qiao.Name == "乔小满"
-                && qiao.Text == UiWorldCodex.QiaoChapter1
-                && qiao.Limit == UiWorldCodex.QiaoChapter1Limit
+                && qiao.Lines != null && qiao.Lines.Length == 2
+                && qiao.Text == qiao.Lines[0].Text
+                && qiao.Limit == qiao.Lines[0].Limit
+                && qiao.SecondText == qiao.Lines[1].Text
+                && qiao.SecondLimit == qiao.Lines[1].Limit
                 && qiao.LineCount == 2);
 
-            // 配置里有三位不止一场（乔小满 2、苏晚织 2、阮青 4），
-            // 但原型 B03 只展示乔小满的第二场：有第二段文本的只能有他一位，
-            // 其余多场角色屏上只写「还有几场在配置里」，不串用别人的定词。
             var multi = 0;
             var withSecond = 0;
+            var generated = 0;
+            var linesOk = UiContentTable.SpeakerDialogue.Length == UiWorldCodex.Speakers.Length;
             for (var i = 0; i < UiWorldCodex.Speakers.Length; i++)
             {
-                if (UiWorldCodex.Speakers[i].LineCount > 1)
+                var speaker = UiWorldCodex.Speakers[i];
+                linesOk &= speaker.Lines != null && speaker.Lines.Length > 0
+                    && speaker.LineCount == speaker.Lines.Length;
+                if (speaker.LineCount > 1)
                 {
                     multi++;
                 }
 
-                if (!string.IsNullOrEmpty(UiWorldCodex.Speakers[i].SecondText))
+                if (!string.IsNullOrEmpty(speaker.SecondText))
                 {
                     withSecond++;
                 }
+
+                if (i < UiContentTable.SpeakerDialogue.Length)
+                {
+                    generated += UiContentTable.SpeakerDialogue[i].Length;
+                    linesOk &= speaker.Lines.Length == UiContentTable.SpeakerDialogue[i].Length;
+                }
+
+                for (var j = 0; j < speaker.Lines.Length; j++)
+                {
+                    linesOk &= speaker.Lines[j].Chapter > 0
+                        && !string.IsNullOrEmpty(speaker.Lines[j].Text);
+                }
             }
 
-            Report("dialogue_second_chapter", multi == 3 && withSecond == 1);
+            Report("dialogue_lines", linesOk && generated == UiWorldCodex.TotalDialogueLines);
+
+            // 配置里有三位不止一场（乔小满 2、苏晚织 2、阮青 4）；
+            // 多场的都把下一条从配置里带出来，单场的如实写「没有第 2 场」。
+            Report("dialogue_second_chapter", multi == 3 && withSecond == 3);
         }
 
         // ------------------------------------------------------------------ B04

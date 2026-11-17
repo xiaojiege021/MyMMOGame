@@ -33,7 +33,7 @@ namespace HotUpdate.Ui
         /// <summary>八块地表，顺序与 `config/world.json` 的 regions 一致；内容由 config/ 生成。</summary>
         public static readonly Region[] Regions = UiContentTable.Regions;
 
-        /// <summary>开口人的元数据（名字 / 出身 / 场次），由 config/ 生成；台词在 C5 前仍留本文件。</summary>
+        /// <summary>开口人的元数据（名字 / 出身 / 场次），由 config/ 生成。</summary>
         public struct SpeakerMeta
         {
             public string Name;
@@ -59,7 +59,16 @@ namespace HotUpdate.Ui
             public float Facing;
         }
 
-        /// <summary>一位开口的人。定词与边界照抄 `config/dialogue/&lt;姓名&gt;.json` 的第一场。</summary>
+        /// <summary>一条定词（C5）：章节、地表、正文、边界逐字来自 `config/dialogue` 的生成表。</summary>
+        public struct SpeakerLine
+        {
+            public int Chapter;
+            public string Region;
+            public string Text;
+            public string Limit;
+        }
+
+        /// <summary>一位开口的人。元数据与定词都来自 `config/` 的生成表，本文件不写台词。</summary>
         public struct Speaker
         {
             public string Name;
@@ -67,106 +76,70 @@ namespace HotUpdate.Ui
             public int LineCount;
             public int FirstChapter;
             public string FirstRegion;
-            public string Text;
-            public string Limit;
-            // 只有原型 B03 明确要展示第二场的那一位（乔小满）才填这两格；
-            // 其余多场角色留空，屏上只写「还有几场在配置里」，不拿别人的台词顶上。
-            public string SecondText;
-            public string SecondLimit;
+            public SpeakerLine[] Lines;
+
+            public string Text
+            {
+                get { return Lines != null && Lines.Length > 0 ? Lines[0].Text : string.Empty; }
+            }
+
+            public string Limit
+            {
+                get { return Lines != null && Lines.Length > 0 ? Lines[0].Limit : string.Empty; }
+            }
+
+            public string SecondText
+            {
+                get { return Lines != null && Lines.Length > 1 ? Lines[1].Text : string.Empty; }
+            }
+
+            public string SecondLimit
+            {
+                get { return Lines != null && Lines.Length > 1 ? Lines[1].Limit : string.Empty; }
+            }
         }
 
-        /// <summary>只放台词的文本表，与 UiContentTable.Speakers 同序同数；C5 再把台词搬进 config/。</summary>
-        struct SpeakerText
-        {
-            public string Text;
-            public string Limit;
-            public string SecondText;
-            public string SecondLimit;
-        }
-
-        static readonly SpeakerText[] SpeakerTexts =
-        {
-            new SpeakerText
-            {
-                Text = "灵气这么薄，先把眼前这只选中。选不中，后面的招式没有用。",
-                Limit = "只在枯岚道教锁定。不加入后面的队伍",
-                SecondText = "它要扑的那一下有前摇。你要么拉开，要么挡住。",
-                SecondLimit = "送到承露门门口就离开",
-            },
-            new SpeakerText
-            {
-                Text = "承露门只教天地玄黄。外面说秘境灵气无尽，能帮人破境。这句话是传的，门派自己没进去过。",
-                Limit = "代表门派收徒，不替玩家选职业",
-            },
-            new SpeakerText
-            {
-                Text = "我家的脉一年比一年细。我出来是找那处秘境，不是找一个救主。",
-                Limit = "同行之一。四种出身都能遇见他",
-            },
-            new SpeakerText
-            {
-                Text = "旧天路断了。我跟着走一段，走到入口就知道传闻真不真。",
-                Limit = "同行之一。创角时不能飞，他也不能",
-            },
-            new SpeakerText
-            {
-                Text = "住店、听传闻，都按天算。突破的东西这里不卖。",
-                Limit = "不卖灵石、丹药和装备",
-            },
-            new SpeakerText
-            {
-                Text = "续仙盟按人头给钱。认得出承露门的衣服。我是受雇的。",
-                Limit = "这场之后不再出场",
-            },
-            new SpeakerText
-            {
-                Text = "不顺着续仙盟走，只是不顺着他们。承露门对过的事，这里不替它认。",
-                Limit = "只在旧天城区出现。不加副本次数",
-            },
-            new SpeakerText
-            {
-                Text = "用这里的力量往下走，不是去续仙盟报到。",
-                Limit = "只在焦原出现。选他这条不是加入续仙盟",
-            },
-            new SpeakerText
-            {
-                Text = "入口太多，这座城守不住。守护和税收包给宗门。个人的路停在龙巢门口。",
-                Limit = "不要求玩家单独拯救栖云城",
-            },
-        };
-
-        /// <summary>九位开口的人：名字 / 出身 / 场次来自生成表，台词与边界来自上面的文本表。</summary>
+        /// <summary>九位开口的人：名字 / 出身 / 场次与全部定词都来自生成表。</summary>
         public static readonly Speaker[] Speakers = BuildSpeakers();
+
+        /// <summary>配置里定词的总条数；屏脚注按它写，改完配置重生成后自动跟着变。</summary>
+        public static readonly int TotalDialogueLines = CountDialogueLines();
 
         static Speaker[] BuildSpeakers()
         {
             var meta = UiContentTable.Speakers;
+            var dialogue = UiContentTable.SpeakerDialogue;
             var list = new Speaker[meta.Length];
             for (var i = 0; i < meta.Length; i++)
             {
-                var text = SpeakerTexts[i];
+                var lines = i < dialogue.Length ? dialogue[i] : new SpeakerLine[0];
                 list[i] = new Speaker
                 {
                     Name = meta[i].Name,
                     Origin = meta[i].Origin,
-                    LineCount = meta[i].LineCount,
+                    LineCount = lines.Length,
                     FirstChapter = meta[i].FirstChapter,
                     FirstRegion = meta[i].FirstRegion,
-                    Text = text.Text,
-                    Limit = text.Limit,
-                    SecondText = text.SecondText,
-                    SecondLimit = text.SecondLimit,
+                    Lines = lines,
                 };
             }
 
             return list;
         }
 
-        /// <summary>乔小满第 1、2 场的定词，字字照抄 `config/dialogue/乔小满.json`。</summary>
-        public const string QiaoChapter1 = "灵气这么薄，先把眼前这只选中。选不中，后面的招式没有用。";
-        public const string QiaoChapter1Limit = "只在枯岚道教锁定。不加入后面的队伍";
-        public const string QiaoChapter2 = "它要扑的那一下有前摇。你要么拉开，要么挡住。";
-        public const string QiaoChapter2Limit = "送到承露门门口就离开";
+        static int CountDialogueLines()
+        {
+            var count = 0;
+            for (var i = 0; i < Speakers.Length; i++)
+            {
+                if (Speakers[i].Lines != null)
+                {
+                    count += Speakers[i].Lines.Length;
+                }
+            }
+
+            return count;
+        }
 
         /// <summary>三个采集分组。页签顺序与原型 B04 一致。</summary>
         public static readonly string[] GatherTabs = { "矿脉", "药草", "灵石矿脉" };

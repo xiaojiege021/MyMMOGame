@@ -204,12 +204,23 @@ public static class U4Check
 
         Report("codex_realms", realmOk, "realms=" + realms.Length + " flight_realm=" + content.Contains("筑基"));
 
-        // 第二场文本只许出现在乔小满那一条：别人的第二场不能拿他的台词顶上。
-        // K6 起名字在生成表、台词仍在 UiWorldCodex 的文本表；按生成表的顺序核对第一位。
-        var secondCount = Regex.Matches(codex, "SecondText = \"[^\"]+\"").Count;
-        var firstSpeaker = content.Contains("Name = \"乔小满\"");
-        Report("codex_second_line", secondCount == 1 && firstSpeaker,
-            "second_lines=" + secondCount);
+        // 定词只在 config/dialogue 存正本：展示表里不再手写台词，生成表逐条带上全部定词。
+        // C5 起第二场也不再是乔小满一个人的特例，多场角色都从配置取下一条。
+        var generatedLines = Regex.Matches(content, "new UiWorldCodex.SpeakerLine").Count;
+        var configLines = 0;
+        foreach (var file in Directory.GetFiles(Path.Combine(root, "config/dialogue"), "*.json"))
+        {
+            configLines += Regex.Matches(File.ReadAllText(file), "\"text\"\\s*:").Count;
+        }
+
+        var noHardcodedDialogue = !codex.Contains("SpeakerTexts")
+            && !codex.Contains("QiaoChapter1")
+            && !codex.Contains("QiaoChapter2");
+        var generatedDialogue = content.Contains("UiWorldCodex.SpeakerLine[][] SpeakerDialogue")
+            && codex.Contains("UiContentTable.SpeakerDialogue");
+        Report("codex_dialogue_source", noHardcodedDialogue && generatedDialogue
+            && generatedLines == configLines,
+            "generated=" + generatedLines + " config=" + configLines);
     }
 
     // ---------------------------------------------------------------- 档位

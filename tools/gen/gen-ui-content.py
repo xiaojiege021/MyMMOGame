@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
-"""从 config/ 生成客户端的内容表 UiContentTable.cs（K6）。
+"""从 config/ 生成客户端的内容表 UiContentTable.cs（K6 / C5）。
 
 输入（唯一正本）：
   config/world.json          地表顺序、势力、开口人的顺序
   config/region/<地名>.json  地名、章节、邻接、open、position、map_x / map_y
   config/flight.json         每块地表的境界门槛与三段大境界
   config/npc.json            NPC 实体（名字、地表、站位、职能、对话 / 商店引用）
-  config/dialogue/<人名>.json 开口人的 origin / 场次
+  config/dialogue/<人名>.json 开口人的 origin / 场次 / 每一条定词与边界
 
 输出：
   client/MMOGame/Assets/HotUpdate/Ui/UiContentTable.cs
 
-客户端不再手写人名 / 地名；改配置后重跑本脚本，check-k6.sh 会逐字比对生成物。
+客户端不再手写人名 / 地名 / 台词；改配置后重跑本脚本，check-k6.sh / check-c5.sh
+会逐字比对生成物。
   python3 tools/gen/gen-ui-content.py            # 写正本
   python3 tools/gen/gen-ui-content.py --out X    # 写到别处（核对用）
+  python3 tools/gen/gen-ui-content.py --root R --out X   # 用 R 下的配置生成（改配置演练）
 """
 
 import argparse
@@ -24,10 +26,11 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEFAULT_OUT = os.path.join(ROOT, "client/MMOGame/Assets/HotUpdate/Ui/UiContentTable.cs")
+BASE = ROOT
 
 
 def load(rel):
-    path = os.path.join(ROOT, rel)
+    path = os.path.join(BASE, rel)
     if not os.path.exists(path):
         raise SystemExit("缺少配置：" + rel)
     with open(path, encoding="utf-8") as f:
@@ -49,9 +52,12 @@ def arr(values, fmt=cs):
 
 
 def main():
+    global BASE
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=DEFAULT_OUT)
+    parser.add_argument("--root", default=ROOT, help="配置根目录，默认仓库根")
     args = parser.parse_args()
+    BASE = os.path.abspath(args.root)
 
     world = load("config/world.json")
     flight = load("config/flight.json")
@@ -99,6 +105,8 @@ def main():
             ))
 
     speaker_lines = []
+    dialogue_lines = []
+    total_lines = 0
     for name in speakers:
         if name not in npc_by_dialogue:
             raise SystemExit("npc.json 没有开口的人：" + name)
@@ -114,6 +122,28 @@ def main():
             "            },"
             % (cs(name), cs(dialogue.get("origin") or ""), len(lines),
                int(first.get("chapter") or 0), cs(first.get("region") or "")))
+
+        rows = []
+        for line in lines:
+            total_lines += 1
+            text = line.get("text") or ""
+            if not text:
+                raise SystemExit("dialogue/%s.json 有空的 text" % name)
+            region = line.get("region") or ""
+            rows.append(
+                "                new UiWorldCodex.SpeakerLine\n"
+                "                {\n"
+                "                    Chapter = %d, Region = %s,\n"
+                "                    Text = %s, Limit = %s,\n"
+                "                },"
+                % (int(line.get("chapter") or 0), cs(region),
+                   cs(text), cs(line.get("limit") or "")))
+        dialogue_lines.append(
+            "            new[]\n"
+            "            {\n"
+            "%s\n"
+            "            },"
+            % "\n".join(rows))
 
     npc_lines = []
     for npc in npcs:
@@ -138,15 +168,15 @@ def main():
 //   config/world.json / config/region/*.json / config/flight.json
 //   config/npc.json / config/dialogue/*.json / tools/gen/ui_map_layout.json
 // 重新生成：python3 tools/gen/gen-ui-content.py
-// 核对：bash tools/check/check-k6.sh（重跑生成器并逐字比对）
+// 核对：bash tools/check/check-k6.sh / bash tools/check/check-c5.sh（重跑生成器并逐字比对）
 // </auto-generated>
 
 namespace HotUpdate.Ui
 {
-    /// <summary>客户端唯一的内容表：人名、地名、势力、开口人的元数据都从 config/ 生成。</summary>
+    /// <summary>客户端唯一的内容表：人名、地名、势力、开口人的元数据与全部定词都从 config/ 生成。</summary>
     public static class UiContentTable
     {
-        public const int Version = 1;
+        public const int Version = 2;
 
         /// <summary>三段大境界，顺序与 config/flight.json 一致。</summary>
         public static readonly string[] Realms = %s;
@@ -166,6 +196,12 @@ namespace HotUpdate.Ui
 %s
         };
 
+        /// <summary>九位开口人的全部定词（C5），顺序与 Speakers 一致，逐条照 config/dialogue。</summary>
+        public static readonly UiWorldCodex.SpeakerLine[][] SpeakerDialogue =
+        {
+%s
+        };
+
         /// <summary>五个势力，照 config/world.json 的 factions。</summary>
         public static readonly string[] Factions = %s;
 
@@ -177,14 +213,16 @@ namespace HotUpdate.Ui
     }
 }
 """ % (arr(realms), cs(flight_realm), "\n".join(region_lines),
-       "\n".join(speaker_lines), arr(factions), "\n".join(npc_lines))
+       "\n".join(speaker_lines), "\n".join(dialogue_lines),
+       arr(factions), "\n".join(npc_lines))
 
     out = os.path.abspath(args.out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         f.write(body)
-    print("wrote=%s regions=%d speakers=%d npcs=%d" %
-          (os.path.relpath(out, ROOT), len(region_order), len(speakers), len(npcs)))
+    print("wrote=%s regions=%d speakers=%d npcs=%d lines=%d" %
+          (os.path.relpath(out, ROOT), len(region_order), len(speakers),
+           len(npcs), total_lines))
 
 
 if __name__ == "__main__":
