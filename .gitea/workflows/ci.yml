@@ -10,8 +10,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      # 钉精确版本，不用 10.0.x：与仓库根的 global.json 同一个版本，见 .github 那份的注释。
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.403'
       - name: build + 无库段核对
         run: bash tools/check/ci.sh

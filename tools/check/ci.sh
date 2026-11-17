@@ -38,8 +38,16 @@ gh_error() {
 }
 
 step "1. 编译（服务端 sln，Release）"
-# 先打一行环境：GitHub runner 上的 SDK 与本机不同，编不过时第一眼要看的就是它。
-"$DOTNET" --version 2>&1 | sed 's/^/       sdk /'
+# SDK 版本要钉住：GitHub runner 预装了更新的 SDK 预览版（11.0.100），`dotnet build`
+# 默认挑最新那个，于是 MSBuild 的 task host 起不来，报 MSB4216（不是代码错）。
+# 仓库根的 global.json 与两个 workflow 都钉 10.0.403，这里再挡一道并说清原因。
+SDK="$("$DOTNET" --version 2>/dev/null)"
+echo "       sdk ${SDK}"
+if [ "${SDK#10.0.}" = "$SDK" ]; then
+  echo "  FAIL SDK 不是 10.0.x（现在是 ${SDK:-空}）：global.json 与 ci.yml 都钉了 10.0.403"
+  gh_error "CI SDK mismatch: got ${SDK:-empty}, want 10.0.403"
+  exit 1
+fi
 if "$DOTNET" build src/MMOGame.sln -c Release --nologo -v q >"$TMP/build.log" 2>&1; then
   echo "  ok   编译通过"
 else
