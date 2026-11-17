@@ -344,7 +344,6 @@ internal static class ConfigTableCli
                         + " kind=" + item.Kind
                         + " grade=" + (item.HasGrade ? item.Grade : "-")
                         + " set=" + (item.SetId.Length == 0 ? "-" : item.SetId)
-                        + " icon=" + item.Icon
                         + " name=" + item.Name
                         + " desc=" + item.Desc);
                 }

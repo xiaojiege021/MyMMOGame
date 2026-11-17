@@ -2,7 +2,7 @@
 # tools/check/check-k5.sh —— K5 物品表扩展（开发架构 14.7 顺序 3）。
 #
 # 完成标准（14.7 的 K5 行，逐条对应下面的断言）：
-#   1. items.json 加 grade / set_id / icon / desc；
+#   1. items.json 加 grade / set_id / desc（icon 不进配置，v1.172 按第 17 节 17.1 修正）；
 #   2. 全表补齐（14.7 写的 33 件是 K4 前的快照，现在是 39 件，一件不少）；
 #   3. sword_trade 改长刀、新增 15 级法剑；
 #   4. 代码只读；
@@ -11,7 +11,8 @@
 # 口径：
 #   - 装备必须有 grade（六档）；材料、结晶、称号、外观这几类可以留空。
 #   - set_id 现在全表留空：14.7 与核对表都写「先加 B2 的空字段」，套装件数与效果由 B2 填。
-#   - icon 统一写 icon/<物品编号> 作占位；美术换图只改这一处。
+#   - 图标地址不进 items.json：第 17 节 17.1 写定 config 里没有美术字段，
+#     客户端按 icon/<物品编号> 自己拼；这里断言「配置里没有这一格」。
 #   - 装备部位仍只在 crystal.json 的 equipment_parts 一处，items.json 不写 part。
 #   - --item-list 是 K5 加的只读入口，与真实启动共用同一个 ItemTable.Load；
 #     坏配置在它这里就必须 config_error。
@@ -63,10 +64,10 @@ ids = [x.get("id") or "" for x in items]
 idset = set(ids)
 by_id = {x["id"]: x for x in items if x.get("id")}
 GRADES = {"white", "green", "blue", "purple", "orange", "red"}
-REQUIRED = ("grade", "set_id", "icon", "desc")
+REQUIRED = ("grade", "set_id", "desc")
 
 # ---------------------------------------------------------------- 1. 表本身
-report("schema_v3", doc.get("schema") == "item-table/3" and doc.get("version") == 3,
+report("schema_v4", doc.get("schema") == "item-table/4" and doc.get("version") == 4,
        "schema=%s version=%s" % (doc.get("schema"), doc.get("version")))
 report("items_count_floor", len(ids) >= 39, "只有 %d 件（K4 收口时 38，K5 再加 1 把法剑）" % len(ids))
 report("items_id_unique", len(ids) == len(idset), "重复=%s" % ",".join(
@@ -93,10 +94,9 @@ nonempty_set = [x.get("id") for x in items if x.get("set_id")]
 report("set_id_pending_b2", not nonempty_set,
        "已经填了套装（B2 之前应全空）：%s" % ",".join(nonempty_set[:8]))
 
-bad_icon = ["%s:%s" % (x.get("id"), x.get("icon")) for x in items
-            if x.get("icon") != "icon/" + (x.get("id") or "")]
-report("icon_slot", not bad_icon, ";".join(bad_icon[:8]))
-report("icon_unique", len({x.get("icon") for x in items}) == len(items), "图标地址重复")
+# v1.172：图标地址不进配置（第 17 节 17.1），谁把它写回 items.json 就红。
+with_icon = [x.get("id") for x in items if "icon" in x]
+report("no_icon_field", not with_icon, "这几件还写着 icon：%s" % ",".join(with_icon[:8]))
 
 bad_desc = [x.get("id") for x in items
             if not isinstance(x.get("desc"), str) or len((x.get("desc") or "").strip()) < 4]
@@ -150,10 +150,13 @@ report("spirit_sword_part", parts.get("spirit_sword_trade") == "weapon",
 item_cs = read("src/Character/ItemTable.cs")
 report("itemtable_reads_fields",
        all(('"%s"' % k) in item_cs for k in REQUIRED),
-       "ItemTable 没有读全 grade / set_id / icon / desc")
+       "ItemTable 没有读全 grade / set_id / desc")
+# 配置里不写图标地址，ItemTable 也不许再认这一格（v1.172）。
+report("itemtable_no_icon_field", '"icon"' not in item_cs,
+       "ItemTable 又映射了 icon 字段")
 report("itemtable_validates",
        all(k in item_cs for k in ("grade 不认识", "必须写 grade", "只有装备能写 set_id",
-                                  "icon 要写", "缺 desc")),
+                                  "缺 desc")),
        "ItemTable 缺少新字段的加载期校验")
 report("itemtable_no_item_branches", not any('"%s"' % i in item_cs for i in idset),
        "ItemTable 里出现了具体物品编号")
@@ -206,17 +209,17 @@ fi
 echo "== 3. 只读入口：新字段真的被代码读到 =="
 IL="$("$DOTNET" "$CHARACTER_DLL" --item-list 2>&1)"; ilrc=$?
 ITEM_COUNT="$(python3 -c 'import json; print(len(json.load(open("config/items.json"))["items"]))')"
-[ "$ilrc" = "0" ] && grep -q "^item_table_state=ok version=3 items=${ITEM_COUNT}\$" <<< "$IL" \
-  && ok "物品表 v3 读出 ${ITEM_COUNT} 件（不连库）" \
+[ "$ilrc" = "0" ] && grep -q "^item_table_state=ok version=4 items=${ITEM_COUNT}\$" <<< "$IL" \
+  && ok "物品表 v4 读出 ${ITEM_COUNT} 件（不连库）" \
   || bad "只读入口不对（rc=${ilrc}）：$(head -2 <<< "$IL" | tr '\n' ' ')"
 if [ "$(grep -c '^item=' <<< "$IL")" = "$ITEM_COUNT" ]; then
   ok "物品清单条数与表一致（${ITEM_COUNT}）"
 else
   bad "物品清单条数不对：$(grep -c '^item=' <<< "$IL") / ${ITEM_COUNT}"
 fi
-grep -q '^item=sword_trade kind=equipment grade=green set=- icon=icon/sword_trade name=行商长刀 ' <<< "$IL" \
+grep -q '^item=sword_trade kind=equipment grade=green set=- name=行商长刀 ' <<< "$IL" \
   && ok "sword_trade 读出长刀（saber / 15 级）" || bad "sword_trade 读出不对：$(grep '^item=sword_trade' <<< "$IL")"
-grep -q '^item=spirit_sword_trade kind=equipment grade=green set=- icon=icon/spirit_sword_trade name=行商法剑 ' <<< "$IL" \
+grep -q '^item=spirit_sword_trade kind=equipment grade=green set=- name=行商法剑 ' <<< "$IL" \
   && ok "新增 15 级法剑读出（spirit_sword）" || bad "法剑读出不对：$(grep '^item=spirit_sword_trade' <<< "$IL")"
 grep -q '^item=ore_iron kind=material grade=- ' <<< "$IL" \
   && ok "材料没有品阶（grade=-，空字段不被当成配置错误）" || bad "材料行不对：$(grep '^item=ore_iron' <<< "$IL")"
@@ -246,10 +249,10 @@ done
 stop_pid "$START_PID"
 if grep -q '^config_error=' "$STARTUP"; then
   bad "真配置整链加载失败：$(head -1 "$STARTUP")"
-elif grep -q "^items=${ITEM_COUNT} item_table_version=3 " "$STARTUP"; then
-  ok "真配置整链加载通过（物品表 v3 / ${ITEM_COUNT} 件）"
+elif grep -q "^items=${ITEM_COUNT} item_table_version=4 " "$STARTUP"; then
+  ok "真配置整链加载通过（物品表 v4 / ${ITEM_COUNT} 件）"
 else
-  bad "启动没读到物品表 v3：$(grep '^items=' "$STARTUP" | head -1)"
+  bad "启动没读到物品表 v4：$(grep '^items=' "$STARTUP" | head -1)"
 fi
 
 echo "== 5. 坏配置都起不来 =="
@@ -305,16 +308,6 @@ json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
 PY
 assert_bad_config "$(run_bad "$CASE" --item-list)" "set_id 形状不对：起不来"
 
-CASE="$(newcase bad_icon)"
-ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
-import json, os
-p = os.path.join(os.environ["CASE"], "config/items.json")
-d = json.load(open(p, encoding="utf-8"))
-next(x for x in d["items"] if x["id"] == "talisman_red")["icon"] = "talisman_red.png"
-json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
-PY
-assert_bad_config "$(run_bad "$CASE" --item-list)" "图标地址没写 icon/：起不来"
-
 CASE="$(newcase empty_desc)"
 ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
 import json, os
@@ -344,7 +337,7 @@ items = json.load(open(os.path.join(base, "items.json"), encoding="utf-8"))
 items["items"].append({
     "id": "k5_probe_blade", "name": "核对用长刀", "kind": "equipment",
     "grade": "blue", "set_id": "", "weapon_kind": "saber", "require_level": 20,
-    "stack_max": 1, "bind": "none", "icon": "icon/k5_probe_blade",
+    "stack_max": 1, "bind": "none",
     "desc": "核对用的一件装备，不进仓库。"})
 json.dump(items, open(os.path.join(base, "items.json"), "w", encoding="utf-8"), ensure_ascii=False)
 crystal = json.load(open(os.path.join(base, "crystal.json"), encoding="utf-8"))

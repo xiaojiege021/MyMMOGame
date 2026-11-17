@@ -85,15 +85,15 @@ for key in realm_pending realm_phase promote_ok promote_reject promote_body; do
 done
 
 echo "== 4. 不做项 =="
-# 这一条守的是「境界子阶这条链不许改配置与玩法」：配置目录整份不动；
-# proto 与 src 别的卡会各自改（N14 就动了 world.proto），所以不按整目录比对，
-# 改成断言本卡依赖的两条 rpc 与网关路径仍在（更稳，也不会被后一张卡扫红）。
+# 这一条守的是「境界子阶这条链不许改配置与玩法」：只看境界 / 职业那两份配置；
+# 别的卡会改物品表、商店表这些跟境界无关的文件，不按整个 config/ 目录比对。
+# proto 与 src 同理（N14 就动了 world.proto），改成断言本卡依赖的两条 rpc 与网关路径仍在。
 if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-  if git -C "$ROOT" diff --quiet -- config 2>/dev/null; then
-    ok "config/ 一行未改"
+  if git -C "$ROOT" diff --quiet -- config/realms.json config/classes.json 2>/dev/null; then
+    ok "境界 / 职业配置一行未改"
   else
-    bad "这张卡改了 config/"
-    git -C "$ROOT" diff --name-only -- config | detail
+    bad "这张卡改了境界或职业配置"
+    git -C "$ROOT" diff --name-only -- config/realms.json config/classes.json | detail
   fi
 else
   echo "  skip 不是 git 仓库，跳过改动比对"

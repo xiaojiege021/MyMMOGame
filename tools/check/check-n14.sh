@@ -154,11 +154,13 @@ fi
 
 echo "== 6. 不做项 =="
 if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-  if git -C "$ROOT" diff --quiet -- config 2>/dev/null; then
-    ok "config/ 一行未改（地名与解锁规则不动）"
+  # 只钉这张卡承诺不动的四份：八块地表、解锁表与世界顺序表。
+  # 不按整个 config/ 目录比对——别的卡会改物品表、商店表这些跟地名无关的文件。
+  if git -C "$ROOT" diff --quiet -- config/region config/region_unlock.json config/world.json 2>/dev/null; then
+    ok "地名 / 邻接 / 章节 / 解锁表一行未改"
   else
-    bad "这张卡改了 config/"
-    git -C "$ROOT" diff --name-only -- config | detail
+    bad "这张卡改了地表或解锁表"
+    git -C "$ROOT" diff --name-only -- config/region config/region_unlock.json config/world.json | detail
   fi
 else
   echo "  skip 不是 git 仓库，跳过改动比对"

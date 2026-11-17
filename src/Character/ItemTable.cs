@@ -18,12 +18,13 @@ public enum BindRule
 
 /// <summary>
 /// 一件物品的静态定义。价格、发货、掉落不在这里：那些只在商店 / 配方 / 掉落表。
-/// grade / set_id / icon / desc 是 K5 加的展示与品阶字段，代码只读，不按物品编号分支。
+/// grade / set_id / desc 是 K5 加的展示与品阶字段，代码只读，不按物品编号分支。
+/// 图标地址不进配置（第 17 节 17.1）：客户端按 icon/<物品编号> 自己拼，服务端不认这一格。
 /// </summary>
 public sealed record ItemDef(
     string Id, string Name, string Kind, int StackMax, BindRule Bind,
     string WeaponKind = "", int RequireLevel = 0,
-    string Grade = "", string SetId = "", string Icon = "", string Desc = "")
+    string Grade = "", string SetId = "", string Desc = "")
 {
     /// <summary>有没有品阶。材料、结晶、称号、外观可以不写。</summary>
     public bool HasGrade => Grade.Length > 0;
@@ -102,12 +103,12 @@ public sealed class ItemTable
                 throw new ConfigException("武器 " + id + " 必须写 require_level，不写就是任意等级都能穿");
             }
 
-            // K5：四个展示 / 品阶字段。加载期硬校验，坏配置直接 config_error，
+            // K5：三个展示 / 品阶字段。加载期硬校验，坏配置直接 config_error，
             // 不静默落到空串上——空串会让背包与后续 B2 的品阶逻辑当成「没配」。
+            // 图标地址不在这里：v1.172 起 icon 不进配置（第 17 节 17.1）。
             var kind = (item.Kind ?? "material").Trim();
             var grade = (item.Grade ?? "").Trim();
             var setId = (item.SetId ?? "").Trim();
-            var icon = (item.Icon ?? "").Trim();
             var desc = (item.Desc ?? "").Trim();
             if (grade.Length > 0 && !Grades.Contains(grade))
             {
@@ -128,10 +129,6 @@ public sealed class ItemTable
                     throw new ConfigException("物品 " + id + " 的 set_id 要写成 set_<小写编号>：" + setId);
                 }
             }
-            if (!IsIcon(icon))
-            {
-                throw new ConfigException("物品 " + id + " 的 icon 要写成 icon/<小写路径>：" + icon);
-            }
             if (desc.Length == 0)
             {
                 throw new ConfigException("物品 " + id + " 缺 desc");
@@ -144,7 +141,7 @@ public sealed class ItemTable
             }
             map[id] = new ItemDef(
                 id, (item.Name ?? id).Trim(), kind, stackMax,
-                item.Bind.Value, weaponKind, requireLevel, grade, setId, icon, desc);
+                item.Bind.Value, weaponKind, requireLevel, grade, setId, desc);
         }
 
         if (map.Count == 0)
@@ -172,24 +169,6 @@ public sealed class ItemTable
         return true;
     }
 
-    /// <summary>图标地址：icon/ 开头，后面只许小写字母、数字、下划线、斜杠与短横线。</summary>
-    static bool IsIcon(string value)
-    {
-        const string prefix = "icon/";
-        if (!value.StartsWith(prefix, StringComparison.Ordinal) || value.Length <= prefix.Length)
-        {
-            return false;
-        }
-        foreach (var c in value.AsSpan(prefix.Length))
-        {
-            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
-                  || c == '_' || c == '/' || c == '-'))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
 
     static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -234,9 +213,6 @@ public sealed class ItemTable
 
         [JsonPropertyName("set_id")]
         public string? SetId { get; init; }
-
-        [JsonPropertyName("icon")]
-        public string? Icon { get; init; }
 
         [JsonPropertyName("desc")]
         public string? Desc { get; init; }

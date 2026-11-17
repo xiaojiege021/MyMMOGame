@@ -469,11 +469,11 @@ import json, os
 base = os.path.join(os.environ["CASE"], "config")
 
 items = json.load(open(os.path.join(base, "items.json"), encoding="utf-8"))
-# K5 起物品表有四个必填的展示字段：新加的核对物品也要按 v3 schema 写全。
+# K5 起物品表有必填的展示字段（grade / set_id / desc），新加的核对物品也要按 v4 schema 写全。
+# v1.172 起 icon 不进配置，夹具里不再写这一格。
 items["items"].append({"id": "k4_probe_talisman", "name": "核对用新符",
                        "kind": "consumable", "grade": "white", "set_id": "",
                        "stack_max": 20, "bind": "always",
-                       "icon": "icon/k4_probe_talisman",
                        "desc": "核对用的临时符，不进仓库。"})
 json.dump(items, open(os.path.join(base, "items.json"), "w", encoding="utf-8"), ensure_ascii=False)
 
