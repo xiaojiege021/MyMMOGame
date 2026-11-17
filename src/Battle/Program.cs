@@ -14,6 +14,9 @@ var siegeTerritoryOnly = false;
 string? siegeTerritoryPath = null;
 var siegeViewOnly = false;
 var siegeViewArgs = new List<string>();
+// S1：只读入口，打印技能表的门派 / 阶 / 分支归属就退出，不起服、不连库。
+var skillListOnly = false;
+string? skillTablePath = null;
 var worldBossOnly = false;
 string? worldBossPath = null;
 var worldBossAtMs = 0L;
@@ -87,6 +90,14 @@ for (var i = 0; i < args.Length; i++)
             {
                 siegeViewArgs.Add(args[++i]);
             }
+            break;
+        // S1：打印技能表的门派 / 阶 / 分支归属。与真实启动共用同一个 SkillTable.Load。
+        case "--skill-list":
+            skillListOnly = true;
+            break;
+        case "--skill-table-path" when i + 1 < args.Length:
+            skillListOnly = true;
+            skillTablePath = args[++i];
             break;
     }
 }
@@ -214,6 +225,55 @@ if (siegeViewOnly)
 {
     return Battle.SiegeViewCli.Run(siegeViewArgs);
 }
+
+if (skillListOnly)
+{
+    try
+    {
+        Battle.SkillTable table = skillTablePath is null
+            ? Battle.BattleConfig.Load(configPath).Skills
+            : Battle.SkillTable.Load(skillTablePath);
+
+        Console.WriteLine($"skill_table_version={table.Version}"
+            + $" skills={table.All.Count}"
+            + $" schools={table.Schools.Count}");
+        foreach (var school in table.Schools)
+        {
+            var inSchool = table.ForSchool(school.Id);
+            var branches = inSchool.Where(s => s.Branch.Length > 0)
+                .Select(s => s.Branch).Distinct().OrderBy(b => b, StringComparer.Ordinal).ToList();
+            Console.WriteLine($"skill_school=id={school.Id} name={school.Name} giver={school.Giver}"
+                + $" tiers={Join(school.Tiers.Select(t => t.Id))}"
+                + $" skills={inSchool.Count}"
+                + $" branches={(branches.Count == 0 ? "-" : Join(branches))}");
+        }
+
+        foreach (var skill in table.All.OrderBy(s => s.Id))
+        {
+            Console.WriteLine($"skill_row=id={skill.Id} name={skill.Name} class={skill.ClassId}"
+                + $" school={Dash(skill.School)} tier={Dash(skill.Tier)} branch={Dash(skill.Branch)}");
+        }
+
+        // 门派通用（不挂分支）与挂到分支的各几条：数字随配置走，这里只汇总。
+        var common = table.All.Count(s => s.Branch.Length == 0);
+        var branched = table.All.Where(s => s.Branch.Length > 0).Select(s => s.Branch).Distinct().Count();
+        Console.WriteLine($"skill_branch_total={branched} common={common}");
+        return 0;
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+}
+
+static string Join(IEnumerable<string> parts)
+{
+    var text = string.Join(",", parts);
+    return text.Length == 0 ? "-" : text;
+}
+
+static string Dash(string text) => text.Length == 0 ? "-" : text;
 
 if (battlefieldOnly)
 {

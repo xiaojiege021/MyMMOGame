@@ -10,7 +10,7 @@
 #      MemberUpdated/BossPhase 有处理、蓝只在回包里更新、技能键用技能名
 #   3. 起一个带两阶段与出手的战斗进程（固定 127.0.0.1:60001）
 #   4. 出包装起，adb reverse，等战士开场（满血满蓝、五职业目录、技能名）
-#   5. 点 Boss、走近、劈砍命中（伤害 120，蓝和仇恨跟手）
+#   5. 点 Boss、走近、断露命中（伤害 120，蓝和仇恨跟手）
 #   6. 换职业按钮走一圈：射手远程出手，法师/牧师/坦克的开场数值逐个对
 #   7. 切回战士连打到血线：阶段广播 + Boss 出手把玩家打掉血
 #
@@ -45,6 +45,27 @@ detail() { sed 's/^/       /'; }
 pick() {
   local body="${1#*=}"
   printf '%s' "$body" | tr ' ' '\n' | sed -n "s/^$2=//p" | head -1
+}
+
+# S1 起技能名走配置（每个技能还挂门派 / 阶 / 分支），脚本不再写死名字：
+# 按职业从 skills.json 现取，顺序按技能编号。换名字只改配置，不用回头改这里。
+skill_names() {
+  python3 - "$ROOT/config/skills.json" "$1" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1], encoding="utf-8"))
+rows = sorted((s for s in data["skills"] if s["class_id"] == sys.argv[2]), key=lambda s: s["id"])
+print(" ".join(r["name"] for r in rows))
+PY
+}
+
+# "编号:名字" 串，顺序与战斗服下发一致（按编号），直接跟回包等值比对。
+skill_labels() {
+  python3 - "$ROOT/config/skills.json" "$1" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1], encoding="utf-8"))
+rows = sorted((s for s in data["skills"] if s["class_id"] == sys.argv[2]), key=lambda s: s["id"])
+print(",".join("%d:%s" % (r["id"], r["name"]) for r in rows))
+PY
 }
 
 cleanup() {
@@ -319,12 +340,11 @@ else
 fi
 
 SKILLS_LINE="$(pick "$WARRIOR_OPENED" skills)"
-if printf '%s' "$SKILLS_LINE" | grep -q '1001:劈砍' \
-  && printf '%s' "$SKILLS_LINE" | grep -q '1002:重斩' \
-  && printf '%s' "$SKILLS_LINE" | grep -q '1003:横扫'; then
+SKILLS_WANT="$(skill_labels warrior)"
+if [ "$SKILLS_LINE" = "$SKILLS_WANT" ]; then
   ok "战士技能表带名字：${SKILLS_LINE}"
 else
-  bad "战士技能表不全：${SKILLS_LINE}"
+  bad "战士技能表与配置不一致：${SKILLS_LINE} 期望 ${SKILLS_WANT}"
 fi
 
 # 换职业按钮与技能键的坐标由界面启动时打出，和命中判定是同一套像素。
@@ -388,7 +408,7 @@ else
   bad "没拿到 Boss 的点击坐标"
 fi
 
-# 走近：出生 6000mm，劈砍射程 3000mm。向左拖摇杆，一次约 0.6 米。
+# 走近：出生 6000mm，断露射程 3000mm。向左拖摇杆，一次约 0.6 米。
 "$ADB" -s "$DEVICE_ID" logcat -c >/dev/null 2>&1 || true
 STICK_X=$(( SCREEN_W / 5 ))
 STICK_Y=$(( SCREEN_H / 2 ))
@@ -401,23 +421,23 @@ refresh_log
 
 NEAR_DIST="$(grep 'p02b_move' "$LOG" 2>/dev/null | tail -1 | tr ' ' '\n' | sed -n 's/^distance=//p' | tail -1)"
 if [ -n "$NEAR_DIST" ] && [ "$NEAR_DIST" -lt 3000 ]; then
-  ok "走近了：距离 ${NEAR_DIST}mm，劈砍够得着"
+  ok "走近了：距离 ${NEAR_DIST}mm，断露够得着"
 elif [ -n "$NEAR_DIST" ]; then
-  bad "还没走进劈砍射程：${NEAR_DIST}mm"
+  bad "还没走进断露射程：${NEAR_DIST}mm"
 else
   bad "走位没有回包"
 fi
 
-# 劈砍一下：伤害 120，蓝不动（普攻零耗），仇恨 = 120 + 体力 30。
+# 断露一下：伤害 120，蓝不动（普攻零耗），仇恨 = 120 + 体力 30。
 "$ADB" -s "$DEVICE_ID" logcat -c >/dev/null 2>&1 || true
 "$ADB" -s "$DEVICE_ID" shell input swipe "$S1_CX" "$S1_CY" "$S1_CX" "$S1_CY" 220 >/dev/null 2>&1
 sleep 2.5
 refresh_log
 
 if grep -q 'p02b_cast_end skill=1001 result=hit damage=120 ' "$LOG"; then
-  ok "劈砍命中：伤害 120（力量 100 × 2.0 × 0.6）"
+  ok "断露命中：伤害 120（力量 100 × 2.0 × 0.6）"
 else
-  bad "劈砍没有命中"
+  bad "断露没有命中"
   grep -m3 'p02b_cast' "$LOG" | detail
 fi
 
@@ -488,18 +508,18 @@ switch_round() {
   fi
 }
 
-switch_round archer 660 1040 "速射 穿云箭 连珠"
+switch_round archer 660 1040 "$(skill_names archer)"
 
-# 射手出生 6000mm，速射射程 25000mm，不用走近就能出手（伤害 = 敏捷 100 × 2.0 × 0.5）。
+# 射手出生 6000mm，鸣镝射程 25000mm，不用走近就能出手（伤害 = 敏捷 100 × 2.0 × 0.5）。
 "$ADB" -s "$DEVICE_ID" logcat -c >/dev/null 2>&1 || true
 "$ADB" -s "$DEVICE_ID" shell input swipe "$S1_CX" "$S1_CY" "$S1_CX" "$S1_CY" 220 >/dev/null 2>&1
 sleep 2.5
 refresh_log
 
 if grep -q 'p02b_cast_end skill=1101 result=hit damage=100 ' "$LOG"; then
-  ok "射手速射命中：伤害 100，不用走近"
+  ok "射手鸣镝命中：伤害 100，不用走近"
 else
-  bad "射手速射没有命中"
+  bad "射手鸣镝没有命中"
   grep -m3 'p02b_cast' "$LOG" | detail
 fi
 
@@ -510,10 +530,10 @@ else
   bad "射手回包蓝量不对：$(pick "$ARCHER_CAST" mana)"
 fi
 
-switch_round mage 1400 880 "法杖击 火球 寒霜"
-switch_round priest 1400 960 "圣光 治疗 回生"
-switch_round tank 380 1200 "锤击 盾击 裂地"
-switch_round warrior 520 1200 "劈砍 重斩 横扫"
+switch_round mage 1400 880 "$(skill_names mage)"
+switch_round priest 1400 960 "$(skill_names priest)"
+switch_round tank 380 1200 "$(skill_names tank)"
+switch_round warrior 520 1200 "$(skill_names warrior)"
 
 if grep -q 'p03c_switch_skip' "$LOG"; then
   bad "换职业有被跳过的（same_class）"
@@ -536,10 +556,10 @@ NEAR_DIST="$(grep 'p02b_move' "$LOG" 2>/dev/null | tail -1 | tr ' ' '\n' | sed -
 if [ -n "$NEAR_DIST" ] && [ "$NEAR_DIST" -lt 3000 ]; then
   ok "第二场走近了：距离 ${NEAR_DIST}mm"
 else
-  bad "第二场没走近（${NEAR_DIST:-没有读数}），横扫够不着也得靠重斩打完"
+  bad "第二场没走近（${NEAR_DIST:-没有读数}），摧锋够不着也得靠裂碑打完"
 fi
 
-# S1 劈砍 120 / S2 重斩 260，各 2 秒冷却；S3 横扫 340 六秒冷却。
+# 技能 1 断露 120 / 技能 2 裂碑 260，各 2 秒冷却；技能 3 摧锋 340 六秒冷却。
 # 打到 1000 伤害（一半血）切阶段。轮着点，每几手看一眼阶段广播。
 "$ADB" -s "$DEVICE_ID" logcat -c >/dev/null 2>&1 || true
 PHASE_OK=0

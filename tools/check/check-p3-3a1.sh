@@ -337,7 +337,7 @@ PY
   while IFS= read -r line; do
     case "$line" in "PASS "*) ok "真服：${line#PASS }" ;; "FAIL "*) bad "真服：${line#FAIL }" ;; esac
   done < "$TMP/siege-parse.txt"
-  # 技能结算：1002 重斩射程 30000，出生 6000 直接命中；damage 由战斗服 Encounter 算。
+  # 技能结算：1002 裂碑射程 30000，出生 6000 直接命中；damage 由战斗服 Encounter 算。
   "$DOTNET" "$PROBE" --url "$WU/battle?siege=cast&team=a&char=$A&class=warrior" \
     --case damage --boss "$BOSS" --ranged 1002 >"$TMP/cast.log" 2>&1
   DMG="$(grep -oE 'damage=[0-9]+' "$TMP/cast.log" | head -1)"
