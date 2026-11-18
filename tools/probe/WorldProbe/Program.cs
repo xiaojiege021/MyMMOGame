@@ -64,10 +64,10 @@ internal static class Program
         var client = new WorldService.WorldServiceClient(channel);
         var reply = await client.EnterLineAsync(new EnterLineRequest
         {
-            Account = Arg("--account") ?? "q11-probe",
+            Account = Arg("--account", "q11-probe"),
             CharacterId = ulong.TryParse(Arg("--char"), out var id) ? id : 1UL,
-            RegionId = Arg("--region") ?? "",
-            DisplayName = Arg("--name") ?? "探针",
+            RegionId = Arg("--region"),
+            DisplayName = Arg("--name", "探针"),
         });
         Console.WriteLine($"boss_enter entered={(reply.Entered ? "true" : "false")} reason={reply.Reason}"
             + $" line={reply.LineId} region={reply.RegionId} line_no={reply.LineNo}"
@@ -86,12 +86,12 @@ internal static class Program
         var client = new WorldService.WorldServiceClient(channel);
         var reply = await client.RecordWorldBossOwnerAsync(new RecordWorldBossOwnerRequest
         {
-            TxnId = Arg("--txn") ?? "q11-txn",
-            EntranceId = Arg("--entrance") ?? "",
-            WindowKey = Arg("--window") ?? "",
-            Killed = (Arg("--killed") ?? "true") == "true",
+            TxnId = Arg("--txn", "q11-txn"),
+            EntranceId = Arg("--entrance"),
+            WindowKey = Arg("--window"),
+            Killed = Arg("--killed", "true") == "true",
             WinnerSectId = ulong.TryParse(Arg("--sect"), out var sect) ? sect : 0UL,
-            WinnerSectName = Arg("--sect-name") ?? "",
+            WinnerSectName = Arg("--sect-name"),
             DamageTotal = long.TryParse(Arg("--damage"), out var dmg) ? dmg : 0L,
         });
         Console.WriteLine($"boss_record ok={(reply.Ok ? "true" : "false")} reason={reply.Reason}"

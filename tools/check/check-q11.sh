@@ -271,4 +271,18 @@ grep -q "degraded=upstream_off" "$TMP/battle-b.log" \
   && ok "战斗服日志写明降级依据（degraded=upstream_off fallback=party_connections）" \
   || bad "降级没有留下痕迹"
 
+# 打掉这一场：事实值交回入口，入口关掉、名字只记第一次（这条放在最后，
+# 因为入口一关，前面那些占位用例就都会先撞 worldboss_fought）。
+WKEY="$(grep -oE 'window=[^ ]+' "$TMP/world.log" | head -1 | sed 's/^window=//')"
+REC="$("$DOTNET" "$WP" --case boss_record --grpc "$GRPC" --entrance "$ENT" --window "$WKEY" \
+  --killed true --sect 7001 --sect-name 太虚道宗 --damage 6200 2>&1 | utf8)"
+printf '%s' "$REC" | grep -q 'ok=true' && printf '%s' "$REC" | grep -q 'closed=true' \
+  && ok "打掉这一场：入口关掉、伤害最高的宗门记在入口上（$(printf '%s' "$REC" | grep -oE 'owner_name=[^ ]+')）" \
+  || bad "入口没关或没记名字：$REC"
+REC2="$("$DOTNET" "$WP" --case boss_record --grpc "$GRPC" --entrance "$ENT" --window "$WKEY" \
+  --killed true --sect 7002 --sect-name 别家 --damage 6300 2>&1 | utf8)"
+printf '%s' "$REC2" | grep -q 'duplicate=true' && printf '%s' "$REC2" | grep -q 'owner=7001' \
+  && ok "同一场第二次报回 duplicate，名字不被后到的覆盖（谁先报谁算）" \
+  || bad "第二次报改了名字或没判重：$REC2"
+
 finish "$TITLE"
