@@ -54,6 +54,26 @@ bs = branches.get("branches", [])
 R("branches_have_weapon_kinds", bs and all(b.get("weapon_kinds") for b in bs), str(len(bs)))
 R("weapon_lock_level", branches.get("weapon_lock_level") == 15, str(branches.get("weapon_lock_level")))
 
+# W1（兵器按职业）：本命兵器只有方案写定的 8 个 kind，一个职业一组，同一职业的两条分支共用。
+# 期望值现取：并集与每个职业的集合都从 branches.json 读出来比，不在脚本里另立一套「当时的事实」。
+W1_KINDS = {"mace", "axe", "saber", "spear", "bow", "crossbow", "staff", "spirit_sword"}
+W1_BY_CLASS = {
+    "tank": {"mace", "axe"},
+    "warrior": {"saber", "spear"},
+    "archer": {"bow", "crossbow"},
+    "mage": {"staff", "spirit_sword"},
+    "priest": {"staff", "spirit_sword"},
+}
+union = {k for b in bs for k in (b.get("weapon_kinds") or [])}
+per = {}
+for b in bs:
+    per.setdefault(b.get("class_id"), set()).update(b.get("weapon_kinds") or [])
+R("w1_kinds_are_the_eight", union == W1_KINDS, str(sorted(union)))
+R("w1_class_sets", per == W1_BY_CLASS, str({k: sorted(v) for k, v in per.items()}))
+R("w1_branches_share_class_group",
+  all(set(b.get("weapon_kinds") or []) == W1_BY_CLASS.get(b.get("class_id"), set()) for b in bs),
+  str([b.get("id") for b in bs if set(b.get("weapon_kinds") or []) != W1_BY_CLASS.get(b.get("class_id"), set())]))
+
 by = {i["id"]: i for i in items.get("items", [])}
 trial = by.get("sword_trial", {})
 trade = by.get("sword_trade", {})
@@ -61,11 +81,20 @@ staff = by.get("staff_trade", {})
 R("low_weapon_below_lock", trial.get("weapon_kind") == "sword" and trial.get("require_level") == 10,
   str(trial))
 # K5 把 sword_trade 从 15 级剑改成 15 级长刀（weapon_kind=saber，编号不变）；
-# 战士（破军）仍同时有 saber / sword，武器锁语义没变，这里只跟着改兵器种类。
+# W1 把战士兵器收到 saber / spear，武器锁语义没变，这里只跟着改兵器种类。
 R("high_weapon_at_lock", trade.get("weapon_kind") == "saber" and trade.get("require_level") == 15,
   str(trade))
 R("staff_needs_15", staff.get("weapon_kind") == "staff" and staff.get("require_level") == 15,
   str(staff))
+
+# W1 两把旧剑的去向：sword_trade 已是 saber（15 级长刀），sword_trial 仍是 10 级 sword；
+# 15 级以后没有任何物品再用 sword 种类，那 8 个本命兵器里也没有它。
+R("w1_trial_all_classes",
+  trial.get("require_level", 0) < branches.get("weapon_lock_level", 0) and "sword" not in union,
+  "require=%s lock=%s" % (trial.get("require_level"), branches.get("weapon_lock_level")))
+_hi_sword = [i.get("id") for i in items.get("items", [])
+             if i.get("weapon_kind") == "sword" and (i.get("require_level") or 0) >= 15]
+R("w1_no_high_level_sword", not _hi_sword, str(_hi_sword))
 
 res = classes.get("resurrect", {})
 R("resurrect_base", res.get("exp_cost_pct") == 10, str(res.get("exp_cost_pct")))
@@ -92,7 +121,9 @@ R("jielv_cannot_resurrect", 'CannotResurrectBranch = "jielv"' in enc
   and "SkillRejectCannotResurrect" in enc)
 R("shengxi_second_turn", 'ShengxiBranch = "shengxi"' in enc
   and "SecondTurnExpCostPct" in enc)
-R("profile_cached", "ProfileOf(Member member)" in enc and "member.Profile ??=" in enc)
+# 缓存实现已从 `member.Profile ??=` 改成 ProfileChecked 标记 + 一次性赋值（W1 顺手对齐，语义没变：一条命只取一次）。
+R("profile_cached", "ProfileOf(Member member)" in enc
+  and "member.ProfileChecked" in enc and "member.Profile = " in enc)
 
 proto = rd(os.path.join(root, "proto", "mmo", "character.proto"))
 bproto = rd(os.path.join(root, "proto", "mmo", "battle.proto"))
@@ -121,8 +152,9 @@ wr="$("$DOTNET" "$CD" --weapon-rules 2>&1)"; wrc=$?
   && ok "武器锁等级 15（不连库也能读）" || bad "只读入口不对（rc=${wrc}）"
 printf '%s' "$wr" | grep -q 'weapon=sword_trial kind=sword require_level=10' \
   && ok "sword_trial 是 10 级剑（不到 15 级，全职业可装备）" || bad "sword_trial 不对"
-printf '%s' "$wr" | grep -q 'class=warrior kinds=.*sword' \
-  && ok "战士的可用兵器含剑（该职业分支并集）" || bad "战士兵器不对"
+# W1 起战士兵器是长刀 / 长枪（saber / spear），不再含 sword——旧断言钉的是 P2-4a 当时的事实。
+printf '%s' "$wr" | grep -q 'class=warrior kinds=.*saber' \
+  && ok "战士兵器含长刀（该职业分支并集）" || bad "战士兵器不对"
 printf '%s' "$wr" | grep -qE 'class=tank kinds=.*mace' \
   && ok "坦克的可用兵器含锤（另一个职业的并集）" || bad "坦克兵器不对"
 
@@ -263,6 +295,17 @@ except Exception: print("")' 2>/dev/null)"
     && ok "战士装 15 级法杖：class_mismatch（15 级起只能用本职业兵器）" || bad "战士装上了法杖"
   equip "$M45" staff_trade | grep -q 'ok=true' && ok "法师能装同一根法杖" || bad "法师装不了法杖"
   equip "$W45" ring_trial | grep -q 'ok=true' && ok "戒指不是武器，不受武器锁约束" || bad "戒指被武器锁挡住"
+  # W1：一个职业一组本命兵器。坦克只有锤斧、法师两件都行、战士不再能摸法剑。
+  lv "$T12" 45
+  equip "$T12" sword_trade | grep -q 'reason=class_mismatch' \
+    && ok "坦克装 15 级长刀：class_mismatch（坦克只有锤 / 斧）" || bad "坦克装上了长刀"
+  equip "$M45" spirit_sword_trade | grep -q 'ok=true' \
+    && ok "法师装 15 级法剑：ok（法杖 / 法剑都算本命）" || bad "法师装不了法剑"
+  equip "$W45" spirit_sword_trade | grep -q 'reason=class_mismatch' \
+    && ok "战士装 15 级法剑：class_mismatch" || bad "战士装上了法剑"
+  # 不到 15 级全职业：五个角色都拿剑试，等级都在锁线以上，只靠 require_level 放行。
+  equip "$M45" sword_trial | grep -q 'ok=true' && ok "法师也能装 10 级剑（不到 15 级全职业）" || bad "法师装不了 10 级剑"
+  equip "$P45" sword_trial | grep -q 'ok=true' && ok "牧师也能装 10 级剑（不到 15 级全职业）" || bad "牧师装不了 10 级剑"
 
   echo "-- ③ 诫律不能复活 --"
   # party / class / char 由探针自己拼，URL 只给到 /battle——重复的 query 会让两个人进不同的场。

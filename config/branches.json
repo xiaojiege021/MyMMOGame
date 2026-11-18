@@ -1,7 +1,7 @@
 {
   "schema": "branch-table/1",
-  "version": 2,
-  "note": "15 级一转时五个职业各选一条，45 级二转只把这条往前推，不另开分支（方案 8.3）。创建角色时分支可以留空，一转时再写。weapon_kinds 是这条分支的本命兵器种类，15 级起只能用本职业兵器——按职业取该职业所有分支的并集，兵器不改分支（P2-4a）。 weapon_lock_level 是「15 级起只能用本职业兵器」的那条线，不满这个等级的武器五个职业都能装备。",
+  "version": 3,
+  "note": "15 级一转时五个职业各选一条，45 级二转只把这条往前推，不另开分支（方案 8.3）。创建角色时分支可以留空，一转时再写。weapon_kinds 是这条分支的本命兵器种类，15 级起只能用本职业兵器——按职业取该职业所有分支的并集，兵器不改分支（P2-4a）。 weapon_lock_level 是「15 级起只能用本职业兵器」的那条线，不满这个等级的武器五个职业都能装备。 W1（兵器按职业，2026-11-18）把并集收到方案写定的 8 个 kind，一个职业只有一组：坦克 mace/axe、战士 saber/spear、射手 bow/crossbow、法师与牧师 staff/spirit_sword。同一职业的两条分支共用这一组兵器，分支只决定技能与外观，不再细分可用兵器；即固垒不再带 spear/club、陷阵不再带 halberd、罗网不再带 whip、诫律不再带 crutch。 weapons 是方案 8.3 的分支展示文本（含钺、戟、镋、棒、槊、叉、鞭、拐等称谓），只给文案看，判定只认 weapon_kinds——两者不一致时以 weapon_kinds 为准。 两把旧剑的去向：sword_trade 在 K5 已由剑改成 15 级长刀（weapon_kind=saber，编号不变）；sword_trial 保留 sword 种类、仍只作 10 级试炼配发，不到 15 级全职业可装，不属于这 8 个本命兵器，任何职业都不会在 15 级后拿到新的 sword 兵器。",
   "branches": [
     {
       "id": "zhenyue",
@@ -19,8 +19,8 @@
       "class_id": "tank",
       "weapons": "戟、镋、棒",
       "weapon_kinds": [
-        "spear",
-        "club"
+        "mace",
+        "axe"
       ]
     },
     {
@@ -30,7 +30,7 @@
       "weapons": "刀、剑、锏",
       "weapon_kinds": [
         "saber",
-        "sword"
+        "spear"
       ]
     },
     {
@@ -39,8 +39,8 @@
       "class_id": "warrior",
       "weapons": "枪、槊、叉",
       "weapon_kinds": [
-        "spear",
-        "halberd"
+        "saber",
+        "spear"
       ]
     },
     {
@@ -60,8 +60,7 @@
       "weapons": "弓、弩，以及流星、钩、抓、鞭",
       "weapon_kinds": [
         "bow",
-        "crossbow",
-        "whip"
+        "crossbow"
       ]
     },
     {
@@ -70,7 +69,8 @@
       "class_id": "mage",
       "weapons": "法杖",
       "weapon_kinds": [
-        "staff"
+        "staff",
+        "spirit_sword"
       ]
     },
     {
@@ -79,7 +79,8 @@
       "class_id": "mage",
       "weapons": "法杖",
       "weapon_kinds": [
-        "staff"
+        "staff",
+        "spirit_sword"
       ]
     },
     {
@@ -88,7 +89,8 @@
       "class_id": "priest",
       "weapons": "棍",
       "weapon_kinds": [
-        "staff"
+        "staff",
+        "spirit_sword"
       ]
     },
     {
@@ -97,7 +99,8 @@
       "class_id": "priest",
       "weapons": "拐",
       "weapon_kinds": [
-        "crutch"
+        "staff",
+        "spirit_sword"
       ]
     }
   ],
