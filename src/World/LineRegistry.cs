@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace World;
 
 public sealed record EnterResult(
@@ -157,6 +159,34 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
                    && lines.TryGetValue(lineId, out var line)
                 ? line.RegionId
                 : null;
+        }
+    }
+
+    /// <summary>
+    /// Q11：按角色编号取他所在的那条线（人数与上限一起给）。世界 Boss 占位时用这个
+    /// 复核「人确实在入口那条分线上」。按角色编号反查是因为战斗服这条链路只有角色号；
+    /// 账号仍然只由网关给，不从这里流出去。
+    /// </summary>
+    public LineSnapshot? StandingOf(ulong characterId)
+    {
+        var suffix = ":" + characterId.ToString(CultureInfo.InvariantCulture);
+        lock (gate)
+        {
+            foreach (var (key, lineId) in seats)
+            {
+                if (!key.EndsWith(suffix, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (lines.TryGetValue(lineId, out var line))
+                {
+                    return new LineSnapshot(
+                        line.Id, line.RegionId, line.LineNo, line.Members.Count, config.LineCapacity);
+                }
+            }
+
+            return null;
         }
     }
 

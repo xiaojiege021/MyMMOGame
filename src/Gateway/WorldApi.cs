@@ -510,6 +510,13 @@ public static class WorldApi
                     ends_at_ms = result.EndsAtMs,
                     next_starts_at_ms = result.NextStartsAtMs,
                     cap = result.Cap,
+                    // Q11：这一刻发出去的名额与还能进几个人，以及名额的三个时长。
+                    // 客户端只展示，不参与判定；名额账只在世界服。
+                    current = result.Current,
+                    remaining = result.Remaining,
+                    hold_s = result.HoldS,
+                    renew_s = result.RenewS,
+                    lost_s = result.LostS,
                     killed = result.Killed,
                     owner_sect_id = result.OwnerSectId,
                     owner_sect_name = result.OwnerSectName,

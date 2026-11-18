@@ -1300,7 +1300,7 @@ public sealed class BattleServer(
             return;
         }
 
-        var window = table.WindowOf(DateTimeOffset.UtcNow);
+        var window = table.WindowOf(DateTimeOffset.UtcNow, config.Calendar);
 
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
         var send = new SemaphoreSlim(1, 1);
@@ -1318,6 +1318,36 @@ public sealed class BattleServer(
                 },
                 context.RequestAborted);
             return;
+        }
+
+        // Q11：名额先向世界服要。抢名额发生在进这一场之前，所以不会出现
+        // 「一百个人同时连进来再判满」。世界服不可达时按本进程人数判满（不挡人），
+        // 也不假装占到了名额：这一场的名额账只在世界服那一份。
+        var slot = worldBossSink.Hold(charId);
+        if (!slot.Ok && !slot.UpstreamDown)
+        {
+            await RejectEnterAsync(socket, send,
+                new EnterRejected
+                {
+                    Reason = slot.Reason,
+                    Limit = (uint)(slot.Cap > 0 ? slot.Cap : table.Cap),
+                    Current = (uint)Math.Max(0, slot.Current),
+                },
+                context.RequestAborted);
+            return;
+        }
+
+        if (slot.Ok)
+        {
+            Console.WriteLine($"worldboss_slot=op=hold character={charId} window={slot.WindowKey}"
+                + $" current={slot.Current} cap={slot.Cap} line={slot.LineKey}"
+                + $" line_occupancy={slot.LineOccupancy} line_capacity={slot.LineCapacity}"
+                + $" expires_at_ms={slot.ExpiresAtMs}");
+        }
+        else
+        {
+            Console.WriteLine($"worldboss_slot=op=hold character={charId} degraded={slot.Reason}"
+                + " fallback=party_connections");
         }
 
         var partyKey = "wb-" + window.Key;
@@ -1413,6 +1443,13 @@ public sealed class BattleServer(
                 _parties.TryRemove(partyKey, out _);
             }
 
+            if (slot.Ok)
+            {
+                // 名额拿到了但这一场没进成（本地兜底判满 / 编号撞车）：立刻还回去，
+                // 不让一个没进场的人白占着位置等 hold_s 到期。
+                worldBossSink.Release(charId, "rejected");
+            }
+
             await RejectEnterAsync(socket, send, rejected, context.RequestAborted);
             return;
         }
@@ -1429,9 +1466,19 @@ public sealed class BattleServer(
             }
         }
 
+        if (slot.Ok)
+        {
+            // 第一次续约带 entered=true：世界服据此把到期时刻从 hold_s 换成 renew_s。
+            var confirmed = worldBossSink.Renew(charId, entered: true);
+            Console.WriteLine($"worldboss_slot=op=confirm character={charId} ok={(confirmed.Ok ? "true" : "false")}"
+                + $" reason={(confirmed.Reason.Length == 0 ? "none" : confirmed.Reason)}"
+                + $" current={confirmed.Current} cap={confirmed.Cap}");
+        }
+
         if (created)
         {
             _ = TickLoopAsync(party);
+            _ = WorldBossRenewLoopAsync(party);
             Console.WriteLine($"worldboss_open=entrance={table.EntranceId} window={window.Key}"
                 + $" session={party.Encounter.SessionId} boss={table.Boss.Id}"
                 + $" boss_hp_max={party.Encounter.BossHpMax} cap={table.Cap}"
@@ -1475,7 +1522,50 @@ public sealed class BattleServer(
         finally
         {
             Detach(party, member!);
+            // Q11：人走了就把名额还回去；世界服还记着这一场谁占着位置。
+            if (slot.Ok)
+            {
+                var released = worldBossSink.Release(charId, "leave");
+                Console.WriteLine($"worldboss_slot=op=leave character={charId} ok={(released.Ok ? "true" : "false")}"
+                    + $" reason={(released.Reason.Length == 0 ? "none" : released.Reason)}"
+                    + $" current={released.Current}");
+            }
+
             Console.WriteLine($"session_close={party.Encounter.SessionId}");
+        }
+    }
+
+    /// <summary>
+    /// Q11：这一场的续约节拍。每 renew_s 把在场每个人的名额续一次；续不上的只记日志，
+    /// 不踢人——名额丢了不等于人不在场（世界服重启过、上游抖过），这一场里谁还在
+    /// 由战斗服自己按 Q9 的宽限管。节拍只跑在这一场，散场随 party.Ticker 一起停。
+    /// </summary>
+    async Task WorldBossRenewLoopAsync(Party party)
+    {
+        var period = TimeSpan.FromSeconds(Math.Max(1, config.WorldBoss.Hold.RenewSeconds));
+        try
+        {
+            while (!party.Ticker.IsCancellationRequested)
+            {
+                await Task.Delay(period, party.Ticker.Token);
+                List<ulong> ids;
+                lock (_gate)
+                {
+                    ids = party.Connections.Select(c => c.Member.Id).ToList();
+                }
+
+                foreach (var id in ids)
+                {
+                    var reply = worldBossSink.Renew(id, entered: true);
+                    if (!reply.Ok && !reply.UpstreamDown)
+                    {
+                        Console.WriteLine($"worldboss_renew=character={id} ok=false reason={reply.Reason}");
+                    }
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
     }
 

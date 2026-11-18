@@ -39,6 +39,18 @@ service WorldService {
   // 世界服只关入口、记名字，不加属性、不改税收、不碰灵石矿脉，也不写任何库表。
   // 同一个场次只记一次（场次编号 + 事务号挡重放）。
   rpc RecordWorldBossOwner(RecordWorldBossOwnerRequest) returns (RecordWorldBossOwnerResponse);
+
+  // Q11：一场的名额由世界服一串发，抢名额发生在连上战斗服之前。
+  // 请求里只有角色编号：这一刻是哪一场、还有几个位置、人站在哪条分线上，
+  // 全由世界服按表、日历与分线注册表判定，客户端一个都带不进来。
+  rpc HoldWorldBossSlot(HoldWorldBossSlotRequest) returns (HoldWorldBossSlotResponse);
+
+  // Q11：进场后按 hold.renew_s 续约；entered=true 表示这条连接已经在战斗服里，
+  // 之后按 renew_s 续，还没进去时按 hold_s 续。名额过期或被回收回 slot_missing。
+  rpc RenewWorldBossSlot(RenewWorldBossSlotRequest) returns (RenewWorldBossSlotResponse);
+
+  // Q11：离场 / 散场 / 掉线超时，把名额还回去。只还自己那一个，不动别人的。
+  rpc ReleaseWorldBossSlot(ReleaseWorldBossSlotRequest) returns (ReleaseWorldBossSlotResponse);
 }
 
 // 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
@@ -279,6 +291,13 @@ message DescribeWorldBossResponse {
   string owner_sect_name = 13;
   string owner_window_key = 14;
   uint64 owner_recorded_at_ms = 15;
+  // Q11：这一刻已经发出去的名额、还能进几个人，以及名额的三个时长。
+  // current 是这一场占住的位置数（含已经进场与还在连接中的），remaining = cap - current。
+  uint32 current = 16;
+  uint32 remaining = 17;
+  uint32 hold_s = 18;
+  uint32 renew_s = 19;
+  uint32 lost_s = 20;
 }
 
 // 战斗服交回的这一场事实值：打掉没打掉、伤害最高的宗门是谁。
@@ -305,4 +324,55 @@ message RecordWorldBossOwnerResponse {
   uint64 owner_sect_id = 5;
   string owner_sect_name = 6;
   bool entrance_closed = 7;
+}
+
+// Q11：要一个名额。character_id 是唯一入参——场次、剩余位置、分线都由世界服给。
+// ok=false 的 reason：table_missing / request_missing / worldboss_closed（没到点或过点）/
+// worldboss_fought（这一场已经打掉）/ worldboss_not_on_entrance_line（人不在入口那条分线）/
+// worldboss_line_full（入口分线的站立人数超上限）/ worldboss_full（这一场名额发完）。
+// current / cap / line_occupancy / line_capacity 是这一刻的事实值，拒绝时也回。
+message HoldWorldBossSlotRequest {
+  uint64 character_id = 1;
+}
+
+message HoldWorldBossSlotResponse {
+  bool ok = 1;
+  string reason = 2;
+  bool duplicate = 3;
+  string window_key = 4;
+  uint64 expires_at_ms = 5;
+  uint32 current = 6;
+  uint32 cap = 7;
+  string line_key = 8;
+  uint32 line_occupancy = 9;
+  uint32 line_capacity = 10;
+}
+
+// Q11：续约。entered=true 表示已经进到战斗服里（第一次确认也从这里走）。
+message RenewWorldBossSlotRequest {
+  uint64 character_id = 1;
+  bool entered = 2;
+}
+
+// ok=false 的 reason：table_missing / worldboss_closed / slot_missing（没占过或已被回收）/
+// window_changed（换了一场，旧名额作废）。
+message RenewWorldBossSlotResponse {
+  bool ok = 1;
+  string reason = 2;
+  string window_key = 3;
+  uint64 expires_at_ms = 4;
+  uint32 current = 5;
+  uint32 cap = 6;
+}
+
+// Q11：还名额。reason 只作日志（leave / closed / timeout / clear），不参与判定。
+message ReleaseWorldBossSlotRequest {
+  uint64 character_id = 1;
+  string reason = 2;
+}
+
+message ReleaseWorldBossSlotResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint32 current = 3;
 }

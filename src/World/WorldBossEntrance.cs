@@ -13,7 +13,7 @@ namespace World;
 /// 但「没打掉」可以升级成「打掉了」：一场里前一批人散场没打死、后一批人进来打死了，
 /// 入口必须关。反过来永远不行。
 /// </summary>
-public sealed class WorldBossEntrance(WorldBossTable? table)
+public sealed class WorldBossEntrance(WorldBossTable? table, CalendarTable calendar)
 {
     /// <summary>只留最近这么多个场次的事实值，避免进程长跑攒垃圾。</summary>
     const int MaxWindows = 32;
@@ -38,7 +38,7 @@ public sealed class WorldBossEntrance(WorldBossTable? table)
                 new OwnerRecord(0, "", "", 0));
         }
 
-        var window = table.WindowOf(now);
+        var window = table.WindowOf(now, calendar);
         lock (_gate)
         {
             var killed = window.Open && _windows.TryGetValue(window.Key, out var rec) && rec.Killed;

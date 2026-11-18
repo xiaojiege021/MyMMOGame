@@ -9,5 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../../src/Shared/Shared.csproj" />
+    <!-- Q11：占位链路要直连世界服的服与服 gRPC（进线、交回入口事实值）。 -->
+    <PackageReference Include="Grpc.Net.Client" Version="2.85.0" />
   </ItemGroup>
 </Project>

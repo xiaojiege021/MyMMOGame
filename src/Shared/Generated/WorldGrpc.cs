@@ -91,6 +91,18 @@ namespace Mmo.Proto.World {
     static readonly grpc::Marshaller<global::Mmo.Proto.World.RecordWorldBossOwnerRequest> __Marshaller_mmo_world_RecordWorldBossOwnerRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.RecordWorldBossOwnerRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.RecordWorldBossOwnerResponse> __Marshaller_mmo_world_RecordWorldBossOwnerResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.RecordWorldBossOwnerResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.HoldWorldBossSlotRequest> __Marshaller_mmo_world_HoldWorldBossSlotRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.HoldWorldBossSlotRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.HoldWorldBossSlotResponse> __Marshaller_mmo_world_HoldWorldBossSlotResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.HoldWorldBossSlotResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.RenewWorldBossSlotRequest> __Marshaller_mmo_world_RenewWorldBossSlotRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.RenewWorldBossSlotRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.RenewWorldBossSlotResponse> __Marshaller_mmo_world_RenewWorldBossSlotResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.RenewWorldBossSlotResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.ReleaseWorldBossSlotRequest> __Marshaller_mmo_world_ReleaseWorldBossSlotRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ReleaseWorldBossSlotRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.ReleaseWorldBossSlotResponse> __Marshaller_mmo_world_ReleaseWorldBossSlotResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ReleaseWorldBossSlotResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse> __Method_EnterLine = new grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse>(
@@ -171,6 +183,30 @@ namespace Mmo.Proto.World {
         "RecordWorldBossOwner",
         __Marshaller_mmo_world_RecordWorldBossOwnerRequest,
         __Marshaller_mmo_world_RecordWorldBossOwnerResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.HoldWorldBossSlotRequest, global::Mmo.Proto.World.HoldWorldBossSlotResponse> __Method_HoldWorldBossSlot = new grpc::Method<global::Mmo.Proto.World.HoldWorldBossSlotRequest, global::Mmo.Proto.World.HoldWorldBossSlotResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "HoldWorldBossSlot",
+        __Marshaller_mmo_world_HoldWorldBossSlotRequest,
+        __Marshaller_mmo_world_HoldWorldBossSlotResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.RenewWorldBossSlotRequest, global::Mmo.Proto.World.RenewWorldBossSlotResponse> __Method_RenewWorldBossSlot = new grpc::Method<global::Mmo.Proto.World.RenewWorldBossSlotRequest, global::Mmo.Proto.World.RenewWorldBossSlotResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RenewWorldBossSlot",
+        __Marshaller_mmo_world_RenewWorldBossSlotRequest,
+        __Marshaller_mmo_world_RenewWorldBossSlotResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.ReleaseWorldBossSlotRequest, global::Mmo.Proto.World.ReleaseWorldBossSlotResponse> __Method_ReleaseWorldBossSlot = new grpc::Method<global::Mmo.Proto.World.ReleaseWorldBossSlotRequest, global::Mmo.Proto.World.ReleaseWorldBossSlotResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ReleaseWorldBossSlot",
+        __Marshaller_mmo_world_ReleaseWorldBossSlotRequest,
+        __Marshaller_mmo_world_ReleaseWorldBossSlotResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -284,6 +320,45 @@ namespace Mmo.Proto.World {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.RecordWorldBossOwnerResponse> RecordWorldBossOwner(global::Mmo.Proto.World.RecordWorldBossOwnerRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q11：一场的名额由世界服一串发，抢名额发生在连上战斗服之前。
+      /// 请求里只有角色编号：这一刻是哪一场、还有几个位置、人站在哪条分线上，
+      /// 全由世界服按表、日历与分线注册表判定，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.HoldWorldBossSlotResponse> HoldWorldBossSlot(global::Mmo.Proto.World.HoldWorldBossSlotRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q11：进场后按 hold.renew_s 续约；entered=true 表示这条连接已经在战斗服里，
+      /// 之后按 renew_s 续，还没进去时按 hold_s 续。名额过期或被回收回 slot_missing。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.RenewWorldBossSlotResponse> RenewWorldBossSlot(global::Mmo.Proto.World.RenewWorldBossSlotRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q11：离场 / 散场 / 掉线超时，把名额还回去。只还自己那一个，不动别人的。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.ReleaseWorldBossSlotResponse> ReleaseWorldBossSlot(global::Mmo.Proto.World.ReleaseWorldBossSlotRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -693,6 +768,162 @@ namespace Mmo.Proto.World {
       {
         return CallInvoker.AsyncUnaryCall(__Method_RecordWorldBossOwner, null, options, request);
       }
+      /// <summary>
+      /// Q11：一场的名额由世界服一串发，抢名额发生在连上战斗服之前。
+      /// 请求里只有角色编号：这一刻是哪一场、还有几个位置、人站在哪条分线上，
+      /// 全由世界服按表、日历与分线注册表判定，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.HoldWorldBossSlotResponse HoldWorldBossSlot(global::Mmo.Proto.World.HoldWorldBossSlotRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return HoldWorldBossSlot(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q11：一场的名额由世界服一串发，抢名额发生在连上战斗服之前。
+      /// 请求里只有角色编号：这一刻是哪一场、还有几个位置、人站在哪条分线上，
+      /// 全由世界服按表、日历与分线注册表判定，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.HoldWorldBossSlotResponse HoldWorldBossSlot(global::Mmo.Proto.World.HoldWorldBossSlotRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_HoldWorldBossSlot, null, options, request);
+      }
+      /// <summary>
+      /// Q11：一场的名额由世界服一串发，抢名额发生在连上战斗服之前。
+      /// 请求里只有角色编号：这一刻是哪一场、还有几个位置、人站在哪条分线上，
+      /// 全由世界服按表、日历与分线注册表判定，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.HoldWorldBossSlotResponse> HoldWorldBossSlotAsync(global::Mmo.Proto.World.HoldWorldBossSlotRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return HoldWorldBossSlotAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q11：一场的名额由世界服一串发，抢名额发生在连上战斗服之前。
+      /// 请求里只有角色编号：这一刻是哪一场、还有几个位置、人站在哪条分线上，
+      /// 全由世界服按表、日历与分线注册表判定，客户端一个都带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.HoldWorldBossSlotResponse> HoldWorldBossSlotAsync(global::Mmo.Proto.World.HoldWorldBossSlotRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_HoldWorldBossSlot, null, options, request);
+      }
+      /// <summary>
+      /// Q11：进场后按 hold.renew_s 续约；entered=true 表示这条连接已经在战斗服里，
+      /// 之后按 renew_s 续，还没进去时按 hold_s 续。名额过期或被回收回 slot_missing。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.RenewWorldBossSlotResponse RenewWorldBossSlot(global::Mmo.Proto.World.RenewWorldBossSlotRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RenewWorldBossSlot(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q11：进场后按 hold.renew_s 续约；entered=true 表示这条连接已经在战斗服里，
+      /// 之后按 renew_s 续，还没进去时按 hold_s 续。名额过期或被回收回 slot_missing。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.RenewWorldBossSlotResponse RenewWorldBossSlot(global::Mmo.Proto.World.RenewWorldBossSlotRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RenewWorldBossSlot, null, options, request);
+      }
+      /// <summary>
+      /// Q11：进场后按 hold.renew_s 续约；entered=true 表示这条连接已经在战斗服里，
+      /// 之后按 renew_s 续，还没进去时按 hold_s 续。名额过期或被回收回 slot_missing。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.RenewWorldBossSlotResponse> RenewWorldBossSlotAsync(global::Mmo.Proto.World.RenewWorldBossSlotRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RenewWorldBossSlotAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q11：进场后按 hold.renew_s 续约；entered=true 表示这条连接已经在战斗服里，
+      /// 之后按 renew_s 续，还没进去时按 hold_s 续。名额过期或被回收回 slot_missing。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.RenewWorldBossSlotResponse> RenewWorldBossSlotAsync(global::Mmo.Proto.World.RenewWorldBossSlotRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RenewWorldBossSlot, null, options, request);
+      }
+      /// <summary>
+      /// Q11：离场 / 散场 / 掉线超时，把名额还回去。只还自己那一个，不动别人的。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.ReleaseWorldBossSlotResponse ReleaseWorldBossSlot(global::Mmo.Proto.World.ReleaseWorldBossSlotRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ReleaseWorldBossSlot(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q11：离场 / 散场 / 掉线超时，把名额还回去。只还自己那一个，不动别人的。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.ReleaseWorldBossSlotResponse ReleaseWorldBossSlot(global::Mmo.Proto.World.ReleaseWorldBossSlotRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ReleaseWorldBossSlot, null, options, request);
+      }
+      /// <summary>
+      /// Q11：离场 / 散场 / 掉线超时，把名额还回去。只还自己那一个，不动别人的。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.ReleaseWorldBossSlotResponse> ReleaseWorldBossSlotAsync(global::Mmo.Proto.World.ReleaseWorldBossSlotRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ReleaseWorldBossSlotAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q11：离场 / 散场 / 掉线超时，把名额还回去。只还自己那一个，不动别人的。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.ReleaseWorldBossSlotResponse> ReleaseWorldBossSlotAsync(global::Mmo.Proto.World.ReleaseWorldBossSlotRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ReleaseWorldBossSlot, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override WorldServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -716,7 +947,10 @@ namespace Mmo.Proto.World {
           .AddMethod(__Method_Fly, serviceImpl.Fly)
           .AddMethod(__Method_CrossRegion, serviceImpl.CrossRegion)
           .AddMethod(__Method_DescribeWorldBoss, serviceImpl.DescribeWorldBoss)
-          .AddMethod(__Method_RecordWorldBossOwner, serviceImpl.RecordWorldBossOwner).Build();
+          .AddMethod(__Method_RecordWorldBossOwner, serviceImpl.RecordWorldBossOwner)
+          .AddMethod(__Method_HoldWorldBossSlot, serviceImpl.HoldWorldBossSlot)
+          .AddMethod(__Method_RenewWorldBossSlot, serviceImpl.RenewWorldBossSlot)
+          .AddMethod(__Method_ReleaseWorldBossSlot, serviceImpl.ReleaseWorldBossSlot).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -736,6 +970,9 @@ namespace Mmo.Proto.World {
       serviceBinder.AddMethod(__Method_CrossRegion, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.CrossRegionRequest, global::Mmo.Proto.World.CrossRegionResponse>(serviceImpl.CrossRegion));
       serviceBinder.AddMethod(__Method_DescribeWorldBoss, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.DescribeWorldBossRequest, global::Mmo.Proto.World.DescribeWorldBossResponse>(serviceImpl.DescribeWorldBoss));
       serviceBinder.AddMethod(__Method_RecordWorldBossOwner, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.RecordWorldBossOwnerRequest, global::Mmo.Proto.World.RecordWorldBossOwnerResponse>(serviceImpl.RecordWorldBossOwner));
+      serviceBinder.AddMethod(__Method_HoldWorldBossSlot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.HoldWorldBossSlotRequest, global::Mmo.Proto.World.HoldWorldBossSlotResponse>(serviceImpl.HoldWorldBossSlot));
+      serviceBinder.AddMethod(__Method_RenewWorldBossSlot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.RenewWorldBossSlotRequest, global::Mmo.Proto.World.RenewWorldBossSlotResponse>(serviceImpl.RenewWorldBossSlot));
+      serviceBinder.AddMethod(__Method_ReleaseWorldBossSlot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.ReleaseWorldBossSlotRequest, global::Mmo.Proto.World.ReleaseWorldBossSlotResponse>(serviceImpl.ReleaseWorldBossSlot));
     }
 
   }

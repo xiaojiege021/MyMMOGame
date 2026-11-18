@@ -1,0 +1,22 @@
+{
+  "card": "q11",
+  "note": "Q11 世界 Boss 时间窗 / 分线。两处该被抓住的：名额上限（世界服占位表按 cap 发）与「人必须在入口那条分线上」。两条都在 check-q11.sh 的无库段，不需要库。",
+  "mutations": [
+    {
+      "id": "场次名额上限失效",
+      "file": "src/World/WorldBossSlots.cs",
+      "kind": "text-replace",
+      "find": "if (CountLocked(window.Key) >= table.Cap)",
+      "replace": "if (false)",
+      "expect": "check-q11.sh 的「第 cap+1 个人回 worldboss_full」应红（名额不再按配置上限发）"
+    },
+    {
+      "id": "入口分线复核失效",
+      "file": "src/World/WorldBossSlots.cs",
+      "kind": "text-replace",
+      "find": "if (!standing.OnEntranceRegion)",
+      "replace": "if (false)",
+      "expect": "check-q11.sh 的「人不在入口那条分线上一个位置都不给」与真服段的 not_on_entrance_line 应红（可以绕开表世界直接连战斗服）"
+    }
+  ]
+}

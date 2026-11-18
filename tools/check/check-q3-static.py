@@ -94,9 +94,11 @@ report("season_api_still_five_proto_fields",
        len(re.findall(r"^\s*\w+\s+\w+\s*=\s*\d+;",
                       read("proto/mmo/trade.proto").split(
                           "message DescribeSeasonResponse {")[1].split("}")[0], re.M)) == 5)
-report("world_boss_table_still_utc",
-       '"timezone": "utc"' in read("config/world_boss.json")
-       and "start_utc" in read("config/world_boss.json"))
+# Q11 起世界 Boss 的窗口时刻也按 config/calendar.json 的时区解释：Q3 留下的
+# 展示字段（*_at_local）不变，出现时刻本身改由日历表折算，这里只钉住那条口径。
+report("world_boss_table_follows_calendar",
+       '"timezone": "calendar"' in read("config/world_boss.json")
+       and "start_local" in read("config/world_boss.json"))
 
 # 5. probe 只读入口与测试挂载
 parser = read("tools/probe/CliProbe/CliParser.cs")

@@ -17,10 +17,13 @@ public sealed class WorldProcess(
         NpcTable? npcTable;
         FlightTable flights;
         WorldBossTable? worldBossTable;
+        CalendarTable calendar;
         RegionUnlockTable? regionUnlocks;
         try
         {
             config = WorldConfig.Load(configPath);
+            // Q11：世界 Boss 的窗口时刻按这份日历时区解释，战斗服读同一份。
+            calendar = CalendarTable.Load(config.CalendarTable);
             catalog = WorldCatalog.Load(config);
             var regionIds = catalog.Regions.Select(r => r.Id).ToHashSet(StringComparer.Ordinal);
             // 节点必须长在已经配置的地表上；采集表坏掉同样不带半截配置跑。
@@ -113,7 +116,14 @@ public sealed class WorldProcess(
             + " region_realms=" + string.Join(",", catalog.Regions.Select(
                 r => r.Id + ":" + flights.RequiredFor(r.Id)))
             + " ground_y=" + config.SpawnY);
-        Console.WriteLine("world_boss_config=ok " + DescribeWorldBossTable(worldBossTable, worldBossConfigPath));
+        Console.WriteLine("calendar=ok timezone=" + calendar.TimeZoneId
+            + " daily_reset_hour=" + calendar.DailyResetHour);
+        Console.WriteLine("world_boss_config=ok " + DescribeWorldBossTable(worldBossTable, worldBossConfigPath)
+            + (worldBossTable is null
+                ? ""
+                : " hold_s=" + worldBossTable.Hold.HoldSeconds
+                  + " renew_s=" + worldBossTable.Hold.RenewSeconds
+                  + " lost_s=" + worldBossTable.Hold.LostSeconds));
         // N1 新加的一行：解锁表在不在、每块静态不开放的地表要哪一场哪一路。老行一字未动。
         Console.WriteLine(regionUnlocks is null
             ? "region_unlock=missing path=" + regionUnlockPath
@@ -140,7 +150,10 @@ public sealed class WorldProcess(
         var flightGate = new FlightGate(flights, realmReader, registry, catalog, regionGate);
         // 入口的在线状态只在世界服：“这一刻开没开、这一场打掉没有、名字记的是谁”。
         // 全在进程内存，不落库、不结算技能、不碰任何角色数据。
-        var worldBoss = new WorldBossEntrance(worldBossTable);
+        var worldBoss = new WorldBossEntrance(worldBossTable, calendar);
+        // Q11：名额占位表。第一层容量看分线注册表，第二层看 cap，两个都先查再发名额。
+        var worldBossSlots = new WorldBossSlots(
+            worldBossTable, calendar, worldBoss, new LineStandingProbe(registry, worldBossTable));
 
         var builder = WebApplication.CreateSlimBuilder();
         // 服与服是明文 gRPC（h2c）：端点必须显式只走 HTTP/2。
@@ -166,6 +179,7 @@ public sealed class WorldProcess(
         builder.Services.AddSingleton(regionGate);
         builder.Services.AddSingleton(flightGate);
         builder.Services.AddSingleton(worldBoss);
+        builder.Services.AddSingleton(worldBossSlots);
         builder.Services.AddHostedService<PositionBroadcaster>();
 
         var app = builder.Build();

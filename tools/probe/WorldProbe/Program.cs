@@ -40,6 +40,10 @@ internal static class Program
                 "tier_spoof" => await CaseTierSpoofAsync(),
                 "tier_isolate" => await CaseTierIsolateAsync(),
                 "flight_frame" => await CaseFlightFrameAsync(),
+                // Q11：直连世界服的服与服 gRPC。核对脚本用它把角色送进入口分线，
+                // 再让战斗服去要名额——整条链不需要客户端，也不需要角色库。
+                "boss_enter" => await CaseBossEnterAsync(),
+                "boss_record" => await CaseBossRecordAsync(),
                 _ => Fail("unknown_case=" + name),
             };
         }
@@ -47,6 +51,53 @@ internal static class Program
         {
             return Fail("exception=" + ex.GetType().Name + " " + ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Q11：把一个人送进某块地表的一条分线（世界服 EnterLine）。判定全在服务端：
+    /// 地表开不开由 RegionGate 给结论，分线号与容量由注册表给，请求里带不进。
+    /// </summary>
+    static async Task<int> CaseBossEnterAsync()
+    {
+        using var channel = Grpc.Net.Client.GrpcChannel.ForAddress(
+            Arg("--grpc") ?? "http://127.0.0.1:63000");
+        var client = new WorldService.WorldServiceClient(channel);
+        var reply = await client.EnterLineAsync(new EnterLineRequest
+        {
+            Account = Arg("--account") ?? "q11-probe",
+            CharacterId = ulong.TryParse(Arg("--char"), out var id) ? id : 1UL,
+            RegionId = Arg("--region") ?? "",
+            DisplayName = Arg("--name") ?? "探针",
+        });
+        Console.WriteLine($"boss_enter entered={(reply.Entered ? "true" : "false")} reason={reply.Reason}"
+            + $" line={reply.LineId} region={reply.RegionId} line_no={reply.LineNo}"
+            + $" line_size={reply.LineSize} line_capacity={reply.LineCapacity}");
+        return reply.Entered ? 0 : 1;
+    }
+
+    /// <summary>
+    /// Q11：直接交回一场的事实值（打掉没打掉、伤害最高的宗门）。世界服只记名字、
+    /// 关入口，不写库、不加属性；核对脚本据此验「记在入口上的名字」。
+    /// </summary>
+    static async Task<int> CaseBossRecordAsync()
+    {
+        using var channel = Grpc.Net.Client.GrpcChannel.ForAddress(
+            Arg("--grpc") ?? "http://127.0.0.1:63000");
+        var client = new WorldService.WorldServiceClient(channel);
+        var reply = await client.RecordWorldBossOwnerAsync(new RecordWorldBossOwnerRequest
+        {
+            TxnId = Arg("--txn") ?? "q11-txn",
+            EntranceId = Arg("--entrance") ?? "",
+            WindowKey = Arg("--window") ?? "",
+            Killed = (Arg("--killed") ?? "true") == "true",
+            WinnerSectId = ulong.TryParse(Arg("--sect"), out var sect) ? sect : 0UL,
+            WinnerSectName = Arg("--sect-name") ?? "",
+            DamageTotal = long.TryParse(Arg("--damage"), out var dmg) ? dmg : 0L,
+        });
+        Console.WriteLine($"boss_record ok={(reply.Ok ? "true" : "false")} reason={reply.Reason}"
+            + $" duplicate={(reply.Duplicate ? "true" : "false")} owner={reply.OwnerSectId}"
+            + $" owner_name={reply.OwnerSectName} closed={(reply.EntranceClosed ? "true" : "false")}");
+        return reply.Ok ? 0 : 1;
     }
 
     static string Url(string token, ulong characterId) =>

@@ -22,6 +22,12 @@ namespace Mmo.Net
         public long StartsAtMs;
         public long EndsAtMs;
         public long NextStartsAtMs;
+        /// <summary>Q11：这一刻发出去的名额、还能进几个人、名额的三个时长。只展示。</summary>
+        public int Current;
+        public int Remaining;
+        public int HoldSeconds;
+        public int RenewSeconds;
+        public int LostSeconds;
         public string DisplayText;
     }
 
@@ -50,6 +56,7 @@ namespace Mmo.Net
             var text = visible
                 ? (entrance.Length == 0 ? "入口未定" : entrance)
                     + (killed ? " · 这一场已打掉" : " · 这一场还开着")
+                    + SlotLine((int)ReadLong(json, "current"), (int)ReadLong(json, "cap"))
                 : "这一刻没开：" + JsonField.Of(json, "reason");
 
             return new WorldBossFacts
@@ -60,6 +67,11 @@ namespace Mmo.Net
                 EntranceName = entrance,
                 WindowKey = JsonField.Of(json, "window_key"),
                 Cap = (int)ReadLong(json, "cap"),
+                Current = (int)ReadLong(json, "current"),
+                Remaining = (int)ReadLong(json, "remaining"),
+                HoldSeconds = (int)ReadLong(json, "hold_s"),
+                RenewSeconds = (int)ReadLong(json, "renew_s"),
+                LostSeconds = (int)ReadLong(json, "lost_s"),
                 Killed = killed,
                 OwnerSectId = (ulong)ReadLong(json, "owner_sect_id"),
                 OwnerSectName = owner,
@@ -68,6 +80,16 @@ namespace Mmo.Net
                 NextStartsAtMs = ReadLong(json, "next_starts_at_ms"),
                 DisplayText = text,
             };
+        }
+
+        /// <summary>
+        /// Q11：名额那一句。两个数都由世界服给，这里只拼字，不拿 cap 减自己数出来的人数。
+        /// 回包里没有 current 时整句不出现，老回包照样能读。
+        /// </summary>
+        static string SlotLine(int current, int cap)
+        {
+            return cap <= 0 ? "" : " · 已进 " + current.ToString(CultureInfo.InvariantCulture)
+                + " / " + cap.ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>入口上记的名字。没宗门记过就给空串，屏上写「无人记名」，不编一个。</summary>

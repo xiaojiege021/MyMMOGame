@@ -552,6 +552,14 @@ public sealed class BattleConfig
     public string WorldBossTablePath { get; private set; } = "";
 
     /// <summary>
+    /// Q11：日历时区是「这一刻是哪一场世界 Boss」的唯一解释口径（config/calendar.json）。
+    /// 世界服与战斗服读同一份，改时区后出现时刻整体平移。
+    /// </summary>
+    public CalendarTable Calendar { get; private set; } = null!;
+
+    public string CalendarPath { get; private set; } = "";
+
+    /// <summary>
     /// Q9：断线宽限、重连窗口与逃跑惩罚（config/reconnect.json）。可选表：老卡的
     /// 临时配置目录没有它时按「断线即离场、不重连、不惩罚」跑，老链路一字不变。
     /// </summary>
@@ -591,6 +599,14 @@ public sealed class BattleConfig
         var sectTechPath = Resolve(dir, raw.SectTechTable, "sect_tech.json");
         var siegeTerritoryPath = Resolve(dir, raw.SiegeTerritoryTable, "siege_territory.json");
         var worldBossPath = Resolve(dir, raw.WorldBossTable, "world_boss.json");
+        // Q11：日历表是窗口时刻的解释口径。临时配置目录只指了 world_boss_table
+        // 却没带 calendar.json 时，退回仓库根那份正本（各进程都从仓库根启动，
+        // 与网关的 DefaultCalendarTable 同一条约定）；显式写了路径却缺文件照样起不来。
+        var calendarPath = Resolve(dir, raw.CalendarTable, "calendar.json");
+        if (!File.Exists(calendarPath) && string.IsNullOrWhiteSpace(raw.CalendarTable))
+        {
+            calendarPath = Path.Combine("config", "calendar.json");
+        }
         // Q9：断线重连表同样可选。老卡的临时配置目录没有 reconnect.json 时按
         // 「断线即离场、不重连、不惩罚」跑；显式写了路径却缺文件照样起不来。
         var reconnectPath = Resolve(dir, raw.ReconnectTable, "reconnect.json");
@@ -636,6 +652,8 @@ public sealed class BattleConfig
         // 世界 Boss 表同理：config/battle.json 不显式登记 world_boss_table，靠默认文件名 +
         // 文件存在性判断。老卡的临时配置目录没有这份表，缺表只让带 worldboss 的连接一律拒，
         // 别的模式照跑；显式写了路径却缺文件照样起不来。
+        var calendar = CalendarTable.Load(calendarPath);
+
         var worldBoss = File.Exists(worldBossPath)
             ? WorldBossTable.Load(worldBossPath)
             : string.IsNullOrWhiteSpace(raw.WorldBossTable)
@@ -707,6 +725,8 @@ public sealed class BattleConfig
             SectTechTablePath = sectTechPath,
             SiegeTerritoryTablePath = siegeTerritoryPath,
             WorldBossTablePath = worldBossPath,
+            CalendarPath = calendarPath,
+            Calendar = calendar,
             WorldUpstream = (raw.WorldUpstream ?? "").Trim(),
             SocialUpstream = (raw.SocialUpstream ?? "").Trim(),
             DefaultClass = string.IsNullOrWhiteSpace(raw.DefaultClass) ? "warrior" : raw.DefaultClass,
@@ -963,6 +983,7 @@ public sealed class BattleConfig
         public string SiegeTerritoryTable { get; init; } = "";
         /// <summary>P3-5a 世界 Boss 表；留空时按默认文件名找，找不到就降级为没有入口。</summary>
         public string WorldBossTable { get; init; } = "";
+        public string CalendarTable { get; init; } = "";
         /// <summary>Q9 断线重连表；留空时按默认文件名找，找不到就降级为不重连、不惩罚。</summary>
         public string ReconnectTable { get; init; } = "";
         /// <summary>社交服地址；留空就不查宗门科技，老链路照跑。</summary>

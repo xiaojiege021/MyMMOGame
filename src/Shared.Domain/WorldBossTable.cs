@@ -6,17 +6,20 @@ namespace Mmo.Shared.Domain;
 /// <summary>
 /// 世界 Boss 表（config/world_boss.json）。C6/D12 起世界服与战斗服共用这一份解析：
 /// 同一份文件、同一条「窗口不许重叠」的硬校验、同一个纯计算
-/// （start_utc + duration_s → 这一刻是不是这一场）。
+/// （start_local + duration_s + 日历时区 → 这一刻是不是这一场）。
 ///
-/// 两个进程的差别只在调用参数：世界服传已开放地表集合，入口必须长在开放地表上；
-/// 战斗服不传集合，只算窗口、人数上限与首领数值。两边读到的是同一个类型。
+/// Q11 起窗口时刻按 config/calendar.json 的 timezone 解释：表里写玩家看得见的
+/// 本地时刻，两端拿同一份日历表折成 UTC。两个进程的差别只在调用参数：世界服传
+/// 已开放地表集合，入口必须长在开放地表上；战斗服不传集合，只算窗口、人数上限
+/// 与首领数值。两边读到的是同一个类型、同一把钥匙。
 ///
 /// 这张表里放不进奖励、掉落、灵石、矿脉、税收、归属加成：归属只记名字，
-/// 在本卡里连一个数值都不产生。
+/// 在本卡里连一个数值都不产生。名额占位与续约只放时限（hold 段），不放任何
+/// 与奖励、势力、属性有关的键。
 /// </summary>
 public sealed class WorldBossTable
 {
-    public const string EntrySchema = "world-boss-table/1";
+    public const string EntrySchema = "world-boss-table/2";
 
     const int MinutesPerDay = 24 * 60;
     const int SecondsPerDay = 24 * 60 * 60;
@@ -25,11 +28,12 @@ public sealed class WorldBossTable
     [
         "schema", "version", "pending", "note",
         "entrance", "cap", "cap_note", "timezone", "timezone_note",
-        "windows", "windows_note", "boss",
+        "windows", "windows_note", "hold", "hold_note", "boss",
     ];
 
     static readonly string[] EntranceKeys = ["id", "region_id", "name", "note"];
-    static readonly string[] WindowKeys = ["id", "start_utc", "duration_s"];
+    static readonly string[] WindowKeys = ["id", "start_local", "duration_s"];
+    static readonly string[] HoldKeys = ["hold_s", "renew_s", "lost_s"];
     static readonly string[] BossKeys =
         ["id", "name", "hp_max", "spawn_mm", "exp_on_clear", "attack", "phases", "note"];
     static readonly string[] AttackKeys = ["damage", "interval_ms", "foreswing_ms"];
@@ -48,7 +52,7 @@ public sealed class WorldBossTable
 
     WorldBossTable(
         int version, bool pending, string entranceId, string entranceName, string regionId,
-        int cap, BossConfig boss, List<BossWindow> windows)
+        int cap, BossHold hold, BossConfig boss, List<BossWindow> windows)
     {
         Version = version;
         Pending = pending;
@@ -56,6 +60,7 @@ public sealed class WorldBossTable
         EntranceName = entranceName;
         RegionId = regionId;
         Cap = cap;
+        Hold = hold;
         Boss = boss;
         _windows = windows;
     }
@@ -69,6 +74,9 @@ public sealed class WorldBossTable
     /// <summary>同一场最多几个人。这一场的人数上限只有这一个来源。</summary>
     public int Cap { get; }
 
+    /// <summary>名额怎么发、怎么续、多久没续就收回。只有这三个时长，没有奖励。</summary>
+    public BossHold Hold { get; }
+
     /// <summary>这一场打的首领。与 config/battle.json 的 boss 是两条独立的线。</summary>
     public BossConfig Boss { get; }
 
@@ -76,7 +84,7 @@ public sealed class WorldBossTable
 
     /// <summary>没配这张表：带 worldboss 参数的连接一律拒，别的模式照跑。</summary>
     public static WorldBossTable Missing() =>
-        new(0, false, "", "", "", 0, new BossConfig { Id = 0 }, []);
+        new(0, false, "", "", "", 0, BossHold.Missing, new BossConfig { Id = 0 }, []);
 
     public bool IsMissing => Version == 0;
 
@@ -129,10 +137,10 @@ public sealed class WorldBossTable
             var pending = Bool(root, "pending");
 
             var timezone = Text(root, "timezone");
-            if (!string.Equals(timezone, "utc", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(timezone, "calendar", StringComparison.OrdinalIgnoreCase))
             {
                 throw new ConfigException(
-                    "世界 Boss 表的 timezone 只认 utc（服务端时钟是唯一事实值），现在是「"
+                    "世界 Boss 表的 timezone 只认 calendar（时刻按 config/calendar.json 的时区解释），现在是「"
                     + timezone + "」");
             }
 
@@ -155,10 +163,11 @@ public sealed class WorldBossTable
             }
 
             var windows = ParseWindows(root);
+            var hold = ParseHold(root);
             var boss = ParseBoss(root);
 
             return new WorldBossTable(
-                version, pending, entranceId, entranceName, regionId, cap, boss, windows);
+                version, pending, entranceId, entranceName, regionId, cap, hold, boss, windows);
         }
     }
 
@@ -186,7 +195,7 @@ public sealed class WorldBossTable
                 throw new ConfigException("windows 里的 id 重复：" + id);
             }
 
-            var start = RequiredText(item, "start_utc", "windows[].start_utc");
+            var start = RequiredText(item, "start_local", "windows[].start_local");
             var minutes = ParseMinutes(start);
             var duration = Int(item, "duration_s");
             if (duration < 60 || duration > SecondsPerDay)
@@ -224,6 +233,43 @@ public sealed class WorldBossTable
 
         windows.Sort((a, b) => a.StartMinutes.CompareTo(b.StartMinutes));
         return windows;
+    }
+
+    /// <summary>
+    /// 名额的三个时长。世界服占位表按它发名额、战斗服按它续约，双方都从这里取，
+    /// 代码里没有第二份数字。缺表时全 0：带 worldboss 的连接本来就一律拒。
+    /// </summary>
+    static BossHold ParseHold(JsonElement root)
+    {
+        var hold = Block(root, "hold", HoldKeys, "hold");
+        RejectForbidden(hold, "hold");
+        var holdS = Int(hold, "hold_s");
+        var renewS = Int(hold, "renew_s");
+        var lostS = Int(hold, "lost_s");
+        if (holdS < 5 || holdS > 600)
+        {
+            throw new ConfigException("hold.hold_s 必须在 5 到 600 之间，现在是 " + holdS);
+        }
+
+        if (lostS < 5 || lostS > 600)
+        {
+            throw new ConfigException("hold.lost_s 必须在 5 到 600 之间，现在是 " + lostS);
+        }
+
+        if (renewS < 1 || renewS > holdS)
+        {
+            throw new ConfigException(
+                "hold.renew_s 必须在 1 到 hold_s 之间，现在是 " + renewS + "（hold_s=" + holdS + "）");
+        }
+
+        if (renewS * 2 > lostS)
+        {
+            // 两次续约之间的空档必须落在失联容忍之内，否则一次网络抖动就被判失联。
+            throw new ConfigException(
+                "hold.renew_s 的两倍不能超过 lost_s：" + renewS + " * 2 > " + lostS);
+        }
+
+        return new BossHold(holdS, renewS, lostS);
     }
 
     static BossConfig ParseBoss(JsonElement root)
@@ -342,50 +388,61 @@ public sealed class WorldBossTable
     }
 
     /// <summary>
-    /// 这一刻是不是落在某一场里。纯计算，只读服务端时钟；同一时刻所有人算出来
-    /// 同一把钥匙（入口 + 日期 + 窗口编号），所以「同一时刻一场」是结构保证。
+    /// 这一刻是不是落在某一场里。纯计算，只读服务端时钟与日历表；同一时刻所有人
+    /// 算出来同一把钥匙（入口 + 本地日期 + 窗口编号），所以「同一时刻一场」是结构保证。
+    /// Q11 起时刻按日历表的时区解释：表里写的是本地时刻，这里折成 UTC 再比。
     /// </summary>
-    public WorldBossWindow WindowOf(DateTimeOffset now)
+    public WorldBossWindow WindowOf(DateTimeOffset now, CalendarTable calendar)
     {
         if (IsMissing)
         {
             return new WorldBossWindow(false, "", 0, 0, 0);
         }
 
-        var utc = now.ToUniversalTime();
-        var dayStart = new DateTimeOffset(utc.Year, utc.Month, utc.Day, 0, 0, 0, TimeSpan.Zero);
-        var secondOfDay = (int)(utc - dayStart).TotalSeconds;
-        var date = utc.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        var zone = calendar.Zone;
+        var local = TimeZoneInfo.ConvertTime(now, zone);
+        var secondOfDay = local.Hour * 3600 + local.Minute * 60 + local.Second;
+        var date = local.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+        var dayStart = new DateTime(local.Year, local.Month, local.Day, 0, 0, 0, DateTimeKind.Unspecified);
 
         foreach (var window in _windows)
         {
             var start = window.StartSeconds;
             if (secondOfDay >= start && secondOfDay < start + window.DurationSeconds)
             {
-                var startAt = dayStart.AddSeconds(start);
+                // 起止都按本地时钟面折算：真出现夏令时的那一档也不会把两小时算成三小时。
+                var startAt = LocalToUtc(dayStart.AddSeconds(start), zone);
+                var endAt = LocalToUtc(dayStart.AddSeconds(start + window.DurationSeconds), zone);
                 return new WorldBossWindow(
                     true, EntranceId + "-" + date + "-" + window.Id,
-                    startAt.ToUnixTimeMilliseconds(),
-                    startAt.AddSeconds(window.DurationSeconds).ToUnixTimeMilliseconds(), 0);
+                    startAt.ToUnixTimeMilliseconds(), endAt.ToUnixTimeMilliseconds(), 0);
             }
         }
 
-        return new WorldBossWindow(false, "", 0, 0, NextStartAfter(utc).ToUnixTimeMilliseconds());
+        return new WorldBossWindow(
+            false, "", 0, 0, NextStartAfter(local, zone).ToUnixTimeMilliseconds());
     }
 
-    DateTimeOffset NextStartAfter(DateTimeOffset utc)
+    DateTimeOffset NextStartAfter(DateTimeOffset local, TimeZoneInfo zone)
     {
-        var dayStart = new DateTimeOffset(utc.Year, utc.Month, utc.Day, 0, 0, 0, TimeSpan.Zero);
+        var dayStart = new DateTime(local.Year, local.Month, local.Day, 0, 0, 0, DateTimeKind.Unspecified);
         foreach (var window in _windows)
         {
-            var start = dayStart.AddMinutes(window.StartMinutes);
-            if (start > utc)
+            var start = LocalToUtc(dayStart.AddMinutes(window.StartMinutes), zone);
+            if (start > local.ToUniversalTime())
             {
                 return start;
             }
         }
 
-        return dayStart.AddDays(1).AddMinutes(_windows[0].StartMinutes);
+        return LocalToUtc(dayStart.AddDays(1).AddMinutes(_windows[0].StartMinutes), zone);
+    }
+
+    static DateTimeOffset LocalToUtc(DateTime local, TimeZoneInfo zone)
+    {
+        var utc = TimeZoneInfo.ConvertTimeToUtc(
+            DateTime.SpecifyKind(local, DateTimeKind.Unspecified), zone);
+        return new DateTimeOffset(utc, TimeSpan.Zero);
     }
 
     static int ParseMinutes(string text)
@@ -396,7 +453,7 @@ public sealed class WorldBossTable
             || !int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out var minute)
             || hour is < 0 or > 23 || minute is < 0 or > 59)
         {
-            throw new ConfigException("窗口的 start_utc 要写成 HH:MM（UTC），现在是「" + text + "」");
+            throw new ConfigException("窗口的 start_local 要写成 HH:MM（本地时刻），现在是「" + text + "」");
         }
 
         return hour * 60 + minute;
@@ -471,7 +528,7 @@ public sealed class WorldBossTable
             ? value.GetInt64()
             : throw new ConfigException("世界 Boss 表缺 " + label);
 
-    /// <summary>配置里的一条场次窗口。start 是 UTC 的当日分钟数。</summary>
+    /// <summary>配置里的一条场次窗口。start 是本地时区（config/calendar.json）的当日分钟数。</summary>
     public sealed record BossWindow(string Id, int StartMinutes, int DurationSeconds)
     {
         public int StartSeconds => StartMinutes * 60;
@@ -480,6 +537,15 @@ public sealed class WorldBossTable
             StartSeconds < other.StartSeconds + other.DurationSeconds
             && other.StartSeconds < StartSeconds + DurationSeconds;
     }
+}
+
+/// <summary>
+/// 名额的三个时长：拿到名额多久内必须进场、进场后多久续一次、多久没续判失联。
+/// 只影响「谁还占着这一场的位置」，不影响伤害、奖励、归属。
+/// </summary>
+public sealed record BossHold(int HoldSeconds, int RenewSeconds, int LostSeconds)
+{
+    public static readonly BossHold Missing = new(0, 0, 0);
 }
 
 /// <summary>这一刻的场次事实值。关着时 next_starts_at_ms 是下一次出现的时刻。</summary>

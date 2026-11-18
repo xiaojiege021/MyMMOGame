@@ -27,7 +27,7 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 WD="$ROOT/src/World/bin/Release/net10.0/World.dll"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
-AT=1763380800000   # 2025-11-17T12:00:00Z，落在 w1 窗口内；只验纯计算，不连库。
+AT=1763380800000   # 2025-11-17T12:00:00Z = 本地 20:00，落在 w2 窗口内；只验纯计算，不连库。
 TMP="$(mktemp -d)"
 TITLE="C6（Shared.Domain）"
 trap 'rm -rf "$TMP"' EXIT
@@ -154,7 +154,10 @@ BKEY="$(printf '%s' "$BOUT" | grep -oE 'key=[^ ]+' | head -1)"
 WKEY="$(printf '%s' "$WOUT" | grep -oE 'key=[^ ]+' | head -1)"
 BV="$(printf '%s' "$BOUT" | grep -oE 'world_boss_table_version=[0-9]+' | head -1)"
 WV="$(printf '%s' "$WOUT" | grep -oE 'world_boss_table=ok version=[0-9]+' | head -1 | grep -oE '[0-9]+$')"
-if [ "$BKEY" = "key=world_boss_1-20251117-w1" ] && [ "$BKEY" = "$WKEY" ]; then
+# Q11 起窗口按日历时区解释，这场落在哪个窗口不写死：只要两端现算的钥匙一样、
+# 形状对（入口-本地日期-窗口编号）就算同源。
+if [ -n "$BKEY" ] && [ "$BKEY" = "$WKEY" ] \
+   && printf '%s' "$BKEY" | grep -qE '^key=world_boss_1-[0-9]{8}-w[0-9]+$'; then
   ok "战斗服 / 世界服同一时刻算出同一把钥匙：$BKEY"
 else
   bad "两进程钥匙不一致：battle=$BKEY world=$WKEY"

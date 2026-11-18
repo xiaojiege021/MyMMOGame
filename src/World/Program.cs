@@ -27,6 +27,9 @@ var gatherSpreadState = false;
 var flightState = false;
 var worldBossState = false;
 var worldBossAtMs = 0L;
+// Q11：世界 Boss 的窗口时刻按日历时区解释。核对脚本可以指一份临时日历表，
+// 空着就用 --config 那份 world.json 里写的 calendar_table。
+var calendarPath = "";
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -79,6 +82,10 @@ for (var i = 0; i < args.Length; i++)
         // 只给核对用：把读表后的入口、上限、窗口与「这一刻是哪一场」打出来，不起进程。
         case "--world-boss-state":
             worldBossState = true;
+            break;
+        // 搭配 --world-boss-state：换一份日历表跑（验改时区后出现时刻整体平移）。
+        case "--calendar" when i + 1 < args.Length:
+            calendarPath = args[++i];
             break;
         // 搭配 --world-boss-state：把「这一刻」定成给定的毫秒时间戳，用来验未到点 / 到点。
         case "--at" when i + 1 < args.Length:
@@ -511,11 +518,15 @@ if (regionListState)
 if (worldBossState)
 {
     WorldBossTable table;
+    Mmo.Shared.Domain.CalendarTable calendar;
     try
     {
-        var catalog = WorldCatalog.Load(WorldConfig.Load(configPath));
+        var worldConfig = WorldConfig.Load(configPath);
+        var catalog = WorldCatalog.Load(worldConfig);
         var open = catalog.Regions.Where(r => r.Open).Select(r => r.Id)
             .ToHashSet(StringComparer.Ordinal);
+        calendar = Mmo.Shared.Domain.CalendarTable.Load(
+            calendarPath.Length > 0 ? calendarPath : worldConfig.CalendarTable);
         if (!File.Exists(worldBossConfigPath))
         {
             Console.WriteLine("world_boss=missing");
@@ -546,7 +557,9 @@ if (worldBossState)
     var now = worldBossAtMs > 0
         ? DateTimeOffset.FromUnixTimeMilliseconds(worldBossAtMs)
         : DateTimeOffset.UtcNow;
-    var window = table.WindowOf(now);
+    var window = table.WindowOf(now, calendar);
+    Console.WriteLine("world_boss_calendar=timezone=" + calendar.TimeZoneId
+        + " path=" + (calendarPath.Length > 0 ? calendarPath : "config/calendar.json"));
     Console.WriteLine("world_boss_window=at=" + now.ToUnixTimeMilliseconds()
         + " open=" + (window.Open ? "true" : "false")
         + " key=" + (window.Key.Length == 0 ? "none" : window.Key)
@@ -556,7 +569,7 @@ if (worldBossState)
 
     // 纯计算：入口这台状态机不连线也能验。一场里「散场没打死」只记一次、
     // 可以被后来「打死了」升级、打掉以后再来报一律 duplicate —— 顺序反过来不行。
-    var probe = new WorldBossEntrance(table);
+    var probe = new WorldBossEntrance(table, calendar);
     var probeKey = window.Key.Length == 0
         ? table.EntranceId + "-selftest"
         : window.Key;
@@ -587,8 +600,68 @@ if (worldBossState)
         + " owner=" + probe.WindowOf(probeKey).SectId
         + " owner_name=" + (probe.WindowOf(probeKey).SectName.Length == 0
             ? "none" : probe.WindowOf(probeKey).SectName));
+
+    // Q11：名额占位表不连线也能验。假一条入口分线与一条非入口分线，把发名额、
+    // 重复要、续约、满员、不在入口线、分线满、过期回收、释放都走一遍。
+    // 名额只在进程内存，这里跑完就丢，不落库、不发奖、不改任何数值。
+    var probeEntrance = new WorldBossEntrance(table, calendar);
+    var onLine = new ProbeStanding(true, table.RegionId + "#1", 1, 4);
+    var offLine = new ProbeStanding(false, "", 0, 0);
+    var fullLine = new ProbeStanding(true, table.RegionId + "#2", 9, 4);
+    void Slot(string step, SlotOutcome r)
+        => Console.WriteLine("world_boss_slot=step=" + step
+            + " ok=" + (r.Ok ? "true" : "false")
+            + " reason=" + (r.Reason.Length == 0 ? "none" : r.Reason)
+            + " duplicate=" + (r.Duplicate ? "true" : "false")
+            + " current=" + r.Current + " cap=" + r.Cap
+            + " line=" + (r.LineKey.Length == 0 ? "none" : r.LineKey)
+            + " line_occupancy=" + r.LineOccupancy + " line_capacity=" + r.LineCapacity);
+
+    if (!window.Open)
+    {
+        // 闭场时也要能要名额：一律 worldboss_closed，一个位置都不占。
+        var closedAt = DateTimeOffset.FromUnixTimeMilliseconds(
+            window.NextStartsAtMs > 0 ? window.NextStartsAtMs - 1000 : now.ToUnixTimeMilliseconds());
+        var closedSlots = new WorldBossSlots(table, calendar, probeEntrance, onLine);
+        Slot("closed", closedSlots.Hold(1001, closedAt));
+        Console.WriteLine("world_boss_slot=summary current=0 cap=" + table.Cap);
+        return 0;
+    }
+
+    var at = DateTimeOffset.FromUnixTimeMilliseconds(window.StartsAtMs + 1000);
+    var slots = new WorldBossSlots(table, calendar, probeEntrance, onLine);
+    Slot("hold", slots.Hold(1001, at));
+    Slot("hold_again", slots.Hold(1001, at));
+    Slot("renew_entered", slots.Renew(1001, entered: true, at));
+    for (ulong id = 1002; id <= 1000UL + (ulong)table.Cap; id++)
+    {
+        slots.Hold(id, at);
+    }
+
+    Slot("hold_over_cap", slots.Hold(9001, at));
+    Slot("renew_unknown", slots.Renew(9002, entered: true, at));
+    Slot("release", slots.Release(1001, "leave", at));
+    Slot("release_again", slots.Release(1001, "leave", at));
+    var offSlots = new WorldBossSlots(table, calendar, probeEntrance, offLine);
+    Slot("not_on_entrance_line", offSlots.Hold(2001, at));
+    var fullSlots = new WorldBossSlots(table, calendar, probeEntrance, fullLine);
+    Slot("line_full", fullSlots.Hold(2002, at));
+    var holdFacts = slots.Describe(at);
+    var late = at.AddSeconds(holdFacts.HoldSeconds + 1);
+    Slot("renew_after_lost", slots.Renew(1002, entered: false, late));
+    var facts = slots.Describe(late);
+    Console.WriteLine("world_boss_slot=summary current=" + facts.Current
+        + " remaining=" + facts.Remaining + " cap=" + facts.Cap
+        + " hold_s=" + facts.HoldSeconds + " renew_s=" + facts.RenewSeconds
+        + " lost_s=" + facts.LostSeconds);
+    var counters = slots.Counters;
+    Console.WriteLine("world_boss_slot=counters granted=" + counters.Granted
+        + " renewed=" + counters.Renewed + " released=" + counters.Released
+        + " expired=" + counters.Expired + " rejected_full=" + counters.RejectedFull
+        + " rejected_line=" + counters.RejectedLine);
     return 0;
 }
+
 
 using var stop = new CancellationTokenSource();
 PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
@@ -606,3 +679,9 @@ return await new WorldProcess(
     configPath, gatherConfigPath, flightConfigPath, worldBossConfigPath, gatherSpreadConfigPath,
     regionUnlockPath)
     .RunAsync(stop.Token);
+
+/// <summary>只给只读入口的占位自检用：固定结论的分线探测口，不读注册表。</summary>
+sealed class ProbeStanding(bool onEntrance, string lineKey, int occupancy, int capacity) : IEntranceLine
+{
+    public LineStanding Where(ulong characterId) => new(onEntrance, lineKey, occupancy, capacity);
+}

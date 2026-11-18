@@ -12,7 +12,7 @@ namespace World;
 public sealed class WorldGrpcService(
     LineRegistry registry, WorldCatalog catalog, PositionHub hub,
     GatherTable gather, GatherNodeRegistry nodes, IGatherGrant grants,
-    FlightGate flight, WorldBossEntrance worldBoss, RegionGate regions)
+    FlightGate flight, WorldBossEntrance worldBoss, WorldBossSlots worldBossSlots, RegionGate regions)
     : global::Mmo.Proto.World.WorldService.WorldServiceBase
 {
     public override async Task<EnterLineResponse> EnterLine(
@@ -283,11 +283,14 @@ public sealed class WorldGrpcService(
         DescribeWorldBossRequest request, ServerCallContext context)
     {
         var state = worldBoss.Describe(DateTimeOffset.UtcNow);
+        var slots = worldBossSlots.Describe(DateTimeOffset.UtcNow);
         Console.WriteLine("world_boss=entrance=" + (state.EntranceId.Length == 0 ? "none" : state.EntranceId)
             + " visible=" + state.Visible
             + " reason=" + (state.Reason.Length == 0 ? "none" : state.Reason)
             + " window=" + (state.WindowKey.Length == 0 ? "none" : state.WindowKey)
             + " cap=" + state.Cap
+            + " current=" + slots.Current
+            + " remaining=" + slots.Remaining
             + " killed=" + state.Killed
             + " owner_sect=" + state.Owner.SectId
             + " owner=" + (state.Owner.SectName.Length == 0 ? "none" : state.Owner.SectName));
@@ -309,6 +312,93 @@ public sealed class WorldGrpcService(
             OwnerSectName = state.Owner.SectName,
             OwnerWindowKey = state.Owner.WindowKey,
             OwnerRecordedAtMs = (ulong)Math.Max(0, state.Owner.RecordedAtMs),
+            Current = (uint)Math.Max(0, slots.Current),
+            Remaining = (uint)Math.Max(0, slots.Remaining),
+            HoldS = (uint)Math.Max(0, slots.HoldSeconds),
+            RenewS = (uint)Math.Max(0, slots.RenewSeconds),
+            LostS = (uint)Math.Max(0, slots.LostSeconds),
+        });
+    }
+
+    /// <summary>
+    /// Q11：要一个名额。三层判定都在世界服：这一刻是不是这一场（表 + 日历）、
+    /// 人在不在入口那条分线上（分线注册表）、这一场还有没有位置（占位表）。
+    /// 请求里只有角色编号，场次与位置一个都带不进来。
+    /// </summary>
+    public override Task<HoldWorldBossSlotResponse> HoldWorldBossSlot(
+        HoldWorldBossSlotRequest request, ServerCallContext context)
+    {
+        var outcome = worldBossSlots.Hold(request.CharacterId, DateTimeOffset.UtcNow);
+        Console.WriteLine("world_boss_slot=op=hold"
+            + " character=" + request.CharacterId
+            + " ok=" + (outcome.Ok ? "true" : "false")
+            + " reason=" + (outcome.Reason.Length == 0 ? "none" : outcome.Reason)
+            + " duplicate=" + (outcome.Duplicate ? "true" : "false")
+            + " window=" + (outcome.WindowKey.Length == 0 ? "none" : outcome.WindowKey)
+            + " current=" + outcome.Current
+            + " cap=" + outcome.Cap
+            + " line=" + (outcome.LineKey.Length == 0 ? "none" : outcome.LineKey)
+            + " line_occupancy=" + outcome.LineOccupancy
+            + " line_capacity=" + outcome.LineCapacity);
+
+        return Task.FromResult(new HoldWorldBossSlotResponse
+        {
+            Ok = outcome.Ok,
+            Reason = outcome.Reason,
+            Duplicate = outcome.Duplicate,
+            WindowKey = outcome.WindowKey,
+            ExpiresAtMs = (ulong)Math.Max(0, outcome.ExpiresAtMs),
+            Current = (uint)Math.Max(0, outcome.Current),
+            Cap = (uint)Math.Max(0, outcome.Cap),
+            LineKey = outcome.LineKey,
+            LineOccupancy = (uint)Math.Max(0, outcome.LineOccupancy),
+            LineCapacity = (uint)Math.Max(0, outcome.LineCapacity),
+        });
+    }
+
+    /// <summary>Q11：续约。进场后的第一次确认也走这条（entered=true）。</summary>
+    public override Task<RenewWorldBossSlotResponse> RenewWorldBossSlot(
+        RenewWorldBossSlotRequest request, ServerCallContext context)
+    {
+        var outcome = worldBossSlots.Renew(request.CharacterId, request.Entered, DateTimeOffset.UtcNow);
+        Console.WriteLine("world_boss_slot=op=renew"
+            + " character=" + request.CharacterId
+            + " entered=" + (request.Entered ? "true" : "false")
+            + " ok=" + (outcome.Ok ? "true" : "false")
+            + " reason=" + (outcome.Reason.Length == 0 ? "none" : outcome.Reason)
+            + " window=" + (outcome.WindowKey.Length == 0 ? "none" : outcome.WindowKey)
+            + " current=" + outcome.Current
+            + " cap=" + outcome.Cap);
+
+        return Task.FromResult(new RenewWorldBossSlotResponse
+        {
+            Ok = outcome.Ok,
+            Reason = outcome.Reason,
+            WindowKey = outcome.WindowKey,
+            ExpiresAtMs = (ulong)Math.Max(0, outcome.ExpiresAtMs),
+            Current = (uint)Math.Max(0, outcome.Current),
+            Cap = (uint)Math.Max(0, outcome.Cap),
+        });
+    }
+
+    /// <summary>Q11：还名额。reason 只作日志（leave / closed / timeout / clear）。</summary>
+    public override Task<ReleaseWorldBossSlotResponse> ReleaseWorldBossSlot(
+        ReleaseWorldBossSlotRequest request, ServerCallContext context)
+    {
+        var reason = (request.Reason ?? "").Trim();
+        var outcome = worldBossSlots.Release(request.CharacterId, reason, DateTimeOffset.UtcNow);
+        Console.WriteLine("world_boss_slot=op=release"
+            + " character=" + request.CharacterId
+            + " ok=" + (outcome.Ok ? "true" : "false")
+            + " reason=" + (outcome.Reason.Length == 0 ? "none" : outcome.Reason)
+            + " window=" + (outcome.WindowKey.Length == 0 ? "none" : outcome.WindowKey)
+            + " current=" + outcome.Current);
+
+        return Task.FromResult(new ReleaseWorldBossSlotResponse
+        {
+            Ok = outcome.Ok,
+            Reason = outcome.Reason,
+            Current = (uint)Math.Max(0, outcome.Current),
         });
     }
 

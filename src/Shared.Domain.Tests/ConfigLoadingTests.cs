@@ -246,24 +246,47 @@ public sealed class ConfigLoadingTests
     public void WorldBossTable_window_math_is_pure_and_shared()
     {
         var table = LoadWorldBoss();
+        var calendar = LoadCalendar();
 
-        var open = table.WindowOf(new DateTimeOffset(2026, 11, 17, 12, 10, 0, TimeSpan.Zero));
+        // Q11：窗口写的是本地时刻（现为东八区 12:00），这一刻是北京时间 12:10。
+        var open = table.WindowOf(
+            new DateTimeOffset(2026, 11, 17, 4, 10, 0, TimeSpan.Zero), calendar);
         Assert.True(open.Open);
         Assert.Equal("world_boss_1-20261117-w1", open.Key);
         Assert.Equal(
-            new DateTimeOffset(2026, 11, 17, 12, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds(),
+            new DateTimeOffset(2026, 11, 17, 4, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds(),
             open.StartsAtMs);
         Assert.Equal(
-            new DateTimeOffset(2026, 11, 17, 12, 30, 0, TimeSpan.Zero).ToUnixTimeMilliseconds(),
+            new DateTimeOffset(2026, 11, 17, 4, 30, 0, TimeSpan.Zero).ToUnixTimeMilliseconds(),
             open.EndsAtMs);
 
-        var now = new DateTimeOffset(2026, 11, 17, 13, 0, 0, TimeSpan.Zero);
-        var closed = table.WindowOf(now);
+        // 北京时间 13:00：这一场已经过点，下一场是本地 20:00（UTC 12:00）。
+        var now = new DateTimeOffset(2026, 11, 17, 5, 0, 0, TimeSpan.Zero);
+        var closed = table.WindowOf(now, calendar);
         Assert.False(closed.Open);
         Assert.Equal("", closed.Key);
         Assert.Equal(
-            new DateTimeOffset(2026, 11, 17, 20, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds(),
+            new DateTimeOffset(2026, 11, 17, 12, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds(),
             closed.NextStartsAtMs);
+    }
+
+    [Fact]
+    public void WorldBossTable_window_follows_calendar_timezone()
+    {
+        // 同一份世界 Boss 表、同一个 UTC 时刻，换日历时区后命中不同场次：
+        // 出现时刻整体平移，代码里没有第二套时钟。
+        var table = LoadWorldBoss();
+        var root = ReadReal("calendar.json");
+        root["timezone"] = "UTC";
+        var utcCalendar = CalendarTable.LoadText(
+            root.ToJsonString(), "calendar-utc.json");
+
+        // UTC 04:10 = 北京时间 12:10：按日历时区开的是 w1，按 UTC 解释这一刻没有窗口。
+        var at = new DateTimeOffset(2026, 11, 17, 4, 10, 0, TimeSpan.Zero);
+        var localWindow = table.WindowOf(at, LoadCalendar());
+        Assert.True(localWindow.Open);
+        Assert.Equal("world_boss_1-20261117-w1", localWindow.Key);
+        Assert.False(table.WindowOf(at, utcCalendar).Open);
     }
 
     [Fact]
@@ -271,14 +294,14 @@ public sealed class ConfigLoadingTests
     {
         var table = WorldBossTable.Missing();
         Assert.True(table.IsMissing);
-        Assert.False(table.WindowOf(DateTimeOffset.UtcNow).Open);
+        Assert.False(table.WindowOf(DateTimeOffset.UtcNow, LoadCalendar()).Open);
     }
 
     [Fact]
     public void WorldBossTable_rejects_overlapping_windows()
     {
         var root = ReadReal("world_boss.json");
-        root["windows"]![1]!["start_utc"] = "12:10";
+        root["windows"]![1]!["start_local"] = "12:10";
         var path = WriteTemp(root, "world_boss.json");
 
         var ex = Assert.Throws<ConfigException>(() => WorldBossTable.Load(path));

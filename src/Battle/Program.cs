@@ -285,8 +285,9 @@ if (worldBossOnly)
 {
     try
     {
+        var battleConfig = Battle.BattleConfig.Load(configPath);
         WorldBossTable table = worldBossPath is null
-            ? Battle.BattleConfig.Load(configPath).WorldBoss
+            ? battleConfig.WorldBoss
             : WorldBossTable.Load(worldBossPath);
 
         if (table.IsMissing)
@@ -315,7 +316,7 @@ if (worldBossOnly)
         var now = worldBossAtMs > 0
             ? DateTimeOffset.FromUnixTimeMilliseconds(worldBossAtMs)
             : DateTimeOffset.UtcNow;
-        var slot = table.WindowOf(now);
+        var slot = table.WindowOf(now, battleConfig.Calendar);
         Console.WriteLine($"world_boss_now=at={now.ToUnixTimeMilliseconds()}"
             + $" open={(slot.Open ? "true" : "false")}"
             + $" key={(slot.Key.Length == 0 ? "none" : slot.Key)}"

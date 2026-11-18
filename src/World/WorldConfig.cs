@@ -27,7 +27,8 @@ public sealed record WorldConfig(
     double TierFarDistance,
     IReadOnlyList<string> Regions,
     IReadOnlyList<string> Speakers,
-    IReadOnlyList<string> Factions)
+    IReadOnlyList<string> Factions,
+    string CalendarTable)
 {
     public static WorldConfig Load(string path)
     {
@@ -80,6 +81,13 @@ public sealed record WorldConfig(
             throw new ConfigException("world.json 的 npc_table 不能为空");
         }
 
+        // Q11：世界 Boss 的窗口时刻按这份日历时区解释，世界服与战斗服读同一份。
+        var calendarTable = (wire.CalendarTable ?? "config/calendar.json").Trim();
+        if (calendarTable.Length == 0)
+        {
+            throw new ConfigException("world.json 的 calendar_table 不能为空");
+        }
+
         var capacity = wire.LineCapacity ?? throw new ConfigException("world.json 缺 line_capacity");
         if (capacity < 1 || capacity > 10_000)
         {
@@ -125,7 +133,8 @@ public sealed record WorldConfig(
             near, far,
             Names(wire.Regions, "regions"),
             Names(wire.Speakers, "speakers"),
-            Names(wire.Factions, "factions"));
+            Names(wire.Factions, "factions"),
+            calendarTable);
     }
 
     static double Distance(double? value, string key)
@@ -202,5 +211,6 @@ public sealed record WorldConfig(
         [JsonPropertyName("regions")] public List<string>? Regions { get; init; }
         [JsonPropertyName("speakers")] public List<string>? Speakers { get; init; }
         [JsonPropertyName("factions")] public List<string>? Factions { get; init; }
+        [JsonPropertyName("calendar_table")] public string? CalendarTable { get; init; }
     }
 }

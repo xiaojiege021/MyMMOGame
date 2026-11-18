@@ -48,18 +48,23 @@ listen_of() {
 }
 # 战斗服的临时配置：表路径一律给绝对路径——临时配置所在目录里没有那几张表，
 # 加载器是按配置文件的目录去找相对路径的。
-mk_battle() { # <名字> [世界 Boss 表路径]
-  python3 - "$ROOT" "$TMP" "$1" "${2:-}" <<'PY'
+mk_battle() { # <名字> [世界 Boss 表路径] [world_upstream；写 none = 不写这一项]
+  python3 - "$ROOT" "$TMP" "$1" "${2:-}" "${3:-http://127.0.0.1:63000}" <<'PY'
 import json, os, sys
-root, tmp, name, table = sys.argv[1:5]
+root, tmp, name, table, upstream = sys.argv[1:6]
 d = json.load(open(os.path.join(root, "config", "battle.json"), encoding="utf-8"))
 d.update(listen="127.0.0.1:0",
          settlement_dir=os.path.join(tmp, "set-" + name),
          character_dir=os.path.join(tmp, "chr-" + name),
          exp_upstream="http://127.0.0.1:62000",
          character_upstream="http://127.0.0.1:62000",
-         social_upstream="http://127.0.0.1:65000",
-         world_upstream="http://127.0.0.1:63000")
+         social_upstream="http://127.0.0.1:65000")
+# Q11：人数上限那一条不需要世界服（上游留空就按本进程人数判满），
+# 结算与归属那几场仍连世界服。
+if upstream == "none":
+    d.pop("world_upstream", None)
+else:
+    d["world_upstream"] = upstream
 if table:
     d["world_boss_table"] = table
 else:
@@ -100,8 +105,8 @@ def emit(k, c, i=""): print(("PASS " if c else "FAIL ") + k + ("" if c else "  "
 t = cfg("config/world_boss.json")
 bc = cfg("config/battle.json")
 region = cfg("config/region/" + t["entrance"]["region_id"] + ".json")
-emit("world_boss_schema", t.get("schema") == "world-boss-table/1" and t.get("version", 0) > 0)
-emit("world_boss_pending_note", t.get("pending") is True and "待定" in t.get("note", ""))
+emit("world_boss_schema", t.get("schema") == "world-boss-table/2" and t.get("version", 0) > 0)
+emit("world_boss_pending_note", t.get("pending") is False and "Q11 定稿" in t.get("note", ""))
 emit("world_boss_cap_is_config", isinstance(t.get("cap"), int) and 0 < t["cap"] <= 100)
 emit("world_boss_entrance_on_open_region", region.get("open") is True)
 emit("world_boss_entrance_keys", set(t["entrance"]) <= {"id", "region_id", "name", "note"})
@@ -112,7 +117,7 @@ emit("world_boss_no_reward_or_attribute_keys", not any(k in keys for k in (
      "reward", "drop", "loot", "gold", "spirit_stone", "vein", "tax", "owner_sect",
      "shop", "balance", "attribute", "power")))
 emit("world_boss_windows_in_config", len(t["windows"]) >= 1 and all(
-     re.fullmatch(r"\d\d:\d\d", w["start_utc"]) and w["duration_s"] >= 60 for w in t["windows"]))
+     re.fullmatch(r"\d\d:\d\d", w["start_local"]) and w["duration_s"] >= 60 for w in t["windows"]))
 emit("battle_json_no_new_table", "world_boss_table" not in bc and "world_upstream" not in bc)
 # 经验只有一份正本（config/exp.json）：世界 Boss 表里的那个数字只给结算回包用，
 # 两边不一致就会出现「屏幕说一份、包里另一份」。
@@ -135,7 +140,7 @@ world_src = "".join(rd(os.path.join("src/World", f)) for f in os.listdir(os.path
 emit("world_never_settles_skills", not re.search(r"Encounter|SkillResult|skill_result", world_src))
 ent = rd("src/World/WorldBossEntrance.cs")
 emit("owner_is_memory_only", not re.search(r"insert into|update \"|delete from", ent, re.I))
-emit("entrance_key_by_server_clock", "table.WindowOf(now)" in ent and "StartSeconds" in wc)
+emit("entrance_key_by_server_clock", "table.WindowOf(now, calendar)" in ent and "StartSeconds" in wc)
 srv = rd("src/Battle/Server.cs"); enc = rd("src/Battle/Encounter.cs")
 emit("worldboss_branch_before_siege",
      srv.index('QueryOrNull(query, "worldboss")') < srv.index('QueryOrNull(query, "siege")'))
@@ -162,16 +167,18 @@ while IFS= read -r line; do
 done < "$TMP/static.txt"
 
 echo "== 3. 两个只读入口按同一时刻算出同一把钥匙 =="
-python3 - "$WB" >"$TMP/points.txt" <<'PY'
-import datetime, json, sys
+python3 - "$WB" "$ROOT/config/calendar.json" >"$TMP/points.txt" <<'PY'
+import datetime, json, sys, zoneinfo
 t = json.load(open(sys.argv[1], encoding="utf-8"))
+# Q11：窗口写的是本地时刻，同一时刻两端要按同一份日历时区算出同一把钥匙。
+zone = zoneinfo.ZoneInfo(json.load(open(sys.argv[2], encoding="utf-8"))["timezone"])
 eid = t["entrance"]["id"]
 w1, w2 = t["windows"][0], t["windows"][1] if len(t["windows"]) > 1 else (t["windows"][0], None)
 day = datetime.date(2026, 11, 14)
 def at(w, secs):
-    h, m = (int(x) for x in w["start_utc"].split(":"))
+    h, m = (int(x) for x in w["start_local"].split(":"))
     return datetime.datetime(day.year, day.month, day.day, h, m,
-                             tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=secs)
+                             tzinfo=zone) + datetime.timedelta(seconds=secs)
 def key(w): return "%s-%s-%s" % (eid, day.strftime("%Y%m%d"), w["id"])
 def emit(w, secs, want_open):
     ms = int(at(w, secs).timestamp() * 1000)
@@ -224,7 +231,7 @@ import json, sys
 src, dst, mode = sys.argv[1:4]
 d = json.load(open(src, encoding="utf-8"))
 w = d["windows"][0]
-if mode == "schema": d["schema"] = "world-boss-table/2"
+if mode == "schema": d["schema"] = "world-boss-table/1"
 elif mode == "version": d["version"] = 0
 elif mode == "timezone": d["timezone"] = "local"
 elif mode == "cap0": d["cap"] = 0
@@ -233,9 +240,9 @@ elif mode == "region_closed": d["entrance"]["region_id"] = "焦原"
 elif mode == "region_unknown": d["entrance"]["region_id"] = "无此地"
 elif mode == "no_windows": d["windows"] = []
 elif mode == "overlap": d["windows"] = [dict(w), dict(w, id="w2")]
-elif mode == "midnight": w["start_utc"] = "23:50"
+elif mode == "midnight": w["start_local"] = "23:50"
 elif mode == "short": w["duration_s"] = 30
-elif mode == "bad_clock": w["start_utc"] = "25:00"
+elif mode == "bad_clock": w["start_local"] = "25:00"
 elif mode == "hp0": d["boss"]["hp_max"] = 0
 elif mode == "no_boss": d.pop("boss")
 elif mode == "reward": d["reward"] = {"item_id": "x"}
@@ -285,9 +292,12 @@ if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then
   printf '  ..   跳过真服真库段（MMO_P3_5A_HAS_DB 未开或缺 MMO_GAMEDB）\n'
 else
   python3 - "$ROOT" "$TMP" <<'PY'
-import datetime, json, os, sys
+import datetime, json, os, sys, zoneinfo
 root, tmp = sys.argv[1:3]
-now = datetime.datetime.now(datetime.timezone.utc)
+# Q11：窗口按日历时区解释，这里的「现在」与窗口起点都要按同一个时区算。
+zone = zoneinfo.ZoneInfo(
+    json.load(open(os.path.join(root, "config", "calendar.json"), encoding="utf-8"))["timezone"])
+now = datetime.datetime.now(datetime.timezone.utc).astimezone(zone)
 now_s = now.hour * 3600 + now.minute * 60 + now.second
 base = json.load(open(os.path.join(root, "config", "world_boss.json"), encoding="utf-8"))
 def hhmm(sec): return "%02d:%02d" % (sec // 3600, (sec % 3600) // 60)
@@ -305,17 +315,20 @@ def variant(name, windows, damage=None, interval=None, hp=None):
 open_dur = min(86400, max(60, now_s + 600))
 future = now + datetime.timedelta(minutes=30)
 closed_start = future.hour * 3600 + future.minute * 60 if future.date() == now.date() else 0
-variant("wb-open.json", [{"id": "w1", "start_utc": "00:00", "duration_s": open_dur}],
+variant("wb-open.json", [{"id": "w1", "start_local": "00:00", "duration_s": open_dur}],
         damage=1, hp=900)
-variant("wb-open2.json", [{"id": "w9", "start_utc": "00:00", "duration_s": open_dur}],
+variant("wb-open2.json", [{"id": "w9", "start_local": "00:00", "duration_s": open_dur}],
         damage=1, hp=900)
-variant("wb-open3.json", [{"id": "w7", "start_utc": "00:00", "duration_s": open_dur}],
+variant("wb-open3.json", [{"id": "w7", "start_local": "00:00", "duration_s": open_dur}],
         damage=900, interval=1200)
-variant("wb-closed.json", [{"id": "w5", "start_utc": hhmm(closed_start), "duration_s": 60}])
+variant("wb-closed.json", [{"id": "w5", "start_local": hhmm(closed_start), "duration_s": 60}])
 PY
   for spec in "closed:wb-closed.json" "open:wb-open.json" "open2:wb-open2.json" "open3:wb-open3.json"; do
     mk_battle "${spec%%:*}" "$TMP/${spec##*:}"
   done
+  # Q11：要名额要站在入口那条分线上，探针的 20 个编号并不真在线上。
+  # 人数上限那一条用不连世界服的一份（降级按本进程人数判满），结算 / 归属仍连世界服。
+  mk_battle fill "$TMP/wb-open.json" none
   "$DOTNET" "$GD" --migrate --sql "$ROOT/db/character/character.sql" $CG >"$TMP/mig-character.log" 2>&1 || true
   "$DOTNET" "$SD" --migrate --sql "$ROOT/db/social/social.sql" $CS >"$TMP/mig-social.log" 2>&1 || true
   grep -q '^migrate=ok' "$TMP/mig-character.log" \
@@ -327,15 +340,30 @@ PY
   "$DOTNET" "$WD" $CW --gather-config "$ROOT/config/gather.json" \
     --world-boss-config "$TMP/wb-open.json" >"$TMP/world.log" 2>&1 & PIDS="$PIDS $!"
   wait_ready "$TMP/world.log" '^ready' "世界服" || true
-  for n in closed open open2 open3; do
+  for n in closed open open2 open3 fill; do
     "$DOTNET" "$BD" --config "$TMP/battle-$n.json" >"$TMP/battle-$n.log" 2>&1 & PIDS="$PIDS $!"
   done
   U1="$(listen_of "$TMP/battle-closed.log")"; U2="$(listen_of "$TMP/battle-open.log")"
   U3="$(listen_of "$TMP/battle-open2.log")"; U4="$(listen_of "$TMP/battle-open3.log")"
+  U5="$(listen_of "$TMP/battle-fill.log")"
   # 客户端那条是 WebSocket：listen 回的是 http://，探针只认 ws://。
-  U1="ws${U1#http}"; U2="ws${U2#http}"; U3="ws${U3#http}"; U4="ws${U4#http}"
-  [ -n "$U1" ] && [ -n "$U2" ] && [ -n "$U3" ] && [ -n "$U4" ] \
-    && ok "真服：四场战斗进程各就绪（未到点 / 单人 / 同门 / 复活）" || bad "战斗进程没起来"
+  U1="ws${U1#http}"; U2="ws${U2#http}"; U3="ws${U3#http}"; U4="ws${U4#http}"; U5="ws${U5#http}"
+  [ -n "$U1" ] && [ -n "$U2" ] && [ -n "$U3" ] && [ -n "$U4" ] && [ -n "$U5" ] \
+    && ok "真服：五场战斗进程各就绪（未到点 / 单人 / 同门 / 复活 / 人数上限）" || bad "战斗进程没起来"
+
+  # Q11：进名额得先站在入口那条分线上。网关 /world/enter 会先复核归属（角色服真库），
+  # 再让世界服把这两个角色放进入口所在地表的一条分线；客户端带不进分线号。
+  ENT_REGION="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1],encoding="utf-8"))["entrance"]["region_id"])' "$WB")"
+  line_in() {
+    curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/world/enter?token=$TOK" \
+      -H 'Content-Type: application/json' -d "{\"character_id\":$1,\"region_id\":\"$ENT_REGION\"}"
+  }
+  LINED=1
+  for who in "$A" "$B"; do
+    printf '%s' "$(line_in "$who")" | grep -q '"entered":true' || LINED=0
+  done
+  [ "$LINED" = "1" ] && ok "真服：两个角色都站进了 ${ENT_REGION} 的一条分线（进名额的前提）" \
+    || bad "没把角色送进入口分线"
   python3 - "$ROOT" "$TMP" "$U2" <<'PY'
 import json, os, sys
 root, tmp, url = sys.argv[1:4]
@@ -399,12 +427,12 @@ print(next(i["price"] for i in d["items"] if i["category"] == "revive_scroll"))'
     && ok "拒绝只由服务端事实值给出（服务端日志有 worldboss_closed）" || bad "服务端没记拒绝原因"
 
   # 2) 首发上限 20：满 20 人，第 21 人被拒。
-  R="$("$DOTNET" "$PROBE" --url "$U2/battle?worldboss=$ENT" --case worldboss_fill --cap "$CAP" \
+  R="$("$DOTNET" "$PROBE" --url "$U5/battle?worldboss=$ENT" --case worldboss_fill --cap "$CAP" \
     --a-char "$A" --boss "$BOSS" 2>&1)"; echo "$R" | sed 's/^/       /'
   printf '%s' "$R" | grep -q 'verdict=ok' \
     && ok "一个人能进；满 $CAP 人后第 $((CAP + 1)) 人回 worldboss_full（上限只从配置读）" \
     || bad "人数上限不对：$(printf '%s' "$R" | tail -2 | detail)"
-  grep -q "reason=worldboss_full current=$CAP limit=$CAP" "$TMP/battle-open.log" \
+  grep -q "reason=worldboss_full current=$CAP limit=$CAP" "$TMP/battle-fill.log" \
     && ok "服务端日志：worldboss_full current=$CAP limit=$CAP" || bad "没记满员拒绝"
 
   # 3) 一个人打掉这一场：结算来源 world_boss、等级经验真进库。
