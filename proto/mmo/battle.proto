@@ -266,6 +266,8 @@ message ClientMessage {
     // P1-5c6：用一张复活卷轴。同样没有目标编号——方案 12.1 写定「只拉起自己，
     // 不能拉队友」，这条协议表达不出「拉别人」；拉队友只能走牧师的生息。
     UseReviveScrollRequest scroll = 5;
+    // Q8：对一件掉落表态（need / greed / pass）。意图只活在这一场内存里。
+    LootIntentRequest loot_intent = 6;
   }
 }
 
@@ -295,6 +297,8 @@ message ServerMessage {
     EffectState effects = 15;
     // Q2：Boss 的血量或效果变了（DoT 跳、debuff 到期）。没有对应施法的那一类变化。
     BossState boss_state = 16;
+    // Q8：need_greed 下这一场的掉落归属。personal 不发这条。
+    LootAssigned loot_assigned = 17;
   }
 }
 
@@ -388,4 +392,26 @@ message ReviveScrollRejected {
   uint32 retry_after_ms = 3;
   int64 hp_after = 4;
   int64 mana_after = 5;
+}
+
+// Q8/H2：对一件掉落表态。decision 只认 need / greed / pass（服务端按这三个词判，
+// 认不出的值整条忽略）。同一件重复表态以后到的覆盖先到的；意图只活在这一场内存里，
+// 结算时用一次就随这场丢掉。掷点不在客户端：这条消息里没有一个字段能带进点数。
+message LootIntentRequest {
+  string item_id = 1;
+  string decision = 2;
+}
+
+// Q8/H2：need_greed 下这一场的分配结果，结算时逐行广播一次。
+// winner_character_id=0 表示这一行没人要（全员 pass 或没有参与者），该行不发放。
+message LootAssignment {
+  string item_id = 1;
+  int32 count = 2;
+  uint64 winner_character_id = 3;
+}
+
+message LootAssigned {
+  // 恒为 need_greed；personal 不发这条（每人各拿整份，不需要公布归属）。
+  string mode = 1;
+  repeated LootAssignment lines = 2;
 }

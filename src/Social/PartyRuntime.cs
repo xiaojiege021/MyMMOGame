@@ -14,6 +14,11 @@ namespace Social;
 /// </summary>
 public sealed class PartyRuntime(PartyTable table)
 {
+    /// <summary>
+    /// 这一进程用的分配规则（Q8）。只读暴露给回包层填事实值——
+    /// 掷点本身不在这里做：分配发生在战斗服本地结算，社交服只给口径。
+    /// </summary>
+    public PartyTable.Loot LootRule => table.LootRule;
     readonly object _gate = new();
 
     /// <summary>一条队伍的成员快照。joined_seq 是加入顺序，队长继任用最小值。</summary>

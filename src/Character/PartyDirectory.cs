@@ -16,8 +16,15 @@ public static class PartyDirectory
     /// <summary>队伍事实。不在队伍时 Size 固定 1、MemberIds 只有自己。</summary>
     public sealed record Fact(
         bool InParty, ulong PartyId, ulong LeaderCharacterId, int Size,
-        bool AllReady, IReadOnlyList<ulong> MemberIds)
+        bool AllReady, IReadOnlyList<ulong> MemberIds,
+        string LootMode = PartyLoot.Personal, string LootRoll = PartyLoot.RollNone,
+        int RollMin = 0, int RollMax = 0)
     {
+        /// <summary>
+        /// 不在队伍 / 社交服不可达：按 personal 结算（每人各发整份，默认口径）。
+        /// 区间给 0——personal 不掷点，区间只有 need_greed 才有意义，
+        /// 这里也不写死 1..100（数字只在 config/party.json）。
+        /// </summary>
         public static Fact Single(ulong characterId) =>
             new(false, 0, 0, 1, false, [characterId]);
     }
@@ -65,6 +72,11 @@ public static class PartyDirectory
         }
 
         return new Fact(true, reply.PartyId, reply.LeaderCharacterId, ids.Count,
-            reply.AllReady, ids);
+            reply.AllReady, ids,
+            // Q8：分配口径按社交服回的事实值；老社交服二进制没有这两个字段时
+            // 回空串——按 personal 兜底（默认口径，绝不因为缺字段改成分份更少的模式）。
+            string.IsNullOrWhiteSpace(reply.LootMode) ? PartyLoot.Personal : reply.LootMode,
+            string.IsNullOrWhiteSpace(reply.LootRoll) ? PartyLoot.RollNone : reply.LootRoll,
+            reply.RollMin, reply.RollMax);
     }
 }

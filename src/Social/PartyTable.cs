@@ -22,7 +22,7 @@ public sealed class PartyTable
         ["schema", "version", "pending", "note", "max_size", "invite_timeout_s",
          "ready_check_timeout_s", "leader_succession", "loot", "level_range"];
 
-    static readonly string[] LootKeys = ["mode", "roll"];
+    static readonly string[] LootKeys = ["mode", "roll", "roll_min", "roll_max"];
     static readonly string[] LevelKeys = ["enabled", "max_gap"];
     static readonly string[] LootModes = ["personal", "need_greed"];
     static readonly string[] RollModes = ["none", "server"];
@@ -30,8 +30,12 @@ public sealed class PartyTable
     /// <summary>队长离队后谁接班：转给最早加入的成员，或者整队解散。</summary>
     static readonly string[] Successions = ["earliest_joined", "disband"];
 
-    /// <summary>分配段。Q7 只读，落地归 Q8。</summary>
-    public sealed record Loot(string Mode, string Roll);
+    /// <summary>
+    /// 分配段（Q8 落地）。mode=personal 时每人各发整份、不掷点（roll 必须 none）；
+    /// mode=need_greed 时全队只出这一份，掷点只由服务端在 [RollMin, RollMax] 里掷。
+    /// 区间是数值，方案没写，留在配置里标 pending。
+    /// </summary>
+    public sealed record Loot(string Mode, string Roll, int RollMin, int RollMax);
 
     /// <summary>等级区间段。方案没写，默认关着；开着时 Q7 仍不拦人（留给后续卡）。</summary>
     public sealed record LevelRange(bool Enabled, int MaxGap);
@@ -182,10 +186,37 @@ public sealed class PartyTable
         }
 
         // 掷点只在服务端：方案写定「掷点只在服务端」，配置里不许出现客户端掷点。
+        // Q8：personal 不掷点（每人各发整份）；need_greed 必须显式写 server，
+        // 不允许「mode 开了需求/贪婪却没写掷点方式」这种半落地配置。
         if (mode == "personal" && roll != "none")
         {
             throw new ConfigException("party.json 的 loot.mode=personal 时 loot.roll 必须是 none（"
                 + "个人份额不掷点）；掷点只在 need_greed 下、且只在服务端");
+        }
+
+        if (mode == "need_greed" && roll != "server")
+        {
+            throw new ConfigException("party.json 的 loot.mode=need_greed 时 loot.roll 必须是 server（"
+                + "掷点只在服务端；客户端不参与掷点）");
+        }
+
+        // 区间只在配置里：代码不写死 1..100，改区间重启社交服生效。
+        if (loot.RollMin < 1 || loot.RollMin > 1000)
+        {
+            throw new ConfigException("party.json 的 loot.roll_min 必须在 1..1000，现在是 "
+                + loot.RollMin);
+        }
+
+        if (loot.RollMax < 1 || loot.RollMax > 1000)
+        {
+            throw new ConfigException("party.json 的 loot.roll_max 必须在 1..1000，现在是 "
+                + loot.RollMax);
+        }
+
+        if (loot.RollMin > loot.RollMax)
+        {
+            throw new ConfigException("party.json 的 loot.roll_min 不能大于 loot.roll_max（"
+                + loot.RollMin + " > " + loot.RollMax + "）");
         }
 
         var levels = wire.LevelRange ?? throw new ConfigException("party.json 缺 level_range 段");
@@ -197,7 +228,8 @@ public sealed class PartyTable
 
         return new PartyTable(wire.Version, wire.Pending, (wire.Note ?? "").Trim(),
             wire.MaxSize, wire.InviteTimeoutS, wire.ReadyCheckTimeoutS, succession,
-            new Loot(mode, roll), new LevelRange(levels.Enabled, levels.MaxGap));
+            new Loot(mode, roll, loot.RollMin, loot.RollMax),
+            new LevelRange(levels.Enabled, levels.MaxGap));
     }
 
     // 反口径词只针对「把人数上限放开」这一种写法，正常说明里不会出现。
@@ -230,6 +262,8 @@ public sealed class PartyTable
     {
         [JsonPropertyName("mode")] public string? Mode { get; set; }
         [JsonPropertyName("roll")] public string? Roll { get; set; }
+        [JsonPropertyName("roll_min")] public int RollMin { get; set; }
+        [JsonPropertyName("roll_max")] public int RollMax { get; set; }
     }
 
     sealed class WireLevelRange

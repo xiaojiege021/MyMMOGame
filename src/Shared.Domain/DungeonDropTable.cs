@@ -210,6 +210,45 @@ public sealed class DungeonDropTable
         return true;
     }
 
+    /// <summary>
+    /// Q8/H2：上报的掉落是不是**表内子集**。need_greed 下一个赢家只拿其中一行，
+    /// 拿不到整份；个人份额仍然上报整份，同样通过这一条。
+    ///
+    /// 收紧的三点（比「整份匹配」更严的地方）：每一行的物品必须在表内、数量必须
+    /// 与表内**一字不差**（不能放大）、同一物品不许出现两行（不能靠拆行多拿）。
+    /// 放宽的只有一处：允许少行——少发是玩家吃亏，不是超发。
+    /// </summary>
+    public bool MatchesReportedSubset(string dungeonId, IReadOnlyList<DropLineDef> reported)
+    {
+        var expected = LinesFor(dungeonId);
+        if (expected.Count == 0)
+        {
+            return reported.Count == 0;
+        }
+
+        var tableCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var line in expected)
+        {
+            tableCounts[line.ItemId] = line.Count;
+        }
+
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var line in reported)
+        {
+            if (!tableCounts.TryGetValue(line.ItemId, out var count) || count != line.Count)
+            {
+                return false;
+            }
+
+            if (!seen.Add(line.ItemId))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     static string ResolveItemsPath(string dropPath, string itemsConfig)
     {
         if (itemsConfig.Length == 0)

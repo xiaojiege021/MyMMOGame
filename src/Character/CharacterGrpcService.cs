@@ -814,6 +814,36 @@ public sealed class CharacterGrpcService(
     }
 
     /// <summary>
+    /// Q8/H2：战斗服结算前读一次的分配口径。队伍、成员、队长与 loot 规则
+    /// 全部转社交服拿事实值——请求里只有一个角色号，客户端与战斗服都带不进
+    /// 模式、区间或成员。没队伍 / 社交服不可达时按 personal 与 1 人回
+    /// （默认口径，只少给不多给：绝不因为查不到就改成「全队一份」）。
+    /// </summary>
+    public override async Task<DescribeLootScopeResponse> DescribeLootScope(
+        DescribeLootScopeRequest request,
+        ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        var fact = await PartyDirectory.DescribeAsync(
+            social, request.CharacterId, context.CancellationToken);
+
+        return new DescribeLootScopeResponse
+        {
+            LootMode = fact.LootMode,
+            LootRoll = fact.LootRoll,
+            RollMin = fact.RollMin,
+            RollMax = fact.RollMax,
+            LeaderCharacterId = fact.LeaderCharacterId,
+            InParty = fact.InParty,
+            MemberIds = { fact.MemberIds },
+        };
+    }
+
+    /// <summary>
     /// 温泉。恢复量从 config/dungeons.json 的 hot_spring_recovery 读（方案写定 1500），
     /// 客户端请求里没有「恢复多少」这个字段，改不了包也改不了数值。
     /// 角色服是持久数据的唯一写入方：网关只转请求，扣疲劳的进本和补疲劳的温泉
@@ -982,7 +1012,10 @@ public sealed class CharacterGrpcService(
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, "drop_table_missing"));
             }
 
-            if (!dungeonDropTable.MatchesReported(dungeonId, reportedDrops))
+            // Q8/H2：need_greed 下一个赢家只拿其中一行，所以这里认「表内子集」：
+            // 物品必须在表内、数量与表内一字不差、同一物品不许拆成两行；
+            // 只允许少行（少发不构成超发，多报仍然拒）。
+            if (!dungeonDropTable.MatchesReportedSubset(dungeonId, reportedDrops))
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "drop_invalid"));
             }

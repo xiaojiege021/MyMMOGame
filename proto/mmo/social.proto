@@ -420,6 +420,13 @@ message PartyResponse {
   string txn_id = 10;
   // 不在队伍时 in_party=false，其余事实值一律 0 / 空。
   bool in_party = 11;
+  // Q8：这一队此刻的分配口径，由社交服按 config/party.json 给事实值。
+  // personal = 每人各发整份、不掷点；need_greed = 全队只出一份、服务端掷点。
+  // 客户端只用来显示，判定与掷点都在服务端（战斗服结算时按它分拣掉落）。
+  string loot_mode = 12;
+  string loot_roll = 13;
+  int32 roll_min = 14;
+  int32 roll_max = 15;
 }
 
 service SocialService {

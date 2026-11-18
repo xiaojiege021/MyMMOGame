@@ -1569,6 +1569,15 @@ public sealed class BattleServer(
                         cleared = true;
                     }
                     await BroadcastAsync(party, message, party.Ticker.Token);
+
+                    // Q8：need_greed 的归属在 Ended 之后公布一次；personal 没有这条。
+                    if (message.Ended is not null && party.Encounter.LootResult is { } loot)
+                    {
+                        await BroadcastAsync(
+                            party,
+                            new ServerMessage { LootAssigned = ToLootAssigned(loot) },
+                            party.Ticker.Token);
+                    }
                 }
 
                 // P3-5a：这一场打掉了，把事实值交回入口（只记名字，不写库）。
@@ -1687,6 +1696,13 @@ public sealed class BattleServer(
                         party.Encounter.UseReviveScroll(member, inbound.Scroll),
                         token);
                     break;
+
+                case ClientMessage.BodyOneofCase.LootIntent:
+                    // Q8：只记表态，不回包、不广播。掷点与归属都在结算时由服务端算，
+                    // 客户端这条消息里没有任何数值能影响结果。
+                    party.Encounter.SetLootIntent(
+                        member.Id, inbound.LootIntent.ItemId, inbound.LootIntent.Decision);
+                    break;
             }
         }
     }
@@ -1694,6 +1710,26 @@ public sealed class BattleServer(
     /// <summary>结算结果、队友状态、阶段和收尾发全场：技术架构写的是「把结果发给本里的人」。</summary>
     Task BroadcastAsync(Party party, ServerMessage message, CancellationToken token) =>
         BroadcastAsync(party, message, token, exceptSocket: null);
+
+    /// <summary>
+    /// Q8：把服务端算好的归属转成一条回包。Winner=0 的行是「全员放弃」，客户端
+    /// 只显示「无人需求」，不能据此认为自己可以捡——那一行没有发给任何人。
+    /// </summary>
+    static LootAssigned ToLootAssigned(LootAllocation allocation)
+    {
+        var message = new LootAssigned { Mode = allocation.Mode };
+        foreach (var line in allocation.Lines)
+        {
+            message.Lines.Add(new LootAssignment
+            {
+                ItemId = line.ItemId,
+                Count = line.Count,
+                WinnerCharacterId = line.Winner,
+            });
+        }
+
+        return message;
+    }
 
     async Task BroadcastAsync(Party party, ServerMessage message, CancellationToken token, WebSocket? exceptSocket)
     {

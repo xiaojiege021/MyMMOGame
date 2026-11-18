@@ -118,6 +118,23 @@ namespace Mmo.Net
             });
         }
 
+        /// <summary>
+        /// Q8：对一件掉落表态。decision 只认 need / greed / pass，服务端认不出的整条忽略；
+        /// 这里不带任何点数——掷点只在服务端，客户端报了也不算。
+        /// 界面（需求 / 贪婪 / 放弃按钮与归属提示）还没有做，记在 U 线欠项里。
+        /// </summary>
+        public Task SendLootIntentAsync(string itemId, string decision)
+        {
+            return SendAsync(new ClientMessage
+            {
+                LootIntent = new LootIntentRequest
+                {
+                    ItemId = itemId ?? "",
+                    Decision = decision ?? "",
+                },
+            });
+        }
+
         /// <summary>主线程取一条已经收到的消息。没有就返回 false，不阻塞。</summary>
         public bool TryReceive(out ServerMessage message)
         {

@@ -283,6 +283,7 @@ if (partyConfig)
             + " ready_check_timeout_s=" + table.ReadyCheckTimeoutSeconds
             + " leader_succession=" + table.LeaderSuccession
             + " loot=" + table.LootRule.Mode + "/" + table.LootRule.Roll
+            + " roll_range=" + table.LootRule.RollMin + ".." + table.LootRule.RollMax
             + " level_range=" + (table.Levels.Enabled ? "on" : "off")
             + "/" + table.Levels.MaxGap
             + " pending=" + (table.Pending ? "true" : "false"));
@@ -826,7 +827,10 @@ HomesteadTable? startupHomestead;
 HomesteadPlantTable? startupHomesteadPlant;
 try
 {
-    startup = SocialLoader.LoadAll(configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
+    // Q8 修正：真实启动也要吃 --party-table（Q7 只让只读口吃到了这个参数，
+    // 真服一直是默认路径那份表；核对要切 need_greed 就切不动）。
+    startup = SocialLoader.LoadAll(
+        configPath, sectTablePath, calendarTablePath, sectTaskTablePath, partyTablePath);
     startupHomestead = HomesteadTable.LoadIfPresent(homesteadPath);
     startupHomesteadPlant = HomesteadPlantTable.LoadIfPresent(homesteadPlantPath);
 }

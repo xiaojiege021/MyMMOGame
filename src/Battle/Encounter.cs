@@ -279,6 +279,65 @@ public sealed class Encounter
         }
     }
 
+    /// <summary>
+    /// Q8/H2：本场的掉落表态（角色编号 → 物品编号 → need / greed / pass）。
+    /// 只活在这一场内存里；结算时用一次就随这场丢掉，不落库、不进角色服。
+    /// 离场不清：打完就断线的人投过的票仍然算。
+    /// </summary>
+    readonly Dictionary<ulong, Dictionary<string, string>> _lootIntents = [];
+
+    /// <summary>
+    /// need_greed 下的分配结果（结算时填一次，Server 在 Ended 之后广播）。
+    /// personal 为 null：每人各发整份，没有「谁拿了哪件」可公布。
+    /// </summary>
+    public LootAllocation? LootResult { get; private set; }
+
+    /// <summary>
+    /// 收一条掉落表态。物品编号为空或表态词认不出就整条忽略（不改已有表态、不报错）。
+    /// 同一件重复表态以后到的覆盖先到的——客户端重发不该被算成两次。
+    /// 结算之后不再接受（结算完的表态改不了已经分完的件）。
+    /// </summary>
+    public void SetLootIntent(ulong characterId, string itemId, string decision)
+    {
+        var id = (itemId ?? "").Trim();
+        var word = (decision ?? "").Trim();
+        if (characterId == 0 || id.Length == 0 || !LootAllocator.IsDecision(word))
+        {
+            return;
+        }
+
+        lock (_gate)
+        {
+            if (_closed)
+            {
+                return;
+            }
+
+            if (!_lootIntents.TryGetValue(characterId, out var mine))
+            {
+                mine = new Dictionary<string, string>(StringComparer.Ordinal);
+                _lootIntents[characterId] = mine;
+            }
+
+            mine[id] = word;
+        }
+    }
+
+    /// <summary>结算前复制一份表态（接收线程还在写，不能把字典直接交给分配）。</summary>
+    Dictionary<ulong, IReadOnlyDictionary<string, string>> SnapshotLootIntents()
+    {
+        lock (_gate)
+        {
+            var copy = new Dictionary<ulong, IReadOnlyDictionary<string, string>>(_lootIntents.Count);
+            foreach (var (characterId, mine) in _lootIntents)
+            {
+                copy[characterId] = new Dictionary<string, string>(mine, StringComparer.Ordinal);
+            }
+
+            return copy;
+        }
+    }
+
     /// <summary>倍率 = 1 + (人数 - 1) × 每多一人的增量；单人固定 1，不经过浮点。</summary>
     static double Factor(double perPlayer, int partySize) =>
         partySize <= 1 ? 1.0 : 1.0 + (partySize - 1) * perPlayer;
@@ -1620,9 +1679,25 @@ public sealed class Encounter
             var drops = dungeonId.Length > 0 && _bossHp <= 0
                 ? _config.DungeonDrops.LinesFor(dungeonId)
                 : (IReadOnlyList<DropLineDef>)[];
+            var memberIds = _members.Keys.ToArray();
+
+            // Q8/H2：先在服务端把这一份掉落分到人头上，再逐人入包。
+            // personal 时每人是整份（N6 的口径一字不变）；need_greed 时每行只有一个赢家，
+            // 掷点只在这里做一次——同一件不会被两个人各拿一份。
+            var scope = _expSettlement.ResolveLootScope(memberIds);
+            var allocation = LootAllocator.Allocate(scope, memberIds, drops, SnapshotLootIntents());
+            LootResult = string.Equals(allocation.Mode, PartyLoot.NeedGreed, StringComparison.Ordinal)
+                ? allocation
+                : null;
+
+            Console.WriteLine("loot_alloc mode=" + allocation.Mode
+                + " members=" + memberIds.Length
+                + " lines=" + drops.Count
+                + " announced=" + allocation.Lines.Count);
+
             _expSettlement.SettleParty(
-                _settlementId, SettlementSource, settledSize, _members.Keys.ToArray(),
-                dungeonId, _qualifiedKills, drops);
+                _settlementId, SettlementSource, settledSize, memberIds,
+                dungeonId, _qualifiedKills, allocation.ByMember);
         }
 
         return new BattleEnded

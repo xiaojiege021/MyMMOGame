@@ -126,67 +126,69 @@ namespace Mmo.Proto.Social {
             "Eg8KB2FjY291bnQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgEEg4KBnR4",
             "bl9pZBgDIAEoCSJdCg9QYXJ0eU1lbWJlckZhY3QSFAoMY2hhcmFjdGVyX2lk",
             "GAEgASgEEhEKCWlzX2xlYWRlchgCIAEoCBINCgVyZWFkeRgDIAEoCBISCgpq",
-            "b2luZWRfc2VxGAQgASgDIvgBCg1QYXJ0eVJlc3BvbnNlEgoKAm9rGAEgASgI",
+            "b2luZWRfc2VxGAQgASgDIsICCg1QYXJ0eVJlc3BvbnNlEgoKAm9rGAEgASgI",
             "Eg4KBnJlYXNvbhgCIAEoCRIQCghwYXJ0eV9pZBgDIAEoBBIbChNsZWFkZXJf",
             "Y2hhcmFjdGVyX2lkGAQgASgEEgwKBHNpemUYBSABKAUSEAoIbWF4X3NpemUY",
             "BiABKAUSEQoJYWxsX3JlYWR5GAcgASgIEhkKEXJlYWR5X2RlYWRsaW5lX21z",
             "GAggASgDEiwKB21lbWJlcnMYCSADKAsyGy5tbW8uc29jaWFsLlBhcnR5TWVt",
-            "YmVyRmFjdBIOCgZ0eG5faWQYCiABKAkSEAoIaW5fcGFydHkYCyABKAgyhRMK",
-            "DVNvY2lhbFNlcnZpY2USRQoKQ3JlYXRlU2VjdBIdLm1tby5zb2NpYWwuQ3Jl",
-            "YXRlU2VjdFJlcXVlc3QaGC5tbW8uc29jaWFsLlNlY3RSZXNwb25zZRJBCghK",
-            "b2luU2VjdBIbLm1tby5zb2NpYWwuSm9pblNlY3RSZXF1ZXN0GhgubW1vLnNv",
-            "Y2lhbC5TZWN0UmVzcG9uc2USSQoMRGVzY3JpYmVTZWN0Eh8ubW1vLnNvY2lh",
-            "bC5EZXNjcmliZVNlY3RSZXF1ZXN0GhgubW1vLnNvY2lhbC5TZWN0UmVzcG9u",
-            "c2USUQoPQXBwb2ludFBvc2l0aW9uEhsubW1vLnNvY2lhbC5Qb3NpdGlvblJl",
-            "cXVlc3QaIS5tbW8uc29jaWFsLlBvc2l0aW9uU3RhdGVSZXNwb25zZRJRCg9E",
-            "aXNtaXNzUG9zaXRpb24SGy5tbW8uc29jaWFsLlBvc2l0aW9uUmVxdWVzdBoh",
-            "Lm1tby5zb2NpYWwuUG9zaXRpb25TdGF0ZVJlc3BvbnNlElMKEURlc2NyaWJl",
-            "UG9zaXRpb25zEhsubW1vLnNvY2lhbC5Qb3NpdGlvblJlcXVlc3QaIS5tbW8u",
-            "c29jaWFsLlBvc2l0aW9uU3RhdGVSZXNwb25zZRJTChJUcmFuc2ZlckxlYWRl",
-            "cnNoaXASHS5tbW8uc29jaWFsLkxlYWRlcnNoaXBSZXF1ZXN0Gh4ubW1vLnNv",
-            "Y2lhbC5MZWFkZXJzaGlwUmVzcG9uc2USSQoJTGVhdmVTZWN0EhwubW1vLnNv",
-            "Y2lhbC5MZWF2ZVNlY3RSZXF1ZXN0Gh4ubW1vLnNvY2lhbC5MZWFkZXJzaGlw",
-            "UmVzcG9uc2USUwoSRGVzY3JpYmVMZWFkZXJzaGlwEh0ubW1vLnNvY2lhbC5M",
-            "ZWFkZXJzaGlwUmVxdWVzdBoeLm1tby5zb2NpYWwuTGVhZGVyc2hpcFJlc3Bv",
-            "bnNlEkoKC1VwZ3JhZGVTZWN0Eh4ubW1vLnNvY2lhbC5VcGdyYWRlU2VjdFJl",
-            "cXVlc3QaGy5tbW8uc29jaWFsLlVwZ3JhZGVSZXNwb25zZRJOCg9EZXNjcmli",
-            "ZVVwZ3JhZGUSHi5tbW8uc29jaWFsLlVwZ3JhZGVTZWN0UmVxdWVzdBobLm1t",
-            "by5zb2NpYWwuVXBncmFkZVJlc3BvbnNlEmAKEURlc2NyaWJlU2VjdFRhc2tz",
-            "EiQubW1vLnNvY2lhbC5EZXNjcmliZVNlY3RUYXNrc1JlcXVlc3QaJS5tbW8u",
-            "c29jaWFsLkRlc2NyaWJlU2VjdFRhc2tzUmVzcG9uc2USXQoQQ29tcGxldGVT",
-            "ZWN0VGFzaxIjLm1tby5zb2NpYWwuQ29tcGxldGVTZWN0VGFza1JlcXVlc3Qa",
-            "JC5tbW8uc29jaWFsLkNvbXBsZXRlU2VjdFRhc2tSZXNwb25zZRJsChVEZXNj",
-            "cmliZUNoYXJhY3RlclNlY3QSKC5tbW8uc29jaWFsLkRlc2NyaWJlQ2hhcmFj",
-            "dGVyU2VjdFJlcXVlc3QaKS5tbW8uc29jaWFsLkRlc2NyaWJlQ2hhcmFjdGVy",
-            "U2VjdFJlc3BvbnNlEl0KEERlc2NyaWJlU2VjdFRlY2gSIy5tbW8uc29jaWFs",
-            "LkRlc2NyaWJlU2VjdFRlY2hSZXF1ZXN0GiQubW1vLnNvY2lhbC5EZXNjcmli",
-            "ZVNlY3RUZWNoUmVzcG9uc2USTQoOUGxhY2VIb21lRGVjb3ISHC5tbW8uc29j",
-            "aWFsLkhvbWVzdGVhZFJlcXVlc3QaHS5tbW8uc29jaWFsLkhvbWVzdGVhZFJl",
-            "c3BvbnNlEk4KD1JlbW92ZUhvbWVEZWNvchIcLm1tby5zb2NpYWwuSG9tZXN0",
-            "ZWFkUmVxdWVzdBodLm1tby5zb2NpYWwuSG9tZXN0ZWFkUmVzcG9uc2USWAoR",
-            "RGVzY3JpYmVIb21lc3RlYWQSJC5tbW8uc29jaWFsLkRlc2NyaWJlSG9tZXN0",
-            "ZWFkUmVxdWVzdBodLm1tby5zb2NpYWwuSG9tZXN0ZWFkUmVzcG9uc2USWwoS",
-            "UGxhbnRIb21lc3RlYWRDcm9wEiEubW1vLnNvY2lhbC5Ib21lc3RlYWRQbGFu",
-            "dFJlcXVlc3QaIi5tbW8uc29jaWFsLkhvbWVzdGVhZFBsYW50UmVzcG9uc2US",
-            "XQoUSGFydmVzdEhvbWVzdGVhZENyb3ASIS5tbW8uc29jaWFsLkhvbWVzdGVh",
-            "ZFBsYW50UmVxdWVzdBoiLm1tby5zb2NpYWwuSG9tZXN0ZWFkUGxhbnRSZXNw",
-            "b25zZRJpChdEZXNjcmliZUhvbWVzdGVhZFBsYW50cxIqLm1tby5zb2NpYWwu",
-            "RGVzY3JpYmVIb21lc3RlYWRQbGFudHNSZXF1ZXN0GiIubW1vLnNvY2lhbC5I",
-            "b21lc3RlYWRQbGFudFJlc3BvbnNlEmMKEkRlc2NyaWJlU2VjdFJvc3RlchIl",
-            "Lm1tby5zb2NpYWwuRGVzY3JpYmVTZWN0Um9zdGVyUmVxdWVzdBomLm1tby5z",
-            "b2NpYWwuRGVzY3JpYmVTZWN0Um9zdGVyUmVzcG9uc2USSAoLSW52aXRlUGFy",
-            "dHkSHi5tbW8uc29jaWFsLlBhcnR5SW52aXRlUmVxdWVzdBoZLm1tby5zb2Np",
-            "YWwuUGFydHlSZXNwb25zZRJQChJSZXNwb25kUGFydHlJbnZpdGUSHy5tbW8u",
-            "c29jaWFsLlBhcnR5UmVzcG9uZFJlcXVlc3QaGS5tbW8uc29jaWFsLlBhcnR5",
-            "UmVzcG9uc2USSwoUU3RhcnRQYXJ0eVJlYWR5Q2hlY2sSGC5tbW8uc29jaWFs",
-            "LlBhcnR5UmVxdWVzdBoZLm1tby5zb2NpYWwuUGFydHlSZXNwb25zZRJJCg1T",
-            "ZXRQYXJ0eVJlYWR5Eh0ubW1vLnNvY2lhbC5QYXJ0eVJlYWR5UmVxdWVzdBoZ",
-            "Lm1tby5zb2NpYWwuUGFydHlSZXNwb25zZRJBCgpMZWF2ZVBhcnR5EhgubW1v",
-            "LnNvY2lhbC5QYXJ0eVJlcXVlc3QaGS5tbW8uc29jaWFsLlBhcnR5UmVzcG9u",
-            "c2USQwoMRGlzYmFuZFBhcnR5EhgubW1vLnNvY2lhbC5QYXJ0eVJlcXVlc3Qa",
-            "GS5tbW8uc29jaWFsLlBhcnR5UmVzcG9uc2USRAoNRGVzY3JpYmVQYXJ0eRIY",
-            "Lm1tby5zb2NpYWwuUGFydHlSZXF1ZXN0GhkubW1vLnNvY2lhbC5QYXJ0eVJl",
-            "c3BvbnNlQhOqAhBNbW8uUHJvdG8uU29jaWFsYgZwcm90bzM="));
+            "YmVyRmFjdBIOCgZ0eG5faWQYCiABKAkSEAoIaW5fcGFydHkYCyABKAgSEQoJ",
+            "bG9vdF9tb2RlGAwgASgJEhEKCWxvb3Rfcm9sbBgNIAEoCRIQCghyb2xsX21p",
+            "bhgOIAEoBRIQCghyb2xsX21heBgPIAEoBTKFEwoNU29jaWFsU2VydmljZRJF",
+            "CgpDcmVhdGVTZWN0Eh0ubW1vLnNvY2lhbC5DcmVhdGVTZWN0UmVxdWVzdBoY",
+            "Lm1tby5zb2NpYWwuU2VjdFJlc3BvbnNlEkEKCEpvaW5TZWN0EhsubW1vLnNv",
+            "Y2lhbC5Kb2luU2VjdFJlcXVlc3QaGC5tbW8uc29jaWFsLlNlY3RSZXNwb25z",
+            "ZRJJCgxEZXNjcmliZVNlY3QSHy5tbW8uc29jaWFsLkRlc2NyaWJlU2VjdFJl",
+            "cXVlc3QaGC5tbW8uc29jaWFsLlNlY3RSZXNwb25zZRJRCg9BcHBvaW50UG9z",
+            "aXRpb24SGy5tbW8uc29jaWFsLlBvc2l0aW9uUmVxdWVzdBohLm1tby5zb2Np",
+            "YWwuUG9zaXRpb25TdGF0ZVJlc3BvbnNlElEKD0Rpc21pc3NQb3NpdGlvbhIb",
+            "Lm1tby5zb2NpYWwuUG9zaXRpb25SZXF1ZXN0GiEubW1vLnNvY2lhbC5Qb3Np",
+            "dGlvblN0YXRlUmVzcG9uc2USUwoRRGVzY3JpYmVQb3NpdGlvbnMSGy5tbW8u",
+            "c29jaWFsLlBvc2l0aW9uUmVxdWVzdBohLm1tby5zb2NpYWwuUG9zaXRpb25T",
+            "dGF0ZVJlc3BvbnNlElMKElRyYW5zZmVyTGVhZGVyc2hpcBIdLm1tby5zb2Np",
+            "YWwuTGVhZGVyc2hpcFJlcXVlc3QaHi5tbW8uc29jaWFsLkxlYWRlcnNoaXBS",
+            "ZXNwb25zZRJJCglMZWF2ZVNlY3QSHC5tbW8uc29jaWFsLkxlYXZlU2VjdFJl",
+            "cXVlc3QaHi5tbW8uc29jaWFsLkxlYWRlcnNoaXBSZXNwb25zZRJTChJEZXNj",
+            "cmliZUxlYWRlcnNoaXASHS5tbW8uc29jaWFsLkxlYWRlcnNoaXBSZXF1ZXN0",
+            "Gh4ubW1vLnNvY2lhbC5MZWFkZXJzaGlwUmVzcG9uc2USSgoLVXBncmFkZVNl",
+            "Y3QSHi5tbW8uc29jaWFsLlVwZ3JhZGVTZWN0UmVxdWVzdBobLm1tby5zb2Np",
+            "YWwuVXBncmFkZVJlc3BvbnNlEk4KD0Rlc2NyaWJlVXBncmFkZRIeLm1tby5z",
+            "b2NpYWwuVXBncmFkZVNlY3RSZXF1ZXN0GhsubW1vLnNvY2lhbC5VcGdyYWRl",
+            "UmVzcG9uc2USYAoRRGVzY3JpYmVTZWN0VGFza3MSJC5tbW8uc29jaWFsLkRl",
+            "c2NyaWJlU2VjdFRhc2tzUmVxdWVzdBolLm1tby5zb2NpYWwuRGVzY3JpYmVT",
+            "ZWN0VGFza3NSZXNwb25zZRJdChBDb21wbGV0ZVNlY3RUYXNrEiMubW1vLnNv",
+            "Y2lhbC5Db21wbGV0ZVNlY3RUYXNrUmVxdWVzdBokLm1tby5zb2NpYWwuQ29t",
+            "cGxldGVTZWN0VGFza1Jlc3BvbnNlEmwKFURlc2NyaWJlQ2hhcmFjdGVyU2Vj",
+            "dBIoLm1tby5zb2NpYWwuRGVzY3JpYmVDaGFyYWN0ZXJTZWN0UmVxdWVzdBop",
+            "Lm1tby5zb2NpYWwuRGVzY3JpYmVDaGFyYWN0ZXJTZWN0UmVzcG9uc2USXQoQ",
+            "RGVzY3JpYmVTZWN0VGVjaBIjLm1tby5zb2NpYWwuRGVzY3JpYmVTZWN0VGVj",
+            "aFJlcXVlc3QaJC5tbW8uc29jaWFsLkRlc2NyaWJlU2VjdFRlY2hSZXNwb25z",
+            "ZRJNCg5QbGFjZUhvbWVEZWNvchIcLm1tby5zb2NpYWwuSG9tZXN0ZWFkUmVx",
+            "dWVzdBodLm1tby5zb2NpYWwuSG9tZXN0ZWFkUmVzcG9uc2USTgoPUmVtb3Zl",
+            "SG9tZURlY29yEhwubW1vLnNvY2lhbC5Ib21lc3RlYWRSZXF1ZXN0Gh0ubW1v",
+            "LnNvY2lhbC5Ib21lc3RlYWRSZXNwb25zZRJYChFEZXNjcmliZUhvbWVzdGVh",
+            "ZBIkLm1tby5zb2NpYWwuRGVzY3JpYmVIb21lc3RlYWRSZXF1ZXN0Gh0ubW1v",
+            "LnNvY2lhbC5Ib21lc3RlYWRSZXNwb25zZRJbChJQbGFudEhvbWVzdGVhZENy",
+            "b3ASIS5tbW8uc29jaWFsLkhvbWVzdGVhZFBsYW50UmVxdWVzdBoiLm1tby5z",
+            "b2NpYWwuSG9tZXN0ZWFkUGxhbnRSZXNwb25zZRJdChRIYXJ2ZXN0SG9tZXN0",
+            "ZWFkQ3JvcBIhLm1tby5zb2NpYWwuSG9tZXN0ZWFkUGxhbnRSZXF1ZXN0GiIu",
+            "bW1vLnNvY2lhbC5Ib21lc3RlYWRQbGFudFJlc3BvbnNlEmkKF0Rlc2NyaWJl",
+            "SG9tZXN0ZWFkUGxhbnRzEioubW1vLnNvY2lhbC5EZXNjcmliZUhvbWVzdGVh",
+            "ZFBsYW50c1JlcXVlc3QaIi5tbW8uc29jaWFsLkhvbWVzdGVhZFBsYW50UmVz",
+            "cG9uc2USYwoSRGVzY3JpYmVTZWN0Um9zdGVyEiUubW1vLnNvY2lhbC5EZXNj",
+            "cmliZVNlY3RSb3N0ZXJSZXF1ZXN0GiYubW1vLnNvY2lhbC5EZXNjcmliZVNl",
+            "Y3RSb3N0ZXJSZXNwb25zZRJICgtJbnZpdGVQYXJ0eRIeLm1tby5zb2NpYWwu",
+            "UGFydHlJbnZpdGVSZXF1ZXN0GhkubW1vLnNvY2lhbC5QYXJ0eVJlc3BvbnNl",
+            "ElAKElJlc3BvbmRQYXJ0eUludml0ZRIfLm1tby5zb2NpYWwuUGFydHlSZXNw",
+            "b25kUmVxdWVzdBoZLm1tby5zb2NpYWwuUGFydHlSZXNwb25zZRJLChRTdGFy",
+            "dFBhcnR5UmVhZHlDaGVjaxIYLm1tby5zb2NpYWwuUGFydHlSZXF1ZXN0Ghku",
+            "bW1vLnNvY2lhbC5QYXJ0eVJlc3BvbnNlEkkKDVNldFBhcnR5UmVhZHkSHS5t",
+            "bW8uc29jaWFsLlBhcnR5UmVhZHlSZXF1ZXN0GhkubW1vLnNvY2lhbC5QYXJ0",
+            "eVJlc3BvbnNlEkEKCkxlYXZlUGFydHkSGC5tbW8uc29jaWFsLlBhcnR5UmVx",
+            "dWVzdBoZLm1tby5zb2NpYWwuUGFydHlSZXNwb25zZRJDCgxEaXNiYW5kUGFy",
+            "dHkSGC5tbW8uc29jaWFsLlBhcnR5UmVxdWVzdBoZLm1tby5zb2NpYWwuUGFy",
+            "dHlSZXNwb25zZRJECg1EZXNjcmliZVBhcnR5EhgubW1vLnNvY2lhbC5QYXJ0",
+            "eVJlcXVlc3QaGS5tbW8uc29jaWFsLlBhcnR5UmVzcG9uc2VCE6oCEE1tby5Q",
+            "cm90by5Tb2NpYWxiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -226,7 +228,7 @@ namespace Mmo.Proto.Social {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.PartyReadyRequest), global::Mmo.Proto.Social.PartyReadyRequest.Parser, new[]{ "Account", "CharacterId", "TxnId", "Ready" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.PartyRequest), global::Mmo.Proto.Social.PartyRequest.Parser, new[]{ "Account", "CharacterId", "TxnId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.PartyMemberFact), global::Mmo.Proto.Social.PartyMemberFact.Parser, new[]{ "CharacterId", "IsLeader", "Ready", "JoinedSeq" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.PartyResponse), global::Mmo.Proto.Social.PartyResponse.Parser, new[]{ "Ok", "Reason", "PartyId", "LeaderCharacterId", "Size", "MaxSize", "AllReady", "ReadyDeadlineMs", "Members", "TxnId", "InParty" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Social.PartyResponse), global::Mmo.Proto.Social.PartyResponse.Parser, new[]{ "Ok", "Reason", "PartyId", "LeaderCharacterId", "Size", "MaxSize", "AllReady", "ReadyDeadlineMs", "Members", "TxnId", "InParty", "LootMode", "LootRoll", "RollMin", "RollMax" }, null, null, null, null)
           }));
     }
     #endregion
@@ -13259,6 +13261,10 @@ namespace Mmo.Proto.Social {
       members_ = other.members_.Clone();
       txnId_ = other.txnId_;
       inParty_ = other.inParty_;
+      lootMode_ = other.lootMode_;
+      lootRoll_ = other.lootRoll_;
+      rollMin_ = other.rollMin_;
+      rollMax_ = other.rollMax_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -13408,6 +13414,59 @@ namespace Mmo.Proto.Social {
       }
     }
 
+    /// <summary>Field number for the "loot_mode" field.</summary>
+    public const int LootModeFieldNumber = 12;
+    private string lootMode_ = "";
+    /// <summary>
+    /// Q8：这一队此刻的分配口径，由社交服按 config/party.json 给事实值。
+    /// personal = 每人各发整份、不掷点；need_greed = 全队只出一份、服务端掷点。
+    /// 客户端只用来显示，判定与掷点都在服务端（战斗服结算时按它分拣掉落）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string LootMode {
+      get { return lootMode_; }
+      set {
+        lootMode_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "loot_roll" field.</summary>
+    public const int LootRollFieldNumber = 13;
+    private string lootRoll_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string LootRoll {
+      get { return lootRoll_; }
+      set {
+        lootRoll_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "roll_min" field.</summary>
+    public const int RollMinFieldNumber = 14;
+    private int rollMin_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int RollMin {
+      get { return rollMin_; }
+      set {
+        rollMin_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "roll_max" field.</summary>
+    public const int RollMaxFieldNumber = 15;
+    private int rollMax_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int RollMax {
+      get { return rollMax_; }
+      set {
+        rollMax_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -13434,6 +13493,10 @@ namespace Mmo.Proto.Social {
       if(!members_.Equals(other.members_)) return false;
       if (TxnId != other.TxnId) return false;
       if (InParty != other.InParty) return false;
+      if (LootMode != other.LootMode) return false;
+      if (LootRoll != other.LootRoll) return false;
+      if (RollMin != other.RollMin) return false;
+      if (RollMax != other.RollMax) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -13452,6 +13515,10 @@ namespace Mmo.Proto.Social {
       hash ^= members_.GetHashCode();
       if (TxnId.Length != 0) hash ^= TxnId.GetHashCode();
       if (InParty != false) hash ^= InParty.GetHashCode();
+      if (LootMode.Length != 0) hash ^= LootMode.GetHashCode();
+      if (LootRoll.Length != 0) hash ^= LootRoll.GetHashCode();
+      if (RollMin != 0) hash ^= RollMin.GetHashCode();
+      if (RollMax != 0) hash ^= RollMax.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -13511,6 +13578,22 @@ namespace Mmo.Proto.Social {
         output.WriteRawTag(88);
         output.WriteBool(InParty);
       }
+      if (LootMode.Length != 0) {
+        output.WriteRawTag(98);
+        output.WriteString(LootMode);
+      }
+      if (LootRoll.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(LootRoll);
+      }
+      if (RollMin != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(RollMin);
+      }
+      if (RollMax != 0) {
+        output.WriteRawTag(120);
+        output.WriteInt32(RollMax);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -13562,6 +13645,22 @@ namespace Mmo.Proto.Social {
         output.WriteRawTag(88);
         output.WriteBool(InParty);
       }
+      if (LootMode.Length != 0) {
+        output.WriteRawTag(98);
+        output.WriteString(LootMode);
+      }
+      if (LootRoll.Length != 0) {
+        output.WriteRawTag(106);
+        output.WriteString(LootRoll);
+      }
+      if (RollMin != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(RollMin);
+      }
+      if (RollMax != 0) {
+        output.WriteRawTag(120);
+        output.WriteInt32(RollMax);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -13602,6 +13701,18 @@ namespace Mmo.Proto.Social {
       }
       if (InParty != false) {
         size += 1 + 1;
+      }
+      if (LootMode.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(LootMode);
+      }
+      if (LootRoll.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(LootRoll);
+      }
+      if (RollMin != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RollMin);
+      }
+      if (RollMax != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RollMax);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -13645,6 +13756,18 @@ namespace Mmo.Proto.Social {
       }
       if (other.InParty != false) {
         InParty = other.InParty;
+      }
+      if (other.LootMode.Length != 0) {
+        LootMode = other.LootMode;
+      }
+      if (other.LootRoll.Length != 0) {
+        LootRoll = other.LootRoll;
+      }
+      if (other.RollMin != 0) {
+        RollMin = other.RollMin;
+      }
+      if (other.RollMax != 0) {
+        RollMax = other.RollMax;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -13709,6 +13832,22 @@ namespace Mmo.Proto.Social {
             InParty = input.ReadBool();
             break;
           }
+          case 98: {
+            LootMode = input.ReadString();
+            break;
+          }
+          case 106: {
+            LootRoll = input.ReadString();
+            break;
+          }
+          case 112: {
+            RollMin = input.ReadInt32();
+            break;
+          }
+          case 120: {
+            RollMax = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -13770,6 +13909,22 @@ namespace Mmo.Proto.Social {
           }
           case 88: {
             InParty = input.ReadBool();
+            break;
+          }
+          case 98: {
+            LootMode = input.ReadString();
+            break;
+          }
+          case 106: {
+            LootRoll = input.ReadString();
+            break;
+          }
+          case 112: {
+            RollMin = input.ReadInt32();
+            break;
+          }
+          case 120: {
+            RollMax = input.ReadInt32();
             break;
           }
         }

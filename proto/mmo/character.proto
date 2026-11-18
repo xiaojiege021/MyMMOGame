@@ -67,6 +67,10 @@ service CharacterService {
   // 人数与扣减规则都从 config/dungeons.json 来，不在代码里写死。
   rpc EnterDungeon(EnterDungeonRequest) returns (EnterDungeonResponse);
 
+  // Q8/H2：战斗服结算前读一次的分配口径（队伍事实 + loot 规则）。
+  // 只读，不写库、不改队伍；社交服不可达时回 personal（默认口径）。
+  rpc DescribeLootScope(DescribeLootScopeRequest) returns (DescribeLootScopeResponse);
+
   // 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
   // 不动周份额、进本记录、货币、背包和等级。减到 0 为止，不写成负数。
   rpc UseHotSpring(UseHotSpringRequest) returns (UseHotSpringResponse);
@@ -340,6 +344,26 @@ message EnterDungeonResponse {
   int32 hard_entries_used = 14;
   int32 hard_entries_cap = 15;
   int32 hard_entries_remaining = 16;
+}
+
+// Q8/H2：战斗服结算前问一次「这一场按哪种分配口径发掉落」。
+// 请求只有一个角色号（本场任一成员）；队伍、队长、成员与 loot 规则都由
+// 角色服转社交服拿事实值，客户端与战斗服都带不进来。没队伍时回 personal。
+message DescribeLootScopeRequest {
+  uint64 character_id = 1;
+}
+
+message DescribeLootScopeResponse {
+  // personal / need_greed。社交服不可达或没有队伍时一律 personal。
+  string loot_mode = 1;
+  // none / server。need_greed 时恒为 server（掷点只在服务端）。
+  string loot_roll = 2;
+  int32 roll_min = 3;
+  int32 roll_max = 4;
+  // 服务端事实成员（不在队伍时只有自己）。战斗服按它与本场实际上报成员取交集。
+  repeated uint64 member_ids = 5;
+  uint64 leader_character_id = 6;
+  bool in_party = 7;
 }
 
 // 一条变更：加/减货币，或者往格子里放物品。一个事务里可以混着来。

@@ -15,10 +15,20 @@ namespace Battle;
 /// </summary>
 public interface IExpSettlement : IDisposable
 {
+    /// <summary>
+    /// Q8/H2：结算前问一次这一场按哪种口径分掉落。返回的是服务端事实
+    /// （社交服的队伍规则经角色服转出）；拿不到就按 personal。
+    /// </summary>
+    LootScope ResolveLootScope(IReadOnlyCollection<ulong> memberIds);
+
+    /// <summary>
+    /// 逐人入包。dropsByMember 是这一场分配之后**每个人各自应得**的那几行：
+    /// personal 时每人是整份，need_greed 时只有赢家拿到该行。
+    /// </summary>
     void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
         string dungeonId, int qualifiedKills,
-        IReadOnlyList<DropLineDef> drops);
+        IReadOnlyDictionary<ulong, IReadOnlyList<DropLineDef>> dropsByMember);
 }
 
 /// <summary>
@@ -27,10 +37,13 @@ public interface IExpSettlement : IDisposable
 /// </summary>
 public sealed class NoExpSettlement : IExpSettlement
 {
+    public LootScope ResolveLootScope(IReadOnlyCollection<ulong> memberIds) =>
+        LootScope.Personal(LootAllocator.Normalize([.. memberIds]));
+
     public void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
         string dungeonId, int qualifiedKills,
-        IReadOnlyList<DropLineDef> drops)
+        IReadOnlyDictionary<ulong, IReadOnlyList<DropLineDef>> dropsByMember)
     {
     }
 
@@ -55,13 +68,55 @@ public sealed class GrpcExpSettlement : IExpSettlement, IDisposable
         _client = new CharacterService.CharacterServiceClient(_channel);
     }
 
+    public LootScope ResolveLootScope(IReadOnlyCollection<ulong> memberIds)
+    {
+        var members = LootAllocator.Normalize([.. memberIds]);
+        // 用本场第一个成员问：队伍是同一个，问谁结果都一样。
+        var self = members.Count > 0 ? members[0] : 0UL;
+        if (self == 0)
+        {
+            return LootScope.Personal(members);
+        }
+
+        try
+        {
+            var reply = _client.DescribeLootScope(
+                new DescribeLootScopeRequest { CharacterId = self },
+                deadline: DateTime.UtcNow.AddSeconds(3));
+
+            Console.WriteLine("loot_scope=ok character=" + self
+                + " mode=" + reply.LootMode
+                + " roll=" + reply.LootRoll
+                + " min=" + reply.RollMin
+                + " max=" + reply.RollMax
+                + " party=" + (reply.InParty ? "true" : "false")
+                + " members=" + reply.MemberIds.Count);
+
+            return new LootScope(
+                string.IsNullOrWhiteSpace(reply.LootMode) ? PartyLoot.Personal : reply.LootMode,
+                string.IsNullOrWhiteSpace(reply.LootRoll) ? PartyLoot.RollNone : reply.LootRoll,
+                reply.RollMin, reply.RollMax, [.. reply.MemberIds]);
+        }
+        catch (Exception ex) when (ex is RpcException or InvalidOperationException)
+        {
+            // 角色服 / 社交服不可达：按 personal 结算。这是默认口径，
+            // 不改成别的模式（改小会让玩家白丢件，改大等于超发）。
+            Console.WriteLine("loot_scope=error character=" + self
+                + " " + ex.Message.Replace('\n', ' '));
+            return LootScope.Personal(members);
+        }
+    }
+
     public void SettleParty(
         string settlementId, string source, int partySize, IReadOnlyCollection<ulong> memberIds,
         string dungeonId, int qualifiedKills,
-        IReadOnlyList<DropLineDef> drops)
+        IReadOnlyDictionary<ulong, IReadOnlyList<DropLineDef>> dropsByMember)
     {
         foreach (var characterId in memberIds)
         {
+            var drops = dropsByMember.TryGetValue(characterId, out var mine)
+                ? mine
+                : (IReadOnlyList<DropLineDef>)[];
             var txnId = settlementId + ":" + characterId.ToString("x16");
             try
             {

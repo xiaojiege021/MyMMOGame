@@ -59,7 +59,8 @@ report("config_ready_timeout", isinstance(cfg.get("ready_check_timeout_s"), int)
 report("config_succession", cfg.get("leader_succession") in ("earliest_joined", "disband"),
        cfg.get("leader_succession"))
 loot = cfg.get("loot") or {}
-report("config_loot_keys", set(loot) <= {"mode", "roll"}, sorted(loot))
+# Q8 起 loot 段多了掷点区间；这里只钉「没有第四种键混进来」，取值与区间归 check-q8。
+report("config_loot_keys", set(loot) <= {"mode", "roll", "roll_min", "roll_max"}, sorted(loot))
 report("config_loot_mode", loot.get("mode") in ("personal", "need_greed"), loot.get("mode"))
 report("config_loot_roll", loot.get("roll") in ("none", "server"), loot.get("roll"))
 report("config_personal_no_roll",

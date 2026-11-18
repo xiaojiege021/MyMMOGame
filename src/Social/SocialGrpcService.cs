@@ -796,7 +796,7 @@ public sealed class SocialGrpcService(
             request.CharacterId, request.TargetCharacterId, DateTimeOffset.UtcNow);
         Log("party_invite", account, request.CharacterId, result, txnId,
             "target=" + request.TargetCharacterId);
-        return Task.FromResult(ToPartyResponse(result, txnId));
+        return Task.FromResult(ToPartyResponse(result, txnId, parties.LootRule));
     }
 
     public override Task<PartyResponse> RespondPartyInvite(
@@ -821,7 +821,7 @@ public sealed class SocialGrpcService(
             request.CharacterId, request.FromCharacterId, request.Accept, DateTimeOffset.UtcNow);
         Log("party_respond", account, request.CharacterId, result, txnId,
             "from=" + request.FromCharacterId + " accept=" + (request.Accept ? "true" : "false"));
-        return Task.FromResult(ToPartyResponse(result, txnId));
+        return Task.FromResult(ToPartyResponse(result, txnId, parties.LootRule));
     }
 
     public override Task<PartyResponse> StartPartyReadyCheck(
@@ -841,7 +841,7 @@ public sealed class SocialGrpcService(
 
         var result = parties.StartReadyCheck(request.CharacterId, DateTimeOffset.UtcNow);
         Log("party_ready_start", account, request.CharacterId, result, request.TxnId ?? "", "");
-        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? ""));
+        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? "", parties.LootRule));
     }
 
     public override Task<PartyResponse> SetPartyReady(
@@ -863,7 +863,7 @@ public sealed class SocialGrpcService(
             request.CharacterId, request.Ready, DateTimeOffset.UtcNow);
         Log("party_ready", account, request.CharacterId, result, request.TxnId ?? "",
             "ready=" + (request.Ready ? "true" : "false"));
-        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? ""));
+        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? "", parties.LootRule));
     }
 
     public override Task<PartyResponse> LeaveParty(
@@ -883,7 +883,7 @@ public sealed class SocialGrpcService(
 
         var result = parties.Leave(request.CharacterId, DateTimeOffset.UtcNow);
         Log("party_leave", account, request.CharacterId, result, request.TxnId ?? "", "");
-        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? ""));
+        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? "", parties.LootRule));
     }
 
     public override Task<PartyResponse> DisbandParty(
@@ -903,7 +903,7 @@ public sealed class SocialGrpcService(
 
         var result = parties.Disband(request.CharacterId, DateTimeOffset.UtcNow);
         Log("party_disband", account, request.CharacterId, result, request.TxnId ?? "", "");
-        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? ""));
+        return Task.FromResult(ToPartyResponse(result, request.TxnId ?? "", parties.LootRule));
     }
 
     /// <summary>
@@ -926,7 +926,7 @@ public sealed class SocialGrpcService(
         }
 
         var snapshot = parties.Describe(request.CharacterId, DateTimeOffset.UtcNow);
-        var response = PartySnapshotResponse(snapshot, request.TxnId ?? "");
+        var response = PartySnapshotResponse(snapshot, request.TxnId ?? "", parties.LootRule);
         Console.WriteLine("party_describe character=" + request.CharacterId
             + " in_party=" + (response.InParty ? "true" : "false")
             + " party=" + response.PartyId
@@ -950,15 +950,16 @@ public sealed class SocialGrpcService(
         InParty = false,
     };
 
-    static PartyResponse ToPartyResponse(PartyRuntime.Result result, string txnId)
+    static PartyResponse ToPartyResponse(PartyRuntime.Result result, string txnId, PartyTable.Loot loot)
     {
-        var response = PartySnapshotResponse(result.Party, txnId);
+        var response = PartySnapshotResponse(result.Party, txnId, loot);
         response.Ok = result.Ok;
         response.Reason = result.Reason;
         return response;
     }
 
-    static PartyResponse PartySnapshotResponse(PartyRuntime.Snapshot? snapshot, string txnId)
+    static PartyResponse PartySnapshotResponse(
+        PartyRuntime.Snapshot? snapshot, string txnId, PartyTable.Loot loot)
     {
         var response = new PartyResponse
         {
@@ -966,6 +967,12 @@ public sealed class SocialGrpcService(
             Reason = snapshot is null ? "not_in_party" : "",
             TxnId = txnId ?? "",
             InParty = snapshot is not null,
+            // Q8：分配口径由社交服按 config/party.json 给事实值，客户端只用来显示；
+            // 不在队伍时也照配置回（角色服据此按 personal 发），判定不在这一层。
+            LootMode = loot.Mode,
+            LootRoll = loot.Roll,
+            RollMin = loot.RollMin,
+            RollMax = loot.RollMax,
         };
 
         if (snapshot is null)

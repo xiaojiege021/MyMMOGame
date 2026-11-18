@@ -25,6 +25,8 @@ var damageArgs = new Dictionary<string, double>(StringComparer.Ordinal);
 var worldBossOnly = false;
 string? worldBossPath = null;
 var worldBossAtMs = 0L;
+// Q8：分配算法的离线自检。不连库、不起服、不读配置。
+var lootStateOnly = false;
 for (var i = 0; i < args.Length; i++)
 {
     switch (args[i])
@@ -127,7 +129,16 @@ for (var i = 0; i < args.Length; i++)
             }
             damageArgs[key] = value;
             break;
+        // Q8：掉落分配的离线自检（纯函数，不连库、不起服、不读配置）。
+        case "--loot-state":
+            lootStateOnly = true;
+            break;
     }
+}
+
+if (lootStateOnly)
+{
+    return Battle.LootSelfCheck.Run();
 }
 
 if (sectTechOnly)

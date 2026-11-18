@@ -85,6 +85,10 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.EnterDungeonResponse> __Marshaller_mmo_character_EnterDungeonResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EnterDungeonResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeLootScopeRequest> __Marshaller_mmo_character_DescribeLootScopeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeLootScopeRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeLootScopeResponse> __Marshaller_mmo_character_DescribeLootScopeResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeLootScopeResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseHotSpringRequest> __Marshaller_mmo_character_UseHotSpringRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseHotSpringRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseHotSpringResponse> __Marshaller_mmo_character_UseHotSpringResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseHotSpringResponse.Parser));
@@ -318,6 +322,14 @@ namespace Mmo.Proto.Character {
         "EnterDungeon",
         __Marshaller_mmo_character_EnterDungeonRequest,
         __Marshaller_mmo_character_EnterDungeonResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeLootScopeRequest, global::Mmo.Proto.Character.DescribeLootScopeResponse> __Method_DescribeLootScope = new grpc::Method<global::Mmo.Proto.Character.DescribeLootScopeRequest, global::Mmo.Proto.Character.DescribeLootScopeResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeLootScope",
+        __Marshaller_mmo_character_DescribeLootScopeRequest,
+        __Marshaller_mmo_character_DescribeLootScopeResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse> __Method_UseHotSpring = new grpc::Method<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse>(
@@ -760,6 +772,19 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.EnterDungeonResponse> EnterDungeon(global::Mmo.Proto.Character.EnterDungeonRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q8/H2：战斗服结算前读一次的分配口径（队伍事实 + loot 规则）。
+      /// 只读，不写库、不改队伍；社交服不可达时回 personal（默认口径）。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeLootScopeResponse> DescribeLootScope(global::Mmo.Proto.Character.DescribeLootScopeRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1744,6 +1769,58 @@ namespace Mmo.Proto.Character {
       public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.EnterDungeonResponse> EnterDungeonAsync(global::Mmo.Proto.Character.EnterDungeonRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_EnterDungeon, null, options, request);
+      }
+      /// <summary>
+      /// Q8/H2：战斗服结算前读一次的分配口径（队伍事实 + loot 规则）。
+      /// 只读，不写库、不改队伍；社交服不可达时回 personal（默认口径）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeLootScopeResponse DescribeLootScope(global::Mmo.Proto.Character.DescribeLootScopeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeLootScope(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q8/H2：战斗服结算前读一次的分配口径（队伍事实 + loot 规则）。
+      /// 只读，不写库、不改队伍；社交服不可达时回 personal（默认口径）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeLootScopeResponse DescribeLootScope(global::Mmo.Proto.Character.DescribeLootScopeRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeLootScope, null, options, request);
+      }
+      /// <summary>
+      /// Q8/H2：战斗服结算前读一次的分配口径（队伍事实 + loot 规则）。
+      /// 只读，不写库、不改队伍；社交服不可达时回 personal（默认口径）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeLootScopeResponse> DescribeLootScopeAsync(global::Mmo.Proto.Character.DescribeLootScopeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeLootScopeAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q8/H2：战斗服结算前读一次的分配口径（队伍事实 + loot 规则）。
+      /// 只读，不写库、不改队伍；社交服不可达时回 personal（默认口径）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeLootScopeResponse> DescribeLootScopeAsync(global::Mmo.Proto.Character.DescribeLootScopeRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeLootScope, null, options, request);
       }
       /// <summary>
       /// 温泉。只把当日已用疲劳减回配置里的 hot_spring_recovery（方案写定 1500），
@@ -3868,6 +3945,7 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_GetCurrency, serviceImpl.GetCurrency)
           .AddMethod(__Method_ApplyGrant, serviceImpl.ApplyGrant)
           .AddMethod(__Method_EnterDungeon, serviceImpl.EnterDungeon)
+          .AddMethod(__Method_DescribeLootScope, serviceImpl.DescribeLootScope)
           .AddMethod(__Method_UseHotSpring, serviceImpl.UseHotSpring)
           .AddMethod(__Method_SettleExp, serviceImpl.SettleExp)
           .AddMethod(__Method_Enhance, serviceImpl.Enhance)
@@ -3927,6 +4005,7 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_GetCurrency, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.GetCurrencyRequest, global::Mmo.Proto.Character.GetCurrencyResponse>(serviceImpl.GetCurrency));
       serviceBinder.AddMethod(__Method_ApplyGrant, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ApplyGrantRequest, global::Mmo.Proto.Character.ApplyGrantResponse>(serviceImpl.ApplyGrant));
       serviceBinder.AddMethod(__Method_EnterDungeon, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnterDungeonRequest, global::Mmo.Proto.Character.EnterDungeonResponse>(serviceImpl.EnterDungeon));
+      serviceBinder.AddMethod(__Method_DescribeLootScope, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeLootScopeRequest, global::Mmo.Proto.Character.DescribeLootScopeResponse>(serviceImpl.DescribeLootScope));
       serviceBinder.AddMethod(__Method_UseHotSpring, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseHotSpringRequest, global::Mmo.Proto.Character.UseHotSpringResponse>(serviceImpl.UseHotSpring));
       serviceBinder.AddMethod(__Method_SettleExp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleExpRequest, global::Mmo.Proto.Character.SettleExpResponse>(serviceImpl.SettleExp));
       serviceBinder.AddMethod(__Method_Enhance, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EnhanceRequest, global::Mmo.Proto.Character.EnhanceResponse>(serviceImpl.Enhance));

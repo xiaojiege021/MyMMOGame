@@ -1,0 +1,30 @@
+{
+  "card": "q8",
+  "note": "Q8/H2 掉落分配。三处该被抓住的：需求优先、平手取小号、每行只发一人。三条都在 check-q8.sh 的 --loot-state 离线自检里，不需要库；改坏后 loot_step 应当变红。",
+  "mutations": [
+    {
+      "id": "需求优先失效",
+      "file": "src/Battle/LootAllocator.cs",
+      "kind": "text-replace",
+      "find": "var pool = needed.Count > 0 ? needed : greedy;",
+      "replace": "var pool = greedy.Count > 0 ? greedy : needed;",
+      "expect": "check-q8.sh 的 need_beats_greed 步应红（投了 need 的人被 greedy 挤掉）"
+    },
+    {
+      "id": "平手不取小号",
+      "file": "src/Battle/LootAllocator.cs",
+      "kind": "text-replace",
+      "find": "if (value > best || (value == best && id < winner))",
+      "replace": "if (value > best || (value == best && id > winner))",
+      "expect": "check-q8.sh 的 tie_lowest_id 步应红（平手给了大号）"
+    },
+    {
+      "id": "同一件发给全队",
+      "file": "src/Battle/LootAllocator.cs",
+      "kind": "text-replace",
+      "find": "            byMember[winner].Add(line);",
+      "replace": "            byMember[winner].Add(line);\n            byMember[participants[0]].Add(line);",
+      "expect": "check-q8.sh 的 need_greed_single_winner 步应红（同一件多发给一个人）"
+    }
+  ]
+}
