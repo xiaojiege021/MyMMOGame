@@ -28,6 +28,18 @@ internal static class CliLoaders
         return (table, items);
     }
 
+    // Q5/J2：城池任务表的加载链。与真实启动同一份 CityTaskTable.Load：
+    // 城池编号必须在 config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json。
+    public static CityTaskTable LoadCityTasks(CharacterConfig cfg, string? path)
+    {
+        var currencies = CurrencyTable.Load("config/currency.json");
+        var dungeons = DungeonTable.Load(cfg.DungeonTable);
+        var realms = RealmTable.Load(cfg.RealmTable, dungeons, currencies);
+        var stones = StoneExchangeTable.Load(cfg.StoneExchangeTable, currencies);
+        var cities = CityTable.Load(cfg.CityTable);
+        return CityTaskTable.Load(path ?? cfg.CityTaskTable, cities, stones, realms);
+    }
+
     // C1：主线十二场的加载链。与真实启动同一份 MainlineTable.Load：
     // 十二场挂的 main 必须是 1 人 / 不扣疲劳 / 不占份额，等突破的三段必须在首发里。
     public static MainlineTable LoadMainline(CharacterConfig cfg, string? path)

@@ -71,7 +71,9 @@ public sealed class CharacterGrpcService(
     HomeCoinShopTable homeCoinShopTable,
     HeroCodexRepository heroCodex,
     RecipeTable recipeTable,
-    CraftRepository crafts) : CharacterService.CharacterServiceBase
+    CraftRepository crafts,
+    CityTaskTable? cityTaskTable,
+    CityTaskRepository? cityTasks) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
@@ -4034,5 +4036,170 @@ public sealed class CharacterGrpcService(
             ReadyAtUnix = job.ReadyAt.ToUnixTimeSeconds(),
             RemainingS = job.RemainingSeconds,
         };
+    }
+
+    /// <summary>
+    /// Q5/J2：主城修炼 / 境界任务面板。只读，不写库。
+    /// 任务表没加载到（老卡环境没有 config/city_tasks.json）时回 config_missing，
+    /// 不编一份假内容；门槛与次数都是服务端算出来的展示事实。
+    /// </summary>
+    public override async Task<DescribeCityTasksResponse> DescribeCityTasks(
+        DescribeCityTasksRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var characterId = (long)request.CharacterId;
+        if (account.Length == 0 || characterId <= 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_or_character_missing"));
+        }
+
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        if (cityTasks is null || cityTaskTable is null)
+        {
+            return new DescribeCityTasksResponse
+            {
+                Ok = true,
+                CharacterId = request.CharacterId,
+                ConfigMissing = true,
+            };
+        }
+
+        var board = await cityTasks.BoardAsync(
+            characterId, DateTimeOffset.UtcNow, context.CancellationToken);
+        if (!board.Ok)
+        {
+            return new DescribeCityTasksResponse
+            {
+                Ok = false,
+                Reason = board.Reason,
+                CharacterId = request.CharacterId,
+                ConfigMissing = false,
+            };
+        }
+
+        var response = new DescribeCityTasksResponse
+        {
+            Ok = true,
+            CharacterId = request.CharacterId,
+            Level = board.Level,
+            Realm = board.Realm,
+            TableVersion = cityTaskTable.Version,
+            Pending = cityTaskTable.Pending,
+        };
+
+        foreach (var row in board.Rows)
+        {
+            var fact = new CityTaskFact
+            {
+                TaskId = row.TaskId,
+                Name = row.Name,
+                CityId = row.CityId,
+                Period = row.Period,
+                Done = row.Done,
+                MaxPerPeriod = row.MaxPerPeriod,
+                RequireLevel = row.RequireLevel,
+                RequireRealm = row.RequireRealm,
+                PeriodKey = row.PeriodKey,
+                Eligible = row.Eligible,
+            };
+            foreach (var reward in row.Rewards)
+            {
+                fact.Rewards.Add(new CityTaskRewardFact
+                {
+                    Currency = reward.Currency,
+                    Amount = reward.Amount,
+                });
+            }
+
+            response.Tasks.Add(fact);
+        }
+
+        foreach (var pair in board.Stones.OrderBy(p => p.Key, StringComparer.Ordinal))
+        {
+            response.Stones.Add(new CityCurrencyBalance { Kind = pair.Key, Amount = pair.Value });
+        }
+
+        return response;
+    }
+
+    /// <summary>
+    /// Q5/J2：完成一条城池任务。业务拒绝（task_unknown / duplicate / level_too_low /
+    /// realm_too_low / limit_reached / city_missing）是 ok=false + reason；
+    /// 身份与参数错才走 gRPC 错误码。请求里的数量、税率、等级、境界一概不采信。
+    /// </summary>
+    public override async Task<CompleteCityTaskResponse> CompleteCityTask(
+        CompleteCityTaskRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        var taskId = (request.TaskId ?? "").Trim();
+        var characterId = (long)request.CharacterId;
+        if (account.Length == 0 || characterId <= 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "account_or_character_missing"));
+        }
+
+        if (txnId.Length == 0 || txnId.Length > GrantRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_id_invalid"));
+        }
+
+        if (taskId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "task_id_missing"));
+        }
+
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        if (cityTasks is null || cityTaskTable is null)
+        {
+            return new CompleteCityTaskResponse
+            {
+                Ok = false,
+                Reason = "config_missing",
+                TaskId = taskId,
+                TxnId = txnId,
+            };
+        }
+
+        var result = await cityTasks.CompleteAsync(
+            characterId, taskId, txnId, DateTimeOffset.UtcNow, context.CancellationToken);
+
+        var response = new CompleteCityTaskResponse
+        {
+            Ok = result.Ok,
+            Reason = result.Reason,
+            Duplicate = string.Equals(result.Reason, "duplicate", StringComparison.Ordinal),
+            TaskId = result.TaskId,
+            CityId = result.CityId,
+            Done = result.Done,
+            MaxPerPeriod = result.MaxPerPeriod,
+            PeriodKey = result.PeriodKey,
+            TxnId = txnId,
+            TaxPct = result.TaxPct,
+        };
+
+        foreach (var grant in result.Grants)
+        {
+            response.Grants.Add(new CityTaskGrantFact
+            {
+                Currency = grant.Currency,
+                Amount = grant.Amount,
+                BalanceBefore = grant.BalanceBefore,
+                BalanceAfter = grant.BalanceAfter,
+                TaxAmount = grant.TaxStone,
+            });
+        }
+
+        return response;
     }
 }

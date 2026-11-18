@@ -92,6 +92,9 @@ public sealed class GatewayProcess(string configPath)
         SlotApi.Map(app, tokens, config);
         // C1：主线十二场的只读与交任务。事务号由网关生成，进度与门槛全在角色服。
         MainlineApi.Map(app, tokens, config);
+        // Q5/J2：主城修炼 / 境界任务的只读面板与完成口。事务号由网关生成，
+        // 灵石数量、城池抽成比例与门槛判定全在角色服，网关不本地算。
+        CityTaskApi.Map(app, tokens, config);
         // P1-5c1：商城只认清单，清单外拒绝且不扣元宝。
         ShopApi.Map(app, tokens, config);
         // P1-5c7：限时经验道具走网关到角色服，扣一张与写到期时刻在同一笔事务里。

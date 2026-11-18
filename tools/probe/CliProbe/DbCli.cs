@@ -63,6 +63,9 @@ internal static class DbCli
             code = await EconomyCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await CityTaskCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await InvariantCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -107,6 +110,7 @@ internal static class DbCli
     || mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0
     || mainlineSeedSettlementOf != 0
     || craftStartOf != 0 || craftFinishOf != 0 || craftStateOf != 0
+    || cityTaskStateOf != 0 || cityTaskCompleteOf != 0 || cityTaskLedgerOf != 0
     || rawItemWriteId != 0;
     }
 }

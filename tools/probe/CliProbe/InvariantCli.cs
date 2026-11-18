@@ -322,6 +322,36 @@ internal static class InvariantCli
                     where p.character_id = l.character_id and p.task_id = l.task_id
                       and p.period_key = l.period_key)
                 """),
+            // Q5：城池任务的进度次数与流水笔数同笔提交。一条奖励一个币种写一行流水，
+            // 所以这里数的是 distinct txn_id（一次完成），不是行数。
+            new("INV-20", "city_task_progress_matches_ledger", """
+                select 'character=' || p.character_id || ' task=' || p.task_id
+                       || ' period=' || p.period_key || ' done=' || p.done_count
+                       || ' ledger=' || count(distinct l.txn_id) as detail
+                from "角色".city_task_progress p
+                left join "角色".city_task_ledger l
+                       on l.character_id = p.character_id and l.task_id = p.task_id
+                      and l.period_key = p.period_key
+                group by p.character_id, p.task_id, p.period_key, p.done_count
+                having p.done_count <> count(distinct l.txn_id)
+                union all
+                select 'ledger-only character=' || l.character_id || ' task=' || l.task_id
+                       || ' period=' || l.period_key as detail
+                from "角色".city_task_ledger l
+                where not exists (
+                    select 1 from "角色".city_task_progress p
+                    where p.character_id = l.character_id and p.task_id = l.task_id
+                      and p.period_key = l.period_key)
+                """),
+            // Q5：灵石只从唯一发放入口来——每笔城池任务流水都能在「角色」.grant_txn
+            // 里找到同一个事务号。找不到说明有人绕开 GrantRepository 直写了货币。
+            new("INV-21", "city_task_ledger_has_grant_txn", """
+                select 'txn=' || l.txn_id || ' character=' || l.character_id
+                       || ' task=' || l.task_id || ' currency=' || l.currency as detail
+                from "角色".city_task_ledger l
+                where not exists (
+                    select 1 from "角色".grant_txn g where g.txn_id = l.txn_id)
+                """),
         ];
     }
 

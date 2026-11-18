@@ -28,7 +28,8 @@
         { "version": 19, "file": "db/character/branch_step.sql" },
         { "version": 20, "file": "db/character/realm_advance.sql" },
         { "version": 21, "file": "db/character/realm_phase.sql" },
-        { "version": 22, "file": "db/character/craft.sql" }
+        { "version": 22, "file": "db/character/craft.sql" },
+        { "version": 23, "file": "db/character/city_task.sql" }
       ]
     },
     {
@@ -45,7 +46,8 @@
         { "version": 8, "file": "db/social/city.sql" },
         { "version": 9, "file": "db/social/homestead.sql" },
         { "version": 10, "file": "db/social/homestead_plant.sql" },
-        { "version": 11, "file": "db/social/sect_task.sql" }
+        { "version": 11, "file": "db/social/sect_task.sql" },
+        { "version": 12, "file": "db/social/city_task.sql" }
       ]
     },
     {

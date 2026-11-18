@@ -15,7 +15,7 @@ public sealed record CharacterConfig(
     string StoneExchangeTable, string CityTable, string SiegeTerritoryTable,
     string SeasonPassTable, string SeasonTable, string MonthlyBundleTable,
     string CharacterSlotTable, string GlobalUpstream, string MainlineTable,
-    string RecipeTable, string CalendarTable)
+    string RecipeTable, string CalendarTable, string CityTaskTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -56,6 +56,9 @@ public sealed record CharacterConfig(
     // Q3/G1：日 / 周 / 赛季边界的唯一正本。存量临时配置不写这一项时走仓库根这一份，
     // 核对脚本可以指到临时日历表试时区与重置小时。
     public const string DefaultCalendarTable = "config/calendar.json";
+    // Q5/J2：主城修炼 / 境界任务的正本。与日历一样不显式登记进 character.json，
+    // 老配置不写这一项也照常起（走仓库根这一份）；核对脚本可指到临时表试坏配置。
+    public const string DefaultCityTaskTable = "config/city_tasks.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -288,13 +291,21 @@ public sealed record CharacterConfig(
             throw new ConfigException("calendar_table 不能为空");
         }
 
+        // Q5/J2：城池任务表只加配置，不改既有表。缺表由调用方降级，不在这里抛。
+        var cityTaskTable = (wire.CityTaskTable ?? DefaultCityTaskTable).Trim();
+        if (cityTaskTable.Length == 0)
+        {
+            throw new ConfigException("city_task_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
-            characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable);
+            characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable,
+            cityTaskTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -388,5 +399,8 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("calendar_table")]
         public string? CalendarTable { get; init; }
+
+        [JsonPropertyName("city_task_table")]
+        public string? CityTaskTable { get; init; }
     }
 }

@@ -274,9 +274,13 @@ report("db_main_migration_includes",
 man = cfg("db/migrations.json")
 entries = next(s["entries"] for s in man["schemas"] if s["key"] == "character")
 last = entries[-1]
+# Q5 起后面还会有卡追加迁移：这里只钉「craft.sql 是角色 v22，且它之后的版本都更大」，
+# 不钉「craft.sql 永远是最后一条」（那是当时的事实，不是规则）。
+craft_idx = next((i for i, e in enumerate(entries) if e.get("file") == "db/character/craft.sql"), -1)
 report("migration_appended",
-       last.get("version") == len(entries) and last.get("file") == "db/character/craft.sql",
-       "迁移版本不是追加在最后：%s" % last)
+       craft_idx >= 0 and entries[craft_idx].get("version") == 22
+       and all(e.get("version") > 22 for e in entries[craft_idx + 1:]),
+       "craft.sql 不是角色 v22，或它后面追加了更小的版本：%s" % last)
 
 flags = read("tools/probe/CliProbe/CliFlags.cs")
 parser = read("tools/probe/CliProbe/CliParser.cs")

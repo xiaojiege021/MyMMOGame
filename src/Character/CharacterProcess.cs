@@ -51,6 +51,7 @@ public sealed class CharacterProcess(string configPath)
         HeroCodexTable heroCodexTable;
         CalendarTable calendar;
         RecipeTable recipeTable;
+        CityTaskTable cityTaskTable;
         DungeonDropTable dungeonDropTable;
         MainlineDropTable mainlineDropTable;
         try
@@ -143,6 +144,12 @@ public sealed class CharacterProcess(string configPath)
             // K3：生产 / 配方的唯一正本。四个副职、每条配方的材料 / 产出 / 费用 /
             // 成功率 / 耗时 / 解锁等级都在这一份文件里；加一个配方不改代码。
             recipeTable = RecipeTable.Load(config.RecipeTable, items, currencies);
+            // Q5/J2：主城修炼 / 境界任务的正本。与启动共用同一份 Load：城池编号必须在
+            // config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json 的顺序表里；
+            // 缺表降级成「没有任务」，老卡环境照常起。
+            cityTaskTable = File.Exists(config.CityTaskTable)
+                ? CityTaskTable.Load(config.CityTaskTable, cityTable, stoneExchange, realms)
+                : CityTaskTable.Empty;
             var dungeonDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
             dungeonDropTable = DungeonDropTable.LoadIfPresent(
@@ -366,6 +373,25 @@ public sealed class CharacterProcess(string configPath)
                 + " name=" + profession.Name
                 + " recipes=" + recipeTable.ForProfession(profession.Id).Count);
         }
+        // Q5/J2：城池任务表的事实值。数值全在 config/city_tasks.json，这里只列出来，
+        // 与 --city-task-config 的只读入口同一个键名、同一组字段。
+        Console.WriteLine("city_task_config=" + (cityTaskTable.Tasks.Count == 0 ? "missing" : "ok")
+            + " version=" + cityTaskTable.Version
+            + " pending=" + (cityTaskTable.Pending ? "true" : "false")
+            + " tasks=" + cityTaskTable.Tasks.Count
+            + " stone_tiers=" + string.Join("+", cityTaskTable.Tasks
+                .SelectMany(t => t.Rewards).Select(r => r.Currency).Distinct()));
+        foreach (var task in cityTaskTable.Tasks)
+        {
+            Console.WriteLine("city_task_row=" + task.Id
+                + " city=" + task.CityId
+                + " period=" + task.Period
+                + " max=" + task.MaxPerPeriod
+                + " level=" + task.RequireLevel
+                + " realm=" + (task.RequireRealm.Length == 0 ? "-" : task.RequireRealm)
+                + " rewards=" + string.Join("+", task.Rewards.Select(r => r.Currency + ":" + r.Amount)));
+        }
+
         Console.WriteLine("hero_codex=version=" + heroCodexTable.Version
             + " pending=" + (heroCodexTable.Pending ? "true" : "false")
             + " kind=" + heroCodexTable.PassiveKind
@@ -448,6 +474,10 @@ public sealed class CharacterProcess(string configPath)
         // 产出入包复用 grants 的同一条 SQL，钱只用 grants 的货币写法。
         var crafts = new CraftRepository(
             dataSource, recipeTable, items, config, grants, inventory);
+        // Q5/J2：城池任务。钱复用 grants 的同一条货币写法，抽成复用 cityTax 的账本写法，
+        // 周期键只读 calendar；本卡不另开第二条货币 UPDATE，也不另算一套抽成。
+        var cityTasks = new CityTaskRepository(
+            dataSource, cityTaskTable, calendar, realms, grants, cityTax);
         var dungeonEntries = new DungeonEntryRepository(dataSource, calendar);
         // P2-2a：高难本（龙巢）每人每周的次数。只写 dungeon_entry 一行，
         // 不碰疲劳与周份额；次数以库里已写下的进本记录为准。
@@ -579,6 +609,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(heroCodexTable);
         builder.Services.AddSingleton(heroCodex);
         builder.Services.AddSingleton(recipeTable);
+        builder.Services.AddSingleton(cityTaskTable);
+        builder.Services.AddSingleton(cityTasks);
         builder.Services.AddSingleton(crafts);
         builder.Services.AddSingleton(dungeonDropTable);
         builder.Services.AddSingleton(mainlineDropTable);

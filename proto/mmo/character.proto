@@ -207,6 +207,13 @@ service CharacterService {
   rpc FinishCraft(FinishCraftRequest) returns (FinishCraftResponse);
   // K3：当前有没有活、还差几秒。只读。
   rpc DescribeCraft(DescribeCraftRequest) returns (DescribeCraftResponse);
+  // Q5/J2：主城修炼 / 境界任务面板。任务、次数、门槛与奖励只在
+  // config/city_tasks.json；周期键只由 config/calendar.json 算，客户端算不了。
+  rpc DescribeCityTasks(DescribeCityTasksRequest) returns (DescribeCityTasksResponse);
+  // Q5/J2：完成一条任务。一笔事务里抢 grant_txn → 发灵石 → 写城池灵石抽成流水
+  // → 进度 +1；同一事务号重放回 duplicate，不二次发灵石。请求里带不进数量、
+  // 税率、等级与境界：全部由角色服按配置与库里的事实值判。
+  rpc CompleteCityTask(CompleteCityTaskRequest) returns (CompleteCityTaskResponse);
 }
 
 message SettleExpRequest {
@@ -1463,4 +1470,92 @@ message DescribeCraftResponse {
   int64 started_at_unix = 7;
   int64 ready_at_unix = 8;
   int32 remaining_s = 9;
+}
+
+// Q5/J2：一条任务的奖励行。币种只能是灵石五档（config/stone_exchange.json），
+// 数量来自 config/city_tasks.json；请求里两个字段都带不进来。
+message CityTaskRewardFact {
+  string currency = 1;
+  int64 amount = 2;
+}
+
+// Q5/J2：面板上一条任务的事实值。done 是这一周期已完成的次数，period_key 是
+// 业务日（日常）或业务周首（周常），都由服务端按日历算；eligible 是服务端按
+// 库里的 level / realm 判出来的展示事实，客户端不拿它自己算能不能做。
+message CityTaskFact {
+  string task_id = 1;
+  string name = 2;
+  string city_id = 3;
+  string period = 4;
+  int32 done = 5;
+  int32 max_per_period = 6;
+  // 0 表示不卡等级。
+  int32 require_level = 7;
+  // 空串表示不卡境界。
+  string require_realm = 8;
+  repeated CityTaskRewardFact rewards = 9;
+  string period_key = 10;
+  bool eligible = 11;
+}
+
+// Q5/J2：面板上的一个灵石档位余额（只返回本表实际用到的档位）。
+message CityCurrencyBalance {
+  string kind = 1;
+  int64 amount = 2;
+}
+
+message DescribeCityTasksRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message DescribeCityTasksResponse {
+  bool ok = 1;
+  // character_not_found 是正常回包里的 ok=false；身份与参数错才走 gRPC 错误码。
+  string reason = 2;
+  uint64 character_id = 3;
+  int32 level = 4;
+  string realm = 5;
+  int32 table_version = 6;
+  bool pending = 7;
+  // 角色服没加载到任务表时为 true：面板空、完成一律拒绝，不编内容。
+  bool config_missing = 8;
+  repeated CityTaskFact tasks = 9;
+  repeated CityCurrencyBalance stones = 10;
+}
+
+// Q5/J2：这一笔实际发出去的灵石。before / after 是库里的事实值，
+// tax_amount 是按城池税率算出的抽成（只记账、不从玩家扣）。
+message CityTaskGrantFact {
+  string currency = 1;
+  int64 amount = 2;
+  int64 balance_before = 3;
+  int64 balance_after = 4;
+  int64 tax_amount = 5;
+}
+
+message CompleteCityTaskRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  // 网关生成的 P1-1b5 幂等号；同一个号再提交，整笔不做。
+  string txn_id = 3;
+  string task_id = 4;
+}
+
+message CompleteCityTaskResponse {
+  // task_unknown / duplicate / character_not_found / level_too_low /
+  // realm_too_low / limit_reached / city_missing 是 ok=false + reason；
+  // 拒绝时下面的事实值一律留 0 / 空串。
+  bool ok = 1;
+  string reason = 2;
+  bool duplicate = 3;
+  string task_id = 4;
+  string city_id = 5;
+  int32 done = 6;
+  int32 max_per_period = 7;
+  string period_key = 8;
+  repeated CityTaskGrantFact grants = 9;
+  string txn_id = 10;
+  // 这一笔用的城池抽成比例（库里「社交」.city.tax_pct 的事实值）。
+  int32 tax_pct = 11;
 }

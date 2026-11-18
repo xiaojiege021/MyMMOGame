@@ -17,13 +17,12 @@ internal static class CliParser
                 sqlPath = args[++i]; sqlGiven = true;
                 break;
             case "--calendar": case "--calendar-path": case "--at": CalendarCli.Parse(args, ref i); break;
+            case var flag when CityTaskCli.Handles(flag): CityTaskCli.Parse(args, ref i); break;
             case "--migrate": migrate = true; break;
             case "--migrations" when i + 1 < args.Length: migrationsPath = args[++i]; break;
             case "--schema" when i + 1 < args.Length: schemaFilter = args[++i]; break;
             case "--schema-status": schemaStatus = true; break;
-            case "--character-report" when i + 1 < args.Length:
-                reportName = args[++i];
-                break;
+            case "--character-report" when i + 1 < args.Length: reportName = args[++i]; break;
             case "--delete-character" when i + 1 < args.Length:
                 deleteName = args[++i];
                 break;

@@ -88,7 +88,8 @@ internal static class CalendarCli
         return 0;
     }
 
-    static bool TryParseInstant(string? text, out DateTimeOffset value)
+    /// <summary>--at 的解析（ISO 8601 或毫秒时间戳）。Q5 的城池任务入口复用同一份。</summary>
+    internal static bool TryParseInstant(string? text, out DateTimeOffset value)
     {
         value = DateTimeOffset.UtcNow;
         var trimmed = (text ?? "").Trim();

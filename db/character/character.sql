@@ -578,3 +578,50 @@ CREATE TABLE IF NOT EXISTS "角色".craft_job (
     -- start 那一行流水也由这里回指，删角色时两张表一起走。
     FOREIGN KEY (start_txn_id) REFERENCES "角色".craft_log (txn_id) ON DELETE CASCADE
 );
+
+-- Q5/J2：以下 DDL 与 db/character/city_task.sql 是同一份，整份追加进主迁移。
+-- 主城修炼 / 境界任务的进度与流水在「角色」schema；城池灵石抽成流水在「社交」schema，
+-- 与金币账本 city_tax_ledger 分开两张表（单位不同，不能相加）。
+CREATE TABLE IF NOT EXISTS "角色".city_task_progress (
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    task_id      text        NOT NULL,
+    period_key   date        NOT NULL,
+    city_id      text        NOT NULL,
+    done_count   int         NOT NULL DEFAULT 0 CHECK (done_count >= 0),
+    updated_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, task_id, period_key)
+);
+
+CREATE INDEX IF NOT EXISTS city_task_progress_period
+    ON "角色".city_task_progress (character_id, period_key);
+
+CREATE TABLE IF NOT EXISTS "角色".city_task_ledger (
+    txn_id       text        NOT NULL,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    task_id      text        NOT NULL,
+    city_id      text        NOT NULL,
+    period       text        NOT NULL CHECK (period IN ('daily', 'weekly')),
+    period_key   date        NOT NULL,
+    currency     text        NOT NULL,
+    amount       bigint      NOT NULL CHECK (amount > 0),
+    recorded_at  timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (txn_id, currency)
+);
+
+CREATE INDEX IF NOT EXISTS city_task_ledger_character
+    ON "角色".city_task_ledger (character_id, recorded_at DESC);
+
+CREATE TABLE IF NOT EXISTS "社交".city_stone_tax_ledger (
+    txn_id      text        NOT NULL,
+    currency    text        NOT NULL,
+    city_id     text        NOT NULL REFERENCES "社交".city (city_id) ON DELETE CASCADE,
+    source      text        NOT NULL CHECK (source IN ('task_grant', 'mining', 'other')),
+    gross_stone bigint      NOT NULL CHECK (gross_stone > 0),
+    tax_stone   bigint      NOT NULL CHECK (tax_stone >= 0),
+    recorded_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (txn_id, currency),
+    CHECK (tax_stone <= gross_stone)
+);
+
+CREATE INDEX IF NOT EXISTS city_stone_tax_ledger_city
+    ON "社交".city_stone_tax_ledger (city_id, recorded_at);

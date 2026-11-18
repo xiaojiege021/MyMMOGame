@@ -1,0 +1,22 @@
+{
+  "card": "q5",
+  "note": "Q5 灵石修炼 / 境界任务。两处该被抓住的：奖励币种闸门（灵石五档）与流水数量约束。两条都在 check-q5.sh 的无库段，不需要库。",
+  "mutations": [
+    {
+      "id": "奖励币种闸门失效",
+      "file": "src/Character/CityTaskTable.cs",
+      "kind": "text-replace",
+      "find": "if (stones.IndexOf(kind) < 0)",
+      "replace": "if (false)",
+      "expect": "check-q5.sh 的「坏任务表 non_stone」应报没被挡住（任务变成第二条发金币的路）"
+    },
+    {
+      "id": "任务流水去掉数量约束",
+      "file": "db/character/city_task.sql",
+      "kind": "text-replace",
+      "find": "    amount       bigint      NOT NULL CHECK (amount > 0),",
+      "replace": "    amount       bigint      NOT NULL,",
+      "expect": "check-q5.sh 的 ddl_ledger 应红（流水不再挡住 0 / 负数量）"
+    }
+  ]
+}

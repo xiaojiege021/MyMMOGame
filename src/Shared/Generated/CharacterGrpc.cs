@@ -238,6 +238,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeCraftRequest> __Marshaller_mmo_character_DescribeCraftRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeCraftRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeCraftResponse> __Marshaller_mmo_character_DescribeCraftResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeCraftResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeCityTasksRequest> __Marshaller_mmo_character_DescribeCityTasksRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeCityTasksRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeCityTasksResponse> __Marshaller_mmo_character_DescribeCityTasksResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeCityTasksResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CompleteCityTaskRequest> __Marshaller_mmo_character_CompleteCityTaskRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CompleteCityTaskRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CompleteCityTaskResponse> __Marshaller_mmo_character_CompleteCityTaskResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CompleteCityTaskResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -622,6 +630,22 @@ namespace Mmo.Proto.Character {
         "DescribeCraft",
         __Marshaller_mmo_character_DescribeCraftRequest,
         __Marshaller_mmo_character_DescribeCraftResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeCityTasksRequest, global::Mmo.Proto.Character.DescribeCityTasksResponse> __Method_DescribeCityTasks = new grpc::Method<global::Mmo.Proto.Character.DescribeCityTasksRequest, global::Mmo.Proto.Character.DescribeCityTasksResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeCityTasks",
+        __Marshaller_mmo_character_DescribeCityTasksRequest,
+        __Marshaller_mmo_character_DescribeCityTasksResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.CompleteCityTaskRequest, global::Mmo.Proto.Character.CompleteCityTaskResponse> __Method_CompleteCityTask = new grpc::Method<global::Mmo.Proto.Character.CompleteCityTaskRequest, global::Mmo.Proto.Character.CompleteCityTaskResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CompleteCityTask",
+        __Marshaller_mmo_character_CompleteCityTaskRequest,
+        __Marshaller_mmo_character_CompleteCityTaskResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -1237,6 +1261,33 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeCraftResponse> DescribeCraft(global::Mmo.Proto.Character.DescribeCraftRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q5/J2：主城修炼 / 境界任务面板。任务、次数、门槛与奖励只在
+      /// config/city_tasks.json；周期键只由 config/calendar.json 算，客户端算不了。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeCityTasksResponse> DescribeCityTasks(global::Mmo.Proto.Character.DescribeCityTasksRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q5/J2：完成一条任务。一笔事务里抢 grant_txn → 发灵石 → 写城池灵石抽成流水
+      /// → 进度 +1；同一事务号重放回 duplicate，不二次发灵石。请求里带不进数量、
+      /// 税率、等级与境界：全部由角色服按配置与库里的事实值判。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CompleteCityTaskResponse> CompleteCityTask(global::Mmo.Proto.Character.CompleteCityTaskRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -3686,6 +3737,114 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeCraft, null, options, request);
       }
+      /// <summary>
+      /// Q5/J2：主城修炼 / 境界任务面板。任务、次数、门槛与奖励只在
+      /// config/city_tasks.json；周期键只由 config/calendar.json 算，客户端算不了。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeCityTasksResponse DescribeCityTasks(global::Mmo.Proto.Character.DescribeCityTasksRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeCityTasks(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q5/J2：主城修炼 / 境界任务面板。任务、次数、门槛与奖励只在
+      /// config/city_tasks.json；周期键只由 config/calendar.json 算，客户端算不了。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeCityTasksResponse DescribeCityTasks(global::Mmo.Proto.Character.DescribeCityTasksRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeCityTasks, null, options, request);
+      }
+      /// <summary>
+      /// Q5/J2：主城修炼 / 境界任务面板。任务、次数、门槛与奖励只在
+      /// config/city_tasks.json；周期键只由 config/calendar.json 算，客户端算不了。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeCityTasksResponse> DescribeCityTasksAsync(global::Mmo.Proto.Character.DescribeCityTasksRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeCityTasksAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q5/J2：主城修炼 / 境界任务面板。任务、次数、门槛与奖励只在
+      /// config/city_tasks.json；周期键只由 config/calendar.json 算，客户端算不了。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeCityTasksResponse> DescribeCityTasksAsync(global::Mmo.Proto.Character.DescribeCityTasksRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeCityTasks, null, options, request);
+      }
+      /// <summary>
+      /// Q5/J2：完成一条任务。一笔事务里抢 grant_txn → 发灵石 → 写城池灵石抽成流水
+      /// → 进度 +1；同一事务号重放回 duplicate，不二次发灵石。请求里带不进数量、
+      /// 税率、等级与境界：全部由角色服按配置与库里的事实值判。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CompleteCityTaskResponse CompleteCityTask(global::Mmo.Proto.Character.CompleteCityTaskRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CompleteCityTask(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q5/J2：完成一条任务。一笔事务里抢 grant_txn → 发灵石 → 写城池灵石抽成流水
+      /// → 进度 +1；同一事务号重放回 duplicate，不二次发灵石。请求里带不进数量、
+      /// 税率、等级与境界：全部由角色服按配置与库里的事实值判。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CompleteCityTaskResponse CompleteCityTask(global::Mmo.Proto.Character.CompleteCityTaskRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CompleteCityTask, null, options, request);
+      }
+      /// <summary>
+      /// Q5/J2：完成一条任务。一笔事务里抢 grant_txn → 发灵石 → 写城池灵石抽成流水
+      /// → 进度 +1；同一事务号重放回 duplicate，不二次发灵石。请求里带不进数量、
+      /// 税率、等级与境界：全部由角色服按配置与库里的事实值判。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CompleteCityTaskResponse> CompleteCityTaskAsync(global::Mmo.Proto.Character.CompleteCityTaskRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CompleteCityTaskAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q5/J2：完成一条任务。一笔事务里抢 grant_txn → 发灵石 → 写城池灵石抽成流水
+      /// → 进度 +1；同一事务号重放回 duplicate，不二次发灵石。请求里带不进数量、
+      /// 税率、等级与境界：全部由角色服按配置与库里的事实值判。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CompleteCityTaskResponse> CompleteCityTaskAsync(global::Mmo.Proto.Character.CompleteCityTaskRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CompleteCityTask, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -3747,7 +3906,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_DescribeRecipes, serviceImpl.DescribeRecipes)
           .AddMethod(__Method_StartCraft, serviceImpl.StartCraft)
           .AddMethod(__Method_FinishCraft, serviceImpl.FinishCraft)
-          .AddMethod(__Method_DescribeCraft, serviceImpl.DescribeCraft).Build();
+          .AddMethod(__Method_DescribeCraft, serviceImpl.DescribeCraft)
+          .AddMethod(__Method_DescribeCityTasks, serviceImpl.DescribeCityTasks)
+          .AddMethod(__Method_CompleteCityTask, serviceImpl.CompleteCityTask).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -3805,6 +3966,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_StartCraft, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.StartCraftRequest, global::Mmo.Proto.Character.StartCraftResponse>(serviceImpl.StartCraft));
       serviceBinder.AddMethod(__Method_FinishCraft, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.FinishCraftRequest, global::Mmo.Proto.Character.FinishCraftResponse>(serviceImpl.FinishCraft));
       serviceBinder.AddMethod(__Method_DescribeCraft, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeCraftRequest, global::Mmo.Proto.Character.DescribeCraftResponse>(serviceImpl.DescribeCraft));
+      serviceBinder.AddMethod(__Method_DescribeCityTasks, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeCityTasksRequest, global::Mmo.Proto.Character.DescribeCityTasksResponse>(serviceImpl.DescribeCityTasks));
+      serviceBinder.AddMethod(__Method_CompleteCityTask, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CompleteCityTaskRequest, global::Mmo.Proto.Character.CompleteCityTaskResponse>(serviceImpl.CompleteCityTask));
     }
 
   }

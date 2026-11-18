@@ -1,8 +1,8 @@
 {
   "schema": "city-task-table/1",
-  "version": 1,
+  "version": 2,
   "pending": true,
-  "note": "Q5/J2：主城修炼与境界任务的唯一正本。方案 9.5/12 写定灵石由主城矿脉经修炼任务和境界任务发放；具体任务与数量方案没写，全部 pending。代码尚未读取，由 Q5 接入。",
+  "note": "Q5/J2：主城修炼与境界任务的唯一正本。方案 9.5 / 12 写定灵石由主城掌管的矿脉产出发放（「大头做成修炼任务和境界任务的奖励，掌管方按城池税收抽成，比例走配置」），但没写具体任务名与数量，本表两行都标待定：改这一份重启角色服即生效，代码 / proto / SQL 不写第二套数字。周期只有 daily / weekly 两种；重置边界只认 config/calendar.json 的业务日与业务周首（日常按 DayKey、周常按 WeekStartDate），本表不另写小时数，代码里也不出现第二套时钟或数据库当天函数。奖励只能是灵石五档（currency 取 config/stone_exchange.json 的档位，方案「灵石仍只按城池任务发放、不从打怪来」），一条任务可以有多行、但币种不许重复；等级 / 境界门槛进请求带不进来，由角色服按库里的 level / realm 判。完成一笔是角色库的一笔事务：抢 grant_txn 事务号 → 写灵石（只走 GrantRepository 的货币写法）→ 写「社交」.city_stone_tax_ledger 的抽成流水（按库里「社交」.city.tax_pct，只记账不从玩家扣）→ 进度 +1，四处同时提交；同一事务号重放只回 duplicate，不二次发灵石。城池抽成比例是会变的运行时事实（城战写回 city.tax_pct），本表不带税率。",
   "tasks": [
     {
       "id": "qiyun_cultivate_daily",

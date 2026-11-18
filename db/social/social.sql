@@ -248,3 +248,20 @@ CREATE TABLE IF NOT EXISTS "社交".sect_contribution (
     updated_at   timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (sect_id, character_id)
 );
+
+-- Q5/J2：以下 DDL 与 db/social/city_task.sql 是同一份，整份追加进社交聚合主迁移。
+-- 城池灵石抽成与金币账本 city_tax_ledger 分开两张表（单位不同，不能相加）。
+CREATE TABLE IF NOT EXISTS "社交".city_stone_tax_ledger (
+    txn_id      text        NOT NULL,
+    currency    text        NOT NULL,
+    city_id     text        NOT NULL REFERENCES "社交".city (city_id) ON DELETE CASCADE,
+    source      text        NOT NULL CHECK (source IN ('task_grant', 'mining', 'other')),
+    gross_stone bigint      NOT NULL CHECK (gross_stone > 0),
+    tax_stone   bigint      NOT NULL CHECK (tax_stone >= 0),
+    recorded_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (txn_id, currency),
+    CHECK (tax_stone <= gross_stone)
+);
+
+CREATE INDEX IF NOT EXISTS city_stone_tax_ledger_city
+    ON "社交".city_stone_tax_ledger (city_id, recorded_at);

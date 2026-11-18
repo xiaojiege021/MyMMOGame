@@ -40,6 +40,14 @@ internal static class CliFlags
     public static bool contentList = false;
     // K5：把物品表的 grade / set_id / desc 读出来，不连库、不启动进程（icon 不进配置，见第 17 节 17.1）。
     public static bool itemList = false;
+    // Q5/J2：城池任务。config / table 只读不连库；state / complete / ledger 连库核对。
+    public static bool cityTaskConfig = false;
+    public static string? cityTaskTablePath = null;
+    public static long cityTaskStateOf = 0;
+    public static long cityTaskCompleteOf = 0;
+    public static string? cityTaskCompleteTask = null;
+    public static string? cityTaskTxn = null;
+    public static long cityTaskLedgerOf = 0;
     // K3：把配方表读出来（与启动共用同一 RecipeTable.Load），不连库、不启动进程；坏配置也走这里。
     public static bool recipeList = false;
     public static string? recipeTablePath = null;

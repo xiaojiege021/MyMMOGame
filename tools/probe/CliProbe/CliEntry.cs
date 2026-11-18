@@ -41,6 +41,9 @@ internal static class CliEntry
         code = MainlineCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = CityTaskCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = MetaCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
