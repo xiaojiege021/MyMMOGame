@@ -1,8 +1,189 @@
 {
-  "schema": "effect-table/1",
-  "version": 2,
+  "schema": "effect-table/2",
+  "version": 3,
   "pending": true,
-  "note": "Q1/Q2：buff、debuff、控制、HoT、DoT、护盾的唯一正本。方案没有写定具体效果与数值；这里只给类型与样例，全部标 pending。代码尚未读取，由 Q1 设计、Q2 接入；伤害管线与叠层规则见 docs/未覆盖排期.md。",
+  "note": "Q1（F1 效果层设计）的唯一正本，Q1 只写设计与配置、不改代码，Q2 才读。effects 段定义 7 类效果（buff / debuff / control / hot / dot / shield / cleanse）的样例与字段，interaction 段定义打断 / 硬直 / CC 递减 / 叠层 / 驱散 / 免疫 / 净化，damage 段把方案 7.2 的四段伤害写成可落地的键。穿透 / 抗性本轮已打开（enabled=true），默认值 0，所以第 4 段在默认值下与 7.2 逐字等价；来源与数值等 B10 / B15。所有数值仍标 pending，代码里不写第二套。效果表只定义「是什么」；谁施加、几层写在 skills.json / items.json 的 effect 块（B1 / B15）。",
+  "control_types": [
+    {
+      "id": "root",
+      "name": "定身",
+      "sample": "cc_root_1"
+    },
+    {
+      "id": "slow",
+      "name": "减速",
+      "sample": "cc_slow_1"
+    },
+    {
+      "id": "stun",
+      "name": "眩晕",
+      "sample": "cc_stun_1"
+    },
+    {
+      "id": "silence",
+      "name": "沉默",
+      "sample": "",
+      "note": "只留键：本轮只补 stun 一条样例，silence 的样例等 B15 内容一起补，不提前编技能。"
+    }
+  ],
+  "interaction": {
+    "interrupt": {
+      "when": "foreswing",
+      "mana_refund_pct": 100,
+      "cooldown_ms": 1000,
+      "note": "只在前摇窗口内可打断；被打断退回蓝耗、进一条短冷却。数值待定，Q2 实现，别在代码里写死。"
+    },
+    "hitstun": {
+      "source": "skill_table",
+      "default_ms": 300,
+      "note": "每个技能一条硬直，来自技能表 / 回包；这里只是缺省值。"
+    },
+    "cc_diminishing": {
+      "window_ms": 15000,
+      "steps_pct": [
+        100,
+        60,
+        30,
+        0
+      ],
+      "note": "同一目标 15 秒内同类控制第 1 / 2 / 3 / 4 次的时长百分比；第 4 次免疫。曲线待定。"
+    },
+    "stacking": {
+      "rules": [
+        "refresh",
+        "stack",
+        "independent"
+      ],
+      "refresh_on_stack": true,
+      "note": "refresh=重置时长、层数不变；stack=加一层到 max_stacks；independent=各算各的时长，需实例号。"
+    },
+    "dispel": {
+      "by_tags": true,
+      "note": "按 dispel_tags 命中移除，不按技能编号写死。"
+    },
+    "immunity": {
+      "by_tags": true,
+      "note": "按 immunity_tags 判定，命中即整条效果不生效。"
+    },
+    "cleanse": {
+      "by_tags": true,
+      "note": "cleanse 类效果按标签移除 debuff / control；只移除，不返还已跳的 DoT / HoT。"
+    },
+    "pending": true
+  },
+  "damage": {
+    "schema": "damage-pipeline/1",
+    "note": "方案 7.2 四段。四段都是乘区；中间保留 double，只在最终四舍五入一次。穿透与抗性是第 4 段的两个子因子，默认 0 时与 7.2 逐字等价。",
+    "stages": [
+      {
+        "id": "base",
+        "formula": "(primary * primary_coef + equipment_flat) * (1 + realm_bonus_pct / 10000)",
+        "inputs": [
+          "classes.json.attack_per_primary",
+          "classes.json.equipment_attack",
+          "battle_profile.passive_pct_bps"
+        ]
+      },
+      {
+        "id": "enhance",
+        "formula": "base * (1 + enhance_coef + crystal_flat_attack / base)",
+        "inputs": [
+          "config/enhance.json",
+          "config/crystal.json"
+        ]
+      },
+      {
+        "id": "skill",
+        "formula": "enhanced * skill_multiplier * counter_coef",
+        "inputs": [
+          "config/skills.json.damage_multiplier",
+          "counter_table"
+        ]
+      },
+      {
+        "id": "final",
+        "formula": "skill_damage * defense_mitigation * (1 + crit_bonus) * random_factor * (1 - resistance_pct / 100)",
+        "inputs": [
+          "defense",
+          "crit",
+          "random",
+          "penetration",
+          "resistance"
+        ]
+      }
+    ],
+    "realm_bonus": {
+      "source": "battle_profile.passive_pct_bps",
+      "unit": "bps",
+      "note": "角色服把 N10 的 passive_pct_bps 放进战斗快照；战斗服不另读境界表，避免两份口径。"
+    },
+    "defense": {
+      "formula": "clamp(1 - effective_def / (effective_def + k), min_pct, 100)",
+      "k": 100,
+      "min_pct": 10,
+      "note": "方案只写「防御减免」没给公式；Q1 补公式，k 与下限待数值卡确认。怪物防御现值 8–40。"
+    },
+    "crit": {
+      "formula": "1 + (roll < rate_pct ? damage_pct : 0) / 100",
+      "rate_pct": 0,
+      "damage_pct": 50,
+      "note": "方案只写 (1 + 暴伤判定)；Q1 展开成暴击率 × 暴伤。默认 0% 暴击，等 B2 / B10 给来源。"
+    },
+    "random": {
+      "min_pct": 95,
+      "max_pct": 105,
+      "note": "方案写定 0.95~1.05，不是待定值。"
+    },
+    "penetration": {
+      "enabled": true,
+      "formula": "effective_def = max(0, defense * (1 - penetration_pct / 100))",
+      "default_pct": 0,
+      "cap_pct": 100,
+      "source": "B10 结晶 / B15 技能",
+      "note": "本轮已打开结构；默认 0，等来源与数值落地，Q2 只把乘区接上。"
+    },
+    "resistance": {
+      "enabled": true,
+      "formula": "final *= (1 - resistance_pct / 100)",
+      "default_pct": 0,
+      "cap_pct": 90,
+      "types": [
+        "physical",
+        "metal",
+        "wood",
+        "water",
+        "fire",
+        "earth"
+      ],
+      "source": "B15 元素 / B10 装备",
+      "note": "按伤害类型取抗性；当前所有技能按 physical 算，抗性 0。五行表等 B15，不在这里编元素技能。"
+    },
+    "rounding": "final_round_half_up",
+    "boundaries": {
+      "rule": "效果与伤害管线只作用在战斗快照上；模板 / 1.3 / 科技在快照生成时已经生效，管线不许改模板属性。",
+      "pve": {
+        "mode": "full",
+        "source": "battle_profile"
+      },
+      "arena": {
+        "mode": "template",
+        "source": "config/arena_match.json",
+        "defense_default": 0,
+        "note": "模板没有防御字段时按 0 处理；不许用真实装备属性覆盖模板。"
+      },
+      "battlefield": {
+        "mode": "power_compress_before_pipeline",
+        "source": "config/battlefield.json",
+        "note": "同队战力先压缩，压缩后的属性进四段；1.3 不是伤害乘区，这里不抄数字。"
+      },
+      "siege": {
+        "mode": "full_equipment_plus_tech",
+        "source": "config/siege.json",
+        "note": "装备全额 + 科技乘在属性上，再进四段；不另开城战伤害公式。"
+      }
+    },
+    "pending": true
+  },
   "effects": [
     {
       "id": "buff_attack_up_1",
@@ -53,6 +234,9 @@
       "max_stacks": 1,
       "stack_rule": "refresh",
       "diminishing": true,
+      "dispel_tags": [
+        "control"
+      ],
       "immunity_tags": [
         "cc_immune"
       ],
@@ -68,6 +252,9 @@
       "stack_rule": "refresh",
       "value_pct": -30,
       "diminishing": true,
+      "dispel_tags": [
+        "control"
+      ],
       "immunity_tags": [
         "cc_immune"
       ],
@@ -124,6 +311,24 @@
         }
       ],
       "pending": true
+    },
+    {
+      "id": "cc_stun_1",
+      "name": "眩晕",
+      "kind": "control",
+      "control": "stun",
+      "duration_ms": 1500,
+      "max_stacks": 1,
+      "stack_rule": "refresh",
+      "diminishing": true,
+      "dispel_tags": [
+        "control"
+      ],
+      "immunity_tags": [
+        "cc_immune"
+      ],
+      "pending": true,
+      "note": "Q1 新补的唯一一条 stun 样例；silence 仍只留键。"
     }
   ]
 }
