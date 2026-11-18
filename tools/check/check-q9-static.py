@@ -117,10 +117,14 @@ char_entries = [e for s in manifest["schemas"] if s["key"] == "character" for e 
 report("migration_listed",
        any(e["file"] == "db/character/deserter_penalty.sql" for e in char_entries),
        [e["file"] for e in char_entries[-2:]])
+# 版本号要比排在它前面的都大；不要求它永远是最后一条（后续卡还会往后加迁移）。
+_q9_idx = [i for i, e in enumerate(char_entries)
+           if e["file"].endswith("deserter_penalty.sql")]
+_q9_ver = [char_entries[i]["version"] for i in _q9_idx]
 report("migration_version_new",
-       [e["version"] for e in char_entries if e["file"].endswith("deserter_penalty.sql")]
-       == [max(e["version"] for e in char_entries)],
-       "只追加在末尾")
+       len(_q9_idx) == 1
+       and all(e["version"] < _q9_ver[0] for e in char_entries[:_q9_idx[0]]),
+       "版本号要比它前面的都大（不钉最后一条）")
 
 migration = read("db/character/deserter_penalty.sql")
 report("migration_character_schema", '"角色".deserter_penalty' in migration, "表在角色 schema")

@@ -22,8 +22,18 @@ public sealed record CreatedCharacter(
 public sealed record CreateOutcome(bool Ok, string Reason, CreatedCharacter? Created);
 
 /// <summary>
+/// 改名的结果。CountLeft 是改完之后背包里还剩几张改名卡；
+/// 没走到扣卡那一步时是 -1（不是 0，0 是「扣完了一张不剩」这个真事实）。
+/// </summary>
+public sealed record RenameOutcome(bool Ok, string Reason, string Name, int CountLeft);
+
+/// <summary>
 /// 角色表的唯一写入点。网关只能转请求过来，自己不写库。
-/// 这一行只做「建一个角色」；查角色、改角色、背包与货币都不在这里。
+/// 建号、改名与名字登记都在这一个类里；背包、货币、经验不在这里。
+/// Q12/K3 起：名字唯一性问的是 <c>"角色".character_name</c>（跨账号全局唯一），
+/// 不再是 (account, name) 那条账号内唯一的索引。
+/// 改名要扣卡、要抢事务号，这两个协作方按方法传入，不给构造加依赖——
+/// 只读核对（probe）建这个仓储时不该被迫装配一整套发放链。
 /// </summary>
 public sealed class CharacterRepository(NpgsqlDataSource dataSource)
 {
@@ -35,6 +45,7 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
     public async Task<CreateOutcome> CreateAsync(
         string account,
         string name,
+        string nameKey,
         string race,
         string appearance,
         string classId,
@@ -120,19 +131,174 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
                 reader.GetBoolean(9));
         }
 
+        // Q12/K3：名字登记与建号在同一笔事务里。两个人同时建同名时，
+        // character_name 的 name_key 主键是最后一道闸，撞了整笔回滚。
+        try
+        {
+            await using var claim = new NpgsqlCommand(
+                "insert into \"角色\".character_name (name_key, name, character_id) "
+                + "values ($1, $2, $3)",
+                connection, transaction);
+            claim.Parameters.AddWithValue(nameKey);
+            claim.Parameters.AddWithValue(name);
+            claim.Parameters.AddWithValue(created.Id);
+            await claim.ExecuteNonQueryAsync(stopping);
+        }
+        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            await transaction.RollbackAsync(stopping);
+            return new CreateOutcome(false, "name_taken", null);
+        }
+
         await transaction.CommitAsync(stopping);
         return new CreateOutcome(true, "", created);
     }
 
-    /// <summary>同一个账号下名字不重。撞了返回 false，由调用方转成错误码。</summary>
-    public async Task<bool> NameTakenAsync(string account, string name, CancellationToken stopping)
+    /// <summary>
+    /// Q12/K3：名字在全服是否已被占用。按归一后的 key 查登记表，
+    /// 与账号无关——换个账号也不能用同一个名字。
+    /// </summary>
+    public async Task<bool> NameTakenAsync(string nameKey, CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(
-            "select 1 from \"角色\".character where account = $1 and name = $2");
-        command.Parameters.AddWithValue(account);
-        command.Parameters.AddWithValue(name);
+            "select 1 from \"角色\".character_name where name_key = $1");
+        command.Parameters.AddWithValue(nameKey);
         await using var reader = await command.ExecuteReaderAsync(stopping);
         return await reader.ReadAsync(stopping);
+    }
+
+    /// <summary>只给核对用：某个角色当前占着的名字（没有登记行就返回 null）。</summary>
+    public async Task<string?> RegisteredNameAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select name from \"角色\".character_name where character_id = $1");
+        command.Parameters.AddWithValue(characterId);
+        var value = await command.ExecuteScalarAsync(stopping);
+        return value is null or DBNull ? null : (string)value;
+    }
+
+    /// <summary>只给核对用：登记表里一共有几行（一个角色一行）。</summary>
+    public async Task<int> NameRegistryCountAsync(CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select count(*) from \"角色\".character_name");
+        var value = await command.ExecuteScalarAsync(stopping);
+        return Convert.ToInt32(value);
+    }
+
+    /// <summary>
+    /// Q12/K3：改名。一笔事务里做完五件事：锁角色行、抢事务号、扣一张改名卡、
+    /// 改 character.name、换名字登记行（删旧 + 插新）。任一步不成立就整笔回滚——
+    /// 不会出现「卡扣了名字没改」或「名字改了旧名还占着」。
+    /// 拒绝码：character_not_found / rename_card_missing / name_taken /
+    /// name_unchanged / duplicate。
+    /// </summary>
+    public async Task<RenameOutcome> RenameAsync(
+        InventoryRepository inventory,
+        GrantRepository grants,
+        string account,
+        long characterId,
+        string newName,
+        string newNameKey,
+        string itemId,
+        string txnId,
+        CancellationToken stopping)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(stopping);
+        await using var transaction = await connection.BeginTransactionAsync(stopping);
+
+        string currentName;
+        await using (var lockRow = new NpgsqlCommand(
+            "select name from \"角色\".character "
+            + "where id = $1 and ($2 = '' or account = $2) for update",
+            connection, transaction))
+        {
+            lockRow.Parameters.AddWithValue(characterId);
+            lockRow.Parameters.AddWithValue(account);
+            var value = await lockRow.ExecuteScalarAsync(stopping);
+            if (value is null or DBNull)
+            {
+                await transaction.RollbackAsync(stopping);
+                return new RenameOutcome(false, "character_not_found", "", -1);
+            }
+
+            currentName = (string)value;
+        }
+
+        // 抢号在「同名判定」与扣卡之前：同一个 txn 重放时这里就挡住，
+        // 既不会二次扣卡，也不会把重放误报成 name_unchanged。
+        if (!await grants.TryClaimTxnInTransactionAsync(
+                connection, transaction, characterId, txnId, stopping))
+        {
+            await transaction.RollbackAsync(stopping);
+            return new RenameOutcome(false, "duplicate", currentName, -1);
+        }
+
+        // 归一后同名等于没改：不扣卡，免得白白花掉一张（号已抢，本次请求到此为止）。
+        if (string.Equals(
+                NameRulesTable.Normalize(currentName), newNameKey, StringComparison.Ordinal))
+        {
+            await transaction.RollbackAsync(stopping);
+            return new RenameOutcome(false, "name_unchanged", currentName, -1);
+        }
+
+        if (!await inventory.ConsumeInTransactionAsync(
+                connection, transaction, characterId, itemId, 1, stopping))
+        {
+            await transaction.RollbackAsync(stopping);
+            return new RenameOutcome(false, "rename_card_missing", currentName, 0);
+        }
+
+        await using (var rename = new NpgsqlCommand(
+            "update \"角色\".character set name = $2 where id = $1",
+            connection, transaction))
+        {
+            rename.Parameters.AddWithValue(characterId);
+            rename.Parameters.AddWithValue(newName);
+            await rename.ExecuteNonQueryAsync(stopping);
+        }
+
+        // 先删旧行再插新行：character_id 上有唯一索引，留着旧行插不进去；
+        // 删了之后如果新名被别人抢了（并发），整笔回滚、旧行随事务恢复。
+        await using (var release = new NpgsqlCommand(
+            "delete from \"角色\".character_name where character_id = $1",
+            connection, transaction))
+        {
+            release.Parameters.AddWithValue(characterId);
+            await release.ExecuteNonQueryAsync(stopping);
+        }
+
+        try
+        {
+            await using var claim = new NpgsqlCommand(
+                "insert into \"角色\".character_name (name_key, name, character_id) "
+                + "values ($1, $2, $3)",
+                connection, transaction);
+            claim.Parameters.AddWithValue(newNameKey);
+            claim.Parameters.AddWithValue(newName);
+            claim.Parameters.AddWithValue(characterId);
+            await claim.ExecuteNonQueryAsync(stopping);
+        }
+        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            await transaction.RollbackAsync(stopping);
+            return new RenameOutcome(false, "name_taken", currentName, -1);
+        }
+
+        int left;
+        await using (var readLeft = new NpgsqlCommand(
+            "select coalesce(sum(count), 0) from \"角色\".inventory "
+            + "where character_id = $1 and item_id = $2",
+            connection, transaction))
+        {
+            readLeft.Parameters.AddWithValue(characterId);
+            readLeft.Parameters.AddWithValue(itemId);
+            var value = await readLeft.ExecuteScalarAsync(stopping);
+            left = value is null or DBNull ? 0 : Convert.ToInt32(value);
+        }
+
+        await transaction.CommitAsync(stopping);
+        return new RenameOutcome(true, "", newName, left);
     }
 
     /// <summary>账号必须在，否则外键会炸；先查一次好给出明确的错误码。</summary>

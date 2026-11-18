@@ -684,3 +684,17 @@ CREATE TABLE IF NOT EXISTS "角色".deserter_penalty (
 
 CREATE INDEX IF NOT EXISTS deserter_penalty_until
     ON "角色".deserter_penalty (until_ms);
+
+-- Q12/K3：角色名登记表（与 db/character/name_registry.sql 是同一份）。
+-- 全服跨账号唯一靠 name_key 主键；改名删旧行 + 插新行，旧名随后释放。
+-- name_key 由角色服算好（NFKC + 去空白 + 大小写不敏感），库里不写第二套归一。
+CREATE TABLE IF NOT EXISTS "角色".character_name (
+    name_key      text        PRIMARY KEY,
+    name          text        NOT NULL,
+    character_id  bigint      NOT NULL
+                  REFERENCES "角色".character (id) ON DELETE CASCADE,
+    registered_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS character_name_character
+    ON "角色".character_name (character_id);

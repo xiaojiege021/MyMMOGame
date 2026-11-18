@@ -1,14 +1,14 @@
 {
   "schema": "shop-table/1",
-  "version": 11,
+  "version": 12,
   "currency": "yuanbao",
-  "note": "商城清单唯一正本（K1 起 v11）。方案 12.1 写定：只收元宝、直接标价、不做抽卡；能上架的只有 categories 里那十八种，forbidden 那串一律不上架——两张表都在本文件里，代码不再写第二份。每条商品按 delivery.mode 决定买到手变成什么：item（进背包，走 ApplyGrant 同一事务）/ season_pass（开本季付费轨，不背包）/ monthly_bundle（一次放两种符，发什么只在 monthly_bundle.json）/ second_slot（账号角色位 +1）/ none（还没接发货，回 delivery_pending、一分不扣）。mode 的取值是代码能力、不是内容：wardrobe / bag_slots / guild_display 三种要等 B7+B8 接上才允许出现在这里，在那之前那八条外观与扩容商品写 none。价格、数量、货币、发货方式、限购、库存只在配置里，代码 / proto / SQL 没有第二份。limit 与 stock 这两个数方案没写定：一次性商品（通行证 / 第二角色栏）填 1 声明「每角色一张」，其余填 0 = 不限；库存一律 unlimited。本卡只把这些字段带齐并在加载期校验范围，真正的限购 / 库存判定在 B7+B8 与 K2，不在这里假装生效。通栏规则照旧：红符必须就是 talisman.json 的 red.item_id、蓝符是 blue.item_id（红符不是红药、蓝符不是蓝药）、复活卷轴是 revive_scroll.json 的 scroll.item_id（不另卖复活币）、经验道具是 exp_booster.json 的 booster.item_id（商城是唯一来源）、解绑道具是 unbind_item.json 的 unbind.item_id、保护券是 enhance.json 的 protect_item_id（与通行证付费轨发的是同一种），传送符与月叠发的是同一件。新增一件商品只改这个文件，不改代码。",
+  "note": "商城清单唯一正本（K1 起 v11，Q12 升 v12）。方案 12.1 写定：只收元宝、直接标价、不做抽卡；能上架的只有 categories 里那十九种（Q12 按用户决定追加第十九种 rename_card，改名卡 500 元宝、一张改一次名，方案正文同步追加），forbidden 那串一律不上架——两张表都在本文件里，代码不再写第二份。每条商品按 delivery.mode 决定买到手变成什么：item（进背包，走 ApplyGrant 同一事务）/ season_pass（开本季付费轨，不背包）/ monthly_bundle（一次放两种符，发什么只在 monthly_bundle.json）/ second_slot（账号角色位 +1）/ none（还没接发货，回 delivery_pending、一分不扣）。mode 的取值是代码能力、不是内容：wardrobe / bag_slots / guild_display 三种要等 B7+B8 接上才允许出现在这里，在那之前那八条外观与扩容商品写 none。价格、数量、货币、发货方式、限购、库存只在配置里，代码 / proto / SQL 没有第二份。limit 与 stock 这两个数方案没写定：一次性商品（通行证 / 第二角色栏）填 1 声明「每角色一张」，其余填 0 = 不限；库存一律 unlimited。本卡只把这些字段带齐并在加载期校验范围，真正的限购 / 库存判定在 B7+B8 与 K2，不在这里假装生效。通栏规则照旧：红符必须就是 talisman.json 的 red.item_id、蓝符是 blue.item_id（红符不是红药、蓝符不是蓝药）、复活卷轴是 revive_scroll.json 的 scroll.item_id（不另卖复活币）、经验道具是 exp_booster.json 的 booster.item_id（商城是唯一来源）、解绑道具是 unbind_item.json 的 unbind.item_id、保护券是 enhance.json 的 protect_item_id（与通行证付费轨发的是同一种）、改名卡是 name_rules.json 的 rename_item_id（一张改一次，扣卡在角色服改名事务里），传送符与月叠发的是同一件。新增一件商品只改这个文件，不改代码。",
   "categories": [
     "outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
     "home_decor", "guild_display", "bag_expand", "teleport_talisman",
     "red_talisman", "blue_talisman", "revive_scroll", "unbind_item",
     "exp_booster", "monthly_bundle", "second_slot", "season_pass",
-    "protect_ticket"
+    "protect_ticket", "rename_card"
   ],
   "forbidden": [
     "gold", "enhance_stone", "transfer_stone", "crystal", "spirit_stone",
@@ -230,8 +230,29 @@
       "delivery": { "mode": "item", "item_id": "ticket_protect", "count": 1 },
       "limit": { "per_character": 0, "per_day": 0 },
       "stock": { "rule": "unlimited" },
-      "on_sale": true,
-      "note": "到账即绑，只挡一次掉级；编号就是 enhance.json 的 protect_item_id，与通行证付费轨发的是同一种"
-    }
-  ]
+    "on_sale": true,
+    "note": "到账即绑，只挡一次掉级；编号就是 enhance.json 的 protect_item_id，与通行证付费轨发的是同一种"
+  },
+  {
+    "id": "shop_rename_card_1",
+    "name": "改名卡",
+    "category": "rename_card",
+    "price": 500,
+    "currency": "yuanbao",
+    "delivery": {
+      "mode": "item",
+      "item_id": "rename_card",
+      "count": 1
+    },
+    "limit": {
+      "per_character": 0,
+      "per_day": 0
+    },
+    "stock": {
+      "rule": "unlimited"
+    },
+    "on_sale": true,
+    "note": "Q12：一张改一次名，不限时间不限次数；到账即绑，不能上架。物品编号是 name_rules.json 的 rename_item_id，价格只在本文件"
+  }
+]
 }

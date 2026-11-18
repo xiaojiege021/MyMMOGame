@@ -53,7 +53,7 @@ KINDS_121 = ["outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin"
              "home_decor", "guild_display", "bag_expand", "teleport_talisman",
              "red_talisman", "blue_talisman", "revive_scroll", "unbind_item",
              "exp_booster", "monthly_bundle", "second_slot", "season_pass",
-             "protect_ticket"]
+             "protect_ticket", "rename_card"]
 FORBIDDEN_121 = ["gold", "enhance_stone", "transfer_stone", "crystal", "spirit_stone",
                  "pill", "ore", "herb", "equip_blueprint", "equip", "attr_item",
                  "revive_coin", "fatigue", "dungeon_count", "weekly_share",
@@ -71,8 +71,10 @@ home_cs = read("src/Character/HomeCoinShopTable.cs")
 svc = read("src/Character/CharacterGrpcService.cs")
 
 # ---------------------------------------------------------------- 1. 配置字段
+# 版本号只增不减：K1 收口时是 11，后面的卡（Q12 加改名卡）会往上走，不钉具体数字。
 report("shop_schema_version",
-       shop.get("schema") == "shop-table/1" and shop.get("version") == 11,
+       shop.get("schema") == "shop-table/1" and isinstance(shop.get("version"), int)
+       and shop.get("version") >= 11,
        "schema=%s version=%s" % (shop.get("schema"), shop.get("version")))
 report("shop_categories_from_config", shop.get("categories") == KINDS_121,
        "config=%s" % ",".join(shop.get("categories") or []))
@@ -222,10 +224,12 @@ elif ! grep -q '^PASS static_end' "$TMP/static.txt"; then
 fi
 
 echo "== 3. 只读入口 =="
+# 版本号从配置现取：K1 之后每加一条商品就会升版本，钉死会一直红。
+SHOP_VERSION="$(python3 -c 'import json;print(json.load(open("config/shop.json"))["version"])')"
 if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
   head1="$(head -1 "$TMP/list.txt")"
   case "$head1" in
-    "shop_list_state=ok version=11 "*) ok "清单读得出来：v11、只收元宝" ;;
+    "shop_list_state=ok version=${SHOP_VERSION} "*) ok "清单读得出来：v${SHOP_VERSION}、只收元宝" ;;
     *) bad "清单头部不对：$head1" ;;
   esac
   rows=$(grep -c '^shop_item=' "$TMP/list.txt" || true)
@@ -302,8 +306,8 @@ if grep -q 'shop_item=shop_k1_probe_1 .*mode=none.*delivery=pending ' <<< "$ADDE
 else
   bad "新加商品没生效：$(printf '%s' "$ADDED" | grep shop_k1_probe_1 | head -1)"
 fi
-if grep -q 'items=19' <<< "$(head -1 <<< "$ADDED")"; then
-  ok "条数跟着配置走（18 → 19）"
+if grep -q "items=$(python3 -c 'import json;print(len(json.load(open("config/shop.json"))["items"])+1)')" <<< "$(head -1 <<< "$ADDED")"; then
+  ok "条数跟着配置走（配置条数 + 1）"
 else
   bad "条数没跟着配置走：$(printf '%s' "$ADDED" | head -1)"
 fi

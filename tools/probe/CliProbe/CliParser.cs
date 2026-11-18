@@ -19,6 +19,7 @@ internal static class CliParser
             case "--calendar": case "--calendar-path": case "--at": CalendarCli.Parse(args, ref i); break;
             case var flag when CityTaskCli.Handles(flag): CityTaskCli.Parse(args, ref i); break;
             case var flag2 when PassProgressCli.Handles(flag2): PassProgressCli.Parse(args, ref i); break;
+            case var nameFlag when NameCli.Handles(nameFlag): NameCli.Parse(args, ref i); break;
             case "--migrate": migrate = true; break;
             case "--migrations" when i + 1 < args.Length: migrationsPath = args[++i]; break;
             case "--schema" when i + 1 < args.Length: schemaFilter = args[++i]; break;
@@ -571,9 +572,7 @@ internal static class CliParser
                 siegeTerritoryTableState = true;
                 siegeTerritoryTablePath = args[++i];
                 break;
-            case "--siege-result-state":
-                siegeResultState = true;
-                break;
+            case "--siege-result-state": siegeResultState = true; break;
             // 核对用：直接调同一笔写回事务，验重放幂等与各类拒绝，不必每次都打一场城战。
             case "--apply-siege-result" when i + 5 < args.Length:
                 applySiegeResultTxn = args[++i];

@@ -96,4 +96,9 @@ internal static class CliLoaders
             cfg.ShopTable, currencies, items, enhance, talismans, scrolls, boosters, unbinds);
         return CharacterSlotTable.Load(path ?? cfg.CharacterSlotTable, shop);
     }
+
+    // Q12/K3：名字规则的加载链。只读入口与启动共用同一份 NameRulesTable.Load：
+    // 物品表是同一份正本（rename_item_id 必须在里面），敏感词表路径也由规则文件指。
+    public static NameRulesTable LoadNameRules(CharacterConfig cfg, string? path) =>
+        NameRulesTable.Load(path ?? cfg.NameRulesTable, ItemTable.Load("config/items.json"));
 }

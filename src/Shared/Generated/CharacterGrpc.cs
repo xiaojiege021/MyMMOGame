@@ -53,6 +53,10 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CreateCharacterResponse> __Marshaller_mmo_character_CreateCharacterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CreateCharacterResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.RenameCharacterRequest> __Marshaller_mmo_character_RenameCharacterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.RenameCharacterRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.RenameCharacterResponse> __Marshaller_mmo_character_RenameCharacterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.RenameCharacterResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SetLevelRequest> __Marshaller_mmo_character_SetLevelRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SetLevelRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.SetLevelResponse> __Marshaller_mmo_character_SetLevelResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SetLevelResponse.Parser));
@@ -266,6 +270,14 @@ namespace Mmo.Proto.Character {
         "CreateCharacter",
         __Marshaller_mmo_character_CreateCharacterRequest,
         __Marshaller_mmo_character_CreateCharacterResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.RenameCharacterRequest, global::Mmo.Proto.Character.RenameCharacterResponse> __Method_RenameCharacter = new grpc::Method<global::Mmo.Proto.Character.RenameCharacterRequest, global::Mmo.Proto.Character.RenameCharacterResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RenameCharacter",
+        __Marshaller_mmo_character_RenameCharacterRequest,
+        __Marshaller_mmo_character_RenameCharacterResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.SetLevelRequest, global::Mmo.Proto.Character.SetLevelResponse> __Method_SetLevel = new grpc::Method<global::Mmo.Proto.Character.SetLevelRequest, global::Mmo.Proto.Character.SetLevelResponse>(
@@ -695,6 +707,18 @@ namespace Mmo.Proto.Character {
     {
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CreateCharacterResponse> CreateCharacter(global::Mmo.Proto.Character.CreateCharacterRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q12/K3：改名。名字在全服跨账号唯一；旧名在同一笔事务里释放。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.RenameCharacterResponse> RenameCharacter(global::Mmo.Proto.Character.RenameCharacterRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1416,6 +1440,54 @@ namespace Mmo.Proto.Character {
       public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CreateCharacterResponse> CreateCharacterAsync(global::Mmo.Proto.Character.CreateCharacterRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_CreateCharacter, null, options, request);
+      }
+      /// <summary>
+      /// Q12/K3：改名。名字在全服跨账号唯一；旧名在同一笔事务里释放。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.RenameCharacterResponse RenameCharacter(global::Mmo.Proto.Character.RenameCharacterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RenameCharacter(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q12/K3：改名。名字在全服跨账号唯一；旧名在同一笔事务里释放。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.RenameCharacterResponse RenameCharacter(global::Mmo.Proto.Character.RenameCharacterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RenameCharacter, null, options, request);
+      }
+      /// <summary>
+      /// Q12/K3：改名。名字在全服跨账号唯一；旧名在同一笔事务里释放。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.RenameCharacterResponse> RenameCharacterAsync(global::Mmo.Proto.Character.RenameCharacterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RenameCharacterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q12/K3：改名。名字在全服跨账号唯一；旧名在同一笔事务里释放。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.RenameCharacterResponse> RenameCharacterAsync(global::Mmo.Proto.Character.RenameCharacterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RenameCharacter, null, options, request);
       }
       /// <summary>
       /// 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
@@ -4096,6 +4168,7 @@ namespace Mmo.Proto.Character {
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
           .AddMethod(__Method_CreateCharacter, serviceImpl.CreateCharacter)
+          .AddMethod(__Method_RenameCharacter, serviceImpl.RenameCharacter)
           .AddMethod(__Method_SetLevel, serviceImpl.SetLevel)
           .AddMethod(__Method_AddItem, serviceImpl.AddItem)
           .AddMethod(__Method_ListInventory, serviceImpl.ListInventory)
@@ -4158,6 +4231,7 @@ namespace Mmo.Proto.Character {
     public static void BindService(grpc::ServiceBinderBase serviceBinder, CharacterServiceBase serviceImpl)
     {
       serviceBinder.AddMethod(__Method_CreateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(serviceImpl.CreateCharacter));
+      serviceBinder.AddMethod(__Method_RenameCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RenameCharacterRequest, global::Mmo.Proto.Character.RenameCharacterResponse>(serviceImpl.RenameCharacter));
       serviceBinder.AddMethod(__Method_SetLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SetLevelRequest, global::Mmo.Proto.Character.SetLevelResponse>(serviceImpl.SetLevel));
       serviceBinder.AddMethod(__Method_AddItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AddItemRequest, global::Mmo.Proto.Character.InventorySlot>(serviceImpl.AddItem));
       serviceBinder.AddMethod(__Method_ListInventory, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ListInventoryRequest, global::Mmo.Proto.Character.ListInventoryResponse>(serviceImpl.ListInventory));

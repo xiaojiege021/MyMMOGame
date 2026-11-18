@@ -286,4 +286,15 @@ internal static class CliFlags
     // 用来在「故意造一条违反」的临时库上验核对器还灵，不改主库。
     public static bool invariants = false;
     public static string? dbOverride = null;
+    // Q12/K3：名字规则只读入口、单名判定、改名、登记表状态与旧库回填。
+    public static bool nameRulesState = false;
+    public static string? nameRulesPath = null;
+    public static string? nameCheck = null;
+    public static long characterRenameOf = 0;
+    public static string? characterRenameTo = null;
+    public static string? renameTxn = null;
+    public static long nameStateOf = 0;
+    public static bool nameBackfill = false;
+    public static bool nameRegistry = false;
+    public static int nameRegistryLimit = 100;
 }

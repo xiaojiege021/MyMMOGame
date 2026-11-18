@@ -60,8 +60,9 @@ def cfg(p):
 def report(key, cond, info=""):
     print(("PASS " if cond else "FAIL ") + key + ("" if cond else "  " + info))
 
-# 14.7 的 K4 行只写了「物品引用」；这五种键就是当前配置里全部引用方式。
-REF_KEYS = {"item_id", "stone_id", "protect_item_id", "stone_item_id"}
+# 14.7 的 K4 行只写了「物品引用」；这几种键就是当前配置里全部引用方式。
+# Q12 加了 rename_item_id（name_rules.json 指到改名卡），同样要在这里登记。
+REF_KEYS = {"item_id", "stone_id", "protect_item_id", "stone_item_id", "rename_item_id"}
 
 # 配置设计 2 节的物品种类，加上通行证已经在用的 appearance_fragment / outfit。
 KINDS = {

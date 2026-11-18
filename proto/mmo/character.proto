@@ -34,9 +34,39 @@ message CreateCharacterResponse {
   bool alignment_empty = 10;
 }
 
+// Q12/K3：改名。改一次消耗一张改名卡（物品编号在 config/name_rules.json 的
+// rename_item_id），卡在角色服那笔事务里扣，客户端说了不算。
+// txn_id 由网关生成：同一个号重放只回 duplicate，不会二次扣卡。
+message RenameCharacterRequest {
+  // 网关填账号并先核归属；战斗服 / 探针直连时留空，只按角色号找。
+  string account = 1;
+  uint64 character_id = 2;
+  string new_name = 3;
+  string txn_id = 4;
+}
+
+message RenameCharacterResponse {
+  bool ok = 1;
+  // 拒绝码：name_too_short / name_too_long / name_banned / name_invalid /
+  // name_taken / name_unchanged / rename_card_missing / rename_disabled /
+  // character_not_found / duplicate。
+  string reason = 2;
+  // 改成功后的显示名；失败时是改名前的名字。
+  string name = 3;
+  // 这一次用的是哪件物品（改名卡编号）。
+  string item_id = 4;
+  // 改完之后背包里还剩几张；没扣卡时是 0。
+  int32 count_left = 5;
+  // 同一个 txn_id 重放时为 true，此时没有扣卡、名字没变。
+  bool duplicate = 6;
+}
+
 // 角色服。角色的唯一写入在这里，网关只能转请求，不能直接写库。
 service CharacterService {
   rpc CreateCharacter(CreateCharacterRequest) returns (CreateCharacterResponse);
+
+  // Q12/K3：改名。名字在全服跨账号唯一；旧名在同一笔事务里释放。
+  rpc RenameCharacter(RenameCharacterRequest) returns (RenameCharacterResponse);
 
   // 写等级。1–100 可写，超过 100 或小于 1 直接拒绝，不改库里的值。
   // 上限是大版本也不抬的（方案「成长与物品」），所以拒绝而不是夹到 100。

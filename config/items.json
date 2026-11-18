@@ -400,6 +400,16 @@
       "stack_max": 1,
       "bind": "none",
       "desc": "行商带来的法剑，十五级可用。"
+    },
+    {
+      "id": "rename_card",
+      "name": "改名卡",
+      "kind": "consumable",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 20,
+      "bind": "always",
+      "desc": "改一次角色名，用掉一张。商城有售。"
     }
   ]
 }

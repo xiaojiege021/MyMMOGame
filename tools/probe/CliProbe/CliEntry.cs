@@ -47,6 +47,9 @@ internal static class CliEntry
         code = PassProgressCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = NameCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = MetaCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

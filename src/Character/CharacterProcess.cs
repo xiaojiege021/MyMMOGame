@@ -53,6 +53,7 @@ public sealed class CharacterProcess(string configPath)
         RecipeTable recipeTable;
         CityTaskTable cityTaskTable;
         SeasonPassProgressTable seasonPassProgressTable;
+        NameRulesTable nameRulesTable;
         DungeonDropTable dungeonDropTable;
         MainlineDropTable mainlineDropTable;
         try
@@ -63,6 +64,9 @@ public sealed class CharacterProcess(string configPath)
             branches = BranchTable.Load("config/branches.json");
             classes = new ClassIds("config/classes.json");
             items = ItemTable.Load("config/items.json");
+            // Q12/K3：名字规则。长度、唯一、改名与敏感词表路径都在这份文件里；
+            // rename_item_id 必须在上面这份物品表里——加载期就挡住「配了一个不存在的卡」。
+            nameRulesTable = NameRulesTable.Load(config.NameRulesTable, items);
             currencies = CurrencyTable.Load("config/currency.json");
             dungeons = DungeonTable.Load(config.DungeonTable);
             // P3-1a1：十一段按顺序开放，首发到结丹；元婴起每段一个开关。
@@ -335,6 +339,17 @@ public sealed class CharacterProcess(string configPath)
                 + " period=" + source.Period
                 + " max=" + source.MaxPerPeriod);
         }
+
+        // Q12/K3：名字规则的事实值。长度、唯一、改名开关、改名卡编号与敏感词条数
+        // 都能在这里一次看全；与 --name-rules 的只读入口同一组字段。
+        Console.WriteLine("name_rules=version=" + nameRulesTable.Version
+            + " global_unique=" + (nameRulesTable.GlobalUnique ? "true" : "false")
+            + " allow_rename=" + (nameRulesTable.AllowRename ? "true" : "false")
+            + " min_length=" + nameRulesTable.MinLength
+            + " max_length=" + nameRulesTable.MaxLength
+            + " rename_item_id=" + nameRulesTable.RenameItemId
+            + " banned_words=" + nameRulesTable.BannedCount
+            + " banned_words_file=" + nameRulesTable.BannedWordsFile);
 
         // P3-4a2：通行证两轨的事实值。改配置重启后这里能直接核对到：
         // 标价来自 shop.json 那条 season_pass 商品，保护券就是 enhance.json 那一件。
@@ -627,6 +642,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(social);
         builder.Services.AddSingleton(seasonPassTable);
         builder.Services.AddSingleton(seasonPassProgressTable);
+        builder.Services.AddSingleton(nameRulesTable);
         builder.Services.AddSingleton(seasonPassPoints);
         builder.Services.AddSingleton(seasonPasses);
         builder.Services.AddSingleton(monthlyBundleTable);

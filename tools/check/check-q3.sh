@@ -167,8 +167,9 @@ for name, cal in (("character", "ny"), ("global", "sun")):
     d["calendar_table"] = tmp + "/" + cal + ".json"
     json.dump(d, open(tmp + "/" + name + "-good.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 PY
+  # 行数不钉死：后续卡会在启动日志里加行，head -80 会被挤掉（Q12 加 name_rules= 时踩到）。
   CH="$(MMO_GAMEDB= "$DOTNET" "$CHAR_SERVICE_DLL" \
-    --config "$TMP/character-good.json" 2>&1 | head -80)"
+    --config "$TMP/character-good.json" 2>&1 | head -200)"
   printf '%s' "$CH" | grep -q 'calendar=ok .*timezone=America/New_York .*day=2026-' \
     && printf '%s' "$CH" | grep -q 'db_missing=1' \
     && ok "角色服无库时仍打出换时区后的 day / week_start，再退 db_missing" \

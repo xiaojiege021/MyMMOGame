@@ -89,14 +89,21 @@ service = files[service_cs]
 api = files[api_cs]
 proto_text = files[proto]
 
-# 12.1 的十八种。这一串是方案正文，改动就要停下来问。
+# 12.1 的种类。这一串是方案正文的英文键视图（方案那张表是中文），
+# 条数不写死：下面拿方案 12.1 表格的实际行数来比，方案追加一行而这里没跟就会红。
 kinds_121 = ["outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
              "home_decor", "guild_display", "bag_expand", "teleport_talisman",
              "red_talisman", "blue_talisman", "revive_scroll", "unbind_item",
              "exp_booster", "monthly_bundle", "second_slot", "season_pass",
-             "protect_ticket"]
-# 18 类 K1 起只在配置里（config/shop.json 的 categories），代码没有第二份。
-report("kinds_18", shop.get("categories") == kinds_121,
+             "protect_ticket", "rename_card"]
+# 种类 K1 起只在配置里（config/shop.json 的 categories），代码没有第二份。
+plan_html = os.path.join(root, "docs/MMO系统架构方案.html")
+plan = read(plan_html)
+sec_121 = plan.split('<span class="n">12.1</span>', 1)[-1].split("</table>", 1)[0]
+rows_121 = sec_121.count("<tr><td>")
+report("kinds_match_121_rows", rows_121 == len(kinds_121),
+       "plan_rows=%d kinds=%d" % (rows_121, len(kinds_121)))
+report("kinds_121", shop.get("categories") == kinds_121,
        "config=%s" % ",".join(shop.get("categories") or []))
 
 def delivery(i):

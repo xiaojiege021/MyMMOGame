@@ -76,7 +76,8 @@ public sealed class CharacterGrpcService(
     CraftRepository crafts,
     CityTaskTable? cityTaskTable,
     CityTaskRepository? cityTasks,
-    DeserterRepository deserters) : CharacterService.CharacterServiceBase
+    DeserterRepository deserters,
+    NameRulesTable nameRules) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
@@ -100,10 +101,15 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "account_missing"));
         }
 
-        if (name.Length == 0 || name.Length > 16)
+        // Q12/K3：长度、可见字符、敏感词只按 config/name_rules.json 的规则判，
+        // 代码里没有第二个长度常量（以前这里写死 16）。
+        var verdict = nameRules.Check(name);
+        if (!verdict.Ok)
         {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "name_invalid"));
+            throw new RpcException(new Status(StatusCode.InvalidArgument, verdict.Reason));
         }
+
+        name = verdict.Display;
 
         if (races.Find(race) is null)
         {
@@ -126,7 +132,7 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.NotFound, "account_not_found"));
         }
 
-        if (await characters.NameTakenAsync(account, name, context.CancellationToken))
+        if (await characters.NameTakenAsync(verdict.Normalized, context.CancellationToken))
         {
             throw new RpcException(new Status(StatusCode.AlreadyExists, "name_taken"));
         }
@@ -138,6 +144,7 @@ public sealed class CharacterGrpcService(
             var outcome = await characters.CreateAsync(
                 account,
                 name,
+                verdict.Normalized,
                 race,
                 appearance,
                 classId,
@@ -153,6 +160,15 @@ public sealed class CharacterGrpcService(
                         "character_reject account={Account} name={Name} reason=slot_full base_slots={Base}",
                         account, name, characterSlotTable.BaseSlots);
                     throw new RpcException(new Status(StatusCode.AlreadyExists, "slot_full"));
+                }
+
+                // 登记表主键撞了：两个同名并发建号，后到的那一笔整笔回滚。
+                if (string.Equals(outcome.Reason, "name_taken", StringComparison.Ordinal))
+                {
+                    logger.LogInformation(
+                        "character_reject account={Account} name={Name} reason=name_taken",
+                        account, name);
+                    throw new RpcException(new Status(StatusCode.AlreadyExists, "name_taken"));
                 }
 
                 throw new RpcException(new Status(StatusCode.NotFound, "account_not_found"));
@@ -183,6 +199,114 @@ public sealed class CharacterGrpcService(
             // 并发下两个同名一起进来，唯一索引是最后一道闸。
             throw new RpcException(new Status(StatusCode.AlreadyExists, "name_taken"));
         }
+    }
+
+    /// <summary>
+    /// Q12/K3：改名。名字判定与建号同一份规则（长度、可见字符、敏感词），
+    /// 卡在角色服那笔事务里扣——网关只转请求，不带「用了哪张卡」这种客户端能编的字段。
+    /// 业务拒绝（重名、没卡、名字没变、重放）一律回 ok=false + 原因，不改库里的任何值；
+    /// 只有请求本身不成立（缺角色号 / 缺事务号 / 角色不属于这个账号）才抛 RpcException。
+    /// </summary>
+    public override async Task<RenameCharacterResponse> RenameCharacter(
+        RenameCharacterRequest request,
+        ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > 64)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (account.Length > 0)
+        {
+            if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+        }
+        else if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        // 规则里关了改名就到此为止，连卡都不看。
+        if (!nameRules.AllowRename)
+        {
+            return new RenameCharacterResponse
+            {
+                Ok = false,
+                Reason = NameRulesTable.ReasonRenameDisabled,
+                Name = "",
+                ItemId = nameRules.RenameItemId,
+                CountLeft = 0,
+                Duplicate = false,
+            };
+        }
+
+        var verdict = nameRules.Check(request.NewName);
+        if (!verdict.Ok)
+        {
+            logger.LogInformation(
+                "character_rename_reject id={Id} account={Account} reason={Reason}",
+                characterId, account, verdict.Reason);
+            return new RenameCharacterResponse
+            {
+                Ok = false,
+                Reason = verdict.Reason,
+                Name = "",
+                ItemId = nameRules.RenameItemId,
+                CountLeft = 0,
+                Duplicate = false,
+            };
+        }
+
+        var outcome = await characters.RenameAsync(
+            inventory,
+            grants,
+            account,
+            characterId,
+            verdict.Display,
+            verdict.Normalized,
+            nameRules.RenameItemId,
+            txnId,
+            context.CancellationToken);
+
+        if (!outcome.Ok)
+        {
+            logger.LogInformation(
+                "character_rename_reject id={Id} account={Account} reason={Reason}",
+                characterId, account, outcome.Reason);
+            return new RenameCharacterResponse
+            {
+                Ok = false,
+                Reason = outcome.Reason,
+                Name = outcome.Name,
+                ItemId = nameRules.RenameItemId,
+                CountLeft = Math.Max(0, outcome.CountLeft),
+                Duplicate = string.Equals(outcome.Reason, "duplicate", StringComparison.Ordinal),
+            };
+        }
+
+        logger.LogInformation(
+            "character_renamed id={Id} account={Account} name={Name} card_left={Left}",
+            characterId, account, outcome.Name, outcome.CountLeft);
+
+        return new RenameCharacterResponse
+        {
+            Ok = true,
+            Reason = "",
+            Name = outcome.Name,
+            ItemId = nameRules.RenameItemId,
+            CountLeft = outcome.CountLeft,
+            Duplicate = false,
+        };
     }
 
     /// <summary>

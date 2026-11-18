@@ -1,12 +1,12 @@
 {
-  "schema": "name-rules/1",
-  "version": 1,
-  "pending": true,
-  "note": "Q12/K3：角色名规则的唯一正本。方案没写定长度、改名与敏感词；这里只给骨架，全部 pending。代码尚未读取，由 Q12 接入；敏感词表以后单独放，不写进本文件。",
+  "schema": "name-rules/2",
+  "version": 2,
+  "pending": false,
+  "note": "Q12/K3：角色名规则的唯一正本。方案正文没写长度、改名与敏感词（12.1 只写商城上架清单），这几个数由用户在开卡时定：名长 2–12、跨账号全局唯一、改名消耗一张改名卡（物品编号见 rename_item_id；商城价 500 元宝只在 shop.json，本文件不写第二份价格）、敏感词表单独一个文件（banned_words_file，每行一词，# 开头为注释）。判重口径是代码能力、不是内容：NFKC 归一 + 去首尾空白 + 大小写不敏感，只此一种实现，配置里不写「用哪种归一」这种不生效的开关。改名不限次数、不设冷却：一张卡改一次，卡从背包扣。长度按归一后的字符数算，不是字节数。",
   "min_length": 2,
   "max_length": 12,
   "global_unique": true,
   "allow_rename": true,
-  "rename_cost_gold": 0,
-  "banned_patterns": []
+  "rename_item_id": "rename_card",
+  "banned_words_file": "config/name_banned_words.txt"
 }
