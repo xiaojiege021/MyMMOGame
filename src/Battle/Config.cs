@@ -551,6 +551,14 @@ public sealed class BattleConfig
 
     public string WorldBossTablePath { get; private set; } = "";
 
+    /// <summary>
+    /// Q9：断线宽限、重连窗口与逃跑惩罚（config/reconnect.json）。可选表：老卡的
+    /// 临时配置目录没有它时按「断线即离场、不重连、不惩罚」跑，老链路一字不变。
+    /// </summary>
+    public ReconnectTable Reconnect { get; private set; } = ReconnectTable.Missing;
+
+    public string ReconnectTablePath { get; private set; } = "";
+
     /// <summary>世界服地址。留空就不把入口事实值交回去（技能与经验照常结算）。</summary>
     public string WorldUpstream { get; init; } = "";
 
@@ -583,6 +591,9 @@ public sealed class BattleConfig
         var sectTechPath = Resolve(dir, raw.SectTechTable, "sect_tech.json");
         var siegeTerritoryPath = Resolve(dir, raw.SiegeTerritoryTable, "siege_territory.json");
         var worldBossPath = Resolve(dir, raw.WorldBossTable, "world_boss.json");
+        // Q9：断线重连表同样可选。老卡的临时配置目录没有 reconnect.json 时按
+        // 「断线即离场、不重连、不惩罚」跑；显式写了路径却缺文件照样起不来。
+        var reconnectPath = Resolve(dir, raw.ReconnectTable, "reconnect.json");
         // 竞技场表是可选项：没写这一项、文件也不在，就起一张空表（竞技场一律拒），
         // 副本与练习场不受影响。但显式写了路径就必须兑现，缺文件照样起不来。
         var arenaMatch = File.Exists(arenaMatchPath)
@@ -634,6 +645,12 @@ public sealed class BattleConfig
         // K6：怪物表的技能编号要落在这份技能表里。缺表按「没有怪物」处理，
         // 老卡的临时配置目录不受影响；显式写了路径却缺文件仍然起不来。
         var skills = SkillTable.Load(skillPath);
+
+        var reconnect = File.Exists(reconnectPath)
+            ? ReconnectTable.Load(reconnectPath)
+            : string.IsNullOrWhiteSpace(raw.ReconnectTable)
+                ? ReconnectTable.Missing
+                : throw new ConfigException($"{path}：reconnect_table 指的 {reconnectPath} 不存在");
 
         // Q2：效果表是可选表。配置目录里没有它就按恒等伤害跑（老卡的临时配置目录
         // 一个文件都不用改）；显式写了路径却缺文件照样起不来。技能里写了 effect 块
@@ -715,6 +732,8 @@ public sealed class BattleConfig
             SectTech = sectTech,
             SiegeTerritory = siegeTerritory,
             WorldBoss = worldBoss,
+            Reconnect = reconnect,
+            ReconnectTablePath = reconnectPath,
         };
 
         // 模板与职业表对齐：每个职业都要有默认模板，模板里也不许出现职业表没有的职业。
@@ -944,6 +963,8 @@ public sealed class BattleConfig
         public string SiegeTerritoryTable { get; init; } = "";
         /// <summary>P3-5a 世界 Boss 表；留空时按默认文件名找，找不到就降级为没有入口。</summary>
         public string WorldBossTable { get; init; } = "";
+        /// <summary>Q9 断线重连表；留空时按默认文件名找，找不到就降级为不重连、不惩罚。</summary>
+        public string ReconnectTable { get; init; } = "";
         /// <summary>社交服地址；留空就不查宗门科技，老链路照跑。</summary>
         public string SocialUpstream { get; init; } = "";
         /// <summary>世界服地址；留空就不把入口事实值交回去。</summary>

@@ -27,6 +27,10 @@ string? worldBossPath = null;
 var worldBossAtMs = 0L;
 // Q8：分配算法的离线自检。不连库、不起服、不读配置。
 var lootStateOnly = false;
+// Q9：重连表的只读入口（打印三个数字），以及「这个角色还要等多久」的只读查询。
+// 两者都与真实启动共用同一份 BattleConfig.Load，不另起一套配置读法。
+var reconnectStateOnly = false;
+var deserterStateOf = 0UL;
 for (var i = 0; i < args.Length; i++)
 {
     switch (args[i])
@@ -133,6 +137,73 @@ for (var i = 0; i < args.Length; i++)
         case "--loot-state":
             lootStateOnly = true;
             break;
+        // Q9：重连表只读核对。与真实启动共用同一个 BattleConfig.Load；
+        // 缺表时打 reconnect_state=missing，老卡临时配置目录就是这个状态。
+        case "--reconnect-state":
+            reconnectStateOnly = true;
+            break;
+        // Q9：问角色服「这个角色还要等多久」。只读，不写库、不改任何事实值。
+        case "--deserter-state" when i + 1 < args.Length:
+            if (!ulong.TryParse(args[++i], out deserterStateOf))
+            {
+                Console.WriteLine("bad_arg=--deserter-state");
+                return 64;
+            }
+            break;
+    }
+}
+
+if (reconnectStateOnly)
+{
+    try
+    {
+        var reconnect = Battle.BattleConfig.Load(configPath).Reconnect;
+        if (reconnect.IsMissing)
+        {
+            Console.WriteLine("reconnect_state=missing");
+            return 0;
+        }
+
+        Console.WriteLine($"reconnect_state=ok version={reconnect.Version}"
+            + $" grace_ms={reconnect.GraceMs} window_ms={reconnect.WindowMs}"
+            + $" penalty_ms={reconnect.PenaltyMs}");
+        return 0;
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+}
+
+if (deserterStateOf != 0)
+{
+    try
+    {
+        var config = Battle.BattleConfig.Load(configPath);
+        if (string.IsNullOrEmpty(config.CharacterUpstream))
+        {
+            // 本机口径：没有角色库可问，惩罚只活在战斗服内存里。
+            Console.WriteLine($"deserter=character={deserterStateOf} found=false remaining_ms=0"
+                + " reason=upstream_off");
+            return 0;
+        }
+
+        using var channel = Grpc.Net.Client.GrpcChannel.ForAddress(config.CharacterUpstream);
+        var client = new Mmo.Proto.Character.CharacterService.CharacterServiceClient(channel);
+        var reply = client.DescribeDeserter(
+            new Mmo.Proto.Character.DescribeDeserterRequest { CharacterId = deserterStateOf },
+            deadline: DateTime.UtcNow.AddSeconds(3));
+        Console.WriteLine($"deserter=character={deserterStateOf}"
+            + $" found={(reply.Ok && reply.RemainingMs > 0 ? "true" : "false")}"
+            + $" remaining_ms={reply.RemainingMs} reason={reply.Reason}"
+            + $" session={reply.SessionId}");
+        return 0;
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
     }
 }
 

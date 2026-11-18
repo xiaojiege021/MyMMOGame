@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Builder;
@@ -135,6 +136,34 @@ sealed class Party
 }
 
 /// <summary>
+/// Q9：一个人从这条连接上掉下来了，还在等他自己回来。
+///
+/// 两个时刻各有各的用处，别合成一个：
+///   - 宽限（config/reconnect.json 的 battle_grace_ms）先到：位置、血量、冷却与效果
+///     都失效了，成员离开这一场（Boss 不再打他，队友名单里也没有他），但还没判他逃跑；
+///   - 窗口（reconnect_window_s）才到：没人回来，按逃跑记一次惩罚。
+/// 窗口内回来（哪怕宽限已过）都算回来，不罚；只有超过窗口才罚。
+///
+/// 这条记录只活在进程内存里（技术架构第 6 节：在线状态不进库）；惩罚本身由角色服
+/// 按事实值落表，进程重启后惩罚还在。
+/// </summary>
+sealed class OfflineWatch
+{
+    public required ulong CharacterId { get; init; }
+    public required ulong SessionId { get; init; }
+    public required string PartyKey { get; init; }
+    public required long SinceMs { get; init; }
+
+    /// <summary>主动发 Close 帧退出的：立即判罚，不给宽限。</summary>
+    public required bool Voluntary { get; init; }
+
+    int _claimed;
+
+    /// <summary>回连时抢一次。两个连接同时回来只有一个能接管这条记录。</summary>
+    public bool TryClaim() => Interlocked.Exchange(ref _claimed, 1) == 0;
+}
+
+/// <summary>
 /// 一条本机 WebSocket 就是一个人，带同一个 party 参数的连接进同一场。
 /// 网关鉴权和协议加密按方案放到后续，这里只听 127.0.0.1，
 /// 端口从配置来，配 0 就随机取一个，启动时把实际地址打出来。
@@ -146,7 +175,8 @@ public sealed class BattleServer(
     BattleConfig config, SettlementStore settlements, ICharacterStore characters,
     IExpSettlement expSettlement, ITalismanSpend talismans, IReviveScrollUse scrolls,
     IBattleProfileSource profiles, ISectTechSource sectTech,
-    ISiegeSectSource sectFacts, ISiegeResultSink siegeResult, IWorldBossSink worldBossSink)
+    ISiegeSectSource sectFacts, ISiegeResultSink siegeResult, IWorldBossSink worldBossSink,
+    IDeserterPenalty deserter)
 {
     /// <summary>20Hz。前摇、冷却、后摇的判定精度都在这个粒度上。</summary>
     const int TickIntervalMs = 50;
@@ -175,6 +205,20 @@ public sealed class BattleServer(
     // 世界 Boss：这一进程里已经打掉的场次。打完入口就关，不再接受新的进场；
     // 和场次一样只活在内存里（技术架构第 6 节：在线状态放进程内存）。
     readonly HashSet<string> _worldBossFought = new(StringComparer.Ordinal);
+
+    // Q9：掉线等回连的人（角色号 → 那条记录）。只有主线（副本 / 练习场 / 竞技场）
+    // 用这套：那三个模式一场只由一条 party 钥匙决定，同一场能被同一个人接回去。
+    // 战场 / 城战 / 世界 Boss 是服务端组队与排队制，掉线仍按老口径立即离场。
+    readonly ConcurrentDictionary<ulong, OfflineWatch> _offline = new();
+
+    // Q9：本机口径的惩罚兜底。角色服可达时以角色库的到期时刻为准，这里只补
+    // 「角色服没起 / 写不进」的那一段；两边都取，进场看较大的那个。
+    readonly ConcurrentDictionary<ulong, long> _penaltyUntilMs = new();
+
+    static long NowMs() => (long)Stopwatch.GetElapsedTime(0).TotalMilliseconds;
+
+    /// <summary>这张队列里有没有断线重连表。没有就是老口径：断线即离场，不罚。</summary>
+    bool ReconnectOn => !config.Reconnect.IsMissing;
 
     public async Task RunAsync(CancellationToken stopping)
     {
@@ -228,6 +272,26 @@ public sealed class BattleServer(
         if (!ulong.TryParse(charRaw, out var charId) || charId == 0)
         {
             charId = config.Caster.Id;
+        }
+
+        // Q9/H4：逃跑惩罚挡在所有战斗入口的最前面（副本 / 竞技场 / 战场 / 城战 /
+        // 世界 Boss 都算），不是只挡副本——否则换个模式就能绕过去。被罚的人连握手
+        // 都不给，直接 403 带剩余秒数；重连回同一场的人不在惩罚表里，不受影响。
+        if (ReconnectOn)
+        {
+            var remaining = await DeserterRemainingMsAsync(charId);
+            if (remaining > 0)
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    error = "deserter_penalty",
+                    remaining_s = (long)Math.Ceiling(remaining / 1000.0),
+                });
+                Console.WriteLine(
+                    $"join_reject=deserter_penalty character={charId} remaining_ms={remaining}");
+                return;
+            }
         }
 
         // P3-5a：世界 Boss。入口在世界服，进去是战斗服的一场实例：按 config/world_boss.json
@@ -424,13 +488,24 @@ public sealed class BattleServer(
 
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
 
-        Party party;
+        // Q9：宽限期内回连。同一把队伍钥匙、同一个角色号、那一场还没收尾，就把原来
+        // 那个人整份接回来：血量、蓝、位置、冷却与效果都还在 Encounter 里，开场包
+        // 里的 effects 是服务端时钟算出的剩余毫秒，客户端不用自己补算。
         var send = new SemaphoreSlim(1, 1);
+        if (TryResume(charId, partyKey, out var resumedParty, out var resumedMember))
+        {
+            await ServeResumedAsync(socket, send, resumedParty, resumedMember, context.RequestAborted);
+            return;
+        }
+
+        Party party;
         Member member;
         var created = false;
 
         // 满员与换本要先把原因发回去再关，不能无声断开——客户端与核对都靠这条。
         EnterRejected? rejected = null;
+        // Q9：这一场已经收尾时，把它当时那一条 Ended 原样回给重连的人。
+        BattleEnded? settled = null;
         lock (_gate)
         {
             if (!_parties.TryGetValue(partyKey, out party!))
@@ -497,6 +572,14 @@ public sealed class BattleServer(
             {
                 member = null!;
             }
+            else if (party.Encounter.IsClosed && party.Encounter.EndSnapshot is { } ended)
+            {
+                // Q9：这一场已经收尾了（队友还在连着，所以 party 还没散）。只把当时
+                // 那一条 Ended 原样回去，不 Join、不结算、不再发掉落归属——重复结算
+                // 在这里结构上不可能发生：结算只在 Encounter.Close 里做过一次。
+                settled = ended;
+                member = null!;
+            }
             else
             {
                 try
@@ -511,8 +594,25 @@ public sealed class BattleServer(
                     return;
                 }
 
+                // 宽限已过但窗口没到：他是重新入场的（满血、出生点），不是续战。
+                // 但窗口内回来也算回来——把那条等待记录撤掉，别到点再罚一次。
+                if (ReconnectOn && _offline.TryRemove(charId, out _))
+                {
+                    Console.WriteLine($"reconnect_rejoin=session={party.Encounter.SessionId} character={charId}");
+                }
+
                 party.Connections.Add(new PartyConn { Socket = socket, Send = send, Member = member });
             }
+        }
+
+        if (settled is not null)
+        {
+            Console.WriteLine(
+                $"reconnect_settled=session={settled.SessionId} character={charId} "
+                + $"settlement={settled.SettlementId} cleared={(settled.Cleared ? "true" : "false")}");
+            await SendAsync(socket, send, new ServerMessage { Ended = settled }, context.RequestAborted);
+            await CloseAsync(socket, "already_settled");
+            return;
         }
 
         if (rejected is not null)
@@ -554,12 +654,14 @@ public sealed class BattleServer(
         var joined = new ServerMessage { MemberUpdated = new() { Member = Snapshot(member, party) } };
 
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted);
+        // Q9：客户端主动发 Close 帧退出的（不是网断），不给宽限，立即按逃跑处理。
+        var voluntary = false;
         try
         {
             await SendAsync(socket, send, new ServerMessage { Opened = party.Encounter.Open(member) }, linked.Token);
             await BroadcastAsync(party, joined, party.Ticker.Token, exceptSocket: socket);
 
-            await ReceiveLoopAsync(socket, send, party, member, linked.Token);
+            voluntary = await ReceiveLoopAsync(socket, send, party, member, linked.Token);
             await linked.CancelAsync();
         }
         catch (OperationCanceledException)
@@ -575,7 +677,7 @@ public sealed class BattleServer(
         }
         finally
         {
-            Detach(party, member);
+            Detach(party, member, voluntary);
             Console.WriteLine($"session_close={party.Encounter.SessionId}");
         }
     }
@@ -1514,18 +1616,38 @@ public sealed class BattleServer(
         }
     }
 
-    void Detach(Party party, Member member)
+    void Detach(Party party, Member member, bool voluntary = false)
     {
         Party? removed = null;
+        OfflineWatch? watch = null;
         lock (_gate)
         {
             party.Connections.RemoveAll(c => c.Member == member);
-            party.Encounter.Leave(member);
-            if (party.Connections.Count == 0)
+
+            // Q9：主线（副本 / 练习场 / 竞技场）断线先留宽限，别的模式按老口径
+            // 立即离场——战场 / 城战 / 世界 Boss 是服务端组队与排队制，一场不由
+            // 一把钥匙决定，重连要重新排队，留一个「人在场却没人操作」的成员只会坏账。
+            if (!Resumable(party) || party.Encounter.IsClosed)
             {
-                // 最后一个人走了：散场，tick 停掉。
-                _parties.TryRemove(party.Key, out _);
-                removed = party;
+                party.Encounter.Leave(member);
+                if (party.Connections.Count == 0)
+                {
+                    // 最后一个人走了：散场，tick 停掉。
+                    _parties.TryRemove(party.Key, out _);
+                    removed = party;
+                }
+            }
+            else
+            {
+                watch = new OfflineWatch
+                {
+                    CharacterId = member.Id,
+                    SessionId = party.Encounter.SessionId,
+                    PartyKey = party.Key,
+                    SinceMs = NowMs(),
+                    Voluntary = voluntary,
+                };
+                _offline[member.Id] = watch;
             }
         }
 
@@ -1535,23 +1657,212 @@ public sealed class BattleServer(
             _siegeTeams.Remove(member.Id);
         }
 
+        if (watch is not null)
+        {
+            Console.WriteLine($"session_offline=session={watch.SessionId} character={watch.CharacterId}"
+                + $" party={watch.PartyKey} voluntary={(voluntary ? "true" : "false")}"
+                + $" grace_ms={config.Reconnect.GraceMs} window_ms={config.Reconnect.WindowMs}");
+            _ = WatchOfflineAsync(party, member, watch);
+            return;
+        }
+
         if (removed is not null)
         {
-            removed.Encounter.Abandon();
-            removed.Ticker.Cancel();
-
-            // P3-5a：这一场散了（没打掉也算一场），把事实值交回入口。
-            // 已经在打掉那一条报过的不会再报第二次（WorldBossFinished）。
-            if (removed.WorldBossWindow.Length > 0)
-            {
-                _ = Task.Run(() => FinishWorldBoss(removed, false));
-            }
+            DissolveParty(removed);
         }
         else if (party.Key.StartsWith("siege-", StringComparison.Ordinal))
         {
             // 城战有人离场：名单少了，剩下的人再收一份服务端确认过的档位。
             _ = RefreshSiegeViewsAsync(party, party.Ticker.Token);
         }
+    }
+
+    /// <summary>
+    /// Q9：这一场能不能被同一个人接回去。只有主线三个模式（副本 / 练习场 / 竞技场）
+    /// 是「一把 party 钥匙 = 一场」，所以只有它们的队伍钥匙能当重连凭据。
+    /// </summary>
+    bool Resumable(Party party) =>
+        ReconnectOn
+        && !party.Key.StartsWith("field-", StringComparison.Ordinal)
+        && !party.Key.StartsWith("siege-", StringComparison.Ordinal)
+        && !party.Key.StartsWith("wb-", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Q9：掉线的人在等自己回来。主动退当场判罚；网断先给宽限（位置与效果留在场内），
+    /// 宽限一过就把他从这一场拿掉，窗口一到还没人回来才按逃跑记一次。
+    /// </summary>
+    async Task WatchOfflineAsync(Party party, Member member, OfflineWatch watch)
+    {
+        if (watch.Voluntary)
+        {
+            if (_offline.TryRemove(watch.CharacterId, out var current) && ReferenceEquals(current, watch))
+            {
+                DropFromParty(party, member);
+                RecordDeserter(watch.CharacterId, watch.SessionId, "voluntary");
+            }
+
+            return;
+        }
+
+        var graceMs = config.Reconnect.GraceMs;
+        var windowMs = config.Reconnect.WindowMs;
+
+        await Task.Delay((int)Math.Min(graceMs, int.MaxValue));
+        if (_offline.TryGetValue(watch.CharacterId, out var waiting) && ReferenceEquals(waiting, watch))
+        {
+            DropFromParty(party, member);
+            Console.WriteLine($"reconnect_grace_expired=session={watch.SessionId}"
+                + $" character={watch.CharacterId} grace_ms={graceMs}");
+        }
+
+        var left = windowMs - graceMs;
+        if (left > 0)
+        {
+            await Task.Delay((int)Math.Min(left, int.MaxValue));
+        }
+
+        if (_offline.TryRemove(watch.CharacterId, out var expired) && ReferenceEquals(expired, watch))
+        {
+            RecordDeserter(watch.CharacterId, watch.SessionId, "timeout");
+        }
+    }
+
+    /// <summary>宽限到点：把人从这一场拿掉；这一场再没有人了就地散场（不结算）。</summary>
+    void DropFromParty(Party party, Member member)
+    {
+        Party? removed = null;
+        lock (_gate)
+        {
+            party.Encounter.Leave(member);
+            if (party.Connections.Count == 0 && party.Encounter.MemberCount == 0
+                && _parties.TryRemove(party.Key, out _))
+            {
+                removed = party;
+            }
+        }
+
+        if (removed is not null)
+        {
+            DissolveParty(removed);
+        }
+    }
+
+    void DissolveParty(Party party)
+    {
+        party.Encounter.Abandon();
+        party.Ticker.Cancel();
+
+        // P3-5a：这一场散了（没打掉也算一场），把事实值交回入口。
+        // 已经在打掉那一条报过的不会再报第二次（WorldBossFinished）。
+        if (party.WorldBossWindow.Length > 0)
+        {
+            _ = Task.Run(() => FinishWorldBoss(party, false));
+        }
+    }
+
+    /// <summary>
+    /// Q9：宽限内回来，把原来那个人整份接回来。命中要求三件事同时成立：
+    /// 同一把队伍钥匙还在、那一场里这个角色还在（没被宽限到点拿掉）、这条等待
+    /// 记录还没被别人抢走。命中之后不再 Join——血量、蓝、位置、冷却与效果都还在。
+    /// </summary>
+    bool TryResume(ulong characterId, string partyKey, out Party party, out Member member)
+    {
+        party = null!;
+        member = null!;
+
+        if (!ReconnectOn || !_parties.TryGetValue(partyKey, out var found) || !Resumable(found))
+        {
+            return false;
+        }
+
+        if (!_offline.TryGetValue(characterId, out var watch)
+            || watch.SessionId != found.Encounter.SessionId
+            || !watch.TryClaim())
+        {
+            return false;
+        }
+
+        var existing = found.Encounter.FindMember(characterId);
+        if (existing is null || !_offline.TryRemove(characterId, out _))
+        {
+            // 宽限到点已经被拿掉了：这次按重新入场处理（走正常 Join，满血出生点）。
+            return false;
+        }
+
+        party = found;
+        member = existing;
+        return true;
+    }
+
+    /// <summary>
+    /// Q9：续战的一条连接。开场包里的 everything（血量、位置、效果剩余毫秒）都是
+    /// 现在这一刻的服务端事实值，客户端照抄就行。这里不广播 MemberUpdated：
+    /// 队友那边从来没收到「他离场」，也就不需要一条「他回来了」。
+    /// </summary>
+    async Task ServeResumedAsync(
+        WebSocket socket, SemaphoreSlim send, Party party, Member member, CancellationToken requestAborted)
+    {
+        Console.WriteLine($"reconnect_resumed=session={party.Encounter.SessionId}"
+            + $" character={member.Id} hp={member.Hp} effects={member.Status.State(NowMs()).Effects.Count}");
+
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(requestAborted);
+        var voluntary = false;
+        try
+        {
+            await SendAsync(socket, send, new ServerMessage { Opened = party.Encounter.Open(member) }, linked.Token);
+            voluntary = await ReceiveLoopAsync(socket, send, party, member, linked.Token);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (WebSocketException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"conn_error=session={party.Encounter.SessionId} {ex.GetType().Name} {ex.Message}");
+        }
+        finally
+        {
+            Detach(party, member, voluntary);
+            Console.WriteLine($"session_close={party.Encounter.SessionId}");
+        }
+    }
+
+    /// <summary>
+    /// Q9：进场前问一次还能不能进。内存兜底与角色库事实值取较大的那个：
+    /// 角色服没起时至少本进程内还挡得住，角色服活着时惩罚跨进程重启也还在。
+    /// </summary>
+    async Task<long> DeserterRemainingMsAsync(ulong characterId)
+    {
+        var local = _penaltyUntilMs.TryGetValue(characterId, out var until) ? until - NowMs() : 0;
+        var remote = await Task.Run(() => deserter.RemainingMs(characterId));
+        return Math.Max(0, Math.Max(local, remote));
+    }
+
+    /// <summary>
+    /// Q9：记一次逃跑。时长只从 config/reconnect.json 读；到期时刻由角色服按这个
+    /// 时长现算，战斗服这边只留一份本机兜底（进程内有效）。
+    /// </summary>
+    void RecordDeserter(ulong characterId, ulong sessionId, string reason)
+    {
+        var penaltyMs = config.Reconnect.PenaltyMs;
+        if (penaltyMs <= 0)
+        {
+            Console.WriteLine($"deserter_penalty=character={characterId} session={sessionId}"
+                + $" reason={reason} penalty_ms=0 skipped=true");
+            return;
+        }
+
+        var until = NowMs() + penaltyMs;
+        _penaltyUntilMs.AddOrUpdate(
+            characterId,
+            until,
+            (_, existing) => Math.Max(existing, until));
+
+        var remaining = deserter.Record(characterId, sessionId, reason, penaltyMs);
+        Console.WriteLine($"deserter_penalty=character={characterId} session={sessionId}"
+            + $" reason={reason} penalty_ms={penaltyMs} remaining_ms={Math.Max(remaining, penaltyMs)}");
     }
 
     async Task TickLoopAsync(Party party)
@@ -1599,7 +1910,12 @@ public sealed class BattleServer(
         }
     }
 
-    async Task ReceiveLoopAsync(
+    /// <summary>
+    /// 收一条连接上的消息，直到它断。返回值是 Q9 要的那一个位：true 表示客户端
+    /// 主动发了 Close 帧（自己退的），false 表示网断或服务端取消——两者的宽限与
+    /// 惩罚不一样，主动退立即算逃跑。
+    /// </summary>
+    async Task<bool> ReceiveLoopAsync(
         WebSocket socket, SemaphoreSlim send, Party party, Member member, CancellationToken token)
     {
         var buffer = new byte[4096];
@@ -1617,7 +1933,7 @@ public sealed class BattleServer(
                 if (received.MessageType == WebSocketMessageType.Close)
                 {
                     await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, token);
-                    return;
+                    return true;
                 }
 
                 if (received.MessageType != WebSocketMessageType.Binary)
@@ -1630,7 +1946,7 @@ public sealed class BattleServer(
                 {
                     // 不像正常请求，直接掐掉这条连接。
                     socket.Abort();
-                    return;
+                    return false;
                 }
             }
             while (!received.EndOfMessage);
@@ -1705,6 +2021,8 @@ public sealed class BattleServer(
                     break;
             }
         }
+
+        return false;
     }
 
     /// <summary>结算结果、队友状态、阶段和收尾发全场：技术架构写的是「把结果发给本里的人」。</summary>

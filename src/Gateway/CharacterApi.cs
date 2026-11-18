@@ -641,7 +641,8 @@ public static class CharacterApi
                     + " min_players=" + result.MinPlayers
                     + " hard_entries_used=" + result.HardEntriesUsed
                     + " hard_entries_cap=" + result.HardEntriesCap
-                    + " hard_entries_left=" + result.HardEntriesRemaining);
+                    + " hard_entries_left=" + result.HardEntriesRemaining
+                    + " deserter_s=" + result.DeserterRemainingS);
 
                 await WriteAsync(context, 200, new
                 {
@@ -661,6 +662,8 @@ public static class CharacterApi
                     hard_entries_used = result.HardEntriesUsed,
                     hard_entries_cap = result.HardEntriesCap,
                     hard_entries_remaining = result.HardEntriesRemaining,
+                    // Q9：逃跑惩罚还剩多少秒。0 表示没被罚；>0 时 allowed 一定是 false。
+                    deserter_remaining_s = result.DeserterRemainingS,
                 });
             }
             catch (RpcException ex)

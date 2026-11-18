@@ -1,10 +1,10 @@
 {
   "schema": "reconnect/1",
-  "version": 1,
-  "pending": true,
-  "note": "Q9/H4：断线与逃跑惩罚的唯一正本。方案没写定具体时长，全部 pending。代码尚未读取，由 Q9 接入。",
+  "version": 2,
+  "pending": false,
+  "note": "Q9/H4：断线与逃跑惩罚的唯一正本。方案没写具体时长，v1.192 由 Q9 定下：宽限期内位置与效果留在场内（无缝续战），窗口内可回这一场，主动退或窗口超时按惩罚时长挡下一次进本。代码只在战斗服读取，角色服只落事实值（不读本文件）。",
   "battle_grace_ms": 30000,
   "reconnect_window_s": 120,
   "deserter_penalty_s": 300,
-  "penalty_note": "中途退出或超时未回，下一场进入排队延迟。"
+  "penalty_note": "中途退出或超时未回，下一场进入排队延迟。到期时刻由角色服按 penalty_ms 现算，不读本文件。"
 }

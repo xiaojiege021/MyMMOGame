@@ -1,3 +1,4 @@
+using System.Net.WebSockets;
 using Mmo.Proto.Battle;
 
 namespace Mmo.Tools;
@@ -121,6 +122,14 @@ internal static class Program
                 "p15c6_scroll_other" => await CaseP15c6OtherAsync(url, otherItem),
                 "p15c6_scroll_none" => await CaseP15c6NoneAsync(url, scroll),
                 "p15c6_scroll_off" => await CaseP15c6OffAsync(url, scroll),
+                // Q9：断线重连 / 逃跑惩罚。宽限、窗口与惩罚时长由脚本的临时配置压小。
+                "q9_seamless" => await CaseQ9SeamlessAsync(url, waitMs),
+                "q9_rejoin" => await CaseQ9RejoinAsync(url, Arg(args, "--b-url") ?? url, waitMs, 300),
+                "q9_deserter" => await CaseQ9DeserterAsync(url, waitMs),
+                "q9_voluntary" => await CaseQ9VoluntaryAsync(url, waitMs),
+                "q9_blocked" => await CaseQ9BlockedAsync(url),
+                "q9_settled_once" => await CaseQ9SettledOnceAsync(
+                    url, Arg(args, "--b-url") ?? url, boss, ranged, waitMs),
                 _ => Fail($"没有这个场景：{name}"),
             };
         }
@@ -1983,6 +1992,170 @@ internal static class Program
         return Report(ok,
             $"case=q2_interrupt cancelled={cancelled?.Cancelled?.Accepted}"
             + $" reason={rejected?.Reason} retry_after_ms={rejected?.RetryAfterMs}");
+    }
+
+    // ---- Q9/H4：断线重连 / 逃跑惩罚 ----
+    //
+    // 四个场景共用同一条地址（带 party 与 char）。宽限与窗口由核对脚本的临时配置
+    // 压到毫秒级，探针只按参数等，不假设产品现值。
+
+    /// <summary>
+    /// 宽限内回来：接回原来那个人。证据是「同一场 + 位置还是断线前服务端确认过的那个
+    /// 位置 + 血量没回到满」——重新入场会回出生点、满血，三者不会同时成立。
+    /// </summary>
+    static async Task<int> CaseQ9SeamlessAsync(string url, int waitMs)
+    {
+        await using var first = await Session.ConnectAsync(url);
+        var sessionId = first.Opened.SessionId;
+        var hp = first.Opened.CasterHp;
+        var spawnX = first.Opened.CasterXMm;
+
+        await first.MoveAsync(spawnX + 300, first.Opened.CasterYMm);
+        var moved = await first.ReadUntilAsync(m => m.Moved is not null, 3000);
+        if (moved?.Moved is null)
+        {
+            return Fail("q9_seamless 走位没有回包");
+        }
+
+        var x = moved.Moved.XMm;
+        first.Abort();
+        await Task.Delay(waitMs);
+
+        await using var second = await Session.ConnectAsync(url);
+        var ok = second.Opened.SessionId == sessionId
+                 && second.Opened.CasterXMm == x
+                 && second.Opened.CasterHp == hp;
+
+        return Report(ok,
+            $"case=q9_seamless session={sessionId}/{second.Opened.SessionId}"
+            + $" x={x}/{second.Opened.CasterXMm} spawn_x={spawnX}"
+            + $" hp={hp}/{second.Opened.CasterHp}");
+    }
+
+    /// <summary>
+    /// 宽限过了但窗口没到：同一场里有队友还在，回来是重新入场（满血、出生点），
+    /// 但还算「回来了」——不判逃跑，session 号不变。
+    /// </summary>
+    static async Task<int> CaseQ9RejoinAsync(string url, string bUrl, int graceMs, int waitMs)
+    {
+        await using var b = await Session.ConnectAsync(bUrl);
+        var sessionId = b.Opened.SessionId;
+
+        await using var a = await Session.ConnectAsync(url);
+        var spawnX = a.Opened.CasterXMm;
+        var hpMax = a.Opened.CasterHpMax;
+        await a.MoveAsync(spawnX + 300, a.Opened.CasterYMm);
+        var moved = await a.ReadUntilAsync(m => m.Moved is not null, 3000);
+        a.Abort();
+
+        await Task.Delay(graceMs + waitMs);
+
+        await using var again = await Session.ConnectAsync(url);
+        var ok = again.Opened.SessionId == sessionId
+                 && again.Opened.CasterXMm == spawnX
+                 && again.Opened.CasterHp == hpMax;
+
+        return Report(ok,
+            $"case=q9_rejoin session={sessionId}/{again.Opened.SessionId}"
+            + $" x={again.Opened.CasterXMm} spawn_x={spawnX} moved_x={moved?.Moved?.XMm}"
+            + $" hp={again.Opened.CasterHp}/{hpMax}");
+    }
+
+    /// <summary>窗口到点没回来：再连被拒（HTTP 403 deserter_penalty）。</summary>
+    static async Task<int> CaseQ9DeserterAsync(string url, int waitMs)
+    {
+        await using (var first = await Session.ConnectAsync(url))
+        {
+            first.Abort();
+        }
+
+        await Task.Delay(waitMs);
+        return await ExpectRejectAsync(url, "q9_deserter");
+    }
+
+    /// <summary>
+    /// 已经被罚的人直接连一次：应当被拒。给「重启战斗服后惩罚还在」这种场景用——
+    /// 那种情况下第一次连接就该是 403，不能先正常连一场再断。
+    /// </summary>
+    static Task<int> CaseQ9BlockedAsync(string url) => ExpectRejectAsync(url, "q9_blocked");
+
+    /// <summary>主动退（Close 帧）：不给宽限，立刻判罚，马上重连也被拒。</summary>
+    static async Task<int> CaseQ9VoluntaryAsync(string url, int waitMs)
+    {
+        await using (var first = await Session.ConnectAsync(url))
+        {
+            await first.VoluntaryCloseAsync();
+        }
+
+        await Task.Delay(waitMs);
+        return await ExpectRejectAsync(url, "q9_voluntary");
+    }
+
+    static async Task<int> ExpectRejectAsync(string url, string name)
+    {
+        try
+        {
+            await using var again = await Session.ConnectAsync(url);
+            _ = again.Opened;
+        }
+        catch (WebSocketException ex)
+        {
+            // 握手被拒时 .NET 只给状态码，不给响应体；「为什么是 403」由服务端日志的
+            // join_reject=deserter_penalty 作证（脚本单独 grep 那一行）。
+            var text = ex.Message.Replace('\n', ' ');
+            return Report(text.Contains("403"), $"case={name} rejected=true detail={text}");
+        }
+
+        return Fail(name + " 窗口到点后仍然连上了");
+    }
+
+    /// <summary>
+    /// 结算之后再掉线重连：这一场已经收尾。队友还在场时（party 没散），重连只把
+    /// 原来那一条 Ended 原样回去，不再 Join、不再结算；结算条数由脚本数目录来核。
+    ///
+    /// 顺序是有讲究的：B 先断（A 还在，party 保得住），B 重连才走得到「已收尾」那一支；
+    /// 若 A 先断，最后一个人一走就散场，B 重新连上的是新的一场。
+    /// </summary>
+    static async Task<int> CaseQ9SettledOnceAsync(string url, string bUrl, ulong boss, uint skill, int waitMs)
+    {
+        await using var b = await Session.ConnectAsync(bUrl);
+        string? settlement = null;
+        ulong sessionId = 0;
+        await using (var a = await Session.ConnectAsync(url))
+        {
+            sessionId = a.Opened.SessionId;
+            var deadline = Environment.TickCount64 + 30000;
+            while (Environment.TickCount64 < deadline)
+            {
+                await a.SubmitAsync(skill, boss, Session.NowMs());
+                var message = await a.ReadUntilAsync(
+                    m => m.Ended is not null || m.Rejected is not null, 3000);
+                if (message?.Ended is { } ended)
+                {
+                    settlement = ended.SettlementId;
+                    break;
+                }
+            }
+
+            if (settlement is null)
+            {
+                return Fail("q9_settled_once 没打通，拿不到结算号");
+            }
+
+            // 队友（B）先断：A 还在，所以这一场不会散。
+            b.Abort();
+            await Task.Delay(waitMs);
+
+            await using var again = await Session.ConnectRawAsync(bUrl);
+            var first = await again.ReadUntilAsync(m => m.Ended is not null, 4000);
+            var ended2 = first?.Ended;
+            var ok = ended2 is not null
+                     && ended2.SessionId == sessionId
+                     && ended2.SettlementId == settlement;
+            return Report(ok,
+                $"case=q9_settled_once settlement={settlement}/{ended2?.SettlementId}"
+                + $" session={sessionId}/{ended2?.SessionId} cleared={ended2?.Cleared}");
+        }
     }
 
     static int Report(bool ok, string line)

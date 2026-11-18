@@ -75,7 +75,8 @@ public sealed class CharacterGrpcService(
     RecipeTable recipeTable,
     CraftRepository crafts,
     CityTaskTable? cityTaskTable,
-    CityTaskRepository? cityTasks) : CharacterService.CharacterServiceBase
+    CityTaskRepository? cityTasks,
+    DeserterRepository deserters) : CharacterService.CharacterServiceBase
 {
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。
     public StoneExchangeTable StoneExchange { get; } = stoneExchange;
@@ -597,6 +598,22 @@ public sealed class CharacterGrpcService(
         if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
         {
             throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        // Q9/H4：逃跑惩罚。挡在所有扣减之前：不扣疲劳、不扣周份额、不写高难本次数，
+        // 回包里的 cost 全是 0，只剩 remaining_s 给客户端提示「还要等几秒」。
+        var deserterFact = await deserters.DescribeAsync(characterId, context.CancellationToken);
+        if (deserterFact.RemainingMs > 0)
+        {
+            logger.LogInformation(
+                "dungeon_reject account={Account} id={Id} dungeon={Dungeon} reason=deserter_penalty "
+                + "remaining_ms={Remaining}",
+                account, characterId, dungeon.Id, deserterFact.RemainingMs);
+
+            var blocked = Rejected(
+                "deserter_penalty", dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
+            blocked.DeserterRemainingS = (uint)Math.Ceiling(deserterFact.RemainingMs / 1000.0);
+            return blocked;
         }
 
         // P3-1a1：境界从库里读，客户端带进来的字段一概不认。
@@ -4357,5 +4374,77 @@ public sealed class CharacterGrpcService(
         }
 
         return response;
+    }
+
+    /// <summary>
+    /// Q9/H4：记一次逃跑。只认 voluntary / timeout 两个原因，时长由战斗服从
+    /// config/reconnect.json 算成毫秒传进来；这里只加到期时刻、不扣任何东西。
+    /// 角色不存在、时长 &lt;= 0 都不写，回 ok=false 让战斗服按本机兜底继续。
+    /// </summary>
+    public override async Task<RecordDeserterResponse> RecordDeserter(
+        RecordDeserterRequest request,
+        ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            return new RecordDeserterResponse { Ok = false, Reason = "character_missing" };
+        }
+
+        var reason = (request.Reason ?? "").Trim();
+        if (reason is not ("voluntary" or "timeout"))
+        {
+            return new RecordDeserterResponse { Ok = false, Reason = "reason_invalid" };
+        }
+
+        if (request.PenaltyMs <= 0)
+        {
+            return new RecordDeserterResponse { Ok = false, Reason = "penalty_off" };
+        }
+
+        var fact = await deserters.RecordAsync(
+            (long)request.CharacterId, (long)request.SessionId, reason, request.PenaltyMs,
+            context.CancellationToken);
+
+        if (!fact.Found)
+        {
+            return new RecordDeserterResponse { Ok = false, Reason = "character_not_found" };
+        }
+
+        logger.LogInformation(
+            "deserter_record character={Character} session={Session} reason={Reason} "
+            + "penalty_ms={Penalty} remaining_ms={Remaining}",
+            request.CharacterId, request.SessionId, fact.Reason, request.PenaltyMs, fact.RemainingMs);
+
+        return new RecordDeserterResponse
+        {
+            Ok = true,
+            RemainingMs = fact.RemainingMs,
+            UntilMs = fact.UntilMs,
+            SessionId = (ulong)Math.Max(0, fact.SessionId),
+        };
+    }
+
+    /// <summary>
+    /// Q9/H4：这个角色还要等多久才能再进本。只读，不写库、不改任何事实值；
+    /// 没被罚过或已经过期都回 0——「还能不能进」只看 remaining_ms 这一个数。
+    /// </summary>
+    public override async Task<DescribeDeserterResponse> DescribeDeserter(
+        DescribeDeserterRequest request,
+        ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            return new DescribeDeserterResponse { Ok = false };
+        }
+
+        var fact = await deserters.DescribeAsync((long)request.CharacterId, context.CancellationToken);
+        return new DescribeDeserterResponse
+        {
+            Ok = true,
+            RemainingMs = fact.RemainingMs,
+            UntilMs = fact.UntilMs,
+            SessionId = (ulong)Math.Max(0, fact.SessionId),
+            Reason = fact.Reason,
+        };
     }
 }

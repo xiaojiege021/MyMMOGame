@@ -30,7 +30,8 @@
         { "version": 21, "file": "db/character/realm_phase.sql" },
         { "version": 22, "file": "db/character/craft.sql" },
         { "version": 23, "file": "db/character/city_task.sql" },
-        { "version": 24, "file": "db/character/season_pass_progress.sql" }
+        { "version": 24, "file": "db/character/season_pass_progress.sql" },
+        { "version": 25, "file": "db/character/deserter_penalty.sql" }
       ]
     },
     {

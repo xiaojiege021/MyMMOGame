@@ -1,0 +1,30 @@
+{
+  "card": "q9",
+  "note": "Q9/H4 断线重连 / 逃跑惩罚。三处该被抓住的：宽限内不续战（改坏成重新入场）、主动退不判罚、状态只在内存不落库。第一条与第二条在 check-q9.sh 的无库 WebSocket 段就能红；第三条在真库段红（MMO_Q9_DB=1）。",
+  "mutations": [
+    {
+      "id": "宽限内不续战",
+      "file": "src/Battle/Server.cs",
+      "kind": "text-replace",
+      "find": "        var existing = found.Encounter.FindMember(characterId);\n        if (existing is null || !_offline.TryRemove(characterId, out _))",
+      "replace": "        var existing = (Member?)null;\n        if (existing is null || !_offline.TryRemove(characterId, out _))",
+      "expect": "check-q9.sh 的 q9_seamless 应红（位置回到出生点、血量满）"
+    },
+    {
+      "id": "主动退不判罚",
+      "file": "src/Battle/Server.cs",
+      "kind": "text-replace",
+      "find": "                DropFromParty(party, member);\n                RecordDeserter(watch.CharacterId, watch.SessionId, \"voluntary\");",
+      "replace": "                DropFromParty(party, member);",
+      "expect": "check-q9.sh 的 q9_voluntary 应红（主动退后马上能再连）"
+    },
+    {
+      "id": "超时不判罚",
+      "file": "src/Battle/Server.cs",
+      "kind": "text-replace",
+      "find": "        if (_offline.TryRemove(watch.CharacterId, out var expired) && ReferenceEquals(expired, watch))\n        {\n            RecordDeserter(watch.CharacterId, watch.SessionId, \"timeout\");\n        }",
+      "replace": "        if (_offline.TryRemove(watch.CharacterId, out var expired) && ReferenceEquals(expired, watch))\n        {\n        }",
+      "expect": "check-q9.sh 的 q9_deserter 应红（窗口过了还能再进）"
+    }
+  ]
+}

@@ -250,6 +250,14 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CompleteCityTaskRequest> __Marshaller_mmo_character_CompleteCityTaskRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CompleteCityTaskRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CompleteCityTaskResponse> __Marshaller_mmo_character_CompleteCityTaskResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CompleteCityTaskResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.RecordDeserterRequest> __Marshaller_mmo_character_RecordDeserterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.RecordDeserterRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.RecordDeserterResponse> __Marshaller_mmo_character_RecordDeserterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.RecordDeserterResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeDeserterRequest> __Marshaller_mmo_character_DescribeDeserterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeDeserterRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeDeserterResponse> __Marshaller_mmo_character_DescribeDeserterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeDeserterResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -658,6 +666,22 @@ namespace Mmo.Proto.Character {
         "CompleteCityTask",
         __Marshaller_mmo_character_CompleteCityTaskRequest,
         __Marshaller_mmo_character_CompleteCityTaskResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.RecordDeserterRequest, global::Mmo.Proto.Character.RecordDeserterResponse> __Method_RecordDeserter = new grpc::Method<global::Mmo.Proto.Character.RecordDeserterRequest, global::Mmo.Proto.Character.RecordDeserterResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RecordDeserter",
+        __Marshaller_mmo_character_RecordDeserterRequest,
+        __Marshaller_mmo_character_RecordDeserterResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeDeserterRequest, global::Mmo.Proto.Character.DescribeDeserterResponse> __Method_DescribeDeserter = new grpc::Method<global::Mmo.Proto.Character.DescribeDeserterRequest, global::Mmo.Proto.Character.DescribeDeserterResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeDeserter",
+        __Marshaller_mmo_character_DescribeDeserterRequest,
+        __Marshaller_mmo_character_DescribeDeserterResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -1313,6 +1337,33 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CompleteCityTaskResponse> CompleteCityTask(global::Mmo.Proto.Character.CompleteCityTaskRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q9/H4：逃跑惩罚。战斗服在一场里判出「主动退 / 窗口超时没回来」时写一次事实，
+      /// 到期时刻由角色服按 penalty_ms 现算（战斗服不传绝对时刻，两台机时钟不一致也不怕）；
+      /// 同一角色重复写取较晚的那一个，不叠加。请求里带不进剩余时长、也不改任何人的
+      /// 金币 / 经验 / 疲劳——惩罚只挡下一次进本。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.RecordDeserterResponse> RecordDeserter(global::Mmo.Proto.Character.RecordDeserterRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q9/H4：这个角色还要等多久才能再进本。只读；没被罚过回 remaining_ms = 0。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeDeserterResponse> DescribeDeserter(global::Mmo.Proto.Character.DescribeDeserterRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -3922,6 +3973,114 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_CompleteCityTask, null, options, request);
       }
+      /// <summary>
+      /// Q9/H4：逃跑惩罚。战斗服在一场里判出「主动退 / 窗口超时没回来」时写一次事实，
+      /// 到期时刻由角色服按 penalty_ms 现算（战斗服不传绝对时刻，两台机时钟不一致也不怕）；
+      /// 同一角色重复写取较晚的那一个，不叠加。请求里带不进剩余时长、也不改任何人的
+      /// 金币 / 经验 / 疲劳——惩罚只挡下一次进本。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.RecordDeserterResponse RecordDeserter(global::Mmo.Proto.Character.RecordDeserterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RecordDeserter(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q9/H4：逃跑惩罚。战斗服在一场里判出「主动退 / 窗口超时没回来」时写一次事实，
+      /// 到期时刻由角色服按 penalty_ms 现算（战斗服不传绝对时刻，两台机时钟不一致也不怕）；
+      /// 同一角色重复写取较晚的那一个，不叠加。请求里带不进剩余时长、也不改任何人的
+      /// 金币 / 经验 / 疲劳——惩罚只挡下一次进本。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.RecordDeserterResponse RecordDeserter(global::Mmo.Proto.Character.RecordDeserterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RecordDeserter, null, options, request);
+      }
+      /// <summary>
+      /// Q9/H4：逃跑惩罚。战斗服在一场里判出「主动退 / 窗口超时没回来」时写一次事实，
+      /// 到期时刻由角色服按 penalty_ms 现算（战斗服不传绝对时刻，两台机时钟不一致也不怕）；
+      /// 同一角色重复写取较晚的那一个，不叠加。请求里带不进剩余时长、也不改任何人的
+      /// 金币 / 经验 / 疲劳——惩罚只挡下一次进本。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.RecordDeserterResponse> RecordDeserterAsync(global::Mmo.Proto.Character.RecordDeserterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RecordDeserterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q9/H4：逃跑惩罚。战斗服在一场里判出「主动退 / 窗口超时没回来」时写一次事实，
+      /// 到期时刻由角色服按 penalty_ms 现算（战斗服不传绝对时刻，两台机时钟不一致也不怕）；
+      /// 同一角色重复写取较晚的那一个，不叠加。请求里带不进剩余时长、也不改任何人的
+      /// 金币 / 经验 / 疲劳——惩罚只挡下一次进本。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.RecordDeserterResponse> RecordDeserterAsync(global::Mmo.Proto.Character.RecordDeserterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RecordDeserter, null, options, request);
+      }
+      /// <summary>
+      /// Q9/H4：这个角色还要等多久才能再进本。只读；没被罚过回 remaining_ms = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeDeserterResponse DescribeDeserter(global::Mmo.Proto.Character.DescribeDeserterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeDeserter(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q9/H4：这个角色还要等多久才能再进本。只读；没被罚过回 remaining_ms = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeDeserterResponse DescribeDeserter(global::Mmo.Proto.Character.DescribeDeserterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeDeserter, null, options, request);
+      }
+      /// <summary>
+      /// Q9/H4：这个角色还要等多久才能再进本。只读；没被罚过回 remaining_ms = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeDeserterResponse> DescribeDeserterAsync(global::Mmo.Proto.Character.DescribeDeserterRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeDeserterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q9/H4：这个角色还要等多久才能再进本。只读；没被罚过回 remaining_ms = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeDeserterResponse> DescribeDeserterAsync(global::Mmo.Proto.Character.DescribeDeserterRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeDeserter, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -3986,7 +4145,9 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_FinishCraft, serviceImpl.FinishCraft)
           .AddMethod(__Method_DescribeCraft, serviceImpl.DescribeCraft)
           .AddMethod(__Method_DescribeCityTasks, serviceImpl.DescribeCityTasks)
-          .AddMethod(__Method_CompleteCityTask, serviceImpl.CompleteCityTask).Build();
+          .AddMethod(__Method_CompleteCityTask, serviceImpl.CompleteCityTask)
+          .AddMethod(__Method_RecordDeserter, serviceImpl.RecordDeserter)
+          .AddMethod(__Method_DescribeDeserter, serviceImpl.DescribeDeserter).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -4047,6 +4208,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DescribeCraft, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeCraftRequest, global::Mmo.Proto.Character.DescribeCraftResponse>(serviceImpl.DescribeCraft));
       serviceBinder.AddMethod(__Method_DescribeCityTasks, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeCityTasksRequest, global::Mmo.Proto.Character.DescribeCityTasksResponse>(serviceImpl.DescribeCityTasks));
       serviceBinder.AddMethod(__Method_CompleteCityTask, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CompleteCityTaskRequest, global::Mmo.Proto.Character.CompleteCityTaskResponse>(serviceImpl.CompleteCityTask));
+      serviceBinder.AddMethod(__Method_RecordDeserter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RecordDeserterRequest, global::Mmo.Proto.Character.RecordDeserterResponse>(serviceImpl.RecordDeserter));
+      serviceBinder.AddMethod(__Method_DescribeDeserter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeDeserterRequest, global::Mmo.Proto.Character.DescribeDeserterResponse>(serviceImpl.DescribeDeserter));
     }
 
   }

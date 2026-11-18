@@ -163,6 +163,17 @@ namespace Mmo.Net
             throw new TimeoutException("等战斗服回消息超时，等了 " + (int)timeout.TotalMilliseconds + " 毫秒");
         }
 
+        /// <summary>
+        /// Q9/H4：掉线之后用同一个地址再连一次。地址里带着 party 与角色号，
+        /// 服务端靠这两样认出「是同一个人回来」——窗口内回来就接回原来那一场
+        /// （血量、位置、冷却与 buff / DoT 剩余毫秒都由服务端现算，客户端不补算）；
+        /// 超过窗口回来会被罚，握手直接被拒（HTTP 403 deserter_penalty）。
+        ///
+        /// 返回的是一条新连接，老对象调用方负责 Dispose。重连提示与倒计时的界面
+        /// 按本卡开卡口径拆到 U 线（与 Q7 / Q8 的界面欠项同一口径）。
+        /// </summary>
+        public Task<BattleLink> ReconnectAsync(TimeSpan timeout) => ConnectAsync(Url, timeout);
+
         /// <summary>正常收尾。先挥手再停收包，服务端好把这场标成关闭。</summary>
         public async Task CloseAsync()
         {

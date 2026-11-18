@@ -69,6 +69,18 @@ internal sealed class Session : IAsyncDisposable
         return session;
     }
 
+    /// <summary>
+    /// Q9：只建立连接、不预读第一条。重连到已经收尾的场时第一条是 Ended（不是
+    /// 开场包也不是拒绝包），用这个入口自己按条件去挑。
+    /// </summary>
+    public static async Task<Session> ConnectRawAsync(string url)
+    {
+        var session = new Session();
+        await session._socket.ConnectAsync(new Uri(url), session._cts.Token);
+        _ = session.PumpAsync();
+        return session;
+    }
+
     public async Task<ServerMessage?> ReadAsync(int timeoutMs)
     {
         using var timeout = new CancellationTokenSource(timeoutMs);
@@ -178,6 +190,28 @@ internal sealed class Session : IAsyncDisposable
         });
 
     public static long NowMs() => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+    /// <summary>
+    /// Q9：模拟网断——直接掐掉 TCP，不发 Close 帧。服务端看到的是异常终止，
+    /// 按「被动掉线」处理（给宽限）。与 <see cref="VoluntaryCloseAsync"/> 是两条路。
+    /// </summary>
+    public void Abort() => _socket.Abort();
+
+    /// <summary>Q9：主动退出——正常挥手。服务端据此判「自己退的」，不给宽限。</summary>
+    public async Task VoluntaryCloseAsync()
+    {
+        if (_socket.State == WebSocketState.Open)
+        {
+            using var timeout = new CancellationTokenSource(1000);
+            try
+            {
+                await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", timeout.Token);
+            }
+            catch (Exception ex) when (ex is WebSocketException or OperationCanceledException)
+            {
+            }
+        }
+    }
 
     async Task SendAsync(ClientMessage message)
     {

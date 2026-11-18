@@ -218,6 +218,13 @@ service CharacterService {
   // → 进度 +1；同一事务号重放回 duplicate，不二次发灵石。请求里带不进数量、
   // 税率、等级与境界：全部由角色服按配置与库里的事实值判。
   rpc CompleteCityTask(CompleteCityTaskRequest) returns (CompleteCityTaskResponse);
+  // Q9/H4：逃跑惩罚。战斗服在一场里判出「主动退 / 窗口超时没回来」时写一次事实，
+  // 到期时刻由角色服按 penalty_ms 现算（战斗服不传绝对时刻，两台机时钟不一致也不怕）；
+  // 同一角色重复写取较晚的那一个，不叠加。请求里带不进剩余时长、也不改任何人的
+  // 金币 / 经验 / 疲劳——惩罚只挡下一次进本。
+  rpc RecordDeserter(RecordDeserterRequest) returns (RecordDeserterResponse);
+  // Q9/H4：这个角色还要等多久才能再进本。只读；没被罚过回 remaining_ms = 0。
+  rpc DescribeDeserter(DescribeDeserterRequest) returns (DescribeDeserterResponse);
 }
 
 message SettleExpRequest {
@@ -344,6 +351,9 @@ message EnterDungeonResponse {
   int32 hard_entries_used = 14;
   int32 hard_entries_cap = 15;
   int32 hard_entries_remaining = 16;
+  // Q9/H4：这个角色还要等多少秒才能再进本（逃跑惩罚）。0 表示没被罚；
+  // 大于 0 时 allowed 一定是 false、reason = deserter_penalty，且不扣疲劳 / 次数。
+  uint32 deserter_remaining_s = 17;
 }
 
 // Q8/H2：战斗服结算前问一次「这一场按哪种分配口径发掉落」。
@@ -1590,4 +1600,41 @@ message CompleteCityTaskResponse {
   string txn_id = 10;
   // 这一笔用的城池抽成比例（库里「社交」.city.tax_pct 的事实值）。
   int32 tax_pct = 11;
+}
+
+// Q9/H4：记一次逃跑。战斗服判出「主动退」或「重连窗口到了还没回来」时发一次。
+// penalty_ms 从战斗服的 config/reconnect.json 读出来传进来——角色服不读那份配置，
+// 也不相信客户端；到期时刻由角色服按自己的时钟算。
+message RecordDeserterRequest {
+  uint64 character_id = 1;
+  // 判出这件事的那一场。只用于追查，不参与判定、不进奖励。
+  uint64 session_id = 2;
+  // voluntary（主动退） / timeout（窗口到点没回来）。只允许这两个值。
+  string reason = 3;
+  // 要等多久（毫秒）。<= 0 时按「不惩罚」处理，写都不写。
+  int64 penalty_ms = 4;
+}
+
+message RecordDeserterResponse {
+  bool ok = 1;
+  string reason = 2;
+  // 从这一刻起还要等多久。角色库里已有的到期时刻更晚时不覆盖（取较晚的）。
+  int64 remaining_ms = 3;
+  int64 until_ms = 4;
+  uint64 session_id = 5;
+}
+
+// Q9/H4：这个角色现在能不能进本。只读，不写库、不改任何事实值。
+message DescribeDeserterRequest {
+  uint64 character_id = 1;
+}
+
+message DescribeDeserterResponse {
+  bool ok = 1;
+  // 0 表示没被罚或者已经过期。
+  int64 remaining_ms = 2;
+  int64 until_ms = 3;
+  // 最近一次判罚的场次与原因；没被罚过时是 0 / 空串。
+  uint64 session_id = 4;
+  string reason = 5;
 }

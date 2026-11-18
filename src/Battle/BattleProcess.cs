@@ -57,6 +57,11 @@ public sealed class BattleProcess(string configPath)
         using IWorldBossSink worldBoss = string.IsNullOrEmpty(config.WorldUpstream)
             ? new NoWorldBossSink()
             : new GrpcWorldBossSink(config.WorldUpstream);
+        // Q9：逃跑惩罚的事实值落角色库（持久数据的唯一写入方）。没配角色服就是本机
+        // 口径：惩罚只活在战斗服内存里，进程重启就没了——不编一个跨进程的假事实。
+        using IDeserterPenalty deserter = string.IsNullOrEmpty(config.CharacterUpstream)
+            ? new NoDeserterPenalty()
+            : new GrpcDeserterPenalty(config.CharacterUpstream);
 
         Console.WriteLine("config=" + config.SourcePath);
         Console.WriteLine("exp_upstream=" + (config.ExpUpstream.Length == 0 ? "off" : config.ExpUpstream));
@@ -158,12 +163,21 @@ public sealed class BattleProcess(string configPath)
                   + $" world_boss_pending={(config.WorldBoss.Pending ? "true" : "false")}")
             + $" world_upstream={(config.WorldUpstream.Length == 0 ? "off" : config.WorldUpstream)}");
         Console.WriteLine("resume=off");
+        // Q9：重连表单独一行，三个数字全部现取（核对脚本不写死产品现值）；
+        // missing 表示这一进程按老口径断线即离场，不重连也不记惩罚。
+        Console.WriteLine($"reconnect_table={config.ReconnectTablePath}"
+            + (config.Reconnect.IsMissing
+                ? " reconnect=missing"
+                : $" reconnect_version={config.Reconnect.Version}"
+                  + $" battle_grace_ms={config.Reconnect.GraceMs}"
+                  + $" reconnect_window_ms={config.Reconnect.WindowMs}"
+                  + $" deserter_penalty_ms={config.Reconnect.PenaltyMs}"));
         Console.WriteLine("ready name=Battle pid=" + Environment.ProcessId);
 
         try
         {
             await new BattleServer(config, settlements, characters, expSettlement, talismans,
-                scrolls, profiles, sectTech, siegeSect, siegeResult, worldBoss)
+                scrolls, profiles, sectTech, siegeSect, siegeResult, worldBoss, deserter)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

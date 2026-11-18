@@ -209,6 +209,46 @@ public sealed class Encounter
     string _settlementId = "";
     bool _closed;
 
+    /// <summary>
+    /// Q9：这一场的收尾事实。通关时是 <see cref="Close"/> 发出去的那一条；没打完就散场
+    /// （<see cref="Abandon"/>）时保持 null——「没结算」与「结算了但没通关」是两件事。
+    /// 重连到已经收尾的场只把这一条原样回去，绝不调用第二次结算。
+    /// </summary>
+    public BattleEnded? EndSnapshot { get; private set; }
+
+    /// <summary>这一场是否已经收尾（通关或散场）。</summary>
+    public bool IsClosed
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _closed;
+            }
+        }
+    }
+
+    /// <summary>按角色号找这一场里的成员；不在场返回 null（Q9 用它判断能不能续战）。</summary>
+    public Member? FindMember(ulong memberId)
+    {
+        lock (_gate)
+        {
+            return _members.TryGetValue(memberId, out var member) ? member : null;
+        }
+    }
+
+    /// <summary>这一场里现在还有几个人。Q9 用它判断散场（最后一个在线的人走了才散）。</summary>
+    public int MemberCount
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _members.Count;
+            }
+        }
+    }
+
     // Boss 的出手与阶段
     int _phaseIndex;
     (ulong MemberId, long LandAtMs)? _bossPending;
@@ -1700,13 +1740,14 @@ public sealed class Encounter
                 dungeonId, _qualifiedKills, allocation.ByMember);
         }
 
-        return new BattleEnded
+        EndSnapshot = new BattleEnded
         {
             SessionId = SessionId,
             Cleared = _bossHp <= 0,
             SettlementId = _settlementId,
             ExpGain = string.IsNullOrEmpty(_settlementId) ? 0 : _boss.ExpOnClear,
         };
+        return EndSnapshot;
     }
 
     // ---- 换算 ----

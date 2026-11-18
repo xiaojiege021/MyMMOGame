@@ -500,6 +500,8 @@ public sealed class CharacterProcess(string configPath)
         // 周期键只读 calendar；本卡不另开第二条货币 UPDATE，也不另算一套抽成。
         var cityTasks = new CityTaskRepository(
             dataSource, cityTaskTable, calendar, realms, grants, cityTax);
+        // Q9/H4：逃跑惩罚的唯一写入口（写到期时刻，不扣任何东西）。
+        var deserters = new DeserterRepository(dataSource);
         var dungeonEntries = new DungeonEntryRepository(dataSource, calendar);
         // P2-2a：高难本（龙巢）每人每周的次数。只写 dungeon_entry 一行，
         // 不碰疲劳与周份额；次数以库里已写下的进本记录为准。
@@ -639,6 +641,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(recipeTable);
         builder.Services.AddSingleton(cityTaskTable);
         builder.Services.AddSingleton(cityTasks);
+        builder.Services.AddSingleton(deserters);
         builder.Services.AddSingleton(crafts);
         builder.Services.AddSingleton(dungeonDropTable);
         builder.Services.AddSingleton(mainlineDropTable);
