@@ -102,11 +102,20 @@ namespace HotUpdate
         /// </summary>
         public int EffectSeq { get; private set; }
 
-        /// <summary>每个单位（含 Boss）最近一次效果快照。收到就整份替换，不做增量。</summary>
-        readonly Dictionary<ulong, List<EffectSnapshot>> _effects = new();
+        /// <summary>
+        /// 一个单位最近一份效果快照。热更侧不写字典泛型（AOT 侧没有精确实例化，
+        /// 真机一调就 MissingMethod，M2 抓到的那条），所以改成单层 List + 小类，
+        /// 查找走线性（同场单位个位数）。
+        /// </summary>
+        sealed class EffectSlot
+        {
+            public ulong UnitId;
+            public double StampMs;
+            public readonly List<EffectSnapshot> Effects = new();
+        }
 
-        /// <summary>那份快照收到的本地时钟毫秒。界面只拿它做显示倒计时，不做结算。</summary>
-        readonly Dictionary<ulong, double> _effectStampMs = new();
+        /// <summary>每个单位（含 Boss）最近一次效果快照。收到就整份替换，不做增量。</summary>
+        readonly List<EffectSlot> _effects = new();
 
         public readonly List<SkillInfo> Skills = new();
 
@@ -138,9 +147,21 @@ namespace HotUpdate
         /// </summary>
         public IReadOnlyList<EffectSnapshot> EffectsOf(ulong unitId)
         {
-            return _effects.TryGetValue(unitId, out var list)
-                ? (IReadOnlyList<EffectSnapshot>)list
-                : Array.Empty<EffectSnapshot>();
+            var slot = FindEffectSlot(unitId);
+            return slot != null ? (IReadOnlyList<EffectSnapshot>)slot.Effects : Array.Empty<EffectSnapshot>();
+        }
+
+        /// <summary>找某个单位的快照槽，没有就是 null。</summary>
+        EffectSlot FindEffectSlot(ulong unitId)
+        {
+            for (var i = 0; i < _effects.Count; i++)
+            {
+                if (_effects[i].UnitId == unitId)
+                {
+                    return _effects[i];
+                }
+            }
+            return null;
         }
 
         /// <summary>自己身上的效果。CasterId 还没下发时是空表。</summary>
@@ -155,14 +176,22 @@ namespace HotUpdate
         /// </summary>
         public double EffectAgeMs(ulong unitId)
         {
-            return _effectStampMs.TryGetValue(unitId, out var at) ? NowMs() - at : 0;
+            var slot = FindEffectSlot(unitId);
+            return slot != null ? NowMs() - slot.StampMs : 0;
         }
 
         /// <summary>整份替换某个单位的效果列表，并把「有新快照」的序号推一格。</summary>
         void ApplyEffectState(ulong unitId, IEnumerable<EffectSnapshot> effects)
         {
-            _effects[unitId] = new List<EffectSnapshot>(effects);
-            _effectStampMs[unitId] = NowMs();
+            var slot = FindEffectSlot(unitId);
+            if (slot == null)
+            {
+                slot = new EffectSlot { UnitId = unitId };
+                _effects.Add(slot);
+            }
+            slot.Effects.Clear();
+            slot.Effects.AddRange(effects);
+            slot.StampMs = NowMs();
             EffectSeq++;
         }
 
@@ -255,7 +284,6 @@ namespace HotUpdate
             LastReject = "";
             EffectSeq = 0;
             _effects.Clear();
-            _effectStampMs.Clear();
             Skills.Clear();
             Party.Clear();
             Classes.Clear();
@@ -409,7 +437,6 @@ namespace HotUpdate
                     // Q2：新一场的效果集合也在开场包里。先清掉上一场的，
                     // 再按每一条 EffectState 整份收进来（正常开场是空的，Q9 重连才有）。
                     _effects.Clear();
-                    _effectStampMs.Clear();
                     foreach (var state in opened.Effects)
                     {
                         ApplyEffectState(state.UnitId, state.Effects);

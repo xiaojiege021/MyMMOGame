@@ -162,6 +162,16 @@ else
   ok "客户端没有算血量、蓝量和伤害"
 fi
 
+# M2：热更代码不许用字典泛型。AOT 侧不会为热更用到的组合精确实例化，
+# 真机一调 TryGetValue 就 MissingMethod（M2 第一轮撞的是嵌套那份、第二轮撞的是 ulong/double）。
+# 热更侧一律单层 List + 小类。
+if grep -qE 'Dictionary<|SortedDictionary<|ConcurrentDictionary<' \
+     -r "$ROOT/client/MMOGame/Assets/HotUpdate" 2>/dev/null; then
+  bad "热更里有字典泛型，AOT 侧没实例化，真机会 MissingMethod"
+else
+  ok "热更里没有字典泛型（只用单层 List 与小类）"
+fi
+
 echo "== 3. 起战斗进程（两阶段 + 出手）=="
 if [ ! -x "$ADB" ]; then
   bad "找不到 adb：$ADB"

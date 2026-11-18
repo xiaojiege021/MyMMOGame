@@ -95,8 +95,12 @@ namespace HotUpdate
 
         readonly Text[] _bossEffectLabels = new Text[BossEffectSlots];
 
-        /// <summary>上一份自己的效果集合，按 effect_id 做差，只在自身刷战斗日志。</summary>
-        readonly Dictionary<string, EffectSnapshot> _selfEffectSeen = new();
+        /// <summary>
+        /// 上一份自己的效果集合，按 effect_id 做差，只在自身刷战斗日志。
+        /// 热更侧不用 Dictionary：AOT 侧没有精确实例化，真机一调就 MissingMethod（M2 抓到），
+        /// 所以这里是单层 List + 线性查（同场效果个位数）。
+        /// </summary>
+        readonly List<EffectSnapshot> _selfEffectSeen = new();
 
         int _seenEffectSeq;
 
@@ -647,30 +651,55 @@ namespace HotUpdate
             }
         }
 
+        /// <summary>上一份里有没有这个 effect_id，有就返回那一条。</summary>
+        EffectSnapshot FindSeenEffect(string effectId)
+        {
+            foreach (var seen in _selfEffectSeen)
+            {
+                if (seen.EffectId == effectId)
+                {
+                    return seen;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>新的一份里有没有这个 effect_id，有就返回那一条。</summary>
+        static EffectSnapshot FindEffect(List<EffectSnapshot> list, string effectId)
+        {
+            foreach (var item in list)
+            {
+                if (item.EffectId == effectId)
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// 自身效果集合变了就在战斗日志里补一句人话。按 effect_id 与上一份做差，
         /// 只做自身；护盾出场写剩余吸收量，其余写「获得 / 结束」。
         /// </summary>
         void LogSelfEffectChanges()
         {
-            var current = new Dictionary<string, EffectSnapshot>();
+            var current = new List<EffectSnapshot>();
             foreach (var effect in _client.SelfEffects)
             {
                 if (!string.IsNullOrEmpty(effect.EffectId))
                 {
-                    current[effect.EffectId] = effect;
+                    current.Add(effect);
                 }
             }
 
             var lines = new List<string>();
-            foreach (var pair in current)
+            foreach (var effect in current)
             {
-                if (_selfEffectSeen.ContainsKey(pair.Key))
+                if (FindSeenEffect(effect.EffectId) != null)
                 {
                     continue;
                 }
 
-                var effect = pair.Value;
                 if (effect.Kind == "shield")
                 {
                     lines.Add(effect.Name + " " + effect.ShieldLeft);
@@ -681,23 +710,20 @@ namespace HotUpdate
                 }
             }
 
-            foreach (var pair in _selfEffectSeen)
+            foreach (var old in _selfEffectSeen)
             {
-                if (!current.ContainsKey(pair.Key))
+                if (FindEffect(current, old.EffectId) == null)
                 {
-                    lines.Add(pair.Value.Name + " 结束");
+                    lines.Add(old.Name + " 结束");
                 }
             }
 
             _selfEffectSeen.Clear();
-            foreach (var pair in current)
-            {
-                _selfEffectSeen[pair.Key] = pair.Value;
-            }
+            _selfEffectSeen.AddRange(current);
 
             if (lines.Count > 0)
             {
-                _logLine = "效果：" + string.Join(" · ", lines);
+                _logLine = "效果：" + string.Join(" · ", lines.ToArray());
             }
         }
 
