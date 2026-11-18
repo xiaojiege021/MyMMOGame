@@ -957,6 +957,9 @@ message DescribeBattleProfileResponse {
   int32 enhance_slots = 6;
   // 二转步数：0 未转、1 一转、2 二转。生息二转的复活减免按它算。
   int32 branch_step = 7;
+  // Q2：段内阶的被动万分比（N10 的 passive_pct_bps）。战斗服的伤害第一段读它，
+  // 不另读一份境界配置；低境界是 0，默认值下与旧伤害逐字等价。
+  int32 passive_pct_bps = 8;
 }
 
 // P2-4a：二转。只推进一步已经选定的分支，不另开分支、不改兵器。

@@ -2638,6 +2638,11 @@ public sealed class CharacterGrpcService(
         var (total, slots) = await enhances.TotalsAsync(
             (long)request.CharacterId, context.CancellationToken);
 
+        // Q2：段内阶被动万分比。战斗服的伤害第一段只从这份快照读，
+        // 不另读 config/realms.json，避免两端口径不一致；查不到按 0（低境界）。
+        var passive = await realmPhases.DescribePassiveAsync(
+            (long)request.CharacterId, context.CancellationToken);
+
         return new DescribeBattleProfileResponse
         {
             Found = true,
@@ -2647,6 +2652,7 @@ public sealed class CharacterGrpcService(
             EnhanceTotal = total,
             EnhanceSlots = slots,
             BranchStep = identity.Value.BranchStep,
+            PassivePctBps = passive.Found ? passive.PassivePctBps : 0,
         };
     }
 

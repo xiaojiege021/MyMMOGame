@@ -39,89 +39,100 @@ namespace Mmo.Proto.Battle {
             "AyJKCg5Ta2lsbENhbmNlbGxlZBIQCghza2lsbF9pZBgBIAEoDRIUCgxjYXN0",
             "X3RpbWVfbXMYAiABKAMSEAoIYWNjZXB0ZWQYAyABKAgiQQoLTW92ZVJlcXVl",
             "c3QSDAoEeF9tbRgBIAEoBRIMCgR5X21tGAIgASgFEhYKDmNsaWVudF90aW1l",
-            "X21zGAMgASgDIk0KCU1vdmVTdGF0ZRIMCgR4X21tGAEgASgFEgwKBHlfbW0Y",
-            "AiABKAUSEwoLZGlzdGFuY2VfbW0YAyABKA0SDwoHY2xhbXBlZBgEIAEoCCKk",
-            "AQoJU2tpbGxJbmZvEhAKCHNraWxsX2lkGAEgASgNEgwKBG5hbWUYAiABKAkS",
-            "EAoIcmFuZ2VfbW0YAyABKA0SFAoMZm9yZXN3aW5nX21zGAQgASgNEhMKC3Jl",
-            "Y292ZXJ5X21zGAUgASgNEhMKC2Nvb2xkb3duX21zGAYgASgNEhIKCnN0YWdn",
-            "ZXJfbXMYByABKA0SEQoJbWFuYV9jb3N0GAggASgNIisKCUNsYXNzSW5mbxIQ",
-            "CghjbGFzc19pZBgBIAEoCRIMCgRuYW1lGAIgASgJImoKC1BhcnR5TWVtYmVy",
-            "EhEKCW1lbWJlcl9pZBgBIAEoBBIQCghjbGFzc19pZBgCIAEoCRIMCgRuYW1l",
-            "GAMgASgJEgoKAmhwGAQgASgDEg4KBmhwX21heBgFIAEoAxIMCgRkb3duGAYg",
-            "ASgIIsgDCgxCYXR0bGVPcGVuZWQSEgoKc2Vzc2lvbl9pZBgBIAEoBBIRCglj",
-            "YXN0ZXJfaWQYAiABKAQSDwoHYm9zc19pZBgDIAEoBBIPCgdib3NzX2hwGAQg",
-            "ASgDEhMKC2Jvc3NfaHBfbWF4GAUgASgDEhEKCWNhc3Rlcl9ocBgGIAEoAxIV",
-            "Cg1jYXN0ZXJfaHBfbWF4GAcgASgDEhMKC2Rpc3RhbmNlX21tGAggASgNEiUK",
-            "BnNraWxscxgJIAMoCzIVLm1tby5iYXR0bGUuU2tpbGxJbmZvEhcKD2FyZW5h",
-            "X3JhZGl1c19tbRgKIAEoDRIbChNtb3ZlX3NwZWVkX21tX3Blcl9zGAsgASgN",
-            "EhMKC2Nhc3Rlcl94X21tGAwgASgFEhMKC2Nhc3Rlcl95X21tGA0gASgFEhAK",
-            "CGNsYXNzX2lkGA4gASgJEhIKCmNsYXNzX25hbWUYDyABKAkSDAoEbWFuYRgQ",
-            "IAEoAxIQCghtYW5hX21heBgRIAEoAxImCgVwYXJ0eRgSIAMoCzIXLm1tby5i",
-            "YXR0bGUuUGFydHlNZW1iZXISJgoHY2xhc3NlcxgTIAMoCzIVLm1tby5iYXR0",
-            "bGUuQ2xhc3NJbmZvIlsKC0JhdHRsZUVuZGVkEhIKCnNlc3Npb25faWQYASAB",
-            "KAQSDwoHY2xlYXJlZBgCIAEoCBIVCg1zZXR0bGVtZW50X2lkGAMgASgJEhAK",
-            "CGV4cF9nYWluGAQgASgDIjgKDU1lbWJlclVwZGF0ZWQSJwoGbWVtYmVyGAEg",
-            "ASgLMhcubW1vLmJhdHRsZS5QYXJ0eU1lbWJlciIuCglCb3NzUGhhc2USEwoL",
-            "cGhhc2VfaW5kZXgYASABKAUSDAoEbmFtZRgCIAEoCSJ5Cg9TaWVnZVVuaXRW",
-            "aXN1YWwSEQoJbWVtYmVyX2lkGAEgASgEEgwKBHRlYW0YAiABKA0SCgoCaHAY",
-            "AyABKAMSDgoGaHBfbWF4GAQgASgDEikKBHRpZXIYBSABKA4yGy5tbW8uYmF0",
-            "dGxlLlNpZWdlVmlzdWFsVGllciKTAQoJU2llZ2VWaWV3EhIKCnNlc3Npb25f",
-            "aWQYASABKAQSGAoQZnVsbF9tb2RlbF9saW1pdBgCIAEoDRIYChBmdWxsX21v",
-            "ZGVsX2NvdW50GAMgASgNEhIKCnVuaXRfY291bnQYBCABKA0SKgoFdW5pdHMY",
-            "BSADKAsyGy5tbW8uYmF0dGxlLlNpZWdlVW5pdFZpc3VhbCKHAgoNQ2xpZW50",
-            "TWVzc2FnZRIpCgVza2lsbBgBIAEoCzIYLm1tby5iYXR0bGUuU2tpbGxSZXF1",
-            "ZXN0SAASMAoGY2FuY2VsGAIgASgLMh4ubW1vLmJhdHRsZS5Ta2lsbENhbmNl",
-            "bFJlcXVlc3RIABInCgRtb3ZlGAMgASgLMhcubW1vLmJhdHRsZS5Nb3ZlUmVx",
-            "dWVzdEgAEjIKCHRhbGlzbWFuGAQgASgLMh4ubW1vLmJhdHRsZS5Vc2VUYWxp",
-            "c21hblJlcXVlc3RIABI0CgZzY3JvbGwYBSABKAsyIi5tbW8uYmF0dGxlLlVz",
-            "ZVJldml2ZVNjcm9sbFJlcXVlc3RIAEIGCgRib2R5IsQFCg1TZXJ2ZXJNZXNz",
-            "YWdlEioKBm9wZW5lZBgBIAEoCzIYLm1tby5iYXR0bGUuQmF0dGxlT3BlbmVk",
-            "SAASKQoGcmVzdWx0GAIgASgLMhcubW1vLmJhdHRsZS5Ta2lsbFJlc3VsdEgA",
-            "Ei0KCHJlamVjdGVkGAMgASgLMhkubW1vLmJhdHRsZS5Ta2lsbFJlamVjdGVk",
-            "SAASLwoJY2FuY2VsbGVkGAQgASgLMhoubW1vLmJhdHRsZS5Ta2lsbENhbmNl",
-            "bGxlZEgAEigKBWVuZGVkGAUgASgLMhcubW1vLmJhdHRsZS5CYXR0bGVFbmRl",
-            "ZEgAEiYKBW1vdmVkGAYgASgLMhUubW1vLmJhdHRsZS5Nb3ZlU3RhdGVIABIz",
-            "Cg5tZW1iZXJfdXBkYXRlZBgHIAEoCzIZLm1tby5iYXR0bGUuTWVtYmVyVXBk",
-            "YXRlZEgAEisKCmJvc3NfcGhhc2UYCCABKAsyFS5tbW8uYmF0dGxlLkJvc3NQ",
-            "aGFzZUgAEjMKDmVudGVyX3JlamVjdGVkGAkgASgLMhkubW1vLmJhdHRsZS5F",
-            "bnRlclJlamVjdGVkSAASMQoNdGFsaXNtYW5fdXNlZBgKIAEoCzIYLm1tby5i",
-            "YXR0bGUuVGFsaXNtYW5Vc2VkSAASOQoRdGFsaXNtYW5fcmVqZWN0ZWQYCyAB",
-            "KAsyHC5tbW8uYmF0dGxlLlRhbGlzbWFuUmVqZWN0ZWRIABIzCgtzY3JvbGxf",
-            "dXNlZBgMIAEoCzIcLm1tby5iYXR0bGUuUmV2aXZlU2Nyb2xsVXNlZEgAEjsK",
-            "D3Njcm9sbF9yZWplY3RlZBgNIAEoCzIgLm1tby5iYXR0bGUuUmV2aXZlU2Ny",
-            "b2xsUmVqZWN0ZWRIABIrCgpzaWVnZV92aWV3GA4gASgLMhUubW1vLmJhdHRs",
-            "ZS5TaWVnZVZpZXdIAEIGCgRib2R5IlMKDUVudGVyUmVqZWN0ZWQSDgoGcmVh",
-            "c29uGAEgASgJEg0KBWxpbWl0GAIgASgNEg8KB2N1cnJlbnQYAyABKA0SEgoK",
-            "ZHVuZ2Vvbl9pZBgEIAEoCSI9ChJVc2VUYWxpc21hblJlcXVlc3QSDwoHaXRl",
-            "bV9pZBgBIAEoCRIWCg5jbGllbnRfdGltZV9tcxgCIAEoAyLgAQoMVGFsaXNt",
-            "YW5Vc2VkEhEKCWNhc3Rlcl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJEg4K",
-            "BmhlYWxlZBgDIAEoAxIQCghocF9hZnRlchgEIAEoAxITCgtjb29sZG93bl9t",
-            "cxgFIAEoDRIWCg5jb29sZG93bl9ncm91cBgGIAEoCRISCgpjb3VudF9sZWZ0",
-            "GAcgASgDEgwKBHBvb2wYCCABKAkSEAoIcmVzdG9yZWQYCSABKAMSEgoKbWFu",
-            "YV9hZnRlchgKIAEoAxIVCg1tYW5hX3Jlc3RvcmVkGAsgASgDInEKEFRhbGlz",
-            "bWFuUmVqZWN0ZWQSDwoHaXRlbV9pZBgBIAEoCRIOCgZyZWFzb24YAiABKAkS",
-            "FgoOcmV0cnlfYWZ0ZXJfbXMYAyABKA0SEAoIaHBfYWZ0ZXIYBCABKAMSEgoK",
-            "bWFuYV9hZnRlchgFIAEoAyJBChZVc2VSZXZpdmVTY3JvbGxSZXF1ZXN0Eg8K",
-            "B2l0ZW1faWQYASABKAkSFgoOY2xpZW50X3RpbWVfbXMYAiABKAMizgEKEFJl",
-            "dml2ZVNjcm9sbFVzZWQSEQoJY2FzdGVyX2lkGAEgASgEEg8KB2l0ZW1faWQY",
-            "AiABKAkSEAoIaHBfYWZ0ZXIYAyABKAMSEgoKbWFuYV9hZnRlchgEIAEoAxIQ",
-            "CghleHBfY29zdBgFIAEoAxINCgVsZXZlbBgGIAEoAxIRCglleHBfYWZ0ZXIY",
-            "ByABKAMSEwoLY29vbGRvd25fbXMYCCABKA0SEwoLcmVhZHlfYXRfbXMYCSAB",
-            "KAMSEgoKY291bnRfbGVmdBgKIAEoAyJ1ChRSZXZpdmVTY3JvbGxSZWplY3Rl",
-            "ZBIPCgdpdGVtX2lkGAEgASgJEg4KBnJlYXNvbhgCIAEoCRIWCg5yZXRyeV9h",
-            "ZnRlcl9tcxgDIAEoDRIQCghocF9hZnRlchgEIAEoAxISCgptYW5hX2FmdGVy",
-            "GAUgASgDKvYCChFTa2lsbFJlamVjdFJlYXNvbhIcChhTS0lMTF9SRUpFQ1Rf",
-            "VU5TUEVDSUZJRUQQABIeChpTS0lMTF9SRUpFQ1RfTk9UX0lOX0JBVFRMRRAB",
-            "Eh4KGlNLSUxMX1JFSkVDVF9VTktOT1dOX1NLSUxMEAISHAoYU0tJTExfUkVK",
-            "RUNUX1RBUkdFVF9HT05FEAMSHAoYU0tJTExfUkVKRUNUX0NBU1RFUl9ERUFE",
-            "EAQSGQoVU0tJTExfUkVKRUNUX0NPT0xET1dOEAUSHQoZU0tJTExfUkVKRUNU",
-            "X09VVF9PRl9SQU5HRRAGEhgKFFNLSUxMX1JFSkVDVF9DQVNUSU5HEAcSGQoV",
-            "U0tJTExfUkVKRUNUX1JFQ09WRVJZEAgSGAoUU0tJTExfUkVKRUNUX05PX01B",
-            "TkEQCRIbChdTS0lMTF9SRUpFQ1RfQkFEX1RBUkdFVBAKEiEKHVNLSUxMX1JF",
-            "SkVDVF9DQU5OT1RfUkVTVVJSRUNUEAsqXwoPU2llZ2VWaXN1YWxUaWVyEhwK",
-            "GFNJRUdFX1ZJU1VBTF9VTlNQRUNJRklFRBAAEhUKEVNJRUdFX1ZJU1VBTF9G",
-            "VUxMEAESFwoTU0lFR0VfVklTVUFMX01BUktFUhACQhOqAhBNbW8uUHJvdG8u",
-            "QmF0dGxlYgZwcm90bzM="));
+            "X21zGAMgASgDIl4KCU1vdmVTdGF0ZRIMCgR4X21tGAEgASgFEgwKBHlfbW0Y",
+            "AiABKAUSEwoLZGlzdGFuY2VfbW0YAyABKA0SDwoHY2xhbXBlZBgEIAEoCBIP",
+            "CgdibG9ja2VkGAUgASgIIo0BCg5FZmZlY3RTbmFwc2hvdBIRCgllZmZlY3Rf",
+            "aWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRraW5kGAMgASgJEhEKCXNvdXJj",
+            "ZV9pZBgEIAEoBBIUCgxyZW1haW5pbmdfbXMYBSABKA0SDgoGc3RhY2tzGAYg",
+            "ASgNEhMKC3NoaWVsZF9sZWZ0GAcgASgDIksKC0VmZmVjdFN0YXRlEg8KB3Vu",
+            "aXRfaWQYASABKAQSKwoHZWZmZWN0cxgCIAMoCzIaLm1tby5iYXR0bGUuRWZm",
+            "ZWN0U25hcHNob3QiZQoJQm9zc1N0YXRlEg8KB2Jvc3NfaWQYASABKAQSCgoC",
+            "aHAYAiABKAMSDgoGaHBfbWF4GAMgASgDEisKB2VmZmVjdHMYBCADKAsyGi5t",
+            "bW8uYmF0dGxlLkVmZmVjdFNuYXBzaG90IqQBCglTa2lsbEluZm8SEAoIc2tp",
+            "bGxfaWQYASABKA0SDAoEbmFtZRgCIAEoCRIQCghyYW5nZV9tbRgDIAEoDRIU",
+            "Cgxmb3Jlc3dpbmdfbXMYBCABKA0SEwoLcmVjb3ZlcnlfbXMYBSABKA0SEwoL",
+            "Y29vbGRvd25fbXMYBiABKA0SEgoKc3RhZ2dlcl9tcxgHIAEoDRIRCgltYW5h",
+            "X2Nvc3QYCCABKA0iKwoJQ2xhc3NJbmZvEhAKCGNsYXNzX2lkGAEgASgJEgwK",
+            "BG5hbWUYAiABKAkiagoLUGFydHlNZW1iZXISEQoJbWVtYmVyX2lkGAEgASgE",
+            "EhAKCGNsYXNzX2lkGAIgASgJEgwKBG5hbWUYAyABKAkSCgoCaHAYBCABKAMS",
+            "DgoGaHBfbWF4GAUgASgDEgwKBGRvd24YBiABKAgi8gMKDEJhdHRsZU9wZW5l",
+            "ZBISCgpzZXNzaW9uX2lkGAEgASgEEhEKCWNhc3Rlcl9pZBgCIAEoBBIPCgdi",
+            "b3NzX2lkGAMgASgEEg8KB2Jvc3NfaHAYBCABKAMSEwoLYm9zc19ocF9tYXgY",
+            "BSABKAMSEQoJY2FzdGVyX2hwGAYgASgDEhUKDWNhc3Rlcl9ocF9tYXgYByAB",
+            "KAMSEwoLZGlzdGFuY2VfbW0YCCABKA0SJQoGc2tpbGxzGAkgAygLMhUubW1v",
+            "LmJhdHRsZS5Ta2lsbEluZm8SFwoPYXJlbmFfcmFkaXVzX21tGAogASgNEhsK",
+            "E21vdmVfc3BlZWRfbW1fcGVyX3MYCyABKA0SEwoLY2FzdGVyX3hfbW0YDCAB",
+            "KAUSEwoLY2FzdGVyX3lfbW0YDSABKAUSEAoIY2xhc3NfaWQYDiABKAkSEgoK",
+            "Y2xhc3NfbmFtZRgPIAEoCRIMCgRtYW5hGBAgASgDEhAKCG1hbmFfbWF4GBEg",
+            "ASgDEiYKBXBhcnR5GBIgAygLMhcubW1vLmJhdHRsZS5QYXJ0eU1lbWJlchIm",
+            "CgdjbGFzc2VzGBMgAygLMhUubW1vLmJhdHRsZS5DbGFzc0luZm8SKAoHZWZm",
+            "ZWN0cxgUIAMoCzIXLm1tby5iYXR0bGUuRWZmZWN0U3RhdGUiWwoLQmF0dGxl",
+            "RW5kZWQSEgoKc2Vzc2lvbl9pZBgBIAEoBBIPCgdjbGVhcmVkGAIgASgIEhUK",
+            "DXNldHRsZW1lbnRfaWQYAyABKAkSEAoIZXhwX2dhaW4YBCABKAMiOAoNTWVt",
+            "YmVyVXBkYXRlZBInCgZtZW1iZXIYASABKAsyFy5tbW8uYmF0dGxlLlBhcnR5",
+            "TWVtYmVyIi4KCUJvc3NQaGFzZRITCgtwaGFzZV9pbmRleBgBIAEoBRIMCgRu",
+            "YW1lGAIgASgJInkKD1NpZWdlVW5pdFZpc3VhbBIRCgltZW1iZXJfaWQYASAB",
+            "KAQSDAoEdGVhbRgCIAEoDRIKCgJocBgDIAEoAxIOCgZocF9tYXgYBCABKAMS",
+            "KQoEdGllchgFIAEoDjIbLm1tby5iYXR0bGUuU2llZ2VWaXN1YWxUaWVyIpMB",
+            "CglTaWVnZVZpZXcSEgoKc2Vzc2lvbl9pZBgBIAEoBBIYChBmdWxsX21vZGVs",
+            "X2xpbWl0GAIgASgNEhgKEGZ1bGxfbW9kZWxfY291bnQYAyABKA0SEgoKdW5p",
+            "dF9jb3VudBgEIAEoDRIqCgV1bml0cxgFIAMoCzIbLm1tby5iYXR0bGUuU2ll",
+            "Z2VVbml0VmlzdWFsIocCCg1DbGllbnRNZXNzYWdlEikKBXNraWxsGAEgASgL",
+            "MhgubW1vLmJhdHRsZS5Ta2lsbFJlcXVlc3RIABIwCgZjYW5jZWwYAiABKAsy",
+            "Hi5tbW8uYmF0dGxlLlNraWxsQ2FuY2VsUmVxdWVzdEgAEicKBG1vdmUYAyAB",
+            "KAsyFy5tbW8uYmF0dGxlLk1vdmVSZXF1ZXN0SAASMgoIdGFsaXNtYW4YBCAB",
+            "KAsyHi5tbW8uYmF0dGxlLlVzZVRhbGlzbWFuUmVxdWVzdEgAEjQKBnNjcm9s",
+            "bBgFIAEoCzIiLm1tby5iYXR0bGUuVXNlUmV2aXZlU2Nyb2xsUmVxdWVzdEgA",
+            "QgYKBGJvZHkinQYKDVNlcnZlck1lc3NhZ2USKgoGb3BlbmVkGAEgASgLMhgu",
+            "bW1vLmJhdHRsZS5CYXR0bGVPcGVuZWRIABIpCgZyZXN1bHQYAiABKAsyFy5t",
+            "bW8uYmF0dGxlLlNraWxsUmVzdWx0SAASLQoIcmVqZWN0ZWQYAyABKAsyGS5t",
+            "bW8uYmF0dGxlLlNraWxsUmVqZWN0ZWRIABIvCgljYW5jZWxsZWQYBCABKAsy",
+            "Gi5tbW8uYmF0dGxlLlNraWxsQ2FuY2VsbGVkSAASKAoFZW5kZWQYBSABKAsy",
+            "Fy5tbW8uYmF0dGxlLkJhdHRsZUVuZGVkSAASJgoFbW92ZWQYBiABKAsyFS5t",
+            "bW8uYmF0dGxlLk1vdmVTdGF0ZUgAEjMKDm1lbWJlcl91cGRhdGVkGAcgASgL",
+            "MhkubW1vLmJhdHRsZS5NZW1iZXJVcGRhdGVkSAASKwoKYm9zc19waGFzZRgI",
+            "IAEoCzIVLm1tby5iYXR0bGUuQm9zc1BoYXNlSAASMwoOZW50ZXJfcmVqZWN0",
+            "ZWQYCSABKAsyGS5tbW8uYmF0dGxlLkVudGVyUmVqZWN0ZWRIABIxCg10YWxp",
+            "c21hbl91c2VkGAogASgLMhgubW1vLmJhdHRsZS5UYWxpc21hblVzZWRIABI5",
+            "ChF0YWxpc21hbl9yZWplY3RlZBgLIAEoCzIcLm1tby5iYXR0bGUuVGFsaXNt",
+            "YW5SZWplY3RlZEgAEjMKC3Njcm9sbF91c2VkGAwgASgLMhwubW1vLmJhdHRs",
+            "ZS5SZXZpdmVTY3JvbGxVc2VkSAASOwoPc2Nyb2xsX3JlamVjdGVkGA0gASgL",
+            "MiAubW1vLmJhdHRsZS5SZXZpdmVTY3JvbGxSZWplY3RlZEgAEisKCnNpZWdl",
+            "X3ZpZXcYDiABKAsyFS5tbW8uYmF0dGxlLlNpZWdlVmlld0gAEioKB2VmZmVj",
+            "dHMYDyABKAsyFy5tbW8uYmF0dGxlLkVmZmVjdFN0YXRlSAASKwoKYm9zc19z",
+            "dGF0ZRgQIAEoCzIVLm1tby5iYXR0bGUuQm9zc1N0YXRlSABCBgoEYm9keSJT",
+            "Cg1FbnRlclJlamVjdGVkEg4KBnJlYXNvbhgBIAEoCRINCgVsaW1pdBgCIAEo",
+            "DRIPCgdjdXJyZW50GAMgASgNEhIKCmR1bmdlb25faWQYBCABKAkiPQoSVXNl",
+            "VGFsaXNtYW5SZXF1ZXN0Eg8KB2l0ZW1faWQYASABKAkSFgoOY2xpZW50X3Rp",
+            "bWVfbXMYAiABKAMi4AEKDFRhbGlzbWFuVXNlZBIRCgljYXN0ZXJfaWQYASAB",
+            "KAQSDwoHaXRlbV9pZBgCIAEoCRIOCgZoZWFsZWQYAyABKAMSEAoIaHBfYWZ0",
+            "ZXIYBCABKAMSEwoLY29vbGRvd25fbXMYBSABKA0SFgoOY29vbGRvd25fZ3Jv",
+            "dXAYBiABKAkSEgoKY291bnRfbGVmdBgHIAEoAxIMCgRwb29sGAggASgJEhAK",
+            "CHJlc3RvcmVkGAkgASgDEhIKCm1hbmFfYWZ0ZXIYCiABKAMSFQoNbWFuYV9y",
+            "ZXN0b3JlZBgLIAEoAyJxChBUYWxpc21hblJlamVjdGVkEg8KB2l0ZW1faWQY",
+            "ASABKAkSDgoGcmVhc29uGAIgASgJEhYKDnJldHJ5X2FmdGVyX21zGAMgASgN",
+            "EhAKCGhwX2FmdGVyGAQgASgDEhIKCm1hbmFfYWZ0ZXIYBSABKAMiQQoWVXNl",
+            "UmV2aXZlU2Nyb2xsUmVxdWVzdBIPCgdpdGVtX2lkGAEgASgJEhYKDmNsaWVu",
+            "dF90aW1lX21zGAIgASgDIs4BChBSZXZpdmVTY3JvbGxVc2VkEhEKCWNhc3Rl",
+            "cl9pZBgBIAEoBBIPCgdpdGVtX2lkGAIgASgJEhAKCGhwX2FmdGVyGAMgASgD",
+            "EhIKCm1hbmFfYWZ0ZXIYBCABKAMSEAoIZXhwX2Nvc3QYBSABKAMSDQoFbGV2",
+            "ZWwYBiABKAMSEQoJZXhwX2FmdGVyGAcgASgDEhMKC2Nvb2xkb3duX21zGAgg",
+            "ASgNEhMKC3JlYWR5X2F0X21zGAkgASgDEhIKCmNvdW50X2xlZnQYCiABKAMi",
+            "dQoUUmV2aXZlU2Nyb2xsUmVqZWN0ZWQSDwoHaXRlbV9pZBgBIAEoCRIOCgZy",
+            "ZWFzb24YAiABKAkSFgoOcmV0cnlfYWZ0ZXJfbXMYAyABKA0SEAoIaHBfYWZ0",
+            "ZXIYBCABKAMSEgoKbWFuYV9hZnRlchgFIAEoAyqrAwoRU2tpbGxSZWplY3RS",
+            "ZWFzb24SHAoYU0tJTExfUkVKRUNUX1VOU1BFQ0lGSUVEEAASHgoaU0tJTExf",
+            "UkVKRUNUX05PVF9JTl9CQVRUTEUQARIeChpTS0lMTF9SRUpFQ1RfVU5LTk9X",
+            "Tl9TS0lMTBACEhwKGFNLSUxMX1JFSkVDVF9UQVJHRVRfR09ORRADEhwKGFNL",
+            "SUxMX1JFSkVDVF9DQVNURVJfREVBRBAEEhkKFVNLSUxMX1JFSkVDVF9DT09M",
+            "RE9XThAFEh0KGVNLSUxMX1JFSkVDVF9PVVRfT0ZfUkFOR0UQBhIYChRTS0lM",
+            "TF9SRUpFQ1RfQ0FTVElORxAHEhkKFVNLSUxMX1JFSkVDVF9SRUNPVkVSWRAI",
+            "EhgKFFNLSUxMX1JFSkVDVF9OT19NQU5BEAkSGwoXU0tJTExfUkVKRUNUX0JB",
+            "RF9UQVJHRVQQChIhCh1TS0lMTF9SRUpFQ1RfQ0FOTk9UX1JFU1VSUkVDVBAL",
+            "EhgKFFNLSUxMX1JFSkVDVF9TVFVOTkVEEAwSGQoVU0tJTExfUkVKRUNUX1NJ",
+            "TEVOQ0VEEA0qXwoPU2llZ2VWaXN1YWxUaWVyEhwKGFNJRUdFX1ZJU1VBTF9V",
+            "TlNQRUNJRklFRBAAEhUKEVNJRUdFX1ZJU1VBTF9GVUxMEAESFwoTU0lFR0Vf",
+            "VklTVUFMX01BUktFUhACQhOqAhBNbW8uUHJvdG8uQmF0dGxlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Mmo.Proto.Battle.SkillRejectReason), typeof(global::Mmo.Proto.Battle.SiegeVisualTier), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -131,18 +142,21 @@ namespace Mmo.Proto.Battle {
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SkillCancelRequest), global::Mmo.Proto.Battle.SkillCancelRequest.Parser, new[]{ "SkillId", "CastTimeMs" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SkillCancelled), global::Mmo.Proto.Battle.SkillCancelled.Parser, new[]{ "SkillId", "CastTimeMs", "Accepted" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.MoveRequest), global::Mmo.Proto.Battle.MoveRequest.Parser, new[]{ "XMm", "YMm", "ClientTimeMs" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.MoveState), global::Mmo.Proto.Battle.MoveState.Parser, new[]{ "XMm", "YMm", "DistanceMm", "Clamped" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.MoveState), global::Mmo.Proto.Battle.MoveState.Parser, new[]{ "XMm", "YMm", "DistanceMm", "Clamped", "Blocked" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.EffectSnapshot), global::Mmo.Proto.Battle.EffectSnapshot.Parser, new[]{ "EffectId", "Name", "Kind", "SourceId", "RemainingMs", "Stacks", "ShieldLeft" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.EffectState), global::Mmo.Proto.Battle.EffectState.Parser, new[]{ "UnitId", "Effects" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BossState), global::Mmo.Proto.Battle.BossState.Parser, new[]{ "BossId", "Hp", "HpMax", "Effects" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SkillInfo), global::Mmo.Proto.Battle.SkillInfo.Parser, new[]{ "SkillId", "Name", "RangeMm", "ForeswingMs", "RecoveryMs", "CooldownMs", "StaggerMs", "ManaCost" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ClassInfo), global::Mmo.Proto.Battle.ClassInfo.Parser, new[]{ "ClassId", "Name" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.PartyMember), global::Mmo.Proto.Battle.PartyMember.Parser, new[]{ "MemberId", "ClassId", "Name", "Hp", "HpMax", "Down" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BattleOpened), global::Mmo.Proto.Battle.BattleOpened.Parser, new[]{ "SessionId", "CasterId", "BossId", "BossHp", "BossHpMax", "CasterHp", "CasterHpMax", "DistanceMm", "Skills", "ArenaRadiusMm", "MoveSpeedMmPerS", "CasterXMm", "CasterYMm", "ClassId", "ClassName", "Mana", "ManaMax", "Party", "Classes" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BattleOpened), global::Mmo.Proto.Battle.BattleOpened.Parser, new[]{ "SessionId", "CasterId", "BossId", "BossHp", "BossHpMax", "CasterHp", "CasterHpMax", "DistanceMm", "Skills", "ArenaRadiusMm", "MoveSpeedMmPerS", "CasterXMm", "CasterYMm", "ClassId", "ClassName", "Mana", "ManaMax", "Party", "Classes", "Effects" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BattleEnded), global::Mmo.Proto.Battle.BattleEnded.Parser, new[]{ "SessionId", "Cleared", "SettlementId", "ExpGain" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.MemberUpdated), global::Mmo.Proto.Battle.MemberUpdated.Parser, new[]{ "Member" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.BossPhase), global::Mmo.Proto.Battle.BossPhase.Parser, new[]{ "PhaseIndex", "Name" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SiegeUnitVisual), global::Mmo.Proto.Battle.SiegeUnitVisual.Parser, new[]{ "MemberId", "Team", "Hp", "HpMax", "Tier" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.SiegeView), global::Mmo.Proto.Battle.SiegeView.Parser, new[]{ "SessionId", "FullModelLimit", "FullModelCount", "UnitCount", "Units" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ClientMessage), global::Mmo.Proto.Battle.ClientMessage.Parser, new[]{ "Skill", "Cancel", "Move", "Talisman", "Scroll" }, new[]{ "Body" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected", "TalismanUsed", "TalismanRejected", "ScrollUsed", "ScrollRejected", "SiegeView" }, new[]{ "Body" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.ServerMessage), global::Mmo.Proto.Battle.ServerMessage.Parser, new[]{ "Opened", "Result", "Rejected", "Cancelled", "Ended", "Moved", "MemberUpdated", "BossPhase", "EnterRejected", "TalismanUsed", "TalismanRejected", "ScrollUsed", "ScrollRejected", "SiegeView", "Effects", "BossState" }, new[]{ "Body" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.EnterRejected), global::Mmo.Proto.Battle.EnterRejected.Parser, new[]{ "Reason", "Limit", "Current", "DungeonId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.UseTalismanRequest), global::Mmo.Proto.Battle.UseTalismanRequest.Parser, new[]{ "ItemId", "ClientTimeMs" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Mmo.Proto.Battle.TalismanUsed), global::Mmo.Proto.Battle.TalismanUsed.Parser, new[]{ "CasterId", "ItemId", "Healed", "HpAfter", "CooldownMs", "CooldownGroup", "CountLeft", "Pool", "Restored", "ManaAfter", "ManaRestored" }, null, null, null, null),
@@ -205,6 +219,11 @@ namespace Mmo.Proto.Battle {
     /// P2-4a：这个分支不能复活（诫律）。请求不算错，是这个职业分支没有这条能力。
     /// </summary>
     [pbr::OriginalName("SKILL_REJECT_CANNOT_RESURRECT")] SkillRejectCannotResurrect = 11,
+    /// <summary>
+    /// Q2：被控制。眩晕既不能施法也不能走位；沉默只挡施法，走位照常。
+    /// </summary>
+    [pbr::OriginalName("SKILL_REJECT_STUNNED")] SkillRejectStunned = 12,
+    [pbr::OriginalName("SKILL_REJECT_SILENCED")] SkillRejectSilenced = 13,
   }
 
   /// <summary>
@@ -2271,6 +2290,7 @@ namespace Mmo.Proto.Battle {
       yMm_ = other.yMm_;
       distanceMm_ = other.distanceMm_;
       clamped_ = other.clamped_;
+      blocked_ = other.blocked_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2328,6 +2348,22 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "blocked" field.</summary>
+    public const int BlockedFieldNumber = 5;
+    private bool blocked_;
+    /// <summary>
+    /// Q2：被定身 / 眩晕挡住，这一步没有生效。位置是服务端权威的原地，
+    /// 客户端无论偏差多小都要照这个回退，不能只看 clamped 的 500mm 阈值。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Blocked {
+      get { return blocked_; }
+      set {
+        blocked_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -2347,6 +2383,7 @@ namespace Mmo.Proto.Battle {
       if (YMm != other.YMm) return false;
       if (DistanceMm != other.DistanceMm) return false;
       if (Clamped != other.Clamped) return false;
+      if (Blocked != other.Blocked) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2358,6 +2395,7 @@ namespace Mmo.Proto.Battle {
       if (YMm != 0) hash ^= YMm.GetHashCode();
       if (DistanceMm != 0) hash ^= DistanceMm.GetHashCode();
       if (Clamped != false) hash ^= Clamped.GetHashCode();
+      if (Blocked != false) hash ^= Blocked.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2392,6 +2430,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(32);
         output.WriteBool(Clamped);
       }
+      if (Blocked != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Blocked);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2418,6 +2460,10 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(32);
         output.WriteBool(Clamped);
       }
+      if (Blocked != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Blocked);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2438,6 +2484,9 @@ namespace Mmo.Proto.Battle {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(DistanceMm);
       }
       if (Clamped != false) {
+        size += 1 + 1;
+      }
+      if (Blocked != false) {
         size += 1 + 1;
       }
       if (_unknownFields != null) {
@@ -2463,6 +2512,9 @@ namespace Mmo.Proto.Battle {
       }
       if (other.Clamped != false) {
         Clamped = other.Clamped;
+      }
+      if (other.Blocked != false) {
+        Blocked = other.Blocked;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2497,6 +2549,10 @@ namespace Mmo.Proto.Battle {
           }
           case 32: {
             Clamped = input.ReadBool();
+            break;
+          }
+          case 40: {
+            Blocked = input.ReadBool();
             break;
           }
         }
@@ -2534,6 +2590,974 @@ namespace Mmo.Proto.Battle {
             Clamped = input.ReadBool();
             break;
           }
+          case 40: {
+            Blocked = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// Q2：一个效果实例在某个人 / Boss 身上的事实值。名称与类型来自 config/effects.json，
+  /// 剩余毫秒与层数只由服务端时钟算；客户端只照这个显示，不自己套配置算时长。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class EffectSnapshot : pb::IMessage<EffectSnapshot>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<EffectSnapshot> _parser = new pb::MessageParser<EffectSnapshot>(() => new EffectSnapshot());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<EffectSnapshot> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[7]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EffectSnapshot() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EffectSnapshot(EffectSnapshot other) : this() {
+      effectId_ = other.effectId_;
+      name_ = other.name_;
+      kind_ = other.kind_;
+      sourceId_ = other.sourceId_;
+      remainingMs_ = other.remainingMs_;
+      stacks_ = other.stacks_;
+      shieldLeft_ = other.shieldLeft_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EffectSnapshot Clone() {
+      return new EffectSnapshot(this);
+    }
+
+    /// <summary>Field number for the "effect_id" field.</summary>
+    public const int EffectIdFieldNumber = 1;
+    private string effectId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string EffectId {
+      get { return effectId_; }
+      set {
+        effectId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "name" field.</summary>
+    public const int NameFieldNumber = 2;
+    private string name_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "kind" field.</summary>
+    public const int KindFieldNumber = 3;
+    private string kind_ = "";
+    /// <summary>
+    /// 七类之一：buff / debuff / control / hot / dot / shield / cleanse。
+    /// cleanse 是瞬时效果，不会出现在快照里。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Kind {
+      get { return kind_; }
+      set {
+        kind_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "source_id" field.</summary>
+    public const int SourceIdFieldNumber = 4;
+    private ulong sourceId_;
+    /// <summary>
+    /// 谁施加的。Boss 施加给玩家的效果里是 Boss 编号，玩家之间的互助是队友编号。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong SourceId {
+      get { return sourceId_; }
+      set {
+        sourceId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "remaining_ms" field.</summary>
+    public const int RemainingMsFieldNumber = 5;
+    private uint remainingMs_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint RemainingMs {
+      get { return remainingMs_; }
+      set {
+        remainingMs_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "stacks" field.</summary>
+    public const int StacksFieldNumber = 6;
+    private uint stacks_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Stacks {
+      get { return stacks_; }
+      set {
+        stacks_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "shield_left" field.</summary>
+    public const int ShieldLeftFieldNumber = 7;
+    private long shieldLeft_;
+    /// <summary>
+    /// 护盾类还剩多少吸收量；不是护盾时是 0。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long ShieldLeft {
+      get { return shieldLeft_; }
+      set {
+        shieldLeft_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as EffectSnapshot);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(EffectSnapshot other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (EffectId != other.EffectId) return false;
+      if (Name != other.Name) return false;
+      if (Kind != other.Kind) return false;
+      if (SourceId != other.SourceId) return false;
+      if (RemainingMs != other.RemainingMs) return false;
+      if (Stacks != other.Stacks) return false;
+      if (ShieldLeft != other.ShieldLeft) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (EffectId.Length != 0) hash ^= EffectId.GetHashCode();
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (Kind.Length != 0) hash ^= Kind.GetHashCode();
+      if (SourceId != 0UL) hash ^= SourceId.GetHashCode();
+      if (RemainingMs != 0) hash ^= RemainingMs.GetHashCode();
+      if (Stacks != 0) hash ^= Stacks.GetHashCode();
+      if (ShieldLeft != 0L) hash ^= ShieldLeft.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (EffectId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(EffectId);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Kind.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Kind);
+      }
+      if (SourceId != 0UL) {
+        output.WriteRawTag(32);
+        output.WriteUInt64(SourceId);
+      }
+      if (RemainingMs != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(RemainingMs);
+      }
+      if (Stacks != 0) {
+        output.WriteRawTag(48);
+        output.WriteUInt32(Stacks);
+      }
+      if (ShieldLeft != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(ShieldLeft);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (EffectId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(EffectId);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Kind.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Kind);
+      }
+      if (SourceId != 0UL) {
+        output.WriteRawTag(32);
+        output.WriteUInt64(SourceId);
+      }
+      if (RemainingMs != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(RemainingMs);
+      }
+      if (Stacks != 0) {
+        output.WriteRawTag(48);
+        output.WriteUInt32(Stacks);
+      }
+      if (ShieldLeft != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(ShieldLeft);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (EffectId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(EffectId);
+      }
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (Kind.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Kind);
+      }
+      if (SourceId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(SourceId);
+      }
+      if (RemainingMs != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(RemainingMs);
+      }
+      if (Stacks != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Stacks);
+      }
+      if (ShieldLeft != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ShieldLeft);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(EffectSnapshot other) {
+      if (other == null) {
+        return;
+      }
+      if (other.EffectId.Length != 0) {
+        EffectId = other.EffectId;
+      }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      if (other.Kind.Length != 0) {
+        Kind = other.Kind;
+      }
+      if (other.SourceId != 0UL) {
+        SourceId = other.SourceId;
+      }
+      if (other.RemainingMs != 0) {
+        RemainingMs = other.RemainingMs;
+      }
+      if (other.Stacks != 0) {
+        Stacks = other.Stacks;
+      }
+      if (other.ShieldLeft != 0L) {
+        ShieldLeft = other.ShieldLeft;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            EffectId = input.ReadString();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 26: {
+            Kind = input.ReadString();
+            break;
+          }
+          case 32: {
+            SourceId = input.ReadUInt64();
+            break;
+          }
+          case 40: {
+            RemainingMs = input.ReadUInt32();
+            break;
+          }
+          case 48: {
+            Stacks = input.ReadUInt32();
+            break;
+          }
+          case 56: {
+            ShieldLeft = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            EffectId = input.ReadString();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 26: {
+            Kind = input.ReadString();
+            break;
+          }
+          case 32: {
+            SourceId = input.ReadUInt64();
+            break;
+          }
+          case 40: {
+            RemainingMs = input.ReadUInt32();
+            break;
+          }
+          case 48: {
+            Stacks = input.ReadUInt32();
+            break;
+          }
+          case 56: {
+            ShieldLeft = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// Q2：一个单位身上的整份效果集合。变了就整份重发（施加 / 到期 / 驱散 / 清空），
+  /// 不做增量，客户端收到就整份替换；单位可以是人，也可以是 Boss。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class EffectState : pb::IMessage<EffectState>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<EffectState> _parser = new pb::MessageParser<EffectState>(() => new EffectState());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<EffectState> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[8]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EffectState() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EffectState(EffectState other) : this() {
+      unitId_ = other.unitId_;
+      effects_ = other.effects_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EffectState Clone() {
+      return new EffectState(this);
+    }
+
+    /// <summary>Field number for the "unit_id" field.</summary>
+    public const int UnitIdFieldNumber = 1;
+    private ulong unitId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong UnitId {
+      get { return unitId_; }
+      set {
+        unitId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "effects" field.</summary>
+    public const int EffectsFieldNumber = 2;
+    private static readonly pb::FieldCodec<global::Mmo.Proto.Battle.EffectSnapshot> _repeated_effects_codec
+        = pb::FieldCodec.ForMessage(18, global::Mmo.Proto.Battle.EffectSnapshot.Parser);
+    private readonly pbc::RepeatedField<global::Mmo.Proto.Battle.EffectSnapshot> effects_ = new pbc::RepeatedField<global::Mmo.Proto.Battle.EffectSnapshot>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::Mmo.Proto.Battle.EffectSnapshot> Effects {
+      get { return effects_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as EffectState);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(EffectState other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (UnitId != other.UnitId) return false;
+      if(!effects_.Equals(other.effects_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (UnitId != 0UL) hash ^= UnitId.GetHashCode();
+      hash ^= effects_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (UnitId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(UnitId);
+      }
+      effects_.WriteTo(output, _repeated_effects_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (UnitId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(UnitId);
+      }
+      effects_.WriteTo(ref output, _repeated_effects_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (UnitId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(UnitId);
+      }
+      size += effects_.CalculateSize(_repeated_effects_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(EffectState other) {
+      if (other == null) {
+        return;
+      }
+      if (other.UnitId != 0UL) {
+        UnitId = other.UnitId;
+      }
+      effects_.Add(other.effects_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            UnitId = input.ReadUInt64();
+            break;
+          }
+          case 18: {
+            effects_.AddEntriesFrom(input, _repeated_effects_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            UnitId = input.ReadUInt64();
+            break;
+          }
+          case 18: {
+            effects_.AddEntriesFrom(ref input, _repeated_effects_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// Q2：Boss 的血量或身上的效果变化。普攻命中仍走 SkillResult，
+  /// 这条只给 DoT / debuff 到期这类「没有某一次施法」的变化用。
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class BossState : pb::IMessage<BossState>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<BossState> _parser = new pb::MessageParser<BossState>(() => new BossState());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<BossState> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[9]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public BossState() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public BossState(BossState other) : this() {
+      bossId_ = other.bossId_;
+      hp_ = other.hp_;
+      hpMax_ = other.hpMax_;
+      effects_ = other.effects_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public BossState Clone() {
+      return new BossState(this);
+    }
+
+    /// <summary>Field number for the "boss_id" field.</summary>
+    public const int BossIdFieldNumber = 1;
+    private ulong bossId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong BossId {
+      get { return bossId_; }
+      set {
+        bossId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "hp" field.</summary>
+    public const int HpFieldNumber = 2;
+    private long hp_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Hp {
+      get { return hp_; }
+      set {
+        hp_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "hp_max" field.</summary>
+    public const int HpMaxFieldNumber = 3;
+    private long hpMax_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long HpMax {
+      get { return hpMax_; }
+      set {
+        hpMax_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "effects" field.</summary>
+    public const int EffectsFieldNumber = 4;
+    private static readonly pb::FieldCodec<global::Mmo.Proto.Battle.EffectSnapshot> _repeated_effects_codec
+        = pb::FieldCodec.ForMessage(34, global::Mmo.Proto.Battle.EffectSnapshot.Parser);
+    private readonly pbc::RepeatedField<global::Mmo.Proto.Battle.EffectSnapshot> effects_ = new pbc::RepeatedField<global::Mmo.Proto.Battle.EffectSnapshot>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::Mmo.Proto.Battle.EffectSnapshot> Effects {
+      get { return effects_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as BossState);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(BossState other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (BossId != other.BossId) return false;
+      if (Hp != other.Hp) return false;
+      if (HpMax != other.HpMax) return false;
+      if(!effects_.Equals(other.effects_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (BossId != 0UL) hash ^= BossId.GetHashCode();
+      if (Hp != 0L) hash ^= Hp.GetHashCode();
+      if (HpMax != 0L) hash ^= HpMax.GetHashCode();
+      hash ^= effects_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (BossId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(BossId);
+      }
+      if (Hp != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(Hp);
+      }
+      if (HpMax != 0L) {
+        output.WriteRawTag(24);
+        output.WriteInt64(HpMax);
+      }
+      effects_.WriteTo(output, _repeated_effects_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (BossId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(BossId);
+      }
+      if (Hp != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(Hp);
+      }
+      if (HpMax != 0L) {
+        output.WriteRawTag(24);
+        output.WriteInt64(HpMax);
+      }
+      effects_.WriteTo(ref output, _repeated_effects_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (BossId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(BossId);
+      }
+      if (Hp != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Hp);
+      }
+      if (HpMax != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(HpMax);
+      }
+      size += effects_.CalculateSize(_repeated_effects_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(BossState other) {
+      if (other == null) {
+        return;
+      }
+      if (other.BossId != 0UL) {
+        BossId = other.BossId;
+      }
+      if (other.Hp != 0L) {
+        Hp = other.Hp;
+      }
+      if (other.HpMax != 0L) {
+        HpMax = other.HpMax;
+      }
+      effects_.Add(other.effects_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            BossId = input.ReadUInt64();
+            break;
+          }
+          case 16: {
+            Hp = input.ReadInt64();
+            break;
+          }
+          case 24: {
+            HpMax = input.ReadInt64();
+            break;
+          }
+          case 34: {
+            effects_.AddEntriesFrom(input, _repeated_effects_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            BossId = input.ReadUInt64();
+            break;
+          }
+          case 16: {
+            Hp = input.ReadInt64();
+            break;
+          }
+          case 24: {
+            HpMax = input.ReadInt64();
+            break;
+          }
+          case 34: {
+            effects_.AddEntriesFrom(ref input, _repeated_effects_codec);
+            break;
+          }
         }
       }
     }
@@ -2560,7 +3584,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3023,7 +4047,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3261,7 +4285,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[12]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3647,7 +4671,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[10]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[13]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3686,6 +4710,7 @@ namespace Mmo.Proto.Battle {
       manaMax_ = other.manaMax_;
       party_ = other.party_.Clone();
       classes_ = other.classes_.Clone();
+      effects_ = other.effects_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3941,6 +4966,21 @@ namespace Mmo.Proto.Battle {
       get { return classes_; }
     }
 
+    /// <summary>Field number for the "effects" field.</summary>
+    public const int EffectsFieldNumber = 20;
+    private static readonly pb::FieldCodec<global::Mmo.Proto.Battle.EffectState> _repeated_effects_codec
+        = pb::FieldCodec.ForMessage(162, global::Mmo.Proto.Battle.EffectState.Parser);
+    private readonly pbc::RepeatedField<global::Mmo.Proto.Battle.EffectState> effects_ = new pbc::RepeatedField<global::Mmo.Proto.Battle.EffectState>();
+    /// <summary>
+    /// Q2：这一场里已经存在的效果。正常开场是空的；Q9 的断线重连复用这一格，
+    /// 按服务端时钟算出的剩余时长恢复 buff / DoT，不从客户端补算。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::Mmo.Proto.Battle.EffectState> Effects {
+      get { return effects_; }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -3975,6 +5015,7 @@ namespace Mmo.Proto.Battle {
       if (ManaMax != other.ManaMax) return false;
       if(!party_.Equals(other.party_)) return false;
       if(!classes_.Equals(other.classes_)) return false;
+      if(!effects_.Equals(other.effects_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -4001,6 +5042,7 @@ namespace Mmo.Proto.Battle {
       if (ManaMax != 0L) hash ^= ManaMax.GetHashCode();
       hash ^= party_.GetHashCode();
       hash ^= classes_.GetHashCode();
+      hash ^= effects_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -4086,6 +5128,7 @@ namespace Mmo.Proto.Battle {
       }
       party_.WriteTo(output, _repeated_party_codec);
       classes_.WriteTo(output, _repeated_classes_codec);
+      effects_.WriteTo(output, _repeated_effects_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -4163,6 +5206,7 @@ namespace Mmo.Proto.Battle {
       }
       party_.WriteTo(ref output, _repeated_party_codec);
       classes_.WriteTo(ref output, _repeated_classes_codec);
+      effects_.WriteTo(ref output, _repeated_effects_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -4224,6 +5268,7 @@ namespace Mmo.Proto.Battle {
       }
       size += party_.CalculateSize(_repeated_party_codec);
       size += classes_.CalculateSize(_repeated_classes_codec);
+      size += effects_.CalculateSize(_repeated_effects_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -4287,6 +5332,7 @@ namespace Mmo.Proto.Battle {
       }
       party_.Add(other.party_);
       classes_.Add(other.classes_);
+      effects_.Add(other.effects_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -4380,6 +5426,10 @@ namespace Mmo.Proto.Battle {
           }
           case 154: {
             classes_.AddEntriesFrom(input, _repeated_classes_codec);
+            break;
+          }
+          case 162: {
+            effects_.AddEntriesFrom(input, _repeated_effects_codec);
             break;
           }
         }
@@ -4477,6 +5527,10 @@ namespace Mmo.Proto.Battle {
             classes_.AddEntriesFrom(ref input, _repeated_classes_codec);
             break;
           }
+          case 162: {
+            effects_.AddEntriesFrom(ref input, _repeated_effects_codec);
+            break;
+          }
         }
       }
     }
@@ -4503,7 +5557,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[11]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[14]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4816,7 +5870,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[12]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[15]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5026,7 +6080,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[13]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[16]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5265,7 +6319,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[14]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[17]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5615,7 +6669,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[15]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[18]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5953,7 +7007,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[16]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[19]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6414,7 +7468,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[17]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[20]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6476,6 +7530,12 @@ namespace Mmo.Proto.Battle {
           break;
         case BodyOneofCase.SiegeView:
           SiegeView = other.SiegeView.Clone();
+          break;
+        case BodyOneofCase.Effects:
+          Effects = other.Effects.Clone();
+          break;
+        case BodyOneofCase.BossState:
+          BossState = other.BossState.Clone();
           break;
       }
 
@@ -6674,6 +7734,36 @@ namespace Mmo.Proto.Battle {
       }
     }
 
+    /// <summary>Field number for the "effects" field.</summary>
+    public const int EffectsFieldNumber = 15;
+    /// <summary>
+    /// Q2：某个单位身上的效果集合变了。整份替换，客户端照它画 buff 条。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.EffectState Effects {
+      get { return bodyCase_ == BodyOneofCase.Effects ? (global::Mmo.Proto.Battle.EffectState) body_ : null; }
+      set {
+        body_ = value;
+        bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.Effects;
+      }
+    }
+
+    /// <summary>Field number for the "boss_state" field.</summary>
+    public const int BossStateFieldNumber = 16;
+    /// <summary>
+    /// Q2：Boss 的血量或效果变了（DoT 跳、debuff 到期）。没有对应施法的那一类变化。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Mmo.Proto.Battle.BossState BossState {
+      get { return bodyCase_ == BodyOneofCase.BossState ? (global::Mmo.Proto.Battle.BossState) body_ : null; }
+      set {
+        body_ = value;
+        bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.BossState;
+      }
+    }
+
     private object body_;
     /// <summary>Enum of possible cases for the "body" oneof.</summary>
     public enum BodyOneofCase {
@@ -6692,6 +7782,8 @@ namespace Mmo.Proto.Battle {
       ScrollUsed = 12,
       ScrollRejected = 13,
       SiegeView = 14,
+      Effects = 15,
+      BossState = 16,
     }
     private BodyOneofCase bodyCase_ = BodyOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6736,6 +7828,8 @@ namespace Mmo.Proto.Battle {
       if (!object.Equals(ScrollUsed, other.ScrollUsed)) return false;
       if (!object.Equals(ScrollRejected, other.ScrollRejected)) return false;
       if (!object.Equals(SiegeView, other.SiegeView)) return false;
+      if (!object.Equals(Effects, other.Effects)) return false;
+      if (!object.Equals(BossState, other.BossState)) return false;
       if (BodyCase != other.BodyCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -6758,6 +7852,8 @@ namespace Mmo.Proto.Battle {
       if (bodyCase_ == BodyOneofCase.ScrollUsed) hash ^= ScrollUsed.GetHashCode();
       if (bodyCase_ == BodyOneofCase.ScrollRejected) hash ^= ScrollRejected.GetHashCode();
       if (bodyCase_ == BodyOneofCase.SiegeView) hash ^= SiegeView.GetHashCode();
+      if (bodyCase_ == BodyOneofCase.Effects) hash ^= Effects.GetHashCode();
+      if (bodyCase_ == BodyOneofCase.BossState) hash ^= BossState.GetHashCode();
       hash ^= (int) bodyCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -6833,6 +7929,14 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(114);
         output.WriteMessage(SiegeView);
       }
+      if (bodyCase_ == BodyOneofCase.Effects) {
+        output.WriteRawTag(122);
+        output.WriteMessage(Effects);
+      }
+      if (bodyCase_ == BodyOneofCase.BossState) {
+        output.WriteRawTag(130, 1);
+        output.WriteMessage(BossState);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -6899,6 +8003,14 @@ namespace Mmo.Proto.Battle {
         output.WriteRawTag(114);
         output.WriteMessage(SiegeView);
       }
+      if (bodyCase_ == BodyOneofCase.Effects) {
+        output.WriteRawTag(122);
+        output.WriteMessage(Effects);
+      }
+      if (bodyCase_ == BodyOneofCase.BossState) {
+        output.WriteRawTag(130, 1);
+        output.WriteMessage(BossState);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -6950,6 +8062,12 @@ namespace Mmo.Proto.Battle {
       }
       if (bodyCase_ == BodyOneofCase.SiegeView) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(SiegeView);
+      }
+      if (bodyCase_ == BodyOneofCase.Effects) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Effects);
+      }
+      if (bodyCase_ == BodyOneofCase.BossState) {
+        size += 2 + pb::CodedOutputStream.ComputeMessageSize(BossState);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -7047,6 +8165,18 @@ namespace Mmo.Proto.Battle {
             SiegeView = new global::Mmo.Proto.Battle.SiegeView();
           }
           SiegeView.MergeFrom(other.SiegeView);
+          break;
+        case BodyOneofCase.Effects:
+          if (Effects == null) {
+            Effects = new global::Mmo.Proto.Battle.EffectState();
+          }
+          Effects.MergeFrom(other.Effects);
+          break;
+        case BodyOneofCase.BossState:
+          if (BossState == null) {
+            BossState = new global::Mmo.Proto.Battle.BossState();
+          }
+          BossState.MergeFrom(other.BossState);
           break;
       }
 
@@ -7195,6 +8325,24 @@ namespace Mmo.Proto.Battle {
             SiegeView = subBuilder;
             break;
           }
+          case 122: {
+            global::Mmo.Proto.Battle.EffectState subBuilder = new global::Mmo.Proto.Battle.EffectState();
+            if (bodyCase_ == BodyOneofCase.Effects) {
+              subBuilder.MergeFrom(Effects);
+            }
+            input.ReadMessage(subBuilder);
+            Effects = subBuilder;
+            break;
+          }
+          case 130: {
+            global::Mmo.Proto.Battle.BossState subBuilder = new global::Mmo.Proto.Battle.BossState();
+            if (bodyCase_ == BodyOneofCase.BossState) {
+              subBuilder.MergeFrom(BossState);
+            }
+            input.ReadMessage(subBuilder);
+            BossState = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -7340,6 +8488,24 @@ namespace Mmo.Proto.Battle {
             SiegeView = subBuilder;
             break;
           }
+          case 122: {
+            global::Mmo.Proto.Battle.EffectState subBuilder = new global::Mmo.Proto.Battle.EffectState();
+            if (bodyCase_ == BodyOneofCase.Effects) {
+              subBuilder.MergeFrom(Effects);
+            }
+            input.ReadMessage(subBuilder);
+            Effects = subBuilder;
+            break;
+          }
+          case 130: {
+            global::Mmo.Proto.Battle.BossState subBuilder = new global::Mmo.Proto.Battle.BossState();
+            if (bodyCase_ == BodyOneofCase.BossState) {
+              subBuilder.MergeFrom(BossState);
+            }
+            input.ReadMessage(subBuilder);
+            BossState = subBuilder;
+            break;
+          }
         }
       }
     }
@@ -7365,7 +8531,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[18]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[21]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7684,7 +8850,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[19]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[22]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7922,7 +9088,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[20]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[23]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8517,7 +9683,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[21]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[24]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8878,7 +10044,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[22]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[25]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9117,7 +10283,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[23]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[26]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9657,7 +10823,7 @@ namespace Mmo.Proto.Battle {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[24]; }
+      get { return global::Mmo.Proto.Battle.BattleReflection.Descriptor.MessageTypes[27]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

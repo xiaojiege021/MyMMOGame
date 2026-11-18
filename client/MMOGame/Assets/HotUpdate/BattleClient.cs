@@ -96,6 +96,18 @@ namespace HotUpdate
 
         public int EndedSeq { get; private set; }
 
+        /// <summary>
+        /// Q2 效果快照序号。每收到一整份效果集合就 +1，界面靠它判断要不要刷日志。
+        /// 只做计数，不按效果编号自己算到期或层数。
+        /// </summary>
+        public int EffectSeq { get; private set; }
+
+        /// <summary>每个单位（含 Boss）最近一次效果快照。收到就整份替换，不做增量。</summary>
+        readonly Dictionary<ulong, List<EffectSnapshot>> _effects = new();
+
+        /// <summary>那份快照收到的本地时钟毫秒。界面只拿它做显示倒计时，不做结算。</summary>
+        readonly Dictionary<ulong, double> _effectStampMs = new();
+
         public readonly List<SkillInfo> Skills = new();
 
         /// <summary>同一场里的人，含自己。界面照这个显示队友血条。</summary>
@@ -119,6 +131,40 @@ namespace HotUpdate
         float _lastLoggedDistance = -1;
 
         public SkillInfo FindSkill(uint id) => Skills.Find(s => s.SkillId == id);
+
+        /// <summary>
+        /// 某个单位最近一份效果快照，只读。没有就是空表，界面直接当「没有效果」画。
+        /// 服务端每次整份重发，这里也整份替换，不在本地做增量或补算。
+        /// </summary>
+        public IReadOnlyList<EffectSnapshot> EffectsOf(ulong unitId)
+        {
+            return _effects.TryGetValue(unitId, out var list)
+                ? (IReadOnlyList<EffectSnapshot>)list
+                : Array.Empty<EffectSnapshot>();
+        }
+
+        /// <summary>自己身上的效果。CasterId 还没下发时是空表。</summary>
+        public IReadOnlyList<EffectSnapshot> SelfEffects => EffectsOf(CasterId);
+
+        /// <summary>Boss 身上的效果。</summary>
+        public IReadOnlyList<EffectSnapshot> BossEffects => EffectsOf(BossId);
+
+        /// <summary>
+        /// 这份快照已经过了多少本地毫秒。界面用它从 remaining_ms 往下倒计时；
+        /// 到 0 就停在 0，真正的到期与层数仍只认服务端的下一条快照。
+        /// </summary>
+        public double EffectAgeMs(ulong unitId)
+        {
+            return _effectStampMs.TryGetValue(unitId, out var at) ? NowMs() - at : 0;
+        }
+
+        /// <summary>整份替换某个单位的效果列表，并把「有新快照」的序号推一格。</summary>
+        void ApplyEffectState(ulong unitId, IEnumerable<EffectSnapshot> effects)
+        {
+            _effects[unitId] = new List<EffectSnapshot>(effects);
+            _effectStampMs[unitId] = NowMs();
+            EffectSeq++;
+        }
 
         /// <summary>单调时钟毫秒。和服务端一样，不受系统时间跳变影响。</summary>
         static double NowMs() => Stopwatch.GetTimestamp() * 1000.0 / Stopwatch.Frequency;
@@ -207,6 +253,9 @@ namespace HotUpdate
             PhaseName = "";
             LastDamage = 0;
             LastReject = "";
+            EffectSeq = 0;
+            _effects.Clear();
+            _effectStampMs.Clear();
             Skills.Clear();
             Party.Clear();
             Classes.Clear();
@@ -357,6 +406,20 @@ namespace HotUpdate
                     PhaseName = "";
                     PhaseSeq = 0;
 
+                    // Q2：新一场的效果集合也在开场包里。先清掉上一场的，
+                    // 再按每一条 EffectState 整份收进来（正常开场是空的，Q9 重连才有）。
+                    _effects.Clear();
+                    _effectStampMs.Clear();
+                    foreach (var state in opened.Effects)
+                    {
+                        ApplyEffectState(state.UnitId, state.Effects);
+                    }
+
+                    Debug.Log("q2_opened_effects units=" + opened.Effects.Count
+                        + " self=" + SelfEffects.Count
+                        + " boss=" + BossEffects.Count
+                        + " seq=" + EffectSeq);
+
                     // 出生点由服务端给。不设的话本地默认 (0,0)，一上报就把自己
                     // 报成站在 Boss 脚下，服务端还得按速度拉回去。
                     XMm = opened.CasterXMm;
@@ -434,6 +497,16 @@ namespace HotUpdate
                         + " result=rejected"
                         + " reason=" + LastReject
                         + " retry_after=" + rejected.RetryAfterMs);
+
+                    // Q2：眩晕 / 沉默走的是同一套拒绝码，界面按 ToString() 原样显示。
+                    // 这里只多留一行，方便在 logcat 里分清是哪种控制挡的。
+                    if (rejected.Reason == SkillRejectReason.SkillRejectStunned
+                        || rejected.Reason == SkillRejectReason.SkillRejectSilenced)
+                    {
+                        Debug.Log("q2_reject_control skill=" + rejected.SkillId
+                            + " reason=" + LastReject);
+                    }
+
                     break;
                 }
 
@@ -456,7 +529,19 @@ namespace HotUpdate
                     DistanceMm = moved.DistanceMm;
 
                     // 偏差小就不动，免得每 100 毫秒把画面抖一下；差得多说明被夹了，吸附过去。
-                    if (Mathf.Abs(moved.XMm - XMm) > 500 || Mathf.Abs(moved.YMm - YMm) > 500)
+                    if (moved.Blocked)
+                    {
+                        // Q2：被定身 / 眩晕挡住时，服务端给的是权威原地。
+                        // 这一步没生效就不能再按 500mm 阈值赌，位置无条件贴回去。
+                        XMm = moved.XMm;
+                        YMm = moved.YMm;
+                        _lastLoggedDistance = moved.DistanceMm;
+                        Debug.Log("q2_move_blocked x=" + moved.XMm
+                            + " y=" + moved.YMm
+                            + " distance=" + moved.DistanceMm
+                            + " clamped=" + moved.Clamped);
+                    }
+                    else if (Mathf.Abs(moved.XMm - XMm) > 500 || Mathf.Abs(moved.YMm - YMm) > 500)
                     {
                         XMm = moved.XMm;
                         YMm = moved.YMm;
@@ -522,6 +607,40 @@ namespace HotUpdate
                     Debug.Log("p03c_phase index=" + phase.PhaseIndex
                         + " name=" + phase.Name
                         + " boss_hp=" + BossHp + "/" + BossHpMax);
+                    break;
+                }
+
+                // Q2：某个单位身上的效果集合变了。服务端整份重发，这里整份替换；
+                // 施加 / 到期 / 驱散 / 清空都走这一条，不做增量，也不本地补算。
+                case ServerMessage.BodyOneofCase.Effects:
+                {
+                    var state = message.Effects;
+                    ApplyEffectState(state.UnitId, state.Effects);
+
+                    Debug.Log("q2_effects unit=" + state.UnitId
+                        + " count=" + state.Effects.Count
+                        + " seq=" + EffectSeq
+                        + " names=" + string.Join(",",
+                            state.Effects.Select(e => e.EffectId + ":" + e.Stacks).ToArray()));
+                    break;
+                }
+
+                // Q2：Boss 血量和效果一起回。DoT 跳、debuff 到期这类没有施法的变化走这条，
+                // 普攻 / 技能命中仍走 SkillResult。
+                case ServerMessage.BodyOneofCase.BossState:
+                {
+                    var boss = message.BossState;
+                    BossHp = boss.Hp;
+                    BossHpMax = boss.HpMax;
+
+                    // 正常 boss_id 与开场一致；万一是 0 就退回开场那个编号，不往 0 号身上挂。
+                    var unitId = boss.BossId != 0 ? boss.BossId : BossId;
+                    ApplyEffectState(unitId, boss.Effects);
+
+                    Debug.Log("q2_boss_state boss=" + unitId
+                        + " hp=" + boss.Hp + "/" + boss.HpMax
+                        + " effects=" + boss.Effects.Count
+                        + " seq=" + EffectSeq);
                     break;
                 }
 

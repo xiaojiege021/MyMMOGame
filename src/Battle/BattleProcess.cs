@@ -68,6 +68,12 @@ public sealed class BattleProcess(string configPath)
         Console.WriteLine("settlements=" + settlements.Count());
         Console.WriteLine("character_dir=" + characters.Dir);
         Console.WriteLine($"skills={config.Skills.All.Count} skill_table_version={config.Skills.Version}");
+        // Q2：效果表在不在打出来。缺表时伤害走恒等、不施加效果——老卡临时配置目录就是这个口径。
+        Console.WriteLine("effects="
+            + (config.Effects.IsMissing
+                ? "missing"
+                : $"ok version={config.Effects.Version} effects={config.Effects.All.Count}"
+                  + $" pending={(config.Effects.Pending ? "true" : "false")}"));
         Console.WriteLine($"classes={config.Classes.All.Count} class_table_version={config.Classes.Version} default_class={config.DefaultClass}");
         Console.WriteLine(config.Monsters is null
             ? "monster_table=missing"

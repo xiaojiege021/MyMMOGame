@@ -8,9 +8,11 @@ namespace Battle;
 /// 战场要按「装备生效」算属性，而装备只在角色库里。这里只取事实值：
 /// 职业、分支、等级、各槽强化等级之和。折算与战力全在战斗服按
 /// config/battlefield.json 算，角色服不参与数值。
+/// Q2：段内阶的被动万分比也在这里一起给，伤害第一段读它，战斗服不另读境界表。
 /// </summary>
 public sealed record BattleProfile(
-    string ClassId, string Branch, int Level, int EnhanceTotal, int EnhanceSlots, int BranchStep);
+    string ClassId, string Branch, int Level, int EnhanceTotal, int EnhanceSlots, int BranchStep,
+    int PassivePctBps = 0);
 
 public interface IBattleProfileSource : IDisposable
 {
@@ -53,7 +55,7 @@ public sealed class GrpcBattleProfileSource : IBattleProfileSource
             return reply.Found
                 ? new BattleProfile(
                     reply.ClassId, reply.Branch, reply.Level, reply.EnhanceTotal,
-                    reply.EnhanceSlots, reply.BranchStep)
+                    reply.EnhanceSlots, reply.BranchStep, reply.PassivePctBps)
                 : null;
         }
         catch (RpcException ex)

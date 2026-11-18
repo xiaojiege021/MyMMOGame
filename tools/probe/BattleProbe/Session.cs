@@ -151,6 +151,13 @@ internal sealed class Session : IAsyncDisposable
             Cancel = new SkillCancelRequest { SkillId = skillId, CastTimeMs = castTimeMs },
         });
 
+    /// <summary>Q2：走位。被定身 / 眩晕时服务端回 blocked=true，位置原样。</summary>
+    public Task MoveAsync(int xMm, int yMm) =>
+        SendAsync(new ClientMessage
+        {
+            Move = new MoveRequest { XMm = xMm, YMm = yMm, ClientTimeMs = NowMs() },
+        });
+
     /// <summary>
     /// 用一张符。请求里没有目标编号——红符只回复自己，客户端连「想治谁」都表达不了。
     /// </summary>

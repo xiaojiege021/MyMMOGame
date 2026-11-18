@@ -192,16 +192,22 @@ allsh = read("tools/check/check-all.sh")
 report("checkall_deps", re.search(r"q1\)\s*echo", allsh) is not None)
 report("checkall_cards", re.search(r'ALL_CARDS="[^"]*\bq1\b', allsh, re.S) is not None)
 
+# Q1 当时没有任何读取方；Q2 起效果层是唯一读取方。这里只钉「读取方没有扩散」：
+# 允许 Q2 的效果层与配置加载，别处出现 effects.json / effect-table 就是第二套口径。
+# Program.cs 是 Q2 的两个只读入口（--effect-list / --damage-preview），也只读。
+allowed_readers = {"src/Battle/Config.cs", "src/Battle/Effects.cs",
+                   "src/Battle/DamagePipeline.cs", "src/Battle/Encounter.cs",
+                   "src/Battle/Program.cs"}
 src_hits = []
 for base, dirs, files in os.walk("src"):
     dirs[:] = [d for d in dirs if d not in ("bin", "obj", "Generated")]
     for f in files:
         if f.endswith(".cs"):
-            p = os.path.join(base, f)
-            t = read(p)
-            if "effects.json" in t or "effect-table" in t:
-                src_hits.append(p)
-report("no_code_reader", not src_hits, src_hits[:3])
+            rel = os.path.relpath(os.path.join(base, f), ".")
+            t = read(rel)
+            if ("effects.json" in t or "effect-table" in t) and rel not in allowed_readers:
+                src_hits.append(rel)
+report("only_q2_reader", not src_hits, src_hits[:3])
 PY
 
 if grep -q '^PASS\|^FAIL' "$TMP/static.txt"; then

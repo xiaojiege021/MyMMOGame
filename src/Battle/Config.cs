@@ -69,6 +69,13 @@ public sealed class SkillDef
     public int RecoveryMs { get; init; }
     public int CooldownMs { get; init; }
     public int StaggerMs { get; init; }
+
+    /// <summary>
+    /// Q2：这一手结算时对目标施加的效果。空表示只有伤害 / 回复，不带效果。
+    /// 只引用 config/effects.json 的编号，不在这里抄时长与数值；
+    /// B1 / B15 铺技能内容时只填这一段，运行时不动。
+    /// </summary>
+    public List<EffectSpec> Effects { get; init; } = [];
 }
 
 /// <summary>
@@ -481,6 +488,14 @@ public sealed class BattleConfig
     public ClassTable Classes { get; private set; } = null!;
 
     /// <summary>
+    /// Q2：效果层正本（config/effects.json）。老卡临时配置目录没有这份表时是
+    /// <see cref="EffectTable.Missing"/>：伤害走恒等、不施加任何效果，老链路一字不动。
+    /// </summary>
+    public EffectTable Effects { get; private set; } = EffectTable.Missing;
+
+    public string EffectTablePath { get; private set; } = "";
+
+    /// <summary>
     /// K6 怪物表（config/monsters.json）。可选表：老卡临时配置目录没有它时为 null，
     /// 副本 / 竞技场 / 战场 / 城战照跑；显式写了路径却缺文件照样起不来。
     /// </summary>
@@ -557,6 +572,7 @@ public sealed class BattleConfig
         var dir = Path.GetDirectoryName(full)!;
 
         var skillPath = Resolve(dir, raw.SkillTable, "skills.json");
+        var effectPath = Resolve(dir, raw.EffectTable, "effects.json");
         var monsterPath = Resolve(dir, raw.MonsterTable, "monsters.json");
         var classPath = Resolve(dir, raw.ClassTable, "classes.json");
         var dungeonPath = Resolve(dir, raw.DungeonTable, "dungeons.json");
@@ -618,6 +634,41 @@ public sealed class BattleConfig
         // K6：怪物表的技能编号要落在这份技能表里。缺表按「没有怪物」处理，
         // 老卡的临时配置目录不受影响；显式写了路径却缺文件仍然起不来。
         var skills = SkillTable.Load(skillPath);
+
+        // Q2：效果表是可选表。配置目录里没有它就按恒等伤害跑（老卡的临时配置目录
+        // 一个文件都不用改）；显式写了路径却缺文件照样起不来。技能里写了 effect 块
+        // 却没有效果表，属于内容接错了，起不来，不静默丢效果。
+        var effects = File.Exists(effectPath)
+            ? EffectTable.Load(effectPath)
+            : string.IsNullOrWhiteSpace(raw.EffectTable)
+                ? EffectTable.Missing
+                : throw new ConfigException($"{path}：effect_table 指的 {effectPath} 不存在");
+        foreach (var skill in skills.All)
+        {
+            foreach (var spec in skill.Effects)
+            {
+                if (spec.Target is not ("self" or "target"))
+                {
+                    throw new ConfigException(
+                        $"{path}：技能 {skill.Id} 的效果目标「{spec.Target}」只认 self / target");
+                }
+                if (spec.Stacks < 1)
+                {
+                    throw new ConfigException($"{path}：技能 {skill.Id} 的效果层数必须 >= 1");
+                }
+                if (effects.IsMissing)
+                {
+                    throw new ConfigException(
+                        $"{path}：技能 {skill.Id} 引用了效果 {spec.EffectId}，但没有 effect_table");
+                }
+                if (!effects.TryGet(spec.EffectId, out _))
+                {
+                    throw new ConfigException(
+                        $"{path}：技能 {skill.Id} 引用的效果 {spec.EffectId} 不在效果表里");
+                }
+            }
+        }
+
         var monsters = File.Exists(monsterPath)
             ? MonsterTable.Load(monsterPath, skills.All.Select(x => x.Id.ToString()).ToList())
             : string.IsNullOrWhiteSpace(raw.MonsterTable)
@@ -652,6 +703,8 @@ public sealed class BattleConfig
             Arena = raw.Arena,
             SourcePath = full,
             Skills = skills,
+            Effects = effects,
+            EffectTablePath = effectPath,
             Classes = ClassTable.Load(classPath),
             Monsters = monsters,
             Dungeons = DungeonTable.Load(dungeonPath),
@@ -717,6 +770,11 @@ public sealed class BattleConfig
         if (Boss.ExpOnClear < 0)
         {
             throw new ConfigException($"{SourcePath}：boss.exp_on_clear 不能是负数");
+        }
+
+        if (Boss.Defense < 0)
+        {
+            throw new ConfigException($"{SourcePath}：boss.defense 不能是负数");
         }
 
         if (Boss.Id == Caster.Id)
@@ -872,6 +930,8 @@ public sealed class BattleConfig
         public string CharacterDir { get; init; } = "var/battle/characters";
         public string SkillTable { get; init; } = "skills.json";
         public string ClassTable { get; init; } = "classes.json";
+        /// <summary>Q2 效果表；留空时按默认文件名找，找不到就降级为恒等伤害。</summary>
+        public string EffectTable { get; init; } = "";
         /// <summary>K6 怪物表；留空时按默认文件名找，找不到就降级为没有怪物。</summary>
         public string MonsterTable { get; init; } = "";
         public string DungeonTable { get; init; } = "dungeons.json";

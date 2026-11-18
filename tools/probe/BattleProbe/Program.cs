@@ -45,6 +45,14 @@ internal static class Program
         var expectLevel = long.TryParse(Arg(args, "--expect-level"), out var lv) ? lv : 1L;
         var cap = int.TryParse(Arg(args, "--cap"), out var cp) ? cp : 20;
         var secondChar = ulong.TryParse(Arg(args, "--second-char"), out var sc) ? sc : 0UL;
+        // Q2：效果层的三个场景各自用哪条技能。技能表由核对脚本临时生成，编号不改产品配置。
+        var buffSkill = uint.TryParse(Arg(args, "--buff"), out var bs) ? bs : 1001U;
+        var dotSkill = uint.TryParse(Arg(args, "--dot"), out var ds) ? ds : 1002U;
+        var shieldSkill = uint.TryParse(Arg(args, "--shield"), out var sh) ? sh : 1003U;
+        var controlSkill = uint.TryParse(Arg(args, "--control"), out var ct) ? ct : 1001U;
+        var cleanseSkill = uint.TryParse(Arg(args, "--cleanse"), out var cl) ? cl : 1003U;
+        var slowSkill = uint.TryParse(Arg(args, "--slow"), out var sl) ? sl : 1001U;
+        var hit2Skill = uint.TryParse(Arg(args, "--hit2"), out var h2) ? h2 : 1002U;
 
         try
         {
@@ -72,6 +80,13 @@ internal static class Program
                 "p11a2_reject" => await CaseP11a2RejectAsync(url),
                 "p11a2_expire" => await CaseP11a2ExpireAsync(url, boss, hit, waitMs),
                 "p12a_join" => await CaseP12aJoinAsync(url, Arg(args, "--expect") ?? "open", holdMs),
+                // Q2：效果层。技能表由核对脚本临时生成，效果编号仍来自 config/effects.json。
+                "q2_buff_dot" => await CaseQ2BuffDotAsync(url, boss, buffSkill, dotSkill),
+                "q2_shield" => await CaseQ2ShieldAsync(url, boss, shieldSkill),
+                "q2_control" => await CaseQ2ControlAsync(url, boss, controlSkill, hit2Skill),
+                "q2_cleanse" => await CaseQ2CleanseAsync(url, boss, dotSkill, cleanseSkill),
+                "q2_diminish" => await CaseQ2DiminishAsync(url, boss, slowSkill),
+                "q2_interrupt" => await CaseQ2InterruptAsync(url, boss, controlSkill),
                 "p12c_boss_hit" => await CaseP12cBossHitAsync(url),
                 "p12c_player_damage" => await CaseP12cPlayerDamageAsync(url, boss, hit),
                 "p12d_clear" => await CaseP12dClearAsync(url, boss, hit, aChar, bChar, partySize),
@@ -1775,6 +1790,199 @@ internal static class Program
         var reject = message?.ScrollRejected;
         return Report(reject?.Reason == "upstream_off" && message!.ScrollUsed is null,
             $"case=p15c6_scroll_off reason={reject?.Reason} hp_after={reject?.HpAfter}");
+    }
+
+    // ---- Q2 效果层 ----
+
+    /// <summary>
+    /// 自我 buff + 目标 DoT。buff 在结算后施加，第二下的伤害要比第一下高（效果表 fixture
+    /// 把随机固定成 100%，所以差的是 attack_pct 那一截）；DoT 由服务端时钟跳，BossState 掉血。
+    /// </summary>
+    static async Task<int> CaseQ2BuffDotAsync(string url, ulong boss, uint buffSkill, uint dotSkill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var bossHp0 = session.Opened.BossHp;
+
+        await session.SubmitAsync(buffSkill, boss, Session.NowMs());
+        var first = await session.ReadResultAsync(5000);
+        var buffMessage = await session.ReadUntilAsync(
+            m => m.Effects is { } e && e.Effects.Any(x => x.EffectId == "buff_attack_up_1"), 3000);
+        var buff = buffMessage?.Effects.Effects.FirstOrDefault(x => x.EffectId == "buff_attack_up_1");
+
+        // 第一手还有后摇（技能表里是 300ms），等过去再发第二手，别把恢复期当成效果没生效。
+        await Task.Delay(400);
+        await session.SubmitAsync(dotSkill, boss, Session.NowMs());
+        var second = await session.ReadResultAsync(5000);
+        var dotMessage = await session.ReadUntilAsync(
+            m => m.BossState is { } b && b.Effects.Any(x => x.EffectId == "dot_poison_1"), 3000);
+        var dot = dotMessage?.BossState.Effects.FirstOrDefault(x => x.EffectId == "dot_poison_1");
+
+        var hpAfterDot = second?.TargetHpAfter ?? session.Opened.BossHp;
+        var tickMessage = await session.ReadUntilAsync(
+            m => m.BossState is { } b && b.Hp < hpAfterDot, 6000);
+
+        var ok = first is { Hit: true, Damage: > 0 }
+                 && second is { Hit: true, Damage: > 0 }
+                 && second.Damage > first.Damage
+                 && buff is { RemainingMs: > 0, Stacks: >= 1 }
+                 && dot is { RemainingMs: > 0 }
+                 && tickMessage?.BossState is { } tick
+                 && tick.Hp < hpAfterDot
+                 && tick.Hp < bossHp0;
+
+        return Report(ok,
+            $"case=q2_buff_dot first_damage={first?.Damage} second_damage={second?.Damage}"
+            + $" buff_remaining={buff?.RemainingMs} buff_stacks={buff?.Stacks}"
+            + $" dot_remaining={dot?.RemainingMs} dot_applied_hp={hpAfterDot}"
+            + $" dot_tick_hp={tickMessage?.BossState?.Hp} boss_hp_start={bossHp0}");
+    }
+
+    /// <summary>
+    /// 护盾先吃伤害：先挨一下（没有盾），再开盾，下一击打不穿盾——
+    /// 血停在挨过第一下之后的数，盾的剩余量跟着回包里减。
+    /// </summary>
+    static async Task<int> CaseQ2ShieldAsync(string url, ulong boss, uint shieldSkill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var hp0 = session.Opened.CasterHp;
+
+        var firstHit = await session.ReadUntilAsync(
+            m => m.MemberUpdated is { } u
+                 && u.Member.MemberId == session.Opened.CasterId
+                 && u.Member.Hp < hp0, 8000);
+        var hpAfterFirst = firstHit?.MemberUpdated.Member.Hp ?? hp0;
+
+        await session.SubmitAsync(shieldSkill, boss, Session.NowMs());
+        var result = await session.ReadResultAsync(5000);
+        var shieldMessage = await session.ReadUntilAsync(
+            m => m.Effects is { } e && e.Effects.Any(x => x.EffectId == "shield_1" && x.ShieldLeft > 0), 3000);
+        var shield = shieldMessage?.Effects.Effects.FirstOrDefault(x => x.EffectId == "shield_1");
+        var shield0 = shield?.ShieldLeft ?? 0;
+
+        var afterHit = await session.ReadUntilAsync(
+            m => m.Effects is { } e && e.Effects.Any(x => x.EffectId == "shield_1" && x.ShieldLeft < shield0), 8000);
+        var reduced = afterHit?.Effects.Effects.FirstOrDefault(x => x.EffectId == "shield_1");
+        var update = await session.ReadUntilAsync(
+            m => m.MemberUpdated is { } u && u.Member.MemberId == session.Opened.CasterId, 3000);
+
+        var ok = result is { Hit: true }
+                 && shield0 > 0
+                 && afterHit is not null
+                 && update?.MemberUpdated.Member.Hp == hpAfterFirst;
+
+        return Report(ok,
+            $"case=q2_shield shield_left={shield0} shield_after={reduced?.ShieldLeft}"
+            + $" hp_start={hp0} hp_after_first_hit={hpAfterFirst}"
+            + $" hp_after_shielded_hit={update?.MemberUpdated?.Member?.Hp}");
+    }
+
+    /// <summary>眩晕：施法被拒（Stunned）、走位被挡（blocked），到点自动解除后又能出手。</summary>
+    static async Task<int> CaseQ2ControlAsync(string url, ulong boss, uint controlSkill, uint hitSkill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var x0 = session.Opened.CasterXMm;
+        var y0 = session.Opened.CasterYMm;
+
+        await session.SubmitAsync(controlSkill, boss, Session.NowMs());
+        var applied = await session.ReadResultAsync(5000);
+        var stateMessage = await session.ReadUntilAsync(
+            m => m.Effects is { } e && e.Effects.Any(x => x.EffectId == "cc_stun_1"), 3000);
+        var stun = stateMessage?.Effects.Effects.FirstOrDefault(x => x.EffectId == "cc_stun_1");
+
+        await session.SubmitAsync(hitSkill, boss, Session.NowMs());
+        var rejected = await session.ReadRejectedAsync(3000);
+
+        await session.MoveAsync(x0 + 2000, y0);
+        var moved = await session.ReadUntilAsync(m => m.Moved is not null, 3000);
+
+        var expired = await session.ReadUntilAsync(
+            m => m.Effects is { } e && e.Effects.All(x => x.EffectId != "cc_stun_1"), 5000);
+
+        await session.SubmitAsync(hitSkill, boss, Session.NowMs());
+        var after = await session.ReadResultAsync(5000);
+
+        var ok = applied is { Hit: true }
+                 && stun is { RemainingMs: > 0 }
+                 && rejected?.Reason == SkillRejectReason.SkillRejectStunned
+                 && moved?.Moved is { Blocked: true } blocked
+                 && blocked.XMm == x0 && blocked.YMm == y0
+                 && expired is not null
+                 && after is { Hit: true, Damage: > 0 };
+
+        return Report(ok,
+            $"case=q2_control stun_remaining={stun?.RemainingMs} reject={rejected?.Reason}"
+            + $" moved_blocked={moved?.Moved?.Blocked} x={moved?.Moved?.XMm} y={moved?.Moved?.YMm}"
+            + $" expire_seen={expired is not null} damage_after={after?.Damage}");
+    }
+
+    /// <summary>净化按标签移除：先给自己挂 DoT，再净化，快照里那条 DoT 要消失。</summary>
+    static async Task<int> CaseQ2CleanseAsync(string url, ulong boss, uint dotSkill, uint cleanseSkill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+
+        await session.SubmitAsync(dotSkill, boss, Session.NowMs());
+        await session.ReadResultAsync(5000);
+        var dotMessage = await session.ReadUntilAsync(
+            m => m.Effects is { } e && e.Effects.Any(x => x.EffectId == "dot_poison_1"), 3000);
+
+        // 上一手还有后摇，净化别撞在恢复期上。
+        await Task.Delay(450);
+        await session.SubmitAsync(cleanseSkill, boss, Session.NowMs());
+        await session.ReadResultAsync(5000);
+        var cleanMessage = await session.ReadUntilAsync(
+            m => m.Effects is { } e && e.Effects.All(x => x.EffectId != "dot_poison_1"), 3000);
+
+        var ok = dotMessage is not null
+                 && cleanMessage is not null
+                 && cleanMessage.Effects.Effects.All(x => x.EffectId != "dot_poison_1");
+
+        return Report(ok,
+            $"case=q2_cleanse dot_seen={dotMessage is not null}"
+            + $" left={string.Join(",", cleanMessage?.Effects.Effects.Select(x => x.EffectId) ?? [])}");
+    }
+
+    /// <summary>CC 递减：同类控制连续施加，剩余时长按配置曲线缩短，不重头再来。</summary>
+    static async Task<int> CaseQ2DiminishAsync(string url, ulong boss, uint slowSkill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        var remaining = new List<uint>();
+        for (var i = 0; i < 3; i++)
+        {
+            await session.SubmitAsync(slowSkill, boss, Session.NowMs());
+            await session.ReadResultAsync(5000);
+            var message = await session.ReadUntilAsync(
+                m => m.Effects is { } e && e.Effects.Any(x => x.EffectId == "cc_slow_1"), 3000);
+            var slow = message?.Effects.Effects.FirstOrDefault(x => x.EffectId == "cc_slow_1");
+            if (slow is null)
+            {
+                return Fail($"case=q2_diminish 第 {i + 1} 次没看到 cc_slow_1");
+            }
+            remaining.Add(slow.RemainingMs);
+        }
+
+        var ok = remaining.Count == 3
+                 && remaining[1] < remaining[0]
+                 && remaining[2] < remaining[1];
+
+        return Report(ok, "case=q2_diminish remaining_ms=" + string.Join(",", remaining));
+    }
+
+    /// <summary>前摇里挨打会打断：客户端收到 Cancelled，技能进被打断的短冷却。</summary>
+    static async Task<int> CaseQ2InterruptAsync(string url, ulong boss, uint skill)
+    {
+        await using var session = await Session.ConnectAsync(url);
+        await session.SubmitAsync(skill, boss, Session.NowMs());
+        var cancelled = await session.ReadUntilAsync(m => m.Cancelled is not null, 4000);
+        await session.SubmitAsync(skill, boss, Session.NowMs());
+        var rejected = await session.ReadRejectedAsync(3000);
+
+        var ok = cancelled?.Cancelled is { Accepted: true }
+                 && rejected?.Reason == SkillRejectReason.SkillRejectCooldown
+                 && rejected.RetryAfterMs > 0;
+
+        return Report(ok,
+            $"case=q2_interrupt cancelled={cancelled?.Cancelled?.Accepted}"
+            + $" reason={rejected?.Reason} retry_after_ms={rejected?.RetryAfterMs}");
     }
 
     static int Report(bool ok, string line)

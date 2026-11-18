@@ -38,7 +38,7 @@ public sealed record CombatStats(
     long Attack, long HpMax, long ManaMax, long HealPower, long ThreatStability);
 
 /// <summary>一场里的一条命。编号就是连接进来时的角色编号。</summary>
-public sealed class Member
+public sealed class Member : IStatusHost
 {
     public required ulong Id { get; init; }
     public required ClassDef Class { get; init; }
@@ -99,11 +99,25 @@ public sealed class Member
 
     /// <summary>
     /// P2-4a：这个人的角色库快照（职业、分支、二转步数）。第一次用到时才向角色服要，
-    /// 之后缓存在这条命上——复活判定要读它，但一场里不会变。
+    /// 之后缓存在这条命上——复活判定要读它，一场里不会变。
+    /// Q2：伤害第一段的境界加成也从这里取，所以「问过一次」要记下来：
+    /// 查不到时不能每一手都去问一次上游。
     /// </summary>
     internal BattleProfile? Profile;
 
+    internal bool ProfileChecked;
+
     public bool Down => Hp <= 0;
+
+    /// <summary>
+    /// Q2：这条命身上的效果。每人一份，DoT / HoT / 控制 / 护盾都只在这里算，
+    /// 战斗服时钟推进，客户端只读快照。
+    /// </summary>
+    public StatusSet Status { get; internal set; } = null!;
+
+    ulong IStatusHost.UnitId => Id;
+
+    void IStatusHost.SetHp(long value) => Hp = Math.Max(0, value);
 
     /// <summary>有效仇恨 = 打出的伤害 + 稳定值（职业表是体力 × 系数，竞技场是模板值）。</summary>
     public long EffectiveThreat => DamageDealt + ThreatStability();
@@ -111,6 +125,33 @@ public sealed class Member
     internal void TouchMoveClock(long now) => _lastMoveMs = now;
 
     internal long MoveClockMs() => _lastMoveMs;
+}
+
+/// <summary>
+/// Boss 作为效果宿主：血量和阶段仍是 Encounter 的字段，这里只是把同一套
+/// StatusSet 接到它身上——Boss 也会吃 DoT / 破甲，不另写一份计时。
+/// </summary>
+sealed class BossHost : IStatusHost
+{
+    readonly Encounter _owner;
+
+    public BossHost(Encounter owner)
+    {
+        _owner = owner;
+        Status = new StatusSet(owner.EffectsTable, this);
+    }
+
+    public ulong UnitId => _owner.BossIdForStatus;
+
+    public long Hp => _owner.BossHpForStatus;
+
+    public long HpMax => _owner.BossHpMax;
+
+    public bool Down => _owner.BossHpForStatus <= 0;
+
+    public void SetHp(long value) => _owner.SetBossHpForStatus(value);
+
+    public StatusSet Status { get; }
 }
 
 /// <summary>
@@ -133,6 +174,10 @@ public sealed class Encounter
     readonly IBattleProfileSource _profiles;
     readonly DungeonDef? _dungeon;
     readonly Dictionary<ulong, Member> _members = [];
+
+    // Q2：Boss 也吃效果（DoT / 破甲），与玩家共用 StatusSet。
+    readonly BossHost _bossUnit;
+    readonly Random _rng = new();
 
     /// <summary>
     /// 这一场打谁。缺省是 config/battle.json 的 boss（副本、练习场、竞技场、战场、
@@ -189,6 +234,7 @@ public sealed class Encounter
         _scrolls = scrolls;
         _profiles = profiles;
         _dungeon = dungeon;
+        _bossUnit = new BossHost(this);
         // 不传就用配置里那一个 boss：老调用点一个都没变。
         _boss = boss ?? config.Boss;
         SessionId = sessionId;
@@ -204,6 +250,14 @@ public sealed class Encounter
     public long BossHpMax => _bossHpMax;
 
     public int PartySize => _partySize;
+
+    internal EffectTable EffectsTable => _config.Effects;
+
+    internal ulong BossIdForStatus => _boss.Id;
+
+    internal long BossHpForStatus => _bossHp;
+
+    internal void SetBossHpForStatus(long value) => _bossHp = Math.Max(0, value);
 
     /// <summary>
     /// P3-5a：这一场结算用的来源标签（写进角色服那一笔流水的 source）。
@@ -252,7 +306,11 @@ public sealed class Encounter
     /// </summary>
     BattleProfile? ProfileOf(Member member)
     {
-        member.Profile ??= _profiles.Get(member.Id);
+        if (!member.ProfileChecked)
+        {
+            member.Profile = _profiles.Get(member.Id);
+            member.ProfileChecked = true;
+        }
         return member.Profile;
     }
 
@@ -292,6 +350,7 @@ public sealed class Encounter
             };
             member.Hp = member.HpMax;
             member.Mana = member.ManaMax;
+            member.Status = new StatusSet(_config.Effects, member);
             member.TouchMoveClock(NowMs());
             _members[memberId] = member;
             return member;
@@ -349,6 +408,15 @@ public sealed class Encounter
                 opened.Classes.Add(new ClassInfo { ClassId = cls.Id, Name = cls.Name });
             }
 
+            // Q2：开场时身上还没效果，这一格是空的；Q9 的断线重连复用同一格，
+            // 按服务端时钟剩下的毫秒恢复，不从客户端补算。
+            var now = NowMs();
+            foreach (var m in _members.Values.OrderBy(m => m.Id))
+            {
+                opened.Effects.Add(m.Status.State(now));
+            }
+            opened.Effects.Add(_bossUnit.Status.State(now));
+
             return opened;
         }
     }
@@ -381,6 +449,16 @@ public sealed class Encounter
             if (skill.ClassId != member.Class.Id)
             {
                 return Reject(request, SkillRejectReason.SkillRejectUnknownSkill);
+            }
+
+            // Q2：被控制时的拒绝。眩晕两样都挡，沉默只挡施法；冷却与资源一个都不动。
+            if (member.Status.Stunned)
+            {
+                return Reject(request, SkillRejectReason.SkillRejectStunned);
+            }
+            if (member.Status.Silenced)
+            {
+                return Reject(request, SkillRejectReason.SkillRejectSilenced);
             }
 
             // 一次只结算一个：前摇里再发一律先挡住，不看冷却。
@@ -526,6 +604,22 @@ public sealed class Encounter
     {
         lock (_gate)
         {
+            var now = NowMs();
+
+            // Q2：定身 / 眩晕时这一步不生效。位置原样回，blocked 让客户端无论偏差多小都照这个回退；
+            // 时钟照常推进，解控后不会攒出一次瞬移。
+            if (member.Status.Rooted)
+            {
+                member.TouchMoveClock(now);
+                return new MoveState
+                {
+                    XMm = (int)Math.Round(member.X),
+                    YMm = (int)Math.Round(member.Y),
+                    DistanceMm = DistanceToBossMm(member),
+                    Blocked = true,
+                };
+            }
+
             var bossX = (double)_boss.SpawnMm.X;
             var bossY = (double)_boss.SpawnMm.Y;
             var targetX = (double)request.XMm;
@@ -548,10 +642,11 @@ public sealed class Encounter
             // 两次上报之间最多走 速度 × 时间。间隔按服务端时钟算，客户端改不了；
             // 单次封顶 200 毫秒，等于「一次上报最多走两步」——站着不动很久也不能
             // 攒出一次瞬移。客户端 100 毫秒报一次，留了一倍的量和抖动的余量。
-            var now = NowMs();
             var dtMs = Math.Clamp(now - member.MoveClockMs(), 1, 200);
             member.TouchMoveClock(now);
-            var maxStep = _config.Arena.MoveSpeedMmPerS * dtMs / 1000.0;
+            // 减速只压这一段的步长，不冻结；夹在 -90%，再慢也能一步步挪。
+            var speedFactor = (100 + member.Status.SlowPct) / 100.0;
+            var maxStep = _config.Arena.MoveSpeedMmPerS * dtMs / 1000.0 * speedFactor;
 
             var dx = targetX - member.X;
             var dy = targetY - member.Y;
@@ -961,9 +1056,81 @@ public sealed class Encounter
             }
 
             TickBossAttack(now, outbox);
+            TickEffects(now, outbox);
             return outbox;
         }
     }
+
+    /// <summary>
+    /// 推进所有效果的时钟：DoT / HoT 按服务端时钟跳，到期就摘，护盾破了就清。
+    /// 血量变化对人是 MemberUpdated、对 Boss 是 BossState；效果集合变了整份重发。
+    /// DoT 把 Boss 打死时，结算与 Close 与技能打死走同一条路。
+    /// </summary>
+    void TickEffects(long now, List<ServerMessage> outbox)
+    {
+        if (_config.Effects.IsMissing)
+        {
+            return;
+        }
+
+        foreach (var member in _members.Values.ToList())
+        {
+            var tick = member.Status.Tick(now);
+            var changed = tick.EffectsChanged;
+
+            // 死了就清空，护盾不跨死；已经倒地的不会反复清。
+            if (member.Down && member.Status.Active.Count > 0)
+            {
+                member.Status.Clear();
+                changed = true;
+                member.Pending = null;
+            }
+
+            if (changed)
+            {
+                outbox.Add(new ServerMessage { Effects = member.Status.State(now) });
+            }
+            if (tick.HpDelta != 0)
+            {
+                outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(member) } });
+            }
+        }
+
+        var bossTick = _bossUnit.Status.Tick(now);
+        if (bossTick.HpDelta < 0)
+        {
+            _damageTotal += -bossTick.HpDelta;
+        }
+        if (bossTick.EffectsChanged || bossTick.HpDelta != 0)
+        {
+            outbox.Add(new ServerMessage { BossState = BossStateOf(now) });
+        }
+
+        if (_bossHp <= 0 && !_closed)
+        {
+            _bossUnit.Status.Clear();
+            outbox.Add(new ServerMessage { BossState = BossStateOf(now) });
+            if (_dungeon is not null)
+            {
+                _qualifiedKills++;
+            }
+            outbox.Add(new ServerMessage { Ended = Close(bossTick.LastSourceId) });
+            return;
+        }
+
+        if (bossTick.HpDelta != 0)
+        {
+            CheckPhase(outbox);
+        }
+    }
+
+    BossState BossStateOf(long now) => new()
+    {
+        BossId = _boss.Id,
+        Hp = _bossHp,
+        HpMax = _bossHpMax,
+        Effects = { _bossUnit.Status.Snapshots(now) },
+    };
 
     void Settle(Member member, PendingCast pending, long now, List<ServerMessage> outbox)
     {
@@ -997,7 +1164,14 @@ public sealed class Encounter
             }
 
             // 只剩这么多血就只算这么多，不把溢出伤害记上去。
-            var applied = Math.Min(DamageOf(member, skill), _bossHp);
+            // Q2：先让 Boss 身上的护盾吃一截，剩下的才落到血上；破盾也要重发效果快照。
+            var raw = DamageOf(member, skill);
+            var afterShield = _bossUnit.Status.Absorb(raw);
+            if (afterShield != raw)
+            {
+                outbox.Add(new ServerMessage { BossState = BossStateOf(now) });
+            }
+            var applied = Math.Min(afterShield, _bossHp);
             _bossHp -= applied;
             member.DamageDealt += applied;
             _damageTotal += applied;
@@ -1022,6 +1196,8 @@ public sealed class Encounter
                     ThreatAfter = member.EffectiveThreat,
                 },
             });
+
+            ApplySkillEffects(member, skill, null, now, outbox);
 
             CheckPhase(outbox);
 
@@ -1076,6 +1252,7 @@ public sealed class Encounter
                 },
             });
             outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(target) } });
+            ApplySkillEffects(member, skill, target, now, outbox);
             return;
         }
 
@@ -1144,6 +1321,53 @@ public sealed class Encounter
             },
         });
         outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(raised) } });
+        ApplySkillEffects(member, skill, raised, now, outbox);
+    }
+
+    /// <summary>
+    /// 技能结算时施加效果。技能表里没有 effect 块就什么都不做；有就一条条走
+    /// <see cref="StatusSet.Apply"/>——丹药 / 道具以后也走同一个入口，不另起一套。
+    /// target=self 恒指施法者；target=target 是这一手本来选中的单位（Boss 或队友）。
+    /// </summary>
+    void ApplySkillEffects(Member caster, SkillDef skill, Member? memberTarget, long now, List<ServerMessage> outbox)
+    {
+        if (_config.Effects.IsMissing || skill.Effects.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var spec in skill.Effects)
+        {
+            if (spec.Target == "self")
+            {
+                ApplyToMember(caster, spec, caster.Id, now, outbox);
+            }
+            else if (memberTarget is not null)
+            {
+                ApplyToMember(memberTarget, spec, caster.Id, now, outbox);
+            }
+            else if (_bossHp > 0)
+            {
+                var result = _bossUnit.Status.Apply(spec.EffectId, caster.Id, now, spec.Stacks);
+                if (result is EffectApply.Applied or EffectApply.Refreshed or EffectApply.Stacked)
+                {
+                    Console.WriteLine($"effect_apply=unit={_boss.Id} effect={spec.EffectId}"
+                        + $" result={result} source={caster.Id}");
+                    outbox.Add(new ServerMessage { BossState = BossStateOf(now) });
+                }
+            }
+        }
+    }
+
+    void ApplyToMember(Member target, EffectSpec spec, ulong sourceId, long now, List<ServerMessage> outbox)
+    {
+        var result = target.Status.Apply(spec.EffectId, sourceId, now, spec.Stacks);
+        if (result is EffectApply.Applied or EffectApply.Refreshed or EffectApply.Stacked)
+        {
+            Console.WriteLine($"effect_apply=unit={target.Id} effect={spec.EffectId}"
+                + $" result={result} source={sourceId}");
+            outbox.Add(new ServerMessage { Effects = target.Status.State(now) });
+        }
     }
 
     /// <summary>
@@ -1167,8 +1391,23 @@ public sealed class Encounter
         }
     }
 
-    long DamageOf(Member member, SkillDef skill) =>
-        (long)Math.Round(member.AttackPower() * skill.DamageMultiplier);
+    /// <summary>
+    /// Q2：四段伤害。属性仍来自战斗快照（职业表 / 竞技场模板 / 战场压缩后 / 城战全额），
+    /// 这里只加效果层：攻击百分比来自自己身上的 buff，防御百分比来自目标身上的 debuff，
+    /// 境界加成来自角色服的 passive_pct_bps。效果表缺失时退回恒等，老链路逐字不变。
+    /// </summary>
+    long DamageOf(Member member, SkillDef skill)
+    {
+        var profile = ProfileOf(member);
+        var input = new DamageInput(
+            Attack: member.AttackPower(),
+            SkillMultiplier: skill.DamageMultiplier,
+            TargetDefense: _boss.Defense,
+            RealmBonusPct: profile?.PassivePctBps ?? 0,
+            AttackPct: member.Status.AttackPct,
+            DefensePct: _bossUnit.Status.DefensePct);
+        return DamagePipeline.Compute(_config.Effects, input, _rng).Rounded;
+    }
 
     // ---- Boss 的出手与阶段 ----
 
@@ -1211,8 +1450,42 @@ public sealed class Encounter
             if (_members.TryGetValue(pending.MemberId, out var victim) && !victim.Down)
             {
                 var damage = ScaleDamage(attack.Damage, _monsterDamageScale);
-                var after = victim.Hp - damage;
+                // Q2：护盾先吃伤害；被打断只在前摇里发生，蓝在结算时才扣，所以没有已花掉的蓝要退。
+                var afterShield = victim.Status.Absorb(damage);
+                if (afterShield != damage)
+                {
+                    outbox.Add(new ServerMessage { Effects = victim.Status.State(now) });
+                }
+
+                var after = victim.Hp - afterShield;
                 victim.Hp = after > 0 ? after : 0;
+
+                if (!_config.Effects.IsMissing
+                    && damage > 0
+                    && victim.Pending is { } interrupted)
+                {
+                    victim.Pending = null;
+                    victim.ReadyAtMs[interrupted.Skill.Id] =
+                        now + _config.Effects.Interaction.InterruptCooldownMs;
+                    outbox.Add(new ServerMessage
+                    {
+                        Cancelled = new SkillCancelled
+                        {
+                            SkillId = interrupted.Skill.Id,
+                            CastTimeMs = interrupted.CastTimeMs,
+                            Accepted = true,
+                        },
+                    });
+                    Console.WriteLine($"effect_interrupt=unit={victim.Id} skill={interrupted.Skill.Id}"
+                        + $" cooldown_ms={_config.Effects.Interaction.InterruptCooldownMs}");
+                }
+
+                if (victim.Down && victim.Status.Active.Count > 0)
+                {
+                    victim.Status.Clear();
+                    outbox.Add(new ServerMessage { Effects = victim.Status.State(now) });
+                }
+
                 outbox.Add(new ServerMessage { MemberUpdated = new() { Member = ToPartyMember(victim) } });
             }
         }
@@ -1284,7 +1557,9 @@ public sealed class Encounter
             foreach (var member in _members.Values)
             {
                 member.Pending = null;
+                member.Status.Clear();
             }
+            _bossUnit.Status.Clear();
         }
     }
 
@@ -1292,6 +1567,15 @@ public sealed class Encounter
     BattleEnded Close(ulong killerId)
     {
         _closed = true;
+
+        // Q2：一场结束，所有人 / Boss 身上的效果全部清空；护盾不跨场，
+        // DoT 不会在结算之后再跳一次。
+        foreach (var member in _members.Values)
+        {
+            member.Status.Clear();
+        }
+        _bossUnit.Status.Clear();
+
         try
         {
             var record = new SettlementRecord

@@ -17,6 +17,11 @@ var siegeViewArgs = new List<string>();
 // S1：只读入口，打印技能表的门派 / 阶 / 分支归属就退出，不起服、不连库。
 var skillListOnly = false;
 string? skillTablePath = null;
+// Q2：只读入口，打印效果表与四段伤害的纯计算，不起服、不连库。
+var effectListOnly = false;
+string? effectTablePath = null;
+var damagePreviewOnly = false;
+var damageArgs = new Dictionary<string, double>(StringComparer.Ordinal);
 var worldBossOnly = false;
 string? worldBossPath = null;
 var worldBossAtMs = 0L;
@@ -98,6 +103,29 @@ for (var i = 0; i < args.Length; i++)
         case "--skill-table-path" when i + 1 < args.Length:
             skillListOnly = true;
             skillTablePath = args[++i];
+            break;
+        // Q2：效果清单。与真实启动共用同一个 EffectTable.Load。
+        case "--effect-list":
+            effectListOnly = true;
+            break;
+        case "--effect-table-path" when i + 1 < args.Length:
+            effectListOnly = true;
+            effectTablePath = args[++i];
+            break;
+        // Q2：四段伤害纯计算。数值全部来自命令参数，不连库、不起服。
+        case "--damage-preview":
+            damagePreviewOnly = true;
+            break;
+        case "--attack" or "--multiplier" or "--defense" or "--realm-bps" or "--attack-pct"
+            or "--defense-pct" or "--penetration" or "--resistance" or "--random-pct"
+            or "--enhance-coef" or "--crystal-flat" when i + 1 < args.Length:
+            var key = args[i][2..];
+            if (!double.TryParse(args[++i], out var value))
+            {
+                Console.WriteLine("bad_arg=" + key);
+                return 64;
+            }
+            damageArgs[key] = value;
             break;
     }
 }
@@ -258,6 +286,97 @@ if (skillListOnly)
         var common = table.All.Count(s => s.Branch.Length == 0);
         var branched = table.All.Where(s => s.Branch.Length > 0).Select(s => s.Branch).Distinct().Count();
         Console.WriteLine($"skill_branch_total={branched} common={common}");
+        return 0;
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+}
+
+if (effectListOnly)
+{
+    try
+    {
+        Battle.EffectTable table = effectTablePath is null
+            ? Battle.BattleConfig.Load(configPath).Effects
+            : Battle.EffectTable.Load(effectTablePath);
+
+        if (table.IsMissing)
+        {
+            Console.WriteLine("effects=missing");
+            return 0;
+        }
+
+        Console.WriteLine($"effect_table=schema=effect-table/2 version={table.Version}"
+            + $" pending={(table.Pending ? "true" : "false")} effects={table.All.Count}");
+        foreach (var effect in table.All.OrderBy(e => e.Id, StringComparer.Ordinal))
+        {
+            Console.WriteLine($"effect=id={effect.Id} name={effect.Name}"
+                + $" kind={Battle.StatusSet.KindName(effect.Kind)}"
+                + $" duration_ms={effect.DurationMs} tick_ms={effect.TickMs}"
+                + $" max_stacks={effect.MaxStacks} stack_rule={effect.StackRule}"
+                + $" control={Dash(Battle.EffectTable.ControlName(effect.Control))}"
+                + $" dispel={Join(effect.DispelTags)} immunity={Join(effect.ImmunityTags)}");
+        }
+
+        var interaction = table.Interaction;
+        Console.WriteLine($"effect_interaction=cc_window_ms={interaction.CcWindowMs}"
+            + $" steps={Join(interaction.CcStepsPct.Select(p => p.ToString()))}"
+            + $" interrupt_ms={interaction.InterruptCooldownMs}"
+            + $" mana_refund_pct={interaction.InterruptManaRefundPct}"
+            + $" hitstun_ms={interaction.HitstunDefaultMs}"
+            + $" refresh_on_stack={(interaction.RefreshOnStack ? "true" : "false")}");
+
+        var damage = table.Damage;
+        Console.WriteLine("effect_damage=stages=base,enhance,skill,final"
+            + $" defense_k={damage.DefenseK} min_pct={damage.DefenseMinPct}"
+            + $" crit_rate_pct={damage.CritRatePct} crit_damage_pct={damage.CritDamagePct}"
+            + $" random={damage.RandomMinPct}..{damage.RandomMaxPct}"
+            + $" penetration={(damage.PenetrationEnabled ? "on" : "off")}/{damage.PenetrationDefaultPct}"
+            + $" resistance={(damage.ResistanceEnabled ? "on" : "off")}/{damage.ResistanceDefaultPct}"
+            + " rounding=final_round_half_up");
+        return 0;
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+}
+
+if (damagePreviewOnly)
+{
+    try
+    {
+        Battle.EffectTable table = Battle.BattleConfig.Load(configPath).Effects;
+        if (table.IsMissing)
+        {
+            Console.WriteLine("effects=missing");
+            return 0;
+        }
+
+        double Value(string key, double fallback) => damageArgs.GetValueOrDefault(key, fallback);
+        var input = new Battle.DamageInput(
+            Attack: Value("attack", 200),
+            SkillMultiplier: Value("multiplier", 1),
+            TargetDefense: Value("defense", 0),
+            RealmBonusPct: Value("realm-bps", 0),
+            AttackPct: Value("attack-pct", 0),
+            DefensePct: Value("defense-pct", 0),
+            PenetrationPct: Value("penetration", 0),
+            ResistancePct: Value("resistance", 0),
+            EnhanceCoef: Value("enhance-coef", 0),
+            CrystalFlatAttack: Value("crystal-flat", 0),
+            ForcedRandomPct: (int)Value("random-pct", 100));
+        var stages = Battle.DamagePipeline.Compute(table, input, new Random(0));
+        Console.WriteLine($"damage_stage=base value={stages.Base:0.####}");
+        Console.WriteLine($"damage_stage=enhance value={stages.Enhanced:0.####}");
+        Console.WriteLine($"damage_stage=skill value={stages.Skill:0.####}");
+        Console.WriteLine($"damage_stage=final value={stages.Final:0.####}"
+            + $" mitigation={stages.DefenseMitigation:0.####} crit={(stages.Crit ? "true" : "false")}");
+        Console.WriteLine($"damage_result=rounded={stages.Rounded}");
         return 0;
     }
     catch (ConfigException ex)

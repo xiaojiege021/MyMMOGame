@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using HotUpdate.Ui;
+using Mmo.Proto.Battle;
 using Debug = UnityEngine.Debug;
 
 namespace HotUpdate
@@ -25,6 +27,17 @@ namespace HotUpdate
 
         /// <summary>小队最多显示四行。超过四个人的场次只画前四个，不缩字号。</summary>
         const int PartySlots = 4;
+
+        /// <summary>Q2：自己的 buff 条最多六格；没有效果就整条不显示。</summary>
+        const int SelfEffectSlots = 6;
+
+        /// <summary>Q2：Boss 血条附近的 debuff / dot 小条最多四格。</summary>
+        const int BossEffectSlots = 4;
+
+        const float SelfEffectSlotWidth = 150f;
+        const float SelfEffectSlotHeight = 50f;
+        const float SelfEffectGap = 8f;
+        const float SelfEffectY = 292f;
 
         BattleClient _client;
 
@@ -71,6 +84,21 @@ namespace HotUpdate
         Text _logText;
 
         string _logLine = UiBattleCodex.HudNotes[0];
+
+        /// <summary>Q2：自己身上那条 buff 条的背景与文本，每格一个。</summary>
+        readonly Image[] _selfEffectBacks = new Image[SelfEffectSlots];
+
+        readonly Text[] _selfEffectLabels = new Text[SelfEffectSlots];
+
+        /// <summary>Q2：Boss 血条附近的 debuff / dot 小条，只画名字和剩余秒数。</summary>
+        readonly Image[] _bossEffectBacks = new Image[BossEffectSlots];
+
+        readonly Text[] _bossEffectLabels = new Text[BossEffectSlots];
+
+        /// <summary>上一份自己的效果集合，按 effect_id 做差，只在自身刷战斗日志。</summary>
+        readonly Dictionary<string, EffectSnapshot> _selfEffectSeen = new();
+
+        int _seenEffectSeq;
 
         Text _distanceText;
 
@@ -249,6 +277,40 @@ namespace HotUpdate
                 _partyLabels[i].text = "";
             }
 
+            // Q2：自己的 buff 条。最多六格，一条横排，位置在战斗日志上方；
+            // 没有效果时全部关掉，整条不显示。只照服务端快照写名字 / 层数 / 剩余 / 护盾，
+            // 本地不读 effects.json、不算到期与层数。
+            for (var i = 0; i < SelfEffectSlots; i++)
+            {
+                var rect = new Rect(40f + i * (SelfEffectSlotWidth + SelfEffectGap), SelfEffectY,
+                    SelfEffectSlotWidth, SelfEffectSlotHeight);
+                _selfEffectBacks[i] = MakeRect("SelfEffectBack" + i, rect,
+                    new Color(0f, 0f, 0f, 0.55f), root).GetComponent<Image>();
+                _selfEffectLabels[i] = MakeText("SelfEffectLabel" + i,
+                    new Rect(rect.x + 6f, rect.y, rect.width - 12f, rect.height), 19,
+                    TextAnchor.MiddleLeft, root);
+                _selfEffectLabels[i].text = "";
+                _selfEffectBacks[i].enabled = false;
+                _selfEffectLabels[i].enabled = false;
+            }
+
+            // Q2：Boss 身上的 debuff / dot 小条，贴在 Boss 血条下面一行，最多四格。
+            // 只画名字与剩余秒数，不刷战斗日志，免得 DoT 每跳一行把屏刷满。
+            var bossEffectSlotWidth = barWidth / BossEffectSlots;
+            for (var i = 0; i < BossEffectSlots; i++)
+            {
+                var rect = new Rect(barX + i * bossEffectSlotWidth, Screen.height - 184f,
+                    bossEffectSlotWidth - 8f, 28f);
+                _bossEffectBacks[i] = MakeRect("BossEffectBack" + i, rect,
+                    new Color(0f, 0f, 0f, 0.5f), root).GetComponent<Image>();
+                _bossEffectLabels[i] = MakeText("BossEffectLabel" + i,
+                    new Rect(rect.x + 6f, rect.y, rect.width - 12f, rect.height), 20,
+                    TextAnchor.MiddleLeft, root);
+                _bossEffectLabels[i].text = "";
+                _bossEffectBacks[i].enabled = false;
+                _bossEffectLabels[i].enabled = false;
+            }
+
             // 战斗日志：写的是回包口径，不是本地编的战报。
             _logText = MakeText("LogText", new Rect(40f, 150f, 660f, 132f), 22, TextAnchor.UpperLeft, root);
             _logText.text = UiBattleCodex.LogHeader + "\n" + _logLine + "\n"
@@ -267,6 +329,14 @@ namespace HotUpdate
                 + " phase_rect=" + _phaseText.rectTransform.anchoredPosition.x + ","
                 + _phaseText.rectTransform.anchoredPosition.y
                 + " log=1 hit_rects_unchanged=1");
+
+            Debug.Log("q2_hud=ready self_slots=" + SelfEffectSlots
+                + " boss_slots=" + BossEffectSlots
+                + " self_rect=" + 40f + "," + SelfEffectY
+                + "," + SelfEffectSlotWidth + "," + SelfEffectSlotHeight
+                + " boss_rect=" + barX + "," + (Screen.height - 184f)
+                + "," + bossEffectSlotWidth + ",28"
+                + " hit_rects_unchanged=1");
         }
 
         void Update()
@@ -388,6 +458,10 @@ namespace HotUpdate
                 }
             }
 
+            // Q2：两条效果条。日志也在这一步补，所以排在 _logText 重写之前。
+            RefreshSelfEffects();
+            RefreshBossEffects();
+
             _logText.text = UiBattleCodex.LogHeader + "\n" + _logLine + "\n"
                 + UiBattleCodex.HudNotes[1] + "\n" + UiBattleCodex.HudNotes[2];
 
@@ -493,6 +567,174 @@ namespace HotUpdate
                 : new Color(0.25f, 0.25f, 0.25f, 0.7f);
         }
 
+        /// <summary>
+        /// Q2：自己那条 buff 条。剩余秒数 = 快照里的 remaining_ms 减去收到后的本地时长，
+        /// 到 0 就停在 0；层数与到期仍只认下一条快照，不在这里改任何战斗状态。
+        /// </summary>
+        void RefreshSelfEffects()
+        {
+            // 日志只看自身的 id 集合差；Boss 的效果不往这里塞，避免 DoT 刷屏。
+            if (_seenEffectSeq != _client.EffectSeq)
+            {
+                _seenEffectSeq = _client.EffectSeq;
+                LogSelfEffectChanges();
+            }
+
+            var effects = _client.SelfEffects;
+            var ageMs = _client.EffectAgeMs(_client.CasterId);
+
+            for (var i = 0; i < SelfEffectSlots; i++)
+            {
+                var used = i < effects.Count;
+                _selfEffectBacks[i].enabled = used;
+                _selfEffectLabels[i].enabled = used;
+
+                if (!used)
+                {
+                    _selfEffectLabels[i].text = "";
+                    continue;
+                }
+
+                var effect = effects[i];
+                var head = effect.Name;
+                if (effect.Stacks > 1)
+                {
+                    head += " x" + effect.Stacks;
+                }
+
+                var tail = RemainingText(effect, ageMs);
+                if (effect.Kind == "shield")
+                {
+                    // 护盾的吸收量是大数，按快照原值显示，不折算成百分比。
+                    tail += "  盾 " + effect.ShieldLeft;
+                }
+
+                _selfEffectLabels[i].text = head + "\n" + tail;
+                _selfEffectLabels[i].color = EffectColor(effect.Kind);
+            }
+        }
+
+        /// <summary>
+        /// Q2：Boss 血条附近的 debuff / dot 小条，最多四格。只显示名字 + 剩余秒数，
+        /// 不写战斗日志；没有这两类效果就整条不显示。
+        /// </summary>
+        void RefreshBossEffects()
+        {
+            var effects = _client.BossEffects;
+            var ageMs = _client.EffectAgeMs(_client.BossId);
+
+            for (var i = 0; i < BossEffectSlots; i++)
+            {
+                _bossEffectBacks[i].enabled = false;
+                _bossEffectLabels[i].enabled = false;
+                _bossEffectLabels[i].text = "";
+            }
+
+            var slot = 0;
+            for (var i = 0; i < effects.Count && slot < BossEffectSlots; i++)
+            {
+                var effect = effects[i];
+                if (effect.Kind != "debuff" && effect.Kind != "dot")
+                {
+                    continue;
+                }
+
+                _bossEffectBacks[slot].enabled = true;
+                _bossEffectLabels[slot].enabled = true;
+                _bossEffectLabels[slot].text = effect.Name + "  " + RemainingText(effect, ageMs);
+                _bossEffectLabels[slot].color = EffectColor(effect.Kind);
+                slot++;
+            }
+        }
+
+        /// <summary>
+        /// 自身效果集合变了就在战斗日志里补一句人话。按 effect_id 与上一份做差，
+        /// 只做自身；护盾出场写剩余吸收量，其余写「获得 / 结束」。
+        /// </summary>
+        void LogSelfEffectChanges()
+        {
+            var current = new Dictionary<string, EffectSnapshot>();
+            foreach (var effect in _client.SelfEffects)
+            {
+                if (!string.IsNullOrEmpty(effect.EffectId))
+                {
+                    current[effect.EffectId] = effect;
+                }
+            }
+
+            var lines = new List<string>();
+            foreach (var pair in current)
+            {
+                if (_selfEffectSeen.ContainsKey(pair.Key))
+                {
+                    continue;
+                }
+
+                var effect = pair.Value;
+                if (effect.Kind == "shield")
+                {
+                    lines.Add(effect.Name + " " + effect.ShieldLeft);
+                }
+                else
+                {
+                    lines.Add("获得 " + effect.Name + " x" + Mathf.Max(1, (int)effect.Stacks));
+                }
+            }
+
+            foreach (var pair in _selfEffectSeen)
+            {
+                if (!current.ContainsKey(pair.Key))
+                {
+                    lines.Add(pair.Value.Name + " 结束");
+                }
+            }
+
+            _selfEffectSeen.Clear();
+            foreach (var pair in current)
+            {
+                _selfEffectSeen[pair.Key] = pair.Value;
+            }
+
+            if (lines.Count > 0)
+            {
+                _logLine = "效果：" + string.Join(" · ", lines);
+            }
+        }
+
+        /// <summary>显示用倒计时：快照剩余毫秒减本地经过的毫秒，最小停在 0.0s。</summary>
+        static string RemainingText(EffectSnapshot effect, double ageMs)
+        {
+            var leftMs = effect.RemainingMs - ageMs;
+            if (leftMs < 0)
+            {
+                leftMs = 0;
+            }
+
+            return (leftMs / 1000.0).ToString("0.0") + "s";
+        }
+
+        /// <summary>按 kind 分色，只影响观感；不读配置、不按 kind 做任何判定。</summary>
+        static Color EffectColor(string kind)
+        {
+            switch (kind)
+            {
+                case "buff":
+                    return new Color(0.62f, 0.92f, 0.62f, 1f);
+                case "debuff":
+                    return new Color(1f, 0.66f, 0.58f, 1f);
+                case "dot":
+                    return new Color(1f, 0.55f, 0.45f, 1f);
+                case "control":
+                    return new Color(1f, 0.86f, 0.42f, 1f);
+                case "hot":
+                    return new Color(0.55f, 0.95f, 0.7f, 1f);
+                case "shield":
+                    return new Color(0.58f, 0.82f, 1f, 1f);
+                default:
+                    return Color.white;
+            }
+        }
+
         /// <summary>一块不画东西的全屏层，只用来把几件东西一起淡入淡出。</summary>
         RectTransform NewLayer(string name, Transform parent)
         {
@@ -520,7 +762,11 @@ namespace HotUpdate
             rt.anchoredPosition = new Vector2(rect.x, rect.y);
             rt.sizeDelta = new Vector2(rect.width, rect.height);
 
-            go.GetComponent<Image>().color = color;
+            // 这个界面不挂 EventSystem，点选靠 HitTest 的像素矩形；
+            // 显示元素一律不吃射线，免得以后接上 GraphicRaycaster 后挡住技能键。
+            var image = go.GetComponent<Image>();
+            image.color = color;
+            image.raycastTarget = false;
             return rt;
         }
 
@@ -541,6 +787,7 @@ namespace HotUpdate
             text.fontSize = size;
             text.alignment = anchor;
             text.color = Color.white;
+            text.raycastTarget = false;
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             return text;

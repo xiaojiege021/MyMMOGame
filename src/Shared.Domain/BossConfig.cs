@@ -20,6 +20,12 @@ public sealed class BossConfig
     public long ExpOnClear { get; init; }
 
     /// <summary>
+    /// Q2：防御值，只进伤害第四段的防御减免。不配就是 0——默认值下
+    /// 1 - 0/(0+K) = 1，与方案 7.2 逐字等价；具体数值等 B10 / B15 内容。
+    /// </summary>
+    public long Defense { get; init; }
+
+    /// <summary>
     /// Boss 的攻击。P0 里 Boss 只做「按间隔打仇恨最高的那个人」这一种，
     /// 读招时间就是 foreswing_ms。不配这一段 Boss 就不出手——单人核对
     /// 还是老样子，不会平白多掉血。

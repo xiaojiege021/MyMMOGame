@@ -57,6 +57,9 @@ enum SkillRejectReason {
   SKILL_REJECT_BAD_TARGET = 10;
   // P2-4a：这个分支不能复活（诫律）。请求不算错，是这个职业分支没有这条能力。
   SKILL_REJECT_CANNOT_RESURRECT = 11;
+  // Q2：被控制。眩晕既不能施法也不能走位；沉默只挡施法，走位照常。
+  SKILL_REJECT_STUNNED = 12;
+  SKILL_REJECT_SILENCED = 13;
 }
 
 // 没有结算就退回来了。这条不改变任何人的生命。
@@ -100,6 +103,41 @@ message MoveState {
   int32 y_mm = 2;
   uint32 distance_mm = 3;
   bool clamped = 4;
+  // Q2：被定身 / 眩晕挡住，这一步没有生效。位置是服务端权威的原地，
+  // 客户端无论偏差多小都要照这个回退，不能只看 clamped 的 500mm 阈值。
+  bool blocked = 5;
+}
+
+// Q2：一个效果实例在某个人 / Boss 身上的事实值。名称与类型来自 config/effects.json，
+// 剩余毫秒与层数只由服务端时钟算；客户端只照这个显示，不自己套配置算时长。
+message EffectSnapshot {
+  string effect_id = 1;
+  string name = 2;
+  // 七类之一：buff / debuff / control / hot / dot / shield / cleanse。
+  // cleanse 是瞬时效果，不会出现在快照里。
+  string kind = 3;
+  // 谁施加的。Boss 施加给玩家的效果里是 Boss 编号，玩家之间的互助是队友编号。
+  uint64 source_id = 4;
+  uint32 remaining_ms = 5;
+  uint32 stacks = 6;
+  // 护盾类还剩多少吸收量；不是护盾时是 0。
+  int64 shield_left = 7;
+}
+
+// Q2：一个单位身上的整份效果集合。变了就整份重发（施加 / 到期 / 驱散 / 清空），
+// 不做增量，客户端收到就整份替换；单位可以是人，也可以是 Boss。
+message EffectState {
+  uint64 unit_id = 1;
+  repeated EffectSnapshot effects = 2;
+}
+
+// Q2：Boss 的血量或身上的效果变化。普攻命中仍走 SkillResult，
+// 这条只给 DoT / debuff 到期这类「没有某一次施法」的变化用。
+message BossState {
+  uint64 boss_id = 1;
+  int64 hp = 2;
+  int64 hp_max = 3;
+  repeated EffectSnapshot effects = 4;
 }
 
 // 开场时一起下发技能表。客户端按编号查前摇时长和名字，不在前端写死数值；
@@ -160,6 +198,9 @@ message BattleOpened {
   repeated PartyMember party = 18;
   // 可选职业目录。换职业要重连一场，客户端按这个循环。
   repeated ClassInfo classes = 19;
+  // Q2：这一场里已经存在的效果。正常开场是空的；Q9 的断线重连复用这一格，
+  // 按服务端时钟算出的剩余时长恢复 buff / DoT，不从客户端补算。
+  repeated EffectState effects = 20;
 }
 
 // 这场收尾。settlement_id 是写进结算记录的事务号；
@@ -250,6 +291,10 @@ message ServerMessage {
     ReviveScrollRejected scroll_rejected = 13;
     // P3-3a2：城战同屏档位，只有城战实例会发；副本 / 练习场 / 竞技场 / 战场都没有这条。
     SiegeView siege_view = 14;
+    // Q2：某个单位身上的效果集合变了。整份替换，客户端照它画 buff 条。
+    EffectState effects = 15;
+    // Q2：Boss 的血量或效果变了（DoT 跳、debuff 到期）。没有对应施法的那一类变化。
+    BossState boss_state = 16;
   }
 }
 
