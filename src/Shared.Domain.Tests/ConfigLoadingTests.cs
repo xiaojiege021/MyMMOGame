@@ -294,4 +294,98 @@ public sealed class ConfigLoadingTests
 
         Assert.Throws<ConfigException>(() => WorldBossTable.Load(path));
     }
+
+    // ---- 重置日历（Q3/G1） ----
+
+    static CalendarTable LoadCalendar() => CalendarTable.Load(Real("calendar.json"));
+
+    [Fact]
+    public void CalendarTable_loads_real_config()
+    {
+        var table = LoadCalendar();
+
+        Assert.Equal(CalendarTable.WrittenSchema, "calendar/2");
+        Assert.False(table.Pending);
+        Assert.Equal("Asia/Shanghai", table.TimeZoneId);
+        Assert.Equal(5, table.DailyResetHour);
+        Assert.Equal(DayOfWeek.Monday, table.WeeklyResetDay);
+        Assert.Equal(5, table.WeeklyResetHour);
+        Assert.Equal(new DateOnly(2026, 1, 5), table.SeasonStartDate);
+        Assert.Equal(90, table.SeasonLengthDays);
+    }
+
+    [Fact]
+    public void CalendarTable_day_boundary_is_local_reset_hour()
+    {
+        var table = LoadCalendar();
+
+        // 东八区 04:59 仍算前一天；05:00 才进新的一天。
+        var before = DateTimeOffset.Parse("2026-11-17T20:59:00Z");
+        var after = DateTimeOffset.Parse("2026-11-17T21:00:00Z");
+        Assert.Equal(new DateOnly(2026, 11, 17), table.DayKey(before));
+        Assert.Equal(new DateOnly(2026, 11, 18), table.DayKey(after));
+    }
+
+    [Fact]
+    public void CalendarTable_week_starts_on_configured_day_and_hour()
+    {
+        var table = LoadCalendar();
+
+        // 2026-11-16 是周一。周一 04:59 还属于上一周，05:00 才换周。
+        var before = DateTimeOffset.Parse("2026-11-15T20:59:00Z");
+        var after = DateTimeOffset.Parse("2026-11-15T21:00:00Z");
+        Assert.Equal(new DateOnly(2026, 11, 9), table.WeekStartDate(before));
+        Assert.Equal(new DateOnly(2026, 11, 16), table.WeekStartDate(after));
+        Assert.Equal(
+            DateTimeOffset.Parse("2026-11-15T21:00:00Z"),
+            table.WeekStartInstant(after).ToUniversalTime());
+    }
+
+    [Fact]
+    public void CalendarTable_timezone_change_moves_boundaries()
+    {
+        var root = ReadReal("calendar.json");
+        root["timezone"] = "America/New_York";
+        var ny = CalendarTable.LoadText(root.ToJsonString(), "ny");
+
+        var at = DateTimeOffset.Parse("2026-11-18T03:00:00Z"); // 上海 11:00 / 纽约 22:00 前一天
+        Assert.Equal(new DateOnly(2026, 11, 18), LoadCalendar().DayKey(at));
+        Assert.Equal(new DateOnly(2026, 11, 17), ny.DayKey(at));
+        Assert.NotEqual(LoadCalendar().FormatLocal(at), ny.FormatLocal(at));
+    }
+
+    [Fact]
+    public void CalendarTable_season_boundary_follows_reset_hour()
+    {
+        var root = ReadReal("calendar.json");
+        var at = DateTimeOffset.Parse("2026-01-05T00:30:00+08:00");
+        Assert.Equal(-1, LoadCalendar().SeasonOf(at).Index);
+
+        root["daily_reset_hour"] = 0;
+        var midnight = CalendarTable.LoadText(root.ToJsonString(), "midnight");
+        Assert.Equal(0, midnight.SeasonOf(at).Index);
+        Assert.Equal(
+            DateTimeOffset.Parse("2026-01-05T00:00:00+08:00"),
+            midnight.SeasonOf(at).StartsAt);
+    }
+
+    [Theory]
+    [InlineData("timezone", "Mars/Base")]
+    [InlineData("daily_reset_hour", 24)]
+    [InlineData("schema", "calendar/1")]
+    public void CalendarTable_rejects_bad_config(string key, object value)
+    {
+        var root = ReadReal("calendar.json");
+        if (value is int number)
+        {
+            root[key] = number;
+        }
+        else
+        {
+            root[key] = value.ToString();
+        }
+
+        Assert.Throws<ConfigException>(
+            () => CalendarTable.LoadText(root.ToJsonString(), "bad"));
+    }
 }

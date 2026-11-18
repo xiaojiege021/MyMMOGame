@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <!-- 正本配置随测试输出一起带过去：单测读的就是仓库里那一份，不另造一份数字。 -->
+    <None Include="../../config/calendar.json" Link="config/calendar.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../config/dungeons.json" Link="config/dungeons.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../config/dungeon_drops.json" Link="config/dungeon_drops.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../config/world_boss.json" Link="config/world_boss.json" CopyToOutputDirectory="PreserveNewest" />

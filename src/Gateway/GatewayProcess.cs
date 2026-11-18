@@ -1,3 +1,4 @@
+using Mmo.Shared.Domain;
 using Npgsql;
 
 namespace Gateway;
@@ -7,13 +8,22 @@ public sealed class GatewayProcess(string configPath)
     public async Task<int> RunAsync(CancellationToken stopping)
     {
         GatewayConfig config;
+        CalendarTable calendar;
         try
         {
             config = GatewayConfig.Load(configPath);
+            // Q3/G1：展示时刻只认这一份日历；坏表起不来，不带着半截时钟跑。
+            calendar = CalendarTable.Load(config.CalendarTable);
         }
         catch (ConfigException ex)
         {
             // 配置不对就起不来，不带着半截配置跑。
+            Console.WriteLine("config_error=" + ex.Message);
+            return 2;
+        }
+        catch (Mmo.Shared.Domain.ConfigException ex)
+        {
+            // 日历表是共享域的类型；错误口径与网关自己的配置一致。
             Console.WriteLine("config_error=" + ex.Message);
             return 2;
         }
@@ -27,6 +37,12 @@ public sealed class GatewayProcess(string configPath)
         Console.WriteLine("world_upstream=" + config.WorldUpstream);
         Console.WriteLine("global_upstream=" + config.GlobalUpstream);
         Console.WriteLine("social_upstream=" + config.SocialUpstream);
+        Console.WriteLine("calendar=ok timezone=" + calendar.TimeZoneId
+            + " daily_reset_hour=" + calendar.DailyResetHour
+            + " weekly_reset=" + calendar.WeeklyResetDay.ToString().ToLowerInvariant()
+            + "@" + calendar.WeeklyResetHour
+            + " season_start=" + calendar.SeasonStartDate.ToString("yyyy-MM-dd")
+            + " season_length_days=" + calendar.SeasonLengthDays);
 
         // 连接串带密码，日志只打来源。
         var connectionString = DbEnv.Resolve();
@@ -69,7 +85,7 @@ public sealed class GatewayProcess(string configPath)
         // 拍卖行：认令牌、复核归属，再 gRPC 转给全局服务。
         AuctionApi.Map(app, tokens, config);
         // P3-4a1：赛季当前目标只读口，认令牌后转给全局服务，不读请求参数。
-        SeasonApi.Map(app, tokens, config);
+        SeasonApi.Map(app, tokens, config, calendar);
         // P3-4a2：通行证只读与领取。季由角色服向全局服务确认，客户端只带角色号、轨与阶。
         PassApi.Map(app, tokens, config);
         // P3-4b：角色位与外观收藏两个账号级只读口，名额与收藏都归角色服回答。
@@ -98,7 +114,7 @@ public sealed class GatewayProcess(string configPath)
         VersusApi.Map(app, tokens, config);
 
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
-        WorldApi.Map(app, tokens, config);
+        WorldApi.Map(app, tokens, config, calendar);
 
         // 表世界位置流：同一套令牌与归属复核，WebSocket 帧转 gRPC 双向流。
         WorldStreamProxy.Map(app, tokens, config);

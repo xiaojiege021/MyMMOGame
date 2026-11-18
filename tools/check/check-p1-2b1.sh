@@ -218,8 +218,8 @@ else
   bad "进本扣减不是整笔事务"
 fi
 
-if grep -q 'fatigue_day <> current_date' "$ENTRY_REPO"; then
-  ok "跨天按数据库 current_date 归零，上限是「一天」而不是永久累计"
+if grep -q 'fatigue_day <> \$3' "$ENTRY_REPO" && grep -q 'calendar.DayKey' "$ENTRY_REPO"; then
+  ok "跨天按 config/calendar.json 的业务日归零，上限是「一天」而不是永久累计"
 else
   bad "没有日界判断，6000 之后会永远进不去"
 fi
@@ -547,14 +547,17 @@ else
   bad "第五次没被挡住：HTTP ${CODE} ${STATE} ${BODY}"
 fi
 
-echo "== 10. 库层：绕过接口写 6001 被挡 =="
-RAW="$("$DOTNET" "$CHARACTER_DLL" --raw-fatigue-write "$ID_CAP" 6001 \
+echo "== 10. 库层：绕过接口写库里那道上限 +1 被挡 =="
+# C7 起库层上限只是兜底（现为 1000000，不再等于配置的 6000）。断言不钉现值：
+# 从 SQL 现取 CHECK 里的 N，写 N+1，只验库层那道闸自己还在。
+RAW_LIMIT=$((CAP_DB + 1))
+RAW="$("$DOTNET" "$CHARACTER_DLL" --raw-fatigue-write "$ID_CAP" "$RAW_LIMIT" \
   --config "$TMP/character.json" 2>&1 | grep -m1 '^raw_fatigue=' || true)"
 STATE="$(fatigue_state "$ID_CAP")"
 if printf '%s' "$RAW" | grep -q 'raw_fatigue=rejected' \
    && printf '%s' "$RAW" | grep -q 'sqlstate=23514' \
    && [ "$(fatigue_of "$STATE")" = "6000" ]; then
-  ok "直写 6001 被库 CHECK 拒（23514），库里仍是 6000：$RAW"
+  ok "直写 ${RAW_LIMIT}（库上限 ${CAP_DB} +1）被库 CHECK 拒（23514），库里仍是 6000：$RAW"
 else
   bad "库层没挡住越界值：$RAW ${STATE}"
 fi

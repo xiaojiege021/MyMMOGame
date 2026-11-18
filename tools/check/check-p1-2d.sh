@@ -309,7 +309,8 @@ fi
 
 if grep -q 'long DamageOf(Member member, SkillDef skill)' "$ENCOUNTER" \
    && grep -q 'config.Dungeons.MonsterHpScalePerPlayer' "$ENCOUNTER" \
-   && grep -qF 'update \"角色\".character set fatigue = $2, fatigue_day = current_date' "$HOT_SPRING" \
+   && grep -qF 'update \"角色\".character set fatigue = $2, fatigue_day = $3' "$HOT_SPRING" \
+   && grep -q 'calendar.DayKey' "$HOT_SPRING" \
    && grep -q 'var cost = partySize' "$SHARE_REPO" \
    && grep -q '"fatigue_daily_cap": 6000' "$DUNGEONS" \
    && grep -q '"hot_spring_recovery": 1500' "$DUNGEONS" \

@@ -184,7 +184,8 @@ internal static class ProgressCli
         if (hardEntryStateOf != 0 || shiftEntryWeekOf != 0)
         {
             // P2-2a：高难次数只从「角色」.dungeon_entry 数，不经过进本逻辑。
-            var hardEntries = new HardEntryRepository(dataSource);
+            var hardEntries = new HardEntryRepository(
+                dataSource, LoadCalendar(CharacterConfig.Load(configPath), null));
 
             if (hardEntryStateOf != 0 && hardEntryDungeon != null)
             {
@@ -216,7 +217,8 @@ internal static class ProgressCli
 
         if (fatigueStateOf != 0 || setFatigueDay != null || rawFatigueId != 0)
         {
-            var dungeonEntries = new DungeonEntryRepository(dataSource);
+            var dungeonEntries = new DungeonEntryRepository(
+                dataSource, LoadCalendar(CharacterConfig.Load(configPath), null));
 
             if (fatigueStateOf != 0)
             {
@@ -256,7 +258,8 @@ internal static class ProgressCli
 
         if (shareStateOf != 0 || setWeekDay != null || rawShareId != 0 || sharesTotalDungeon != null)
         {
-            var weeklyShares = new WeeklyShareRepository(dataSource);
+            var weeklyShares = new WeeklyShareRepository(
+                dataSource, LoadCalendar(CharacterConfig.Load(configPath), null));
 
             if (shareStateOf != 0)
             {

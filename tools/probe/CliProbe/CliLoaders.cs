@@ -3,6 +3,10 @@ namespace Character.Cli;
 /// <summary>只读入口与真实启动共用的表加载链（通行证 / 主线 / 月叠 / 角色栏）。</summary>
 internal static class CliLoaders
 {
+    // Q3/G1：只读入口与真实启动共用同一份日历表加载链。
+    public static CalendarTable LoadCalendar(CharacterConfig cfg, string? path) =>
+        CalendarTable.Load(path ?? cfg.CalendarTable);
+
     // P3-4a2：通行证表的加载链。--season-pass-list 与三条连库入口共用这一份，
     // 免得「只读入口」与「真实启动」各校验一套（preflight 第 3 道闸门的规矩）。
     public static (SeasonPassTable Table, ItemTable Items) LoadSeasonPass(CharacterConfig cfg, string? path)

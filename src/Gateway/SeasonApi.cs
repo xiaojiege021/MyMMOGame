@@ -2,6 +2,7 @@ using System.Text.Json;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Mmo.Proto.Trade;
+using Mmo.Shared.Domain;
 
 namespace Gateway;
 
@@ -18,7 +19,8 @@ public static class SeasonApi
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
     };
 
-    public static void Map(WebApplication app, TokenStore tokens, GatewayConfig config)
+    public static void Map(
+        WebApplication app, TokenStore tokens, GatewayConfig config, CalendarTable calendar)
     {
         var tradeChannel = GrpcChannel.ForAddress(config.GlobalUpstream);
         var trade = new TradeService.TradeServiceClient(tradeChannel);
@@ -33,6 +35,7 @@ public static class SeasonApi
 
             try
             {
+                var window = calendar.SeasonOf(DateTimeOffset.UtcNow);
                 var reply = await trade.DescribeSeasonAsync(
                     new DescribeSeasonRequest(),
                     deadline: DateTime.UtcNow.AddSeconds(5),
@@ -45,6 +48,13 @@ public static class SeasonApi
                     target_dungeon = reply.TargetDungeon,
                     previous_season_id = reply.PreviousSeasonId,
                     previous_target_dungeon = reply.PreviousTargetDungeon,
+                    // Q3/G1：赛季边界也只从 calendar.json 算，与全局服务同一个时区与日界。
+                    // 当前是哪一季仍由全局服务回答；这里只给展示用的边界时刻。
+                    season_index = window.Index,
+                    season_starts_at_ms = window.StartsAt.ToUnixTimeMilliseconds(),
+                    season_ends_at_ms = window.EndsAt.ToUnixTimeMilliseconds(),
+                    season_starts_at_local = calendar.FormatLocal(window.StartsAt),
+                    season_ends_at_local = calendar.FormatLocal(window.EndsAt),
                 });
             }
             catch (RpcException ex)

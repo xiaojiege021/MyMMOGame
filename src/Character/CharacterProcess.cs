@@ -49,11 +49,14 @@ public sealed class CharacterProcess(string configPath)
         CharacterSlotTable characterSlotTable;
         MainlineTable mainlineTable;
         HeroCodexTable heroCodexTable;
+        CalendarTable calendar;
         RecipeTable recipeTable;
         DungeonDropTable dungeonDropTable;
         MainlineDropTable mainlineDropTable;
         try
         {
+            // Q3/G1：日 / 周 / 赛季边界只从这一份日历表算，先于所有仓储加载。
+            calendar = CalendarTable.Load(config.CalendarTable);
             races = RaceTable.Load("config/races.json");
             branches = BranchTable.Load("config/branches.json");
             classes = new ClassIds("config/classes.json");
@@ -158,6 +161,20 @@ public sealed class CharacterProcess(string configPath)
 
         Console.WriteLine("config=" + configPath);
         Console.WriteLine("listen=" + config.Listen);
+        // Q3/G1：启动时把这一份日历的日 / 周 / 赛季边界打出来，改时区或重置小时后
+        // 一眼能确认跑的是哪一套时钟；判定仍在每一笔事务里重算，不缓存。
+        var bootNow = DateTimeOffset.UtcNow;
+        var bootSeason = calendar.SeasonOf(bootNow);
+        Console.WriteLine("calendar=ok version=" + calendar.Version
+            + " timezone=" + calendar.TimeZoneId
+            + " daily_reset_hour=" + calendar.DailyResetHour
+            + " weekly_reset=" + calendar.WeeklyResetDay.ToString().ToLowerInvariant()
+            + "@" + calendar.WeeklyResetHour
+            + " season_start=" + calendar.SeasonStartDate.ToString("yyyy-MM-dd")
+            + " season_length_days=" + calendar.SeasonLengthDays
+            + " day=" + calendar.DayKey(bootNow).ToString("yyyy-MM-dd")
+            + " week_start=" + calendar.WeekStartDate(bootNow).ToString("yyyy-MM-dd")
+            + " season_index=" + bootSeason.Index);
         Console.WriteLine("social_upstream=" + config.SocialUpstream);
         Console.WriteLine("global_upstream=" + config.GlobalUpstream);
         Console.WriteLine("races=" + races.All.Count + " race_table_version=" + races.Version);
@@ -431,12 +448,12 @@ public sealed class CharacterProcess(string configPath)
         // 产出入包复用 grants 的同一条 SQL，钱只用 grants 的货币写法。
         var crafts = new CraftRepository(
             dataSource, recipeTable, items, config, grants, inventory);
-        var dungeonEntries = new DungeonEntryRepository(dataSource);
+        var dungeonEntries = new DungeonEntryRepository(dataSource, calendar);
         // P2-2a：高难本（龙巢）每人每周的次数。只写 dungeon_entry 一行，
         // 不碰疲劳与周份额；次数以库里已写下的进本记录为准。
-        var hardEntries = new HardEntryRepository(dataSource);
-        var weeklyShares = new WeeklyShareRepository(dataSource);
-        var hotSpring = new HotSpringRepository(dataSource);
+        var hardEntries = new HardEntryRepository(dataSource, calendar);
+        var weeklyShares = new WeeklyShareRepository(dataSource, calendar);
+        var hotSpring = new HotSpringRepository(dataSource, calendar);
         var expSettlements = new ExpSettlementRepository(dataSource);
         var enhances = new EnhanceRepository(dataSource, enhanceTable, items);
         var transfers = new TransferRepository(dataSource, transferTable, items);

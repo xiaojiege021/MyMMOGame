@@ -8,6 +8,10 @@ namespace Character.Cli;
 internal static class CliFlags
 {
     public static string configPath = "config/character.json";
+    // Q3/G1：把日历算出来的日界 / 周界 / 赛季边界 / 展示时刻打出来，不连库、不启动进程。
+    public static bool calendarState = false;
+    public static string? calendarPath = null;
+    public static string? calendarAt = null;
     // C7 数值台账：把角色服启动配置的现值打出来（listen / db_pool_max / bag_slots / 表路径），
     // 不连库、不启动进程。台账表 E 的「改配置重启生效」用它取证。
     public static bool configShow = false;

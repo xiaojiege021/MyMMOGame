@@ -12,5 +12,7 @@
     <PackageReference Include="Grpc.Net.Client" Version="2.85.0" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <ProjectReference Include="../Shared/Shared.csproj" />
+    <!-- Q3/G1：赛季边界与其它进程共用同一份日历表。 -->
+    <ProjectReference Include="../Shared.Domain/Shared.Domain.csproj" />
   </ItemGroup>
 </Project>

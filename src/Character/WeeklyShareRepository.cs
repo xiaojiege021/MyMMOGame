@@ -24,15 +24,14 @@ public sealed record WeeklyShareOutcome(
 /// 份额不足时整笔回滚：不扣份额、不发份数、不留进本记录。
 ///
 /// weekly_share 记的是「本周已经用掉的单人份」，不是剩余额度；上限只在
-/// config/dungeons.json 的 weekly_share_cap，库层只守非负。周界按数据库
-/// date_trunc('week', current_date)，不按客户端时间。
+/// config/dungeons.json 的 weekly_share_cap，库层只守非负。周界按
+/// config/calendar.json 的时区、周首星期与重置小时算出来，不按客户端时间，
+/// 也不让数据库用自己的周首函数另算一周。
 /// 这一笔只写 weekly_share、weekly_share_day 与进本记录：疲劳、等级、货币、
 /// 背包一概不碰，巢穴与疲劳解绑。
 /// </summary>
-public sealed class WeeklyShareRepository(NpgsqlDataSource dataSource)
+public sealed class WeeklyShareRepository(NpgsqlDataSource dataSource, CalendarTable calendar)
 {
-    const string WeekStart = "date_trunc('week', current_date::timestamp)::date";
-
     public async Task<WeeklyShareOutcome> EnterWithWeeklyShareAsync(
         long characterId,
         string account,
@@ -43,6 +42,8 @@ public sealed class WeeklyShareRepository(NpgsqlDataSource dataSource)
     {
         // 一份就是单人通关一次的那一份产出，没有额外系数：4 人一次 = 4 份。
         var cost = partySize;
+        // 周首只算一次：比较与写入必须是同一个日期。
+        var weekStart = calendar.WeekStartDate(DateTimeOffset.UtcNow);
 
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         await using var transaction = await connection.BeginTransactionAsync(stopping);
@@ -52,12 +53,13 @@ public sealed class WeeklyShareRepository(NpgsqlDataSource dataSource)
         int effective;
         int fatigue;
         await using (var read = new NpgsqlCommand(
-            "select (case when weekly_share_day <> " + WeekStart + " then 0 else weekly_share end), fatigue "
+            "select (case when weekly_share_day <> $3 then 0 else weekly_share end), fatigue "
             + "from \"角色\".character where id = $1 and account = $2 for update",
             connection, transaction))
         {
             read.Parameters.AddWithValue(characterId);
             read.Parameters.AddWithValue(account);
+            read.Parameters.AddWithValue(weekStart);
             await using var reader = await read.ExecuteReaderAsync(stopping);
             if (!await reader.ReadAsync(stopping))
             {
@@ -82,12 +84,13 @@ public sealed class WeeklyShareRepository(NpgsqlDataSource dataSource)
         // 3. 落账。周界一起刷成本周周首，新的一周自然从 0 起算。
         var used = effective + cost;
         await using (var charge = new NpgsqlCommand(
-            "update \"角色\".character set weekly_share = $2, weekly_share_day = " + WeekStart + " "
-            + "where id = $1 and account = $3",
+            "update \"角色\".character set weekly_share = $2, weekly_share_day = $3 "
+            + "where id = $1 and account = $4",
             connection, transaction))
         {
             charge.Parameters.AddWithValue(characterId);
             charge.Parameters.AddWithValue(used);
+            charge.Parameters.AddWithValue(weekStart);
             charge.Parameters.AddWithValue(account);
             await charge.ExecuteNonQueryAsync(stopping);
         }
@@ -116,9 +119,10 @@ public sealed class WeeklyShareRepository(NpgsqlDataSource dataSource)
         long characterId, int weeklyCap, CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(
-            "select (case when weekly_share_day <> " + WeekStart + " then 0 else weekly_share end), "
+            "select (case when weekly_share_day <> $2 then 0 else weekly_share end), "
             + "fatigue, weekly_share_day from \"角色\".character where id = $1");
         command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(calendar.WeekStartDate(DateTimeOffset.UtcNow));
         await using var reader = await command.ExecuteReaderAsync(stopping);
         if (!await reader.ReadAsync(stopping))
         {

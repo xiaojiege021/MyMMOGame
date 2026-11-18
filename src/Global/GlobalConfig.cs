@@ -10,11 +10,13 @@ namespace Global;
 /// </summary>
 public sealed record GlobalConfig(
     string Listen, int DbPoolMax, string CharacterUpstream, string StoneExchangeTable,
-    string SeasonTableFile)
+    string SeasonTableFile, string CalendarTable)
 {
     public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
     public const string DefaultStoneExchangeTable = "config/stone_exchange.json";
     public const string DefaultSeasonTableFile = "season.json";
+    // Q3/G1：赛季边界只从这一份日历表算。老配置不写这一项时读仓库根这一份。
+    public const string DefaultCalendarTable = "config/calendar.json";
 
     public static GlobalConfig Load(string path)
     {
@@ -71,7 +73,15 @@ public sealed record GlobalConfig(
             throw new ConfigException("season_table_file 必须是本目录下的文件名");
         }
 
-        return new GlobalConfig(listen.TrimEnd('/'), pool, character, stoneExchangeTable, seasonTableFile);
+        var calendarTable = (wire.CalendarTable ?? DefaultCalendarTable).Trim();
+        if (calendarTable.Length == 0)
+        {
+            throw new ConfigException("calendar_table 不能为空");
+        }
+
+        return new GlobalConfig(
+            listen.TrimEnd('/'), pool, character, stoneExchangeTable, seasonTableFile,
+            calendarTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -96,6 +106,9 @@ public sealed record GlobalConfig(
 
         [JsonPropertyName("season_table_file")]
         public string? SeasonTableFile { get; init; }
+
+        [JsonPropertyName("calendar_table")]
+        public string? CalendarTable { get; init; }
     }
 }
 

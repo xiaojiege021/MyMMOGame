@@ -19,8 +19,12 @@ public sealed record DungeonEntryOutcome(
 ///
 /// 并发靠 select ... for update 锁住角色行：两笔同时冲日上限时，
 /// 后一个会等到前一个提交，读到新值，再按上限判断，于是只有一笔能成。
+///
+/// Q3/G1：日界不再由数据库的当天日期决定，改由 <see cref="CalendarTable.DayKey"/>
+/// 按 config/calendar.json 的时区与重置小时算出业务日，再把这一天当参数带进 SQL。
+/// 同一个业务日只认一份时钟，改配置重启后日界立刻跟着变。
 /// </summary>
-public sealed class DungeonEntryRepository(NpgsqlDataSource dataSource)
+public sealed class DungeonEntryRepository(NpgsqlDataSource dataSource, CalendarTable calendar)
 {
     public async Task<DungeonEntryOutcome> EnterWithFatigueAsync(
         long characterId,
@@ -31,6 +35,8 @@ public sealed class DungeonEntryRepository(NpgsqlDataSource dataSource)
         CancellationToken stopping)
     {
         var cost = checked(dungeon.FatiguePerPlayer * partySize);
+        // 业务日只算一次：同一笔事务里的比较与写入必须是同一天。
+        var day = calendar.DayKey(DateTimeOffset.UtcNow);
 
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         await using var transaction = await connection.BeginTransactionAsync(stopping);
@@ -40,12 +46,13 @@ public sealed class DungeonEntryRepository(NpgsqlDataSource dataSource)
         int effective;
         int weeklyShare;
         await using (var read = new NpgsqlCommand(
-            "select (case when fatigue_day <> current_date then 0 else fatigue end), weekly_share "
+            "select (case when fatigue_day <> $3 then 0 else fatigue end), weekly_share "
             + "from \"角色\".character where id = $1 and account = $2 for update",
             connection, transaction))
         {
             read.Parameters.AddWithValue(characterId);
             read.Parameters.AddWithValue(account);
+            read.Parameters.AddWithValue(day);
             await using var reader = await read.ExecuteReaderAsync(stopping);
             if (!await reader.ReadAsync(stopping))
             {
@@ -70,12 +77,13 @@ public sealed class DungeonEntryRepository(NpgsqlDataSource dataSource)
         // 3. 落账。日界一起刷成今天，第二天自然从 0 起算。
         var fatigue = effective + cost;
         await using (var charge = new NpgsqlCommand(
-            "update \"角色\".character set fatigue = $2, fatigue_day = current_date "
-            + "where id = $1 and account = $3",
+            "update \"角色\".character set fatigue = $2, fatigue_day = $3 "
+            + "where id = $1 and account = $4",
             connection, transaction))
         {
             charge.Parameters.AddWithValue(characterId);
             charge.Parameters.AddWithValue(fatigue);
+            charge.Parameters.AddWithValue(day);
             charge.Parameters.AddWithValue(account);
             await charge.ExecuteNonQueryAsync(stopping);
         }

@@ -34,6 +34,12 @@ public sealed record GatewayConfig(
     // 不让 P2-1a1 的闭包首跑因为一个新字段而红。
     public string SocialUpstream { get; init; } = DefaultSocialUpstream;
 
+    // Q3/G1：日 / 周 / 赛季边界与世界 Boss 展示时区的唯一正本。老配置不写这一项时
+    // 读仓库根这一份；核对脚本可以指到临时日历表，验改时区后的展示时刻。
+    public const string DefaultCalendarTable = "config/calendar.json";
+
+    public string CalendarTable { get; init; } = DefaultCalendarTable;
+
     public static GatewayConfig Load(string path)
     {
         if (!File.Exists(path))
@@ -113,9 +119,16 @@ public sealed record GatewayConfig(
             throw new ConfigException("social_upstream 必须是 http:// 或 https:// 地址：" + social);
         }
 
+        var calendar = (wire.CalendarTable ?? DefaultCalendarTable).Trim();
+        if (calendar.Length == 0)
+        {
+            throw new ConfigException("calendar_table 不能为空");
+        }
+
         return new GatewayConfig(listen, ttl, iterations, upstream, character, world, global)
         {
             SocialUpstream = social,
+            CalendarTable = calendar,
         };
     }
 
@@ -152,6 +165,9 @@ public sealed record GatewayConfig(
 
         [JsonPropertyName("social_upstream")]
         public string? SocialUpstream { get; init; }
+
+        [JsonPropertyName("calendar_table")]
+        public string? CalendarTable { get; init; }
     }
 }
 

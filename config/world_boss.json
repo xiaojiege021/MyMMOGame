@@ -12,7 +12,7 @@
   "cap": 20,
   "cap_note": "方案 10.4 / 技术架构第 23 行 / 开发架构第 11 节 P3-5 与第 70 行写定「首发上限 20 人」，写在这里当唯一来源；上限也走配置，代码里没有第二个数字。一个人也能进，不要求百人在线。",
   "timezone": "utc",
-  "timezone_note": "时刻表按 UTC 解释：服务端时钟是所有进程共用的一个事实值，客户端时间、请求体里的时间都带不进判定。",
+  "timezone_note": "时刻表按 UTC 解释：服务端时钟是所有进程共用的一个事实值，客户端时间、请求体里的时间都带不进判定。玩家看到的本地时刻另由 config/calendar.json 的 timezone 决定（Q3 起网关 /world/worldboss 的 display_timezone / *_at_local），这份表不写第二个展示时区。",
   "windows": [
     {
       "id": "w1",

@@ -20,8 +20,11 @@ public sealed record HotSpringOutcome(
 /// 周份额、进本记录、货币、背包、等级一概不碰——这一行只补疲劳。
 /// 并发用 select ... for update 把角色行锁住，两笔温泉一前一后读到各自的新值，
 /// 不会把疲劳减成负数，也不会读到半截账。
+///
+/// Q3/G1：跨天口径与深渊共用同一份日历（config/calendar.json），业务日按配置时区
+/// 与重置小时算出来当参数带入，不读数据库的当天日期。
 /// </summary>
-public sealed class HotSpringRepository(NpgsqlDataSource dataSource)
+public sealed class HotSpringRepository(NpgsqlDataSource dataSource, CalendarTable calendar)
 {
     public async Task<HotSpringOutcome> UseAsync(
         long characterId,
@@ -32,15 +35,17 @@ public sealed class HotSpringRepository(NpgsqlDataSource dataSource)
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         await using var transaction = await connection.BeginTransactionAsync(stopping);
 
+        var day = calendar.DayKey(DateTimeOffset.UtcNow);
         int before;
         int weeklyShare;
         await using (var read = new NpgsqlCommand(
-            "select (case when fatigue_day <> current_date then 0 else fatigue end), weekly_share "
+            "select (case when fatigue_day <> $3 then 0 else fatigue end), weekly_share "
             + "from \"角色\".character where id = $1 and account = $2 for update",
             connection, transaction))
         {
             read.Parameters.AddWithValue(characterId);
             read.Parameters.AddWithValue(account);
+            read.Parameters.AddWithValue(day);
             await using var reader = await read.ExecuteReaderAsync(stopping);
             if (!await reader.ReadAsync(stopping))
             {
@@ -63,12 +68,13 @@ public sealed class HotSpringRepository(NpgsqlDataSource dataSource)
         var recovered = before - after;
 
         await using (var update = new NpgsqlCommand(
-            "update \"角色\".character set fatigue = $2, fatigue_day = current_date "
-            + "where id = $1 and account = $3",
+            "update \"角色\".character set fatigue = $2, fatigue_day = $3 "
+            + "where id = $1 and account = $4",
             connection, transaction))
         {
             update.Parameters.AddWithValue(characterId);
             update.Parameters.AddWithValue(after);
+            update.Parameters.AddWithValue(day);
             update.Parameters.AddWithValue(account);
             await update.ExecuteNonQueryAsync(stopping);
         }

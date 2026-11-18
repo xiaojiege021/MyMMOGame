@@ -15,7 +15,7 @@ public sealed record CharacterConfig(
     string StoneExchangeTable, string CityTable, string SiegeTerritoryTable,
     string SeasonPassTable, string SeasonTable, string MonthlyBundleTable,
     string CharacterSlotTable, string GlobalUpstream, string MainlineTable,
-    string RecipeTable)
+    string RecipeTable, string CalendarTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -53,6 +53,9 @@ public sealed record CharacterConfig(
     // K3：生产 / 配方的正本。同样不显式登记进 character.json：老卡的临时配置目录里
     // 没有这份表时走默认文件名，仓库根的那一份照常可读。
     public const string DefaultRecipeTable = "config/recipes.json";
+    // Q3/G1：日 / 周 / 赛季边界的唯一正本。存量临时配置不写这一项时走仓库根这一份，
+    // 核对脚本可以指到临时日历表试时区与重置小时。
+    public const string DefaultCalendarTable = "config/calendar.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -277,13 +280,21 @@ public sealed record CharacterConfig(
             throw new ConfigException("recipe_table 不能为空");
         }
 
+        // Q3/G1：日、周、赛季边界只从这一份日历表算。路径按工作目录解析，
+        // 与 races.json / items.json 同口径；核对脚本可指到临时表。
+        var calendarTable = (wire.CalendarTable ?? DefaultCalendarTable).Trim();
+        if (calendarTable.Length == 0)
+        {
+            throw new ConfigException("calendar_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
-            characterSlotTable, globalUpstream, mainlineTable, recipeTable);
+            characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -374,5 +385,8 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("recipe_table")]
         public string? RecipeTable { get; init; }
+
+        [JsonPropertyName("calendar_table")]
+        public string? CalendarTable { get; init; }
     }
 }

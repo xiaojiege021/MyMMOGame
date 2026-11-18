@@ -3,6 +3,7 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Mmo.Proto.Character;
 using Mmo.Proto.World;
+using Mmo.Shared.Domain;
 using CharacterClient = Mmo.Proto.Character.CharacterService.CharacterServiceClient;
 using WorldClient = Mmo.Proto.World.WorldService.WorldServiceClient;
 
@@ -35,7 +36,8 @@ public static class WorldApi
         PropertyNameCaseInsensitive = true,
     };
 
-    public static void Map(WebApplication app, TokenStore tokens, GatewayConfig config)
+    public static void Map(
+        WebApplication app, TokenStore tokens, GatewayConfig config, CalendarTable calendar)
     {
         // 通道建一次复用；地址在启动配置里定死，运行期不变。
         var worldChannel = GrpcChannel.ForAddress(config.WorldUpstream);
@@ -513,6 +515,12 @@ public static class WorldApi
                     owner_sect_name = result.OwnerSectName,
                     owner_window_key = result.OwnerWindowKey,
                     owner_recorded_at_ms = result.OwnerRecordedAtMs,
+                    // Q3/G1：世界 Boss 的时刻仍是服务端算出的 UTC 毫秒，展示时区只从
+                    // config/calendar.json 读。改 timezone 后这三条跟着变；客户端不另算。
+                    display_timezone = calendar.TimeZoneId,
+                    starts_at_local = calendar.FormatLocal((long)result.StartsAtMs),
+                    ends_at_local = calendar.FormatLocal((long)result.EndsAtMs),
+                    next_starts_at_local = calendar.FormatLocal((long)result.NextStartsAtMs),
                 });
             }
             catch (RpcException ex)

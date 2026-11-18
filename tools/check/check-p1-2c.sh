@@ -319,7 +319,8 @@ else
 fi
 
 if grep -q 'FatiguePerPlayer \* partySize' "$FATIGUE_REPO" \
-   && grep -qF 'update \"角色\".character set fatigue = $2, fatigue_day = current_date' "$SPRING_REPO" \
+   && grep -qF 'update \"角色\".character set fatigue = $2, fatigue_day = $3' "$SPRING_REPO" \
+   && grep -q 'calendar.DayKey' "$SPRING_REPO" \
    && grep -q '"takes_weekly_share": false' "$CFG" \
    && grep -q '"charges_fatigue": false' "$CFG"; then
   ok "深渊按人数扣疲劳、温泉只补疲劳、主线不扣不占，三行老规则都没回退"

@@ -1,5 +1,4 @@
 using static Character.Cli.CliFlags;
-
 namespace Character.Cli;
 
 /// <summary>命令行解析：133 个 flag 名与取值个数保持原样，未知参数回 64。</summary>
@@ -17,6 +16,7 @@ internal static class CliParser
             case "--sql" when i + 1 < args.Length:
                 sqlPath = args[++i]; sqlGiven = true;
                 break;
+            case "--calendar": case "--calendar-path": case "--at": CalendarCli.Parse(args, ref i); break;
             case "--migrate": migrate = true; break;
             case "--migrations" when i + 1 < args.Length: migrationsPath = args[++i]; break;
             case "--schema" when i + 1 < args.Length: schemaFilter = args[++i]; break;

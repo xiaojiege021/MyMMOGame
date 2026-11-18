@@ -68,7 +68,8 @@ R("not_hardcoded", not re.search(r'"dragon"', ct + bt)
 repo = rd("src/Character/HardEntryRepository.cs")
 low = repo.lower()
 R("repo_lock", "for update" in low, "HardEntryRepository 用 for update 锁角色行")
-R("repo_week", "date_trunc('week'" in repo and "count(*)" in low, "按 date_trunc('week') + count(*) 计数")
+R("repo_week", "calendar.WeekStartInstant(" in repo and "entered_at >= $3" in repo
+  and "count(*)" in low, "按日历周首 + count(*) 计数")
 i = repo.find("EnterHardAsync(")
 j = repo.find("\n    public ", i + 1) if i >= 0 else -1
 heb = repo[i:] if i >= 0 and j < 0 else (repo[i:j] if i >= 0 else "")
@@ -187,7 +188,7 @@ except Exception: print("")')"
   [ "$MIG" = "1" ] && grep -q '^migrate=ok' "$TMP/m1" && grep -q '^migrate=ok' "$TMP/m2" \
     && ok "真 gamedb 主迁移（账号/角色/进本/背包/货币/流水/经验）" || bad "建表失败：$(head -3 "$TMP/m1" "$TMP/m2")"
   ACCOUNT="p22a_$$"; PASSWORD="P22a-$$-$(date +%s)"
-  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" --seed-slots 8 $CG >/dev/null 2>&1
+  printf '%s\n' "$PASSWORD" | "$DOTNET" "$GD" --seed-account "$ACCOUNT" --seed-slots 16 $CG >/dev/null 2>&1
   ok "自造临时账号（口令/令牌/角色号只在内存，不落盘不打印）"
   for p in 62000 61000 "$BP"; do harness_kill_port "$p"; done
   harness_start "$TMP/harness/battle.log" "$DOTNET" "$BD" --config "$TMP/battle.json" >/dev/null

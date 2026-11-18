@@ -20,6 +20,9 @@ internal static class CliEntry
 
         // 只读核对不连库：坏配置在这一步就报 config_error。
         int? code;
+        code = CalendarCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = ConfigCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

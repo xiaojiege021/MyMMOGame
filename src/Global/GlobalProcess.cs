@@ -2,6 +2,7 @@ using System.Net;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Mmo.Proto.Character;
+using Mmo.Shared.Domain;
 using Npgsql;
 
 namespace Global;
@@ -11,11 +12,19 @@ public sealed class GlobalProcess(string configPath)
     public async Task<int> RunAsync(CancellationToken stopping)
     {
         GlobalConfig config;
+        CalendarTable calendar;
         try
         {
             config = GlobalConfig.Load(configPath);
+            // Q3/G1：赛季边界只认这一份日历；坏表起不来。
+            calendar = CalendarTable.Load(config.CalendarTable);
         }
         catch (ConfigException ex)
+        {
+            Console.WriteLine("config_error=" + ex.Message);
+            return 2;
+        }
+        catch (Mmo.Shared.Domain.ConfigException ex)
         {
             Console.WriteLine("config_error=" + ex.Message);
             return 2;
@@ -24,6 +33,19 @@ public sealed class GlobalProcess(string configPath)
         Console.WriteLine("config=" + configPath);
         Console.WriteLine("listen=" + config.Listen);
         Console.WriteLine("character_upstream=" + config.CharacterUpstream);
+        var bootNow = DateTimeOffset.UtcNow;
+        var bootWindow = calendar.SeasonOf(bootNow);
+        Console.WriteLine("calendar=ok timezone=" + calendar.TimeZoneId
+            + " daily_reset_hour=" + calendar.DailyResetHour
+            + " weekly_reset=" + calendar.WeeklyResetDay.ToString().ToLowerInvariant()
+            + "@" + calendar.WeeklyResetHour
+            + " day=" + calendar.DayKey(bootNow).ToString("yyyy-MM-dd")
+            + " week_start=" + calendar.WeekStartDate(bootNow).ToString("yyyy-MM-dd")
+            + " season_start=" + calendar.SeasonStartDate.ToString("yyyy-MM-dd")
+            + " season_length_days=" + calendar.SeasonLengthDays
+            + " season_index=" + bootWindow.Index
+            + " season_window_start=" + calendar.FormatLocal(bootWindow.StartsAt)
+            + " season_window_end=" + calendar.FormatLocal(bootWindow.EndsAt));
 
         // P3-2a：挂单时校验灵石档位，加载失败就起不来，不带着半截配置跑。
         StoneTierTable stoneTiers;

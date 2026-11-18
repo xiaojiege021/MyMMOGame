@@ -245,7 +245,8 @@ else
   bad "温泉入口没有走网关 → 角色服 gRPC"
 fi
 
-if grep -qF 'update \"角色\".character set fatigue = $2, fatigue_day = current_date' "$REPO" \
+if grep -qF 'update \"角色\".character set fatigue = $2, fatigue_day = $3' "$REPO" \
+   && grep -q 'calendar.DayKey' "$REPO" \
    && ! grep -nEi 'insert into|delete from|update .*(currency|inventory|dungeon_entry|grant_txn)|set (level|weekly_share|gold)' "$REPO" >/dev/null; then
   ok "温泉只更新疲劳与日界，不碰周份额、进本记录、货币、背包、等级"
 else
@@ -260,7 +261,7 @@ else
 fi
 
 if grep -q 'if (after < 0)' "$REPO" && grep -q 'recovered = before - after' "$REPO" \
-   && grep -q 'fatigue_day <> current_date' "$REPO" \
+   && grep -q 'fatigue_day <> \$3' "$REPO" \
    && grep -q 'CHECK (fatigue >= 0)' "$SQL" \
    && [ -n "$CAP_DB" ] && [ "$CAP_DB" -ge "$CAP" ]; then
   ok "下限 0、跨天归零都在；库层上限 ${CAP_DB} 不低于配置日上限 ${CAP}，不钉方案现值"

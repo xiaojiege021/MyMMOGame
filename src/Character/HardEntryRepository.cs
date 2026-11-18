@@ -22,16 +22,15 @@ public sealed record HardEntryOutcome(
 /// 就算用掉，进程在奖励写入前崩溃也不退回（技术架构第 108 行）。
 ///
 /// 计数口径：同一角色 + 同一副本在「本周」的「角色」.dungeon_entry 行数，
-/// 周界按数据库 date_trunc('week', now())，不按客户端时间。不新建表、不新增列。
+/// 周界按 config/calendar.json 的时区、周首星期与重置小时算出来（Q3/G1），
+/// 不按客户端时间，也不让数据库自己算一周。不新建表、不新增列。
 ///
 /// 这一笔只写 dungeon_entry 一行：疲劳、周份额、等级、货币、背包一概不碰
 /// （高难本不扣疲劳，也不占巢穴的周份额）。
 /// select ... for update 锁住角色行：并发两笔同时冲最后一次时只有一笔能成。
 /// </summary>
-public sealed class HardEntryRepository(NpgsqlDataSource dataSource)
+public sealed class HardEntryRepository(NpgsqlDataSource dataSource, CalendarTable calendar)
 {
-    const string WeekStart = "date_trunc('week', now())";
-
     public async Task<HardEntryOutcome> EnterHardAsync(
         long characterId,
         string account,
@@ -40,6 +39,8 @@ public sealed class HardEntryRepository(NpgsqlDataSource dataSource)
         CancellationToken stopping)
     {
         var cap = dungeon.EntriesPerWeek;
+        // 周首是本地时区周一 05:00 的真实时刻；与 entered_at（timestamptz）直接比。
+        var weekStart = calendar.WeekStartInstant(DateTimeOffset.UtcNow);
 
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         await using var transaction = await connection.BeginTransactionAsync(stopping);
@@ -63,11 +64,12 @@ public sealed class HardEntryRepository(NpgsqlDataSource dataSource)
         int used;
         await using (var count = new NpgsqlCommand(
             "select count(*) from \"角色\".dungeon_entry "
-            + "where character_id = $1 and dungeon_id = $2 and entered_at >= " + WeekStart,
+            + "where character_id = $1 and dungeon_id = $2 and entered_at >= $3",
             connection, transaction))
         {
             count.Parameters.AddWithValue(characterId);
             count.Parameters.AddWithValue(dungeon.Id);
+            count.Parameters.AddWithValue(weekStart);
             used = Convert.ToInt32(await count.ExecuteScalarAsync(stopping));
         }
 
@@ -106,10 +108,11 @@ public sealed class HardEntryRepository(NpgsqlDataSource dataSource)
     {
         await using var command = dataSource.CreateCommand(
             "select (select count(*) from \"角色\".dungeon_entry "
-            + "where character_id = $1 and dungeon_id = $2 and entered_at >= " + WeekStart + ") "
+            + "where character_id = $1 and dungeon_id = $2 and entered_at >= $3) "
             + "from \"角色\".character where id = $1");
         command.Parameters.AddWithValue(characterId);
         command.Parameters.AddWithValue(dungeonId);
+        command.Parameters.AddWithValue(calendar.WeekStartInstant(DateTimeOffset.UtcNow));
         await using var reader = await command.ExecuteReaderAsync(stopping);
         if (!await reader.ReadAsync(stopping))
         {
