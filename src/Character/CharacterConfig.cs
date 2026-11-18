@@ -15,7 +15,8 @@ public sealed record CharacterConfig(
     string StoneExchangeTable, string CityTable, string SiegeTerritoryTable,
     string SeasonPassTable, string SeasonTable, string MonthlyBundleTable,
     string CharacterSlotTable, string GlobalUpstream, string MainlineTable,
-    string RecipeTable, string CalendarTable, string CityTaskTable)
+    string RecipeTable, string CalendarTable, string CityTaskTable,
+    string SeasonPassProgressTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -59,6 +60,9 @@ public sealed record CharacterConfig(
     // Q5/J2：主城修炼 / 境界任务的正本。与日历一样不显式登记进 character.json，
     // 老配置不写这一项也照常起（走仓库根这一份）；核对脚本可指到临时表试坏配置。
     public const string DefaultCityTaskTable = "config/city_tasks.json";
+    // Q6/J4：通行证点数与来源的正本。与日历 / 城池任务同口径不显式登记进
+    // config/character.json：老配置不写这一项也照常起（走仓库根这一份）。
+    public const string DefaultSeasonPassProgressTable = "config/season_pass_progress.json";
     // P2-1c：角色服判同宗门要问社交服（65000）；本地默认指到它，可被配置覆盖。
     public const string DefaultSocialUpstream = "http://127.0.0.1:65000";
 
@@ -298,6 +302,14 @@ public sealed record CharacterConfig(
             throw new ConfigException("city_task_table 不能为空");
         }
 
+        // Q6/J4：通行证进度表。和城池任务表一样缺表由调用方降级，不在这里抛。
+        var seasonPassProgressTable =
+            (wire.SeasonPassProgressTable ?? DefaultSeasonPassProgressTable).Trim();
+        if (seasonPassProgressTable.Length == 0)
+        {
+            throw new ConfigException("season_pass_progress_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
@@ -305,7 +317,7 @@ public sealed record CharacterConfig(
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
             characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable,
-            cityTaskTable);
+            cityTaskTable, seasonPassProgressTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -402,5 +414,8 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("city_task_table")]
         public string? CityTaskTable { get; init; }
+
+        [JsonPropertyName("season_pass_progress_table")]
+        public string? SeasonPassProgressTable { get; init; }
     }
 }

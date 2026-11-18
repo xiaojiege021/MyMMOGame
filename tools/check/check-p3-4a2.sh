@@ -226,10 +226,18 @@ e = json.load(open(os.path.join(root, "config", "enhance.json"), encoding="utf-8
 for t in e["tiers"]:
     t["success_rate"] = 0.0
 json.dump(e, open(os.path.join(tmp, "enhance-zero.json"), "w", encoding="utf-8"), ensure_ascii=False)
+# Q6 起领取要过点数门槛：这张临时进度表把每阶压到 1 点、一次副本给 100 点，
+# 让本卡原来的「买 → 领三阶」断言仍在同一套规则下成立（不改真表、不改断言的意思）。
+json.dump({"schema": "season-pass-progress/1", "version": 1, "pending": True,
+           "points_per_stage": 1,
+           "sources": [{"id": "check_daily", "kind": "dungeon_clear", "dungeon_id": "abyss",
+                        "points": 100, "period": "daily", "max_per_period": 1}]},
+          open(os.path.join(tmp, "pass-progress.json"), "w", encoding="utf-8"), ensure_ascii=False)
 c = json.load(open(os.path.join(root, "config", "character.json"), encoding="utf-8"))
 c["listen"] = "http://127.0.0.1:62000"
 c["enhance_table"] = os.path.join(tmp, "enhance-zero.json")
 c["global_upstream"] = "http://127.0.0.1:64000"
+c["season_pass_progress_table"] = os.path.join(tmp, "pass-progress.json")
 json.dump(c, open(os.path.join(tmp, "char-real.json"), "w", encoding="utf-8"), ensure_ascii=False)
 PY
   "$DOTNET" "$CD" --migrate --sql "$ROOT/db/character/character.sql" \
@@ -263,6 +271,12 @@ PY
     [ -n "$CID" ] && break; sleep 0.3
   done
   [ -n "$CID" ] && ok "真服：造一个角色（#${CID}）" || { bad "真服：造角色失败"; finish "P3-4a2（通行证）"; }
+  # Q6 起领取要过点数门槛：先按同一份仓储加一次点（100 点，远超本表的三阶门槛）。
+  AWARD="$("$DOTNET" "$CD" --config "$TMP/char-real.json" --pass-season "$CUR" \
+    --pass-point-award "$CID" check_daily --pass-point-ref abyss 2>&1 | tail -1)"
+  printf '%s' "$AWARD" | grep -q 'pass_award=ok .*after=100' \
+    && ok "真服：先给通行证加点（Q6 门槛），check_daily +100" \
+    || bad "真服：通行证加点失败：$(printf '%s' "$AWARD" | utf8)"
   pass_get() { curl -s --noproxy '*' "http://127.0.0.1:61000/season/pass?token=$TOK&character_id=$CID"; }
   claim() {
     curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/season/pass/claim?token=$TOK" \

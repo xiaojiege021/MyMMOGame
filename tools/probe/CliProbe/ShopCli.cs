@@ -327,8 +327,10 @@ internal static class ShopCli
             var passConfig = CharacterConfig.Load(configPath);
             var (passTable, passItems) = LoadSeasonPass(passConfig, seasonPassPath);
             var passSeason = (seasonPassSeason ?? "").Trim();
+            // Q6/J4：领取门槛要读本季点数，进度表与真实启动共用同一条加载链。
+            var passProgress = LoadSeasonPassProgress(passConfig, null);
             var seasonPassRepo = new SeasonPassRepository(
-                dataSource, passTable, passItems, passConfig);
+                dataSource, passTable, passItems, passConfig, passProgress);
 
             if (seasonPassStateOf != 0)
             {

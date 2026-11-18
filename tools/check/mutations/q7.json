@@ -1,0 +1,30 @@
+{
+  "card": "q7",
+  "note": "Q7/H1 队伍系统。三处该被抓住的：人数上限判定、队长继任顺序、准备一致判定。三条都在 check-q7.sh 的无库状态机自检里，不需要库；改坏后 --party-state 应当变红。",
+  "mutations": [
+    {
+      "id": "满员判定失效",
+      "file": "src/Social/PartyRuntime.cs",
+      "kind": "text-replace",
+      "find": "            if (party.Members.Count >= table.MaxSize)\n            {\n                return Result.Fail(\"party_full\");\n            }\n\n            // 同一个人重复邀请同一个目标：刷新超时，不叠第二条。",
+      "replace": "            if (false)\n            {\n                return Result.Fail(\"party_full\");\n            }\n\n            // 同一个人重复邀请同一个目标：刷新超时，不叠第二条。",
+      "expect": "check-q7.sh 的 party_full 步应红（第 5 个人能进 4 人队）"
+    },
+    {
+      "id": "队长继任按角色号倒序",
+      "file": "src/Social/PartyRuntime.cs",
+      "kind": "text-replace",
+      "find": "if (m.JoinedSeq < heir.JoinedSeq)",
+      "replace": "if (m.JoinedSeq > heir.JoinedSeq)",
+      "expect": "check-q7.sh 的 leader_succession 步应红（接手的是最后加入的人）"
+    },
+    {
+      "id": "准备一致判定失效",
+      "file": "src/Social/PartyRuntime.cs",
+      "kind": "text-replace",
+      "find": "allReady && party.ReadyDeadlineUnix != 0 && !party.ReadyExpired",
+      "replace": "true",
+      "expect": "check-q7.sh 的 ready_all 步应红（没确认也算全员已准备）"
+    }
+  ]
+}

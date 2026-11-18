@@ -103,6 +103,9 @@ public sealed class GatewayProcess(string configPath)
         RechargeApi.Map(app, tokens, config);
         // P2-1a1：建 1 级宗门 + 收人入名册。认令牌、复核角色归属、服务端生成事务号。
         SectApi.Map(app, tokens, config);
+        // Q7：队伍（邀请 / 接受 / 准备 / 离队 / 解散 / 只读）。人数上限与两个超时
+        // 只在社交服按 config/party.json 判，网关不算。
+        PartyApi.Map(app, tokens, config);
         // C3：洞府摆放（只做展示和生活）。认令牌、复核归属、生成事务号，
         // 摆放事实与拥有判定全在社交服 / 角色服。
         HomesteadApi.Map(app, tokens, config);

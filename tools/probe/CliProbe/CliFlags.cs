@@ -48,6 +48,16 @@ internal static class CliFlags
     public static string? cityTaskCompleteTask = null;
     public static string? cityTaskTxn = null;
     public static long cityTaskLedgerOf = 0;
+
+    // Q6/J4：通行证进度。--pass-progress-config 只读；其余三个连库核对。
+    public static bool passProgressConfig = false;
+    public static string? passProgressTablePath = null;
+    public static long passPointsOf = 0;
+    public static long passPointAwardOf = 0;
+    public static string? passPointSource = null;
+    public static string? passPointRef = null;
+    public static string? passPointTxn = null;
+    public static long passLedgerOf = 0;
     // K3：把配方表读出来（与启动共用同一 RecipeTable.Load），不连库、不启动进程；坏配置也走这里。
     public static bool recipeList = false;
     public static string? recipeTablePath = null;

@@ -44,6 +44,9 @@ internal static class CliEntry
         code = CityTaskCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = PassProgressCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = MetaCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

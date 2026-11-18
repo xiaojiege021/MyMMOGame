@@ -28,6 +28,20 @@ internal static class CliLoaders
         return (table, items);
     }
 
+    // Q6/J4：通行证进度表的加载链。与真实启动共用同一 SeasonPassProgressTable.Load：
+    // 副本来源必须在 dungeons.json 里、daily / weekly 必须有次数上限。缺表降级。
+    public static SeasonPassProgressTable LoadSeasonPassProgress(CharacterConfig cfg, string? path)
+    {
+        var target = path ?? cfg.SeasonPassProgressTable;
+        if (!File.Exists(target))
+        {
+            return SeasonPassProgressTable.Missing();
+        }
+
+        var dungeons = DungeonTable.Load(cfg.DungeonTable);
+        return SeasonPassProgressTable.Load(target, dungeons);
+    }
+
     // Q5/J2：城池任务表的加载链。与真实启动同一份 CityTaskTable.Load：
     // 城池编号必须在 config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json。
     public static CityTaskTable LoadCityTasks(CharacterConfig cfg, string? path)

@@ -12,7 +12,7 @@ namespace Social;
 /// </summary>
 public sealed class SocialProcess(
     SocialConfig config, SectTable sect, CalendarTable calendar, SectTaskTable taskTable,
-    HomesteadTable? homestead, HomesteadPlantTable? plantTable)
+    PartyTable? partyTable, HomesteadTable? homestead, HomesteadPlantTable? plantTable)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
@@ -48,6 +48,16 @@ public sealed class SocialProcess(
             taskTable.Tasks.Select(t => t.Id + ":" + t.Period + ":" + t.MaxPerPeriod
                 + ":level" + t.RequireLevel + ":" + t.Contribution + "/" + t.Construction))
             + " pending=" + (taskTable.Pending ? "true" : "false"));
+        // Q7：队伍正本逐项打印，与 --party-config 同形（同一份 PartyTable）；缺表降级。
+        Console.WriteLine(partyTable is null ? "party=missing"
+            : "party_config=ok max_size=" + partyTable.MaxSize
+            + " invite_timeout_s=" + partyTable.InviteTimeoutSeconds
+            + " ready_check_timeout_s=" + partyTable.ReadyCheckTimeoutSeconds
+            + " leader_succession=" + partyTable.LeaderSuccession
+            + " loot=" + partyTable.LootRule.Mode + "/" + partyTable.LootRule.Roll
+            + " level_range=" + (partyTable.Levels.Enabled ? "on" : "off")
+            + "/" + partyTable.Levels.MaxGap
+            + " pending=" + (partyTable.Pending ? "true" : "false"));
         // C3：可选内容表。老卡的临时配置目录没有 homestead.json 时只打 missing，
         // 上面 P2-1 的启动日志一行不少（缺表降级不拖垮宗门老链路）。
         Console.WriteLine(homestead is null
@@ -73,6 +83,9 @@ public sealed class SocialProcess(
         await using var dataSource = NpgsqlDataSource.Create(
             DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
         var sects = new SectRepository(dataSource, sect);
+        // Q7：队伍状态只在内存，社交服重启就散；它不碰 dataSource，也不写任何 schema。
+        // 缺表时整个运行时为 null，七个队伍 RPC 一律回 party_unavailable。
+        var parties = partyTable is null ? null : new PartyRuntime(partyTable);
         var tasks = new SectTaskRepository(dataSource, taskTable, calendar);
         using var founderGrant = new SectFounderGrant(config.CharacterUpstream);
         using var levelProbe = new SectTaskLevelProbe(config.CharacterUpstream);
@@ -97,6 +110,15 @@ public sealed class SocialProcess(
         builder.Services.AddSingleton(sect);
         builder.Services.AddSingleton(taskTable);
         builder.Services.AddSingleton(calendar);
+        if (partyTable is not null)
+        {
+            builder.Services.AddSingleton(partyTable);
+        }
+
+        if (parties is not null)
+        {
+            builder.Services.AddSingleton(parties);
+        }
         builder.Services.AddSingleton(sects);
         builder.Services.AddSingleton(tasks);
         builder.Services.AddSingleton(founderGrant);

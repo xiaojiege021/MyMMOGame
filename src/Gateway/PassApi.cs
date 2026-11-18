@@ -54,6 +54,8 @@ public static class PassApi
                     + " found=" + reply.Found
                     + " paid=" + reply.Paid
                     + " price=" + reply.PriceYuanbao
+                    + " points=" + reply.Points
+                    + " per_stage=" + reply.PointsPerStage
                     + " stages=" + reply.Rewards.Count);
 
                 await WriteAsync(context, 200, new
@@ -65,6 +67,9 @@ public static class PassApi
                     paid = reply.Paid,
                     price_yuanbao = reply.PriceYuanbao,
                     protect_item_id = reply.ProtectItemId,
+                    // Q6/J4：本季点数与每阶门槛都是服务端事实值，界面只显示。
+                    points = reply.Points,
+                    points_per_stage = reply.PointsPerStage,
                     rewards = reply.Rewards.Select(r => new
                     {
                         track = r.Track,
@@ -72,6 +77,8 @@ public static class PassApi
                         item_id = r.ItemId,
                         count = r.Count,
                         claimed = r.Claimed,
+                        required_points = r.RequiredPoints,
+                        unlocked = r.Unlocked,
                     }),
                 });
             }

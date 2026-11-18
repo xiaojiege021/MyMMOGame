@@ -58,6 +58,8 @@ public sealed class CharacterGrpcService(
     CityTable cities,
     SiegeTerritoryRepository siegeTerritories,
     SeasonPassTable seasonPassTable,
+    SeasonPassProgressTable seasonPassProgressTable,
+    SeasonPassProgressRepository seasonPassPoints,
     SeasonPassRepository seasonPasses,
     MonthlyBundleTable monthlyBundleTable,
     MonthlyBundleRepository monthlyBundles,
@@ -613,6 +615,24 @@ public sealed class CharacterGrpcService(
                 gate.Reason, dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
         }
 
+        // Q7/H1：人数以社交服的**队伍事实**为准，客户端自报的 party_size 只作提示。
+        // 没有队伍就是 1 人（不多给组队加成）；有队伍就是队里实际人数，并且必须
+        // 全员已准备——「进本时队伍一致」挡在这里，不靠客户端自觉。
+        // 社交服不可达按 1 人（只少给不多给），不阻塞进场。
+        var partyFact = await PartyDirectory.DescribeAsync(
+            social, request.CharacterId, context.CancellationToken);
+        partySize = partyFact.Size;
+        if (partyFact.InParty && !partyFact.AllReady)
+        {
+            logger.LogInformation(
+                "dungeon_reject account={Account} id={Id} dungeon={Dungeon} party={Party} "
+                + "size={Size} reason=party_not_ready",
+                account, characterId, dungeon.Id, partyFact.PartyId, partyFact.Size);
+
+            return Rejected(
+                "party_not_ready", dungeon, reserves.Value.Fatigue, reserves.Value.WeeklyShare);
+        }
+
         // 人数超上限：不是错误码能表达的「业务不允许」，回 allowed=false 让客户端提示。
         if (partySize > dungeon.MaxPlayers)
         {
@@ -878,6 +898,27 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "party_size_invalid"));
         }
 
+        // Q7/H1：**有队伍时**人数与成员一律用队伍事实（自报只作提示）；没有队伍就保留
+        // 调用方给的同场人数——方案 11 写定的是「同一场至少两个人多一截少量加成」，
+        // 那是同场事实，不是队伍事实：世界 Boss 一场 20 人、彼此没组队也要算。
+        // 战斗服的服间直连没有账号，人数是它按本场实际人数算的，同样不受影响。
+        var settleMemberIds = new List<ulong>(request.MemberIds.Count);
+        settleMemberIds.AddRange(request.MemberIds);
+        if (account.Length > 0)
+        {
+            var partyFact = await PartyDirectory.DescribeAsync(
+                social, request.CharacterId, context.CancellationToken);
+            if (partyFact.InParty)
+            {
+                partySize = partyFact.Size;
+                settleMemberIds.Clear();
+                settleMemberIds.AddRange(partyFact.MemberIds);
+                logger.LogInformation(
+                    "exp_settle_party_fact id={Id} party={Party} size={Size} all_ready={AllReady}",
+                    request.CharacterId, partyFact.PartyId, partyFact.Size, partyFact.AllReady);
+            }
+        }
+
         // P3-1a2 补正：历练与等级经验走同一笔。副本编号由战斗服服间直连带上，
         // 空串表示不是副本（表世界、活动等），按方案 8.1 不计历练。
         // 击杀数只是个数，历练数值仍然只从 config/dungeons.json 取，请求带不进来。
@@ -915,7 +956,7 @@ public sealed class CharacterGrpcService(
         // 否则跨服调用会拖长行锁、还可能死锁。社交服只是「额外一截」的来源：
         // 不可达时按「不是同门」处理（少给那一小截），绝不让整笔结算失败——
         // 结算本身（基础 + 组队加成）不能硬依赖社交服，只加经验、不该阻塞。
-        var allSameSect = await ComputeAllSameSectAsync(request.MemberIds, context.CancellationToken);
+        var allSameSect = await ComputeAllSameSectAsync(settleMemberIds, context.CancellationToken);
 
         var reportedDrops = new List<DropLineDef>();
         foreach (var line in request.Drops)
@@ -981,6 +1022,20 @@ public sealed class CharacterGrpcService(
             outcome.DrillGain, outcome.Drill, outcome.DrillReason,
             outcome.DropLines, outcome.DropReason);
 
+        // Q6/J4：副本通关给通行证点数。来源按 config/season_pass_progress.json 的副本编号匹配；
+        // 没配来源的副本（表世界、世界 Boss、活动）不加点。加点幂等键从这次结算的事件号派生，
+        // 所以结算重放只补一次，不会双加。加点失败不回滚经验，只在日志里记一行。
+        if (dungeonId.Length > 0)
+        {
+            var passSource = seasonPassProgressTable.FindByDungeon(dungeonId);
+            if (passSource is not null)
+            {
+                await AwardPassPointsAsync(
+                    (long)request.CharacterId, passSource, dungeonId, txnId,
+                    context.CancellationToken);
+            }
+        }
+
         return new SettleExpResponse
         {
             Duplicate = outcome.Duplicate,
@@ -1013,7 +1068,7 @@ public sealed class CharacterGrpcService(
     /// 也判 false，不臆造同门关系。社交服不可达抛 Unavailable，交给调用方重试。
     /// </summary>
     async Task<bool> ComputeAllSameSectAsync(
-        global::Google.Protobuf.Collections.RepeatedField<ulong> memberIds,
+        IReadOnlyList<ulong> memberIds,
         CancellationToken stopping)
     {
         if (memberIds.Count < 2)
@@ -2262,6 +2317,19 @@ public sealed class CharacterGrpcService(
             characterId, account, txnId, request.Stage, request.Alignment ?? "",
             context.CancellationToken);
 
+        // Q6/J4：主线交任务给通行证点数（来源按配置的 mainline_stage）。重放与补交都按同一个
+        // 事件号幂等：加点流水只有一笔，换季也不重置（period=once）。
+        if (result.Ok || result.Duplicate)
+        {
+            var mainlineSource = seasonPassProgressTable.FindMainline();
+            if (mainlineSource is not null && result.Stage >= 1)
+            {
+                await AwardPassPointsAsync(
+                    characterId, mainlineSource, result.Stage.ToString(), txnId,
+                    context.CancellationToken);
+            }
+        }
+
         return new TurnInMainlineResponse
         {
             Ok = result.Ok,
@@ -2272,6 +2340,49 @@ public sealed class CharacterGrpcService(
             Alignment = result.Alignment,
             TxnId = txnId,
         };
+    }
+
+    /// <summary>
+    /// Q6/J4：给通行证加点。只由服务端事件触发（副本通关 / 主线交任务），客户端没有入口。
+    /// 加点的幂等键从事件的事务号派生：同一事件重放算同一笔，补一次不双加。
+    /// 加点失败不拖垮经验结算与交任务本身——记一行 pass_points= 的失败原因，
+    /// 下一次同一事件重放（或核对入口）会把这一笔补上。
+    /// </summary>
+    async Task AwardPassPointsAsync(
+        long characterId, SeasonPassSourceDef source, string refId, string eventTxn,
+        CancellationToken stopping)
+    {
+        try
+        {
+            var season = await seasonSource.CurrentSeasonAsync(stopping);
+            if (season is null)
+            {
+                logger.LogWarning(
+                    "pass_points id={Id} source={Source} reason=season_unavailable",
+                    characterId, source.Id);
+                return;
+            }
+
+            // 派生键：事件号长短不一，先取 sha256 前 32 个十六进制字符，再加前缀。
+            var digest = System.Security.Cryptography.SHA256.HashData(
+                System.Text.Encoding.UTF8.GetBytes(eventTxn));
+            var txn = "pass_pt:" + Convert.ToHexString(digest)[..32];
+            var outcome = await seasonPassPoints.AwardAsync(
+                characterId, season, source.Id, refId, txn, DateTimeOffset.UtcNow, stopping);
+            logger.LogInformation(
+                "pass_points id={Id} season={Season} source={Source} ref={Ref} ok={Ok} "
+                + "reason={Reason} points={Points} before={Before} after={After} "
+                + "duplicate={Duplicate} txn={Txn}",
+                characterId, season, source.Id, refId, outcome.Ok,
+                outcome.Reason.Length == 0 ? "-" : outcome.Reason, outcome.Points,
+                outcome.PointsBefore, outcome.PointsAfter, outcome.Duplicate, txn);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex, "pass_points id={Id} source={Source} error={Error}",
+                characterId, source.Id, ex.Message);
+        }
     }
 
     /// <summary>
@@ -2359,6 +2470,10 @@ public sealed class CharacterGrpcService(
         }
 
         var state = await seasonPasses.StateAsync(characterId, season, context.CancellationToken);
+        // Q6/J4：本季点数只从库里读一次，阶门槛按「阶号 × points_per_stage」算给界面；
+        // 真正的拒绝仍在领取那一笔事务里再判一遍。
+        var passPointsNow = await seasonPassPoints.PointsAsync(
+            characterId, season, context.CancellationToken);
         var claimed = new HashSet<string>(StringComparer.Ordinal);
         foreach (var row in state.Claims)
         {
@@ -2373,25 +2488,31 @@ public sealed class CharacterGrpcService(
             Paid = state.Paid,
             PriceYuanbao = seasonPassTable.PriceYuanbao,
             ProtectItemId = seasonPassTable.ProtectItemId,
+            Points = passPointsNow,
+            PointsPerStage = seasonPassProgressTable.PointsPerStage,
         };
 
         foreach (var stage in pass.Free)
         {
-            reply.Rewards.Add(PassReward(SeasonPassTable.FreeTrack, stage, claimed));
+            reply.Rewards.Add(PassReward(
+                SeasonPassTable.FreeTrack, stage, claimed, passPointsNow, seasonPassProgressTable));
         }
 
         foreach (var stage in pass.Paid)
         {
-            reply.Rewards.Add(PassReward(SeasonPassTable.PaidTrack, stage, claimed));
+            reply.Rewards.Add(PassReward(
+                SeasonPassTable.PaidTrack, stage, claimed, passPointsNow, seasonPassProgressTable));
         }
 
         return reply;
     }
 
     static SeasonPassReward PassReward(
-        string track, SeasonPassStage stage, HashSet<string> claimed)
+        string track, SeasonPassStage stage, HashSet<string> claimed, long points,
+        SeasonPassProgressTable progress)
     {
         var reward = stage.Rewards[0];
+        var required = progress.RequiredPoints(stage.Stage);
         return new SeasonPassReward
         {
             Track = track,
@@ -2399,6 +2520,8 @@ public sealed class CharacterGrpcService(
             ItemId = reward.ItemId,
             Count = (uint)reward.Count,
             Claimed = claimed.Contains(track + "#" + stage.Stage),
+            RequiredPoints = (uint)required,
+            Unlocked = points >= required,
         };
     }
 

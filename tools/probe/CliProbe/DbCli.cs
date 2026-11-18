@@ -66,6 +66,9 @@ internal static class DbCli
             code = await CityTaskCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await PassProgressCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await InvariantCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -106,6 +109,7 @@ internal static class DbCli
     || stoneListingState
     || siegeResultState || applySiegeResultTxn != null
     || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0
+    || passPointsOf != 0 || passPointAwardOf != 0 || passLedgerOf != 0
     || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null
     || mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0
     || mainlineSeedSettlementOf != 0

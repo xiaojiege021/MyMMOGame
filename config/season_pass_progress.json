@@ -1,8 +1,8 @@
 {
   "schema": "season-pass-progress/1",
-  "version": 1,
+  "version": 2,
   "pending": true,
-  "note": "Q6/J4：通行证进度来源的唯一正本。方案 12.1 只写两轨奖励，没写怎么升阶；这里给点数与来源，全部 pending。代码尚未读取，由 Q6 接入。",
+  "note": "Q6/J4：通行证进度来源的唯一正本。方案 12.1 只写两轨奖励，没写怎么升阶；这里给每阶点数与来源，数值全是方案未写定的占位（pending=true），改这一份就能调，不写进代码。阶门槛 = 阶号 × points_per_stage，点数够才可领该阶；daily / weekly 按 config/calendar.json 的业务日与业务周首计次，once 按角色只给一次（换季也不重置）；点数按季从 0 起，换季不迁移旧点。表里只许出现来源与点数：金币、灵石、物品、装备、副本次数一类字段一律长不出来——通行证点数是进度，不是货币，也不是第二条发货路。",
   "points_per_stage": 100,
   "sources": [
     {

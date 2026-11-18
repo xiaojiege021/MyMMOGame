@@ -30,13 +30,13 @@
     },
     {
       "proto": "proto/mmo/character.proto",
-      "sha256": "8ac2f25ec1283d88efd89cab5f74805cf4b63e67d52571750793f387045aceda",
+      "sha256": "a0577c1fc6c9f0bbdcb865d8f5f28a2c8be909eaaf7eb6ae4537c365103024ec",
       "services": 1,
       "outputs": {
         "server": [
           {
             "path": "src/Shared/Generated/Character.cs",
-            "sha256": "f384496ad023565856bce080d188250d350ce25cc83b4da7bf9519cdca69d4c6"
+            "sha256": "9817d16e3e66cb492122053db47f80653cf896f2447a6ac326dfb02395633fcd"
           },
           {
             "path": "src/Shared/Generated/CharacterGrpc.cs",
@@ -46,7 +46,7 @@
         "client": [
           {
             "path": "client/MMOGame/Assets/Proto/Generated/Character.cs",
-            "sha256": "f384496ad023565856bce080d188250d350ce25cc83b4da7bf9519cdca69d4c6"
+            "sha256": "9817d16e3e66cb492122053db47f80653cf896f2447a6ac326dfb02395633fcd"
           }
         ]
       }
@@ -72,23 +72,23 @@
     },
     {
       "proto": "proto/mmo/social.proto",
-      "sha256": "725c28e10d04e3dd261bcc287783ae381083e25ef0335296cc0e41a553b22ae1",
+      "sha256": "7fdaf5e30523b4cdce8e7384a441af0586dbf874815225ba74cef81c4bc60d80",
       "services": 1,
       "outputs": {
         "server": [
           {
             "path": "src/Shared/Generated/Social.cs",
-            "sha256": "356b8ccdef02934d10ef8755b85423309789ba90b80d2753701a9868620efecb"
+            "sha256": "4ccd780a289486313a5df79ff62fd4149523a5efa8a1a005f9485320f4168916"
           },
           {
             "path": "src/Shared/Generated/SocialGrpc.cs",
-            "sha256": "48ffec7468556eddddae4fbe0101ebc11850e685aab43c04ab6679024a63c882"
+            "sha256": "598eda9ce3e777225aa35a3cf568d29051ddd453e28974e592cd78c92d7ed61d"
           }
         ],
         "client": [
           {
             "path": "client/MMOGame/Assets/Proto/Generated/Social.cs",
-            "sha256": "356b8ccdef02934d10ef8755b85423309789ba90b80d2753701a9868620efecb"
+            "sha256": "4ccd780a289486313a5df79ff62fd4149523a5efa8a1a005f9485320f4168916"
           }
         ]
       }

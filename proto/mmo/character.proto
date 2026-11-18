@@ -1224,6 +1224,10 @@ message SeasonPassReward {
   string item_id = 3;
   uint32 count = 4;
   bool claimed = 5;
+  // Q6/J4：这一阶要多少点（阶号 × points_per_stage）与此刻够不够。
+  // 两个都是服务端事实值：门槛来自 config/season_pass_progress.json，点数来自库里。
+  uint32 required_points = 6;
+  bool unlocked = 7;
 }
 
 message DescribeSeasonPassResponse {
@@ -1240,6 +1244,9 @@ message DescribeSeasonPassResponse {
   // 保护券的编号（enhance.json 的 protect_item_id）。它和商城卖的是同一种券，
   // 回包里给出来只是让界面能显示「这一阶给什么」。
   string protect_item_id = 8;
+  // Q6/J4：本季已攒的点数，与每阶要多少点。领取时点数不够回 points_not_enough。
+  int64 points = 9;
+  int32 points_per_stage = 10;
 }
 
 // 领取只带轨与阶。季由角色服向全局服务确认，物品编号与数量全从配置读。
@@ -1255,7 +1262,8 @@ message ClaimSeasonPassRequest {
 message ClaimSeasonPassResponse {
   bool ok = 1;
   // unknown_track / unknown_stage / pass_not_owned / already_claimed / bag_full /
-  // season_unavailable / character_not_found / txn_missing / duplicate。
+  // season_unavailable / character_not_found / txn_missing / duplicate /
+  // points_not_enough（Q6：本季点数不够这一阶的门槛）/ progress_table_missing。
   string reason = 2;
   string season_id = 3;
   string track = 4;

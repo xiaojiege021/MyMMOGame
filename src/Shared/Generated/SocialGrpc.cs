@@ -99,6 +99,16 @@ namespace Mmo.Proto.Social {
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectRosterRequest> __Marshaller_mmo_social_DescribeSectRosterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectRosterRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectRosterResponse> __Marshaller_mmo_social_DescribeSectRosterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectRosterResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.PartyInviteRequest> __Marshaller_mmo_social_PartyInviteRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PartyInviteRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.PartyResponse> __Marshaller_mmo_social_PartyResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PartyResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.PartyRespondRequest> __Marshaller_mmo_social_PartyRespondRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PartyRespondRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.PartyRequest> __Marshaller_mmo_social_PartyRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PartyRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.PartyReadyRequest> __Marshaller_mmo_social_PartyReadyRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.PartyReadyRequest.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse> __Method_CreateSect = new grpc::Method<global::Mmo.Proto.Social.CreateSectRequest, global::Mmo.Proto.Social.SectResponse>(
@@ -275,6 +285,62 @@ namespace Mmo.Proto.Social {
         "DescribeSectRoster",
         __Marshaller_mmo_social_DescribeSectRosterRequest,
         __Marshaller_mmo_social_DescribeSectRosterResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PartyInviteRequest, global::Mmo.Proto.Social.PartyResponse> __Method_InviteParty = new grpc::Method<global::Mmo.Proto.Social.PartyInviteRequest, global::Mmo.Proto.Social.PartyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "InviteParty",
+        __Marshaller_mmo_social_PartyInviteRequest,
+        __Marshaller_mmo_social_PartyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PartyRespondRequest, global::Mmo.Proto.Social.PartyResponse> __Method_RespondPartyInvite = new grpc::Method<global::Mmo.Proto.Social.PartyRespondRequest, global::Mmo.Proto.Social.PartyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RespondPartyInvite",
+        __Marshaller_mmo_social_PartyRespondRequest,
+        __Marshaller_mmo_social_PartyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse> __Method_StartPartyReadyCheck = new grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "StartPartyReadyCheck",
+        __Marshaller_mmo_social_PartyRequest,
+        __Marshaller_mmo_social_PartyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PartyReadyRequest, global::Mmo.Proto.Social.PartyResponse> __Method_SetPartyReady = new grpc::Method<global::Mmo.Proto.Social.PartyReadyRequest, global::Mmo.Proto.Social.PartyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SetPartyReady",
+        __Marshaller_mmo_social_PartyReadyRequest,
+        __Marshaller_mmo_social_PartyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse> __Method_LeaveParty = new grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "LeaveParty",
+        __Marshaller_mmo_social_PartyRequest,
+        __Marshaller_mmo_social_PartyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse> __Method_DisbandParty = new grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DisbandParty",
+        __Marshaller_mmo_social_PartyRequest,
+        __Marshaller_mmo_social_PartyResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse> __Method_DescribeParty = new grpc::Method<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeParty",
+        __Marshaller_mmo_social_PartyRequest,
+        __Marshaller_mmo_social_PartyResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -465,6 +531,55 @@ namespace Mmo.Proto.Social {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.DescribeSectRosterResponse> DescribeSectRoster(global::Mmo.Proto.Social.DescribeSectRosterRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q7：队伍。邀请 / 接受 / 离队 / 解散 / 发起准备 / 确认准备 / 只读。
+      /// 状态只在社交服内存；进本与结算由角色服读 DescribeParty 的事实值。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PartyResponse> InviteParty(global::Mmo.Proto.Social.PartyInviteRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PartyResponse> RespondPartyInvite(global::Mmo.Proto.Social.PartyRespondRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PartyResponse> StartPartyReadyCheck(global::Mmo.Proto.Social.PartyRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PartyResponse> SetPartyReady(global::Mmo.Proto.Social.PartyReadyRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PartyResponse> LeaveParty(global::Mmo.Proto.Social.PartyRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PartyResponse> DisbandParty(global::Mmo.Proto.Social.PartyRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.PartyResponse> DescribeParty(global::Mmo.Proto.Social.PartyRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1174,6 +1289,178 @@ namespace Mmo.Proto.Social {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeSectRoster, null, options, request);
       }
+      /// <summary>
+      /// Q7：队伍。邀请 / 接受 / 离队 / 解散 / 发起准备 / 确认准备 / 只读。
+      /// 状态只在社交服内存；进本与结算由角色服读 DescribeParty 的事实值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse InviteParty(global::Mmo.Proto.Social.PartyInviteRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return InviteParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q7：队伍。邀请 / 接受 / 离队 / 解散 / 发起准备 / 确认准备 / 只读。
+      /// 状态只在社交服内存；进本与结算由角色服读 DescribeParty 的事实值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse InviteParty(global::Mmo.Proto.Social.PartyInviteRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_InviteParty, null, options, request);
+      }
+      /// <summary>
+      /// Q7：队伍。邀请 / 接受 / 离队 / 解散 / 发起准备 / 确认准备 / 只读。
+      /// 状态只在社交服内存；进本与结算由角色服读 DescribeParty 的事实值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> InvitePartyAsync(global::Mmo.Proto.Social.PartyInviteRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return InvitePartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q7：队伍。邀请 / 接受 / 离队 / 解散 / 发起准备 / 确认准备 / 只读。
+      /// 状态只在社交服内存；进本与结算由角色服读 DescribeParty 的事实值。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> InvitePartyAsync(global::Mmo.Proto.Social.PartyInviteRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_InviteParty, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse RespondPartyInvite(global::Mmo.Proto.Social.PartyRespondRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RespondPartyInvite(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse RespondPartyInvite(global::Mmo.Proto.Social.PartyRespondRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RespondPartyInvite, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> RespondPartyInviteAsync(global::Mmo.Proto.Social.PartyRespondRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RespondPartyInviteAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> RespondPartyInviteAsync(global::Mmo.Proto.Social.PartyRespondRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RespondPartyInvite, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse StartPartyReadyCheck(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return StartPartyReadyCheck(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse StartPartyReadyCheck(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_StartPartyReadyCheck, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> StartPartyReadyCheckAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return StartPartyReadyCheckAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> StartPartyReadyCheckAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_StartPartyReadyCheck, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse SetPartyReady(global::Mmo.Proto.Social.PartyReadyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SetPartyReady(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse SetPartyReady(global::Mmo.Proto.Social.PartyReadyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SetPartyReady, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> SetPartyReadyAsync(global::Mmo.Proto.Social.PartyReadyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SetPartyReadyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> SetPartyReadyAsync(global::Mmo.Proto.Social.PartyReadyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SetPartyReady, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse LeaveParty(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return LeaveParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse LeaveParty(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_LeaveParty, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> LeavePartyAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return LeavePartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> LeavePartyAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_LeaveParty, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse DisbandParty(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DisbandParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse DisbandParty(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DisbandParty, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> DisbandPartyAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DisbandPartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> DisbandPartyAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DisbandParty, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse DescribeParty(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.PartyResponse DescribeParty(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeParty, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> DescribePartyAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribePartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.PartyResponse> DescribePartyAsync(global::Mmo.Proto.Social.PartyRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeParty, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override SocialServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -1209,7 +1496,14 @@ namespace Mmo.Proto.Social {
           .AddMethod(__Method_PlantHomesteadCrop, serviceImpl.PlantHomesteadCrop)
           .AddMethod(__Method_HarvestHomesteadCrop, serviceImpl.HarvestHomesteadCrop)
           .AddMethod(__Method_DescribeHomesteadPlants, serviceImpl.DescribeHomesteadPlants)
-          .AddMethod(__Method_DescribeSectRoster, serviceImpl.DescribeSectRoster).Build();
+          .AddMethod(__Method_DescribeSectRoster, serviceImpl.DescribeSectRoster)
+          .AddMethod(__Method_InviteParty, serviceImpl.InviteParty)
+          .AddMethod(__Method_RespondPartyInvite, serviceImpl.RespondPartyInvite)
+          .AddMethod(__Method_StartPartyReadyCheck, serviceImpl.StartPartyReadyCheck)
+          .AddMethod(__Method_SetPartyReady, serviceImpl.SetPartyReady)
+          .AddMethod(__Method_LeaveParty, serviceImpl.LeaveParty)
+          .AddMethod(__Method_DisbandParty, serviceImpl.DisbandParty)
+          .AddMethod(__Method_DescribeParty, serviceImpl.DescribeParty).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -1241,6 +1535,13 @@ namespace Mmo.Proto.Social {
       serviceBinder.AddMethod(__Method_HarvestHomesteadCrop, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.HomesteadPlantRequest, global::Mmo.Proto.Social.HomesteadPlantResponse>(serviceImpl.HarvestHomesteadCrop));
       serviceBinder.AddMethod(__Method_DescribeHomesteadPlants, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeHomesteadPlantsRequest, global::Mmo.Proto.Social.HomesteadPlantResponse>(serviceImpl.DescribeHomesteadPlants));
       serviceBinder.AddMethod(__Method_DescribeSectRoster, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeSectRosterRequest, global::Mmo.Proto.Social.DescribeSectRosterResponse>(serviceImpl.DescribeSectRoster));
+      serviceBinder.AddMethod(__Method_InviteParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PartyInviteRequest, global::Mmo.Proto.Social.PartyResponse>(serviceImpl.InviteParty));
+      serviceBinder.AddMethod(__Method_RespondPartyInvite, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PartyRespondRequest, global::Mmo.Proto.Social.PartyResponse>(serviceImpl.RespondPartyInvite));
+      serviceBinder.AddMethod(__Method_StartPartyReadyCheck, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(serviceImpl.StartPartyReadyCheck));
+      serviceBinder.AddMethod(__Method_SetPartyReady, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PartyReadyRequest, global::Mmo.Proto.Social.PartyResponse>(serviceImpl.SetPartyReady));
+      serviceBinder.AddMethod(__Method_LeaveParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(serviceImpl.LeaveParty));
+      serviceBinder.AddMethod(__Method_DisbandParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(serviceImpl.DisbandParty));
+      serviceBinder.AddMethod(__Method_DescribeParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.PartyRequest, global::Mmo.Proto.Social.PartyResponse>(serviceImpl.DescribeParty));
     }
 
   }

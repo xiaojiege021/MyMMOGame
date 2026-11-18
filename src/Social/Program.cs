@@ -52,6 +52,11 @@ long homesteadStateOf = 0;
 string[]? homesteadPlace = null;
 string[]? homesteadRemove = null;
 string? homesteadPlantTablePath = null;
+// Q7：队伍只读入口。--party-config 打正本，--party-state 跑内存状态机自检（都不连库），
+// --party-table 指向坏表时与真实启动走同一份硬校验。
+string? partyTablePath = null;
+var partyConfig = false;
+var partyState = false;
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -126,6 +131,16 @@ for (var i = 0; i < args.Length; i++)
         // P2-1a4：升级只读入口 + 仅核对用的建设赋值（不对外、不作为玩法来源）。
         case "--sect-upgrade-config":
             sectUpgradeConfig = true;
+            break;
+        // Q7：队伍正本 / 状态机自检（--at 让超时用例不真的等一分钟）。
+        case "--party-table" when i + 1 < args.Length:
+            partyTablePath = args[++i];
+            break;
+        case "--party-config":
+            partyConfig = true;
+            break;
+        case "--party-state":
+            partyState = true;
             break;
         // Q4：任务表只读口 + 连库只读口（面板 / 流水）。
         case "--sect-task-config":
@@ -245,6 +260,74 @@ if (homesteadConfig)
     }
 
     return 0;
+}
+
+// --party-config：不连库，逐项打印队伍正本。坏表在这一步就起不来
+// （config_error= + 非 0 退出），与真实启动共用同一份 Load + 同一组参数。
+if (partyConfig)
+{
+    try
+    {
+        var loaded = SocialLoader.LoadAll(
+            configPath, sectTablePath, calendarTablePath, sectTaskTablePath, partyTablePath);
+        var table = loaded.Party;
+        if (table is null)
+        {
+            Console.WriteLine("party=missing（可选表：缺 " + partyTablePath + " / config/party.json）");
+            return 0;
+        }
+
+        Console.WriteLine("party_config_state=ok version=" + table.Version
+            + " max_size=" + table.MaxSize
+            + " invite_timeout_s=" + table.InviteTimeoutSeconds
+            + " ready_check_timeout_s=" + table.ReadyCheckTimeoutSeconds
+            + " leader_succession=" + table.LeaderSuccession
+            + " loot=" + table.LootRule.Mode + "/" + table.LootRule.Roll
+            + " level_range=" + (table.Levels.Enabled ? "on" : "off")
+            + "/" + table.Levels.MaxGap
+            + " pending=" + (table.Pending ? "true" : "false"));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
+// --party-state：不连库，把队伍状态机一步步跑完并逐行打 party_step=。
+// 超时用例用 --at 推时钟，不真的等一分钟；坏表同样在这一步起不来。
+if (partyState)
+{
+    try
+    {
+        var loaded = SocialLoader.LoadAll(
+            configPath, sectTablePath, calendarTablePath, sectTaskTablePath, partyTablePath);
+        if (loaded.Party is null)
+        {
+            Console.WriteLine("party=missing（可选表：缺 party.json，队伍 RPC 回 party_unavailable）");
+            return 0;
+        }
+
+        return PartyProbe.Run(loaded.Party, sectTaskAt ?? DateTimeOffset.UtcNow,
+            line => Console.WriteLine(line));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
 }
 
 // --sect-config：不连库，逐档打印配置正本。坏配置在这一步就起不来
@@ -771,5 +854,5 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
 });
 
 return await new SocialProcess(
-    startup.Config, startup.Sect, startup.Calendar, startup.Tasks,
+    startup.Config, startup.Sect, startup.Calendar, startup.Tasks, startup.Party,
     startupHomestead, startupHomesteadPlant).RunAsync(stop.Token);

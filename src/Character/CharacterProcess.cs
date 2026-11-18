@@ -52,6 +52,7 @@ public sealed class CharacterProcess(string configPath)
         CalendarTable calendar;
         RecipeTable recipeTable;
         CityTaskTable cityTaskTable;
+        SeasonPassProgressTable seasonPassProgressTable;
         DungeonDropTable dungeonDropTable;
         MainlineDropTable mainlineDropTable;
         try
@@ -150,6 +151,11 @@ public sealed class CharacterProcess(string configPath)
             cityTaskTable = File.Exists(config.CityTaskTable)
                 ? CityTaskTable.Load(config.CityTaskTable, cityTable, stoneExchange, realms)
                 : CityTaskTable.Empty;
+            // Q6/J4：通行证点数与来源的正本。副本来源必须真的在 dungeons.json 里，
+            // daily / weekly 必须有次数上限；缺表降级成「没有来源」，老卡环境照常起。
+            seasonPassProgressTable = File.Exists(config.SeasonPassProgressTable)
+                ? SeasonPassProgressTable.Load(config.SeasonPassProgressTable, dungeons)
+                : SeasonPassProgressTable.Missing();
             var dungeonDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
             dungeonDropTable = DungeonDropTable.LoadIfPresent(
@@ -314,6 +320,22 @@ public sealed class CharacterProcess(string configPath)
             + " highest=" + stoneExchange.HighestKind + "/" + stoneExchange.HighestName
             + " ingot=" + stoneExchange.IngotKind
             + " version=" + stoneExchange.Version);
+        // Q6/J4：通行证进度的事实值。每阶点数与来源全在 config/season_pass_progress.json，
+        // 与 --pass-progress-config 的只读入口同一个键名、同一组字段。
+        Console.WriteLine("season_pass_progress=version=" + seasonPassProgressTable.Version
+            + " pending=" + (seasonPassProgressTable.Pending ? "true" : "false")
+            + " points_per_stage=" + seasonPassProgressTable.PointsPerStage
+            + " sources=" + seasonPassProgressTable.Sources.Count);
+        foreach (var source in seasonPassProgressTable.Sources)
+        {
+            Console.WriteLine("season_pass_source=" + source.Id
+                + " kind=" + source.Kind
+                + " dungeon=" + (source.DungeonId.Length == 0 ? "-" : source.DungeonId)
+                + " points=" + source.Points
+                + " period=" + source.Period
+                + " max=" + source.MaxPerPeriod);
+        }
+
         // P3-4a2：通行证两轨的事实值。改配置重启后这里能直接核对到：
         // 标价来自 shop.json 那条 season_pass 商品，保护券就是 enhance.json 那一件。
         Console.WriteLine("season_pass=version=" + seasonPassTable.Version
@@ -515,7 +537,11 @@ public sealed class CharacterProcess(string configPath)
         var siegeTerritories = new SiegeTerritoryRepository(
             dataSource, cityTable, siegeTerritoryPolicy);
         // P3-4a2：通行证的唯一写入点。买与领各一笔事务，奖励物品与数量只从配置读。
-        var seasonPasses = new SeasonPassRepository(dataSource, seasonPassTable, items, config);
+        // Q6/J4：点数与来源的唯一写入点。领取那一笔在 SeasonPassRepository 里读本表算门槛。
+        var seasonPassPoints = new SeasonPassProgressRepository(
+            dataSource, seasonPassProgressTable, calendar);
+        var seasonPasses = new SeasonPassRepository(
+            dataSource, seasonPassTable, items, config, seasonPassProgressTable);
         // P3-4b：月叠的唯一写入点（扣元宝 + 两种符一次到账，跨堆叠上限就占多格），
         // 与第二角色栏的名额事务（账号一行、只存总名额）。
         var monthlyBundles = new MonthlyBundleRepository(dataSource, monthlyBundleTable, items, config);
@@ -598,6 +624,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(siegeTerritoryPolicy);
         builder.Services.AddSingleton(social);
         builder.Services.AddSingleton(seasonPassTable);
+        builder.Services.AddSingleton(seasonPassProgressTable);
+        builder.Services.AddSingleton(seasonPassPoints);
         builder.Services.AddSingleton(seasonPasses);
         builder.Services.AddSingleton(monthlyBundleTable);
         builder.Services.AddSingleton(monthlyBundles);

@@ -1,11 +1,12 @@
 {
   "schema": "party-table/1",
-  "version": 1,
+  "version": 2,
   "pending": true,
-  "note": "Q7/Q8：队伍与分配的唯一正本。方案 11 写定 4 人小队；邀请、准备、分配规则方案没写，全部 pending。代码尚未读取，由 Q7/Q8 接入。",
+  "note": "Q7/H1 队伍与 Q8 分配的唯一正本。方案 11 写定「小队是 4 人战斗单元」，人数上限按 4；邀请超时、准备超时、队长继任、等级区间方案没写，全部是占位值，改这份配置重启社交服生效。loot 段归 Q8 掉落分配，Q7 只校验可读、不落地。",
   "max_size": 4,
   "invite_timeout_s": 60,
   "ready_check_timeout_s": 30,
+  "leader_succession": "earliest_joined",
   "loot": {
     "mode": "personal",
     "roll": "none"

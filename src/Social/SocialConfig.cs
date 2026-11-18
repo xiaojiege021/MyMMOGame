@@ -10,11 +10,12 @@ namespace Social;
 /// </summary>
 public sealed record SocialConfig(
     string Listen, int DbPoolMax, string SectTable, string CalendarTable,
-    string SectTaskTable, string CharacterUpstream)
+    string SectTaskTable, string PartyTable, string CharacterUpstream)
 {
     public const string DefaultSectTable = "config/sect.json";
     public const string DefaultCalendarTable = "config/calendar.json";
     public const string DefaultSectTaskTable = "config/sect_tasks.json";
+    public const string DefaultPartyTable = "config/party.json";
     public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
 
     public static SocialConfig Load(string path)
@@ -70,6 +71,13 @@ public sealed record SocialConfig(
             throw new ConfigException("sect_task_table 不能为空");
         }
 
+        // Q7：队伍的人数上限 / 邀请超时 / 准备超时只在这份正本里，可选键缺省。
+        var partyTable = (wire.PartyTable ?? DefaultPartyTable).Trim();
+        if (partyTable.Length == 0)
+        {
+            throw new ConfigException("party_table 不能为空");
+        }
+
         // 创建金币的扣减经角色服 ApplyGrant，社交服不碰角色 schema。
         var character = (wire.CharacterUpstream ?? DefaultCharacterUpstream).Trim().TrimEnd('/');
         if (!Uri.TryCreate(character, UriKind.Absolute, out var characterUri)
@@ -79,7 +87,7 @@ public sealed record SocialConfig(
         }
 
         return new SocialConfig(listen.TrimEnd('/'), pool, sectTable, calendarTable,
-            sectTaskTable, character);
+            sectTaskTable, partyTable, character);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -104,6 +112,9 @@ public sealed record SocialConfig(
 
         [JsonPropertyName("sect_task_table")]
         public string? SectTaskTable { get; init; }
+
+        [JsonPropertyName("party_table")]
+        public string? PartyTable { get; init; }
 
         [JsonPropertyName("character_upstream")]
         public string? CharacterUpstream { get; init; }

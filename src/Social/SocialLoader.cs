@@ -14,13 +14,14 @@ namespace Social;
 /// </summary>
 public sealed record SocialTables(
     SocialConfig Config, SectTable Sect, CalendarTable Calendar,
-    SectTaskTable Tasks);
+    SectTaskTable Tasks, PartyTable? Party);
 
 public static class SocialLoader
 {
     public static SocialTables LoadAll(
         string configPath, string? sectTablePath,
-        string? calendarTablePath = null, string? sectTaskTablePath = null)
+        string? calendarTablePath = null, string? sectTaskTablePath = null,
+        string? partyTablePath = null)
     {
         var config = SocialConfig.Load(configPath);
         var sect = SectTable.Load(sectTablePath ?? config.SectTable);
@@ -36,6 +37,9 @@ public static class SocialLoader
         }
 
         var tasks = SectTaskTable.Load(sectTaskTablePath ?? config.SectTaskTable);
-        return new SocialTables(config, sect, calendar, tasks);
+        // Q7：队伍正本是**可选表**——老卡的临时配置目录没有 party.json 时照常起服务
+        // （队伍 RPC 回 party_unavailable）；有文件但内容坏了仍然起不来。
+        var party = PartyTable.LoadIfPresent(partyTablePath ?? config.PartyTable);
+        return new SocialTables(config, sect, calendar, tasks, party);
     }
 }

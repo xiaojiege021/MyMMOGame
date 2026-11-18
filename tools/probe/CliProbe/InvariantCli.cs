@@ -352,6 +352,33 @@ internal static class InvariantCli
                 where not exists (
                     select 1 from "角色".grant_txn g where g.txn_id = l.txn_id)
                 """),
+            // Q6：本季点数 = 该季流水之和。少于说明有人绕开流水直改点数；
+            // 多于说明流水没写进去。两种都算违反，不看流水为空就算过。
+            new("INV-22", "season_pass_points_match_ledger", """
+                select 'character=' || p.character_id || ' season=' || p.season_id
+                       || ' points=' || p.points || ' ledger=' || coalesce(sum(l.points), 0) as detail
+                from "角色".season_pass_points p
+                left join "角色".season_pass_point_ledger l
+                       on l.character_id = p.character_id and l.season_id = p.season_id
+                group by p.character_id, p.season_id, p.points
+                having p.points <> coalesce(sum(l.points), 0)
+                union all
+                select 'ledger-only character=' || l.character_id || ' season=' || l.season_id as detail
+                from "角色".season_pass_point_ledger l
+                where not exists (
+                    select 1 from "角色".season_pass_points p
+                    where p.character_id = l.character_id and p.season_id = l.season_id)
+                """),
+            // Q6：period=once 的来源跨季也只给一次。同一角色同一来源出现两笔，
+            // 说明周期键被改过或绕开仓储写过流水。
+            new("INV-23", "season_pass_once_source_single", """
+                select 'character=' || character_id || ' source=' || source_id
+                       || ' rows=' || count(*) as detail
+                from "角色".season_pass_point_ledger
+                where period_key = 'once'
+                group by character_id, source_id
+                having count(*) > 1
+                """),
         ];
     }
 

@@ -42,6 +42,27 @@ source "$ROOT/tools/check/lib-common.sh"
 MUT_DIR="$ROOT/tools/check/mutations"
 TMP="$(mktemp -d)"
 
+DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
+[ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
+
+# 还原之后必须强制重编：dotnet 的增量构建按输入哈希判定，源码还原成字节相同的内容后
+# 它会认定「产物已是最新」，而 bin 里躺着的仍是变异版 dll。不重编，下一张卡跑核对会
+# 读到被改坏的二进制——这是 Q7 实际踩到的（状态机自检在源码已还原的情况下仍红）。
+force_rebuild() {
+  local f="$1" dir name
+  case "$f" in
+    src/*/*.cs) dir="src/$(printf '%s' "$f" | cut -d/ -f2)" ;;
+    *) return 0 ;;
+  esac
+  name="$(basename "$dir")"
+  [ -f "$ROOT/$dir/$name.csproj" ] || return 0
+  [ -n "$DOTNET" ] || return 0
+  "$DOTNET" build "$ROOT/$dir/$name.csproj" -c Release -t:Rebuild --nologo -v q \
+    >"$TMP/rebuild-$name.log" 2>&1 || {
+      printf '       （%s 还原后强制重编失败，见 %s）\n' "$dir" "$TMP/rebuild-$name.log"
+    }
+}
+
 RESTORE_FILE=""
 RESTORE_BAK=""
 cleanup() {
@@ -302,6 +323,7 @@ EOF
     fi
 
     cp "$RESTORE_BAK" "$src"
+    force_rebuild "$mfile"
     after="$(file_md5 "$src")"
     if [ "$before" != "$after" ]; then
       bad "还原失败：$mfile 的 md5 与变异前不一致"

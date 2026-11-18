@@ -30,7 +30,8 @@ public sealed class SeasonPassException(string code) : Exception(code)
 ///   · 买：锁角色行 → 先抢事务号 → 本季已经买过就 already_owned（不重复扣）→
 ///     带余额条件扣元宝 → 写 season_pass 一行（付费轨开了）→ 事务内读回余额 → 提交。
 ///     通行证在商城按标价卖，价格只从 shop.json 读；买下不往背包放东西。
-///   · 领：锁角色行 → 先抢事务号 → 付费轨要真的有 season_pass 那一行 → 这一阶没领过 →
+///   · 领：锁角色行 → 先抢事务号 → 付费轨要真的有 season_pass 那一行 →
+///     **本季点数够不够这一阶的门槛（阶号 × points_per_stage，Q6/J4）** → 这一阶没领过 →
 ///     挑格子入包（数量、堆叠、绑定都按物品表）→ 写 season_pass_claim → 提交。
 ///
 /// 奖励物品、数量、阶号全从 SeasonPassTable 读，请求里只有「哪一轨、第几阶」。
@@ -40,7 +41,8 @@ public sealed class SeasonPassRepository(
     NpgsqlDataSource dataSource,
     SeasonPassTable table,
     ItemTable items,
-    CharacterConfig config)
+    CharacterConfig config,
+    SeasonPassProgressTable progress)
 {
     public const int MaxTxnLength = 64;
 
@@ -194,6 +196,19 @@ public sealed class SeasonPassRepository(
                 throw new SeasonPassException("pass_not_owned");
             }
 
+            // Q6/J4：阶门槛只认服务端记下的本季点数。点数不够就拒，绝不「先领后补」；
+            // 点数是只增不减的事实值，读它不需要锁本季点数行。
+            if (progress.IsMissing)
+            {
+                throw new SeasonPassException("progress_table_missing");
+            }
+
+            var points = await SeasonPassPointsAsync(connection, tx, characterId, season, stopping);
+            if (points < progress.RequiredPoints(stage))
+            {
+                throw new SeasonPassException("points_not_enough");
+            }
+
             if (await ClaimedAsync(connection, tx, characterId, season, rail, stage, stopping))
             {
                 throw new SeasonPassException("already_claimed");
@@ -336,6 +351,21 @@ public sealed class SeasonPassRepository(
         read.Parameters.AddWithValue(track);
         read.Parameters.AddWithValue(stage);
         return await read.ExecuteScalarAsync(stopping) is not null;
+    }
+
+    /// <summary>本季点了多少点。Q6/J4 的阶门槛只读这一个事实值。</summary>
+    static async Task<long> SeasonPassPointsAsync(
+        NpgsqlConnection connection, NpgsqlTransaction transaction, long characterId,
+        string seasonId, CancellationToken stopping)
+    {
+        await using var read = new NpgsqlCommand(
+            "select points from \"角色\".season_pass_points "
+            + "where character_id = $1 and season_id = $2",
+            connection, transaction);
+        read.Parameters.AddWithValue(characterId);
+        read.Parameters.AddWithValue(seasonId);
+        var value = await read.ExecuteScalarAsync(stopping);
+        return value is null or DBNull ? 0 : Convert.ToInt64(value);
     }
 
     /// <summary>带余额条件扣元宝。扣不动说明不够，整笔回滚。</summary>

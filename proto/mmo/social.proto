@@ -360,6 +360,68 @@ message DescribeSectRosterResponse {
   repeated SectRosterMember members = 4;
 }
 
+// Q7/H1：队伍。状态只在社交服进程内存（技术架构第 3 节：在线关系类临时态放进程内存），
+// 不落 schema、不发奖、不结算技能，社交服重启或全员掉线就散。人数上限、邀请超时、
+// 准备超时、队长继任方式只从 config/party.json 读，请求里带不进来；回包里的
+// party_id / leader_character_id / size / max_size / all_ready / ready_deadline_ms
+// 都是服务端算的只读事实值。业务拒绝走 ok=false + reason，未生效数值给 0。
+message PartyInviteRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 target_character_id = 4;
+}
+
+// 接受 / 拒绝邀请。from_character_id 是邀请人（不是队伍编号：队伍编号由服务端给）。
+message PartyRespondRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 from_character_id = 4;
+  bool accept = 5;
+}
+
+message PartyReadyRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  bool ready = 4;
+}
+
+// 只读 / 离队 / 解散 / 发起准备检查：只带发起者，别的判定值一概带不进来。
+message PartyRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+}
+
+message PartyMemberFact {
+  uint64 character_id = 1;
+  bool is_leader = 2;
+  bool ready = 3;
+  // 加入顺序，队长继任按它取最小；只作核对，客户端带不进来。
+  int64 joined_seq = 4;
+}
+
+message PartyResponse {
+  bool ok = 1;
+  // request_missing / target_invalid / target_in_party / not_leader / party_full /
+  // not_in_party / invite_not_found / invite_expired / invite_pending /
+  // ready_check_missing；空串表示这一笔做成了。
+  // declined 是「对方拒了邀请」，也是正常回包。
+  string reason = 2;
+  uint64 party_id = 3;
+  uint64 leader_character_id = 4;
+  int32 size = 5;
+  int32 max_size = 6;
+  bool all_ready = 7;
+  int64 ready_deadline_ms = 8;
+  repeated PartyMemberFact members = 9;
+  string txn_id = 10;
+  // 不在队伍时 in_party=false，其余事实值一律 0 / 空。
+  bool in_party = 11;
+}
+
 service SocialService {
   rpc CreateSect(CreateSectRequest) returns (SectResponse);
   rpc JoinSect(JoinSectRequest) returns (SectResponse);
@@ -394,4 +456,13 @@ service SocialService {
   rpc DescribeHomesteadPlants(DescribeHomesteadPlantsRequest) returns (HomesteadPlantResponse);
   // N2：名册逐条只读。不任免、不改人数上限、不写库。
   rpc DescribeSectRoster(DescribeSectRosterRequest) returns (DescribeSectRosterResponse);
+  // Q7：队伍。邀请 / 接受 / 离队 / 解散 / 发起准备 / 确认准备 / 只读。
+  // 状态只在社交服内存；进本与结算由角色服读 DescribeParty 的事实值。
+  rpc InviteParty(PartyInviteRequest) returns (PartyResponse);
+  rpc RespondPartyInvite(PartyRespondRequest) returns (PartyResponse);
+  rpc StartPartyReadyCheck(PartyRequest) returns (PartyResponse);
+  rpc SetPartyReady(PartyReadyRequest) returns (PartyResponse);
+  rpc LeaveParty(PartyRequest) returns (PartyResponse);
+  rpc DisbandParty(PartyRequest) returns (PartyResponse);
+  rpc DescribeParty(PartyRequest) returns (PartyResponse);
 }
