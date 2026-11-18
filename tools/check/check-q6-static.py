@@ -84,12 +84,15 @@ report("sql_in_main_migration",
 migrations = json.loads(read("db/migrations.json"))
 character_entries = next((s.get("entries", []) for s in migrations.get("schemas", [])
                           if s.get("key") == "character"), [])
-last = character_entries[-1] if character_entries else {}
-report("migration_registered", last.get("file") == "db/character/season_pass_progress.sql"
-       and isinstance(last.get("version"), int), last)
-report("migration_appended", all(e.get("version", 0) < last.get("version", 0)
-                                 for e in character_entries[:-1]),
-       "新版本号比已有条目都大")
+# 只认「season_pass_progress.sql 在这张表里、版本号比排在它前面的都大」。
+# 不钉「它必须是最后一条」——Q9 的 deserter_penalty.sql（v25）之后每加一张迁移卡都会破。
+mine = [e for e in character_entries if e.get("file") == "db/character/season_pass_progress.sql"]
+idx = character_entries.index(mine[0]) if mine else -1
+report("migration_registered", bool(mine) and isinstance(mine[0].get("version"), int),
+       mine[0] if mine else "season_pass_progress.sql 没登记")
+report("migration_appended", bool(mine) and all(
+           e.get("version", 0) < mine[0].get("version", 0) for e in character_entries[:idx]),
+       "season_pass_progress.sql 的版本号比它前面的都大")
 
 table = read("src/Character/SeasonPassProgressTable.cs")
 repo = read("src/Character/SeasonPassProgressRepository.cs")

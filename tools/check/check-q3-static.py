@@ -120,7 +120,13 @@ report("season_api_mounted", "SeasonApi.Map(app, tokens, config, calendar)" in r
 ledger = read("docs/数值台账.md")
 report("ledger_calendar_green", "calendar/2 · v2" in ledger
        and "| `calendar.json` | 日 / 周 / 赛季重置时刻与时区；代码尚未读取" not in ledger)
-report("ledger_pending_count", "### 2.1 整份暂取（顶层 `pending=true`，23 份）" in ledger)
+# 2.1 的份数会随着定稿往下走（Q9 / Q11 已各摘掉一份），只比「声明数 == 表里实际行数」，
+# 不写死具体数字——写死一次，下一张卡去 pending 就要回来改这条。
+m21 = re.search(r"### 2\.1 整份暂取（顶层 `pending=true`，(\d+) 份）", ledger)
+sec21 = ledger.split("### 2.1", 1)[1].split("### 2.2", 1)[0] if "### 2.1" in ledger else ""
+rows21 = [l for l in sec21.splitlines() if l.startswith("| `")]
+report("ledger_pending_count", bool(m21) and int(m21.group(1)) == len(rows21),
+       "声明 %s 份 / 实际 %d 行" % (m21.group(1) if m21 else "缺表头", len(rows21)))
 design = read("docs/配置设计.md")
 report("config_design_section", "## 14. calendar.json" in design
        and "calendar/2" in design and "--calendar" in design)

@@ -76,6 +76,11 @@ for c in $CHECKS; do
   fi
 done
 
+# 体量报告：只打印，不参与失败判定（脚本内部恒退出 0）。拆分时机看 14.8 的排期，
+# 这里只让「债在涨」每次都看得见。
+step "3. 体量报告（只告警，不判红）"
+bash tools/check/size-report.sh | sed 's/^/  /' || true
+
 printf '\nCI 结果：%s 张卡，%s 张未过\n' "$(printf '%s\n' $CHECKS | wc -l | tr -d ' ')" "$FAIL"
 if [ "$FAIL" -ne 0 ]; then
   echo "红：见上面 FAIL 行；需要真库 / 真机的段不在这里跑。"
