@@ -12,5 +12,7 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.85.0" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <ProjectReference Include="../Shared/Shared.csproj" />
+    <!-- Q4：宗门任务的周期边界只认 Q3 的 CalendarTable（config/calendar.json 唯一时钟）。 -->
+    <ProjectReference Include="../Shared.Domain/Shared.Domain.csproj" />
   </ItemGroup>
 </Project>

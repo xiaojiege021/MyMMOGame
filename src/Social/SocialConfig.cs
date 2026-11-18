@@ -9,9 +9,12 @@ namespace Social;
 /// 数值正本（五级上限）只有 config/sect.json 一份，这里只记它的路径。
 /// </summary>
 public sealed record SocialConfig(
-    string Listen, int DbPoolMax, string SectTable, string CharacterUpstream)
+    string Listen, int DbPoolMax, string SectTable, string CalendarTable,
+    string SectTaskTable, string CharacterUpstream)
 {
     public const string DefaultSectTable = "config/sect.json";
+    public const string DefaultCalendarTable = "config/calendar.json";
+    public const string DefaultSectTaskTable = "config/sect_tasks.json";
     public const string DefaultCharacterUpstream = "http://127.0.0.1:62000";
 
     public static SocialConfig Load(string path)
@@ -53,6 +56,20 @@ public sealed record SocialConfig(
             throw new ConfigException("sect_table 不能为空");
         }
 
+        // Q4：日 / 周重置边界只认 Q3 的日历正本；宗门任务的次数与奖励只在任务表。
+        // 两条路径都从 social.json 读，缺省指向仓库里的 config/。
+        var calendarTable = (wire.CalendarTable ?? DefaultCalendarTable).Trim();
+        if (calendarTable.Length == 0)
+        {
+            throw new ConfigException("calendar_table 不能为空");
+        }
+
+        var sectTaskTable = (wire.SectTaskTable ?? DefaultSectTaskTable).Trim();
+        if (sectTaskTable.Length == 0)
+        {
+            throw new ConfigException("sect_task_table 不能为空");
+        }
+
         // 创建金币的扣减经角色服 ApplyGrant，社交服不碰角色 schema。
         var character = (wire.CharacterUpstream ?? DefaultCharacterUpstream).Trim().TrimEnd('/');
         if (!Uri.TryCreate(character, UriKind.Absolute, out var characterUri)
@@ -61,7 +78,8 @@ public sealed record SocialConfig(
             throw new ConfigException("character_upstream 必须是 http:// 或 https:// 地址：" + character);
         }
 
-        return new SocialConfig(listen.TrimEnd('/'), pool, sectTable, character);
+        return new SocialConfig(listen.TrimEnd('/'), pool, sectTable, calendarTable,
+            sectTaskTable, character);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -80,6 +98,12 @@ public sealed record SocialConfig(
 
         [JsonPropertyName("sect_table")]
         public string? SectTable { get; init; }
+
+        [JsonPropertyName("calendar_table")]
+        public string? CalendarTable { get; init; }
+
+        [JsonPropertyName("sect_task_table")]
+        public string? SectTaskTable { get; init; }
 
         [JsonPropertyName("character_upstream")]
         public string? CharacterUpstream { get; init; }

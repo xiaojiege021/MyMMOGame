@@ -155,6 +155,74 @@ message UpgradeResponse {
   string txn_id = 10;
 }
 
+// Q4/J1：宗门日常 / 周常面板。只读；任务、次数、奖励与周期键都只由社交服按
+// config/sect_tasks.json 与 config/calendar.json 给事实值，请求里带不进次数 / 等级 /
+// 奖励。daily 的 period_key 是业务日，weekly 是业务周首（yyyy-MM-dd）。
+message DescribeSectTasksRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  uint64 sect_id = 3;
+}
+
+message SectTaskEntry {
+  string task_id = 1;
+  string name = 2;
+  // daily / weekly。重置边界只认 config/calendar.json（业务日 / 业务周首）。
+  string period = 3;
+  int32 done = 4;
+  int32 max_per_period = 5;
+  // 角色等级门槛（事实值）；社交服按角色服快照判，不在这里让客户端算。
+  int32 require_level = 6;
+  int64 reward_contribution = 7;
+  int64 reward_construction = 8;
+  // 这一条当前周期的业务键；日常按业务日、周常按业务周首。
+  string period_key = 9;
+}
+
+// 业务拒绝（sect_not_found / not_member / request_missing）是正常回包里的
+// ok=false + reason；不是成员时 tasks 为空、未生效数值给 0。
+message DescribeSectTasksResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 sect_id = 3;
+  int32 level = 4;
+  int64 construction = 5;
+  // 这个角色在这个宗门的累计贡献（不是宗门总贡献）。
+  int64 contribution = 6;
+  repeated SectTaskEntry tasks = 7;
+}
+
+// 完成一条任务。请求只带任务编号；次数、奖励、周期与等级门槛一概由社交服判定。
+// txn_id 由网关服务端生成（客户端填不进来），sect_task_ledger.txn_id 主键挡重放。
+message CompleteSectTaskRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  uint64 sect_id = 4;
+  string task_id = 5;
+}
+
+// 完成一笔的回包：前六个是判定结果，contribution_* / construction_* 是库里的事实值，
+// granted_* 是这一笔实际加的数量。业务拒绝（task_unknown / not_member / level_too_low /
+// limit_reached / duplicate / sect_not_found / character_not_found / character_unavailable）
+// 是 ok=false + reason，未生效数值给 0。
+message CompleteSectTaskResponse {
+  bool ok = 1;
+  string reason = 2;
+  uint64 sect_id = 3;
+  string task_id = 4;
+  int32 done = 5;
+  int32 max_per_period = 6;
+  int64 contribution_before = 7;
+  int64 contribution_after = 8;
+  int64 construction_before = 9;
+  int64 construction_after = 10;
+  int64 granted_contribution = 11;
+  int64 granted_construction = 12;
+  string period_key = 13;
+  string txn_id = 14;
+}
+
 // P2-1c：只读查一个角色当前归属的宗门编号。建宗门的人不进名册（册里只有弟子），
 // 因此判定要同时看 sect_member.sect_id 与 sect.master_character_id：两条都查不到
 // 才算没宗门。用于角色服判「整队是否同宗门」——只回宗门编号，不写库。
@@ -306,6 +374,9 @@ service SocialService {
   // P2-1a4：升级只耗建设（建设不从商城买）/ 只读查升级事实。
   rpc UpgradeSect(UpgradeSectRequest) returns (UpgradeResponse);
   rpc DescribeUpgrade(UpgradeSectRequest) returns (UpgradeResponse);
+  // Q4/J1：宗门任务面板 + 完成一条。完成是一笔事务（进度 / 流水 / 贡献 / 建设）。
+  rpc DescribeSectTasks(DescribeSectTasksRequest) returns (DescribeSectTasksResponse);
+  rpc CompleteSectTask(CompleteSectTaskRequest) returns (CompleteSectTaskResponse);
   // P2-1c：只读查一个角色当前归属的宗门编号。判同宗门加成在角色服调用；
   // found=false 表示没进宗门（含掌门本人：建宗门不进名册，按 master_character_id 判）。
   rpc DescribeCharacterSect(DescribeCharacterSectRequest) returns (DescribeCharacterSectResponse);

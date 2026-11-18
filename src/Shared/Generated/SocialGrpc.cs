@@ -68,6 +68,14 @@ namespace Mmo.Proto.Social {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.UpgradeResponse> __Marshaller_mmo_social_UpgradeResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.UpgradeResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectTasksRequest> __Marshaller_mmo_social_DescribeSectTasksRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectTasksRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeSectTasksResponse> __Marshaller_mmo_social_DescribeSectTasksResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeSectTasksResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.CompleteSectTaskRequest> __Marshaller_mmo_social_CompleteSectTaskRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.CompleteSectTaskRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Social.CompleteSectTaskResponse> __Marshaller_mmo_social_CompleteSectTaskResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.CompleteSectTaskResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeCharacterSectRequest> __Marshaller_mmo_social_DescribeCharacterSectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeCharacterSectRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Social.DescribeCharacterSectResponse> __Marshaller_mmo_social_DescribeCharacterSectResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Social.DescribeCharacterSectResponse.Parser));
@@ -179,6 +187,22 @@ namespace Mmo.Proto.Social {
         "DescribeUpgrade",
         __Marshaller_mmo_social_UpgradeSectRequest,
         __Marshaller_mmo_social_UpgradeResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.DescribeSectTasksRequest, global::Mmo.Proto.Social.DescribeSectTasksResponse> __Method_DescribeSectTasks = new grpc::Method<global::Mmo.Proto.Social.DescribeSectTasksRequest, global::Mmo.Proto.Social.DescribeSectTasksResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeSectTasks",
+        __Marshaller_mmo_social_DescribeSectTasksRequest,
+        __Marshaller_mmo_social_DescribeSectTasksResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Social.CompleteSectTaskRequest, global::Mmo.Proto.Social.CompleteSectTaskResponse> __Method_CompleteSectTask = new grpc::Method<global::Mmo.Proto.Social.CompleteSectTaskRequest, global::Mmo.Proto.Social.CompleteSectTaskResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CompleteSectTask",
+        __Marshaller_mmo_social_CompleteSectTaskRequest,
+        __Marshaller_mmo_social_CompleteSectTaskResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Social.DescribeCharacterSectRequest, global::Mmo.Proto.Social.DescribeCharacterSectResponse> __Method_DescribeCharacterSect = new grpc::Method<global::Mmo.Proto.Social.DescribeCharacterSectRequest, global::Mmo.Proto.Social.DescribeCharacterSectResponse>(
@@ -336,6 +360,24 @@ namespace Mmo.Proto.Social {
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.UpgradeResponse> DescribeUpgrade(global::Mmo.Proto.Social.UpgradeSectRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q4/J1：宗门任务面板 + 完成一条。完成是一笔事务（进度 / 流水 / 贡献 / 建设）。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.DescribeSectTasksResponse> DescribeSectTasks(global::Mmo.Proto.Social.DescribeSectTasksRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Social.CompleteSectTaskResponse> CompleteSectTask(global::Mmo.Proto.Social.CompleteSectTaskRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -733,6 +775,74 @@ namespace Mmo.Proto.Social {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeUpgrade, null, options, request);
       }
       /// <summary>
+      /// Q4/J1：宗门任务面板 + 完成一条。完成是一笔事务（进度 / 流水 / 贡献 / 建设）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.DescribeSectTasksResponse DescribeSectTasks(global::Mmo.Proto.Social.DescribeSectTasksRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSectTasks(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q4/J1：宗门任务面板 + 完成一条。完成是一笔事务（进度 / 流水 / 贡献 / 建设）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.DescribeSectTasksResponse DescribeSectTasks(global::Mmo.Proto.Social.DescribeSectTasksRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeSectTasks, null, options, request);
+      }
+      /// <summary>
+      /// Q4/J1：宗门任务面板 + 完成一条。完成是一笔事务（进度 / 流水 / 贡献 / 建设）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.DescribeSectTasksResponse> DescribeSectTasksAsync(global::Mmo.Proto.Social.DescribeSectTasksRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSectTasksAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q4/J1：宗门任务面板 + 完成一条。完成是一笔事务（进度 / 流水 / 贡献 / 建设）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.DescribeSectTasksResponse> DescribeSectTasksAsync(global::Mmo.Proto.Social.DescribeSectTasksRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeSectTasks, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.CompleteSectTaskResponse CompleteSectTask(global::Mmo.Proto.Social.CompleteSectTaskRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CompleteSectTask(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Social.CompleteSectTaskResponse CompleteSectTask(global::Mmo.Proto.Social.CompleteSectTaskRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CompleteSectTask, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.CompleteSectTaskResponse> CompleteSectTaskAsync(global::Mmo.Proto.Social.CompleteSectTaskRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CompleteSectTaskAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Social.CompleteSectTaskResponse> CompleteSectTaskAsync(global::Mmo.Proto.Social.CompleteSectTaskRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CompleteSectTask, null, options, request);
+      }
+      /// <summary>
       /// P2-1c：只读查一个角色当前归属的宗门编号。判同宗门加成在角色服调用；
       /// found=false 表示没进宗门（含掌门本人：建宗门不进名册，按 master_character_id 判）。
       /// </summary>
@@ -1089,6 +1199,8 @@ namespace Mmo.Proto.Social {
           .AddMethod(__Method_DescribeLeadership, serviceImpl.DescribeLeadership)
           .AddMethod(__Method_UpgradeSect, serviceImpl.UpgradeSect)
           .AddMethod(__Method_DescribeUpgrade, serviceImpl.DescribeUpgrade)
+          .AddMethod(__Method_DescribeSectTasks, serviceImpl.DescribeSectTasks)
+          .AddMethod(__Method_CompleteSectTask, serviceImpl.CompleteSectTask)
           .AddMethod(__Method_DescribeCharacterSect, serviceImpl.DescribeCharacterSect)
           .AddMethod(__Method_DescribeSectTech, serviceImpl.DescribeSectTech)
           .AddMethod(__Method_PlaceHomeDecor, serviceImpl.PlaceHomeDecor)
@@ -1118,6 +1230,8 @@ namespace Mmo.Proto.Social {
       serviceBinder.AddMethod(__Method_DescribeLeadership, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.LeadershipRequest, global::Mmo.Proto.Social.LeadershipResponse>(serviceImpl.DescribeLeadership));
       serviceBinder.AddMethod(__Method_UpgradeSect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.UpgradeSectRequest, global::Mmo.Proto.Social.UpgradeResponse>(serviceImpl.UpgradeSect));
       serviceBinder.AddMethod(__Method_DescribeUpgrade, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.UpgradeSectRequest, global::Mmo.Proto.Social.UpgradeResponse>(serviceImpl.DescribeUpgrade));
+      serviceBinder.AddMethod(__Method_DescribeSectTasks, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeSectTasksRequest, global::Mmo.Proto.Social.DescribeSectTasksResponse>(serviceImpl.DescribeSectTasks));
+      serviceBinder.AddMethod(__Method_CompleteSectTask, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.CompleteSectTaskRequest, global::Mmo.Proto.Social.CompleteSectTaskResponse>(serviceImpl.CompleteSectTask));
       serviceBinder.AddMethod(__Method_DescribeCharacterSect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeCharacterSectRequest, global::Mmo.Proto.Social.DescribeCharacterSectResponse>(serviceImpl.DescribeCharacterSect));
       serviceBinder.AddMethod(__Method_DescribeSectTech, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.DescribeSectTechRequest, global::Mmo.Proto.Social.DescribeSectTechResponse>(serviceImpl.DescribeSectTech));
       serviceBinder.AddMethod(__Method_PlaceHomeDecor, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Social.HomesteadRequest, global::Mmo.Proto.Social.HomesteadResponse>(serviceImpl.PlaceHomeDecor));

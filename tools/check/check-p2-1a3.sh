@@ -97,7 +97,7 @@ report("not_vice_master_rule", "position = 'vice_master' for update" in seg, "no
 report("grpc_three", all(x in read("src/Social/SocialGrpcService.cs") for x in ["TransferLeadership", "LeaveSect", "DescribeLeadership"]), "三个 gRPC 入口")
 program = read("src/Social/Program.cs")
 report("readonly_entries", all(x in program for x in ["--sect-leadership-config", "--sect-leadership-state", "--sect-leadership-members", "--sect-leave-state", "--migrate", "--sql"]), "四个只读入口 + 迁移链")
-report("same_load", program.count("SocialLoader.LoadAll(configPath, sectTablePath)") >= 3, "只读入口与真实启动共用同一 Load + 同一组参数")
+report("same_load", len(re.findall(r"SocialLoader\.LoadAll\(\s*configPath,\s*sectTablePath", program)) >= 3, "只读入口与真实启动共用同一 Load + 同一组参数")
 report("startup_same_shape", "transfer=" in read("src/Social/SocialProcess.cs")
        and "idempotency:" in read("src/Social/SocialProcess.cs") and "idempotency=" in program,
        "启动日志与 config 入口同形（同一 transfer 拼法）")

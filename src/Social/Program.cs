@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using Npgsql;
 using Social;
 
+using CalendarTable = Mmo.Shared.Domain.CalendarTable;
 // 配置路径可以指到别处，核对脚本用临时配置跑，不碰仓库里那份。
 var configPath = "config/social.json";
 string? sectTablePath = null;
@@ -25,6 +26,15 @@ long sectLeadershipMembersOf = 0;
 long sectLeaveStateOf = 0;
 // P2-1a4：升级只读入口 + 仅核对用的建设赋值，同样与启动共用 LoadAll 同一组参数。
 var sectUpgradeConfig = false;
+// Q4：宗门任务只读入口 + 日历 / 任务表路径覆盖（坏表核对用）。
+string? calendarTablePath = null;
+string? sectTaskTablePath = null;
+var sectTaskConfig = false;
+long sectTaskStateOf = 0;
+long sectTaskStateCharacter = 0;
+long sectTaskLedgerOf = 0;
+DateTimeOffset? sectTaskAt = null;
+string[]? sectTaskComplete = null;
 long sectUpgradeStateOf = 0;
 long sectUpgradeMembersOf = 0;
 long sectConstructionSetOf = 0;
@@ -52,6 +62,13 @@ for (var i = 0; i < args.Length; i++)
             break;
         case "--sect-table" when i + 1 < args.Length:
             sectTablePath = args[++i];
+            break;
+        // Q4：日历 / 任务表的临时路径，与真实启动共用同一份 Load。
+        case "--calendar-table" when i + 1 < args.Length:
+            calendarTablePath = args[++i];
+            break;
+        case "--sect-task-table" when i + 1 < args.Length:
+            sectTaskTablePath = args[++i];
             break;
         case "--sql" when i + 1 < args.Length:
             sqlPath = args[++i];
@@ -109,6 +126,41 @@ for (var i = 0; i < args.Length; i++)
         // P2-1a4：升级只读入口 + 仅核对用的建设赋值（不对外、不作为玩法来源）。
         case "--sect-upgrade-config":
             sectUpgradeConfig = true;
+            break;
+        // Q4：任务表只读口 + 连库只读口（面板 / 流水）。
+        case "--sect-task-config":
+            sectTaskConfig = true;
+            break;
+        case "--sect-task-state" when i + 2 < args.Length:
+            long.TryParse(args[++i], out sectTaskStateOf);
+            long.TryParse(args[++i], out sectTaskStateCharacter);
+            break;
+        case "--sect-task-ledger" when i + 1 < args.Length:
+            long.TryParse(args[++i], out sectTaskLedgerOf);
+            break;
+        // 只给核对用：固定事务号完成一笔（参数 = 宗门 角色 等级 任务号 事务号），
+        // 验「同一号重放不二次计次 / 不二次加建设」。不对外，网关那条才是玩法入口。
+        case "--sect-task-complete" when i + 5 < args.Length:
+            sectTaskComplete = args.Skip(i + 1).Take(5).ToArray();
+            i += 5;
+            break;
+        // 只读口的时间点：ISO 8601 或毫秒时间戳，验业务日 / 周界随日历变。
+        case "--at" when i + 1 < args.Length:
+            var atRaw = args[++i];
+            if (long.TryParse(atRaw, out var atMs))
+            {
+                sectTaskAt = DateTimeOffset.FromUnixTimeMilliseconds(atMs);
+            }
+            else if (DateTimeOffset.TryParse(atRaw, System.Globalization.CultureInfo.InvariantCulture,
+                         System.Globalization.DateTimeStyles.AssumeUniversal, out var atParsed))
+            {
+                sectTaskAt = atParsed;
+            }
+            else
+            {
+                Console.WriteLine("bad_at=" + atRaw);
+                return 64;
+            }
             break;
         case "--sect-upgrade-state" when i + 1 < args.Length:
             long.TryParse(args[++i], out sectUpgradeStateOf);
@@ -201,7 +253,7 @@ if (sectConfig)
 {
     try
     {
-        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
         var table = loaded.Sect;
         Console.WriteLine("sect_config_state=ok version=" + table.Version
             + " levels=" + string.Join(",", table.Levels.Select(l => l.Number + ":" + l.MemberCap))
@@ -230,7 +282,7 @@ if (sectPositionConfig)
 {
     try
     {
-        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
         Console.WriteLine("sect_position_config_state=ok version=" + loaded.Sect.Version
             + " positions=" + string.Join(",",
                 loaded.Sect.Positions.Select(p => p.Id + ":" + p.Cap)));
@@ -255,7 +307,7 @@ if (sectLeadershipConfig)
 {
     try
     {
-        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
         var t = loaded.Sect.Transfer;
         Console.WriteLine("sect_leadership_config_state=ok version=" + loaded.Sect.Version
             + " idempotency=" + t.Idempotency
@@ -282,7 +334,7 @@ if (sectUpgradeConfig)
 {
     try
     {
-        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        var loaded = SocialLoader.LoadAll(configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
         var u = loaded.Sect.Upgrade;
         Console.WriteLine("sect_upgrade_config_state=ok version=" + loaded.Sect.Version
             + " idempotency=" + u.Idempotency
@@ -292,6 +344,40 @@ if (sectUpgradeConfig)
             + " max_level=" + loaded.Sect.MaxLevel
             + " levels=" + string.Join(",",
                 loaded.Sect.Levels.Select(l => l.Number + ":" + l.MemberCap)));
+    }
+    catch (ConfigException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine("config_error=" + ex.Message);
+        return 2;
+    }
+
+    return 0;
+}
+
+// --sect-task-config：不连库，逐条打印任务表与当前日历给的两个周期键。
+// 坏表在这一步就起不来（config_error= + 非 0 退出），与真实启动共用同一份 Load；
+// --at 可把时间点固定住，验业务日 / 周首随 config/calendar.json 变。
+if (sectTaskConfig)
+{
+    try
+    {
+        var loaded = SocialLoader.LoadAll(
+            configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
+        var now = sectTaskAt ?? DateTimeOffset.UtcNow;
+        Console.WriteLine("sect_task_config_state=ok version=" + loaded.Tasks.Version
+            + " pending=" + (loaded.Tasks.Pending ? "true" : "false")
+            + " tasks=" + string.Join(",", loaded.Tasks.Tasks.Select(
+                t => t.Id + ":" + t.Period + ":" + t.MaxPerPeriod
+                    + ":level" + t.RequireLevel + ":" + t.Contribution + "/" + t.Construction)));
+        Console.WriteLine("sect_task_period=day:" + loaded.Calendar.DayKey(now).ToString("yyyy-MM-dd")
+            + " week:" + loaded.Calendar.WeekStartDate(now).ToString("yyyy-MM-dd")
+            + " timezone:" + loaded.Calendar.TimeZoneId
+            + " daily_reset_hour:" + loaded.Calendar.DailyResetHour);
     }
     catch (ConfigException ex)
     {
@@ -317,6 +403,7 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
     || sectPositionList || sectPositionStateOf != 0 || sectPositionMembersOf != 0
     || sectLeadershipStateOf != 0 || sectLeadershipMembersOf != 0 || sectLeaveStateOf != 0
     || sectUpgradeStateOf != 0 || sectUpgradeMembersOf != 0 || sectConstructionSetOf != 0
+    || sectTaskStateOf != 0 || sectTaskLedgerOf != 0 || sectTaskComplete is not null
     || sectTechStateOf != 0 || sectTechSetOf != 0 || sectRosterOf != 0
     // C3：新增的连库只读 / 核对写入口也必须登记进这条「一次性命令」长条件，
     // 否则社交服会走正常启动去 bind 65000，核对时表现为 address already in use。
@@ -324,12 +411,17 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
 {
     SectTable table;
     SocialConfig socialConfig;
+    SectTaskTable taskTable;
+    CalendarTable calendar;
     HomesteadTable? homestead;
     try
     {
-        var loaded = SocialLoader.LoadAll(configPath, sectTablePath);
+        var loaded = SocialLoader.LoadAll(
+            configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
         table = loaded.Sect;
         socialConfig = loaded.Config;
+        taskTable = loaded.Tasks;
+        calendar = loaded.Calendar;
         homestead = HomesteadTable.LoadIfPresent(homesteadPath);
     }
     catch (ConfigException ex)
@@ -353,6 +445,7 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
     Console.WriteLine("db_env=" + DbEnv.Source());
     await using var dataSource = NpgsqlDataSource.Create(DbEnv.WithPoolLimit(connectionString, 2));
     var repo = new SectRepository(dataSource, table);
+    var taskRepo = new SectTaskRepository(dataSource, taskTable, calendar);
     // C3：连库核对入口与真实启动共用同一份可选表装配。
     using var homes = new HomesteadRuntime(homestead, dataSource, socialConfig.CharacterUpstream);
 
@@ -526,6 +619,53 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
                 + " sect=" + sectConstructionSetOf + " construction=" + sectConstructionSetTo);
         }
 
+        if (sectTaskStateOf != 0 && sectTaskStateCharacter != 0)
+        {
+            var board = await taskRepo.BoardAsync(
+                sectTaskStateOf, sectTaskStateCharacter, DateTimeOffset.UtcNow, CancellationToken.None);
+            Console.WriteLine(board.Ok
+                ? "sect_task_state=ok sect=" + board.SectId
+                    + " character=" + sectTaskStateCharacter
+                    + " level=" + board.Level
+                    + " construction=" + board.Construction
+                    + " contribution=" + board.Contribution
+                    + " rows=" + board.Rows.Count
+                    + " tasks=" + string.Join(",", board.Rows.Select(
+                        r => r.TaskId + ":" + r.Done + "/" + r.MaxPerPeriod + ":" + r.PeriodKey))
+                : "sect_task_state=" + board.Reason + " sect=" + sectTaskStateOf
+                    + " character=" + sectTaskStateCharacter);
+        }
+
+        if (sectTaskComplete is not null)
+        {
+            long.TryParse(sectTaskComplete[0], out var cSect);
+            long.TryParse(sectTaskComplete[1], out var cChar);
+            int.TryParse(sectTaskComplete[2], out var cLevel);
+            var outcome = await taskRepo.CompleteAsync(
+                cSect, cChar, cLevel, sectTaskComplete[3], sectTaskComplete[4],
+                sectTaskAt ?? DateTimeOffset.UtcNow, CancellationToken.None);
+            Console.WriteLine("sect_task_complete=state sect=" + outcome.SectId
+                + " task=" + outcome.TaskId
+                + " ok=" + (outcome.Ok ? "true" : "false")
+                + " reason=" + outcome.Reason
+                + " done=" + outcome.Done + "/" + outcome.MaxPerPeriod
+                + " contribution=" + outcome.ContributionBefore + "->" + outcome.ContributionAfter
+                + " construction=" + outcome.ConstructionBefore + "->" + outcome.ConstructionAfter
+                + " granted=" + outcome.GrantedContribution + "/" + outcome.GrantedConstruction
+                + " period=" + outcome.PeriodKey);
+        }
+
+        if (sectTaskLedgerOf != 0)
+        {
+            var rows = await taskRepo.LedgerAsync(sectTaskLedgerOf, 50, CancellationToken.None);
+            Console.WriteLine("sect_task_ledger=ok sect=" + sectTaskLedgerOf
+                + " rows=" + rows.Count
+                + " txns=" + string.Join(",", rows.Select(
+                    r => r.TxnId + ":" + r.TaskId + ":" + r.PeriodKey
+                        + ":" + r.Contribution + "/" + r.Construction
+                        + ":character" + r.CharacterId)));
+        }
+
         // ---- C3 洞府摆放：独立读回与固定事务号重放（只给核对用） ----
         if (homesteadStateOf != 0)
         {
@@ -598,12 +738,12 @@ if (migrate || sectList || sectStateOf != 0 || sectMembersOf != 0 || sectSetLeve
 }
 
 // 真实启动：与上面所有只读入口共用同一份 Load + 同一组参数。
-(SocialConfig Config, SectTable Sect) startup;
+SocialTables startup;
 HomesteadTable? startupHomestead;
 HomesteadPlantTable? startupHomesteadPlant;
 try
 {
-    startup = SocialLoader.LoadAll(configPath, sectTablePath);
+    startup = SocialLoader.LoadAll(configPath, sectTablePath, calendarTablePath, sectTaskTablePath);
     startupHomestead = HomesteadTable.LoadIfPresent(homesteadPath);
     startupHomesteadPlant = HomesteadPlantTable.LoadIfPresent(homesteadPlantPath);
 }
@@ -631,4 +771,5 @@ PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
 });
 
 return await new SocialProcess(
-    startup.Config, startup.Sect, startupHomestead, startupHomesteadPlant).RunAsync(stop.Token);
+    startup.Config, startup.Sect, startup.Calendar, startup.Tasks,
+    startupHomestead, startupHomesteadPlant).RunAsync(stop.Token);

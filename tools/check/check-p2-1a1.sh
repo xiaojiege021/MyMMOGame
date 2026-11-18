@@ -110,7 +110,7 @@ program = read("src/Social/Program.cs")
 report("readonly_entries", all(x in program for x in
        ("--sect-list", "--sect-config", "--sect-state", "--sect-members",
         "--migrate", "--sql", "--sect-set-level")), "四个只读入口 + 迁移 + 核对用改级")
-report("same_load", program.count("SocialLoader.LoadAll(configPath, sectTablePath)") >= 3,
+report("same_load", len(re.findall(r"SocialLoader\.LoadAll\(\s*configPath,\s*sectTablePath", program)) >= 3,
        "只读入口与真实启动共用同一 Load + 同一组参数")
 
 report("gateway_routes", '"/sect/create"' in gateway_src and '"/sect/join"' in gateway_src

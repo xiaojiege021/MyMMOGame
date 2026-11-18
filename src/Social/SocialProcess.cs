@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Npgsql;
 
+using CalendarTable = Mmo.Shared.Domain.CalendarTable;
 namespace Social;
 
 /// <summary>
@@ -10,7 +11,8 @@ namespace Social;
 /// 直接核对得到；配置不对就起不来，不带着半截配置跑。
 /// </summary>
 public sealed class SocialProcess(
-    SocialConfig config, SectTable sect, HomesteadTable? homestead, HomesteadPlantTable? plantTable)
+    SocialConfig config, SectTable sect, CalendarTable calendar, SectTaskTable taskTable,
+    HomesteadTable? homestead, HomesteadPlantTable? plantTable)
 {
     public async Task<int> RunAsync(CancellationToken stopping)
     {
@@ -36,6 +38,16 @@ public sealed class SocialProcess(
             sect.Upgrade.Costs.Select(c => c.FromLevel + "->" + c.ToLevel + ":" + c.Cost))
             + " max_level=" + sect.MaxLevel
             + " levels=" + string.Join(",", sect.Levels.Select(l => l.Number + ":" + l.MemberCap)));
+        // Q4：宗门任务的周期键与任务表逐条打印，与 --sect-task-config 同形。
+        // 日 / 周界只从 Q3 的日历算，这里不另存小时数。
+        var now = DateTimeOffset.UtcNow;
+        Console.WriteLine("sect_tasks_calendar=day:" + calendar.DayKey(now).ToString("yyyy-MM-dd")
+            + " week:" + calendar.WeekStartDate(now).ToString("yyyy-MM-dd")
+            + " timezone:" + calendar.TimeZoneId + " daily_reset_hour:" + calendar.DailyResetHour);
+        Console.WriteLine("sect_tasks=" + string.Join(",",
+            taskTable.Tasks.Select(t => t.Id + ":" + t.Period + ":" + t.MaxPerPeriod
+                + ":level" + t.RequireLevel + ":" + t.Contribution + "/" + t.Construction))
+            + " pending=" + (taskTable.Pending ? "true" : "false"));
         // C3：可选内容表。老卡的临时配置目录没有 homestead.json 时只打 missing，
         // 上面 P2-1 的启动日志一行不少（缺表降级不拖垮宗门老链路）。
         Console.WriteLine(homestead is null
@@ -61,7 +73,9 @@ public sealed class SocialProcess(
         await using var dataSource = NpgsqlDataSource.Create(
             DbEnv.WithPoolLimit(connectionString, config.DbPoolMax));
         var sects = new SectRepository(dataSource, sect);
+        var tasks = new SectTaskRepository(dataSource, taskTable, calendar);
         using var founderGrant = new SectFounderGrant(config.CharacterUpstream);
+        using var levelProbe = new SectTaskLevelProbe(config.CharacterUpstream);
         // C3：洞府摆放的可选装配。缺表时 Table/Repository 都是 null，三个新 RPC
         // 回 homestead_unavailable，宗门那批老 RPC 一个字不受影响。
         using var homes = new HomesteadRuntime(homestead, dataSource, config.CharacterUpstream);
@@ -81,8 +95,12 @@ public sealed class SocialProcess(
         builder.Services.AddGrpc();
         builder.Services.AddSingleton(config);
         builder.Services.AddSingleton(sect);
+        builder.Services.AddSingleton(taskTable);
+        builder.Services.AddSingleton(calendar);
         builder.Services.AddSingleton(sects);
+        builder.Services.AddSingleton(tasks);
         builder.Services.AddSingleton(founderGrant);
+        builder.Services.AddSingleton(levelProbe);
         builder.Services.AddSingleton(homes);
         builder.Services.AddSingleton(plants);
 

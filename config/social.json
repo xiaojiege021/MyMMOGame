@@ -3,5 +3,7 @@
   "listen": "http://127.0.0.1:65000",
   "db_pool_max": 8,
   "sect_table": "config/sect.json",
-  "character_upstream": "http://127.0.0.1:62000"
+  "character_upstream": "http://127.0.0.1:62000",
+  "calendar_table": "config/calendar.json",
+  "sect_task_table": "config/sect_tasks.json"
 }

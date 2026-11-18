@@ -285,6 +285,43 @@ internal static class InvariantCli
                 from "角色".recharge_order
                 where (status = 'paid') <> (paid_at is not null)
                 """),
+            // Q4：个人贡献与任务流水是同一笔事务写的；贡献行是累计，流水记每一笔。
+            new("INV-18", "sect_contribution_matches_ledger", """
+                select 'sect=' || c.sect_id || ' character=' || c.character_id
+                       || ' contribution=' || c.contribution
+                       || ' ledger=' || coalesce(sum(l.contribution), 0) as detail
+                from "社交".sect_contribution c
+                left join "社交".sect_task_ledger l
+                       on l.sect_id = c.sect_id and l.character_id = c.character_id
+                group by c.sect_id, c.character_id, c.contribution
+                having c.contribution <> coalesce(sum(l.contribution), 0)
+                union all
+                select 'ledger-only sect=' || l.sect_id || ' character=' || l.character_id as detail
+                from "社交".sect_task_ledger l
+                where not exists (
+                    select 1 from "社交".sect_contribution c
+                    where c.sect_id = l.sect_id and c.character_id = l.character_id)
+                """),
+            // Q4：进度 +1 与流水一行同笔提交；次数上限、重置、面板都读进度。
+            new("INV-19", "sect_task_progress_matches_ledger", """
+                select 'character=' || p.character_id || ' task=' || p.task_id
+                       || ' period=' || p.period_key || ' done=' || p.done_count
+                       || ' ledger=' || count(l.txn_id) as detail
+                from "社交".sect_task_progress p
+                left join "社交".sect_task_ledger l
+                       on l.character_id = p.character_id and l.task_id = p.task_id
+                      and l.period_key = p.period_key
+                group by p.character_id, p.task_id, p.period_key, p.done_count
+                having p.done_count <> count(l.txn_id)
+                union all
+                select 'ledger-only character=' || l.character_id || ' task=' || l.task_id
+                       || ' period=' || l.period_key as detail
+                from "社交".sect_task_ledger l
+                where not exists (
+                    select 1 from "社交".sect_task_progress p
+                    where p.character_id = l.character_id and p.task_id = l.task_id
+                      and p.period_key = l.period_key)
+                """),
         ];
     }
 

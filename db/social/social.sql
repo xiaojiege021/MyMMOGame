@@ -205,3 +205,46 @@ CREATE TABLE IF NOT EXISTS "社交".siege_result (
     tax_pct      int         NOT NULL CHECK (tax_pct BETWEEN 0 AND 100),
     recorded_at  timestamptz NOT NULL DEFAULT now()
 );
+
+-- === Q4 sect_task.sql（同一份幂等 DDL，追加进主迁移）===
+-- 宗门任务进度 / 流水 / 个人贡献三张表；period_key 只来自 config/calendar.json，
+-- 次数与奖励只在 config/sect_tasks.json。a1–a4 的宗门表结构一个不动。
+CREATE TABLE IF NOT EXISTS "社交".sect_task_progress (
+    character_id bigint      NOT NULL,
+    task_id      text        NOT NULL,
+    -- 业务日（日常）或业务周首（周常），由 CalendarTable 算，不是数据库当天。
+    period_key   date        NOT NULL,
+    sect_id      bigint      NOT NULL REFERENCES "社交".sect (id) ON DELETE CASCADE,
+    done_count   int         NOT NULL DEFAULT 0 CHECK (done_count >= 0),
+    updated_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, task_id, period_key)
+);
+
+-- 面板按「角色 + 当前周期」取这一周期的各条次数；主键前缀是 character_id，
+-- 这条索引补 period_key 的过滤。
+CREATE INDEX IF NOT EXISTS sect_task_progress_period
+    ON "社交".sect_task_progress (character_id, period_key);
+
+CREATE TABLE IF NOT EXISTS "社交".sect_task_ledger (
+    txn_id       text        PRIMARY KEY,
+    sect_id      bigint      NOT NULL REFERENCES "社交".sect (id) ON DELETE CASCADE,
+    character_id bigint      NOT NULL,
+    task_id      text        NOT NULL,
+    period       text        NOT NULL CHECK (period IN ('daily', 'weekly')),
+    period_key   date        NOT NULL,
+    -- 这一笔实际加给个人 / 宗门的数量，来自 config/sect_tasks.json 的 rewards。
+    contribution bigint      NOT NULL CHECK (contribution >= 0),
+    construction bigint      NOT NULL CHECK (construction >= 0),
+    recorded_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS sect_task_ledger_sect
+    ON "社交".sect_task_ledger (sect_id, recorded_at);
+
+CREATE TABLE IF NOT EXISTS "社交".sect_contribution (
+    sect_id      bigint      NOT NULL REFERENCES "社交".sect (id) ON DELETE CASCADE,
+    character_id bigint      NOT NULL,
+    contribution bigint      NOT NULL DEFAULT 0 CHECK (contribution >= 0),
+    updated_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (sect_id, character_id)
+);

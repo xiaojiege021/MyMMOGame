@@ -114,7 +114,7 @@ report("upgrade_no_role_money", '"角色"' not in seg and not re.search(r"grant_
 report("grpc_two", all(x in read("src/Social/SocialGrpcService.cs") for x in ["UpgradeSect", "DescribeUpgrade"]), "两个 gRPC 入口")
 program = read("src/Social/Program.cs")
 report("readonly_entries", all(x in program for x in ["--sect-upgrade-config", "--sect-upgrade-state", "--sect-upgrade-members", "--sect-construction-set", "--migrate", "--sql"]), "四个只读/核对入口 + 迁移链")
-report("same_load", program.count("SocialLoader.LoadAll(configPath, sectTablePath)") >= 5, "只读入口与真实启动共用同一 Load + 同一组参数")
+report("same_load", len(re.findall(r"SocialLoader\.LoadAll\(\s*configPath,\s*sectTablePath", program)) >= 5, "只读入口与真实启动共用同一 Load + 同一组参数")
 report("startup_same_shape", "upgrade_costs=" in read("src/Social/SocialProcess.cs") and "upgrade_costs=" in program, "启动日志与 config 入口同形（同一 upgrade_costs 拼法）")
 report("gateway_route", all(x in gw for x in ['"/sect/upgrade"', "OwnsAsync", "Guid.NewGuid", "UpgradeBody", "UpgradeSectRequest"]) and "SectApi.Map" in gateway_src, "POST /sect/upgrade + 认令牌 + 归属复核 + 服务端生成 txn_id")
 ub = re.search(r"record UpgradeBody\(([^)]*)\)", gw)
