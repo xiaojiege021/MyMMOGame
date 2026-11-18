@@ -236,11 +236,12 @@ PY
   [ -n "$TOK" ] && ok "登录拿到令牌（账号/口令只在内存）" || bad "登录没拿到令牌"
   mkchar() {
     local cls="$1" branch="$2" out id body
+    # 名字长度按 config/name_rules.json 的 max_length=12 起：Q12 之后 p4a_warrior12345 会被 name_too_long 拒。
     for _ in $(seq 1 10); do
       if [ -n "$branch" ]; then
-        body="{\"name\":\"p4a_$cls$RANDOM\",\"race\":\"mai\",\"class_id\":\"$cls\",\"branch\":\"$branch\"}"
+        body="{\"name\":\"p4a${cls:0:1}$RANDOM\",\"race\":\"mai\",\"class_id\":\"$cls\",\"branch\":\"$branch\"}"
       else
-        body="{\"name\":\"p4a_$cls$RANDOM\",\"race\":\"mai\",\"class_id\":\"$cls\"}"
+        body="{\"name\":\"p4a${cls:0:1}$RANDOM\",\"race\":\"mai\",\"class_id\":\"$cls\"}"
       fi
       out="$(curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/character?token=$TOK" \
         -H 'Content-Type: application/json' -d "$body" 2>&1)"
@@ -252,10 +253,11 @@ except Exception: print("")' 2>/dev/null)"
     done
     return 1
   }
-  lv() { "$DOTNET" "$CD" --raw-level-write "$1" "$2" $CC >/dev/null 2>&1; }
-  bstate() { "$DOTNET" "$CD" --branch-state "$1" $CC 2>&1 | grep -m1 '^branch_state='; }
-  adv() { "$DOTNET" "$CD" --advance-branch "$1" "$2" $CC 2>&1 | grep -m1 '^advance_branch='; }
-  equip() { "$DOTNET" "$CD" --can-equip "$1" "$2" $CC 2>&1 | grep -m1 '^can_equip='; }
+  # 夹具没建起来时这几个调用会拿到空 id：空放过，让「角色没建齐」自己红，不要连带一串中止。
+  lv() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --raw-level-write "$1" "$2" $CC >/dev/null 2>&1; }
+  bstate() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --branch-state "$1" $CC 2>&1 | grep -m1 '^branch_state='; }
+  adv() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --advance-branch "$1" "$2" $CC 2>&1 | grep -m1 '^advance_branch='; }
+  equip() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --can-equip "$1" "$2" $CC 2>&1 | grep -m1 '^can_equip='; }
 
   W45="$(mkchar warrior pojun)"; W12="$(mkchar warrior "")"; M45="$(mkchar mage "")"
   T12="$(mkchar tank "")"; P45="$(mkchar priest jielv)"
@@ -303,7 +305,8 @@ except Exception: print("")' 2>/dev/null)"
     && ok "法师装 15 级法剑：ok（法杖 / 法剑都算本命）" || bad "法师装不了法剑"
   equip "$W45" spirit_sword_trade | grep -q 'reason=class_mismatch' \
     && ok "战士装 15 级法剑：class_mismatch" || bad "战士装上了法剑"
-  # 不到 15 级全职业：五个角色都拿剑试，等级都在锁线以上，只靠 require_level 放行。
+  # 不到 15 级全职业：五个角色都拿剑试，只靠 require_level 放行（牧师先拉到 45 级，免得撞 level_not_enough）。
+  lv "$P45" 45
   equip "$M45" sword_trial | grep -q 'ok=true' && ok "法师也能装 10 级剑（不到 15 级全职业）" || bad "法师装不了 10 级剑"
   equip "$P45" sword_trial | grep -q 'ok=true' && ok "牧师也能装 10 级剑（不到 15 级全职业）" || bad "牧师装不了 10 级剑"
 
