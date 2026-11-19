@@ -57,7 +57,8 @@ internal static class EnhanceCli
                     + " gold=" + string.Join(",", table.Tiers.Select(t => t.GoldCost))
                     + " stones=" + string.Join(",", table.Tiers.Select(t => t.StoneCost))
                     + " coupon=" + table.ProtectItemId
-                    + " coupon_bind=always");
+                    + " coupon_bind=always"
+                    + " coef_bps_per_level=" + table.CoefBpsPerLevel);
                 Console.WriteLine("enhance_gate=ok target=7 tier=" + table.TierFor(7).Id
                     + " stone=" + table.TierFor(7).StoneId
                     + " target=12 tier=" + table.TierFor(12).Id);

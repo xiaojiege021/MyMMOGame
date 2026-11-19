@@ -9,10 +9,12 @@ namespace Battle;
 /// 职业、分支、等级、各槽强化等级之和。折算与战力全在战斗服按
 /// config/battlefield.json 算，角色服不参与数值。
 /// Q2：段内阶的被动万分比也在这里一起给，伤害第一段读它，战斗服不另读境界表。
+/// B10：已穿装备的强化系数（万分点）与攻击结晶固定值也在这一份快照里，
+/// 伤害第二段读它们；角色服已经折算好，战斗服不读 enhance.json / crystal.json。
 /// </summary>
 public sealed record BattleProfile(
     string ClassId, string Branch, int Level, int EnhanceTotal, int EnhanceSlots, int BranchStep,
-    int PassivePctBps = 0, int EquipAttack = 0);
+    int PassivePctBps = 0, int EquipAttack = 0, int EnhanceCoefBps = 0, int CrystalFlatAttack = 0);
 
 public interface IBattleProfileSource : IDisposable
 {
@@ -55,7 +57,8 @@ public sealed class GrpcBattleProfileSource : IBattleProfileSource
             return reply.Found
                 ? new BattleProfile(
                     reply.ClassId, reply.Branch, reply.Level, reply.EnhanceTotal,
-                    reply.EnhanceSlots, reply.BranchStep, reply.PassivePctBps, reply.EquipAttack)
+                    reply.EnhanceSlots, reply.BranchStep, reply.PassivePctBps, reply.EquipAttack,
+                    reply.EnhanceCoefBps, reply.CrystalFlatAttack)
                 : null;
         }
         catch (RpcException ex)

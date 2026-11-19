@@ -17,6 +17,12 @@ public sealed record EquipOutcome(
     int BagSlot);
 
 /// <summary>
+/// B10：已穿装备的三样事实值，一次查询读完。战斗快照与只读核对口都读这一个形状；
+/// 折算成伤害系数 / 万分比是调用方的事，仓储只做加法。
+/// </summary>
+public sealed record WornTotals(long Attack, int EnhanceTotal, long CrystalFlatAttack);
+
+/// <summary>
 /// 穿戴的唯一写入口。一条记录 = 「这个角色这个部位穿的是哪一行背包」，
 /// 背包行本身不动（不删行、不改格号），所以：
 ///   · 强化（C4 的 enhance）与结晶（crystal_socket）仍挂在那口背包行上，穿上、脱下都不搬；
@@ -162,14 +168,66 @@ public sealed class EquipRepository(NpgsqlDataSource dataSource)
 
     // ------------------------------------------------------------------ 只读
 
-    /// <summary>
-    /// 全身已穿装备的固定攻击之和。战斗服的副本伤害与客户端的穿戴屏都读这一个数；
+    /// <summary>全身已穿装备的固定攻击之和。战斗服的副本伤害与客户端的穿戴屏都读这一个数；
     /// 数值只来自 config/items.json 的 attack，这里只做加法。
     /// </summary>
     public async Task<long> EquipAttackAsync(long characterId, ItemTable items, CancellationToken stopping)
     {
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         return await AttackAsync(connection, null, characterId, items, stopping);
+    }
+
+    /// <summary>
+    /// B10：一次读完已穿装备的三样事实——固定攻击之和、强化等级之和、攻击类结晶固定值之和。
+    /// 战斗快照（DescribeBattleProfile）只走这一个口，免得三次连接读到三个时刻的库。
+    /// 数值仍各只有一处正本：装备攻击与强化等级来自 items.json / enhance（库里的等级），
+    /// 结晶固定值与类别来自 config/crystal.json；这里只做加法，不折算比例、不写配置默认值。
+    /// 只统计 category=attack 的结晶：方案 7.2 第二段只有「能量结晶固定值」一项是攻击，
+    /// 防御 / 功能两类不进伤害公式。
+    /// </summary>
+    public async Task<WornTotals> WornTotalsAsync(
+        long characterId, ItemTable items, CrystalTable crystals, CancellationToken stopping)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(stopping);
+        // 一件装备一行；装了结晶的装备会因为 left join 出现多行，所以装备那一截按格号去重。
+        // 强化等级挂在背包行 id 上（C4），结晶挂在格子上（P1-4d 的 (角色, 格, 镶嵌位)）。
+        await using var command = new NpgsqlCommand(
+            "select i.slot, i.item_id, coalesce(e.level, 0)::int, cs.crystal_item_id "
+            + "from \"角色\".character_equip ce "
+            + "join \"角色\".inventory i on i.id = ce.inventory_id "
+            + "left join \"角色\".enhance e on e.inventory_id = i.id "
+            + "left join \"角色\".crystal_socket cs on cs.character_id = ce.character_id and cs.slot = i.slot "
+            + "where ce.character_id = $1 order by i.slot, cs.socket",
+            connection);
+        command.Parameters.AddWithValue(characterId);
+
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        var attack = 0L;
+        var enhanceTotal = 0;
+        var crystalFlat = 0L;
+        var counted = new HashSet<short>();
+        while (await reader.ReadAsync(stopping))
+        {
+            var slot = reader.GetInt16(0);
+            if (counted.Add(slot))
+            {
+                attack += items.Find(reader.GetString(1))?.Attack ?? 0;
+                enhanceTotal += reader.GetInt32(2);
+            }
+
+            if (reader.IsDBNull(3))
+            {
+                continue;
+            }
+
+            var crystal = crystals.Find(reader.GetString(3));
+            if (crystal is not null && string.Equals(crystal.Category, "attack", StringComparison.Ordinal))
+            {
+                crystalFlat += crystal.FixedValue;
+            }
+        }
+
+        return new WornTotals(attack, enhanceTotal, crystalFlat);
     }
 
     /// <summary>

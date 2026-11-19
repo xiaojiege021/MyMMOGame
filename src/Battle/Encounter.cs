@@ -1500,17 +1500,23 @@ public sealed class Encounter
     /// Q2：四段伤害。属性仍来自战斗快照（职业表 / 竞技场模板 / 战场压缩后 / 城战全额），
     /// 这里只加效果层：攻击百分比来自自己身上的 buff，防御百分比来自目标身上的 debuff，
     /// 境界加成来自角色服的 passive_pct_bps。效果表缺失时退回恒等，老链路逐字不变。
+    /// B10：第二段的强化系数与结晶固定值只在「按职业表算属性」的那条路上给——
+    /// 竞技场按模板统一属性、战场（含城战全额）已经把装备折进 Combat 并压缩到 1.3 倍以内，
+    /// 这里再加一次就是双算；两条的老数一个都不动。
     /// </summary>
     long DamageOf(Member member, SkillDef skill)
     {
         var profile = ProfileOf(member);
+        var wearsEquipment = member.Template is null && member.Combat is null;
         var input = new DamageInput(
             Attack: member.AttackPower(),
             SkillMultiplier: skill.DamageMultiplier,
             TargetDefense: _boss.Defense,
             RealmBonusPct: profile?.PassivePctBps ?? 0,
             AttackPct: member.Status.AttackPct,
-            DefensePct: _bossUnit.Status.DefensePct);
+            DefensePct: _bossUnit.Status.DefensePct,
+            EnhanceCoef: wearsEquipment ? (profile?.EnhanceCoefBps ?? 0) / 10000.0 : 0,
+            CrystalFlatAttack: wearsEquipment ? profile?.CrystalFlatAttack ?? 0 : 0);
         return DamagePipeline.Compute(_config.Effects, input, _rng).Rounded;
     }
 

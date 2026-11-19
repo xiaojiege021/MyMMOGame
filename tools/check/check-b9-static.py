@@ -165,8 +165,9 @@ want("Combat?.Attack ?? Template?.Attack ?? (Class.Attack() + (Profile?.EquipAtt
 profile = read("src/Battle/BattleProfileClient.cs")
 want("int EquipAttack = 0" in profile and "reply.EquipAttack" in profile,
      "战斗服快照没有 equip_attack")
-want("DescribeBattleProfileResponse" in service and "EquipAttack = (int)await equips.EquipAttackAsync(" in service,
+want("DescribeBattleProfileResponse" in service and "EquipAttack = (int)worn.Attack" in service,
      "角色服的战斗快照没有填 equip_attack")
+want("WornTotalsAsync" in service, "角色服的战斗快照没有走已穿装备汇总（B10 起一次读完三样）")
 
 if fails:
     for one in fails:

@@ -4,7 +4,7 @@ using static Character.Cli.CliFlags;
 
 namespace Character.Cli;
 
-/// <summary>B9 穿戴的连库核对：穿、脱、读已穿（部位 / 格号 / 物品 / 装备固定攻击之和）。</summary>
+/// <summary>B9 / B10 穿戴的连库核对：穿、脱、读已穿（部位 / 格号 / 物品 / 攻击 / 强化 / 结晶）。</summary>
 internal static class EquipCli
 {
     /// <summary>B9 的三个核对 flag 归本类解析（CliParser 一行分发，行数闸门仍 ≤600）。</summary>
@@ -69,6 +69,15 @@ internal static class EquipCli
 
         if (equipRowOf != 0)
         {
+            // B10：同一次连库顺手给「已穿装备」的三样事实——攻击、强化等级之和、攻击结晶固定值之和。
+            // 三项都由 WornTotalsAsync 从库里现取，探针不自己算第二套；强化系数按 enhance.json 折算，
+            // 与战斗快照回包同一个公式。原有 worn= / attack= 两段不删，老断言照旧解析。
+            var currencies = CurrencyTable.Load("config/currency.json");
+            var enhance = EnhanceTable.Load("config/enhance.json", items, currencies);
+            var crystals = CrystalTable.Load("config/crystal.json", items);
+            var worn = await equips.WornTotalsAsync(
+                equipRowOf, items, crystals, CancellationToken.None);
+
             await using var connection = await ctx.DataSource.OpenConnectionAsync();
             await using var command = new NpgsqlCommand(
                 "select ce.slot, i.slot, i.item_id from \"角色\".character_equip ce "
@@ -77,16 +86,16 @@ internal static class EquipCli
             command.Parameters.AddWithValue(equipRowOf);
             await using var reader = await command.ExecuteReaderAsync();
             var rows = new List<string>();
-            var attack = 0L;
             while (await reader.ReadAsync())
             {
-                var itemId = reader.GetString(2);
-                attack += items.Find(itemId)?.Attack ?? 0;
-                rows.Add(reader.GetString(0) + ":" + reader.GetInt16(1) + ":" + itemId);
+                rows.Add(reader.GetString(0) + ":" + reader.GetInt16(1) + ":" + reader.GetString(2));
             }
 
             Console.WriteLine("equip_row=ok worn=" + (rows.Count == 0 ? "-" : string.Join(",", rows))
-                + " attack=" + attack);
+                + " attack=" + worn.Attack
+                + " enhance=" + worn.EnhanceTotal
+                + " enhance_coef_bps=" + enhance.CoefBpsFor(worn.EnhanceTotal)
+                + " crystal_flat=" + worn.CrystalFlatAttack);
         }
 
         return 0;

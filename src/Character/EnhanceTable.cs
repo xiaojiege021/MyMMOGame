@@ -41,16 +41,33 @@ public sealed class EnhanceTable
     /// <summary>唯一一种保护券的物品编号。方案 9.2 / 12.1：商城与通行证发的是同一种，到账即绑。</summary>
     public string ProtectItemId { get; }
 
+    /// <summary>
+    /// B10：每一级强化给多少万分点的伤害系数。方案 7.2 只写了「(1 + 强化系数 + …)」
+    /// 这一项存在，没给每级数值，所以是待定值，只从配置读。
+    /// </summary>
+    public int CoefBpsPerLevel { get; }
+
     public IReadOnlyList<EnhanceTier> Tiers => tiers;
 
-    EnhanceTable(EnhanceTier[] tiers, int version, int maxLevel, string goldKind, string protectItemId)
+    EnhanceTable(
+        EnhanceTier[] tiers, int version, int maxLevel, string goldKind, string protectItemId,
+        int coefBpsPerLevel)
     {
         this.tiers = tiers;
         Version = version;
         MaxLevel = maxLevel;
         GoldKind = goldKind;
         ProtectItemId = protectItemId;
+        CoefBpsPerLevel = coefBpsPerLevel;
     }
+
+    /// <summary>
+    /// 全身强化等级之和 → 方案 7.2 第二段的强化系数（万分点）。只做一次乘法：
+    /// 等级之和的上界由数据自己保证（每人最多三件、每件 ≤12，主键与 CHECK 挡住），
+    /// 这里不再写一个部位数常量，改部位数只改库表与方案。
+    /// </summary>
+    public int CoefBpsFor(int totalLevel) =>
+        totalLevel <= 0 || CoefBpsPerLevel <= 0 ? 0 : totalLevel * CoefBpsPerLevel;
 
     /// <summary>目标等级落在哪一档。只接受 1 到 MaxLevel，越界由调用方先挡。</summary>
     public EnhanceTier TierFor(int targetLevel) =>
@@ -189,7 +206,17 @@ public sealed class EnhanceTable
             throw new ConfigException("enhance.json 的保护券不能和强化石是同一种：" + protectItemId);
         }
 
-        return new EnhanceTable(parsed, wire.Version, maxLevel, goldKind, protectItemId);
+        // B10：每级强化系数。方案没给数值，但这一项必须存在；负数等于反向削弱，
+        // 超过 100%（10000 bps）一级加一倍，两者都不像「强化」而像配置写错，直接起不来。
+        var coefBps = wire.CoefBpsPerLevel
+            ?? throw new ConfigException("enhance.json 缺 coef_bps_per_level");
+        if (coefBps < 0 || coefBps > 10000)
+        {
+            throw new ConfigException("enhance.json 的 coef_bps_per_level 必须在 0 到 10000 之间，现在是 "
+                + coefBps);
+        }
+
+        return new EnhanceTable(parsed, wire.Version, maxLevel, goldKind, protectItemId, coefBps);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -211,6 +238,9 @@ public sealed class EnhanceTable
 
         [JsonPropertyName("protect_item_id")]
         public string? ProtectItemId { get; init; }
+
+        [JsonPropertyName("coef_bps_per_level")]
+        public int? CoefBpsPerLevel { get; init; }
 
         [JsonPropertyName("tiers")]
         public List<TierWire>? Tiers { get; init; }

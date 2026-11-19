@@ -5,6 +5,8 @@
   "max_level": 12,
   "gold_kind": "gold",
   "protect_item_id": "ticket_protect",
+  "coef_bps_per_level": 200,
+  "coef_note": "B10：方案 7.2 第二段「强化后 = 基础攻击 × (1 + 强化系数 + …)」里的强化系数，按「每一级加多少个万分点」给，全身已穿装备的强化等级之和乘它（+12 一件 = 2400 bps = 24%）。方案只写了这一项存在、没给每级数值，所以这里是待定值，改这一行重启角色服即生效；代码里不写第二套数字，也不按强化等级分支。结晶那一截不在这里：它读 config/crystal.json 的 fixed_value。",
   "tiers": [
     {
       "id": "low",
