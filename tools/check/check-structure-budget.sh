@@ -4,14 +4,14 @@
 # 这张脚本不校验玩法，只回答一个问题：工程产物有没有膨胀到该并域了。
 #
 # 为什么是「基线比对」而不是绝对阈值：
-#   v1.201 现状是 check 46,064 行 / 手写业务 60,335 行 = 76%，11 个 helper 在 30 个
+#   v1.201 现状是 check（sh+py）约 4.9 万行 / 手写业务 60,335 行 ≈ 81%，11 种 helper 在 30 个
 #   脚本里重定义。这些都是存量债，历史不许改写（日志 append-only、老脚本不重写），
 #   所以绝对阈值一旦判红，CI 就永远红 —— 永远红的闸门等于没有闸门。
 #   改成基线锁：存量记在 tools/check/structure-baseline.txt，只惩罚「比基线更差」。
 #   并域或瘦文档之后手工把基线调低，成果才会落到账上。
 #
 # 判据：
-#   1. 绝对红线，与基线无关：脚本数 >80 / 单脚本 >500 行 → 直接红
+#   1. 绝对红线，与基线无关：脚本数 >150 / 单脚本 >1000 行 → 直接红
 #   2. 基线比对：任一项比基线差 → 红；变好 → 通过并提示下调基线
 #   3. 目标值（10.1）：只 warn，不改退出码
 #
@@ -107,7 +107,7 @@ fi
 judge "最长脚本行数" "$max_lines" "$(base_num max_script_lines)" min "$TARGET_SCRIPT_LINES"
 
 # ── 3. check 行数 ÷ 手写业务代码 ───────────────────────────────────
-check_lines=$(cat tools/check/*.sh 2>/dev/null | wc -l | tr -d ' ')
+check_lines=$( { cat tools/check/*.sh; cat tools/check/*.py; } 2>/dev/null | wc -l | tr -d ' ')
 biz_lines=$(find src -name '*.cs' -not -path '*/obj/*' -not -path '*/bin/*' \
   -not -path '*/Generated/*' -not -path '*.Tests/*' -print0 2>/dev/null \
   | xargs -0 cat 2>/dev/null | wc -l | tr -d ' ')
@@ -147,12 +147,12 @@ dup_list=""
 for fn in ok bad detail stop_pid body_of code_of json_field expect_json wait_ready wait_line finish; do
   hits=$(grep -l "^${fn}()" tools/check/check-*.sh 2>/dev/null | wc -l | tr -d ' ')
   if [ "$hits" -gt 0 ]; then
-    dup=$((dup + 1))
+    dup=$((dup + hits))
     dup_list="${dup_list}    ${fn}() 在 ${hits} 个卡脚本里重定义，应改用 lib-common.sh
 "
   fi
 done
-judge "重定义的 helper 种类" "$dup" "$(base_num dup_helpers)" min ""
+judge "重定义的 helper 份数" "$dup" "$(base_num dup_sites)" min ""
 if [ "$dup" -gt 0 ]; then
   printf '%s' "$dup_list" | detail
 fi

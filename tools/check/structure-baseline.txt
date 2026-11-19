@@ -7,14 +7,18 @@
 # 更新时机：并域、瘦文档、拆脚本之后手工改；改完跑一次 check-structure-budget.sh 确认
 # 目标值（10.1）写在脚本顶部，不在这里。
 #
-# 口径：scripts 数的是 check-*.sh（不含 lib-common.sh / check-all.sh / 本脚本之外的公共件）
-# 更新时间：2026-11-19，v1.201 收口后首次建账
+# 口径（v1.202 收敛）：
+#   scripts = tools/check/check-*.sh 的个数（含本脚本，不含 lib-common.sh / check-all.sh）
+#   check_lines = tools/check/*.sh + tools/check/*.py 的总行数（py 也算核对产物，不再漏）
+#   biz_lines = src/**/*.cs 排除 obj / bin / Generated / Tests
+#   ratio = check_lines ÷ biz_lines（整数百分比）
+#   dup_sites = 11 种 helper 在各卡脚本里「重定义」的总份数（同一种抄进 N 个脚本算 N 份）
+# 更新时间：2026-11-19，v1.202 结构治理收敛（口径变更后重新建账）
 
 scripts=133
-check_lines=46081
+check_lines=49360
 biz_lines=60335
-ratio=76
+ratio=81
 max_script_lines=934
-latest_log_lines=97
-dup_helpers=11
+dup_sites=152
 latest_log_card=非卡片记录 · 2026-11-19（结构治理：合卡 + 索引式派工 + 结构预算闸）
