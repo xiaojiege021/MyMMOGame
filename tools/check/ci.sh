@@ -81,7 +81,19 @@ done
 step "3. 体量报告（只告警，不判红）"
 bash tools/check/size-report.sh | sed 's/^/  /' || true
 
-printf '\nCI 结果：%s 张卡，%s 张未过\n' "$(printf '%s\n' $CHECKS | wc -l | tr -d ' ')" "$FAIL"
+# 结构预算闸（开发架构 10.1 / 10.3）：比基线差就红。基线是「现状快照」不是目标值，
+# 并域或瘦文档之后手工把 tools/check/structure-baseline.txt 调低，成果才落账。
+step "4. 结构预算闸（比基线差即红）"
+if bash tools/check/check-structure-budget.sh >"$TMP/budget.log" 2>&1; then
+  grep -E '核对：' "$TMP/budget.log" | sed 's/^/  /'
+else
+  echo "  FAIL 结构预算超基线"
+  grep -E '^  (FAIL|warn)' "$TMP/budget.log" | head -12 | sed 's/^/       /'
+  gh_error "CI 结构预算超基线：$(grep -E '^  FAIL' "$TMP/budget.log" | head -3 | tr '\n' ' ')"
+  FAIL=$((FAIL + 1))
+fi
+
+printf '\nCI 结果：%s 张卡 + 1 项结构预算，%s 项未过\n' "$(printf '%s\n' $CHECKS | wc -l | tr -d ' ')" "$FAIL"
 if [ "$FAIL" -ne 0 ]; then
   echo "红：见上面 FAIL 行；需要真库 / 真机的段不在这里跑。"
   exit 1

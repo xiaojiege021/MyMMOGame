@@ -1,0 +1,20 @@
+# tools/check/structure-baseline.txt —— 结构预算基线（check-structure-budget.sh 读这一份）
+#
+# 规则：基线是「现状快照」，不是目标值。脚本比的是「有没有比这一份更差」。
+#   - 任何一项变差 → 判红（不许带着恶化往下走）
+#   - 任何一项变好 → 通过，并提示把这几个数往下调（并域 / 瘦日志的成果要落账）
+#   - 历史不改写：老脚本、老日志的存量只算基线，不要求回头重写
+# 更新时机：并域、瘦文档、拆脚本之后手工改；改完跑一次 check-structure-budget.sh 确认
+# 目标值（10.1）写在脚本顶部，不在这里。
+#
+# 口径：scripts 数的是 check-*.sh（不含 lib-common.sh / check-all.sh / 本脚本之外的公共件）
+# 更新时间：2026-11-19，v1.201 收口后首次建账
+
+scripts=133
+check_lines=46081
+biz_lines=60335
+ratio=76
+max_script_lines=934
+latest_log_lines=97
+dup_helpers=11
+latest_log_card=非卡片记录 · 2026-11-19（结构治理：合卡 + 索引式派工 + 结构预算闸）
