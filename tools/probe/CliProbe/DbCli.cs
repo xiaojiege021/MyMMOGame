@@ -60,6 +60,9 @@ internal static class DbCli
             code = await ShopCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await NpcShopCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await MetaCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -129,6 +132,9 @@ internal static class DbCli
     || craftStartOf != 0 || craftFinishOf != 0 || craftStateOf != 0
     || cityTaskStateOf != 0 || cityTaskCompleteOf != 0 || cityTaskLedgerOf != 0
     || characterRenameOf != 0 || nameStateOf != 0 || nameBackfill || nameRegistry
-    || rawItemWriteId != 0;
+    || rawItemWriteId != 0
+    // K2+Q13：NPC 商店的连库口，缺了会掉到「启动角色服」那条路。
+    || npcShopStateOf != 0 || npcBuyOf != 0 || npcSellOf != 0 || npcBuybackOf != 0
+    || npcRepairOf != 0 || rawDurabilityOf != 0;
     }
 }

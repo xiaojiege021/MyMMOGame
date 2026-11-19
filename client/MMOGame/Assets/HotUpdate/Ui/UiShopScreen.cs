@@ -91,6 +91,114 @@ namespace HotUpdate.Ui
             UiUpgradeViews.Result(shell, result, m.Px(120f), "状态",
                 has ? s.State : "—");
 
+            // ---------------------------------------------------------- K2+Q13 NPC 商店
+            // 同一面板的四件事：看货架、买、卖、回购、修理。货名 / 标价 / 今日剩多少 /
+            // 回收价 / 修理费全部读 /shop/npc 回包，界面不自己算一个数。
+            UiUpgradeViews.Note(shell, UiNpcShopCodex.Note);
+
+            var shops = UiContentTable.NpcShops;
+            var npcShop = shops.Length > 0 ? shops[0].Id : string.Empty;
+            var npcTop = m.Px(820f);
+            var npcText = shell.Label(
+                new Rect(pad, npcTop, m.Width - pad * 2f, m.Px(40f)),
+                shops.Length > 0
+                    ? "NPC 商店：" + shops[0].Name + " · " + shops[0].Id
+                    : "没有 NPC 商店",
+                UiTextRole.Faint, shell.Size(24f), TextAnchor.MiddleLeft, false);
+
+            for (var i = 0; i < shops.Length; i++)
+            {
+                var shop = shops[i];
+                shell.Button(
+                    new Rect(pad + i * m.Px(360f), npcTop - m.Px(80f), m.Px(340f), m.Px(64f)),
+                    shop.Name,
+                    () =>
+                    {
+                        npcShop = shop.Id;
+                        npcText.Label.text = "NPC 商店：" + shop.Name + " · " + shop.Id;
+                        if (!flow.Busy)
+                        {
+                            flow.LoadNpcShop(shop.Id);
+                        }
+                    }, UiButtonKind.Normal);
+            }
+
+            shell.Button(
+                new Rect(pad, npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
+                "看货架",
+                () =>
+                {
+                    if (!flow.Busy)
+                    {
+                        flow.LoadNpcShop(npcShop);
+                    }
+                }, UiButtonKind.Primary);
+
+            shell.Button(
+                new Rect(pad + m.Px(260f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
+                "买第一件",
+                () =>
+                {
+                    var goods = flow.HasShopNpc ? flow.ShopNpc.Goods : null;
+                    if (flow.Busy || goods == null || goods.Count == 0)
+                    {
+                        return;
+                    }
+
+                    flow.NpcBuy(npcShop, goods[0].ItemId);
+                }, UiButtonKind.Normal);
+
+            shell.Button(
+                new Rect(pad + m.Px(520f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
+                "卖第 1 格",
+                () =>
+                {
+                    if (!flow.Busy)
+                    {
+                        flow.NpcSell(npcShop, 1, 1);
+                    }
+                }, UiButtonKind.Normal);
+
+            shell.Button(
+                new Rect(pad + m.Px(780f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
+                "回购最近",
+                () =>
+                {
+                    if (!flow.Busy && flow.HasNpc && flow.LastNpc.BuybackId != 0)
+                    {
+                        flow.NpcBuyback(npcShop, flow.LastNpc.BuybackId);
+                    }
+                    else if (!flow.Busy)
+                    {
+                        flow.NpcBuyback(npcShop, 0L);
+                    }
+                }, UiButtonKind.Normal);
+
+            shell.Button(
+                new Rect(pad + m.Px(1040f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
+                "修理",
+                () =>
+                {
+                    if (!flow.Busy)
+                    {
+                        flow.NpcRepair();
+                    }
+                }, UiButtonKind.Normal);
+
+            var npcResult = shell.Panel("NPC 回包", m.Band(pad, npcTop + m.Px(150f),
+                m.Width - pad * 2f, m.Px(320f)), shell.Size(32f));
+            var sn = flow.ShopNpc;
+            var hasNpcShop = flow.HasShopNpc;
+            UiUpgradeViews.Result(shell, npcResult, m.Px(220f), "货架",
+                hasNpcShop ? sn.DisplayText : "尚未请求");
+            UiUpgradeViews.Result(shell, npcResult, m.Px(164f), "最后一件",
+                flow.HasNpc ? flow.LastNpc.DisplayText : "尚未请求");
+            UiUpgradeViews.Result(shell, npcResult, m.Px(108f), "身上耐久",
+                hasNpcShop ? "只修身上三件 · 修理单价 " + sn.RepairPricePerPoint : "—");
+
+            Debug.Log(UiNpcShopCodex.ReadyLog + " shops=" + shops.Length
+                + " has=" + (hasNpcShop ? "true" : "false"));
+
             Debug.Log(ReadyLog + " goods=" + UiCommerceCodex.Shop.Length
                 + " has=" + (has ? "true" : "false"));
         }

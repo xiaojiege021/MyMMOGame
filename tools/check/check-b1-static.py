@@ -84,7 +84,10 @@ realms = js("config/realms.json")
 recipes = js("config/recipes.json")
 gather = js("config/gather.json")
 
-ok_pills = pills_doc.get("pills", [])
+# K2+Q13 起同一张表里还放着 NPC 卖的两件基础红蓝药（craft=false）：消耗走同一条路径，
+# 但不是丹、不由炼丹产出。下面「六颗丹」的断言只算可炼的那些。
+all_pills = pills_doc.get("pills", [])
+ok_pills = [p for p in all_pills if p.get("craft", True)]
 kinds = [p.get("kind") for p in ok_pills]
 if pills_doc.get("schema") == "pill-table/1":
     ok("config_pill_schema")
@@ -274,7 +277,9 @@ for needle, name in (
 mig = js("db/migrations.json")
 char_entries = [s for s in mig.get("schemas", []) if s.get("key") == "character"]
 versions = [e.get("version") for e in char_entries[0].get("entries", [])] if char_entries else []
-if versions and versions[-1] == 30 and char_entries[0]["entries"][-1].get("file") == "db/character/pill.sql":
+# 只钉「v30 是 pill.sql、版本连续不跳号」：后面的卡只追加新版本，不插号。
+v30 = [e for e in char_entries[0].get("entries", []) if e.get("version") == 30] if char_entries else []
+if versions == list(range(1, len(versions) + 1)) and v30 and v30[0].get("file") == "db/character/pill.sql":
     ok("ddl_migration_v30")
 else:
     bad("ddl_migration_v30", versions[-3:] if versions else versions)

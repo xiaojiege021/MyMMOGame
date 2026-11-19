@@ -35,6 +35,7 @@ public sealed class CharacterProcess(string configPath)
         CrystalTable crystalTable;
         AuctionTable auctionTable;
         ShopTable shopTable;
+        NpcShopTable npcShopTable;
         HomeCoinShopTable homeCoinShopTable;
         TalismanTable talismanTable;
         PillTable pillTable;
@@ -121,6 +122,10 @@ public sealed class CharacterProcess(string configPath)
                 scrollTable, boosterTable, unbindTable);
             homeCoinShopTable = HomeCoinShopTable.Load(
                 "config/home_coin_shop.json", currencies, items);
+            // K2+Q13：NPC 商店。货架 / 回收 / 回购 / 修理四段同一份文件；加载期与物品表、
+            // 币种表、npc.json 交叉校验——装备与战力材料写进货架、价格缺失、耐久上限漏品阶，
+            // 都在启动时起不来，不带着半截配置跑。
+            npcShopTable = NpcShopTable.Load("config/npc_shop.json", currencies, items);
             // P3-2a：灵石五档兑换表与城池表。与启动共用同一套 Load：
             // 档位都要在币种表里、最高一档的中文名要与币种表一致；
             // 城池的 vein_id 要对应 gather.json 里的 spirit_stone 节点。
@@ -286,6 +291,12 @@ public sealed class CharacterProcess(string configPath)
             + " rounding=" + auctionTable.Rounding
             + " ingot_kind=" + auctionTable.IngotKind);
         // 与 --shop-list 只读入口同形：清单改一条，重启后这里能直接核对到。
+        Console.WriteLine("npc_shop_table_version=" + npcShopTable.Version
+            + " shops=" + npcShopTable.Shops.Count
+            + " shelf_kinds=" + npcShopTable.ShelfKinds.Count
+            + " sell_lines=" + npcShopTable.Sell.Items.Count
+            + " buyback_keep=" + npcShopTable.Buyback.Keep
+            + " repair_per_point=" + npcShopTable.Repair.PricePerPoint);
         Console.WriteLine("shop_table_version=" + shopTable.Version
             + " currency=" + shopTable.Currency
             + " items=" + shopTable.Items.Count
@@ -527,6 +538,10 @@ public sealed class CharacterProcess(string configPath)
         // 产出入包复用 grants 的同一条 SQL，钱只用 grants 的货币写法。
         var crafts = new CraftRepository(
             dataSource, recipeTable, items, config, grants, inventory);
+        // K2+Q13：NPC 商店的四笔事务（买 / 卖 / 回购 / 修理）。钱与入包都复用 grants 的
+        // 那两条 SQL，本类不另开第二条货币 UPDATE，也不在客户端算价。
+        var npcShops = new NpcShopRepository(
+            dataSource, npcShopTable, items, config, grants, calendar);
         // Q5/J2：城池任务。钱复用 grants 的同一条货币写法，抽成复用 cityTax 的账本写法，
         // 周期键只读 calendar；本卡不另开第二条货币 UPDATE，也不另算一套抽成。
         var cityTasks = new CityTaskRepository(
@@ -641,6 +656,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(auctionTable);
         builder.Services.AddSingleton(shopTable);
         builder.Services.AddSingleton(homeCoinShopTable);
+        builder.Services.AddSingleton(npcShopTable);
+        builder.Services.AddSingleton(npcShops);
         builder.Services.AddSingleton(talismanTable);
         builder.Services.AddSingleton(pillTable);
         builder.Services.AddSingleton(pills);

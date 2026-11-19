@@ -141,6 +141,14 @@ service CharacterService {
   rpc BuyShopItem(BuyShopItemRequest) returns (BuyShopItemResponse);
   // N11：家园币商城。只许外观与便捷，清单与标价在 config/home_coin_shop.json。
   rpc BuyHomeCoinShopItem(BuyHomeCoinShopRequest) returns (BuyHomeCoinShopResponse);
+  // K2+Q13：NPC 商店。一个面板四件事——看货架、买、卖、回购、修理。
+  // 商品、价格、库存、限购、回收价、回购窗口、耐久上限与修理单价全在
+  // config/npc_shop.json；客户端只带商店编号、格号与事务号，带不进价格。
+  rpc DescribeNpcShop(DescribeNpcShopRequest) returns (DescribeNpcShopResponse);
+  rpc BuyNpcShopItem(BuyNpcShopItemRequest) returns (BuyNpcShopItemResponse);
+  rpc SellNpcItem(SellNpcItemRequest) returns (SellNpcItemResponse);
+  rpc BuybackNpcItem(BuybackNpcItemRequest) returns (BuybackNpcItemResponse);
+  rpc RepairNpcEquipment(RepairNpcEquipmentRequest) returns (RepairNpcEquipmentResponse);
   // P1-5c3：在战斗里用掉一张符。战斗服发过来，只扣一张、不碰生命与蓝量——
   // 战斗态在战斗进程里，角色服只负责背包的这一次扣减。回复值与冷却在回包里带回去。
   rpc ConsumeTalisman(ConsumeTalismanRequest) returns (ConsumeTalismanResponse);
@@ -1888,4 +1896,186 @@ message DescribeDeserterResponse {
   // 最近一次判罚的场次与原因；没被罚过时是 0 / 空串。
   uint64 session_id = 4;
   string reason = 5;
+}
+
+// ---------------------------------------------------------------------------
+// K2+Q13：NPC 商店（城镇 / 宗门）+ 出售 / 回购 / 修理。
+//
+// 面板上的每个数都从角色服的配置与库里来：货架由 config/npc_shop.json 的 shops 段驱动，
+// 今日剩多少 / 今天买了几件是库里的计数，回收价与回购窗口是同一份文件的 sell / buyback，
+// 耐久上限与修理单价是 repair 段。客户端一个数都带不进来，也不自己算钱。
+// ---------------------------------------------------------------------------
+
+message DescribeNpcShopRequest {
+  uint64 character_id = 1;
+  // npc.json 里那位 NPC 的 shop_id。空串表示按 NPC 找店，客户端不带第二套编号。
+  string shop_id = 2;
+}
+
+message NpcShopGoods {
+  string item_id = 1;
+  string name = 2;
+  int64 price = 3;
+  // 今日还剩几件。unlimited=true 时这个数是 0、不代表卖完。
+  int32 stock_left = 4;
+  bool unlimited = 5;
+  int32 bought_today = 6;
+  // 0 表示不限购。
+  int32 limit_per_character = 7;
+  bool enough = 8;
+  bool sold_out = 9;
+  bool limit_reached = 10;
+}
+
+message NpcShopSellLine {
+  string item_id = 1;
+  string name = 2;
+  // NPC 回收单价。卖出得多少由服务端按「单价 × 件数」算，回包里给结果。
+  int64 price = 3;
+}
+
+message NpcShopBuybackRow {
+  int64 id = 1;
+  string item_id = 2;
+  string name = 3;
+  int32 count = 4;
+  // 回购单价（按卖出时的卖价与配置倍率算好落库），不是现在的卖价。
+  int64 unit_price = 5;
+  int64 sold_at_ms = 6;
+}
+
+message NpcShopWornRow {
+  string slot = 1;
+  string item_id = 2;
+  string name = 3;
+  // 当前耐久。等于上限表示没损耗（库里 NULL 也回成上限）。
+  int32 durability = 4;
+  int32 durability_max = 5;
+}
+
+message DescribeNpcShopResponse {
+  bool ok = 1;
+  // shop_unknown（没有这家店）/ npc_unknown（这家店没挂 NPC）。
+  string reason = 2;
+  string shop_id = 3;
+  string npc_id = 4;
+  string currency = 5;
+  string refresh = 6;
+  int64 balance = 7;
+  repeated NpcShopGoods goods = 8;
+  repeated NpcShopSellLine sell = 9;
+  // 回收用的币种余额（与货架币种分开回，两个数都照实给）。
+  int64 sell_balance = 10;
+  repeated NpcShopBuybackRow buyback = 11;
+  int64 repair_price_per_point = 12;
+  string repair_currency = 13;
+  repeated NpcShopWornRow worn = 14;
+}
+
+message BuyNpcShopItemRequest {
+  uint64 character_id = 1;
+  string shop_id = 2;
+  // 只带商品编号：标价、库存、限购全按配置与库里的计数判。
+  string item_id = 3;
+  // 网关生成的幂等号，前缀 npc_shop_buy:。
+  string txn_id = 4;
+}
+
+message BuyNpcShopItemResponse {
+  bool ok = 1;
+  // item_not_in_shop / stock_out / limit_reached / not_enough_gold / bag_full /
+  // duplicate（同一事务号第二次来）/ 空串表示成交。
+  string reason = 2;
+  string shop_id = 3;
+  string item_id = 4;
+  string name = 5;
+  string currency = 6;
+  int64 price = 7;
+  int64 balance = 8;
+  int32 stock_left = 9;
+  int32 bought_today = 10;
+  int32 limit_per_character = 11;
+  // 东西落到第几格。没成交为 0。
+  int32 bag_slot = 12;
+  int32 count = 13;
+  bool bound = 14;
+  bool duplicate = 15;
+}
+
+message SellNpcItemRequest {
+  uint64 character_id = 1;
+  string shop_id = 2;
+  // 卖第几格、几件。卖哪件由服务端按格子里的现状判，白名单外一律拒。
+  int32 bag_slot = 3;
+  int32 count = 4;
+  string txn_id = 5;
+}
+
+message SellNpcItemResponse {
+  bool ok = 1;
+  // item_not_in_bag / not_sellable / equipped / count_invalid / duplicate。
+  string reason = 2;
+  string shop_id = 3;
+  // 这一笔的回购号，随后要回购就用它；没成交为 0。
+  int64 buyback_id = 4;
+  string item_id = 5;
+  string name = 6;
+  int32 count = 7;
+  int64 unit_price = 8;
+  // 这一笔真加的金币。没成交恒为 0。
+  int64 gained = 9;
+  string currency = 10;
+  int64 balance = 11;
+  int32 bag_slot = 12;
+  bool duplicate = 13;
+}
+
+message BuybackNpcItemRequest {
+  uint64 character_id = 1;
+  string shop_id = 2;
+  int64 buyback_id = 3;
+  string txn_id = 4;
+}
+
+message BuybackNpcItemResponse {
+  bool ok = 1;
+  // buyback_empty（没有这条 / 已回购 / 过期）/ not_enough_gold / bag_full / duplicate。
+  string reason = 2;
+  int64 buyback_id = 3;
+  string item_id = 4;
+  string name = 5;
+  int32 count = 6;
+  int64 unit_price = 7;
+  // 这一笔真扣的金币。没成交恒为 0。
+  int64 paid = 8;
+  string currency = 9;
+  int64 balance = 10;
+  int32 bag_slot = 11;
+  bool duplicate = 12;
+}
+
+message RepairNpcEquipmentRequest {
+  uint64 character_id = 1;
+  // 网关生成的幂等号，前缀 npc_shop_repair:。
+  string txn_id = 2;
+}
+
+message NpcRepairRow {
+  string slot = 1;
+  string item_id = 2;
+  int32 before = 3;
+  int32 after = 4;
+  int32 max = 5;
+}
+
+message RepairNpcEquipmentResponse {
+  bool ok = 1;
+  // not_equipment（身上没装备）/ durability_full（都满着）/ not_enough_gold / duplicate。
+  string reason = 2;
+  // 这一笔真扣的金币。没成交恒为 0。
+  int64 charged = 3;
+  string currency = 4;
+  int64 balance = 5;
+  repeated NpcRepairRow repaired = 6;
+  bool duplicate = 7;
 }

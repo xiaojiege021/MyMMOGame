@@ -388,7 +388,8 @@ public sealed class GrantRepository(
         return result;
     }
 
-    static int FindDeliverySlot(
+    /// <summary>K2+Q13：NPC 商店入包也要挑格子，与发奖共用这一处，不另写第二套。</summary>
+    internal static int FindDeliverySlot(
         IReadOnlyList<BagSlot> slots, ItemDef goods, int count, int bagSlots)
     {
         if (count < 1 || count > goods.StackMax)

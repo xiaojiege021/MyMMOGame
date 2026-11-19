@@ -312,4 +312,214 @@ else
   bad "条数没跟着配置走：$(printf '%s' "$ADDED" | head -1)"
 fi
 
+echo "== 6. K2+Q13 NPC 商店：配置驱动 + 禁售清单 + 加一件商品只改配置 =="
+ROOT="$ROOT" python3 - > "$TMP/npc.txt" 2>&1 <<'PY'
+import json, os
+
+root = os.environ["ROOT"]
+
+def read(p):
+    p = os.path.join(root, p)
+    return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
+
+def cfg(p):
+    return json.loads(read(p))
+
+def report(key, cond, info=""):
+    print(("PASS " if cond else "FAIL ") + key + ("" if cond else "  " + info))
+
+npc = cfg("config/npc_shop.json")
+items = cfg("config/items.json")["items"]
+by_id = {i["id"]: i for i in items}
+npc_doc = cfg("config/npc.json")["npcs"]
+pills = {p["item_id"]: p for p in cfg("config/pill.json")["pills"]}
+migrations = cfg("db/migrations.json")
+
+report("npc_shop_schema", npc.get("schema") == "npc-shop-table/2" and npc.get("version", 0) >= 2
+       and npc.get("pending") is False,
+       "schema=%s version=%s pending=%s" % (npc.get("schema"), npc.get("version"), npc.get("pending")))
+
+shops = npc.get("shops") or []
+report("npc_shop_two_shops", [s["id"] for s in shops] == ["npc_general_qiyun", "npc_sect_supply"],
+       "shops=%s" % ",".join(s["id"] for s in shops))
+
+# npc.json 的 shop_id 必须指回来：两张表任意一边改了都起不来。
+shop_of_npc = {n["id"]: n.get("shop_id") or "" for n in npc_doc}
+report("npc_shop_npc_refs", all(shop_of_npc.get(s["npc_id"]) == s["id"] for s in shops),
+       "npc.json=%s" % {s["npc_id"]: shop_of_npc.get(s["npc_id"]) for s in shops})
+
+shelf = set(npc.get("shelf_kinds") or [])
+forbidden = set(npc.get("forbidden_items") or [])
+goods = [(s["id"], g) for s in shops for g in (s.get("items") or [])]
+report("npc_shop_shelf_kinds", shelf == {"consumable", "tool", "bag"}, "shelf=%s" % ",".join(sorted(shelf)))
+report("npc_shop_no_forbidden_kind",
+       not [g for _, g in goods if by_id.get(g["item_id"], {}).get("kind") in ("equipment", "material", "crystal")],
+       "货架上出现了装备 / 材料 / 结晶")
+report("npc_shop_no_forbidden_item",
+       not [g for _, g in goods if g["item_id"] in forbidden],
+       "货架上出现了禁售清单里的物品")
+report("npc_shop_prices_positive",
+       all(isinstance(g["price"], int) and g["price"] > 0 for _, g in goods)
+       and all(isinstance(g.get("stock_per_day", 0), int) and g.get("stock_per_day", 0) >= 0 for _, g in goods)
+       and all(isinstance(g.get("limit_per_character", 0), int) and g.get("limit_per_character", 0) >= 0
+               for _, g in goods),
+       "价格 / 库存 / 限购有非正数")
+
+# 方案 12：宗门卖「基础药品」，不是丹。回春丹 / 凝神丹 / 各档丹都不在货架上。
+report("npc_shop_sect_potions",
+       sorted(g["item_id"] for s in shops if s["id"] == "npc_sect_supply" for g in s["items"])
+       == ["potion_hp_basic", "potion_mp_basic"],
+       "宗门店=%s" % [g["item_id"] for s in shops if s["id"] == "npc_sect_supply" for g in s["items"]])
+hp = pills.get("potion_hp_basic") or {}
+mp = pills.get("potion_mp_basic") or {}
+low = [p["restore"] for p in pills.values() if p["kind"] == "hp" and p["item_id"] != "potion_hp_basic"]
+low_mp = [p["restore"] for p in pills.values() if p["kind"] == "mana" and p["item_id"] != "potion_mp_basic"]
+report("npc_potion_weaker_than_pill",
+       hp.get("restore", 0) > 0 and mp.get("restore", 0) > 0
+       and hp["restore"] < min(low) and mp["restore"] < min(low_mp)
+       and hp.get("cooldown_group") == "heal" and mp.get("cooldown_group") == "mana",
+       "hp=%s mp=%s 最低丹=%s/%s" % (hp.get("restore"), mp.get("restore"), min(low), min(low_mp)))
+
+sell = npc.get("sell") or {}
+sell_items = [x["item_id"] for x in (sell.get("items") or [])]
+report("npc_sell_material_only",
+       sell_items and all(by_id.get(i, {}).get("kind") == "material" for i in sell_items),
+       "sell=%s" % ",".join(sell_items))
+report("npc_sell_prices", all(isinstance(x["price"], int) and x["price"] >= 0 for x in sell.get("items") or []),
+       "回收价有负数")
+
+bb = npc.get("buyback") or {}
+report("npc_buyback_window", 1 <= bb.get("keep", 0) <= 20 and 1 <= bb.get("price_pct", 0) <= 100
+       and 1 <= bb.get("expire_days", 0) <= 365, "buyback=%s" % bb)
+
+repair = npc.get("repair") or {}
+grades = {i.get("grade") for i in items if i.get("kind") == "equipment"}
+missing = sorted(g for g in grades if g not in (repair.get("durability_max") or {}))
+report("npc_repair_covers_grades", not missing and repair.get("price_per_point", 0) > 0,
+       "缺品阶=%s" % missing)
+
+# 价格只在配置：这两份 C# 里不许出现具体价 / 耐久数字。
+table_cs = read("src/Character/NpcShopTable.cs")
+repo_cs = read("src/Character/NpcShopRepository.cs")
+report("npc_shop_no_price_in_code",
+       not any(tok in table_cs + repo_cs for tok in ("price = 10", "price = 5", "durability = 60", "= 60;")),
+       "代码里出现了具体价 / 耐久数字")
+
+# 接线：迁移 31、DDL、proto、网关、probe 五处都在。
+chars = [e for g in migrations["schemas"] if g["key"] == "character" for e in g["entries"]]
+report("npc_shop_migration", chars[-1]["version"] == 31 and chars[-1]["file"] == "db/character/npc_shop.sql",
+       "最后一版=%s" % chars[-1])
+master = read("db/character/character.sql")
+ddl = read("db/character/npc_shop.sql")
+report("npc_shop_ddl",
+       all(t in ddl for t in ('npc_shop_day', 'npc_shop_purchase', 'npc_shop_buyback', 'durability'))
+       and all(t in master for t in ('npc_shop_day', 'npc_shop_purchase', 'npc_shop_buyback', 'durability')),
+       "DDL 缺表 / 缺列，或主迁移没追加同一份")
+report("npc_shop_proto",
+       all(t in read("proto/mmo/character.proto") for t in (
+           "rpc DescribeNpcShop", "rpc BuyNpcShopItem", "rpc SellNpcItem",
+           "rpc BuybackNpcItem", "rpc RepairNpcEquipment")),
+       "proto 缺 rpc")
+report("npc_shop_gateway",
+       all(t in read("src/Gateway/ShopApi.cs") for t in (
+           '"/shop/npc"', '"/shop/npc/buy"', '"/shop/npc/sell"',
+           '"/shop/npc/buyback"', '"/shop/npc/repair"')),
+       "网关缺路由")
+report("npc_shop_probe",
+       "NpcShopCli.TryReadOnly()" in read("tools/probe/CliProbe/CliEntry.cs")
+       and "NpcShopCli.TryRunDbAsync" in read("tools/probe/CliProbe/DbCli.cs"),
+       "probe 分发缺一处")
+# 钱与货的先后：买/回购必须「先抢号 → 先扣币 → 再入包」，修理必须先扣币再写耐久。
+# 这几条不看运行，只看调用顺序，所以「不扣币就发货」这种改法在本地无库段就会红。
+def order(body, first, second):
+    a, b = body.find(first), body.find(second)
+    return a >= 0 and b >= 0 and a < b
+
+buy_body = repo_cs.split("public async Task<NpcBuyFacts> BuyAsync")[1].split("public async Task<NpcSellFacts>")[0]
+sell_body = repo_cs.split("public async Task<NpcSellFacts> SellAsync")[1].split("public async Task<NpcBuybackFacts>")[0]
+back_body = repo_cs.split("public async Task<NpcBuybackFacts> BuybackAsync")[1].split("public async Task<NpcRepairFacts>")[0]
+repair_body = repo_cs.split("public async Task<NpcRepairFacts> RepairAsync")[1].split("// ------------------------------------------------------------------ 内部")[0]
+report("npc_buy_claim_charge_deliver",
+       order(buy_body, "TryClaimTxnInTransactionAsync", "ApplyCurrencyDeltaInTransactionAsync")
+       and order(buy_body, "ApplyCurrencyDeltaInTransactionAsync", "ApplyItemDeltasInTransactionAsync"),
+       "买的顺序不是 抢号 → 扣币 → 入包")
+report("npc_sell_remove_then_gain",
+       order(sell_body, "delete from", "ApplyCurrencyDeltaInTransactionAsync")
+       and "npc_shop_buyback" in sell_body,
+       "卖的顺序不是 删行 → 加币 → 记回购")
+report("npc_buyback_charge_then_deliver",
+       order(back_body, "TryClaimTxnInTransactionAsync", "ApplyCurrencyDeltaInTransactionAsync")
+       and order(back_body, "ApplyCurrencyDeltaInTransactionAsync", "ApplyItemDeltasInTransactionAsync"),
+       "回购的顺序不是 抢号 → 扣币 → 入包")
+report("npc_repair_charge_then_write",
+       order(repair_body, "ApplyCurrencyDeltaInTransactionAsync", "set durability = null"),
+       "修理不是先扣币再写耐久")
+report("npc_shop_client",
+       "NpcShopCodex" in read("client/MMOGame/Assets/HotUpdate/Ui/UiContentTable.cs")
+       and "NpcShops" in read("client/MMOGame/Assets/HotUpdate/Ui/UiContentTable.cs"),
+       "客户端入口表没生成")
+PY
+while IFS= read -r line; do
+  case "$line" in
+    PASS*) ok "${line#PASS }" ;;
+    FAIL*) bad "${line#FAIL }" ;;
+  esac
+done < "$TMP/npc.txt"
+
+NPCLIST="$("$DOTNET" "$CHARACTER_DLL" --npc-shop-list 2>&1)"
+if grep -q 'npc_shop_table=ok version=2 shops=2' <<< "$NPCLIST"; then
+  ok "只读入口：两店都读出来了"
+else
+  bad "只读入口没读出两店：$(head -1 <<< "$NPCLIST")"
+fi
+if [ "$(grep -c '^npc_shop_item ' <<< "$NPCLIST")" = "$(python3 -c 'import json;d=json.load(open("config/npc_shop.json"));print(sum(len(s["items"]) for s in d["shops"]))')" ]; then
+  ok "货架件数跟着配置走"
+else
+  bad "货架件数对不上：$(grep -c '^npc_shop_item ' <<< "$NPCLIST")"
+fi
+if grep -q 'npc_shop_durability grade=red max=' <<< "$NPCLIST"; then
+  ok "修理单价与六档耐久上限都在配置里读出来"
+else
+  bad "耐久上限没读全"
+fi
+
+# 坏配置三例：禁售物品 / 装备 / 丹上了货架，都必须起不来（退出 2，config_error）。
+ROOT="$ROOT" TMP="$TMP" python3 - <<'PY'
+import json, os
+root, tmp = os.environ["ROOT"], os.environ["TMP"]
+base = json.load(open(os.path.join(root, "config/npc_shop.json"), encoding="utf-8"))
+
+def dump(name, mutate):
+    d = json.loads(json.dumps(base))
+    mutate(d)
+    json.dump(d, open(os.path.join(tmp, name), "w", encoding="utf-8"), ensure_ascii=False)
+
+dump("bad-forbidden.json", lambda d: d["shops"][1]["items"].append(
+    {"item_id": "pill_rejuvenate", "price": 1, "stock_per_day": 1, "limit_per_character": 0}))
+dump("bad-equip.json", lambda d: d["shops"][0]["items"].append(
+    {"item_id": "sword_trial", "price": 1, "stock_per_day": 1, "limit_per_character": 0}))
+dump("bad-sell.json", lambda d: d["sell"]["items"].append(
+    {"item_id": "sword_trial", "price": 1}))
+PY
+for case in forbidden equip sell; do
+  out="$("$DOTNET" "$CHARACTER_DLL" --npc-shop-list --npc-shop-table-path "$TMP/bad-$case.json" 2>&1)"
+  assert_bad_config "$out" "坏货架 ${case}：起不来（$(printf '%s' "$out" | head -1 | cut -c1-56)…）"
+done
+
+# 加一件商品只改配置：类别合法的一件新工具，出现在只读入口里，代码一行不动。
+ROOT="$ROOT" TMP="$TMP" python3 - <<'PY'
+import json, os
+root, tmp = os.environ["ROOT"], os.environ["TMP"]
+d = json.load(open(os.path.join(root, "config/npc_shop.json"), encoding="utf-8"))
+d["shops"][0]["items"].append(
+    {"item_id": "rename_card", "price": 7, "stock_per_day": 2, "limit_per_character": 1})
+json.dump(d, open(os.path.join(tmp, "added-npc.json"), "w", encoding="utf-8"), ensure_ascii=False)
+PY
+ADDED_NPC="$("$DOTNET" "$CHARACTER_DLL" --npc-shop-list --npc-shop-table-path "$TMP/added-npc.json" 2>&1)"
+if grep -q 'npc_shop_item shop=npc_general_qiyun item=rename_card .*price=7' <<< "$ADDED_NPC"; then
+  ok "加一件商品：只改配置就进货架，代码不动"
+else
+  bad "新加商品没生效：$(grep rename_card <<< "$ADDED_NPC" | head -1)"
+fi
+
 finish "$TITLE"

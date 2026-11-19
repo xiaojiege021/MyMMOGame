@@ -201,7 +201,9 @@ report("txn_from_gateway", '"shop_buy:" + Guid.NewGuid()' in api and "TxnId = tx
 report("gateway_no_write",
        not [w for w in ("INSERT", "UPDATE ", "DELETE") if w in api], "api_writes")
 
-routes = re.findall(r'MapPost\("(/shop/[a-z/]+)"', api)
+# 元宝商城只许一条口；K2+Q13 的 NPC 商店（/shop/npc/*）是另一个验收主体，不在这条断言里。
+routes = [r for r in re.findall(r'MapPost\("(/shop/[a-z/]+)"', api)
+          if not r.startswith("/shop/npc")]
 report("single_route", routes == ["/shop/buy"], ",".join(routes))
 report("route_mapped", "ShopApi.Map(app, tokens, config)" in files[gateway_cs], "gateway")
 

@@ -46,6 +46,15 @@ namespace HotUpdate.Ui
 
         public bool HasShop { get; private set; }
 
+        // K2+Q13：NPC 商店的面板与四件事的回包。价格、库存、回收价、修理费都只在回包里。
+        public NpcShopOutcome ShopNpc { get; private set; }
+
+        public bool HasShopNpc { get; private set; }
+
+        public NpcActionOutcome LastNpc { get; private set; }
+
+        public bool HasNpc { get; private set; }
+
         public AuctionOutcome LastAuction { get; private set; }
 
         public bool HasAuction { get; private set; }
@@ -170,6 +179,59 @@ namespace HotUpdate.Ui
                     : new ShopOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
                 outcome => { LastShop = outcome; HasShop = true; },
                 "u6_shop", done);
+        }
+
+        /// <summary>看货架：一个 GET，货名 / 标价 / 今日剩多少 / 回购与耐久都是回包里的值。</summary>
+        public void LoadNpcShop(string shopId, Action done = null)
+        {
+            Send<NpcShopOutcome>(CharacterNpcShop.DescribePath(_characterId, shopId), string.Empty,
+                (status, text) => status == 200
+                    ? CharacterNpcShop.ParseDescribe(text)
+                    : new NpcShopOutcome
+                    {
+                        Reason = "status_" + status,
+                        Goods = new List<NpcShopGoodsRow>(),
+                        DisplayText = "没发出去：" + status,
+                    },
+                outcome => { ShopNpc = outcome; HasShopNpc = true; },
+                "u6_npc_shop", done);
+        }
+
+        public void NpcBuy(string shopId, string itemId, Action done = null)
+        {
+            SendNpc("/shop/npc/buy", CharacterNpcShop.BuyBody(_characterId, shopId, itemId),
+                "买了", done);
+        }
+
+        public void NpcSell(string shopId, int bagSlot, int count, Action done = null)
+        {
+            SendNpc("/shop/npc/sell",
+                CharacterNpcShop.SellBody(_characterId, shopId, bagSlot, count), "卖了", done);
+        }
+
+        public void NpcBuyback(string shopId, long buybackId, Action done = null)
+        {
+            SendNpc("/shop/npc/buyback",
+                CharacterNpcShop.BuybackBody(_characterId, shopId, buybackId), "回购了", done);
+        }
+
+        public void NpcRepair(Action done = null)
+        {
+            SendNpc("/shop/npc/repair", CharacterNpcShop.RepairBody(_characterId), "修好了", done);
+        }
+
+        void SendNpc(string path, string body, string what, Action done)
+        {
+            Send<NpcActionOutcome>(path, body,
+                (status, text) => status == 200
+                    ? CharacterNpcShop.ParseAction(text, what)
+                    : new NpcActionOutcome
+                    {
+                        Reason = "status_" + status,
+                        DisplayText = "没发出去：" + status,
+                    },
+                outcome => { LastNpc = outcome; HasNpc = true; },
+                "u6_npc_action", done);
         }
 
         public void AuctionList(uint slot, uint count, long priceGold, Action done = null)

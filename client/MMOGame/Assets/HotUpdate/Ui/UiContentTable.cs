@@ -2,6 +2,7 @@
 // 由 tools/gen/gen-ui-content.py 从以下配置生成，不要手改：
 //   config/world.json / config/region/*.json / config/flight.json
 //   config/npc.json / config/dialogue/*.json / tools/gen/ui_map_layout.json
+//   config/npc_shop.json（只生成商店编号与货架件数，价格与货名一律读服务端回包）
 // 重新生成：python3 tools/gen/gen-ui-content.py
 // 核对：bash tools/check/check-k6.sh / bash tools/check/check-c5.sh（重跑生成器并逐字比对）
 // </auto-generated>
@@ -286,6 +287,22 @@ namespace HotUpdate.Ui
                 Id = "npc_shop_sect", Name = "宗门库房执事", Region = "承露门", Role = "merchant",
                 Faction = "承露门", DialogueId = "", ShopId = "npc_sect_supply",
                 X = 20f, Y = 0f, Z = 6f, Facing = 180f,
+            },
+        };
+
+        /// <summary>
+        /// NPC 商店入口（K2+Q13），照 config/npc_shop.json 的 shops。只给编号、挂哪一位 NPC、
+        /// 货架几件；标价、库存、回收价、修理单价一律读 /shop/npc 回包，不在这里抄第二份。
+        /// </summary>
+        public static readonly UiNpcShopCodex.ShopMeta[] NpcShops =
+        {
+            new UiNpcShopCodex.ShopMeta
+            {
+                Id = "npc_general_qiyun", NpcId = "npc_shop_qiyun", Name = "栖云坊市执事", Goods = 3,
+            },
+            new UiNpcShopCodex.ShopMeta
+            {
+                Id = "npc_sect_supply", NpcId = "npc_shop_sect", Name = "宗门库房执事", Goods = 2,
             },
         };
     }

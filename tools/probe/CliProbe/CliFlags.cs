@@ -321,4 +321,24 @@ internal static class CliFlags
     public static long pillSpendOf = 0;
     public static string? pillSpendItem = null;
     public static string? pillSpendTxn = null;
+    // K2+Q13：NPC 商店。只读列货架，连库走买 / 卖 / 回购 / 修理四笔事务。
+    public static bool npcShopList = false;
+    public static string? npcShopTablePath = null;
+    public static long npcShopStateOf = 0;
+    public static string? npcShopShopId = null;
+    public static long npcBuyOf = 0;
+    public static string? npcBuyShop = null;
+    public static string? npcBuyItem = null;
+    public static long npcSellOf = 0;
+    public static string? npcSellShop = null;
+    public static int npcSellSlot = 0;
+    public static int npcSellCount = 0;
+    public static long npcBuybackOf = 0;
+    public static string? npcBuybackShop = null;
+    public static long npcBuybackId = 0;
+    public static long npcRepairOf = 0;
+    public static string? npcTxn = null;
+    public static long rawDurabilityOf = 0;
+    public static string? rawDurabilitySlot = null;
+    public static int rawDurabilityValue = 0;
 }

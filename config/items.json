@@ -400,6 +400,26 @@
       "desc": "立即回复一部分法力，最低一档蓝药。"
     },
     {
+      "id": "potion_hp_basic",
+      "name": "基础红药",
+      "kind": "consumable",
+      "grade": "white",
+      "set_id": "",
+      "stack_max": 99,
+      "bind": "none",
+      "desc": "宗门发放的入门红药。只回复自己的生命，回复低于最低一档丹，和同色丹、符共用冷却。"
+    },
+    {
+      "id": "potion_mp_basic",
+      "name": "基础蓝药",
+      "kind": "consumable",
+      "grade": "white",
+      "set_id": "",
+      "stack_max": 99,
+      "bind": "none",
+      "desc": "宗门发放的入门蓝药。只回复自己的法力，回复低于最低一档丹，和同色丹、符共用冷却。"
+    },
+    {
       "id": "herb_xue",
       "name": "血参",
       "kind": "material",

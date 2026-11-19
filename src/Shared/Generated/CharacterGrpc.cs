@@ -131,6 +131,26 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyHomeCoinShopResponse> __Marshaller_mmo_character_BuyHomeCoinShopResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyHomeCoinShopResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeNpcShopRequest> __Marshaller_mmo_character_DescribeNpcShopRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeNpcShopRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeNpcShopResponse> __Marshaller_mmo_character_DescribeNpcShopResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeNpcShopResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyNpcShopItemRequest> __Marshaller_mmo_character_BuyNpcShopItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyNpcShopItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuyNpcShopItemResponse> __Marshaller_mmo_character_BuyNpcShopItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuyNpcShopItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SellNpcItemRequest> __Marshaller_mmo_character_SellNpcItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SellNpcItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SellNpcItemResponse> __Marshaller_mmo_character_SellNpcItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SellNpcItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuybackNpcItemRequest> __Marshaller_mmo_character_BuybackNpcItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuybackNpcItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.BuybackNpcItemResponse> __Marshaller_mmo_character_BuybackNpcItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.BuybackNpcItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.RepairNpcEquipmentRequest> __Marshaller_mmo_character_RepairNpcEquipmentRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.RepairNpcEquipmentRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.RepairNpcEquipmentResponse> __Marshaller_mmo_character_RepairNpcEquipmentResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.RepairNpcEquipmentResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeTalismanRequest> __Marshaller_mmo_character_ConsumeTalismanRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeTalismanRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumeTalismanResponse> __Marshaller_mmo_character_ConsumeTalismanResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumeTalismanResponse.Parser));
@@ -462,6 +482,46 @@ namespace Mmo.Proto.Character {
         "BuyHomeCoinShopItem",
         __Marshaller_mmo_character_BuyHomeCoinShopRequest,
         __Marshaller_mmo_character_BuyHomeCoinShopResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeNpcShopRequest, global::Mmo.Proto.Character.DescribeNpcShopResponse> __Method_DescribeNpcShop = new grpc::Method<global::Mmo.Proto.Character.DescribeNpcShopRequest, global::Mmo.Proto.Character.DescribeNpcShopResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeNpcShop",
+        __Marshaller_mmo_character_DescribeNpcShopRequest,
+        __Marshaller_mmo_character_DescribeNpcShopResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.BuyNpcShopItemRequest, global::Mmo.Proto.Character.BuyNpcShopItemResponse> __Method_BuyNpcShopItem = new grpc::Method<global::Mmo.Proto.Character.BuyNpcShopItemRequest, global::Mmo.Proto.Character.BuyNpcShopItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "BuyNpcShopItem",
+        __Marshaller_mmo_character_BuyNpcShopItemRequest,
+        __Marshaller_mmo_character_BuyNpcShopItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.SellNpcItemRequest, global::Mmo.Proto.Character.SellNpcItemResponse> __Method_SellNpcItem = new grpc::Method<global::Mmo.Proto.Character.SellNpcItemRequest, global::Mmo.Proto.Character.SellNpcItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SellNpcItem",
+        __Marshaller_mmo_character_SellNpcItemRequest,
+        __Marshaller_mmo_character_SellNpcItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.BuybackNpcItemRequest, global::Mmo.Proto.Character.BuybackNpcItemResponse> __Method_BuybackNpcItem = new grpc::Method<global::Mmo.Proto.Character.BuybackNpcItemRequest, global::Mmo.Proto.Character.BuybackNpcItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "BuybackNpcItem",
+        __Marshaller_mmo_character_BuybackNpcItemRequest,
+        __Marshaller_mmo_character_BuybackNpcItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.RepairNpcEquipmentRequest, global::Mmo.Proto.Character.RepairNpcEquipmentResponse> __Method_RepairNpcEquipment = new grpc::Method<global::Mmo.Proto.Character.RepairNpcEquipmentRequest, global::Mmo.Proto.Character.RepairNpcEquipmentResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RepairNpcEquipment",
+        __Marshaller_mmo_character_RepairNpcEquipmentRequest,
+        __Marshaller_mmo_character_RepairNpcEquipmentResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse> __Method_ConsumeTalisman = new grpc::Method<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse>(
@@ -1059,6 +1119,44 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.BuyHomeCoinShopResponse> BuyHomeCoinShopItem(global::Mmo.Proto.Character.BuyHomeCoinShopRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// K2+Q13：NPC 商店。一个面板四件事——看货架、买、卖、回购、修理。
+      /// 商品、价格、库存、限购、回收价、回购窗口、耐久上限与修理单价全在
+      /// config/npc_shop.json；客户端只带商店编号、格号与事务号，带不进价格。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeNpcShopResponse> DescribeNpcShop(global::Mmo.Proto.Character.DescribeNpcShopRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.BuyNpcShopItemResponse> BuyNpcShopItem(global::Mmo.Proto.Character.BuyNpcShopItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SellNpcItemResponse> SellNpcItem(global::Mmo.Proto.Character.SellNpcItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.BuybackNpcItemResponse> BuybackNpcItem(global::Mmo.Proto.Character.BuybackNpcItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.RepairNpcEquipmentResponse> RepairNpcEquipment(global::Mmo.Proto.Character.RepairNpcEquipmentRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2662,6 +2760,142 @@ namespace Mmo.Proto.Character {
       public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuyHomeCoinShopResponse> BuyHomeCoinShopItemAsync(global::Mmo.Proto.Character.BuyHomeCoinShopRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_BuyHomeCoinShopItem, null, options, request);
+      }
+      /// <summary>
+      /// K2+Q13：NPC 商店。一个面板四件事——看货架、买、卖、回购、修理。
+      /// 商品、价格、库存、限购、回收价、回购窗口、耐久上限与修理单价全在
+      /// config/npc_shop.json；客户端只带商店编号、格号与事务号，带不进价格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeNpcShopResponse DescribeNpcShop(global::Mmo.Proto.Character.DescribeNpcShopRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeNpcShop(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K2+Q13：NPC 商店。一个面板四件事——看货架、买、卖、回购、修理。
+      /// 商品、价格、库存、限购、回收价、回购窗口、耐久上限与修理单价全在
+      /// config/npc_shop.json；客户端只带商店编号、格号与事务号，带不进价格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeNpcShopResponse DescribeNpcShop(global::Mmo.Proto.Character.DescribeNpcShopRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeNpcShop, null, options, request);
+      }
+      /// <summary>
+      /// K2+Q13：NPC 商店。一个面板四件事——看货架、买、卖、回购、修理。
+      /// 商品、价格、库存、限购、回收价、回购窗口、耐久上限与修理单价全在
+      /// config/npc_shop.json；客户端只带商店编号、格号与事务号，带不进价格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeNpcShopResponse> DescribeNpcShopAsync(global::Mmo.Proto.Character.DescribeNpcShopRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeNpcShopAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// K2+Q13：NPC 商店。一个面板四件事——看货架、买、卖、回购、修理。
+      /// 商品、价格、库存、限购、回收价、回购窗口、耐久上限与修理单价全在
+      /// config/npc_shop.json；客户端只带商店编号、格号与事务号，带不进价格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeNpcShopResponse> DescribeNpcShopAsync(global::Mmo.Proto.Character.DescribeNpcShopRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeNpcShop, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuyNpcShopItemResponse BuyNpcShopItem(global::Mmo.Proto.Character.BuyNpcShopItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyNpcShopItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuyNpcShopItemResponse BuyNpcShopItem(global::Mmo.Proto.Character.BuyNpcShopItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_BuyNpcShopItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuyNpcShopItemResponse> BuyNpcShopItemAsync(global::Mmo.Proto.Character.BuyNpcShopItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuyNpcShopItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuyNpcShopItemResponse> BuyNpcShopItemAsync(global::Mmo.Proto.Character.BuyNpcShopItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_BuyNpcShopItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SellNpcItemResponse SellNpcItem(global::Mmo.Proto.Character.SellNpcItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SellNpcItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SellNpcItemResponse SellNpcItem(global::Mmo.Proto.Character.SellNpcItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SellNpcItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SellNpcItemResponse> SellNpcItemAsync(global::Mmo.Proto.Character.SellNpcItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SellNpcItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SellNpcItemResponse> SellNpcItemAsync(global::Mmo.Proto.Character.SellNpcItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SellNpcItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuybackNpcItemResponse BuybackNpcItem(global::Mmo.Proto.Character.BuybackNpcItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuybackNpcItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.BuybackNpcItemResponse BuybackNpcItem(global::Mmo.Proto.Character.BuybackNpcItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_BuybackNpcItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuybackNpcItemResponse> BuybackNpcItemAsync(global::Mmo.Proto.Character.BuybackNpcItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return BuybackNpcItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.BuybackNpcItemResponse> BuybackNpcItemAsync(global::Mmo.Proto.Character.BuybackNpcItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_BuybackNpcItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.RepairNpcEquipmentResponse RepairNpcEquipment(global::Mmo.Proto.Character.RepairNpcEquipmentRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RepairNpcEquipment(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.RepairNpcEquipmentResponse RepairNpcEquipment(global::Mmo.Proto.Character.RepairNpcEquipmentRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RepairNpcEquipment, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.RepairNpcEquipmentResponse> RepairNpcEquipmentAsync(global::Mmo.Proto.Character.RepairNpcEquipmentRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RepairNpcEquipmentAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.RepairNpcEquipmentResponse> RepairNpcEquipmentAsync(global::Mmo.Proto.Character.RepairNpcEquipmentRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RepairNpcEquipment, null, options, request);
       }
       /// <summary>
       /// P1-5c3：在战斗里用掉一张符。战斗服发过来，只扣一张、不碰生命与蓝量——
@@ -4814,6 +5048,11 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_SettleIngot, serviceImpl.SettleIngot)
           .AddMethod(__Method_BuyShopItem, serviceImpl.BuyShopItem)
           .AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl.BuyHomeCoinShopItem)
+          .AddMethod(__Method_DescribeNpcShop, serviceImpl.DescribeNpcShop)
+          .AddMethod(__Method_BuyNpcShopItem, serviceImpl.BuyNpcShopItem)
+          .AddMethod(__Method_SellNpcItem, serviceImpl.SellNpcItem)
+          .AddMethod(__Method_BuybackNpcItem, serviceImpl.BuybackNpcItem)
+          .AddMethod(__Method_RepairNpcEquipment, serviceImpl.RepairNpcEquipment)
           .AddMethod(__Method_ConsumeTalisman, serviceImpl.ConsumeTalisman)
           .AddMethod(__Method_DescribeTalisman, serviceImpl.DescribeTalisman)
           .AddMethod(__Method_DescribePill, serviceImpl.DescribePill)
@@ -4885,6 +5124,11 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_SettleIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse>(serviceImpl.SettleIngot));
       serviceBinder.AddMethod(__Method_BuyShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyShopItemRequest, global::Mmo.Proto.Character.BuyShopItemResponse>(serviceImpl.BuyShopItem));
       serviceBinder.AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyHomeCoinShopRequest, global::Mmo.Proto.Character.BuyHomeCoinShopResponse>(serviceImpl.BuyHomeCoinShopItem));
+      serviceBinder.AddMethod(__Method_DescribeNpcShop, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeNpcShopRequest, global::Mmo.Proto.Character.DescribeNpcShopResponse>(serviceImpl.DescribeNpcShop));
+      serviceBinder.AddMethod(__Method_BuyNpcShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyNpcShopItemRequest, global::Mmo.Proto.Character.BuyNpcShopItemResponse>(serviceImpl.BuyNpcShopItem));
+      serviceBinder.AddMethod(__Method_SellNpcItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SellNpcItemRequest, global::Mmo.Proto.Character.SellNpcItemResponse>(serviceImpl.SellNpcItem));
+      serviceBinder.AddMethod(__Method_BuybackNpcItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuybackNpcItemRequest, global::Mmo.Proto.Character.BuybackNpcItemResponse>(serviceImpl.BuybackNpcItem));
+      serviceBinder.AddMethod(__Method_RepairNpcEquipment, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RepairNpcEquipmentRequest, global::Mmo.Proto.Character.RepairNpcEquipmentResponse>(serviceImpl.RepairNpcEquipment));
       serviceBinder.AddMethod(__Method_ConsumeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse>(serviceImpl.ConsumeTalisman));
       serviceBinder.AddMethod(__Method_DescribeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeTalismanRequest, global::Mmo.Proto.Character.DescribeTalismanResponse>(serviceImpl.DescribeTalisman));
       serviceBinder.AddMethod(__Method_DescribePill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribePillRequest, global::Mmo.Proto.Character.DescribePillResponse>(serviceImpl.DescribePill));

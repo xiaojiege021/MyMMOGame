@@ -1,8 +1,17 @@
 {
-  "schema": "npc-shop-table/1",
-  "version": 1,
-  "pending": true,
-  "note": "K2：NPC 商店的唯一正本。城镇卖镐、药锄、背包；宗门卖基础药与辅助。具体商品、价格、库存方案没写，全部 pending；tool_* / bag_basic / pill_* 由 K5、B1 补进 items.json。代码尚未读取，由 K2 接入。",
+  "schema": "npc-shop-table/2",
+  "version": 2,
+  "pending": false,
+  "note": "K2+Q13：NPC 商店的唯一正本。城镇卖镐、药锄、背包；宗门卖基础红药 / 基础蓝药（方案 12 的「基础药品」，回复低于最低一档丹，走 pill.json 的 heal 冷却）。货架种类与禁售清单在 shelf_kinds / forbidden_items：装备、材料、结晶、灵石、强化石、转移石、各类丹与胚子在这里长不出来，写进 items 会在加载期报 config_error。sell 是 NPC 回收白名单（不在名单里的一律不能卖），buyback 是回购窗口，repair 是修理单价与按品阶的耐久上限——三个数都只在这一份文件里。",
+  "shelf_kinds": ["consumable", "tool", "bag"],
+  "forbidden_items": [
+    "pill_rejuvenate",
+    "pill_focus",
+    "pill_qixue",
+    "pill_huiling",
+    "pill_zhuji",
+    "pill_pojing"
+  ],
   "shops": [
     {
       "id": "npc_general_qiyun",
@@ -37,18 +46,44 @@
       "refresh": "daily",
       "items": [
         {
-          "item_id": "pill_rejuvenate",
-          "price": 20,
+          "item_id": "potion_hp_basic",
+          "price": 5,
           "stock_per_day": 20,
           "limit_per_character": 5
         },
         {
-          "item_id": "pill_focus",
-          "price": 20,
+          "item_id": "potion_mp_basic",
+          "price": 5,
           "stock_per_day": 20,
           "limit_per_character": 5
         }
       ]
     }
-  ]
+  ],
+  "sell": {
+    "currency": "gold",
+    "items": [
+      { "item_id": "ore_iron", "price": 3 },
+      { "item_id": "herb_ling", "price": 4 },
+      { "item_id": "herb_xue", "price": 2 },
+      { "item_id": "herb_xuan", "price": 2 }
+    ]
+  },
+  "buyback": {
+    "keep": 5,
+    "price_pct": 100,
+    "expire_days": 7
+  },
+  "repair": {
+    "currency": "gold",
+    "price_per_point": 2,
+    "durability_max": {
+      "white": 60,
+      "green": 80,
+      "blue": 100,
+      "purple": 120,
+      "orange": 150,
+      "red": 200
+    }
+  }
 }

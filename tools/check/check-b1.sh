@@ -71,8 +71,10 @@ echo "== 3. 只读入口：六种丹与上限都从配置现取 =="
 LIST="$("$DOTNET" "$PROBE" --pill-list 2>&1)"
 printf '%s' "$LIST" >"$TMP/pill-list.txt"
 HEAD="$(head -1 "$TMP/pill-list.txt")"
+# 条数现取：K2+Q13 往同一张表加了两件 NPC 卖的基础红蓝药，写死 6 会把后来的卡打挂。
+EXPECT_PILLS="$(python3 -c 'import json;print(len(json.load(open("config/pill.json"))["pills"]))')"
 case "$HEAD" in
-  pill_list_state=ok\ version=*\ pills=6\ hp_top=*\ mana_top=*\ talisman_hp_cap=*\ talisman_mana_cap=*)
+  pill_list_state=ok\ version=*\ pills="$EXPECT_PILLS"\ hp_top=*\ mana_top=*\ talisman_hp_cap=*\ talisman_mana_cap=*)
     ok "丹药表读得出来：六种丹 + 两个上限（${HEAD}）" ;;
   *) bad "丹药清单头部不对：$HEAD" ;;
 esac
@@ -140,7 +142,10 @@ esac
 if ROOT="$ROOT" python3 - <<'PY'
 import json, os, sys
 root = os.environ["ROOT"]
-pills = {p["item_id"] for p in json.load(open(os.path.join(root, "config/pill.json"), encoding="utf-8"))["pills"]}
+# 可炼的丹才算炼丹产出：K2+Q13 把两件 NPC 卖的基础红蓝药也放进同一张表
+# （消耗走同一条路径），它们标了 craft=false，不由炼丹产出。
+pills = {p["item_id"] for p in json.load(open(os.path.join(root, "config/pill.json"), encoding="utf-8"))["pills"]
+         if p.get("craft", True)}
 realms = json.load(open(os.path.join(root, "config/realms.json"), encoding="utf-8"))
 bad = [a.get("from") for a in realms["advance"]
        if a.get("pill") not in pills or int(a.get("pill_count", 0)) < 1]
@@ -160,7 +165,10 @@ if ROOT="$ROOT" python3 - <<'PY'
 import json, os, sys
 root = os.environ["ROOT"]
 items = {x["id"]: x for x in json.load(open(os.path.join(root, "config/items.json"), encoding="utf-8"))["items"]}
-pills = {p["item_id"] for p in json.load(open(os.path.join(root, "config/pill.json"), encoding="utf-8"))["pills"]}
+# 可炼的丹才算炼丹产出：K2+Q13 把两件 NPC 卖的基础红蓝药也放进同一张表
+# （消耗走同一条路径），它们标了 craft=false，不由炼丹产出。
+pills = {p["item_id"] for p in json.load(open(os.path.join(root, "config/pill.json"), encoding="utf-8"))["pills"]
+         if p.get("craft", True)}
 recipes = json.load(open(os.path.join(root, "config/recipes.json"), encoding="utf-8"))
 alch = [r for r in recipes["recipes"] if r["profession"] == "alchemy"]
 if sorted(r["output"]["item_id"] for r in alch) != sorted(pills):

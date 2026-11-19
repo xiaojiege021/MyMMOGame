@@ -38,6 +38,9 @@ internal static class CliEntry
         code = ShopCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = NpcShopCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = MainlineCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

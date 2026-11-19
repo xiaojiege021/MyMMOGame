@@ -150,7 +150,9 @@ report("req_fill_scope",
        "grpc_fill")
 
 # 路由只有一条，别处不许再开一个商城口。
-routes = re.findall(r'MapPost\("(/shop/[a-z/]+)"', api)
+# 元宝商城只许一条口；K2+Q13 的 NPC 商店（/shop/npc/*）是另一个验收主体，不在这条断言里。
+routes = [r for r in re.findall(r'MapPost\("(/shop/[a-z/]+)"', api)
+          if not r.startswith("/shop/npc")]
 report("single_route", routes == ["/shop/buy"], ",".join(routes))
 report("route_mapped", "ShopApi.Map(app, tokens, config)" in files[gateway_cs], "gateway")
 

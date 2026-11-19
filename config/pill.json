@@ -45,6 +45,28 @@
       "note": "高一档蓝药，蓝符的上限来源：talisman.json 的 potion_mana_restore 必须等于本条 restore。"
     },
     {
+      "item_id": "potion_hp_basic",
+      "name": "基础红药",
+      "kind": "hp",
+      "tier": 1,
+      "craft": false,
+      "restore": 100,
+      "cooldown_group": "heal",
+      "cooldown_ms": 2000,
+      "note": "K2+Q13：宗门 NPC 卖的基础药品。回复低于最低一档丹（回春丹 150），与丹、符共用 heal 冷却，所以同级最强仍是气血丹，红符上限不动。"
+    },
+    {
+      "item_id": "potion_mp_basic",
+      "name": "基础蓝药",
+      "kind": "mana",
+      "tier": 1,
+      "craft": false,
+      "restore": 60,
+      "cooldown_group": "mana",
+      "cooldown_ms": 2000,
+      "note": "K2+Q13：宗门 NPC 卖的基础药品。回复低于最低一档丹（凝神丹 100），与丹、符共用 mana 冷却。"
+    },
+    {
       "item_id": "pill_zhuji",
       "name": "筑基丹",
       "kind": "breakthrough",
