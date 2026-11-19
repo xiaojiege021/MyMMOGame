@@ -440,11 +440,14 @@ PY
 
 echo "== 5. 起角色服与网关 =="
 CHARACTER_LOG="$TMP/character.log"
+# 版本号现取（config/crystal.json 的 version）：D16 之后固垒加了镶嵌位、表版本涨到 3，
+# 这里钉死 =1 会把当时的事实当成规定。
+CRYSTAL_VERSION="$(python3 -c 'import json; print(json.load(open("config/crystal.json"))["version"])')"
 "$DOTNET" "$CHARACTER_DLL" --config "$TMP/character.json" >"$CHARACTER_LOG" 2>&1 & CHARACTER_PID=$!
 "$DOTNET" "$GATEWAY_DLL" --config "$TMP/gateway.json" >"$TMP/gateway.log" 2>&1 & GATEWAY_PID=$!
 if wait_ready "$CHARACTER_LOG" '^ready name=Character' "角色服" \
    && wait_ready "$TMP/gateway.log" '^ready name=Gateway' "网关" \
-   && wait_line "$CHARACTER_LOG" 'crystal_table_version=1 crystal_sockets=2' \
+   && wait_line "$CHARACTER_LOG" "crystal_table_version=${CRYSTAL_VERSION} crystal_sockets=2" \
    && wait_line "$CHARACTER_LOG" 'crystal_categories=attack,defense,utility'; then
   ok "角色服与网关起来，结晶表与只读入口同形"
 else

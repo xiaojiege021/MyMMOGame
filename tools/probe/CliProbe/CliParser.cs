@@ -18,6 +18,7 @@ internal static class CliParser
                 break;
             case "--calendar": case "--calendar-path": case "--at": CalendarCli.Parse(args, ref i); break;
             case var flag when CityTaskCli.Handles(flag): CityTaskCli.Parse(args, ref i); break;
+            case var enhanceFlag when EnhanceCli.Handles(enhanceFlag): EnhanceCli.Parse(args, ref i); break;
             case var flag2 when PassProgressCli.Handles(flag2): PassProgressCli.Parse(args, ref i); break;
             case var nameFlag when NameCli.Handles(nameFlag): NameCli.Parse(args, ref i); break;
             case "--migrate": migrate = true; break;

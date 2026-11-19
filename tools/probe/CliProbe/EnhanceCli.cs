@@ -8,6 +8,32 @@ namespace Character.Cli;
 /// <summary>强化 / 转移 / 结晶的只读与连库核对。</summary>
 internal static class EnhanceCli
 {
+    /// <summary>C4 的三个核对 flag 归本类解析（CliParser 一行分发，避免把行数推过闸门）。</summary>
+    public static bool Handles(string flag) => flag
+        is "--enhance-row" or "--move-slot" or "--raw-delete-slot";
+
+    public static int Parse(string[] args, ref int i)
+    {
+        switch (args[i])
+        {
+            case "--enhance-row" when i + 2 < args.Length:
+                long.TryParse(args[++i], out enhanceRowOf);
+                int.TryParse(args[++i], out enhanceRowSlot);
+                return 0;
+            case "--move-slot" when i + 3 < args.Length:
+                long.TryParse(args[++i], out moveSlotOf);
+                int.TryParse(args[++i], out moveSlotFrom);
+                int.TryParse(args[++i], out moveSlotTo);
+                return 0;
+            case "--raw-delete-slot" when i + 2 < args.Length:
+                long.TryParse(args[++i], out rawSlotDeleteOf);
+                int.TryParse(args[++i], out rawSlotDeleteSlot);
+                return 0;
+            default:
+                return 64;
+        }
+    }
+
     public static int? TryReadOnly()
     {
         // 强化表只读核对：与启动共用同一套校验（三档材料要在物品表里、金币要在币种表里），
@@ -128,7 +154,7 @@ internal static class EnhanceCli
     {
         var dataSource = ctx.DataSource;
         if (enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0
-            || rawEnhanceId != 0)
+            || rawEnhanceId != 0 || enhanceRowOf != 0 || moveSlotOf != 0 || rawSlotDeleteOf != 0)
         {
             var characterConfig = CharacterConfig.Load(configPath);
             var items = ItemTable.Load("config/items.json");
@@ -179,6 +205,32 @@ internal static class EnhanceCli
                     + await enhances.CouponCountAsync(couponCountOf, CancellationToken.None)
                     + " id=" + couponCountOf
                     + " item=" + enhanceTable.ProtectItemId);
+            }
+
+            if (enhanceRowOf != 0)
+            {
+                var row = await enhances.RowAsync(enhanceRowOf, enhanceRowSlot, CancellationToken.None);
+                Console.WriteLine("enhance_row=ok id=" + enhanceRowOf
+                    + " slot=" + enhanceRowSlot
+                    + " inventory_id=" + row.InventoryId
+                    + " item=" + row.ItemId
+                    + " level=" + row.Level);
+            }
+
+            if (moveSlotOf != 0)
+            {
+                await enhances.RawMoveSlotAsync(
+                    moveSlotOf, moveSlotFrom, moveSlotTo, CancellationToken.None);
+                Console.WriteLine("move_slot=ok id=" + moveSlotOf
+                    + " from=" + moveSlotFrom + " to=" + moveSlotTo);
+            }
+
+            if (rawSlotDeleteOf != 0)
+            {
+                await enhances.RawDeleteSlotAsync(
+                    rawSlotDeleteOf, rawSlotDeleteSlot, CancellationToken.None);
+                Console.WriteLine("raw_slot_delete=ok id=" + rawSlotDeleteOf
+                    + " slot=" + rawSlotDeleteSlot);
             }
         }
 

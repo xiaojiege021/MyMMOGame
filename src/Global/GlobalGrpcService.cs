@@ -78,11 +78,39 @@ public sealed class GlobalGrpcService(
             return new ListAuctionResponse { Ok = false, Reason = check.Reason };
         }
 
+        // C4：挂单要记住挂的是哪一件。格位只是它现在放在哪，卖方之后换格 / 换物
+        // 都不能让买家拿到没挂过的那件；成交时角色服拿这里记的 item_id 复核。
+        var itemId = "";
+        try
+        {
+            var bag = await character.ListInventoryAsync(
+                new ListInventoryRequest { Account = account, CharacterId = request.CharacterId },
+                deadline: DateTime.UtcNow.AddSeconds(5),
+                cancellationToken: context.CancellationToken);
+            foreach (var entry in bag.Slots)
+            {
+                if (entry.Slot == request.Slot)
+                {
+                    itemId = entry.ItemId ?? "";
+                    break;
+                }
+            }
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+        {
+            return new ListAuctionResponse { Ok = false, Reason = "character_not_found" };
+        }
+
+        if (itemId.Length == 0)
+        {
+            return new ListAuctionResponse { Ok = false, Reason = "item_missing" };
+        }
+
         AuctionListingRepository.Created created;
         try
         {
             created = await listings.CreateAsync(
-                (long)request.CharacterId, (int)request.Slot, (int)request.Count,
+                (long)request.CharacterId, (int)request.Slot, itemId, (int)request.Count,
                 request.PriceGold, txnId, context.CancellationToken);
         }
         catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation)

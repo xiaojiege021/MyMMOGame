@@ -240,7 +240,18 @@ if printf '%s' "$CONF" | grep -q '^sect_task_config_state=ok version=2 pending=t
 else
   bad "--sect-task-config 不对：$CONF"
 fi
-if printf '%s' "$CONF" | grep -qE '^sect_task_period=day:2026-11-18 week:2026-11-16 timezone:Asia/Shanghai daily_reset_hour:5'; then
+# 期望值现取：业务日 / 周首按 config/calendar.json 的时区与日界小时算，不写死某一天。
+PERIOD="$(python3 - <<'PY2'
+import datetime, json, zoneinfo
+cfg = json.load(open('config/calendar.json', encoding='utf-8'))
+now = datetime.datetime.now(zoneinfo.ZoneInfo(cfg['timezone']))
+day = (now - datetime.timedelta(hours=cfg['daily_reset_hour'])).date()
+week = day - datetime.timedelta(days=day.weekday())
+print('day:%s week:%s timezone:%s daily_reset_hour:%s'
+      % (day, week, cfg['timezone'], cfg['daily_reset_hour']))
+PY2
+)"
+if printf '%s' "$CONF" | grep -qE "^sect_task_period=${PERIOD}"; then
   ok "--sect-task-config 打出当前业务日 / 周首与日界小时"
 else
   bad "周期键不对：$(printf '%s' "$CONF" | grep 'sect_task_period' | head -1)"

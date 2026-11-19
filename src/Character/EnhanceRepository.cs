@@ -72,13 +72,15 @@ public sealed class EnhanceRepository(
             }
         }
 
-        // 2. 锁住装备这一格再读当前强化等级。所有强化都先拿这把行锁，
-        //    同一格并发点两次也不会各自按旧等级算。
+        // 2. 锁住装备这一格再读当前强化等级。强化等级挂在背包行 id 上（C4）：
+        //    格子只是这件装备现在放在哪，换格不改等级，卖出后这一行没了等级也跟着没了。
+        //    所有强化都先拿这把行锁，同一格并发点两次也不会各自按旧等级算。
         string? itemId = null;
+        long inventoryId = 0;
         var levelBefore = 0;
         await using (var read = new NpgsqlCommand(
-            "select i.item_id, coalesce(e.level, 0) from \"角色\".inventory i "
-            + "left join \"角色\".enhance e on e.character_id = i.character_id and e.slot = i.slot "
+            "select i.id, i.item_id, coalesce(e.level, 0) from \"角色\".inventory i "
+            + "left join \"角色\".enhance e on e.inventory_id = i.id "
             + "where i.character_id = $1 and i.slot = $2 for update of i",
             connection, transaction))
         {
@@ -87,8 +89,9 @@ public sealed class EnhanceRepository(
             await using var reader = await read.ExecuteReaderAsync(stopping);
             if (await reader.ReadAsync(stopping))
             {
-                itemId = reader.GetString(0);
-                levelBefore = reader.GetInt16(1);
+                inventoryId = reader.GetInt64(0);
+                itemId = reader.GetString(1);
+                levelBefore = reader.GetInt16(2);
             }
         }
         // reader 关掉之后再判业务规则：Npgsql 里带着未读完的 reader 回滚会炸成 gRPC 502。
@@ -247,15 +250,16 @@ public sealed class EnhanceRepository(
             }
         }
 
-        // 7. 写等级。没有失败累计必成，券不写进任何「下次必成」的计数里。
+        // 7. 写等级。按背包行 id 落，不按格子：这一格换了位置，等级还是这一件装备的。
+        //    没有失败累计必成，券不写进任何「下次必成」的计数里。
         await using (var write = new NpgsqlCommand(
-            "insert into \"角色\".enhance (character_id, slot, level) values ($1, $2, $3) "
-            + "on conflict (character_id, slot) do update "
+            "insert into \"角色\".enhance (character_id, inventory_id, level) values ($1, $2, $3) "
+            + "on conflict (inventory_id) do update "
             + "set level = excluded.level, updated_at = now()",
             connection, transaction))
         {
             write.Parameters.AddWithValue(characterId);
-            write.Parameters.AddWithValue((short)slot);
+            write.Parameters.AddWithValue(inventoryId);
             write.Parameters.AddWithValue((short)level);
             await write.ExecuteNonQueryAsync(stopping);
         }
@@ -292,7 +296,9 @@ public sealed class EnhanceRepository(
 
         var level = 0;
         await using (var read = new NpgsqlCommand(
-            "select level from \"角色\".enhance where character_id = $1 and slot = $2",
+            "select coalesce(e.level, 0) from \"角色\".inventory i "
+            + "left join \"角色\".enhance e on e.inventory_id = i.id "
+            + "where i.character_id = $1 and i.slot = $2",
             connection))
         {
             read.Parameters.AddWithValue(characterId);
@@ -375,12 +381,60 @@ public sealed class EnhanceRepository(
     /// <summary>只给核对用：绕开业务层直写等级，验证库层 CHECK 挡得住越界。</summary>
     public async Task RawWriteLevelAsync(long characterId, int slot, int level, CancellationToken stopping)
     {
+        // C4：等级挂在背包行 id 上，原始写入也先按 (角色, 格) 找回那一行；
+        // 格子空着就一行都不写（没有装备就没有等级可挂）。
         await using var command = dataSource.CreateCommand(
-            "insert into \"角色\".enhance (character_id, slot, level) values ($1, $2, $3) "
-            + "on conflict (character_id, slot) do update set level = excluded.level");
+            "insert into \"角色\".enhance (character_id, inventory_id, level) "
+            + "select $1, i.id, $3 from \"角色\".inventory i "
+            + "where i.character_id = $1 and i.slot = $2 "
+            + "on conflict (inventory_id) do update set level = excluded.level");
         command.Parameters.AddWithValue(characterId);
         command.Parameters.AddWithValue((short)slot);
         command.Parameters.AddWithValue((short)level);
         await command.ExecuteNonQueryAsync(stopping);
+    }
+
+    /// <summary>
+    /// 只给核对用：把一格物品挪到另一格（C4「换格」）。装备一行不动，只改它现在放在哪，
+    /// 所以挂在背包行 id 上的强化等级必须原样跟过去。
+    /// </summary>
+    public async Task RawMoveSlotAsync(long characterId, int fromSlot, int toSlot, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "update \"角色\".inventory set slot = $3 "
+            + "where character_id = $1 and slot = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue((short)fromSlot);
+        command.Parameters.AddWithValue((short)toSlot);
+        await command.ExecuteNonQueryAsync(stopping);
+    }
+
+    /// <summary>只给核对用：删掉一格（模拟卖出 / 扣光），看强化等级会不会留给下一个进这一格的物品。</summary>
+    public async Task RawDeleteSlotAsync(long characterId, int slot, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "delete from \"角色\".inventory where character_id = $1 and slot = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue((short)slot);
+        await command.ExecuteNonQueryAsync(stopping);
+    }
+
+    /// <summary>只给核对用：按格读回背包行 id 与等级，证明等级挂的是那一件装备而不是格子。</summary>
+    public async Task<(long InventoryId, int Level, string ItemId)> RowAsync(
+        long characterId, int slot, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select i.id, coalesce(e.level, 0), i.item_id from \"角色\".inventory i "
+            + "left join \"角色\".enhance e on e.inventory_id = i.id "
+            + "where i.character_id = $1 and i.slot = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue((short)slot);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return (0, 0, "");
+        }
+
+        return (reader.GetInt64(0), reader.GetInt16(1), reader.GetString(2));
     }
 }

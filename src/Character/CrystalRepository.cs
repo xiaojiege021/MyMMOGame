@@ -489,7 +489,7 @@ public sealed class CrystalRepository(
         var bound = false;
         await using (var equip = new NpgsqlCommand(
             "select i.bound, coalesce(e.level, 0) from \"角色\".inventory i "
-            + "left join \"角色\".enhance e on e.character_id = i.character_id and e.slot = i.slot "
+            + "left join \"角色\".enhance e on e.inventory_id = i.id "
             + "where i.character_id = $1 and i.slot = $2",
             connection, transaction))
         {

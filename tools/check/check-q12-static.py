@@ -162,11 +162,12 @@ report("main_migration", 'character_name' in main_ddl,
 
 manifest = load("db/migrations.json")
 entries = (manifest.get("schemas") or [{}])[0].get("entries") or []
-last = entries[-1] if entries else {}
+# 按文件找，不按「最后一条」：后面的卡会继续往后追加迁移（C4 起是 enhance_item.sql）。
+entry = next((e for e in entries if e.get("file") == "db/character/name_registry.sql"), None)
+versions = [e.get("version") for e in entries]
 report("migration_registered",
-       last.get("file") == "db/character/name_registry.sql"
-       and all(e.get("version", 0) < last.get("version", 0) for e in entries[:-1]),
-       "迁移清单最后一条=%s" % json.dumps(last, ensure_ascii=False))
+       entry is not None and versions.count(entry.get("version")) == 1,
+       "迁移清单里 name_registry=%s" % json.dumps(entry, ensure_ascii=False))
 
 # ---------------------------------------------------------------- 只读入口接线
 loaders = read("tools/probe/CliProbe/CliLoaders.cs")

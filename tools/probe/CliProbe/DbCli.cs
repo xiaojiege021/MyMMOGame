@@ -96,6 +96,7 @@ internal static class DbCli
     || rawFatigueId != 0 || shareStateOf != 0 || setWeekDay != null
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
+    || enhanceRowOf != 0 || moveSlotOf != 0 || rawSlotDeleteOf != 0
     || transferStateOf != 0 || transferTxnCount != null
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
     || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0

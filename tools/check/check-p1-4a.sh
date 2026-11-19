@@ -287,9 +287,14 @@ for name in ('ok', 'reason', 'level', 'max_level', 'success', 'duplicate'):
     assert re.search(r'\b' + name + r'\s*=', resp), name
 sql = open(root + '/db/character/enhance.sql', encoding='utf-8').read()
 assert 'CHECK (level BETWEEN 0 AND 12)' in sql
+# 这两行是 P1-4a 当时的样子，文件本身不改（已应用的迁移不许原地改）；
+# C4 起真正的身份是 db/character/enhance_item.sql 里的 inventory_id，见 check-c4.sh。
 assert 'PRIMARY KEY (character_id, slot)' in sql
-assert 'txn_id       text        PRIMARY KEY' in sql
 assert 'REFERENCES "角色".inventory (character_id, slot)' in sql
+item = open(root + '/db/character/enhance_item.sql', encoding='utf-8').read()
+assert 'PRIMARY KEY (inventory_id)' in item
+assert 'ALTER TABLE "角色".enhance DROP COLUMN IF EXISTS slot;' in item
+assert 'txn_id       text        PRIMARY KEY' in sql
 table = open(root + '/src/Character/EnhanceTable.cs', encoding='utf-8').read()
 assert 'WrittenMaxLevel = 12' in table
 assert 'WrittenTierIds' in table and 'WrittenBounds' in table

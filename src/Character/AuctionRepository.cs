@@ -66,10 +66,11 @@ public sealed class AuctionRepository(
             var count = 0;
             long price = 0;
             var state = "missing";
+            var listingItemId = "";
             var found = false;
             await using (var read = new NpgsqlCommand(
-                "select seller_id, slot, count, price_gold, state from \"交易\".auction_listing "
-                + "where listing_id = $1 for update",
+                "select seller_id, slot, count, price_gold, state, item_id "
+                + "from \"交易\".auction_listing where listing_id = $1 for update",
                 connection, transaction))
             {
                 read.Parameters.AddWithValue(listingId);
@@ -81,6 +82,7 @@ public sealed class AuctionRepository(
                     count = reader.GetInt32(2);
                     price = reader.GetInt64(3);
                     state = reader.GetString(4);
+                    listingItemId = reader.GetString(5);
                     found = true;
                 }
             }
@@ -126,12 +128,16 @@ public sealed class AuctionRepository(
             }
 
             // 3. 锁卖方这一格。绑定物品不能上架（P1-1b3），物品编号由库里读。
+            //    C4：强化等级挂在这一行背包上，成交时跟着这件装备一起交给买方。
             var itemId = "";
             var sellerCount = 0;
             var bound = false;
+            var enhanceLevel = 0;
             await using (var read = new NpgsqlCommand(
-                "select item_id, count, bound from \"角色\".inventory "
-                + "where character_id = $1 and slot = $2 for update",
+                "select i.item_id, i.count, i.bound, coalesce(e.level, 0) "
+                + "from \"角色\".inventory i "
+                + "left join \"角色\".enhance e on e.inventory_id = i.id "
+                + "where i.character_id = $1 and i.slot = $2 for update of i",
                 connection, transaction))
             {
                 read.Parameters.AddWithValue(sellerId);
@@ -142,10 +148,19 @@ public sealed class AuctionRepository(
                     itemId = reader.GetString(0);
                     sellerCount = reader.GetInt32(1);
                     bound = reader.GetBoolean(2);
+                    enhanceLevel = reader.GetInt16(3);
                 }
             }
 
             if (itemId.Length == 0)
+            {
+                throw new AuctionException("item_missing");
+            }
+
+            // 挂的是 A，这一格现在放着 B：按「挂的那件不在了」拒，不动买方的钱。
+            // 老挂单（C4 之前写的）item_id 是空串，继续按格位结，不追溯。
+            if (listingItemId.Length > 0
+                && !string.Equals(listingItemId, itemId, StringComparison.Ordinal))
             {
                 throw new AuctionException("item_missing");
             }
@@ -239,13 +254,27 @@ public sealed class AuctionRepository(
                 await using var insert = new NpgsqlCommand(
                     "insert into \"角色\".inventory "
                     + "(character_id, slot, item_id, count, bound, bound_at) "
-                    + "values ($1, $2, $3, $4, false, null)",
+                    + "values ($1, $2, $3, $4, false, null) returning id",
                     connection, transaction);
                 insert.Parameters.AddWithValue(buyerId);
                 insert.Parameters.AddWithValue((short)Convert.ToInt32(free));
                 insert.Parameters.AddWithValue(itemId);
                 insert.Parameters.AddWithValue(count);
-                await insert.ExecuteNonQueryAsync(stopping);
+                var buyerRow = Convert.ToInt64(await insert.ExecuteScalarAsync(stopping));
+
+                // C4：卖方那一行删掉时等级跟着 CASCADE 走了；这里把它挂到买方新行的 id 上。
+                // 只有整件成交（count 全买走）才转等级，拆着买的东西本来也不是装备。
+                if (enhanceLevel > 0 && sellerCount == count)
+                {
+                    await using var level = new NpgsqlCommand(
+                        "insert into \"角色\".enhance (character_id, inventory_id, level) "
+                        + "values ($1, $2, $3)",
+                        connection, transaction);
+                    level.Parameters.AddWithValue(buyerId);
+                    level.Parameters.AddWithValue(buyerRow);
+                    level.Parameters.AddWithValue((short)enhanceLevel);
+                    await level.ExecuteNonQueryAsync(stopping);
+                }
             }
 
             // 6. 扣买方标价。带余额条件的 update，扣不动整笔回滚。

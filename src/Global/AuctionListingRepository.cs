@@ -12,17 +12,18 @@ public sealed class AuctionListingRepository(NpgsqlDataSource dataSource)
     public sealed record Created(long ListingId, bool Duplicate);
 
     public async Task<Created> CreateAsync(
-        long sellerId, int slot, int count, long priceGold, string txnId,
+        long sellerId, int slot, string itemId, int count, long priceGold, string txnId,
         CancellationToken stopping)
     {
         await using var command = dataSource.CreateCommand(
             "insert into \"交易\".auction_listing "
-            + "(list_txn, seller_id, slot, count, price_gold, state) "
-            + "values ($1, $2, $3, $4, $5, 'listed') "
+            + "(list_txn, seller_id, slot, item_id, count, price_gold, state) "
+            + "values ($1, $2, $3, $4, $5, $6, 'listed') "
             + "on conflict (list_txn) do nothing returning listing_id");
         command.Parameters.AddWithValue(txnId);
         command.Parameters.AddWithValue(sellerId);
         command.Parameters.AddWithValue((short)slot);
+        command.Parameters.AddWithValue(itemId);
         command.Parameters.AddWithValue(count);
         command.Parameters.AddWithValue(priceGold);
 

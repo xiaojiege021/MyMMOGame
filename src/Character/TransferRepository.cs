@@ -74,12 +74,17 @@ public sealed class TransferRepository(
         }
 
         // 2. 按格位升序一次锁住两行，避免两笔反向转移互相等锁。
-        //    绑定状态与物品编号都在这一行上，后面改绑定不需要再读一次。
+        //    绑定状态、物品编号与强化等级都在这一行上（C4：等级挂背包行 id，不挂格子），
+        //    后面改绑定、写等级都不需要再读一次。
         var itemIds = new Dictionary<int, string>();
         var bounds = new Dictionary<int, bool>();
+        var levels = new Dictionary<int, int> { [fromSlot] = 0, [toSlot] = 0 };
+        var rows = new Dictionary<int, long>();
         await using (var read = new NpgsqlCommand(
-            "select slot, item_id, bound from \"角色\".inventory "
-            + "where character_id = $1 and slot in ($2, $3) order by slot for update",
+            "select i.slot, i.id, i.item_id, i.bound, coalesce(e.level, 0) "
+            + "from \"角色\".inventory i "
+            + "left join \"角色\".enhance e on e.inventory_id = i.id "
+            + "where i.character_id = $1 and i.slot in ($2, $3) order by i.slot for update of i",
             connection, transaction))
         {
             read.Parameters.AddWithValue(characterId);
@@ -89,8 +94,10 @@ public sealed class TransferRepository(
             while (await reader.ReadAsync(stopping))
             {
                 var slot = reader.GetInt16(0);
-                itemIds[slot] = reader.GetString(1);
-                bounds[slot] = reader.GetBoolean(2);
+                rows[slot] = reader.GetInt64(1);
+                itemIds[slot] = reader.GetString(2);
+                bounds[slot] = reader.GetBoolean(3);
+                levels[slot] = reader.GetInt16(4);
             }
         }
         // reader 关掉之后再判业务规则：Npgsql 里带着未读完的 reader 回滚会炸成 gRPC 502。
@@ -114,22 +121,6 @@ public sealed class TransferRepository(
             }
         }
         // 方案 9.3「不限部位」：这里只认两格都是装备，不比较 item_id、部位或品阶。
-
-        var levels = new Dictionary<int, int> { [fromSlot] = 0, [toSlot] = 0 };
-        await using (var readLevel = new NpgsqlCommand(
-            "select slot, level from \"角色\".enhance "
-            + "where character_id = $1 and slot in ($2, $3)",
-            connection, transaction))
-        {
-            readLevel.Parameters.AddWithValue(characterId);
-            readLevel.Parameters.AddWithValue((short)fromSlot);
-            readLevel.Parameters.AddWithValue((short)toSlot);
-            await using var reader = await readLevel.ExecuteReaderAsync(stopping);
-            while (await reader.ReadAsync(stopping))
-            {
-                levels[reader.GetInt16(0)] = reader.GetInt16(1);
-            }
-        }
 
         var fromLevelBefore = levels[fromSlot];
         var toLevelBefore = levels[toSlot];
@@ -231,16 +222,17 @@ public sealed class TransferRepository(
         }
 
         // 6. 覆盖：来源变 +0，目标变成来源原来的等级。目标原有的强化被覆盖、不返还。
+        //    按背包行 id 写（C4）：等级属于这两件装备，跟格子无关；箱子后换位置也不会串。
         //    没有掷点，转移必定成功，也没有「失败累计必成」这类东西。
         foreach (var (slot, level) in new[] { (fromSlot, 0), (toSlot, fromLevelBefore) })
         {
             await using var write = new NpgsqlCommand(
-                "insert into \"角色\".enhance (character_id, slot, level) values ($1, $2, $3) "
-                + "on conflict (character_id, slot) do update "
+                "insert into \"角色\".enhance (character_id, inventory_id, level) values ($1, $2, $3) "
+                + "on conflict (inventory_id) do update "
                 + "set level = excluded.level, updated_at = now()",
                 connection, transaction);
             write.Parameters.AddWithValue(characterId);
-            write.Parameters.AddWithValue((short)slot);
+            write.Parameters.AddWithValue(rows[slot]);
             write.Parameters.AddWithValue((short)level);
             await write.ExecuteNonQueryAsync(stopping);
         }
@@ -279,7 +271,7 @@ public sealed class TransferRepository(
         var bounds = new Dictionary<int, bool> { [fromSlot] = false, [toSlot] = false };
         await using (var read = new NpgsqlCommand(
             "select i.slot, i.bound, coalesce(e.level, 0) from \"角色\".inventory i "
-            + "left join \"角色\".enhance e on e.character_id = i.character_id and e.slot = i.slot "
+            + "left join \"角色\".enhance e on e.inventory_id = i.id "
             + "where i.character_id = $1 and i.slot in ($2, $3)",
             connection))
         {

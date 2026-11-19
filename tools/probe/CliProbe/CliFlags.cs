@@ -162,6 +162,15 @@ internal static class CliFlags
     public static long rawEnhanceId = 0;
     public static int rawEnhanceSlot = 0;
     public static int rawEnhanceLevel = 0;
+    // C4：强化跟装备。--enhance-row 读背包行 id 与等级；--move-slot / --raw-delete-slot
+    // 只给核对用：模拟换格与卖出，绕开接口直改背包行。
+    public static long enhanceRowOf = 0;
+    public static int enhanceRowSlot = 0;
+    public static long moveSlotOf = 0;
+    public static int moveSlotFrom = 0;
+    public static int moveSlotTo = 0;
+    public static long rawSlotDeleteOf = 0;
+    public static int rawSlotDeleteSlot = 0;
     public static bool transferState = false;
     public static string? transferConfigPath = null;
     public static long transferStateOf = 0;

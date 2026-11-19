@@ -275,7 +275,9 @@ table = open(root + '/src/Character/TransferTable.cs', encoding='utf-8').read()
 assert '费用随转出的强化等级上升' in table and '必须是方案写定的 1' in table
 assert 'gold_cost_by_level' in table and 'currencies.Find(goldKind)' in table
 repo = open(root + '/src/Character/TransferRepository.cs', encoding='utf-8').read()
-assert 'BeginTransactionAsync' in repo and 'order by slot for update' in repo
+assert 'BeginTransactionAsync' in repo and 'order by i.slot for update of i' in repo
+# C4 起两格的等级与背包行 id 一起读出来，写入按行 id：转移认的是装备，不是格子。
+assert 'levels[slot] = reader.GetInt16(4)' in repo and 'rows[slot]' in repo
 assert 'if (fromLevelBefore <= toLevelBefore)' in repo
 assert 'source_not_higher' in repo and 'same_slot' in repo
 assert 'source_empty' in repo and 'target_empty' in repo
