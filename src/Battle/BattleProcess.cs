@@ -30,6 +30,11 @@ public sealed class BattleProcess(string configPath)
             : new GrpcTalismanSpend(config.CharacterUpstream);
         // P1-5c6：卷轴的背包、当前级经验与全局冷却都在角色服；没配上游就一律拒绝，
         // 不在本进程里造一张卷轴或记一份「这个人的冷却」。
+        // B1：丹和符同一条切法——背包在角色服，没配上游就一律拒绝，
+        // 不在本进程里造一颗丹，也不假装备份回复量。
+        using IPillSpend pills = string.IsNullOrEmpty(config.CharacterUpstream)
+            ? new NoPillSpend()
+            : new GrpcPillSpend(config.CharacterUpstream);
         using IReviveScrollUse scrolls = string.IsNullOrEmpty(config.CharacterUpstream)
             ? new NoReviveScrollUse()
             : new GrpcReviveScrollUse(config.CharacterUpstream);
@@ -177,7 +182,7 @@ public sealed class BattleProcess(string configPath)
         try
         {
             await new BattleServer(config, settlements, characters, expSettlement, talismans,
-                scrolls, profiles, sectTech, siegeSect, siegeResult, worldBoss, deserter)
+                pills, scrolls, profiles, sectTech, siegeSect, siegeResult, worldBoss, deserter)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

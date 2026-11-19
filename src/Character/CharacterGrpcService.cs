@@ -41,6 +41,8 @@ public sealed class CharacterGrpcService(
     ShopTable shopTable,
     TalismanTable talismanTable,
     TalismanRepository talismans,
+    PillTable pillTable,
+    PillRepository pills,
     ReviveScrollTable scrollTable,
     ReviveScrollRepository scrolls,
     ExpBoosterTable boosterTable,
@@ -3156,6 +3158,155 @@ public sealed class CharacterGrpcService(
     /// 战斗服拿到池之后才能做「池是不是满了」「这一组冷却到没到」的本地预判，
     /// 预判不过就根本不扣符。这里不写库、不扣符、不碰生命与蓝量。
     /// </summary>
+    /// <summary>
+    /// B1：吃丹之前的只读查询。和 DescribeTalisman 同一个切法——编号到「哪个池、
+    /// 回多少、哪一组冷却」的映射只在角色服的 config/pill.json，战斗服不解析配置。
+    /// 不扣丹、不写库；真正扣不扣由 ConsumePill 那笔事务再判一次。
+    /// 突破丹也会被认出来（is_breakthrough 那一支），但战斗服拿到它就拒绝：
+    /// 方案写定境界丹在突破事务里扣，战斗里吃它没有任何效果。
+    /// </summary>
+    public override async Task<DescribePillResponse> DescribePill(
+        DescribePillRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "item_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var spec = pillTable.Find(itemId);
+        if (spec is null || spec.IsBreakthrough)
+        {
+            // 不是丹，或者是突破丹（不进战斗）：一个都不给池，也不扣。
+            return new DescribePillResponse
+            {
+                Ok = false,
+                Reason = "not_pill",
+                ItemId = itemId,
+                Pool = PillPool.Unspecified,
+                CountLeft = 0,
+            };
+        }
+
+        var left = await pills.CountAsync(characterId, spec.ItemId, context.CancellationToken);
+        return new DescribePillResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = spec.ItemId,
+            Pool = spec.HpRestore > 0 ? PillPool.Hp : PillPool.Mana,
+            CountLeft = left,
+        };
+    }
+
+    /// <summary>
+    /// B1：真扣一颗丹。与 ConsumeTalisman 同一套纪律：先核归属，再看编号是不是丹，
+    /// 然后在角色服的一笔事务里扣一格背包（抢 grant_txn 号挡重放）。
+    /// 生命与蓝量不在这里——当前值是战斗进程里的战斗态，角色库不存。
+    /// 回包带配置里的回复值与冷却组，战斗服照着加，它自己不读配置。
+    /// </summary>
+    public override async Task<ConsumePillResponse> ConsumePill(
+        ConsumePillRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "item_missing"));
+        }
+
+        var txnId = (request.TxnId ?? "").Trim();
+        if (txnId.Length == 0 || txnId.Length > PillRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (account.Length > 0)
+        {
+            if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+        }
+        else if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var spec = pillTable.Find(itemId);
+        if (spec is null || spec.IsBreakthrough)
+        {
+            var left = await pills.CountAsync(characterId, itemId, context.CancellationToken);
+            return new ConsumePillResponse
+            {
+                Ok = false,
+                Reason = "not_pill",
+                ItemId = itemId,
+                CountLeft = left,
+                Pool = PillPool.Unspecified,
+            };
+        }
+
+        var spend = await pills.SpendAsync(characterId, spec.ItemId, txnId, context.CancellationToken);
+        if (!spend.Ok)
+        {
+            return new ConsumePillResponse
+            {
+                Ok = false,
+                Reason = spend.Reason,
+                ItemId = spec.ItemId,
+                CountLeft = spend.CountLeft,
+                Pool = PillPool.Unspecified,
+            };
+        }
+
+        if (spend.Duplicate)
+        {
+            // 同一个号重放：这一笔没扣，颗数给事实值，回复值不再给一遍。
+            return new ConsumePillResponse
+            {
+                Ok = true,
+                Reason = "",
+                ItemId = spec.ItemId,
+                CountLeft = spend.CountLeft,
+                Duplicate = true,
+                Pool = spec.HpRestore > 0 ? PillPool.Hp : PillPool.Mana,
+            };
+        }
+
+        return new ConsumePillResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = spec.ItemId,
+            CountLeft = spend.CountLeft,
+            Slot = (uint)Math.Max(0, spend.Slot),
+            Duplicate = false,
+            HpRestore = spec.HpRestore,
+            CooldownMs = (uint)Math.Max(0, spec.CooldownMs),
+            CooldownGroup = spec.CooldownGroup,
+            Pool = spec.HpRestore > 0 ? PillPool.Hp : PillPool.Mana,
+            ManaRestore = spec.ManaRestore,
+        };
+    }
+
     public override async Task<DescribeTalismanResponse> DescribeTalisman(
         DescribeTalismanRequest request, ServerCallContext context)
     {
@@ -3841,6 +3992,10 @@ public sealed class CharacterGrpcService(
             MainStageRequired = outcome.MainStageRequired,
             SuccessPct = outcome.SuccessPct,
             Duplicate = outcome.Duplicate,
+            // B1：境界丹——配置里的编号与枚数，加上扣完的余额（事实值）。
+            PillKind = outcome.PillKind,
+            PillCount = outcome.PillCount,
+            PillLeft = outcome.PillLeft,
         };
         response.SideQuestsMissing.AddRange(outcome.MissingQuests);
         return response;

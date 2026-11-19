@@ -186,7 +186,7 @@ rt_check 'realm_display_alias=散仙 immortal=金仙 demon=散仙' "旧别名散
 rt_check 'realm_display_other=结丹 immortal=结丹 demon=结丹' "非第十段不因立魔改显示名"
 rt_check 'advance=大乘->金仙:realm_locked' "金仙开关关着：大乘仍突破不到金仙"
 rt_check 'advance=金仙->极境:realm_locked' "极境开关关着：金仙仍突破不到极境"
-rt_check 'realm_table_state=ok version=4 realms=11 launch_until=结丹 open=炼体,筑基,结丹' \
+rt_check 'realm_table_state=ok version=5 realms=11 launch_until=结丹 open=炼体,筑基,结丹' \
   "境界表仍是 11 段、首发三段、开关关着"
 
 finish "$TITLE"

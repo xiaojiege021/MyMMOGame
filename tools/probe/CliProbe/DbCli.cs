@@ -63,6 +63,9 @@ internal static class DbCli
             code = await MetaCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await PillCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await EconomyCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -119,6 +122,8 @@ internal static class DbCli
     || seasonPassStateOf != 0 || buySeasonPassOf != 0 || claimSeasonPassOf != 0
     || passPointsOf != 0 || passPointAwardOf != 0 || passLedgerOf != 0
     || characterSlotsOf != null || wardrobeOf != null || rawSlotAccount != null
+    // B1：丹药持有量与扣丹都连库，缺了这两个判定就会掉到「启动角色服」那条路。
+    || pillStateOf != 0 || pillSpendOf != 0
     || mainlineStateOf != 0 || mainlineTurnInOf != 0 || mainlineBreakthroughOf != 0
     || mainlineSeedSettlementOf != 0
     || craftStartOf != 0 || craftFinishOf != 0 || craftStateOf != 0

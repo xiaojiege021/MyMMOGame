@@ -11,42 +11,42 @@
   "protos": [
     {
       "proto": "proto/mmo/battle.proto",
-      "sha256": "cf19c541cd6ab6877ab3f6bc7618ca0d683dd0e609d74e9fc3e723a4f0178870",
+      "sha256": "f86169adc8de0aca31c819614fa0b24f4763c0b412dd67695b72d20a1916e8f5",
       "services": 0,
       "outputs": {
         "server": [
           {
             "path": "src/Shared/Generated/Battle.cs",
-            "sha256": "fef18f672f30d15d60711948455b099b16810958f64a78d67dc8d6a081e90796"
+            "sha256": "82beed2439bdaea555a42113a7e9e91d2e624043bf78d909f1925e99d92ac88e"
           }
         ],
         "client": [
           {
             "path": "client/MMOGame/Assets/Proto/Generated/Battle.cs",
-            "sha256": "fef18f672f30d15d60711948455b099b16810958f64a78d67dc8d6a081e90796"
+            "sha256": "82beed2439bdaea555a42113a7e9e91d2e624043bf78d909f1925e99d92ac88e"
           }
         ]
       }
     },
     {
       "proto": "proto/mmo/character.proto",
-      "sha256": "d12424e3109f97c6e8b7656bb652d1dab90fbf58db4925f83524b49655b86ec1",
+      "sha256": "21bd61f3dce6d8fbb9af56b8356a767ac74c376f2558b369f3a06cc3a447c967",
       "services": 1,
       "outputs": {
         "server": [
           {
             "path": "src/Shared/Generated/Character.cs",
-            "sha256": "9f7bf8045b27c9f0f3cc8e58de1ff85d3127db0b8249859590af8d973c165868"
+            "sha256": "88539ea4823b9d9e960c7f1800a1c49e839481d717f8ac227e7f495fd99a0810"
           },
           {
             "path": "src/Shared/Generated/CharacterGrpc.cs",
-            "sha256": "51fe39fbad5895fe0acc910c05a31356ff948839f24c052e1b4dba0e1d3916a3"
+            "sha256": "247db39722c2241a87b434078b43cb75d8d02ad0f8a66869febdf518f0d6ef98"
           }
         ],
         "client": [
           {
             "path": "client/MMOGame/Assets/Proto/Generated/Character.cs",
-            "sha256": "9f7bf8045b27c9f0f3cc8e58de1ff85d3127db0b8249859590af8d973c165868"
+            "sha256": "88539ea4823b9d9e960c7f1800a1c49e839481d717f8ac227e7f495fd99a0810"
           }
         ]
       }

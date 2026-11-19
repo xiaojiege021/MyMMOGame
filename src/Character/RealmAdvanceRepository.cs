@@ -6,7 +6,7 @@ namespace Character;
 /// 一次突破的结果。Found=false 表示角色不在；Executed=true 表示这一笔真的掷过了
 /// （成功或失败都算执行，历练与灵石都已按配置扣掉）。Reason 只在没掷的时候给：
 /// realm_locked / realm_max / realm_unknown / heart_not_done / drill_not_enough /
-/// stone_not_enough。Duplicate=true 表示这个事务号已经用过，整笔没做。
+/// stone_not_enough / pill_not_enough。Duplicate=true 表示这个事务号已经用过，整笔没做。
 /// </summary>
 public sealed record RealmAdvanceOutcome(
     bool Found,
@@ -27,7 +27,12 @@ public sealed record RealmAdvanceOutcome(
     int MainStage,
     int MainStageRequired,
     IReadOnlyList<string> MissingQuests,
-    int SuccessPct);
+    int SuccessPct,
+    // B1：这一笔的境界丹（配置值）、要扣几枚、扣完还剩几颗（事实值）。
+    // 没配丹的段（B1 之前的临时表）留空 / 0，老调用点不必改。
+    string PillKind = "",
+    long PillCount = 0,
+    long PillLeft = 0);
 
 /// <summary>一次历练结算的结果。Reason 为空表示加上了；duplicate 表示这个号已经结过。</summary>
 public sealed record DrillSettlementOutcome(
@@ -44,10 +49,12 @@ public sealed record DrillSettlementOutcome(
 ///   - 历练只统计已经能进入的副本，结算时一次写入 character.drill。
 ///   - 炼心 = 这一段已经打开的主线（character.main_stage）+ 必要支线（character_quest）。
 ///   - 突破消耗灵石，并扣掉这次要求的历练值；条件不满足时一分都不扣。
+///   - B1：还消耗一枚境界丹（筑基丹 / 破镜丹）。丹与灵石、历练同一笔事务：
+///     条件全满足才抢事务号，扣丹、扣灵石、扣历练之后才掷；掷失败停在原境界，丹不退。
 ///
-/// 一笔突破 = 一笔事务：锁角色行 → 版本开关 → 炼心 → 历练 → 抢事务号 →
-/// 扣历练 → 扣灵石 → （成功才）写境界 → 提交。任何一条不满足都整笔回滚，
-/// 历练、灵石、境界、流水一个字都不留。随机只在这里掷一次，配置里的
+/// 一笔突破 = 一笔事务：锁角色行 → 版本开关 → 炼心 → 历练 → 境界丹够不够 →
+/// 抢事务号 → 扣历练 → 扣灵石 → 扣丹 → （成功才）写境界 → 提交。任何一条不满足都整笔回滚，
+/// 历练、灵石、丹、境界、流水一个字都不留。随机只在这里掷一次，配置里的
 /// success_pct 是唯一概率来源，代码里不写第二个数。
 /// </summary>
 public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTable realms)
@@ -106,7 +113,7 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
         // 2. 同一个事务号已经掷过：不管当前境界变没变，都整笔不做。
         //    先查流水再判条件，重放才不会因为「境界已经进了下一段」被误判成别的拒绝。
         await using (var dup = new NpgsqlCommand(
-            "select from_realm, to_realm, drill_cost, stone_cost "
+            "select from_realm, to_realm, drill_cost, stone_cost, pill_kind, pill_count "
             + "from \"角色\".realm_breakthrough where txn_id = $1",
             connection, transaction))
         {
@@ -118,12 +125,15 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                 var doneNext = reader.GetString(1);
                 var doneDrill = reader.GetInt64(2);
                 var doneStone = reader.GetInt64(3);
+                var donePill = reader.GetString(4);
+                var donePillCount = reader.GetInt64(5);
                 await reader.DisposeAsync();
                 await transaction.RollbackAsync(stopping);
                 return new RealmAdvanceOutcome(
                     true, "", false, false, true,
                     doneFrom, doneNext, realm, drill, doneDrill, 0, drill,
-                    "", doneStone, 0, mainStage, 0, [], 0);
+                    "", doneStone, 0, mainStage, 0, [], 0,
+                    donePill, donePillCount, 0);
             }
         }
 
@@ -163,7 +173,9 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                 requirement.From, requirement.Next, requirement.From, drill,
                 requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
                 stoneAtGate,
-                mainStage, requirement.MainStage, [], requirement.SuccessPct);
+                mainStage, requirement.MainStage, [], requirement.SuccessPct,
+                requirement.Pill ?? "", requirement.PillCount,
+                await PillBalanceOutsideAsync(characterId, requirement.Pill, stopping));
         }
 
         // 3. 炼心：这一段已经打开的主线场次，以及这一段列出的必要支线。
@@ -171,6 +183,9 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
         // 先读一次灵石余额：任何拒绝路径都在回滚之后返回，回滚后这个事务就不能再读。
         var stoneNow = await StoneBalanceAsync(
             connection, transaction, characterId, requirement.Stone, stopping);
+        // B1：丹的余额也先读一次——所有拒绝路径都在回滚之后返回，回滚后这个事务不能再读。
+        var pillNow = await PillBalanceAsync(
+            connection, transaction, characterId, requirement.Pill, stopping);
         var missing = await MissingQuestsAsync(
             connection, transaction, characterId, requirement.SideQuests, stopping);
         if (mainStage < requirement.MainStage || missing.Count > 0)
@@ -181,7 +196,8 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                 requirement.From, requirement.Next, requirement.From, drill,
                 requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
                 stoneNow,
-                mainStage, requirement.MainStage, missing, requirement.SuccessPct);
+                mainStage, requirement.MainStage, missing, requirement.SuccessPct,
+                requirement.Pill ?? "", requirement.PillCount, pillNow);
         }
 
         // 4. 历练够不够。不够就停在原境界，一分灵石也不动。
@@ -193,7 +209,23 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                 requirement.From, requirement.Next, requirement.From, drill,
                 requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
                 stoneNow,
-                mainStage, requirement.MainStage, [], requirement.SuccessPct);
+                mainStage, requirement.MainStage, [], requirement.SuccessPct,
+                requirement.Pill ?? "", requirement.PillCount, pillNow);
+        }
+
+        // 4.5 B1：境界丹够不够。方案 12.1 写定筑基丹 / 破镜丹用于境界突破；
+        //     不够就停在原境界，历练、灵石、丹一枚都不动，也不抢事务号。
+        if (requirement.PillCount > 0
+            && pillNow < requirement.PillCount)
+        {
+            await transaction.RollbackAsync(stopping);
+            return new RealmAdvanceOutcome(
+                true, "pill_not_enough", false, false, false,
+                requirement.From, requirement.Next, requirement.From, drill,
+                requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
+                stoneNow,
+                mainStage, requirement.MainStage, [], requirement.SuccessPct,
+                requirement.Pill ?? "", requirement.PillCount, pillNow);
         }
 
         // 5. 抢事务号。同一个号再提交不掷第二次，也不扣任何东西。
@@ -201,8 +233,9 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
         var success = Random.Shared.Next(100) < requirement.SuccessPct;
         await using (var claim = new NpgsqlCommand(
             "insert into \"角色\".realm_breakthrough "
-            + "(txn_id, character_id, from_realm, to_realm, success, drill_cost, stone_kind, stone_cost) "
-            + "values ($1, $2, $3, $4, $5, $6, $7, $8) "
+            + "(txn_id, character_id, from_realm, to_realm, success, drill_cost, stone_kind, stone_cost, "
+            + "pill_kind, pill_count) "
+            + "values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) "
             + "on conflict (txn_id) do nothing returning txn_id",
             connection, transaction))
         {
@@ -214,6 +247,8 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
             claim.Parameters.AddWithValue(requirement.Drill);
             claim.Parameters.AddWithValue(requirement.Stone);
             claim.Parameters.AddWithValue(requirement.StoneCost);
+            claim.Parameters.AddWithValue(requirement.Pill ?? "");
+            claim.Parameters.AddWithValue(requirement.PillCount);
             if (await claim.ExecuteScalarAsync(stopping) is null)
             {
                 await transaction.RollbackAsync(stopping);
@@ -222,7 +257,8 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                     requirement.From, requirement.Next, requirement.From, drill,
                     requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
                     stoneNow,
-                    mainStage, requirement.MainStage, [], requirement.SuccessPct);
+                    mainStage, requirement.MainStage, [], requirement.SuccessPct,
+                    requirement.Pill ?? "", requirement.PillCount, pillNow);
             }
         }
 
@@ -244,7 +280,8 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                     requirement.From, requirement.Next, requirement.From, drill,
                     requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
                     stoneNow,
-                    mainStage, requirement.MainStage, [], requirement.SuccessPct);
+                    mainStage, requirement.MainStage, [], requirement.SuccessPct,
+                    requirement.Pill ?? "", requirement.PillCount, pillNow);
             }
 
             drillAfter = Convert.ToInt64(value);
@@ -269,13 +306,38 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
                     requirement.From, requirement.Next, requirement.From, drill,
                     requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
                     stoneNow,
-                    mainStage, requirement.MainStage, [], requirement.SuccessPct);
+                    mainStage, requirement.MainStage, [], requirement.SuccessPct,
+                    requirement.Pill ?? "", requirement.PillCount, pillNow);
             }
 
             stoneLeft = Convert.ToInt64(value);
         }
 
-        // 8. 成功才写境界；失败停在原境界。历练与灵石两种结果都扣。
+        // 7.5 B1：扣境界丹。与灵石同口径——抢到事务号之后才扣，掷失败也不退。
+        //      预判已经拦过「不够」，这里再按行扣一次是为了并发时不出现「掷了但丹没扣」。
+        if (requirement.PillCount > 0)
+        {
+            var deducted = await DeductItemsAsync(
+                connection, transaction, characterId, requirement.Pill,
+                requirement.PillCount, stopping);
+            if (!deducted)
+            {
+                await transaction.RollbackAsync(stopping);
+                return new RealmAdvanceOutcome(
+                    true, "pill_not_enough", false, false, false,
+                    requirement.From, requirement.Next, requirement.From, drill,
+                    requirement.Drill, 0, drill, requirement.Stone, requirement.StoneCost,
+                    stoneNow,
+                    mainStage, requirement.MainStage, [], requirement.SuccessPct,
+                    requirement.Pill ?? "", requirement.PillCount,
+                    await PillBalanceOutsideAsync(characterId, requirement.Pill, stopping));
+            }
+        }
+
+        var pillLeft = await PillBalanceAsync(
+            connection, transaction, characterId, requirement.Pill, stopping);
+
+        // 8. 成功才写境界；失败停在原境界。历练、灵石与丹三种结果都扣。
         if (success)
         {
             await using var write = new NpgsqlCommand(
@@ -293,7 +355,8 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
             success ? requirement.Next : requirement.From,
             drill, requirement.Drill, requirement.Drill, drillAfter,
             requirement.Stone, requirement.StoneCost, stoneLeft,
-            mainStage, requirement.MainStage, [], requirement.SuccessPct);
+            mainStage, requirement.MainStage, [], requirement.SuccessPct,
+            requirement.Pill ?? "", requirement.PillCount, pillLeft);
     }
 
     /// <summary>
@@ -482,5 +545,119 @@ public sealed class RealmAdvanceRepository(NpgsqlDataSource dataSource, RealmTab
         read.Parameters.AddWithValue(kind);
         var value = await read.ExecuteScalarAsync(stopping);
         return value is null || value is DBNull ? 0 : Convert.ToInt64(value);
+    }
+
+    /// <summary>
+    /// B1：这个角色背包里有几颗这个丹（同一笔事务里读）。没配丹的段返回 0，
+    /// 调用方按 requirement.PillCount 判断要不要查。
+    /// </summary>
+    static async Task<long> PillBalanceAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string? itemId,
+        CancellationToken stopping)
+    {
+        if (string.IsNullOrEmpty(itemId))
+        {
+            return 0;
+        }
+
+        await using var read = new NpgsqlCommand(
+            "select coalesce(sum(count), 0) from \"角色\".inventory "
+            + "where character_id = $1 and item_id = $2",
+            connection, transaction);
+        read.Parameters.AddWithValue(characterId);
+        read.Parameters.AddWithValue(itemId);
+        var value = await read.ExecuteScalarAsync(stopping);
+        return value is null || value is DBNull ? 0 : Convert.ToInt64(value);
+    }
+
+    /// <summary>
+    /// 事务已经回滚之后还要报一次余额时用：回滚后那个事务不能再构造命令，
+    /// 换一条独立连接只读（与 R1 的拒绝路径同一个口径）。
+    /// </summary>
+    async Task<long> PillBalanceOutsideAsync(
+        long characterId, string? itemId, CancellationToken stopping)
+    {
+        if (string.IsNullOrEmpty(itemId))
+        {
+            return 0;
+        }
+
+        await using var command = dataSource.CreateCommand(
+            "select coalesce(sum(count), 0) from \"角色\".inventory "
+            + "where character_id = $1 and item_id = $2");
+        command.Parameters.AddWithValue(characterId);
+        command.Parameters.AddWithValue(itemId);
+        return Convert.ToInt64(await command.ExecuteScalarAsync(stopping) ?? 0L);
+    }
+
+    /// <summary>
+    /// B1：从背包扣掉 N 颗同一种丹。一格一颗就删行（表上有 CHECK (count &gt; 0)），
+    /// 一格多颗就减数量；够不够按所有格加起来算，扣到够为止。
+    /// 扣不满就返回 false，由调用方整笔回滚——这一笔不留「扣了一半」。
+    /// </summary>
+    static async Task<bool> DeductItemsAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string? itemId,
+        long count,
+        CancellationToken stopping)
+    {
+        if (count <= 0)
+        {
+            return true;
+        }
+
+        if (string.IsNullOrEmpty(itemId))
+        {
+            return false;
+        }
+
+        var rows = new List<(short Slot, int Count)>();
+        await using (var read = new NpgsqlCommand(
+            "select slot, count from \"角色\".inventory "
+            + "where character_id = $1 and item_id = $2 order by slot for update",
+            connection, transaction))
+        {
+            read.Parameters.AddWithValue(characterId);
+            read.Parameters.AddWithValue(itemId);
+            await using var reader = await read.ExecuteReaderAsync(stopping);
+            while (await reader.ReadAsync(stopping))
+            {
+                rows.Add((reader.GetInt16(0), reader.GetInt32(1)));
+            }
+        }
+
+        var need = count;
+        foreach (var row in rows)
+        {
+            if (need <= 0)
+            {
+                break;
+            }
+
+            var take = (int)Math.Min(need, row.Count);
+            await using var write = new NpgsqlCommand(
+                take >= row.Count
+                    ? "delete from \"角色\".inventory "
+                      + "where character_id = $1 and slot = $2"
+                    : "update \"角色\".inventory set count = count - $3 "
+                      + "where character_id = $1 and slot = $2",
+                connection, transaction);
+            write.Parameters.AddWithValue(characterId);
+            write.Parameters.AddWithValue(row.Slot);
+            if (take < row.Count)
+            {
+                write.Parameters.AddWithValue(take);
+            }
+
+            await write.ExecuteNonQueryAsync(stopping);
+            need -= take;
+        }
+
+        return need <= 0;
     }
 }

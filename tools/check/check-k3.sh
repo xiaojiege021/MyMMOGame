@@ -62,8 +62,10 @@ currencies = {c["id"] for c in cfg("config/currency.json")["currencies"]}
 recipes = doc.get("recipes") or []
 professions = doc.get("professions") or []
 
+# B1 把炼丹六条换成真实配方，version 从 1 升到 2（schema 不变）；这里只要求
+# 「还是那份 schema 且版本不小于 2」，不再钉死 1——钉死会让每次内容定稿都要改老卡。
 report("recipe_schema_version",
-       doc.get("schema") == "recipe-table/1" and doc.get("version") == 1,
+       doc.get("schema") == "recipe-table/1" and int(doc.get("version", 0)) >= 2,
        "schema=%s version=%s" % (doc.get("schema"), doc.get("version")))
 report("recipe_table_pending", doc.get("pending") is True,
        "整表还是占位，pending 必须为 true，表 B 才认得出来")
@@ -353,12 +355,12 @@ echo "== 4. 只读入口 =="
 if "$DOTNET" "$PROBE" --recipe-list > "$TMP/list.txt" 2>&1; then
   head1="$(head -1 "$TMP/list.txt")"
   case "$head1" in
-    "recipe_table_state=ok version=1 pending=true professions=4 recipes="*)
-      ok "配方表读得出来：v1、四个副职、整表占位" ;;
+    "recipe_table_state=ok version=2 pending=true professions=4 recipes="*)
+      ok "配方表读得出来：v2、四个副职、整表占位" ;;
     *) bad "清单头部不对：$head1" ;;
   esac
   rows="$(grep -c '^recipe=' "$TMP/list.txt" || true)"
-  [ "$rows" -ge 8 ] && ok "配方不少于 8 条（实际 ${rows}）" || bad "配方条数少于 8：${rows}"
+  [ "$rows" -ge 12 ] && ok "配方不少于 12 条（实际 ${rows}）" || bad "配方条数少于 12：${rows}"
   if [ "$(grep -cE '^recipe=.* inputs=.* fee=.* output=.* success_pct=[0-9.]+ craft_time_s=[0-9]+$' "$TMP/list.txt")" = "$rows" ]; then
     ok "每条都带 inputs / fee / output / success_pct / craft_time_s"
   else
@@ -394,7 +396,7 @@ else
 fi
 head_added="$(head -1 <<< "$ADDED")"
 case "$head_added" in
-  *"recipes=9"*) ok "条数跟着配置走（8 → 9）" ;;
+  *"recipes=13"*) ok "条数跟着配置走（12 → 13）" ;;
   *) bad "条数没跟着配置走：${head_added}" ;;
 esac
 

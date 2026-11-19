@@ -173,7 +173,8 @@ sealed class OfflineWatch
 /// </summary>
 public sealed class BattleServer(
     BattleConfig config, SettlementStore settlements, ICharacterStore characters,
-    IExpSettlement expSettlement, ITalismanSpend talismans, IReviveScrollUse scrolls,
+    IExpSettlement expSettlement, ITalismanSpend talismans, IPillSpend pills,
+    IReviveScrollUse scrolls,
     IBattleProfileSource profiles, ISectTechSource sectTech,
     ISiegeSectSource sectFacts, ISiegeResultSink siegeResult, IWorldBossSink worldBossSink,
     IDeserterPenalty deserter)
@@ -515,7 +516,7 @@ public sealed class BattleServer(
                     Key = partyKey,
                     Encounter = new Encounter(
                         config, settlements, characters, NextSessionId(), partySize,
-                        expSettlement, talismans, scrolls, profiles, dungeon),
+                        expSettlement, talismans, pills, scrolls, profiles, dungeon),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
                     PartySize = partySize,
@@ -839,7 +840,7 @@ public sealed class BattleServer(
                     Key = partyKey,
                     Encounter = new Encounter(
                         config, settlements, characters, NextSessionId(), config.Battlefield.Players,
-                        expSettlement, talismans, scrolls, profiles, null),
+                        expSettlement, talismans, pills, scrolls, profiles, null),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = null,
                     PartySize = config.Battlefield.Players,
@@ -1100,7 +1101,7 @@ public sealed class BattleServer(
                     Key = partyKey,
                     Encounter = new Encounter(
                         config, settlements, characters, NextSessionId(), table.Players,
-                        expSettlement, talismans, scrolls, profiles, null),
+                        expSettlement, talismans, pills, scrolls, profiles, null),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = null,
                     PartySize = table.Players,
@@ -1378,7 +1379,7 @@ public sealed class BattleServer(
                         Key = partyKey,
                         Encounter = new Encounter(
                             config, settlements, characters, NextSessionId(), 1,
-                            expSettlement, talismans, scrolls, profiles, null, table.Boss),
+                            expSettlement, talismans, pills, scrolls, profiles, null, table.Boss),
                         Ticker = new CancellationTokenSource(),
                         Dungeon = null,
                         PartySize = 1,
@@ -2091,6 +2092,15 @@ public sealed class BattleServer(
                         socket,
                         send,
                         party.Encounter.UseTalisman(member, inbound.Talisman),
+                        token);
+                    break;
+
+                case ClientMessage.BodyOneofCase.Pill:
+                    // B1：吃丹只影响自己：结果或拒绝都只回给这个人，不广播。
+                    await SendAsync(
+                        socket,
+                        send,
+                        party.Encounter.UsePill(member, inbound.Pill),
                         token);
                     break;
 

@@ -19,6 +19,8 @@ public sealed record RealmAdvance(bool Ok, string Reason, string From, string Ne
 /// 一段的突破要求（方案 8.1）。修为就是当前境界，这里不另记一池点数；
 /// Drill 是这一笔要扣掉的历练值，Stone / StoneCost 是灵石档位与数量，
 /// MainStage 是炼心要查到的已经打开的主线场次，SideQuests 是这一段列出的必要支线。
+/// Pill / PillCount 是 B1 的境界丹与枚数（方案 12.1「筑基丹、破镜丹用于境界突破」）：
+/// 丹与灵石、历练同一笔事务，掷失败也不退。没配丹的段（B1 之前的临时表）是空串 / 0。
 /// 数值都没在方案里写定，全部来自 config/realms.json，代码里不写第二套。
 /// </summary>
 public sealed record RealmAdvanceRequirement(
@@ -29,7 +31,9 @@ public sealed record RealmAdvanceRequirement(
     long StoneCost,
     int SuccessPct,
     int MainStage,
-    IReadOnlyList<string> SideQuests);
+    IReadOnlyList<string> SideQuests,
+    string Pill,
+    long PillCount);
 
 /// <summary>
 /// R1：段内阶与被动。阶数按境界配置——炼体 1–9 阶，筑基及以后仍是初/中/后/大圆满。
@@ -438,10 +442,30 @@ public sealed class RealmTable
                 sides.Add(quest);
             }
 
+            // B1：境界丹。配了丹就必须是正整数枚数；没配丹就不许留一个枚数，
+            // 「有数没丹」会让日志里看着像扣了丹而实际没扣。
+            var pill = (item.Pill ?? "").Trim();
+            var pillCount = item.PillCount ?? 0;
+            if (pill.Length == 0 && pillCount != 0)
+            {
+                throw new ConfigException("realms.json 的 " + from
+                    + " 配了 pill_count 却没有 pill");
+            }
+
+            if (pill.Length > 0 && pillCount < 1)
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破丹枚数必须是正整数");
+            }
+
+            if (pill.StartsWith("stone_", StringComparison.Ordinal))
+            {
+                throw new ConfigException("realms.json 的 " + from + " 突破丹配成了灵石：" + pill);
+            }
+
             var index = order.IndexOf(from);
             requirements[from] = new RealmAdvanceRequirement(
                 from, order[index + 1], item.Drill.Value, stone, item.StoneCost.Value,
-                item.SuccessPct.Value, item.MainStage.Value, sides);
+                item.SuccessPct.Value, item.MainStage.Value, sides, pill, pillCount);
         }
 
         for (var i = 0; i < order.Count - 1; i++)
@@ -703,6 +727,14 @@ public sealed class RealmTable
 
         [JsonPropertyName("side_quests")]
         public List<string?>? SideQuests { get; init; }
+
+        // B1：境界丹与枚数。编号必须是 config/pill.json 的突破丹（由 PillTable 互校），
+        // 这里只管形状与范围。
+        [JsonPropertyName("pill")]
+        public string? Pill { get; init; }
+
+        [JsonPropertyName("pill_count")]
+        public long? PillCount { get; init; }
     }
 
     sealed record SwitchItem

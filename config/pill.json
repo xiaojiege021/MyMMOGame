@@ -1,0 +1,62 @@
+{
+  "schema": "pill-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "B1 丹药的唯一内容正本。方案 12.1 写定六种丹：筑基丹、破镜丹用于境界突破；回春丹、气血丹回复生命；凝神丹、回灵丹回复蓝量（蓝药）。都从副本、炼丹和特殊任务来，可以进拍卖；商城不卖这些丹，也不能代替复活。所以本表只写「哪种丹、回复落在哪个池、回多少、哪一组冷却、哪一档」，产出（配方 / 掉落）在 recipes.json 与掉落表，价格不在这里（这些丹不上商城）。档位 tier 从 1 起，同一 kind 里 tier 大的回复更高：符的上限按「同级里最强的那一档丹」算，由 TalismanTable 与 pill.json 加载期互相钉死，不在别处另写一套。回复值、冷却时长、档位划分与两条突破丹的归属，方案只写了「不超过同级丹」「和红药共用冷却」这类相对口径，没给数字，整表 pending=true。突破丹不进战斗、没有回复池也没有冷却：它们在角色服的突破事务里扣（数量与哪一段用哪种丹写在 config/realms.json 的 advance.pill / advance.pill_count）。",
+  "pills": [
+    {
+      "item_id": "pill_rejuvenate",
+      "name": "回春丹",
+      "kind": "hp",
+      "tier": 1,
+      "restore": 150,
+      "cooldown_group": "heal",
+      "cooldown_ms": 2000,
+      "note": "最低一档红药。方案写定「红符回复不超过同级回春丹、气血丹」，上限取同级里最强的一档（气血丹），本条的 150 是同级里较低的一档。"
+    },
+    {
+      "item_id": "pill_qixue",
+      "name": "气血丹",
+      "kind": "hp",
+      "tier": 2,
+      "restore": 300,
+      "cooldown_group": "heal",
+      "cooldown_ms": 2000,
+      "note": "高一档红药。它是红符的上限来源：talisman.json 的 potion_hp_restore 必须等于本条 restore，加载期互校。"
+    },
+    {
+      "item_id": "pill_focus",
+      "name": "凝神丹",
+      "kind": "mana",
+      "tier": 1,
+      "restore": 100,
+      "cooldown_group": "mana",
+      "cooldown_ms": 2000,
+      "note": "最低一档蓝药。方案写定「蓝符回复不超过同级凝神丹、回灵丹」，上限取同级里最强的一档（回灵丹）。"
+    },
+    {
+      "item_id": "pill_huiling",
+      "name": "回灵丹",
+      "kind": "mana",
+      "tier": 2,
+      "restore": 200,
+      "cooldown_group": "mana",
+      "cooldown_ms": 2000,
+      "note": "高一档蓝药，蓝符的上限来源：talisman.json 的 potion_mana_restore 必须等于本条 restore。"
+    },
+    {
+      "item_id": "pill_zhuji",
+      "name": "筑基丹",
+      "kind": "breakthrough",
+      "tier": 0,
+      "note": "境界突破用丹，只在角色服的突破事务里扣。方案写定「筑基丹、破镜丹用于境界突破」，没写哪一段用哪一种；本卡按名字落到「炼体 → 筑基」这一段（见 realms.json 的 advance[炼体].pill）。不进战斗、不进冷却。"
+    },
+    {
+      "item_id": "pill_pojing",
+      "name": "破镜丹",
+      "kind": "breakthrough",
+      "tier": 0,
+      "note": "境界突破用丹，筑基之后每一段大境界突破都扣它（realms.json 的 advance[筑基..金仙].pill）。方案只写了这两种丹用于突破，没写后面每一段用哪种，这是按名字取的口径，改起来只改配置。"
+    }
+  ]
+}

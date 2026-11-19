@@ -139,6 +139,14 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeTalismanResponse> __Marshaller_mmo_character_DescribeTalismanResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeTalismanResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribePillRequest> __Marshaller_mmo_character_DescribePillRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribePillRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribePillResponse> __Marshaller_mmo_character_DescribePillResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribePillResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumePillRequest> __Marshaller_mmo_character_ConsumePillRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumePillRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ConsumePillResponse> __Marshaller_mmo_character_ConsumePillResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ConsumePillResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeReviveScrollRequest> __Marshaller_mmo_character_DescribeReviveScrollRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeReviveScrollRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeReviveScrollResponse> __Marshaller_mmo_character_DescribeReviveScrollResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeReviveScrollResponse.Parser));
@@ -470,6 +478,22 @@ namespace Mmo.Proto.Character {
         "DescribeTalisman",
         __Marshaller_mmo_character_DescribeTalismanRequest,
         __Marshaller_mmo_character_DescribeTalismanResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribePillRequest, global::Mmo.Proto.Character.DescribePillResponse> __Method_DescribePill = new grpc::Method<global::Mmo.Proto.Character.DescribePillRequest, global::Mmo.Proto.Character.DescribePillResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribePill",
+        __Marshaller_mmo_character_DescribePillRequest,
+        __Marshaller_mmo_character_DescribePillResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ConsumePillRequest, global::Mmo.Proto.Character.ConsumePillResponse> __Method_ConsumePill = new grpc::Method<global::Mmo.Proto.Character.ConsumePillRequest, global::Mmo.Proto.Character.ConsumePillResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ConsumePill",
+        __Marshaller_mmo_character_ConsumePillRequest,
+        __Marshaller_mmo_character_ConsumePillResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse> __Method_DescribeReviveScroll = new grpc::Method<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse>(
@@ -1061,6 +1085,31 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeTalismanResponse> DescribeTalisman(global::Mmo.Proto.Character.DescribeTalismanRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B1：丹药。和符同一种切法——编号到回复池的映射只在角色服的 config/pill.json，
+      /// 战斗服不解析配置、不自己记一份。Describe 只读，Consume 才扣背包一格。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribePillResponse> DescribePill(global::Mmo.Proto.Character.DescribePillRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B1：在战斗里吃一颗丹。只扣一颗、不碰生命与蓝量；回复值与冷却由回包带给战斗服。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ConsumePillResponse> ConsumePill(global::Mmo.Proto.Character.ConsumePillRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2717,6 +2766,106 @@ namespace Mmo.Proto.Character {
       public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeTalismanResponse> DescribeTalismanAsync(global::Mmo.Proto.Character.DescribeTalismanRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeTalisman, null, options, request);
+      }
+      /// <summary>
+      /// B1：丹药。和符同一种切法——编号到回复池的映射只在角色服的 config/pill.json，
+      /// 战斗服不解析配置、不自己记一份。Describe 只读，Consume 才扣背包一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribePillResponse DescribePill(global::Mmo.Proto.Character.DescribePillRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribePill(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B1：丹药。和符同一种切法——编号到回复池的映射只在角色服的 config/pill.json，
+      /// 战斗服不解析配置、不自己记一份。Describe 只读，Consume 才扣背包一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribePillResponse DescribePill(global::Mmo.Proto.Character.DescribePillRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribePill, null, options, request);
+      }
+      /// <summary>
+      /// B1：丹药。和符同一种切法——编号到回复池的映射只在角色服的 config/pill.json，
+      /// 战斗服不解析配置、不自己记一份。Describe 只读，Consume 才扣背包一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribePillResponse> DescribePillAsync(global::Mmo.Proto.Character.DescribePillRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribePillAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B1：丹药。和符同一种切法——编号到回复池的映射只在角色服的 config/pill.json，
+      /// 战斗服不解析配置、不自己记一份。Describe 只读，Consume 才扣背包一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribePillResponse> DescribePillAsync(global::Mmo.Proto.Character.DescribePillRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribePill, null, options, request);
+      }
+      /// <summary>
+      /// B1：在战斗里吃一颗丹。只扣一颗、不碰生命与蓝量；回复值与冷却由回包带给战斗服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ConsumePillResponse ConsumePill(global::Mmo.Proto.Character.ConsumePillRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ConsumePill(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B1：在战斗里吃一颗丹。只扣一颗、不碰生命与蓝量；回复值与冷却由回包带给战斗服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ConsumePillResponse ConsumePill(global::Mmo.Proto.Character.ConsumePillRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ConsumePill, null, options, request);
+      }
+      /// <summary>
+      /// B1：在战斗里吃一颗丹。只扣一颗、不碰生命与蓝量；回复值与冷却由回包带给战斗服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ConsumePillResponse> ConsumePillAsync(global::Mmo.Proto.Character.ConsumePillRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ConsumePillAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B1：在战斗里吃一颗丹。只扣一颗、不碰生命与蓝量；回复值与冷却由回包带给战斗服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ConsumePillResponse> ConsumePillAsync(global::Mmo.Proto.Character.ConsumePillRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ConsumePill, null, options, request);
       }
       /// <summary>
       /// P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
@@ -4667,6 +4816,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl.BuyHomeCoinShopItem)
           .AddMethod(__Method_ConsumeTalisman, serviceImpl.ConsumeTalisman)
           .AddMethod(__Method_DescribeTalisman, serviceImpl.DescribeTalisman)
+          .AddMethod(__Method_DescribePill, serviceImpl.DescribePill)
+          .AddMethod(__Method_ConsumePill, serviceImpl.ConsumePill)
           .AddMethod(__Method_DescribeReviveScroll, serviceImpl.DescribeReviveScroll)
           .AddMethod(__Method_ConsumeReviveScroll, serviceImpl.ConsumeReviveScroll)
           .AddMethod(__Method_UseExpBooster, serviceImpl.UseExpBooster)
@@ -4736,6 +4887,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyHomeCoinShopRequest, global::Mmo.Proto.Character.BuyHomeCoinShopResponse>(serviceImpl.BuyHomeCoinShopItem));
       serviceBinder.AddMethod(__Method_ConsumeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeTalismanRequest, global::Mmo.Proto.Character.ConsumeTalismanResponse>(serviceImpl.ConsumeTalisman));
       serviceBinder.AddMethod(__Method_DescribeTalisman, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeTalismanRequest, global::Mmo.Proto.Character.DescribeTalismanResponse>(serviceImpl.DescribeTalisman));
+      serviceBinder.AddMethod(__Method_DescribePill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribePillRequest, global::Mmo.Proto.Character.DescribePillResponse>(serviceImpl.DescribePill));
+      serviceBinder.AddMethod(__Method_ConsumePill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumePillRequest, global::Mmo.Proto.Character.ConsumePillResponse>(serviceImpl.ConsumePill));
       serviceBinder.AddMethod(__Method_DescribeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeReviveScrollRequest, global::Mmo.Proto.Character.DescribeReviveScrollResponse>(serviceImpl.DescribeReviveScroll));
       serviceBinder.AddMethod(__Method_ConsumeReviveScroll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ConsumeReviveScrollRequest, global::Mmo.Proto.Character.ConsumeReviveScrollResponse>(serviceImpl.ConsumeReviveScroll));
       serviceBinder.AddMethod(__Method_UseExpBooster, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseExpBoosterRequest, global::Mmo.Proto.Character.UseExpBoosterResponse>(serviceImpl.UseExpBooster));

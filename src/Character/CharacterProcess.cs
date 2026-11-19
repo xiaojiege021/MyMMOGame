@@ -37,6 +37,7 @@ public sealed class CharacterProcess(string configPath)
         ShopTable shopTable;
         HomeCoinShopTable homeCoinShopTable;
         TalismanTable talismanTable;
+        PillTable pillTable;
         ReviveScrollTable scrollTable;
         ExpBoosterTable boosterTable;
         UnbindTable unbindTable;
@@ -89,6 +90,10 @@ public sealed class CharacterProcess(string configPath)
             // 和红药、牧师治疗共用冷却。回复值与上限都在 config/talisman.json，
             // 超了、物品不在表里、没到账即绑，缺一样就起不来。
             talismanTable = TalismanTable.Load(config.TalismanTable, items);
+            // B1：六种丹的回复值、池、冷却组与档位。加载期要三份文件互校：
+            // 丹是消耗品且到账不绑（能上拍卖）、红药 / 蓝药的冷却组必须是 heal / mana、
+            // 同级最强那一档丹必须等于符表里的上限、突破丹必须被 realms.json 的某一段用到。
+            pillTable = PillTable.Load(config.PillTable, items, talismanTable, realms);
             // 方案 12.1：复活卷轴只拉起自己，冷却跨场保留。编号与冷却时长在
             // revive_scroll.json；拉起血量比例与经验比例读同一份 classes.json
             // （一转基础，生息与卷轴同源，二转减免只给生息），不在这里抄数。
@@ -298,6 +303,12 @@ public sealed class CharacterProcess(string configPath)
             + " potion_mana_restore=" + (talismanTable.BlueTalisman?.PotionManaRestore ?? 0)
             + " blue_group=" + (talismanTable.BlueTalisman?.CooldownGroup ?? "")
             + " blue_cooldown_ms=" + (talismanTable.BlueTalisman?.CooldownMs ?? 0));
+        Console.WriteLine("pill_table_version=" + pillTable.Version
+            + " pending=" + (pillTable.Note.Length > 0 ? "true" : "false")
+            + " pills=" + pillTable.All.Count
+            + " hp_top=" + pillTable.Strongest(PillTable.KindHp)
+            + " mana_top=" + pillTable.Strongest(PillTable.KindMana)
+            + " breakthrough=" + string.Join(",", pillTable.BreakthroughPills.Select(x => x.ItemId)));
         // 与 --revive-scroll-list 只读入口同形：冷却时长、两个比例改一条，
         // 重启后这里能直接核对到；冷却到期时刻不在这里，在角色库那一行。
         Console.WriteLine("revive_scroll_table_version=" + scrollTable.Version
@@ -536,6 +547,8 @@ public sealed class CharacterProcess(string configPath)
         var ingots = new IngotRepository(dataSource, auctionTable);
         // 红符的扣减：只动背包这一张，生命在战斗进程里，不在这里。
         var talismans = new TalismanRepository(dataSource);
+        // B1：吃丹也只有一个写入点——扣一格背包，生命与蓝量不在这里。
+        var pills = new PillRepository(dataSource);
         // 卷轴的冷却到期、背包张数、当前级经验都从角色库读；写那一笔复用
         // ExpSettlementRepository（等级经验只从那里写，不另开一条路）。
         var scrolls = new ReviveScrollRepository(dataSource);
@@ -629,6 +642,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(shopTable);
         builder.Services.AddSingleton(homeCoinShopTable);
         builder.Services.AddSingleton(talismanTable);
+        builder.Services.AddSingleton(pillTable);
+        builder.Services.AddSingleton(pills);
         builder.Services.AddSingleton(scrollTable);
         builder.Services.AddSingleton(boosters);
         builder.Services.AddSingleton(boosterTable);

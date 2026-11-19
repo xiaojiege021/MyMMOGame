@@ -197,6 +197,10 @@ internal static class ConfigTableCli
                         + " success_pct=" + requirement.SuccessPct
                         + " main_stage=" + requirement.MainStage
                         + " side_quests=" + string.Join("+", requirement.SideQuests));
+                    // B1：这一段突破要扣的境界丹。单独一行，老的 advance_req= 格式一个字没动。
+                    Console.WriteLine("advance_pill=" + requirement.From + "->" + requirement.Next
+                        + " pill=" + (requirement.Pill.Length == 0 ? "-" : requirement.Pill)
+                        + " count=" + requirement.PillCount);
                 }
                 foreach (var realm in table.Realms)
                 {

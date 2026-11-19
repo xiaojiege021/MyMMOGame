@@ -313,4 +313,12 @@ internal static class CliFlags
     public static bool nameBackfill = false;
     public static bool nameRegistry = false;
     public static int nameRegistryLimit = 100;
+    // B1：丹药只读入口、临时表路径与这个角色的丹药持有量。
+    public static bool pillList = false;
+    public static string? pillTablePath = null;
+    public static long pillStateOf = 0;
+    // B1：直接走一遍扣丹（与 ConsumePill 同一个仓储），核对「扣一颗」「同号重放不扣第二颗」。
+    public static long pillSpendOf = 0;
+    public static string? pillSpendItem = null;
+    public static string? pillSpendTxn = null;
 }

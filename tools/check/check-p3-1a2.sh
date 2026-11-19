@@ -163,7 +163,7 @@ echo "== 3. 只读入口 --realm-table / --dungeon-table =="
 "$DOTNET" "$CD" --realm-table $CC >"$TMP/rt.raw" 2>&1; rc=$?
 RT="$(utf8 < "$TMP/rt.raw")"
 if [ "$rc" = "0" ] \
-   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=4 realms=11 launch_until=结丹' \
+   && printf '%s' "$RT" | grep -q '^realm_table_state=ok version=5 realms=11 launch_until=结丹' \
    && printf '%s' "$RT" | grep -q '^sub_phase=\*:2 name=后期 passive_pct_bps=160' \
    && printf '%s' "$RT" | grep -q '^advance_req=炼体->筑基 drill=100 stone=stone_1 stone_cost=10 success_pct=70 main_stage=9 side_quests=$' \
    && [ "$(printf '%s' "$RT" | grep -c '^advance_req=')" = "10" ]; then
@@ -246,7 +246,7 @@ else
   for _ in $(seq 1 10); do
     out="$(curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/character?token=$TOK" \
       -H 'Content-Type: application/json' \
-      -d "{\"name\":\"p31a2_$RANDOM$RANDOM\",\"race\":\"mai\",\"class_id\":\"warrior\"}" 2>&1)"
+      -d "{\"name\":\"p31a2_$RANDOM\",\"race\":\"mai\",\"class_id\":\"warrior\"}" 2>&1)"
     ID="$(printf '%s' "$out" | python3 -c 'import json,sys
 try: print(json.load(sys.stdin).get("character_id",""))
 except Exception: print("")' 2>/dev/null)"
@@ -286,13 +286,18 @@ PY
   rawp() { "$DOTNET" "$CD" --raw-realm-phase-write "$1" "$2" $CC >/dev/null 2>&1; }
   qdone() { "$DOTNET" "$CD" --complete-quest "$1" "$2" $CC >/dev/null 2>&1; }
   bstate() { "$DOTNET" "$CD" --realm-break-state "$1" $CC 2>&1 | utf8 | grep -m1 '^realm_break_state='; }
-  adv() { local id="$1" txn="$2"; shift 2; "$DOTNET" "$CD" --advance-realm "$id" "$TX-$txn" "$@" 2>&1 | utf8 | grep -m1 '^advance_realm='; }
+  # B1 起突破要多扣一枚境界丹；这一段验的是 P3-1a2 的门槛与流水，所以每条突破前先把丹补满。
+  adv() { local id="$1" txn="$2"; shift 2; rawi "$id" 9 pill_zhuji 5; rawi "$id" 10 pill_pojing 5; "$DOTNET" "$CD" --advance-realm "$id" "$TX-$txn" "$@" 2>&1 | utf8 | grep -m1 '^advance_realm='; }
   drill() { "$DOTNET" "$CD" --settle-drill "$1" "$2" "$TX-$3" $CC 2>&1 | utf8 | grep -m1 '^settle_drill='; }
   stone() {
     curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/currency/add?token=$TOK" \
       -H 'Content-Type: application/json' -d "{\"character_id\":$1,\"kind\":\"stone_1\",\"delta\":$2}" >/dev/null
   }
   setstone() { "$DOTNET" "$CD" --raw-currency-write "$1" stone_1 "$2" $CC >/dev/null 2>&1; }
+  # B1 起突破要多扣一枚境界丹（筑基丹 / 破镜丹）：这一段验的是 P3-1a2 的门槛与流水，
+  # 所以先在背包里备好丹，让每一条突破都走得到自己要验的那道门。
+  # 一格只放得下一种物品：筑基丹与破镜丹必须占两格，否则后写的会把先写的顶掉。
+  rawi() { "$DOTNET" "$CD" --raw-item-write "$1" "$2" "$3" "$4" $CC >/dev/null 2>&1; }
   stonebalance() {
     curl -s --noproxy '*' "http://127.0.0.1:61000/currency?token=$TOK&character_id=$1" \
       | python3 -c 'import json,sys
@@ -301,6 +306,10 @@ try:
 except Exception:
     print("")'
   }
+
+  # B1：每一条突破都先备好境界丹（炼体→筑基扣筑基丹，后面各段扣破镜丹）。
+  rawi "$ID" 9 pill_zhuji 5
+  rawi "$ID" 10 pill_pojing 5
 
   rawd "$ID" -1 | grep -q 'raw_drill=rejected .*sqlstate=23514' \
     && ok "历练直写负数被库的 CHECK 拒（23514）" || bad "历练负数没被库挡住"
@@ -386,7 +395,7 @@ except Exception:
   # 角色服在同一事务里写经验与历练。这一段用真服真库把这条链跑通。
   echo "== 6. 生产链路：战斗服通关 → 角色服同一笔写历练 =="
   BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
-  BP="$ROOT/tools/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
+  BP="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
   "$DOTNET" build "$ROOT/tools/probe/BattleProbe/BattleProbe.csproj" -c Release --nologo -v q \
     >"$TMP/build-probe.log" 2>&1 \
     && ok "通关探针编译通过" || bad "通关探针编译失败"

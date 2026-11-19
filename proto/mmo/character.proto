@@ -147,6 +147,11 @@ service CharacterService {
   // P1-5c5：用符之前的只读查询。这个编号是哪种符、回复落在哪个池，只有角色服
   // 读配置说了算；战斗服不解析配置文件、不自己记编号映射。不扣符、不写库。
   rpc DescribeTalisman(DescribeTalismanRequest) returns (DescribeTalismanResponse);
+  // B1：丹药。和符同一种切法——编号到回复池的映射只在角色服的 config/pill.json，
+  // 战斗服不解析配置、不自己记一份。Describe 只读，Consume 才扣背包一格。
+  rpc DescribePill(DescribePillRequest) returns (DescribePillResponse);
+  // B1：在战斗里吃一颗丹。只扣一颗、不碰生命与蓝量；回复值与冷却由回包带给战斗服。
+  rpc ConsumePill(ConsumePillRequest) returns (ConsumePillResponse);
   // P1-5c6：用复活卷轴之前的只读查询。编号是不是卷轴、冷却到没到、背包有几张，
   // 只有角色服读配置与角色库说了算；战斗服不解析配置、不自己记冷却。不写库。
   rpc DescribeReviveScroll(DescribeReviveScrollRequest) returns (DescribeReviveScrollResponse);
@@ -958,6 +963,58 @@ message DescribeTalismanResponse {
   int64 count_left = 5;
 }
 
+// B1：丹药的回复池。和符一样只有两池——方案 12.1 写定回春丹 / 气血丹回复生命，
+// 凝神丹 / 回灵丹是蓝药、只回复蓝量。突破丹（筑基丹 / 破镜丹）不进战斗，
+// 没有池：它们在境界突破事务里扣，见 AdvanceRealmResponse 的 pill_* 三列。
+enum PillPool {
+  PILL_POOL_UNSPECIFIED = 0;
+  PILL_POOL_HP = 1;
+  PILL_POOL_MANA = 2;
+}
+
+message DescribePillRequest {
+  uint64 character_id = 1;
+  string item_id = 2;
+}
+
+message DescribePillResponse {
+  bool ok = 1;
+  // not_pill（不是丹）/ upstream_off（角色服没连上）/ 空串表示查到了。
+  string reason = 2;
+  string item_id = 3;
+  PillPool pool = 4;
+  // 只读的背包颗数，事实值；扣不扣由 ConsumePill 那笔事务再判一次。
+  int64 count_left = 5;
+}
+
+message ConsumePillRequest {
+  // 战斗服服间直连时为空，只按 character_id 找角色；客户端填不了这个字段。
+  string account = 1;
+  uint64 character_id = 2;
+  // 只带编号：数量恒为 1，回复值与冷却都不在请求里，客户端改不了「这一颗回多少」。
+  string item_id = 3;
+  // 战斗服生成的幂等号：同一个号只扣一颗，重放整笔不做。
+  string txn_id = 4;
+}
+
+message ConsumePillResponse {
+  bool ok = 1;
+  // not_pill（不是丹）/ no_pill（背包里没有）/ 空串表示真扣掉了。
+  string reason = 2;
+  string item_id = 3;
+  int64 count_left = 4;
+  // 扣的是哪一格。没扣时为 0。
+  uint32 slot = 5;
+  bool duplicate = 6;
+  // 配置里的回复值：回血丹只有 hp_restore，蓝药只有 mana_restore，另一个恒 0。
+  int64 hp_restore = 7;
+  uint32 cooldown_ms = 8;
+  // 和符同一组冷却：红药是 heal（和红符、牧师治疗共用），蓝药是 mana（和蓝符共用）。
+  string cooldown_group = 9;
+  PillPool pool = 10;
+  int64 mana_restore = 11;
+}
+
 // P1-5c6：用卷轴之前的只读查询。请求里只有角色号与物品编号，没有目标、
 // 数量、回复值或冷却——「只拉起自己」在协议结构上就落死了。
 message DescribeReviveScrollRequest {
@@ -1266,6 +1323,11 @@ message AdvanceRealmResponse {
   int32 success_pct = 17;
   // 同一个事务号再提交：这一笔没掷，历练与灵石都没动。
   bool duplicate = 18;
+  // B1：这一笔要求的境界丹（配置值）与扣完的余额。条件不满足时 pill_count 为 0、
+  // pill_left 是当前颗数（事实值）。没配丹的段（老配置）两个都是空 / 0。
+  string pill_kind = 19;
+  int64 pill_count = 20;
+  int64 pill_left = 21;
 }
 
 // P3-1a2：历练结算。请求只有角色、副本与事务号；给多少历练由配置决定。

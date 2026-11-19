@@ -1,8 +1,8 @@
 {
   "schema": "recipe-table/1",
-  "version": 1,
+  "version": 2,
   "pending": true,
-  "note": "K3 生产 / 配方的唯一内容正本。四个副职按方案 12 章的「炼丹 → 铁匠 → 裁缝 → 巧匠」；unlock_level 是角色等级（B3 接副职等级时另加字段，不改这一格的含义）。材料 / 产出 / 费用 / 成功率 / 制作耗时 / 解锁全部只在这份文件里：加一个配方 = 加一条，代码不动。方案只写定「药给炼丹、矿给铁匠」，没给裁缝 / 巧匠的材料来源与任何具体配方；本表 8 条都是 K3 的占位，success_pct 与 craft_time_s 是暂取值，整表 pending 摘掉之前不当作方案数。grade_roll 是 B3「胚子做成装备时掷一次」的位置，K3 不接：配置里写了会起不来，免得静默忽略一次随机。",
+  "note": "B1（v2）：炼丹六条换成真实配方——回春丹 / 凝神丹沿用 K3 的编号，另加气血丹 / 回灵丹 / 筑基丹 / 破镜丹，材料是灵草、血参、玄参三档药材（后两档的采集点在 config/gather.json）。六种丹的回复值与档位在 config/pill.json，本表只写怎么做；铁匠 / 裁缝 / 巧匠六条仍是 K3 占位，B3 定稿前不改。 K3 生产 / 配方的唯一内容正本。四个副职按方案 12 章的「炼丹 → 铁匠 → 裁缝 → 巧匠」；unlock_level 是角色等级（B3 接副职等级时另加字段，不改这一格的含义）。材料 / 产出 / 费用 / 成功率 / 制作耗时 / 解锁全部只在这份文件里：加一个配方 = 加一条，代码不动。方案只写定「药给炼丹、矿给铁匠」，没给裁缝 / 巧匠的材料来源与任何具体配方；本表 8 条都是 K3 的占位，success_pct 与 craft_time_s 是暂取值，整表 pending 摘掉之前不当作方案数。grade_roll 是 B3「胚子做成装备时掷一次」的位置，K3 不接：配置里写了会起不来，免得静默忽略一次随机。",
   "professions": [
     { "id": "alchemy", "name": "炼丹" },
     { "id": "blacksmith", "name": "铁匠" },
@@ -19,7 +19,7 @@
       "output": { "item_id": "pill_rejuvenate", "count": 1 },
       "success_pct": 100,
       "craft_time_s": 5,
-      "note": "最基础的回复丹。药材与成功率是 K3 占位，B1 定真实数值。"
+      "note": "回春丹：灵草两株。数量 / 费用 / 成功率 / 耗时都是 B1 暂取值（方案只写「药给炼丹」）。"
     },
     {
       "id": "recipe_pill_focus",
@@ -30,7 +30,63 @@
       "output": { "item_id": "pill_focus", "count": 1 },
       "success_pct": 80,
       "craft_time_s": 8,
-      "note": "凝神丹。成功率与耗时是 K3 占位，B1 定。"
+      "note": "凝神丹：灵草三株。低阶药材也能出蓝药，代价是件数多、成功率略低。"
+    },
+    {
+      "id": "recipe_pill_qixue",
+      "profession": "alchemy",
+      "unlock_level": 10,
+      "inputs": [
+        { "item_id": "herb_xue", "count": 2 },
+        { "item_id": "herb_ling", "count": 1 }
+      ],
+      "fee": { "gold": 30 },
+      "output": { "item_id": "pill_qixue", "count": 1 },
+      "success_pct": 85,
+      "craft_time_s": 12,
+      "note": "气血丹：血参两株配灵草一株。"
+    },
+    {
+      "id": "recipe_pill_huiling",
+      "profession": "alchemy",
+      "unlock_level": 15,
+      "inputs": [
+        { "item_id": "herb_xuan", "count": 2 },
+        { "item_id": "herb_ling", "count": 1 }
+      ],
+      "fee": { "gold": 40 },
+      "output": { "item_id": "pill_huiling", "count": 1 },
+      "success_pct": 80,
+      "craft_time_s": 15,
+      "note": "回灵丹：玄参两株配灵草一株。"
+    },
+    {
+      "id": "recipe_pill_zhuji",
+      "profession": "alchemy",
+      "unlock_level": 20,
+      "inputs": [
+        { "item_id": "herb_ling", "count": 5 },
+        { "item_id": "herb_xue", "count": 2 }
+      ],
+      "fee": { "gold": 80 },
+      "output": { "item_id": "pill_zhuji", "count": 1 },
+      "success_pct": 60,
+      "craft_time_s": 30,
+      "note": "筑基丹：灵草五株配血参两株。境界丹成功率低于回复丹，方案没给数，是暂取值。"
+    },
+    {
+      "id": "recipe_pill_pojing",
+      "profession": "alchemy",
+      "unlock_level": 40,
+      "inputs": [
+        { "item_id": "herb_xue", "count": 3 },
+        { "item_id": "herb_xuan", "count": 3 }
+      ],
+      "fee": { "gold": 150 },
+      "output": { "item_id": "pill_pojing", "count": 1 },
+      "success_pct": 50,
+      "craft_time_s": 45,
+      "note": "破镜丹：血参三株配玄参三株，两种中高阶药材都要。"
     },
     {
       "id": "recipe_sword_trial",

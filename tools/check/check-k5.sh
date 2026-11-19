@@ -67,7 +67,7 @@ GRADES = {"white", "green", "blue", "purple", "orange", "red"}
 REQUIRED = ("grade", "set_id", "desc")
 
 # ---------------------------------------------------------------- 1. 表本身
-report("schema_v4", doc.get("schema") == "item-table/4" and doc.get("version") == 4,
+report("schema_v4", doc.get("schema") == "item-table/4" and doc.get("version") >= 4,
        "schema=%s version=%s" % (doc.get("schema"), doc.get("version")))
 report("items_count_floor", len(ids) >= 39, "只有 %d 件（K4 收口时 38，K5 再加 1 把法剑）" % len(ids))
 report("items_id_unique", len(ids) == len(idset), "重复=%s" % ",".join(
@@ -209,7 +209,7 @@ fi
 echo "== 3. 只读入口：新字段真的被代码读到 =="
 IL="$("$DOTNET" "$CHARACTER_DLL" --item-list 2>&1)"; ilrc=$?
 ITEM_COUNT="$(python3 -c 'import json; print(len(json.load(open("config/items.json"))["items"]))')"
-[ "$ilrc" = "0" ] && grep -q "^item_table_state=ok version=4 items=${ITEM_COUNT}\$" <<< "$IL" \
+[ "$ilrc" = "0" ] && grep -q "^item_table_state=ok version=5 items=${ITEM_COUNT}\$" <<< "$IL" \
   && ok "物品表 v4 读出 ${ITEM_COUNT} 件（不连库）" \
   || bad "只读入口不对（rc=${ilrc}）：$(head -2 <<< "$IL" | tr '\n' ' ')"
 if [ "$(grep -c '^item=' <<< "$IL")" = "$ITEM_COUNT" ]; then
@@ -249,7 +249,7 @@ done
 stop_pid "$START_PID"
 if grep -q '^config_error=' "$STARTUP"; then
   bad "真配置整链加载失败：$(head -1 "$STARTUP")"
-elif grep -q "^items=${ITEM_COUNT} item_table_version=4 " "$STARTUP"; then
+elif grep -q "^items=${ITEM_COUNT} item_table_version=5 " "$STARTUP"; then
   ok "真配置整链加载通过（物品表 v4 / ${ITEM_COUNT} 件）"
 else
   bad "启动没读到物品表 v4：$(grep '^items=' "$STARTUP" | head -1)"

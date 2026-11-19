@@ -21,6 +21,7 @@ internal static class CliParser
             case var enhanceFlag when EnhanceCli.Handles(enhanceFlag): EnhanceCli.Parse(args, ref i); break;
             case var flag2 when PassProgressCli.Handles(flag2): PassProgressCli.Parse(args, ref i); break;
             case var nameFlag when NameCli.Handles(nameFlag): NameCli.Parse(args, ref i); break;
+            case var pillFlag when PillCli.Handles(pillFlag): PillCli.Parse(args, ref i); break;
             case "--migrate": migrate = true; break;
             case "--migrations" when i + 1 < args.Length: migrationsPath = args[++i]; break;
             case "--schema" when i + 1 < args.Length: schemaFilter = args[++i]; break;
@@ -44,9 +45,8 @@ internal static class CliParser
                 long.TryParse(args[++i], out advanceBranchId);
                 advanceBranchTo = args[++i];
                 break;
-            // 只给核对用：NPC / 怪物两张内容表，不连库；坏配置也走这里。
+            // 只给核对用：内容表（NPC / 怪物）与物品表（品阶 / 套装 / 说明），都不连库；坏配置也走这里。
             case "--content-list": contentList = true; break;
-            // 只给核对用：把物品表的品阶 / 套装 / 图标 / 说明打出来，不连库。坏配置也走这里。
             case "--item-list": itemList = true; break;
             // K3：配方与制作的核对 flag 解析器在 CraftCli.Parse（一个文件一个类型 / 行数闸门）。
             case "--recipe-list": case "--recipe-table-path": case "--craft-start": case "--craft-finish": case "--craft-state": case "--craft-txn": case "--raw-item-write": case "--raw-currency-add": CraftCli.Parse(args, ref i); break;

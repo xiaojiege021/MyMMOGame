@@ -176,6 +176,7 @@ public sealed class Encounter
     readonly ICharacterStore _characters;
     readonly IExpSettlement _expSettlement;
     readonly ITalismanSpend _talismans;
+    readonly IPillSpend _pills;
     readonly IReviveScrollUse _scrolls;
     readonly IBattleProfileSource _profiles;
     readonly DungeonDef? _dungeon;
@@ -210,6 +211,7 @@ public sealed class Encounter
     int _qualifiedKills;
     // 这一场用掉了第几张符。只用来拼事务号：同一场同一个人第几张，重放不会扣两次。
     int _talismanUses;
+    int _pillUses;
     // 卷轴另记一套序号：符与卷轴用同一个角色服事务号表，编号不能撞。
     int _scrollUses;
     string _settlementId = "";
@@ -269,7 +271,7 @@ public sealed class Encounter
     public Encounter(
         BattleConfig config, SettlementStore settlements, ICharacterStore characters,
         ulong sessionId, int partySize, IExpSettlement expSettlement, ITalismanSpend talismans,
-        IReviveScrollUse scrolls, IBattleProfileSource profiles, DungeonDef? dungeon,
+        IPillSpend pills, IReviveScrollUse scrolls, IBattleProfileSource profiles, DungeonDef? dungeon,
         BossConfig? boss = null)
     {
         _config = config;
@@ -277,6 +279,7 @@ public sealed class Encounter
         _characters = characters;
         _expSettlement = expSettlement;
         _talismans = talismans;
+        _pills = pills;
         _scrolls = scrolls;
         _profiles = profiles;
         _dungeon = dungeon;
@@ -974,6 +977,197 @@ public sealed class Encounter
         new()
         {
             TalismanRejected = new TalismanRejected
+            {
+                ItemId = itemId,
+                Reason = reason,
+                RetryAfterMs = retryAfterMs,
+                HpAfter = hpAfter,
+                ManaAfter = manaAfter,
+            },
+        };
+
+    // ---- 吃丹 ----
+
+    /// <summary>
+    /// 吃一颗丹（回春丹 / 气血丹回血，凝神丹 / 回灵丹回蓝）。方案 12.1 的边界：
+    ///   · 只回复自己——请求里没有目标编号，这里恒拿 member 自己当目标；
+    ///   · 不复活——倒地（Down）直接拒绝，丹不能把人拉起来；
+    ///   · 回复不超过同级符那条线由配置定，这里只按池上限截断，不自己算第二套数；
+    ///   · 蓝药不回血、不提高精神、不增加伤害——只写 Mana，另一个池与属性一律不碰。
+    ///
+    /// 扣丹交给角色服（背包只有它能写），扣不掉就不回。
+    /// 红药和红符、牧师治疗共用 heal 组，蓝药和蓝符共用 mana 组——组名由角色服回包给，
+    /// 这里照着写本场的计时器，所以「符和药共用冷却」在代码里也只有一个来源。
+    /// 突破丹不在这条路上：角色服的 DescribePill 会把它判成 not_pill。
+    /// </summary>
+    public ServerMessage UsePill(Member member, UsePillRequest request)
+    {
+        var itemId = (request.ItemId ?? "").Trim();
+        if (itemId.Length == 0)
+        {
+            return RejectPill(itemId, "not_pill", 0, member.Hp, member.Mana);
+        }
+
+        var info = _pills.Describe(member.Id, itemId);
+        if (!info.Ok)
+        {
+            return RejectPill(itemId, info.Reason, 0, member.Hp, member.Mana);
+        }
+
+        string precheck;
+        int seq;
+        lock (_gate)
+        {
+            var now = NowMs();
+            precheck = PillPrecheck(member, now, info.Pool);
+            seq = ++_pillUses;
+        }
+
+        if (precheck.Length > 0)
+        {
+            var retry = 0u;
+            if (precheck == "cooldown")
+            {
+                lock (_gate)
+                {
+                    var readyAt = info.Pool == PillPool.Mana
+                        ? member.ManaGroupReadyAtMs
+                        : member.HealGroupReadyAtMs;
+                    retry = (uint)Math.Max(0, readyAt - NowMs());
+                }
+            }
+
+            return RejectPill(itemId, precheck, retry, member.Hp, member.Mana);
+        }
+
+        // 事务号在这一场里唯一：同一场同一个人第几颗，重放不会扣两次。
+        var txnId = "pill:" + SessionId.ToString("x16")
+            + ":" + member.Id.ToString("x16") + ":" + seq.ToString();
+
+        // 网络调用放在锁外面：一次扣丹最长等五秒，不能把整场的结算一起挂住。
+        var spend = _pills.Spend(member.Id, itemId, txnId);
+        if (!spend.Ok)
+        {
+            return RejectPill(itemId, spend.Reason, 0, member.Hp, member.Mana);
+        }
+
+        lock (_gate)
+        {
+            if (member.Down)
+            {
+                return RejectPill(itemId, "caster_down", 0, member.Hp, member.Mana);
+            }
+
+            if (spend.Pool == PillPool.Mana && member.Mana < member.ManaMax)
+            {
+                var restored = Math.Min(spend.ManaRestore, member.ManaMax - member.Mana);
+                member.Mana += restored;
+                if (spend.CooldownMs > 0)
+                {
+                    // 和蓝符同一个组：符刚用过，这一颗也要等同一段冷却。
+                    member.ManaGroupReadyAtMs = NowMs() + spend.CooldownMs;
+                }
+
+                return PillApplied(member, itemId, spend, 0, restored);
+            }
+
+            if (spend.Pool == PillPool.Hp && member.Hp < member.HpMax)
+            {
+                var healed = Math.Min(spend.HpRestore, member.HpMax - member.Hp);
+                member.Hp += healed;
+                if (spend.CooldownMs > 0)
+                {
+                    // 和红符、牧师治疗同一个组。
+                    member.HealGroupReadyAtMs = NowMs() + spend.CooldownMs;
+                }
+
+                return PillApplied(member, itemId, spend, healed, 0);
+            }
+
+            return RejectPill(itemId,
+                spend.Pool == PillPool.Mana ? "mana_full" : "hp_full",
+                0, member.Hp, member.Mana);
+        }
+    }
+
+    /// <summary>
+    /// 丹真扣掉了，把这一个池的增量回给本人。另一个池的数值原样回、不改动——
+    /// 「蓝药不回血」「红药不回蓝」在这里落死：healed 与 mana_restored 只有一个非零。
+    /// </summary>
+    static ServerMessage PillApplied(
+        Member member, string itemId, PillSpendResult spend, long healed, long restored) =>
+        new()
+        {
+            PillUsed = new PillUsed
+            {
+                CasterId = member.Id,
+                ItemId = itemId,
+                Healed = healed,
+                HpAfter = member.Hp,
+                CooldownMs = (uint)Math.Max(0, spend.CooldownMs),
+                CooldownGroup = spend.CooldownGroup,
+                CountLeft = spend.CountLeft,
+                Pool = spend.Pool.ToString().ToLowerInvariant(),
+                Restored = healed + restored,
+                ManaAfter = member.Mana,
+                ManaRestored = restored,
+            },
+        };
+
+    /// <summary>
+    /// 吃丹的本地前置判定。池由角色服的只读查询给，所以满池与冷却都查对的那一个：
+    /// 红药看血与治疗组，蓝药看蓝与蓝量组。返回空串表示能进下一步（去扣丹）。
+    /// </summary>
+    string PillPrecheck(Member member, long now, PillPool pool)
+    {
+        if (_closed || _bossHp <= 0)
+        {
+            return "not_in_battle";
+        }
+
+        if (member.Down)
+        {
+            return "caster_down";
+        }
+
+        if (pool == PillPool.Mana)
+        {
+            if (now < member.ManaGroupReadyAtMs)
+            {
+                return "cooldown";
+            }
+
+            if (member.Mana >= member.ManaMax)
+            {
+                return "mana_full";
+            }
+
+            return "";
+        }
+
+        if (pool != PillPool.Hp)
+        {
+            return "not_pill";
+        }
+
+        if (now < member.HealGroupReadyAtMs)
+        {
+            return "cooldown";
+        }
+
+        if (member.Hp >= member.HpMax)
+        {
+            return "hp_full";
+        }
+
+        return "";
+    }
+
+    static ServerMessage RejectPill(
+        string itemId, string reason, uint retryAfterMs, long hpAfter, long manaAfter) =>
+        new()
+        {
+            PillRejected = new PillRejected
             {
                 ItemId = itemId,
                 Reason = reason,

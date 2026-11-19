@@ -179,11 +179,26 @@ CREATE TABLE IF NOT EXISTS "角色".realm_breakthrough (
     drill_cost   bigint      NOT NULL CHECK (drill_cost >= 0),
     stone_kind   text        NOT NULL,
     stone_cost   bigint      NOT NULL CHECK (stone_cost > 0),
+    -- B1：这一次扣的境界丹（编号与枚数）。老流水没有这一笔，默认空串 / 0。
+    pill_kind    text        NOT NULL DEFAULT '',
+    pill_count   bigint      NOT NULL DEFAULT 0 CHECK (pill_count >= 0),
     attempted_at timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS realm_breakthrough_character
     ON "角色".realm_breakthrough (character_id, attempted_at DESC);
+
+-- B1：与 db/character/pill.sql 逐条一致。老库只跑主迁移也能补上这两列。
+ALTER TABLE "角色".realm_breakthrough
+    ADD COLUMN IF NOT EXISTS pill_kind text NOT NULL DEFAULT '';
+
+ALTER TABLE "角色".realm_breakthrough
+    ADD COLUMN IF NOT EXISTS pill_count bigint NOT NULL DEFAULT 0;
+
+ALTER TABLE "角色".realm_breakthrough
+    DROP CONSTRAINT IF EXISTS realm_breakthrough_pill_count_non_negative;
+ALTER TABLE "角色".realm_breakthrough
+    ADD CONSTRAINT realm_breakthrough_pill_count_non_negative CHECK (pill_count >= 0);
 
 CREATE TABLE IF NOT EXISTS "角色".realm_drill (
     txn_id       text        PRIMARY KEY,

@@ -53,6 +53,9 @@ internal static class CliEntry
         code = MetaCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = PillCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         // 连库核对与迁移；没有任何连库 flag 时直接落到启动。
         code = await DbCli.TryRunAsync();
         if (code != null) { return code.Value; }

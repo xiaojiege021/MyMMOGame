@@ -217,7 +217,11 @@ internal static class RealmCli
                     + " main_stage=" + outcome.MainStage
                     + " main_required=" + outcome.MainStageRequired
                     + " missing=" + string.Join("+", outcome.MissingQuests)
-                    + " success_pct=" + outcome.SuccessPct);
+                    + " success_pct=" + outcome.SuccessPct
+                    // B1：境界丹——配置里的编号与枚数，加扣完的余额（事实值）。
+                    + " pill=" + (outcome.PillKind.Length == 0 ? "-" : outcome.PillKind)
+                    + " pill_count=" + outcome.PillCount
+                    + " pill_left=" + outcome.PillLeft);
             }
 
             if (settleDrillOf != 0)

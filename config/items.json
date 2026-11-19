@@ -1,7 +1,7 @@
 {
   "schema": "item-table/4",
-  "version": 4,
-  "note": "P3-4a2：通行证两轨的发货物在这儿：免费轨只有称号（title）与外观碎片（appearance_fragment），付费轨只有当季秘境外观（outfit）、洞府摆件（home_decor）与保护券（voucher，仍是 ticket_protect 这一件）。方案没给这些外观起名字，每季一套编号、名字全标占位，改 config/season_pass.json 换成别的编号即可；四种奖励都到账即绑（bind=always），不能上架换成金币或灵石。这些外观 / 称号 / 摆件此刻只作为「到手」的绑定事实进背包，装配与模型表现留给美术与 U 线，本表不写第二套外观数据。 bind 决定到账时是否绑定：none 不绑，on_pickup 拾取即绑（副本装备），always 到账即绑（商城买的符、券、卷轴）。绑定物品不能直接交易，解绑道具只解装备（P1-5c8）。ticket_protect 是方案 9.2 / 12.1 里唯一一种保护券：商城与通行证付费轨以后发的都是这一个编号，到账即绑、不能上架，副本和任务不产出；它只挡一次强化掉级，不加属性、不提高成功率，用的时候按物品编号认，不记来源。P1-4c：stone_transfer 是方案 9.3 与 10 章写定的转移石（巢穴产出、商城不卖），本卡只定物品与用法，掉落发货在后面的卡；sword_trade 是「不绑装备」的样本——方案 9.3 写了非绑来源转非绑目标时目标仍可交易，需要有一件到账不绑的装备可核对，制作与玩家交易在后面的卡。P1-4d：三种 crystal_* 是方案第 9 章第 3 层的攻击 / 防御 / 功能结晶，从副本掉落、商城与宗门 NPC 不卖，发货在后面的卡；robe_trial 与 ring_trial 是护甲、饰品部位的装备样本，用来核对「部位不对的结晶被拒绝」。装备部位归属与结晶类别 / 固定值在 config/crystal.json，不在本表另写一套。 P2-4a：装备带 weapon_kind 与 require_level；不到 15 级的武器全职业可装备，15 级起只能用本职业兵器。 K4：补上 npc_shop.json 早已引用、但此前只在 K5 / B1 计划里的 5 件（tool_pickaxe / tool_hoe / bag_basic / pill_rejuvenate / pill_focus）；这里只给 id / name / kind / stack_max / bind，grade / set_id / icon / desc 已由 K5 补（effect 与数值仍归 B1），价格仍只在 npc_shop.json。 K5（v1.164）：全表加 grade / set_id / desc 三个字段（v1.172 修正：icon 不进配置，见下句），schema 升到 item-table/4。 grade 只认 white / green / blue / purple / orange / red，装备必须有品阶，材料与结晶 / 称号 / 外观这几类可以留空； set_id 现在全表留空，等 B2「装备品阶与套装」定套装件数与效果后再填，字段已在、不用再回填 39 件； 图标地址不进本表：第 17 节 17.1 写定 config 里没有美术字段，客户端按 icon/<物品编号> 自己拼（纯命名约定，文件名即 AB 地址，见 17.2 第 3 条），换图不改配置、也不动服务端；desc 是给背包与提示看的说明。 sword_trade 的编号不变（改编号会打断已有引用），中文名改「行商长刀」、weapon_kind 改 saber； 另补一件 15 级法剑 spirit_sword_trade（weapon_kind=spirit_sword）：W1 把法师 / 牧师本命兵器改成 staff / spirit_sword 之前，还没有职业能在 15 级穿它，这是 W1 的落点，本表只落物品。 装备部位仍只在 crystal.json 的 equipment_parts 一处，items.json 不写第二份 part；价格仍只在 shop.json / npc_shop.json / 配方表。",
+  "version": 5,
+  "note": "B1（v5）：加两档药材 herb_xue / herb_xuan 与四种丹 pill_qixue / pill_huiling / pill_zhuji / pill_pojing；六种丹的回复值、冷却组与档位在 config/pill.json，本表仍只写「是什么、能不能叠、到账绑不绑」。丹药一律 bind=none：方案 12.1 写定从副本 / 炼丹 / 特殊任务来，可以上拍卖；商城禁售由 shop.json 的 forbidden 列表（含 pill / herb）负责，本表不写第二份。 P3-4a2：通行证两轨的发货物在这儿：免费轨只有称号（title）与外观碎片（appearance_fragment），付费轨只有当季秘境外观（outfit）、洞府摆件（home_decor）与保护券（voucher，仍是 ticket_protect 这一件）。方案没给这些外观起名字，每季一套编号、名字全标占位，改 config/season_pass.json 换成别的编号即可；四种奖励都到账即绑（bind=always），不能上架换成金币或灵石。这些外观 / 称号 / 摆件此刻只作为「到手」的绑定事实进背包，装配与模型表现留给美术与 U 线，本表不写第二套外观数据。 bind 决定到账时是否绑定：none 不绑，on_pickup 拾取即绑（副本装备），always 到账即绑（商城买的符、券、卷轴）。绑定物品不能直接交易，解绑道具只解装备（P1-5c8）。ticket_protect 是方案 9.2 / 12.1 里唯一一种保护券：商城与通行证付费轨以后发的都是这一个编号，到账即绑、不能上架，副本和任务不产出；它只挡一次强化掉级，不加属性、不提高成功率，用的时候按物品编号认，不记来源。P1-4c：stone_transfer 是方案 9.3 与 10 章写定的转移石（巢穴产出、商城不卖），本卡只定物品与用法，掉落发货在后面的卡；sword_trade 是「不绑装备」的样本——方案 9.3 写了非绑来源转非绑目标时目标仍可交易，需要有一件到账不绑的装备可核对，制作与玩家交易在后面的卡。P1-4d：三种 crystal_* 是方案第 9 章第 3 层的攻击 / 防御 / 功能结晶，从副本掉落、商城与宗门 NPC 不卖，发货在后面的卡；robe_trial 与 ring_trial 是护甲、饰品部位的装备样本，用来核对「部位不对的结晶被拒绝」。装备部位归属与结晶类别 / 固定值在 config/crystal.json，不在本表另写一套。 P2-4a：装备带 weapon_kind 与 require_level；不到 15 级的武器全职业可装备，15 级起只能用本职业兵器。 K4：补上 npc_shop.json 早已引用、但此前只在 K5 / B1 计划里的 5 件（tool_pickaxe / tool_hoe / bag_basic / pill_rejuvenate / pill_focus）；这里只给 id / name / kind / stack_max / bind，grade / set_id / icon / desc 已由 K5 补（effect 与数值仍归 B1），价格仍只在 npc_shop.json。 K5（v1.164）：全表加 grade / set_id / desc 三个字段（v1.172 修正：icon 不进配置，见下句），schema 升到 item-table/4。 grade 只认 white / green / blue / purple / orange / red，装备必须有品阶，材料与结晶 / 称号 / 外观这几类可以留空； set_id 现在全表留空，等 B2「装备品阶与套装」定套装件数与效果后再填，字段已在、不用再回填 39 件； 图标地址不进本表：第 17 节 17.1 写定 config 里没有美术字段，客户端按 icon/<物品编号> 自己拼（纯命名约定，文件名即 AB 地址，见 17.2 第 3 条），换图不改配置、也不动服务端；desc 是给背包与提示看的说明。 sword_trade 的编号不变（改编号会打断已有引用），中文名改「行商长刀」、weapon_kind 改 saber； 另补一件 15 级法剑 spirit_sword_trade（weapon_kind=spirit_sword）：W1 把法师 / 牧师本命兵器改成 staff / spirit_sword 之前，还没有职业能在 15 级穿它，这是 W1 的落点，本表只落物品。 装备部位仍只在 crystal.json 的 equipment_parts 一处，items.json 不写第二份 part；价格仍只在 shop.json / npc_shop.json / 配方表。",
   "items": [
     {
       "id": "ore_iron",
@@ -387,7 +387,7 @@
       "set_id": "",
       "stack_max": 99,
       "bind": "none",
-      "desc": "立即回复一部分生命。"
+      "desc": "立即回复一部分生命，最低一档红药。"
     },
     {
       "id": "pill_focus",
@@ -397,7 +397,67 @@
       "set_id": "",
       "stack_max": 99,
       "bind": "none",
-      "desc": "立即回复一部分法力。"
+      "desc": "立即回复一部分法力，最低一档蓝药。"
+    },
+    {
+      "id": "herb_xue",
+      "name": "血参",
+      "kind": "material",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 999,
+      "bind": "none",
+      "desc": "筑基以上区域采到的药材，气血类丹药的主料。"
+    },
+    {
+      "id": "herb_xuan",
+      "name": "玄参",
+      "kind": "material",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 999,
+      "bind": "none",
+      "desc": "结丹以上区域采到的药材，回灵与破境类丹药的主料。"
+    },
+    {
+      "id": "pill_qixue",
+      "name": "气血丹",
+      "kind": "consumable",
+      "grade": "white",
+      "set_id": "",
+      "stack_max": 99,
+      "bind": "none",
+      "desc": "立即回复更多生命，比回春丹高一档。"
+    },
+    {
+      "id": "pill_huiling",
+      "name": "回灵丹",
+      "kind": "consumable",
+      "grade": "white",
+      "set_id": "",
+      "stack_max": 99,
+      "bind": "none",
+      "desc": "立即回复更多法力，比凝神丹高一档。"
+    },
+    {
+      "id": "pill_zhuji",
+      "name": "筑基丹",
+      "kind": "consumable",
+      "grade": "white",
+      "set_id": "",
+      "stack_max": 99,
+      "bind": "none",
+      "desc": "炼体突破筑基时在突破事务里扣一枚。"
+    },
+    {
+      "id": "pill_pojing",
+      "name": "破镜丹",
+      "kind": "consumable",
+      "grade": "white",
+      "set_id": "",
+      "stack_max": 99,
+      "bind": "none",
+      "desc": "筑基及以后每次大境界突破扣一枚。"
     },
     {
       "id": "spirit_sword_trade",
