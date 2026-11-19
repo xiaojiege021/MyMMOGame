@@ -24,7 +24,8 @@ public enum BindRule
 public sealed record ItemDef(
     string Id, string Name, string Kind, int StackMax, BindRule Bind,
     string WeaponKind = "", int RequireLevel = 0,
-    string Grade = "", string SetId = "", string Desc = "")
+    string Grade = "", string SetId = "", string Desc = "",
+    string Slot = "", int Attack = 0)
 {
     /// <summary>有没有品阶。材料、结晶、称号、外观可以不写。</summary>
     public bool HasGrade => Grade.Length > 0;
@@ -34,6 +35,9 @@ public sealed record ItemDef(
 
     /// <summary>是不是武器。没有 weapon_kind 的装备（衣服、戒指）不受武器锁约束。</summary>
     public bool IsWeapon => WeaponKind.Length > 0;
+
+    /// <summary>B9：这件是不是装备（决定能不能穿）。部位在 Slot。</summary>
+    public bool IsEquipment => string.Equals(Kind, "equipment", StringComparison.Ordinal);
 }
 
 public sealed class ItemTable
@@ -45,6 +49,12 @@ public sealed class ItemTable
     };
 
     readonly Dictionary<string, ItemDef> _byId = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// B9：三个部位。同部位只许穿一件；这是装备定义里的必填项，不是可调数值，
+    /// 所以不进 config 的数值表，也不许在代码里按物品编号分支。
+    /// </summary>
+    public static readonly string[] EquipSlots = ["weapon", "armor", "accessory"];
 
     public int Version { get; }
 
@@ -133,6 +143,36 @@ public sealed class ItemTable
             {
                 throw new ConfigException("物品 " + id + " 缺 desc");
             }
+
+            // B9：部位与装备固定攻击。装备必须写部位（穿在哪一格由它决定），
+            // 非装备不许写；攻击只能是装备上的，且不许为负。
+            var slot = (item.Slot ?? "").Trim();
+            var attack = item.Attack ?? 0;
+            if (kind == "equipment")
+            {
+                if (Array.IndexOf(EquipSlots, slot) < 0)
+                {
+                    throw new ConfigException(
+                        "装备 " + id + " 的 slot 必须是 weapon / armor / accessory：" + (slot.Length == 0 ? "（没写）" : slot));
+                }
+            }
+            else
+            {
+                if (slot.Length > 0)
+                {
+                    throw new ConfigException("只有装备能写 slot：" + id);
+                }
+                if (attack != 0)
+                {
+                    throw new ConfigException("只有装备能写 attack：" + id);
+                }
+            }
+
+            if (attack < 0)
+            {
+                throw new ConfigException("装备 " + id + " 的 attack 不能是负数");
+            }
+
             if (map.ContainsKey(id))
             {
                 // 配置设计 10.1：同一文件内 id 唯一。重复时以前是后者覆盖前者，
@@ -141,7 +181,7 @@ public sealed class ItemTable
             }
             map[id] = new ItemDef(
                 id, (item.Name ?? id).Trim(), kind, stackMax,
-                item.Bind.Value, weaponKind, requireLevel, grade, setId, desc);
+                item.Bind.Value, weaponKind, requireLevel, grade, setId, desc, slot, attack);
         }
 
         if (map.Count == 0)
@@ -216,5 +256,11 @@ public sealed class ItemTable
 
         [JsonPropertyName("desc")]
         public string? Desc { get; init; }
+
+        [JsonPropertyName("slot")]
+        public string? Slot { get; init; }
+
+        [JsonPropertyName("attack")]
+        public int? Attack { get; init; }
     }
 }

@@ -12,6 +12,8 @@ namespace Character;
 public sealed class CharacterGrpcService(
     CharacterRepository characters,
     InventoryRepository inventory,
+    BagRepository bags,
+    EquipRepository equips,
     CurrencyRepository currency,
     GrantRepository grants,
     RaceTable races,
@@ -304,7 +306,7 @@ public sealed class CharacterGrpcService(
             Reason = "",
             Name = outcome.Name,
             ItemId = nameRules.RenameItemId,
-            CountLeft = outcome.CountLeft,
+            CountLeft = (int)outcome.CountLeft,
             Duplicate = false,
         };
     }
@@ -460,6 +462,9 @@ public sealed class CharacterGrpcService(
             Realm = realm,
             RealmDisplay = realms.DisplayName(realm, facts?.Alignment ?? ""),
         };
+        // B9：这一行正穿在哪个部位。只读一张穿戴表，不改背包；客户端据此把「穿上 / 脱下」
+        // 显示成当前事实，而不是自己记一份。
+        var worn = await equips.EquippedByBagSlotAsync(characterId, context.CancellationToken);
         foreach (var slot in await inventory.ListAsync(characterId, context.CancellationToken))
         {
             response.Slots.Add(new InventorySlot
@@ -468,6 +473,7 @@ public sealed class CharacterGrpcService(
                 ItemId = slot.ItemId,
                 Count = slot.Count,
                 Bound = slot.Bound,
+                EquippedSlot = worn.TryGetValue(slot.Slot, out var where) ? where : "",
             });
         }
 
@@ -2952,6 +2958,10 @@ public sealed class CharacterGrpcService(
             EnhanceSlots = slots,
             BranchStep = identity.Value.BranchStep,
             PassivePctBps = passive.Found ? passive.PassivePctBps : 0,
+            // B9：装备固定攻击之和。副本的伤害第一段读它；竞技场模板、战场压缩与
+            // 城战全额三条都不吃这一格（它们各自的折算在战斗服里，本卡不动）。
+            EquipAttack = (int)await equips.EquipAttackAsync(
+                (long)request.CharacterId, items, context.CancellationToken),
         };
     }
 
@@ -3044,12 +3054,93 @@ public sealed class CharacterGrpcService(
             RequireLevel = item.RequireLevel,
             Level = identity.Value.Level,
             ClassId = identity.Value.ClassId,
+            EquipSlot = item.Slot,
         };
 
         var reason = EquipRules.Check(item, identity.Value.Level, identity.Value.ClassId, branches);
         response.Ok = reason.Length == 0;
         response.Reason = reason;
         return response;
+    }
+
+    /// <summary>
+    /// B9：穿上一件。请求只有背包格号；部位、等级门槛与职业锁从物品表与库里读。
+    /// 背包行不动（不删行、不改格号），强化与结晶仍挂在这一行上。
+    /// </summary>
+    public override async Task<EquipItemResponse> EquipItem(
+        EquipItemRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var bagSlot = (int)request.Slot;
+        if (bagSlot < 1 || bagSlot > config.BagSlots)
+        {
+            // 越界格号是参数错，不是业务拒绝：与 Q10 的移动 / 丢弃同一口径。
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        var outcome = await equips.EquipAsync(
+            characterId, account, bagSlot, items, branches, context.CancellationToken);
+
+        return new EquipItemResponse
+        {
+            Ok = outcome.Reason.Length == 0,
+            Reason = outcome.Reason,
+            ItemId = outcome.ItemId,
+            EquipSlot = outcome.Slot,
+            EquipAttack = (int)outcome.Attack,
+            Level = outcome.Level,
+            ClassId = outcome.ClassId,
+            BagSlot = (uint)outcome.BagSlot,
+        };
+    }
+
+    /// <summary>
+    /// B9：按部位脱下一件。脱下不换格，回包里的 bag_slot 就是它原来那一格。
+    /// </summary>
+    public override async Task<UnequipItemResponse> UnequipItem(
+        UnequipItemRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "character_missing"));
+        }
+
+        var characterId = (long)request.CharacterId;
+        if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var slot = (request.EquipSlot ?? "").Trim();
+        if (Array.IndexOf(ItemTable.EquipSlots, slot) < 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_unknown"));
+        }
+
+        var outcome = await equips.UnequipAsync(
+            characterId, account, slot, items, context.CancellationToken);
+
+        return new UnequipItemResponse
+        {
+            Ok = outcome.Reason.Length == 0,
+            Reason = outcome.Reason,
+            ItemId = outcome.ItemId,
+            EquipSlot = outcome.Slot,
+            BagSlot = (uint)outcome.BagSlot,
+            EquipAttack = (int)outcome.Attack,
+        };
     }
 
     /// <summary>
@@ -4571,4 +4662,282 @@ public sealed class CharacterGrpcService(
             Reason = fact.Reason,
         };
     }
+
+    // ------------------------------------------------------------------ Q10 背包操作
+
+    /// <summary>批量使用认的种类：只认消耗品，装备、材料、凭证都不许「使用」。</summary>
+    const string UsableKind = "consumable";
+
+    /// <summary>
+    /// Q10：移动一格。空格直接挪、同物品合并、不同物品交换；强化挂在背包行上，
+    /// 这里只改 slot，所以不丢也不串。越界格号是参数错，业务拒绝一律回 ok=false。
+    /// </summary>
+    public override async Task<MoveItemResponse> MoveItem(
+        MoveItemRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0 || request.FromSlot == 0 || request.ToSlot == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        if (request.FromSlot > config.BagSlots || request.ToSlot > config.BagSlots)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        var outcome = await bags.MoveAsync(
+            (long)request.CharacterId,
+            (request.Account ?? "").Trim(),
+            (int)request.FromSlot,
+            (int)request.ToSlot,
+            config.BagSlots,
+            items,
+            context.CancellationToken);
+
+        if (!outcome.Found)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "bag_move id={Id} from={From} to={To} ok={Ok} reason={Reason}"
+            + " merged={Merged} swapped={Swapped} source={Source} target={Target}",
+            request.CharacterId, request.FromSlot, request.ToSlot, outcome.Reason.Length == 0,
+            outcome.Reason, outcome.Merged, outcome.Swapped,
+            outcome.Source.ItemId + ":" + outcome.Source.Count,
+            outcome.Target.ItemId + ":" + outcome.Target.Count);
+
+        return new MoveItemResponse
+        {
+            Ok = outcome.Reason.Length == 0,
+            Reason = outcome.Reason,
+            Source = ToProtoSlot(outcome.Source),
+            Target = ToProtoSlot(outcome.Target),
+            Merged = outcome.Merged,
+            Swapped = outcome.Swapped,
+        };
+    }
+
+    /// <summary>
+    /// Q10：丢掉若干件。必须带 confirm=true（界面点两次才发），事务号由网关生成，
+    /// 同号重放回 duplicate、不二次丢。丢光才删行，强化与结晶跟着走。
+    /// </summary>
+    public override async Task<DiscardItemResponse> DiscardItem(
+        DiscardItemRequest request, ServerCallContext context)
+    {
+        var txnId = (request.TxnId ?? "").Trim();
+        if (request.CharacterId == 0 || request.Slot == 0 || txnId.Length == 0
+            || txnId.Length > ExpSettlementRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        if (request.Slot > config.BagSlots)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        if (request.Count < 1)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "count_invalid"));
+        }
+
+        var outcome = await bags.DiscardAsync(
+            (long)request.CharacterId,
+            (request.Account ?? "").Trim(),
+            (int)request.Slot,
+            request.Count,
+            request.Confirm,
+            txnId,
+            context.CancellationToken);
+
+        if (!outcome.Found)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "bag_discard id={Id} slot={Slot} item={Item} count={Count} confirm={Confirm}"
+            + " ok={Ok} reason={Reason} left={Left} duplicate={Duplicate}",
+            request.CharacterId, request.Slot, outcome.ItemId, request.Count, request.Confirm,
+            outcome.Reason.Length == 0, outcome.Reason, outcome.CountLeft, outcome.Duplicate);
+
+        return new DiscardItemResponse
+        {
+            Ok = outcome.Reason.Length == 0,
+            Reason = outcome.Reason,
+            ItemId = outcome.ItemId,
+            CountLeft = outcome.CountLeft,
+            Duplicate = outcome.Duplicate,
+        };
+    }
+
+    /// <summary>
+    /// Q10：排序。种类 → 品阶 → 物品编号，紧凑到第 1 格；只改 slot，
+    /// 绑定、数量、强化一个都不动。回包给的是排完之后的整份背包。
+    /// </summary>
+    public override async Task<SortInventoryResponse> SortInventory(
+        SortInventoryRequest request, ServerCallContext context)
+    {
+        if (request.CharacterId == 0)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        var outcome = await bags.SortAsync(
+            (long)request.CharacterId,
+            (request.Account ?? "").Trim(),
+            items,
+            context.CancellationToken);
+
+        if (!outcome.Found)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        logger.LogInformation(
+            "bag_sort id={Id} ok={Ok} reason={Reason} moved={Moved} rows={Rows}",
+            request.CharacterId, outcome.Reason.Length == 0, outcome.Reason,
+            outcome.Moved, outcome.Slots.Count);
+
+        var response = new SortInventoryResponse
+        {
+            Ok = outcome.Reason.Length == 0,
+            Reason = outcome.Reason,
+            Moved = (uint)Math.Max(0, outcome.Moved),
+        };
+
+        foreach (var slot in outcome.Slots)
+        {
+            response.Slots.Add(ToProtoSlot(slot));
+        }
+
+        return response;
+    }
+
+    /// <summary>
+    /// Q10：一次用掉叠里的若干个。本卡只做门与判定，效果入口不在这一卡：
+    /// 今天挂着的只有「限时经验道具」这一个原入口，而它同时只生效一个、再来一张只刷新，
+    /// 所以一次用多张只会白吃——只放行 1 张，其余回 effect_single_instance；
+    /// 回春丹、凝神丹、符这类还没接效果的回 no_effect，一个都不扣，等 B1 接。
+    /// B1 接丹药时在这里加一条 handler（扣 N 个 + 逐次生效），不改协议、不改客户端。
+    /// </summary>
+    public override async Task<UseItemBatchResponse> UseItemBatch(
+        UseItemBatchRequest request, ServerCallContext context)
+    {
+        var account = (request.Account ?? "").Trim();
+        var txnId = (request.TxnId ?? "").Trim();
+        if (request.CharacterId == 0 || request.Slot == 0 || txnId.Length == 0
+            || txnId.Length > ExpSettlementRepository.MaxTxnLength)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
+        }
+
+        if (request.Slot > config.BagSlots)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
+        }
+
+        if (request.Count < 1)
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "count_invalid"));
+        }
+
+        var characterId = (long)request.CharacterId;
+
+        // 服间直连没有账号，照 UseExpBooster 的口径分两支。
+        if (account.Length > 0)
+        {
+            if (!await inventory.OwnsAsync(account, characterId, context.CancellationToken))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+            }
+        }
+        else if (!await inventory.ExistsAsync(characterId, context.CancellationToken))
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "character_not_found"));
+        }
+
+        var slot = await inventory.GetSlotAsync(characterId, (int)request.Slot, context.CancellationToken);
+        if (slot is null)
+        {
+            return BatchRejected("slot_empty", "", 0, false);
+        }
+
+        var item = items.Find(slot.ItemId);
+        if (item is null || !string.Equals(item.Kind, UsableKind, StringComparison.Ordinal))
+        {
+            return BatchRejected("not_usable", slot.ItemId, slot.Count, false);
+        }
+
+        if (request.Count > slot.Count)
+        {
+            return BatchRejected("count_invalid", slot.ItemId, slot.Count, false);
+        }
+
+        var spec = boosterTable.Find(slot.ItemId);
+        if (spec is null)
+        {
+            logger.LogInformation(
+                "bag_use_reject id={Id} slot={Slot} item={Item} reason=no_effect",
+                characterId, request.Slot, slot.ItemId);
+            return BatchRejected("no_effect", slot.ItemId, slot.Count, false);
+        }
+
+        if (request.Count > 1)
+        {
+            logger.LogInformation(
+                "bag_use_reject id={Id} slot={Slot} item={Item} count={Count}"
+                + " reason=effect_single_instance",
+                characterId, request.Slot, slot.ItemId, request.Count);
+            return BatchRejected("effect_single_instance", slot.ItemId, slot.Count, false);
+        }
+
+        var outcome = await boosters.UseAsync(
+            characterId, account, txnId, spec.ItemId, spec.DurationMs, context.CancellationToken);
+
+        if (!outcome.Found || outcome.Reason.Length > 0)
+        {
+            var reason = outcome.Found ? outcome.Reason : "character_not_found";
+            logger.LogInformation(
+                "bag_use_reject id={Id} slot={Slot} item={Item} txn={Txn} reason={Reason}",
+                characterId, request.Slot, slot.ItemId, txnId, reason);
+            return BatchRejected(reason, spec.ItemId, (int)outcome.CountLeft, outcome.Duplicate);
+        }
+
+        logger.LogInformation(
+            "bag_use id={Id} slot={Slot} item={Item} txn={Txn} used=1 left={Left}",
+            characterId, request.Slot, spec.ItemId, txnId, outcome.CountLeft);
+
+        return new UseItemBatchResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = spec.ItemId,
+            Used = 1,
+            CountLeft = (int)outcome.CountLeft,
+            Duplicate = false,
+        };
+    }
+
+    static UseItemBatchResponse BatchRejected(
+        string reason, string itemId, int countLeft, bool duplicate) =>
+        new()
+        {
+            Ok = false,
+            Reason = reason,
+            ItemId = itemId,
+            Used = 0,
+            CountLeft = countLeft,
+            Duplicate = duplicate,
+        };
+
+    static InventorySlot ToProtoSlot(BagSlot slot) =>
+        new()
+        {
+            Slot = (uint)Math.Max(0, slot.Slot),
+            ItemId = slot.ItemId,
+            Count = slot.Count,
+            Bound = slot.Bound,
+        };
 }

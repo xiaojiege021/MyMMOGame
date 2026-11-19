@@ -175,6 +175,14 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipResponse> __Marshaller_mmo_character_CanEquipResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.EquipItemRequest> __Marshaller_mmo_character_EquipItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EquipItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.EquipItemResponse> __Marshaller_mmo_character_EquipItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EquipItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UnequipItemRequest> __Marshaller_mmo_character_UnequipItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UnequipItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UnequipItemResponse> __Marshaller_mmo_character_UnequipItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UnequipItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AdvanceRealmRequest> __Marshaller_mmo_character_AdvanceRealmRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AdvanceRealmRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AdvanceRealmResponse> __Marshaller_mmo_character_AdvanceRealmResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AdvanceRealmResponse.Parser));
@@ -262,6 +270,22 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeDeserterRequest> __Marshaller_mmo_character_DescribeDeserterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeDeserterRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeDeserterResponse> __Marshaller_mmo_character_DescribeDeserterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeDeserterResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.MoveItemRequest> __Marshaller_mmo_character_MoveItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.MoveItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.MoveItemResponse> __Marshaller_mmo_character_MoveItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.MoveItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DiscardItemRequest> __Marshaller_mmo_character_DiscardItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DiscardItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DiscardItemResponse> __Marshaller_mmo_character_DiscardItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DiscardItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SortInventoryRequest> __Marshaller_mmo_character_SortInventoryRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SortInventoryRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.SortInventoryResponse> __Marshaller_mmo_character_SortInventoryResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.SortInventoryResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseItemBatchRequest> __Marshaller_mmo_character_UseItemBatchRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseItemBatchRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseItemBatchResponse> __Marshaller_mmo_character_UseItemBatchResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseItemBatchResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -520,6 +544,22 @@ namespace Mmo.Proto.Character {
         __Marshaller_mmo_character_CanEquipResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.EquipItemRequest, global::Mmo.Proto.Character.EquipItemResponse> __Method_EquipItem = new grpc::Method<global::Mmo.Proto.Character.EquipItemRequest, global::Mmo.Proto.Character.EquipItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "EquipItem",
+        __Marshaller_mmo_character_EquipItemRequest,
+        __Marshaller_mmo_character_EquipItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.UnequipItemRequest, global::Mmo.Proto.Character.UnequipItemResponse> __Method_UnequipItem = new grpc::Method<global::Mmo.Proto.Character.UnequipItemRequest, global::Mmo.Proto.Character.UnequipItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "UnequipItem",
+        __Marshaller_mmo_character_UnequipItemRequest,
+        __Marshaller_mmo_character_UnequipItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse> __Method_AdvanceRealm = new grpc::Method<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
@@ -694,6 +734,38 @@ namespace Mmo.Proto.Character {
         "DescribeDeserter",
         __Marshaller_mmo_character_DescribeDeserterRequest,
         __Marshaller_mmo_character_DescribeDeserterResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.MoveItemRequest, global::Mmo.Proto.Character.MoveItemResponse> __Method_MoveItem = new grpc::Method<global::Mmo.Proto.Character.MoveItemRequest, global::Mmo.Proto.Character.MoveItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "MoveItem",
+        __Marshaller_mmo_character_MoveItemRequest,
+        __Marshaller_mmo_character_MoveItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DiscardItemRequest, global::Mmo.Proto.Character.DiscardItemResponse> __Method_DiscardItem = new grpc::Method<global::Mmo.Proto.Character.DiscardItemRequest, global::Mmo.Proto.Character.DiscardItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DiscardItem",
+        __Marshaller_mmo_character_DiscardItemRequest,
+        __Marshaller_mmo_character_DiscardItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.SortInventoryRequest, global::Mmo.Proto.Character.SortInventoryResponse> __Method_SortInventory = new grpc::Method<global::Mmo.Proto.Character.SortInventoryRequest, global::Mmo.Proto.Character.SortInventoryResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SortInventory",
+        __Marshaller_mmo_character_SortInventoryRequest,
+        __Marshaller_mmo_character_SortInventoryResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.UseItemBatchRequest, global::Mmo.Proto.Character.UseItemBatchResponse> __Method_UseItemBatch = new grpc::Method<global::Mmo.Proto.Character.UseItemBatchRequest, global::Mmo.Proto.Character.UseItemBatchResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "UseItemBatch",
+        __Marshaller_mmo_character_UseItemBatchRequest,
+        __Marshaller_mmo_character_UseItemBatchResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -1107,6 +1179,33 @@ namespace Mmo.Proto.Character {
       }
 
       /// <summary>
+      /// B9：穿上一件装备。请求只给背包格号——部位、等级门槛、职业限制全由角色服从
+      /// 物品表与库里读，客户端带不进任何数值。背包行不动（不删行、不改格号），
+      /// 只是新增一条「这个部位穿的是哪一行」；因此强化与结晶仍挂在那口背包行上。
+      /// 同部位已经穿着一件时回 slot_occupied，不替玩家自动换下。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.EquipItemResponse> EquipItem(global::Mmo.Proto.Character.EquipItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B9：脱下一件。按部位脱，脱下后那一格还是原来那一格。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UnequipItemResponse> UnequipItem(global::Mmo.Proto.Character.UnequipItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
       /// P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
       /// 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
       /// 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
@@ -1388,6 +1487,60 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeDeserterResponse> DescribeDeserter(global::Mmo.Proto.Character.DescribeDeserterRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// Q10/I2：背包操作四条。格号从 1 起，上限取 character.json 的 bag_slots。
+      /// 移动：空格直接挪、两格不同物品交换、同物品在堆叠上限内合并；强化挂在背包行 id 上，
+      /// 这里只改 slot，所以不丢也不串。合并会删掉来源行，来源行有强化就直接拒绝。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.MoveItemResponse> MoveItem(global::Mmo.Proto.Character.MoveItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 丢弃：必须带 confirm=true（二次确认），事务号由网关生成，同一号重放回 duplicate，
+      /// 不二次丢。丢光就删行（强化行跟着 CASCADE 走），没丢光的只减数量。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DiscardItemResponse> DiscardItem(global::Mmo.Proto.Character.DiscardItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 排序：种类 → 品阶 → 物品编号，紧凑到第 1 格。只改 slot，绑定、绑定时刻、
+      /// 数量、强化等级一个都不动。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.SortInventoryResponse> SortInventory(global::Mmo.Proto.Character.SortInventoryRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// 批量使用：一次扣叠里的 N 个。效果入口不在本卡：已接效果入口的物品逐个走原入口，
+      /// 「同时只生效一个」的那类拒绝连用；还没接效果的（回春丹、凝神丹、符）回 no_effect，
+      /// 一个都不扣，等 B1 接。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UseItemBatchResponse> UseItemBatch(global::Mmo.Proto.Character.UseItemBatchRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -3014,6 +3167,114 @@ namespace Mmo.Proto.Character {
         return CallInvoker.AsyncUnaryCall(__Method_CanEquip, null, options, request);
       }
       /// <summary>
+      /// B9：穿上一件装备。请求只给背包格号——部位、等级门槛、职业限制全由角色服从
+      /// 物品表与库里读，客户端带不进任何数值。背包行不动（不删行、不改格号），
+      /// 只是新增一条「这个部位穿的是哪一行」；因此强化与结晶仍挂在那口背包行上。
+      /// 同部位已经穿着一件时回 slot_occupied，不替玩家自动换下。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.EquipItemResponse EquipItem(global::Mmo.Proto.Character.EquipItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return EquipItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B9：穿上一件装备。请求只给背包格号——部位、等级门槛、职业限制全由角色服从
+      /// 物品表与库里读，客户端带不进任何数值。背包行不动（不删行、不改格号），
+      /// 只是新增一条「这个部位穿的是哪一行」；因此强化与结晶仍挂在那口背包行上。
+      /// 同部位已经穿着一件时回 slot_occupied，不替玩家自动换下。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.EquipItemResponse EquipItem(global::Mmo.Proto.Character.EquipItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_EquipItem, null, options, request);
+      }
+      /// <summary>
+      /// B9：穿上一件装备。请求只给背包格号——部位、等级门槛、职业限制全由角色服从
+      /// 物品表与库里读，客户端带不进任何数值。背包行不动（不删行、不改格号），
+      /// 只是新增一条「这个部位穿的是哪一行」；因此强化与结晶仍挂在那口背包行上。
+      /// 同部位已经穿着一件时回 slot_occupied，不替玩家自动换下。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.EquipItemResponse> EquipItemAsync(global::Mmo.Proto.Character.EquipItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return EquipItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B9：穿上一件装备。请求只给背包格号——部位、等级门槛、职业限制全由角色服从
+      /// 物品表与库里读，客户端带不进任何数值。背包行不动（不删行、不改格号），
+      /// 只是新增一条「这个部位穿的是哪一行」；因此强化与结晶仍挂在那口背包行上。
+      /// 同部位已经穿着一件时回 slot_occupied，不替玩家自动换下。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.EquipItemResponse> EquipItemAsync(global::Mmo.Proto.Character.EquipItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_EquipItem, null, options, request);
+      }
+      /// <summary>
+      /// B9：脱下一件。按部位脱，脱下后那一格还是原来那一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UnequipItemResponse UnequipItem(global::Mmo.Proto.Character.UnequipItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UnequipItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B9：脱下一件。按部位脱，脱下后那一格还是原来那一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UnequipItemResponse UnequipItem(global::Mmo.Proto.Character.UnequipItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_UnequipItem, null, options, request);
+      }
+      /// <summary>
+      /// B9：脱下一件。按部位脱，脱下后那一格还是原来那一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UnequipItemResponse> UnequipItemAsync(global::Mmo.Proto.Character.UnequipItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UnequipItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B9：脱下一件。按部位脱，脱下后那一格还是原来那一格。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UnequipItemResponse> UnequipItemAsync(global::Mmo.Proto.Character.UnequipItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_UnequipItem, null, options, request);
+      }
+      /// <summary>
       /// P3-1a2：突破。请求里只有角色、事务号与网关给的账号；
       /// 修为（当前境界）、历练、炼心（主线 + 必要支线）、灵石与成功率全由角色服
       /// 从库和 config/realms.json 读。条件不满足时一分都不扣；失败时修为不变，
@@ -4153,6 +4414,222 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeDeserter, null, options, request);
       }
+      /// <summary>
+      /// Q10/I2：背包操作四条。格号从 1 起，上限取 character.json 的 bag_slots。
+      /// 移动：空格直接挪、两格不同物品交换、同物品在堆叠上限内合并；强化挂在背包行 id 上，
+      /// 这里只改 slot，所以不丢也不串。合并会删掉来源行，来源行有强化就直接拒绝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.MoveItemResponse MoveItem(global::Mmo.Proto.Character.MoveItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return MoveItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q10/I2：背包操作四条。格号从 1 起，上限取 character.json 的 bag_slots。
+      /// 移动：空格直接挪、两格不同物品交换、同物品在堆叠上限内合并；强化挂在背包行 id 上，
+      /// 这里只改 slot，所以不丢也不串。合并会删掉来源行，来源行有强化就直接拒绝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.MoveItemResponse MoveItem(global::Mmo.Proto.Character.MoveItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_MoveItem, null, options, request);
+      }
+      /// <summary>
+      /// Q10/I2：背包操作四条。格号从 1 起，上限取 character.json 的 bag_slots。
+      /// 移动：空格直接挪、两格不同物品交换、同物品在堆叠上限内合并；强化挂在背包行 id 上，
+      /// 这里只改 slot，所以不丢也不串。合并会删掉来源行，来源行有强化就直接拒绝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.MoveItemResponse> MoveItemAsync(global::Mmo.Proto.Character.MoveItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return MoveItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Q10/I2：背包操作四条。格号从 1 起，上限取 character.json 的 bag_slots。
+      /// 移动：空格直接挪、两格不同物品交换、同物品在堆叠上限内合并；强化挂在背包行 id 上，
+      /// 这里只改 slot，所以不丢也不串。合并会删掉来源行，来源行有强化就直接拒绝。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.MoveItemResponse> MoveItemAsync(global::Mmo.Proto.Character.MoveItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_MoveItem, null, options, request);
+      }
+      /// <summary>
+      /// 丢弃：必须带 confirm=true（二次确认），事务号由网关生成，同一号重放回 duplicate，
+      /// 不二次丢。丢光就删行（强化行跟着 CASCADE 走），没丢光的只减数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DiscardItemResponse DiscardItem(global::Mmo.Proto.Character.DiscardItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DiscardItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 丢弃：必须带 confirm=true（二次确认），事务号由网关生成，同一号重放回 duplicate，
+      /// 不二次丢。丢光就删行（强化行跟着 CASCADE 走），没丢光的只减数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DiscardItemResponse DiscardItem(global::Mmo.Proto.Character.DiscardItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DiscardItem, null, options, request);
+      }
+      /// <summary>
+      /// 丢弃：必须带 confirm=true（二次确认），事务号由网关生成，同一号重放回 duplicate，
+      /// 不二次丢。丢光就删行（强化行跟着 CASCADE 走），没丢光的只减数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DiscardItemResponse> DiscardItemAsync(global::Mmo.Proto.Character.DiscardItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DiscardItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 丢弃：必须带 confirm=true（二次确认），事务号由网关生成，同一号重放回 duplicate，
+      /// 不二次丢。丢光就删行（强化行跟着 CASCADE 走），没丢光的只减数量。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DiscardItemResponse> DiscardItemAsync(global::Mmo.Proto.Character.DiscardItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DiscardItem, null, options, request);
+      }
+      /// <summary>
+      /// 排序：种类 → 品阶 → 物品编号，紧凑到第 1 格。只改 slot，绑定、绑定时刻、
+      /// 数量、强化等级一个都不动。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SortInventoryResponse SortInventory(global::Mmo.Proto.Character.SortInventoryRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SortInventory(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 排序：种类 → 品阶 → 物品编号，紧凑到第 1 格。只改 slot，绑定、绑定时刻、
+      /// 数量、强化等级一个都不动。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.SortInventoryResponse SortInventory(global::Mmo.Proto.Character.SortInventoryRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_SortInventory, null, options, request);
+      }
+      /// <summary>
+      /// 排序：种类 → 品阶 → 物品编号，紧凑到第 1 格。只改 slot，绑定、绑定时刻、
+      /// 数量、强化等级一个都不动。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SortInventoryResponse> SortInventoryAsync(global::Mmo.Proto.Character.SortInventoryRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return SortInventoryAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 排序：种类 → 品阶 → 物品编号，紧凑到第 1 格。只改 slot，绑定、绑定时刻、
+      /// 数量、强化等级一个都不动。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.SortInventoryResponse> SortInventoryAsync(global::Mmo.Proto.Character.SortInventoryRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_SortInventory, null, options, request);
+      }
+      /// <summary>
+      /// 批量使用：一次扣叠里的 N 个。效果入口不在本卡：已接效果入口的物品逐个走原入口，
+      /// 「同时只生效一个」的那类拒绝连用；还没接效果的（回春丹、凝神丹、符）回 no_effect，
+      /// 一个都不扣，等 B1 接。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseItemBatchResponse UseItemBatch(global::Mmo.Proto.Character.UseItemBatchRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseItemBatch(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 批量使用：一次扣叠里的 N 个。效果入口不在本卡：已接效果入口的物品逐个走原入口，
+      /// 「同时只生效一个」的那类拒绝连用；还没接效果的（回春丹、凝神丹、符）回 no_effect，
+      /// 一个都不扣，等 B1 接。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.UseItemBatchResponse UseItemBatch(global::Mmo.Proto.Character.UseItemBatchRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_UseItemBatch, null, options, request);
+      }
+      /// <summary>
+      /// 批量使用：一次扣叠里的 N 个。效果入口不在本卡：已接效果入口的物品逐个走原入口，
+      /// 「同时只生效一个」的那类拒绝连用；还没接效果的（回春丹、凝神丹、符）回 no_effect，
+      /// 一个都不扣，等 B1 接。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseItemBatchResponse> UseItemBatchAsync(global::Mmo.Proto.Character.UseItemBatchRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return UseItemBatchAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// 批量使用：一次扣叠里的 N 个。效果入口不在本卡：已接效果入口的物品逐个走原入口，
+      /// 「同时只生效一个」的那类拒绝连用；还没接效果的（回春丹、凝神丹、符）回 no_effect，
+      /// 一个都不扣，等 B1 接。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.UseItemBatchResponse> UseItemBatchAsync(global::Mmo.Proto.Character.UseItemBatchRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_UseItemBatch, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -4199,6 +4676,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_DescribeBattleProfile, serviceImpl.DescribeBattleProfile)
           .AddMethod(__Method_AdvanceBranch, serviceImpl.AdvanceBranch)
           .AddMethod(__Method_CanEquip, serviceImpl.CanEquip)
+          .AddMethod(__Method_EquipItem, serviceImpl.EquipItem)
+          .AddMethod(__Method_UnequipItem, serviceImpl.UnequipItem)
           .AddMethod(__Method_AdvanceRealm, serviceImpl.AdvanceRealm)
           .AddMethod(__Method_SettleDrill, serviceImpl.SettleDrill)
           .AddMethod(__Method_PromoteRealmPhase, serviceImpl.PromoteRealmPhase)
@@ -4220,7 +4699,11 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_DescribeCityTasks, serviceImpl.DescribeCityTasks)
           .AddMethod(__Method_CompleteCityTask, serviceImpl.CompleteCityTask)
           .AddMethod(__Method_RecordDeserter, serviceImpl.RecordDeserter)
-          .AddMethod(__Method_DescribeDeserter, serviceImpl.DescribeDeserter).Build();
+          .AddMethod(__Method_DescribeDeserter, serviceImpl.DescribeDeserter)
+          .AddMethod(__Method_MoveItem, serviceImpl.MoveItem)
+          .AddMethod(__Method_DiscardItem, serviceImpl.DiscardItem)
+          .AddMethod(__Method_SortInventory, serviceImpl.SortInventory)
+          .AddMethod(__Method_UseItemBatch, serviceImpl.UseItemBatch).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -4262,6 +4745,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DescribeBattleProfile, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse>(serviceImpl.DescribeBattleProfile));
       serviceBinder.AddMethod(__Method_AdvanceBranch, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceBranchRequest, global::Mmo.Proto.Character.AdvanceBranchResponse>(serviceImpl.AdvanceBranch));
       serviceBinder.AddMethod(__Method_CanEquip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(serviceImpl.CanEquip));
+      serviceBinder.AddMethod(__Method_EquipItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EquipItemRequest, global::Mmo.Proto.Character.EquipItemResponse>(serviceImpl.EquipItem));
+      serviceBinder.AddMethod(__Method_UnequipItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UnequipItemRequest, global::Mmo.Proto.Character.UnequipItemResponse>(serviceImpl.UnequipItem));
       serviceBinder.AddMethod(__Method_AdvanceRealm, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse>(serviceImpl.AdvanceRealm));
       serviceBinder.AddMethod(__Method_SettleDrill, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleDrillRequest, global::Mmo.Proto.Character.SettleDrillResponse>(serviceImpl.SettleDrill));
       serviceBinder.AddMethod(__Method_PromoteRealmPhase, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.PromoteRealmPhaseRequest, global::Mmo.Proto.Character.PromoteRealmPhaseResponse>(serviceImpl.PromoteRealmPhase));
@@ -4284,6 +4769,10 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_CompleteCityTask, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CompleteCityTaskRequest, global::Mmo.Proto.Character.CompleteCityTaskResponse>(serviceImpl.CompleteCityTask));
       serviceBinder.AddMethod(__Method_RecordDeserter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RecordDeserterRequest, global::Mmo.Proto.Character.RecordDeserterResponse>(serviceImpl.RecordDeserter));
       serviceBinder.AddMethod(__Method_DescribeDeserter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeDeserterRequest, global::Mmo.Proto.Character.DescribeDeserterResponse>(serviceImpl.DescribeDeserter));
+      serviceBinder.AddMethod(__Method_MoveItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.MoveItemRequest, global::Mmo.Proto.Character.MoveItemResponse>(serviceImpl.MoveItem));
+      serviceBinder.AddMethod(__Method_DiscardItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DiscardItemRequest, global::Mmo.Proto.Character.DiscardItemResponse>(serviceImpl.DiscardItem));
+      serviceBinder.AddMethod(__Method_SortInventory, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SortInventoryRequest, global::Mmo.Proto.Character.SortInventoryResponse>(serviceImpl.SortInventory));
+      serviceBinder.AddMethod(__Method_UseItemBatch, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseItemBatchRequest, global::Mmo.Proto.Character.UseItemBatchResponse>(serviceImpl.UseItemBatch));
     }
 
   }

@@ -504,6 +504,11 @@ public sealed class CharacterProcess(string configPath)
 
         var characters = new CharacterRepository(dataSource);
         var inventory = new InventoryRepository(dataSource);
+        // Q10：背包操作（移动 / 丢弃 / 排序）的唯一写入点，与 inventory 共用同一个连接池。
+        var bags = new BagRepository(dataSource);
+        // B9：穿戴的唯一写入点。一条记录 = 这个部位穿的是哪一行背包；
+        // 装备固定攻击也在这里按已穿装备求和（数值只在 config/items.json）。
+        var equips = new EquipRepository(dataSource);
         var currency = new CurrencyRepository(dataSource);
         var cityTax = new CityTaxRepository(dataSource, cityTable, auctionTable.GoldKind);
         var grants = new GrantRepository(dataSource, items, currencies, config, cityTax);
@@ -595,6 +600,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddGrpc();
         builder.Services.AddSingleton(characters);
         builder.Services.AddSingleton(inventory);
+        builder.Services.AddSingleton(bags);
+        builder.Services.AddSingleton(equips);
         builder.Services.AddSingleton(currency);
         builder.Services.AddSingleton(grants);
         builder.Services.AddSingleton(talismans);

@@ -386,6 +386,292 @@ namespace HotUpdate.Ui
                 });
         }
 
+        // ------------------------------------------------------------------ Q10 背包操作
+
+        /// <summary>Q10：移动回包（格号、数量、合并 / 交换、拒绝码都在回包里）。</summary>
+        public MoveOutcome LastMove { get; private set; }
+
+        public bool HasMove { get; private set; }
+
+        /// <summary>Q10：丢弃回包。被拒时这一格还剩几个照回包写。</summary>
+        public DiscardOutcome LastDiscard { get; private set; }
+
+        public bool HasDiscard { get; private set; }
+
+        /// <summary>Q10：排序回包（换了几行、排完之后的整份背包）。</summary>
+        public SortOutcome LastSort { get; private set; }
+
+        public bool HasSort { get; private set; }
+
+        /// <summary>Q10：批量使用回包（用掉几个、还剩几个、拒绝码）。</summary>
+        public UseBatchOutcome LastUseBatch { get; private set; }
+
+        public bool HasUseBatch { get; private set; }
+
+        /// <summary>
+        /// 背包屏选中的来源格、目标格与数量。存在流程里而不是屏里：
+        /// 回包里来了新事实要重建屏，界面一重建就把局部变量丢了，选中的格子不能跟着丢。
+        /// </summary>
+        public uint BagFromSlot { get; set; }
+
+        public uint BagToSlot { get; set; }
+
+        public int BagCount { get; set; } = 1;
+
+        /// <summary>Q10：移动一格。合并还是交换、能不能合，全看回包。</summary>
+        public void MoveItem(uint fromSlot, uint toSlot, Action done = null)
+        {
+            BagPost("/inventory/move", CharacterBag.MoveBody(_characterId, fromSlot, toSlot),
+                (status, text) =>
+                {
+                    if (status != 200)
+                    {
+                        LastMove = new MoveOutcome
+                        {
+                            Reason = "status_" + status,
+                            DisplayText = "移动没发出去：" + status,
+                        };
+                        Error = LastMove.DisplayText;
+                        Debug.Log("q10_move=reject status=" + status);
+                    }
+                    else
+                    {
+                        LastMove = CharacterBag.ParseMove(text);
+                        Error = LastMove.Ok ? string.Empty : LastMove.DisplayText;
+                        Debug.Log("q10_move=" + (LastMove.Ok ? "ok" : "reject")
+                            + " source=" + LastMove.Source.Slot + ":" + LastMove.Source.ItemId
+                            + " target=" + LastMove.Target.Slot + ":" + LastMove.Target.ItemId
+                            + " merged=" + (LastMove.Merged ? "true" : "false")
+                            + " swapped=" + (LastMove.Swapped ? "true" : "false")
+                            + " reason=" + LastMove.Reason);
+                    }
+
+                    LastOpText = LastMove.DisplayText;
+                    HasMove = true;
+                }, done);
+        }
+
+        /// <summary>
+        /// Q10：丢一件。调用它的只有确认弹窗那一下，所以 confirm 恒为 true——
+        /// 服务端仍按这个字段判，界面点一次就发一次不算二次确认。
+        /// </summary>
+        public void DiscardItem(uint slot, int count, Action done = null)
+        {
+            BagPost("/inventory/discard", CharacterBag.DiscardBody(_characterId, slot, count, true),
+                (status, text) =>
+                {
+                    if (status != 200)
+                    {
+                        LastDiscard = new DiscardOutcome
+                        {
+                            Reason = "status_" + status,
+                            DisplayText = "丢弃没发出去：" + status,
+                        };
+                        Error = LastDiscard.DisplayText;
+                        Debug.Log("q10_discard=reject status=" + status);
+                    }
+                    else
+                    {
+                        LastDiscard = CharacterBag.ParseDiscard(text);
+                        Error = LastDiscard.Ok ? string.Empty : LastDiscard.DisplayText;
+                        Debug.Log("q10_discard=" + (LastDiscard.Ok ? "ok" : "reject")
+                            + " slot=" + slot + " count=" + count
+                            + " item=" + LastDiscard.ItemId
+                            + " left=" + LastDiscard.CountLeft
+                            + " duplicate=" + (LastDiscard.Duplicate ? "true" : "false")
+                            + " reason=" + LastDiscard.Reason);
+                    }
+
+                    LastOpText = LastDiscard.DisplayText;
+                    HasDiscard = true;
+                }, done);
+        }
+
+        /// <summary>Q10：排序。顺序、换了几行都由角色服算，屏上照回包重画。</summary>
+        public void SortBag(Action done = null)
+        {
+            BagPost("/inventory/sort", CharacterBag.SortBody(_characterId),
+                (status, text) =>
+                {
+                    if (status != 200)
+                    {
+                        LastSort = new SortOutcome
+                        {
+                            Reason = "status_" + status,
+                            DisplayText = "排序没发出去：" + status,
+                            Slots = new List<BagSlotView>(),
+                        };
+                        Error = LastSort.DisplayText;
+                        Debug.Log("q10_sort=reject status=" + status);
+                    }
+                    else
+                    {
+                        LastSort = CharacterBag.ParseSort(text);
+                        Error = LastSort.Ok ? string.Empty : LastSort.DisplayText;
+                        Debug.Log("q10_sort=" + (LastSort.Ok ? "ok" : "reject")
+                            + " moved=" + LastSort.Moved
+                            + " rows=" + (LastSort.Slots != null ? LastSort.Slots.Count : 0)
+                            + " reason=" + LastSort.Reason);
+
+                        // 排序回包自带整份背包：直接抄进去，少发一次只读请求。
+                        if (LastSort.Ok && LastSort.Slots != null)
+                        {
+                            var bag = Bag;
+                            bag.Slots = LastSort.Slots;
+                            Bag = bag;
+                            HasBag = true;
+                        }
+                    }
+
+                    LastOpText = LastSort.DisplayText;
+                    HasSort = true;
+                }, done);
+        }
+
+        /// <summary>
+        /// Q10：一次用掉叠里的若干个。能连用几个由服务端判（今天只有「同时只生效一个」
+        /// 那一类挂着，多张会被拒并回 effect_single_instance），界面照回包写。
+        /// </summary>
+        public void UseItemBatch(uint slot, int count, Action done = null)
+        {
+            BagPost("/inventory/use-batch", CharacterBag.UseBatchBody(_characterId, slot, count),
+                (status, text) =>
+                {
+                    if (status != 200)
+                    {
+                        LastUseBatch = new UseBatchOutcome
+                        {
+                            Reason = "status_" + status,
+                            DisplayText = "使用没发出去：" + status,
+                        };
+                        Error = LastUseBatch.DisplayText;
+                        Debug.Log("q10_use=reject status=" + status);
+                    }
+                    else
+                    {
+                        LastUseBatch = CharacterBag.ParseUseBatch(text);
+                        Error = LastUseBatch.Ok ? string.Empty : LastUseBatch.DisplayText;
+                        Debug.Log("q10_use=" + (LastUseBatch.Ok ? "ok" : "reject")
+                            + " slot=" + slot + " count=" + count
+                            + " item=" + LastUseBatch.ItemId
+                            + " used=" + LastUseBatch.Used
+                            + " left=" + LastUseBatch.CountLeft
+                            + " reason=" + LastUseBatch.Reason);
+                    }
+
+                    LastOpText = LastUseBatch.DisplayText;
+                    HasUseBatch = true;
+                }, done);
+        }
+
+        // ------------------------------------------------------------------ B9 穿戴
+
+        /// <summary>B9：穿上回包（部位、装备攻击之和、等级与拒绝码都在回包里）。</summary>
+        public EquipOutcome LastEquip { get; private set; }
+
+        public bool HasEquip { get; private set; }
+
+        /// <summary>B9：脱下回包（脱下不换格，bag_slot 是它原来那一格）。</summary>
+        public UnequipOutcome LastUnequip { get; private set; }
+
+        public bool HasUnequip { get; private set; }
+
+        /// <summary>
+        /// 最近一笔操作在屏上要写的那句话（穿戴与背包六种操作共用一条）。
+        /// 界面只读这一格，不自己按 Has* 猜「哪一条更新」。
+        /// </summary>
+        public string LastOpText { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// B9：把这一格的装备穿上。部位从回包读，界面不按物品编号猜；
+        /// 同部位已经穿着一件时回 slot_occupied，屏上照回包写「先脱下」。
+        /// </summary>
+        public void EquipItem(uint slot, Action done = null)
+        {
+            BagPost("/character/equip", CharacterBag.EquipBody(_characterId, slot),
+                (status, text) =>
+                {
+                    if (status != 200)
+                    {
+                        LastEquip = new EquipOutcome
+                        {
+                            Reason = "status_" + status,
+                            DisplayText = "穿戴没发出去：" + status,
+                        };
+                        Error = LastEquip.DisplayText;
+                        Debug.Log("b9_equip=reject status=" + status);
+                    }
+                    else
+                    {
+                        LastEquip = CharacterBag.ParseEquip(text);
+                        Error = LastEquip.Ok ? string.Empty : LastEquip.DisplayText;
+                        Debug.Log("b9_equip=" + (LastEquip.Ok ? "ok" : "reject")
+                            + " slot=" + slot
+                            + " item=" + LastEquip.ItemId
+                            + " worn=" + LastEquip.EquipSlot
+                            + " attack=" + LastEquip.EquipAttack
+                            + " level=" + LastEquip.Level
+                            + " reason=" + LastEquip.Reason);
+                    }
+
+                    LastOpText = LastEquip.DisplayText;
+                    HasEquip = true;
+                }, done);
+        }
+
+        /// <summary>B9：按部位脱下。格号由回包给，界面不自己记它原来在哪一格。</summary>
+        public void UnequipItem(string equipSlot, Action done = null)
+        {
+            BagPost("/character/unequip", CharacterBag.UnequipBody(_characterId, equipSlot),
+                (status, text) =>
+                {
+                    if (status != 200)
+                    {
+                        LastUnequip = new UnequipOutcome
+                        {
+                            Reason = "status_" + status,
+                            DisplayText = "脱下没发出去：" + status,
+                        };
+                        Error = LastUnequip.DisplayText;
+                        Debug.Log("b9_unequip=reject status=" + status);
+                    }
+                    else
+                    {
+                        LastUnequip = CharacterBag.ParseUnequip(text);
+                        Error = LastUnequip.Ok ? string.Empty : LastUnequip.DisplayText;
+                        Debug.Log("b9_unequip=" + (LastUnequip.Ok ? "ok" : "reject")
+                            + " worn=" + LastUnequip.EquipSlot
+                            + " bag_slot=" + LastUnequip.BagSlot
+                            + " attack=" + LastUnequip.EquipAttack
+                            + " reason=" + LastUnequip.Reason);
+                    }
+
+                    LastOpText = LastUnequip.DisplayText;
+                    HasUnequip = true;
+                }, done);
+        }
+
+        /// <summary>四条背包操作的共同发送：忙标记、请求计数、拆回包，一条不省。</summary>
+        void BagPost(string path, string body, Action<int, string> parse, Action done)
+        {
+            if (_characterId == 0)
+            {
+                Error = "还没有角色";
+                Debug.Log("q10_bag=reject reason=no_character path=" + path);
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(path, body, _token, (status, text) =>
+            {
+                Busy = false;
+                parse(status, text);
+                if (done != null) done();
+            });
+        }
+
         // ------------------------------------------------------------------ 真机发送
 
         void SendByUnityWebRequest(string path, string body, string token, Action<int, string> done)

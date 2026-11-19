@@ -512,8 +512,39 @@ CREATE TABLE IF NOT EXISTS "角色".crystal_socket (
     installed_at    timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (character_id, slot, socket),
     FOREIGN KEY (character_id, slot)
-        REFERENCES "角色".inventory (character_id, slot) ON DELETE CASCADE
+        REFERENCES "角色".inventory (character_id, slot) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+-- Q10：结晶跟着背包行走，换格不用重装。老库建的这条外键没有 ON UPDATE 动作，
+-- 一改 inventory.slot（移动 / 排序只改这一列）就直接报外键冲突。这里按定义找出来
+-- 重建成 ON UPDATE CASCADE：格子变了镶嵌行跟着走，编号不变。
+-- 主迁移是可重跑的，所以每次跑都做一遍——已经是对的库重建一次也没有副作用。
+DO $$
+DECLARE item record;
+BEGIN
+    FOR item IN
+        SELECT c.conname
+          FROM pg_constraint c
+         WHERE c.conrelid = '"角色".crystal_socket'::regclass
+           AND c.contype = 'f'
+           AND c.confrelid = '"角色".inventory'::regclass
+           AND c.conname <> 'crystal_socket_inventory_fkey'
+    LOOP
+        EXECUTE format('ALTER TABLE "角色".crystal_socket DROP CONSTRAINT %I', item.conname);
+    END LOOP;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conrelid = '"角色".crystal_socket'::regclass
+           AND conname = 'crystal_socket_inventory_fkey'
+    ) THEN
+        ALTER TABLE "角色".crystal_socket
+            ADD CONSTRAINT crystal_socket_inventory_fkey
+            FOREIGN KEY (character_id, slot)
+            REFERENCES "角色".inventory (character_id, slot)
+            ON UPDATE CASCADE ON DELETE CASCADE;
+    END IF;
+END $$;
 
 ALTER TABLE "角色".crystal_socket
     DROP CONSTRAINT IF EXISTS crystal_socket_bound_at_matches;
@@ -698,3 +729,18 @@ CREATE TABLE IF NOT EXISTS "角色".character_name (
 
 CREATE UNIQUE INDEX IF NOT EXISTS character_name_character
     ON "角色".character_name (character_id);
+
+-- === B9 equip.sql（同一份幂等 DDL，追加进主迁移）===
+-- B9：装备穿戴。每个部位最多一件，穿着的就是背包里的那一行；行被删（卖出 / 丢弃 /
+-- 合并）时这条记录跟着 CASCADE 走，不留给下一件进这一格的东西。
+CREATE TABLE IF NOT EXISTS "角色".character_equip (
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    slot         text        NOT NULL CHECK (slot IN ('weapon', 'armor', 'accessory')),
+    inventory_id bigint      NOT NULL REFERENCES "角色".inventory (id) ON DELETE CASCADE,
+    equipped_at  timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, slot),
+    UNIQUE (inventory_id)
+);
+
+CREATE INDEX IF NOT EXISTS character_equip_character
+    ON "角色".character_equip (character_id);

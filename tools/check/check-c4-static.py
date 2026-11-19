@@ -85,9 +85,14 @@ global_service = source['src/Global/GlobalGrpcService.cs']
 need('ListInventoryAsync' in global_service and 'itemId = entry.ItemId' in global_service,
      '挂单要从只读背包口读物品编号')
 
-# 5. 协议面不动：C4 不加 RPC、不给已有消息加字段（客户端不用重出包）。
+# 5. 协议面：C4 自己不加 RPC、不给已有消息加字段（客户端不用为 C4 重出包）。
+# Q10（第 33 行）按自己的卡合法加了 MoveItem / DiscardItem / SortInventory / UseItemBatch，
+# 所以这里收窄成「C4 的改动面之外没有第二个换格 RPC」：SwapItem 仍不该存在，
+# C4 依赖的那两个老消息也还在。收窄不放松口径——C4 那四处一个字段都没加这条仍成立。
 proto = read('proto/mmo/character.proto')
-need('rpc MoveItem' not in proto and 'rpc SwapItem' not in proto, 'C4 不新增换格 RPC')
+need('rpc SwapItem' not in proto, 'C4 不新增换格 RPC（SwapItem 不该存在）')
+need('message EnhanceRequest' in proto and 'message CanTradeResponse' in proto,
+     'C4 依赖的两个老消息要原样在')
 req = re.search(r'message EnhanceRequest \{(.*?)\}', proto, re.S).group(1)
 fields = set(re.findall(r'(?:string|uint64|uint32|int64|int32|bool)\s+(\w+)\s*=', req))
 need(fields == {'account', 'character_id', 'slot', 'stone_id', 'txn_id', 'use_coupon'}, 'EnhanceRequest 字段被动过')

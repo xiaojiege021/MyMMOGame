@@ -25,18 +25,57 @@ namespace HotUpdate.Ui
 
         static string _promoteBody = string.Empty;
 
+        static string _bagMoveBody = string.Empty;
+
+        static string _bagDiscardBody = string.Empty;
+
+        static string _equipBody = string.Empty;
+
+        static string _unequipBody = string.Empty;
+
         public static bool Run()
         {
             _failed = false;
             _enhanceCalls = 0;
             _promoteCalls = 0;
             _promoteBody = string.Empty;
+            _bagMoveBody = string.Empty;
+            _bagDiscardBody = string.Empty;
+            _equipBody = string.Empty;
+            _unequipBody = string.Empty;
 
             UiSkinStore.Reset();
             var shell = UiShell.Ensure();
             var flow = UiUpgradeFlow.Ensure(shell);
             flow.SetSender((path, body, token, done) =>
             {
+                // Q10 的四条要排在 /inventory 前面：否则被背包只读口那条前缀先吃掉。
+                if (path.IndexOf("/inventory/move", StringComparison.Ordinal) >= 0)
+                {
+                    _bagMoveBody = body;
+                    done(200, MoveOkJson);
+                    return;
+                }
+
+                if (path.IndexOf("/inventory/discard", StringComparison.Ordinal) >= 0)
+                {
+                    _bagDiscardBody = body;
+                    done(200, DiscardDuplicateJson);
+                    return;
+                }
+
+                if (path.IndexOf("/inventory/sort", StringComparison.Ordinal) >= 0)
+                {
+                    done(200, SortOkJson);
+                    return;
+                }
+
+                if (path.IndexOf("/inventory/use-batch", StringComparison.Ordinal) >= 0)
+                {
+                    done(200, UseRejectJson);
+                    return;
+                }
+
                 if (path.IndexOf("/inventory", StringComparison.Ordinal) >= 0)
                 {
                     done(200, BagJson);
@@ -53,6 +92,21 @@ namespace HotUpdate.Ui
                 if (path.IndexOf("/character/transfer", StringComparison.Ordinal) >= 0)
                 {
                     done(200, TransferRejectJson);
+                    return;
+                }
+
+                // B9：穿戴两条也要在兜底之前接住，否则会被结晶那条兜底回包吃掉。
+                if (path.IndexOf("/character/equip", StringComparison.Ordinal) >= 0)
+                {
+                    _equipBody = body;
+                    done(200, EquipOkJson);
+                    return;
+                }
+
+                if (path.IndexOf("/character/unequip", StringComparison.Ordinal) >= 0)
+                {
+                    _unequipBody = body;
+                    done(200, UnequipOkJson);
                     return;
                 }
 
@@ -163,6 +217,56 @@ namespace HotUpdate.Ui
                 && _promoteBody.IndexOf("txn", StringComparison.OrdinalIgnoreCase) < 0);
             Debug.Log("u5_self_promote_body " + _promoteBody);
 
+            // Q10：四条背包操作。回包靠替换发送实现喂进来，不连网关；
+            // 屏上认的只有回包的字段与请求体里那几个参数。
+            flow.MoveItem(3, 5);
+            var mv = flow.LastMove;
+            Report("q10_move", mv.Ok && mv.Merged && mv.Target.Count == 200
+                && mv.Source.ItemId.Length == 0
+                && _bagMoveBody == "{\"character_id\":7,\"from_slot\":3,\"to_slot\":5}");
+            Debug.Log("u5_self_q10_move target=" + mv.Target.Slot + ":" + mv.Target.Count
+                + " body=" + _bagMoveBody);
+
+            flow.DiscardItem(5, 50);
+            var dc = flow.LastDiscard;
+            Report("q10_discard", dc.Duplicate && dc.CountLeft == 150 && !dc.Ok
+                && _bagDiscardBody.IndexOf("\"confirm\":true", StringComparison.Ordinal) >= 0);
+            Debug.Log("u5_self_q10_discard left=" + dc.CountLeft + " body=" + _bagDiscardBody);
+
+            flow.SortBag();
+            var st = flow.LastSort;
+            Report("q10_sort", st.Ok && st.Moved == 2 && st.Slots.Count == 2
+                && st.Slots[0].Slot == 1 && flow.Bag.Slots.Count == 2);
+            Debug.Log("u5_self_q10_sort moved=" + st.Moved + " rows=" + st.Slots.Count);
+
+            flow.UseItemBatch(1, 2);
+            var ub = flow.LastUseBatch;
+            Report("q10_use", !ub.Ok && ub.Reason == "effect_single_instance" && ub.Used == 0);
+            Debug.Log("u5_self_q10_use reason=" + ub.Reason + " used=" + ub.Used);
+
+            // B9：格子上的 equipped_slot 只认回包——第 1 格穿着武器，第 2 格没穿。
+            Report("b9_bag_worn", flow.Bag.Slots[0].EquippedSlot == "weapon"
+                && !flow.Bag.Slots[1].IsWorn);
+            Debug.Log("u5_self_b9_bag_worn slot1=" + flow.Bag.Slots[0].EquippedSlot
+                + " slot2=" + flow.Bag.Slots[1].EquippedSlot);
+
+            // B9：穿 / 脱。请求体只有角色号与格号 / 部位，数值一个都没带。
+            flow.EquipItem(1);
+            var eq = flow.LastEquip;
+            Report("b9_equip", eq.Ok && eq.EquipSlot == "weapon" && eq.EquipAttack == 20
+                && eq.Level == 12 && eq.BagSlot == 1
+                && _equipBody == "{\"character_id\":7,\"slot\":1}");
+            Debug.Log("u5_self_b9_equip worn=" + eq.EquipSlot + " attack=" + eq.EquipAttack
+                + " body=" + _equipBody);
+
+            flow.UnequipItem("weapon");
+            var uq = flow.LastUnequip;
+            Report("b9_unequip", uq.Ok && uq.EquipSlot == "weapon" && uq.BagSlot == 1
+                && uq.EquipAttack == 0
+                && _unequipBody == "{\"character_id\":7,\"equip_slot\":\"weapon\"}");
+            Debug.Log("u5_self_b9_unequip bag_slot=" + uq.BagSlot + " attack=" + uq.EquipAttack
+                + " body=" + _unequipBody);
+
             // 切皮肤只换颜色：布局与文案一字不差。
             shell.ShowPage("强化", s => UiEnhanceScreen.Build(s, flow));
             var lightLayout = Layout(shell);
@@ -234,10 +338,40 @@ namespace HotUpdate.Ui
         }
 
         const string BagJson =
-            "{\"slots\":[{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true}," +
-            "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true}]," +
+            "{\"slots\":[{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true," +
+            "\"equipped_slot\":\"weapon\"}," +
+            "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true," +
+            "\"equipped_slot\":\"\"}]," +
             "\"bag_slots\":40,\"character_name\":\"自检角色\",\"realm\":\"炼体\"," +
             "\"realm_display\":\"炼体\"}";
+
+        // Q10：合并成功 / 同号重放的丢弃 / 排完两份 / 连用被拒。字段形状与网关回包一致。
+        const string MoveOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"source\":{\"slot\":3,\"item_id\":\"\",\"count\":0," +
+            "\"bound\":false},\"target\":{\"slot\":5,\"item_id\":\"ore_iron\",\"count\":200," +
+            "\"bound\":false},\"merged\":true,\"swapped\":false}";
+
+        const string DiscardDuplicateJson =
+            "{\"ok\":false,\"reason\":\"duplicate\",\"item_id\":\"ore_iron\",\"count_left\":150," +
+            "\"duplicate\":true}";
+
+        const string SortOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"moved\":2,\"slots\":[" +
+            "{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true}," +
+            "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true}]}";
+
+        // B9：穿上 / 脱下。部位、装备攻击之和、格号都是网关回包里的字段。
+        const string EquipOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"item_id\":\"sword_trial\",\"equip_slot\":\"weapon\"," +
+            "\"equip_attack\":20,\"level\":12,\"class_id\":\"warrior\",\"bag_slot\":1}";
+
+        const string UnequipOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"item_id\":\"sword_trial\",\"equip_slot\":\"weapon\"," +
+            "\"bag_slot\":1,\"equip_attack\":0}";
+
+        const string UseRejectJson =
+            "{\"ok\":false,\"reason\":\"effect_single_instance\",\"item_id\":\"exp_booster\"," +
+            "\"used\":0,\"count_left\":2,\"duplicate\":false}";
 
         const string EnhanceOkJson =
             "{\"ok\":true,\"reason\":\"\",\"level_before\":3,\"level\":4,\"max_level\":12," +

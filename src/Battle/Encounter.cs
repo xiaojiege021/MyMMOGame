@@ -55,8 +55,14 @@ public sealed class Member : IStatusHost
     /// </summary>
     public CombatStats? Combat { get; init; }
 
-    /// <summary>攻击：战场 > 竞技场模板 > 职业表主属性系数。</summary>
-    public double AttackPower() => Combat?.Attack ?? Template?.Attack ?? Class.Attack();
+    /// <summary>
+    /// 攻击：战场 > 竞技场模板 > 职业表主属性系数 + 已穿装备的固定攻击（B9）。
+    /// 装备那一截只在走后一条时加：竞技场按模板统一属性、战场与城战各自已经
+    /// 把装备折进 Combat，再加一次就是双算。装备固定攻击来自角色服快照，
+    /// 没配上游时是 0，与 B9 之前逐字相同。
+    /// </summary>
+    public double AttackPower() =>
+        Combat?.Attack ?? Template?.Attack ?? (Class.Attack() + (Profile?.EquipAttack ?? 0));
 
     /// <summary>治疗：战场 > 模板 > 精神 × 职业治疗系数。</summary>
     public double HealPower() =>

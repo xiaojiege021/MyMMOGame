@@ -171,6 +171,13 @@ internal static class CliFlags
     public static int moveSlotTo = 0;
     public static long rawSlotDeleteOf = 0;
     public static int rawSlotDeleteSlot = 0;
+    // B9：穿戴。--equip 走与 RPC 同一条 EquipAsync；--unequip 按部位脱；
+    // --equip-row 只读已穿的部位、格号、物品与装备固定攻击之和。
+    public static long equipOf = 0;
+    public static int equipBagSlot = 0;
+    public static long unequipOf = 0;
+    public static string? unequipSlot = null;
+    public static long equipRowOf = 0;
     public static bool transferState = false;
     public static string? transferConfigPath = null;
     public static long transferStateOf = 0;

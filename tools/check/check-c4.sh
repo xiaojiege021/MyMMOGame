@@ -19,6 +19,15 @@ CHARACTER_DLL="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 GLOBAL_DLL="$ROOT/src/Global/bin/Release/net10.0/Global.dll"
 HAS_DB="${MMO_C4_HAS_DB:-0}"
+
+latest_version() {
+  python3 - "$ROOT/db/migrations.json" "$1" <<'PY2'
+import json, sys
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+print([s for s in d["schemas"] if s["key"] == sys.argv[2]][0]["entries"][-1]["version"])
+PY2
+}
+
 TITLE="C4"
 
 CHAR_PORT=${MMO_C4_CHAR_PORT:-62132}
@@ -89,11 +98,14 @@ else
   bad "迁移失败"; tail -8 "$TMP/migrate.log" | detail; finish "$TITLE"
 fi
 STATUS="$("$DOTNET" "$CHARACTER_DLL" --schema-status --config config/character.json 2>&1)"
-if printf '%s' "$STATUS" | grep -q 'schema_status=ok schema=角色 .*latest_version=27 ' \
-   && printf '%s' "$STATUS" | grep -q 'schema_status=ok schema=交易 .*latest_version=5 '; then
-  ok "版本表记到 角色 v27 / 交易 v5，没有 drift"
+# 版本号现取清单里的最新值：后面每加一条迁移都会往后走，写死就会在别人卡上红。
+ROLE_V="$(latest_version character)"
+TRADE_V="$(latest_version trade)"
+if printf '%s' "$STATUS" | grep -q "schema_status=ok schema=角色 .*latest_version=${ROLE_V} " \
+   && printf '%s' "$STATUS" | grep -q "schema_status=ok schema=交易 .*latest_version=${TRADE_V} "; then
+  ok "版本表记到 角色 v${ROLE_V} / 交易 v${TRADE_V}，没有 drift"
 else
-  bad "版本表不是 角色 v27 / 交易 v5"; printf '%s' "$STATUS" | grep schema_status | detail; finish "$TITLE"
+  bad "版本表不是 角色 v${ROLE_V} / 交易 v${TRADE_V}"; printf '%s' "$STATUS" | grep schema_status | detail; finish "$TITLE"
 fi
 
 ROOT="$ROOT" TMP="$TMP" CHAR_PORT="$CHAR_PORT" GATEWAY_PORT="$GATEWAY_PORT" \

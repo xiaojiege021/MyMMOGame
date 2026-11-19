@@ -337,6 +337,8 @@ items = json.load(open(os.path.join(base, "items.json"), encoding="utf-8"))
 items["items"].append({
     "id": "k5_probe_blade", "name": "核对用长刀", "kind": "equipment",
     "grade": "blue", "set_id": "", "weapon_kind": "saber", "require_level": 20,
+    # B9 起装备必须写部位（weapon / armor / accessory），这里按武器写。
+    "slot": "weapon",
     "stack_max": 1, "bind": "none",
     "desc": "核对用的一件装备，不进仓库。"})
 json.dump(items, open(os.path.join(base, "items.json"), "w", encoding="utf-8"), ensure_ascii=False)

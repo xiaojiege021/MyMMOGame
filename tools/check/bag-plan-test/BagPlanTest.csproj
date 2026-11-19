@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Q10 脱库核对：只引用角色服的纯计划函数，不连库、不起进程。
+       放在 tools/check 下面而不是 src 里：它不进解决方案，也不参与服务端构建。 -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>BagPlanTest</AssemblyName>
+    <RootNamespace>BagPlanTest</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Character/Character.csproj" />
+  </ItemGroup>
+</Project>

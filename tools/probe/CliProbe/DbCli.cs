@@ -54,6 +54,9 @@ internal static class DbCli
             code = await EnhanceCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await EquipCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await ShopCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -97,6 +100,7 @@ internal static class DbCli
     || rawShareId != 0 || sharesTotalDungeon != null || expStateOf != 0 || rawExpId != 0
     || enhanceLevelOf != 0 || enhanceTxnCount != null || couponCountOf != 0 || rawEnhanceId != 0
     || enhanceRowOf != 0 || moveSlotOf != 0 || rawSlotDeleteOf != 0
+    || equipOf != 0 || unequipOf != 0 || equipRowOf != 0
     || transferStateOf != 0 || transferTxnCount != null
     || crystalStateOf != 0 || crystalTxnCount != null || auctionBuyerOf != 0
     || ingotBuyerOf != 0 || shopStateOf != 0 || shopLedgerOf != 0 || talismanStateOf != 0

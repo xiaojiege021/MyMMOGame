@@ -29,8 +29,10 @@
       "kind": "equipment",
       "grade": "white",
       "set_id": "",
+      "slot": "weapon",
       "weapon_kind": "sword",
       "require_level": 10,
+      "attack": 20,
       "stack_max": 1,
       "bind": "on_pickup",
       "desc": "试炼场配发的长剑，十级可用。"
@@ -131,8 +133,10 @@
       "kind": "equipment",
       "grade": "green",
       "set_id": "",
+      "slot": "weapon",
       "weapon_kind": "saber",
       "require_level": 15,
+      "attack": 40,
       "stack_max": 1,
       "bind": "none",
       "desc": "行商带来的长刀，十五级可用。"
@@ -143,6 +147,8 @@
       "kind": "equipment",
       "grade": "white",
       "set_id": "",
+      "slot": "armor",
+      "attack": 20,
       "stack_max": 1,
       "bind": "on_pickup",
       "desc": "试炼场配发的法袍，护甲部位。"
@@ -153,6 +159,8 @@
       "kind": "equipment",
       "grade": "white",
       "set_id": "",
+      "slot": "accessory",
+      "attack": 20,
       "stack_max": 1,
       "bind": "none",
       "desc": "试炼场配发的指环，饰品部位。"
@@ -213,8 +221,10 @@
       "kind": "equipment",
       "grade": "green",
       "set_id": "",
+      "slot": "weapon",
       "weapon_kind": "staff",
       "require_level": 15,
+      "attack": 40,
       "stack_max": 1,
       "bind": "none",
       "desc": "行商带来的法杖，十五级可用。"
@@ -395,8 +405,10 @@
       "kind": "equipment",
       "grade": "green",
       "set_id": "",
+      "slot": "weapon",
       "weapon_kind": "spirit_sword",
       "require_level": 15,
+      "attack": 40,
       "stack_max": 1,
       "bind": "none",
       "desc": "行商带来的法剑，十五级可用。"

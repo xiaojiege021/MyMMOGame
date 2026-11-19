@@ -50,10 +50,10 @@ internal static class CliParser
             case "--item-list": itemList = true; break;
             // K3：配方与制作的核对 flag 解析器在 CraftCli.Parse（一个文件一个类型 / 行数闸门）。
             case "--recipe-list": case "--recipe-table-path": case "--craft-start": case "--craft-finish": case "--craft-state": case "--craft-txn": case "--raw-item-write": case "--raw-currency-add": CraftCli.Parse(args, ref i); break;
+            // B9：穿 / 脱 / 读已穿。解析在 EquipCli.Parse，与 RPC 同一套判定。
+            case "--equip": case "--unequip": case "--equip-row": EquipCli.Parse(args, ref i); break;
             // 只给核对用：把武器锁与职业可用兵器打出来，不连库。坏配置也走这里。
-            case "--weapon-rules":
-                weaponRules = true;
-                break;
+            case "--weapon-rules": weaponRules = true; break;
             // 坏配置走这里：指定另一份分支表 / 物品表，不碰仓库里那两份。
             case "--weapon-rules-path" when i + 2 < args.Length:
                 weaponRules = true;

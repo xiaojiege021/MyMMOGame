@@ -186,6 +186,10 @@ deps_of() {
     q7) echo "k1" ;;
     q8) echo "q7" ;;
     q9) echo "q7" ;;
+    # Q10 是未覆盖排期第 33 行：背包操作，前置 C4（强化挂背包行，换格才不串）。
+    q10) echo "c4" ;;
+    # B9 是 14.5 表第 3 行：装备穿戴，前置 W1（兵器按职业）与 C4（强化挂背包行）。
+    b9) echo "c4" ;;
     q11) echo "q3 q9" ;;
     # Q12 是未覆盖排期第 30 行：角色名全局唯一 / 敏感词 / 改名，队列依赖写的是「—」。
     q12) echo "" ;;
@@ -221,7 +225,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 c4 d1a d1b d4 d5 d8 d15 c6 s1 c7 contract invariants q1 q2 q3 q4 q5 q6 q7 q8 q9 q11 q12"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 c4 d1a d1b d4 d5 d8 d15 c6 s1 c7 contract invariants q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 b9"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {

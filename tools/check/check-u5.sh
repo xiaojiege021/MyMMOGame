@@ -118,7 +118,9 @@ for key in files screens no_config enhance_fields transfer_fields crystal_fields
   fi
 done
 
-for key in bag realm_display seven enhance_ok enhance_reject transfer_reject crystal_reject skin_layout skin_copy; do
+for key in bag realm_display seven enhance_ok enhance_reject transfer_reject crystal_reject \
+           q10_move q10_discard q10_sort q10_use \
+           b9_bag_worn b9_equip b9_unequip skin_layout skin_copy; do
   if grep -q "u5_self_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "七屏自检 u5_self_${key}=ok"
   else

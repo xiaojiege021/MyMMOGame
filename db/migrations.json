@@ -33,7 +33,9 @@
         { "version": 24, "file": "db/character/season_pass_progress.sql" },
         { "version": 25, "file": "db/character/deserter_penalty.sql" },
         { "version": 26, "file": "db/character/name_registry.sql" },
-        { "version": 27, "file": "db/character/enhance_item.sql" }
+        { "version": 27, "file": "db/character/enhance_item.sql" },
+        { "version": 28, "file": "db/character/crystal_slot_follow.sql" },
+        { "version": 29, "file": "db/character/equip.sql" }
       ]
     },
     {

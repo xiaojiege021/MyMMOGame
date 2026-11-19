@@ -19,6 +19,23 @@ public static class CharacterApi
 
     public sealed record CanTradeBody(ulong? CharacterId, uint? Slot);
 
+    // Q10：移动 / 丢弃 / 排序 / 批量使用。数量、格号都由客户端指定，但判不判得下来
+    // 只由角色服按库里的格子与配置决定；discard 的 txn_id 可以由客户端带，没带就现生成。
+    public sealed record MoveItemBody(ulong? CharacterId, uint? FromSlot, uint? ToSlot);
+
+    public sealed record DiscardItemBody(
+        ulong? CharacterId, uint? Slot, int? Count, bool? Confirm, string? TxnId);
+
+    public sealed record SortInventoryBody(ulong? CharacterId);
+
+    public sealed record UseItemBatchBody(
+        ulong? CharacterId, uint? Slot, int? Count, string? TxnId);
+
+    // B9：穿上只给背包格号，脱下只给部位。部位与门槛由角色服从配置与库里读。
+    public sealed record EquipItemBody(ulong? CharacterId, uint? Slot);
+
+    public sealed record UnequipItemBody(ulong? CharacterId, string? EquipSlot);
+
     public sealed record CurrencyBody(ulong? CharacterId, string? Kind, long? Delta);
 
     public sealed record GrantEntryBody(CurrencyDeltaBody? Currency, ItemDeltaBody? Item);
@@ -396,6 +413,429 @@ public static class CharacterApi
             catch (RpcException ex)
             {
                 await WriteRpcErrorAsync(context, "inventory_trade", account, ex);
+            }
+        });
+
+        // Q10：移动一格。空格直接挪、同物品合并、不同物品交换；强化挂在背包行上，
+        // 只改格号，所以不丢也不串。业务拒绝一律 HTTP 200 + ok=false。
+        app.MapPost("/inventory/move", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "inventory_move", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            MoveItemBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<MoveItemBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.FromSlot is null || body.ToSlot is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var move = await client.MoveItemAsync(
+                    new MoveItemRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        FromSlot = body.FromSlot.Value,
+                        ToSlot = body.ToSlot.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("bag_move account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " from=" + body.FromSlot.Value
+                    + " to=" + body.ToSlot.Value
+                    + " ok=" + move.Ok
+                    + " reason=" + move.Reason
+                    + " merged=" + move.Merged
+                    + " swapped=" + move.Swapped);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = move.Ok,
+                    reason = move.Reason,
+                    source = new
+                    {
+                        slot = move.Source.Slot,
+                        item_id = move.Source.ItemId,
+                        count = move.Source.Count,
+                        bound = move.Source.Bound,
+                    },
+                    target = new
+                    {
+                        slot = move.Target.Slot,
+                        item_id = move.Target.ItemId,
+                        count = move.Target.Count,
+                        bound = move.Target.Bound,
+                    },
+                    merged = move.Merged,
+                    swapped = move.Swapped,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "inventory_move", account, ex);
+            }
+        });
+
+        // Q10：丢掉若干件。confirm 不带或 false 一律由角色服拒（not_confirmed），
+        // 网关不替玩家确认。事务号可以客户端带，没带就现生成。
+        app.MapPost("/inventory/discard", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "inventory_discard", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            DiscardItemBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<DiscardItemBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.Slot is null || body.Count is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            var txnId = (body.TxnId ?? "").Trim();
+            if (txnId.Length == 0)
+            {
+                txnId = "bag_discard:" + Guid.NewGuid().ToString("N");
+            }
+
+            try
+            {
+                var discard = await client.DiscardItemAsync(
+                    new DiscardItemRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Slot = body.Slot.Value,
+                        Count = body.Count.Value,
+                        Confirm = body.Confirm ?? false,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("bag_discard account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " slot=" + body.Slot.Value
+                    + " count=" + body.Count.Value
+                    + " ok=" + discard.Ok
+                    + " reason=" + discard.Reason
+                    + " item=" + discard.ItemId
+                    + " left=" + discard.CountLeft
+                    + " duplicate=" + discard.Duplicate);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = discard.Ok,
+                    reason = discard.Reason,
+                    item_id = discard.ItemId,
+                    count_left = discard.CountLeft,
+                    duplicate = discard.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "inventory_discard", account, ex);
+            }
+        });
+
+        // Q10：排序。种类 → 品阶 → 物品编号，紧凑到第 1 格；回包是排完之后的整份背包。
+        app.MapPost("/inventory/sort", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "inventory_sort", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            SortInventoryBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<SortInventoryBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var sort = await client.SortInventoryAsync(
+                    new SortInventoryRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(10),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("bag_sort account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " ok=" + sort.Ok
+                    + " reason=" + sort.Reason
+                    + " moved=" + sort.Moved
+                    + " rows=" + sort.Slots.Count);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = sort.Ok,
+                    reason = sort.Reason,
+                    moved = sort.Moved,
+                    slots = sort.Slots.Select(s => new
+                    {
+                        slot = s.Slot,
+                        item_id = s.ItemId,
+                        count = s.Count,
+                        bound = s.Bound,
+                    }),
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "inventory_sort", account, ex);
+            }
+        });
+
+        // Q10：批量使用。一次用叠里的 N 个；效果入口不在本卡（归 B1），
+        // 角色服只回「这一格能不能用、用了几个」。
+        app.MapPost("/inventory/use-batch", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "inventory_use", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            UseItemBatchBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<UseItemBatchBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.Slot is null || body.Count is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            var txnId = (body.TxnId ?? "").Trim();
+            if (txnId.Length == 0)
+            {
+                txnId = "bag_use:" + Guid.NewGuid().ToString("N");
+            }
+
+            try
+            {
+                var use = await client.UseItemBatchAsync(
+                    new UseItemBatchRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Slot = body.Slot.Value,
+                        Count = body.Count.Value,
+                        TxnId = txnId,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("bag_use account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " slot=" + body.Slot.Value
+                    + " count=" + body.Count.Value
+                    + " ok=" + use.Ok
+                    + " reason=" + use.Reason
+                    + " item=" + use.ItemId
+                    + " used=" + use.Used
+                    + " left=" + use.CountLeft);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = use.Ok,
+                    reason = use.Reason,
+                    item_id = use.ItemId,
+                    used = use.Used,
+                    count_left = use.CountLeft,
+                    duplicate = use.Duplicate,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "inventory_use", account, ex);
+            }
+        });
+
+        // B9：穿上一件装备。请求只给背包格号——部位、等级门槛与职业锁都在角色服判；
+        // 业务拒绝一律 200 + ok=false（slot_empty / slot_occupied / level_not_enough /
+        // class_mismatch / not_equipment / already_equipped），越界格号由角色服按参数错回 4xx。
+        app.MapPost("/character/equip", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "character_equip", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            EquipItemBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<EquipItemBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || body.Slot is null)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var equip = await client.EquipItemAsync(
+                    new EquipItemRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        Slot = body.Slot.Value,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("character_equip account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " slot=" + body.Slot.Value
+                    + " item=" + equip.ItemId
+                    + " worn=" + equip.EquipSlot
+                    + " attack=" + equip.EquipAttack
+                    + " ok=" + equip.Ok
+                    + " reason=" + equip.Reason);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = equip.Ok,
+                    reason = equip.Reason,
+                    item_id = equip.ItemId,
+                    equip_slot = equip.EquipSlot,
+                    equip_attack = equip.EquipAttack,
+                    level = equip.Level,
+                    class_id = equip.ClassId,
+                    bag_slot = equip.BagSlot,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "character_equip", account, ex);
+            }
+        });
+
+        // B9：按部位脱下。脱下不换格，bag_slot 就是它原来那一格。
+        app.MapPost("/character/unequip", async context =>
+        {
+            if (!TryAuthorize(context, tokens, "character_unequip", out var account))
+            {
+                await WriteAsync(context, 401, new { error = "invalid_token" });
+                return;
+            }
+
+            UnequipItemBody? body;
+            try
+            {
+                body = await JsonSerializer.DeserializeAsync<UnequipItemBody>(
+                    context.Request.Body, Json, context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            if (body?.CharacterId is null || string.IsNullOrWhiteSpace(body.EquipSlot))
+            {
+                await WriteAsync(context, 400, new { error = "bad_request" });
+                return;
+            }
+
+            try
+            {
+                var unequip = await client.UnequipItemAsync(
+                    new UnequipItemRequest
+                    {
+                        Account = account,
+                        CharacterId = body.CharacterId.Value,
+                        EquipSlot = body.EquipSlot,
+                    },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
+                    cancellationToken: context.RequestAborted);
+
+                Console.WriteLine("character_unequip account=" + account
+                    + " id=" + body.CharacterId.Value
+                    + " worn=" + unequip.EquipSlot
+                    + " item=" + unequip.ItemId
+                    + " bag_slot=" + unequip.BagSlot
+                    + " attack=" + unequip.EquipAttack
+                    + " ok=" + unequip.Ok
+                    + " reason=" + unequip.Reason);
+
+                await WriteAsync(context, 200, new
+                {
+                    ok = unequip.Ok,
+                    reason = unequip.Reason,
+                    item_id = unequip.ItemId,
+                    equip_slot = unequip.EquipSlot,
+                    bag_slot = unequip.BagSlot,
+                    equip_attack = unequip.EquipAttack,
+                });
+            }
+            catch (RpcException ex)
+            {
+                await WriteRpcErrorAsync(context, "character_unequip", account, ex);
             }
         });
 
