@@ -154,10 +154,15 @@ printf '%s' "$DTU" | grep -q '^dungeon_table_state=ok' \
   && ok "probe 用共享副本表：元婴副本 realm=元婴 drill=200" \
   || bad "共享副本表读不出来：$(printf '%s' "$DTU" | head -3)"
 
+# B2 起掉落表按品阶补了装备行，行数现取，不钉 2。
+WB_LINES="$(python3 -c 'import json
+d=json.load(open("config/dungeon_drops.json",encoding="utf-8"))
+e=next(x for x in d["entries"] if x["dungeon_id"]=="world_boss")
+print(len(e["lines"]))' | tr -d '\r')"
 DD="$("$DOTNET" "$CD" --dungeon-drop-table-path config/dungeon_drops.json \
       --config config/character.json 2>&1)"
-printf '%s' "$DD" | grep -q '^dungeon_drop=world_boss lines=2' \
-  && ok "probe 用共享掉落表：world_boss 两行" \
+printf '%s' "$DD" | grep -q "^dungeon_drop=world_boss lines=${WB_LINES}" \
+  && ok "probe 用共享掉落表：world_boss ${WB_LINES} 行" \
   || bad "共享掉落表读不出来：$(printf '%s' "$DD" | head -3)"
 
 BOUT="$("$DOTNET" "$BD" --world-boss-table --config config/battle.json --at "$AT" 2>&1)"

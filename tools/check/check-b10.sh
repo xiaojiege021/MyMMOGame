@@ -27,6 +27,8 @@ GATEWAY_PORT=${MMO_B10_GATEWAY_PORT:-61156}
 ACCOUNT="p4b10_wear"
 TEST_PASSWORD="p4b10-Pw-3d17"
 CHAR_W="p4b10a$RANDOM"
+# B2：套装段单独造一个角色，别和强化 / 结晶那一段抢同一个武器位。
+CHAR_SET="p4b2s$RANDOM"
 CHARACTER_PID=""
 GATEWAY_PID=""
 TOKEN=""
@@ -38,6 +40,7 @@ cleanup() {
   stop_pid "$CHARACTER_PID"
   if [ -n "${HAVE_DB:-}" ]; then
     "$DOTNET" "$PROBE_DLL" --delete-character "$CHAR_W" --config "$TMP/character.json" >/dev/null 2>&1 || true
+    "$DOTNET" "$PROBE_DLL" --delete-character "$CHAR_SET" --config "$TMP/character.json" >/dev/null 2>&1 || true
     printf '%s\n' "" | "$DOTNET" "$GATEWAY_DLL" --delete-account "$ACCOUNT" \
       --config "$TMP/gateway.json" >/dev/null 2>&1 || true
   fi
@@ -224,7 +227,8 @@ fi
 R="$(post /character/crystal/install "{\"character_id\":$WAR,\"slot\":7,\"crystal_slot\":8,\"socket\":1}")"
 printf '%s' "$R" | grep -Eq '"ok": *true' || { bad "结晶装不上：$R"; finish "$TITLE"; }
 ROW="$(equip_row "$WAR")"
-if printf '%s' "$ROW" | grep -q "crystal_flat=${CRY}\$"; then
+# B2 起行尾还有 set_bonus= / attack_total=，这里只认字段值，不再锚行尾。
+if printf '%s' "$ROW" | grep -q "crystal_flat=${CRY} "; then
   ok "装上攻击结晶：已穿汇总读到 crystal_flat=${CRY}"
 else
   bad "装上结晶后 crystal_flat 不是 ${CRY}：$ROW"
@@ -232,10 +236,78 @@ fi
 
 post /character/crystal/remove "{\"character_id\":$WAR,\"slot\":7,\"socket\":1}" >/dev/null
 ROW="$(equip_row "$WAR")"
-if printf '%s' "$ROW" | grep -q "crystal_flat=0\$"; then
+if printf '%s' "$ROW" | grep -q "crystal_flat=0 "; then
   ok "拆下结晶：crystal_flat 回到 0（装上 / 拆下有差）"
 else
   bad "拆下结晶后 crystal_flat 没归零：$ROW"
 fi
+
+echo "== 7. 真库段：同一套穿 2 件 / 3 件，EquipAttack 差的就是套装加成 =="
+SET_ID_PICK="$(python3 - <<'PY'
+import json
+items = {i["id"]: i for i in json.load(open("config/items.json", encoding="utf-8"))["items"]}
+sets = json.load(open("config/sets.json", encoding="utf-8"))["sets"]
+# 用白档第一套：它三件都是 10 级，20 级的角色一定穿得上
+one = next(s for s in sets if s["grade"] == "white")
+pieces = sorted((i for i in items.values() if i.get("set_id") == one["id"]),
+                key=lambda i: ["weapon", "armor", "accessory"].index(i["slot"]))
+print(one["id"])
+print(one["bonuses"][0]["attack"], one["bonuses"][-1]["attack"])
+for p in pieces:
+    print(p["id"], p["attack"], p["slot"])
+PY
+)"
+SET_ID="$(printf '%s\n' "$SET_ID_PICK" | sed -n '1p')"
+BONUS2="$(printf '%s\n' "$SET_ID_PICK" | sed -n '2p' | awk '{print $1}')"
+BONUS3="$(printf '%s\n' "$SET_ID_PICK" | sed -n '2p' | awk '{print $2}')"
+W_ID="$(printf '%s\n' "$SET_ID_PICK" | sed -n '3p' | awk '{print $1}')"
+W_ATK="$(printf '%s\n' "$SET_ID_PICK" | sed -n '3p' | awk '{print $2}')"
+A_ID="$(printf '%s\n' "$SET_ID_PICK" | sed -n '4p' | awk '{print $1}')"
+A_ATK="$(printf '%s\n' "$SET_ID_PICK" | sed -n '4p' | awk '{print $2}')"
+R_ID="$(printf '%s\n' "$SET_ID_PICK" | sed -n '5p' | awk '{print $1}')"
+R_ATK="$(printf '%s\n' "$SET_ID_PICK" | sed -n '5p' | awk '{print $2}')"
+
+SRESP="$(curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/character?token=${TOKEN}" \
+  -H 'Content-Type: application/json' -d "{\"name\":\"$CHAR_SET\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
+SID="$(printf '%s' "$SRESP" | python3 -c 'import json,sys
+try: print(json.load(sys.stdin).get("character_id",""))
+except Exception: print("")')"
+[ -n "$SID" ] || { bad "套装段角色没建起来：$SRESP"; finish "$TITLE"; }
+"$DOTNET" "$PROBE_DLL" --raw-level-write "$SID" 20 --config "$TMP/character.json" >/dev/null 2>&1
+post /inventory/add "{\"character_id\":$SID,\"slot\":10,\"item_id\":\"$W_ID\",\"count\":1}" >/dev/null
+post /inventory/add "{\"character_id\":$SID,\"slot\":11,\"item_id\":\"$A_ID\",\"count\":1}" >/dev/null
+post /inventory/add "{\"character_id\":$SID,\"slot\":12,\"item_id\":\"$R_ID\",\"count\":1}" >/dev/null
+
+set_bonus_of() { equip_row "$1" | sed -n 's/.* set_bonus=\([0-9]*\) .*/\1/p'; }
+total_of() { equip_row "$1" | sed -n 's/.* attack_total=\([0-9]*\)$/\1/p'; }
+equip_slot() { post /character/equip "{\"character_id\":$SID,\"slot\":$1}"; }
+
+equip_slot 10 >/dev/null
+S1="$(set_bonus_of "$SID")"
+T1="$(total_of "$SID")"
+[ "$S1" = "0" ] && [ "$T1" = "$W_ATK" ] \
+  && ok "只穿武器（1 件）：套装加成 0，装备和 ${W_ATK}" \
+  || bad "1 件时不对：set_bonus=${S1} total=${T1}（应 0 / ${W_ATK}）"
+
+equip_slot 11 >/dev/null
+S2="$(set_bonus_of "$SID")"
+T2="$(total_of "$SID")"
+[ "$S2" = "$BONUS2" ] && [ "$T2" = "$((W_ATK + A_ATK + BONUS2))" ] \
+  && ok "穿到 2 件：套装加成 ${BONUS2}，装备和 + 加成 = ${T2}" \
+  || bad "2 件时不对：set_bonus=${S2} total=${T2}（应 ${BONUS2} / $((W_ATK + A_ATK + BONUS2))）"
+
+equip_slot 12 >/dev/null
+S3="$(set_bonus_of "$SID")"
+T3="$(total_of "$SID")"
+[ "$S3" = "$BONUS3" ] && [ "$T3" = "$((W_ATK + A_ATK + R_ATK + BONUS3))" ] \
+  && ok "穿到 3 件：套装加成升到 ${BONUS3}（${SET_ID}）" \
+  || bad "3 件时不对：set_bonus=${S3} total=${T3}（应 ${BONUS3} / $((W_ATK + A_ATK + R_ATK + BONUS3))）"
+
+# 网关的入参是 equip_slot（UnequipItemBody），不是 slot。
+post /character/unequip "{\"character_id\":$SID,\"equip_slot\":\"accessory\"}" >/dev/null
+S4="$(set_bonus_of "$SID")"
+[ "$S4" = "$BONUS2" ] \
+  && ok "脱下饰品回到 2 件：加成回落到 ${BONUS2}（不继承、不记历史）" \
+  || bad "脱下一件后加成没回落：set_bonus=${S4}（应 ${BONUS2}）"
 
 finish "$TITLE"

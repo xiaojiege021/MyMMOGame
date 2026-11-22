@@ -33,6 +33,9 @@ public sealed class CharacterProcess(string configPath)
         EnhanceTable enhanceTable;
         TransferTable transferTable;
         CrystalTable crystalTable;
+        // B2：品阶与套装两张正本。品阶表先加载，物品表随后逐件对账。
+        GradeTable grades;
+        SetTable sets;
         AuctionTable auctionTable;
         ShopTable shopTable;
         NpcShopTable npcShopTable;
@@ -65,7 +68,12 @@ public sealed class CharacterProcess(string configPath)
             races = RaceTable.Load("config/races.json");
             branches = BranchTable.Load("config/branches.json");
             classes = new ClassIds("config/classes.json");
+            // B2：品阶表是物品表的对账基准，先于 items 的逐件校验读进来。
+            grades = GradeTable.Load("config/grades.json");
             items = ItemTable.Load("config/items.json");
+            grades.CheckItems(items);
+            // B2：套装正本。加载期与物品表交叉对账（套内件数、同套同品阶、加成门槛）。
+            sets = SetTable.Load("config/sets.json", items, grades);
             // Q12/K3：名字规则。长度、唯一、改名与敏感词表路径都在这份文件里；
             // rename_item_id 必须在上面这份物品表里——加载期就挡住「配了一个不存在的卡」。
             nameRulesTable = NameRulesTable.Load(config.NameRulesTable, items);
@@ -175,7 +183,10 @@ public sealed class CharacterProcess(string configPath)
             dungeonDropTable = DungeonDropTable.LoadIfPresent(
                 dungeonDropPath,
                 items.All.Select(item => item.Id),
-                currencies.All.Select(currency => currency.Id));
+                currencies.All.Select(currency => currency.Id),
+                // B2：装备掉落要在本副本的品阶带内。
+                grades.ItemGrades(items),
+                grades.Ordered.ToDictionary(g => g.Id, g => g.Order, StringComparer.Ordinal));
             var mainlineDropPath = Path.GetFullPath(Path.Combine(
                 Path.GetDirectoryName(Path.GetFullPath(configPath))!, "mainline_drops.json"));
             mainlineDropTable = MainlineDropTable.LoadIfPresent(mainlineDropPath, items, currencies);
@@ -424,6 +435,15 @@ public sealed class CharacterProcess(string configPath)
             + " product=" + (shopTable.Items.FirstOrDefault(
                 i => i.Mode == DeliveryMode.BagExpand)?.Id ?? ""));
 
+        // B2：品阶与套装的事实值。六档按 order 出，套数与每档套数从这里能一眼对账。
+        Console.WriteLine("grade_table_version=" + grades.Version
+            + " grades=" + string.Join(",", grades.Ordered.Select(g => g.Id))
+            + " base_attack=" + string.Join(",", grades.Ordered.Select(g => g.BaseAttack)));
+        Console.WriteLine("set_table_version=" + sets.Version
+            + " sets=" + sets.All.Count
+            + " per_grade=" + string.Join(",", grades.Ordered.Select(
+                g => g.Id + ":" + sets.All.Count(s => string.Equals(s.Grade, g.Id, StringComparison.Ordinal)))));
+
         // C1：十二场内容只在这里列一遍事实值，定词正文仍只在 config/dialogue。
         Console.WriteLine("mainline_config=" + (mainlineTable.IsMissing ? "missing" : "ok")
             + " stages=" + mainlineTable.Stages.Count
@@ -663,6 +683,8 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(transferTable);
         builder.Services.AddSingleton(transfers);
         builder.Services.AddSingleton(crystalTable);
+        builder.Services.AddSingleton(grades);
+        builder.Services.AddSingleton(sets);
         builder.Services.AddSingleton(crystals);
         builder.Services.AddSingleton(auctionTable);
         builder.Services.AddSingleton(shopTable);

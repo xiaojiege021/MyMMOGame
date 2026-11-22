@@ -1,0 +1,277 @@
+{
+  "schema": "set-bonus/1",
+  "version": 1,
+  "note": "B2：套装的唯一正本。核对表默认值表写定「每档 3 套，套装只加基础属性」；现有装备的基础属性只有 attack，所以 bonuses 只加 attack，不加暴击、不加技能、不改冷却。每套的件数以 items.json 里同 set_id 的装备为准（本卡是 3 件：武器 + 衣服 + 饰品），bonuses 的 pieces 是生效门槛，取已穿件数所能达到的最高一档，同一部位只算一件。换装不继承（方案 #s8：品阶「不继承，自然换代」），脱下立刻回落。六档的加成数值方案没写定：按该档武器基准的 10% / 25% 暂取（2 件 / 3 件），标待定，代码里不写第二份。",
+  "sets": [
+    {
+      "id": "set_white_melee",
+      "name": "初锋·力",
+      "grade": "white",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 2
+        },
+        {
+          "pieces": 3,
+          "attack": 5
+        }
+      ]
+    },
+    {
+      "id": "set_white_caster",
+      "name": "初锋·法",
+      "grade": "white",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 2
+        },
+        {
+          "pieces": 3,
+          "attack": 5
+        }
+      ]
+    },
+    {
+      "id": "set_white_ranger",
+      "name": "初锋·巧",
+      "grade": "white",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 2
+        },
+        {
+          "pieces": 3,
+          "attack": 5
+        }
+      ]
+    },
+    {
+      "id": "set_green_melee",
+      "name": "行旅·力",
+      "grade": "green",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 4
+        },
+        {
+          "pieces": 3,
+          "attack": 10
+        }
+      ]
+    },
+    {
+      "id": "set_green_caster",
+      "name": "行旅·法",
+      "grade": "green",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 4
+        },
+        {
+          "pieces": 3,
+          "attack": 10
+        }
+      ]
+    },
+    {
+      "id": "set_green_ranger",
+      "name": "行旅·巧",
+      "grade": "green",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 4
+        },
+        {
+          "pieces": 3,
+          "attack": 10
+        }
+      ]
+    },
+    {
+      "id": "set_blue_melee",
+      "name": "流云·力",
+      "grade": "blue",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 8
+        },
+        {
+          "pieces": 3,
+          "attack": 20
+        }
+      ]
+    },
+    {
+      "id": "set_blue_caster",
+      "name": "流云·法",
+      "grade": "blue",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 8
+        },
+        {
+          "pieces": 3,
+          "attack": 20
+        }
+      ]
+    },
+    {
+      "id": "set_blue_ranger",
+      "name": "流云·巧",
+      "grade": "blue",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 8
+        },
+        {
+          "pieces": 3,
+          "attack": 20
+        }
+      ]
+    },
+    {
+      "id": "set_purple_melee",
+      "name": "玄霜·力",
+      "grade": "purple",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 14
+        },
+        {
+          "pieces": 3,
+          "attack": 35
+        }
+      ]
+    },
+    {
+      "id": "set_purple_caster",
+      "name": "玄霜·法",
+      "grade": "purple",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 14
+        },
+        {
+          "pieces": 3,
+          "attack": 35
+        }
+      ]
+    },
+    {
+      "id": "set_purple_ranger",
+      "name": "玄霜·巧",
+      "grade": "purple",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 14
+        },
+        {
+          "pieces": 3,
+          "attack": 35
+        }
+      ]
+    },
+    {
+      "id": "set_orange_melee",
+      "name": "赤霄·力",
+      "grade": "orange",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 22
+        },
+        {
+          "pieces": 3,
+          "attack": 55
+        }
+      ]
+    },
+    {
+      "id": "set_orange_caster",
+      "name": "赤霄·法",
+      "grade": "orange",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 22
+        },
+        {
+          "pieces": 3,
+          "attack": 55
+        }
+      ]
+    },
+    {
+      "id": "set_orange_ranger",
+      "name": "赤霄·巧",
+      "grade": "orange",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 22
+        },
+        {
+          "pieces": 3,
+          "attack": 55
+        }
+      ]
+    },
+    {
+      "id": "set_red_melee",
+      "name": "天罡·力",
+      "grade": "red",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 32
+        },
+        {
+          "pieces": 3,
+          "attack": 80
+        }
+      ]
+    },
+    {
+      "id": "set_red_caster",
+      "name": "天罡·法",
+      "grade": "red",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 32
+        },
+        {
+          "pieces": 3,
+          "attack": 80
+        }
+      ]
+    },
+    {
+      "id": "set_red_ranger",
+      "name": "天罡·巧",
+      "grade": "red",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "attack": 32
+        },
+        {
+          "pieces": 3,
+          "attack": 80
+        }
+      ]
+    }
+  ]
+}

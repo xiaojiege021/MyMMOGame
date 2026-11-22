@@ -35,6 +35,7 @@ public sealed class CharacterGrpcService(
     TransferTable transferTable,
     CrystalRepository crystals,
     CrystalTable crystalTable,
+    SetTable sets,
     AuctionRepository auctions,
     AuctionTable auctionTable,
     IngotRepository ingots,
@@ -3411,7 +3412,7 @@ public sealed class CharacterGrpcService(
         // B10：已穿装备的固定攻击 / 强化等级之和 / 攻击结晶固定值一次读完。
         // 强化系数在这里折算成万分点（配置只给「每级多少」），战斗服只做除法，不读强化表。
         var worn = await equips.WornTotalsAsync(
-            (long)request.CharacterId, items, crystalTable, context.CancellationToken);
+            (long)request.CharacterId, items, crystalTable, sets, context.CancellationToken);
 
         return new DescribeBattleProfileResponse
         {
@@ -3423,9 +3424,10 @@ public sealed class CharacterGrpcService(
             EnhanceSlots = slots,
             BranchStep = identity.Value.BranchStep,
             PassivePctBps = passive.Found ? passive.PassivePctBps : 0,
-            // B9：装备固定攻击之和。副本的伤害第一段读它；竞技场模板、战场压缩与
-            // 城战全额三条都不吃这一格（它们各自的折算在战斗服里，本卡不动）。
-            EquipAttack = (int)worn.Attack,
+            // B9：装备固定攻击之和；B2 把套装加成并进同一格（方案 9 第 1 层：套装只加基础属性）。
+            // 副本的伤害第一段读它；竞技场模板、战场压缩与城战全额三条都不吃这一格
+            // （它们各自的折算在战斗服里，B2 不动）。
+            EquipAttack = (int)worn.TotalAttack,
             // B10：只算「穿在身上的」——没穿的装备即使有强化记录也不加伤害。
             // 方案 7.2 第二段的两个乘区项，竞技场 / 战场 / 城战三条同样不吃。
             EnhanceCoefBps = enhanceTable.CoefBpsFor(worn.EnhanceTotal),

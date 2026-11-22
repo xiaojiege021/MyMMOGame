@@ -46,6 +46,7 @@ internal static class CliParser
             // 只给核对用：内容表（NPC / 怪物）与物品表（品阶 / 套装 / 说明），都不连库；坏配置也走这里。
             case "--content-list": contentList = true; break;
             case "--item-list": itemList = true; break;
+            case "--grade-list": case "--set-list": case "--set-bonus": GradeSetCli.Parse(args, ref i); break;
             // K3：配方与制作的核对 flag 解析器在 CraftCli.Parse（一个文件一个类型 / 行数闸门）。
             case "--recipe-list": case "--recipe-table-path": case "--craft-start": case "--craft-finish": case "--craft-state": case "--craft-txn": case "--raw-item-write": case "--raw-currency-add": CraftCli.Parse(args, ref i); break;
             // K2+Q13：NPC 商店的 flag 解析器在 NpcShopCli.Parse（一个文件一个类型 / 行数闸门）。

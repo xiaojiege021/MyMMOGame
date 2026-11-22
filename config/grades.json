@@ -1,0 +1,43 @@
+{
+  "schema": "grade-table/1",
+  "version": 1,
+  "note": "B2：装备品阶的唯一正本。方案 #s8 第 1 层写定六档顺序（白 → 绿（精良）→ 蓝 → 紫 → 橙 → 红，红是最高档）与「同品阶装备通用、穿戴仍看等级和职业」。base_attack 是该档装备攻击的基准，同时是全表该档装备 attack 的上限：加载期逐件校验「装备 attack 不超过本档基准」，代码里不写第二份数字。require_level 是该档的等级带，装备自己的 require_level 不得超过它。方案没给每档的基准攻击与等级带：这里的数是待定值（白 20 / 绿 40 / 蓝 80 / 紫 140 / 橙 220 / 红 320，等级 10 / 15 / 30 / 45 / 60 / 80），改这份配置重启角色服即生效。每档的套数（方案 3–4 套）是内容事实，不在这里写，由 sets.json 与核对脚本对账。",
+  "grades": [
+    {
+      "id": "white",
+      "order": 1,
+      "require_level": 10,
+      "base_attack": 20
+    },
+    {
+      "id": "green",
+      "order": 2,
+      "require_level": 15,
+      "base_attack": 40
+    },
+    {
+      "id": "blue",
+      "order": 3,
+      "require_level": 30,
+      "base_attack": 80
+    },
+    {
+      "id": "purple",
+      "order": 4,
+      "require_level": 45,
+      "base_attack": 140
+    },
+    {
+      "id": "orange",
+      "order": 5,
+      "require_level": 60,
+      "base_attack": 220
+    },
+    {
+      "id": "red",
+      "order": 6,
+      "require_level": 80,
+      "base_attack": 320
+    }
+  ]
+}

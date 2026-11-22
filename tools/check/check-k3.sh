@@ -363,9 +363,11 @@ fi
 echo "== 4. 只读入口 =="
 if "$DOTNET" "$PROBE" --recipe-list > "$TMP/list.txt" 2>&1; then
   head1="$(head -1 "$TMP/list.txt")"
+  # B2 把配方表的版本从 2 抬到 3：版本号现取，不钉现值（可调数值只认配置）。
+  REC_VER="$(python3 -c 'import json;print(json.load(open("config/recipes.json",encoding="utf-8"))["version"])' | tr -d '\r')"
   case "$head1" in
-    "recipe_table_state=ok version=2 pending=true professions=4 recipes="*)
-      ok "配方表读得出来：v2、四个副职、整表占位" ;;
+    "recipe_table_state=ok version=${REC_VER} pending=true professions=4 recipes="*)
+      ok "配方表读得出来：v${REC_VER}、四个副职、整表占位" ;;
     *) bad "清单头部不对：$head1" ;;
   esac
   rows="$(grep -c '^recipe=' "$TMP/list.txt" || true)"

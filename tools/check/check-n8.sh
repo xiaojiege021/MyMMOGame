@@ -76,8 +76,12 @@ if printf '%s' "$OUT" | grep -q 'dungeon_drop_table_state=ok'; then
 else
   bad "读表失败" && printf '%s\n' "$OUT" | head -3 | detail
 fi
-printf '%s' "$OUT" | grep -q 'dungeon_drop=world_boss lines=2' \
-  && ok "CLI 列出 world_boss 两行" || bad "缺少 dungeon_drop=world_boss"
+WB_N="$(python3 -c 'import json
+d=json.load(open("config/dungeon_drops.json",encoding="utf-8"))
+e=next(x for x in d["entries"] if x["dungeon_id"]=="world_boss")
+print(len(e["lines"]))' | tr -d '\r')"
+printf '%s' "$OUT" | grep -q "dungeon_drop=world_boss lines=${WB_N}" \
+  && ok "CLI 列出 world_boss ${WB_N} 行" || bad "缺少 dungeon_drop=world_boss"
 
 echo "== 4. 真库：世界 Boss 每人一份掉落 =="
 if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then

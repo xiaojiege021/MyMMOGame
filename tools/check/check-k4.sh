@@ -510,10 +510,15 @@ else
   bad "条数没跟着配置走：$(head -1 <<< "$ADDED")"
 fi
 
+# B2 起掉落表按品阶补了装备行：基线行数现取，只钉「加了这一行之后 +1」。
+ABYSS_BASE="$(python3 -c 'import json
+d=json.load(open("config/dungeon_drops.json",encoding="utf-8"))
+e=next(x for x in d["entries"] if x["dungeon_id"]=="abyss")
+print(len(e["lines"]))' | tr -d '\r')"
 DROP_ADDED="$( (cd "$CASE" && "$DOTNET" "$CHARACTER_DLL" --dungeon-drop-table-path config/dungeon_drops.json) 2>&1 )"
 if grep -q '^dungeon_drop_table_state=ok' <<< "$DROP_ADDED" \
-   && grep -q '^dungeon_drop=abyss lines=3' <<< "$DROP_ADDED"; then
-  ok "新物品进掉落表也只改配置（abyss 2 → 3 行）"
+   && grep -q "^dungeon_drop=abyss lines=$((ABYSS_BASE + 1))" <<< "$DROP_ADDED"; then
+  ok "新物品进掉落表也只改配置（abyss ${ABYSS_BASE} → $((ABYSS_BASE + 1)) 行）"
 else
   bad "掉落表没跟着配置走：$(head -3 <<< "$DROP_ADDED" | tr '\n' ' ')"
 fi

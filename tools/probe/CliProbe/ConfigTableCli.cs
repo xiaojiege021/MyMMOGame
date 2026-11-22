@@ -11,6 +11,12 @@ internal static class ConfigTableCli
 {
     public static int? TryReadOnly()
     {
+        // B2：品阶 / 套装三个入口在 GradeSetCli（本文件已到 600 行天花板）。
+        if (GradeSetCli.TryReadOnly() is { } gradeSetRc)
+        {
+            return gradeSetRc;
+        }
+
         // P2-2a 副本表只读核对：与真实启动共用同一 DungeonTable.Load，不连库也不启动进程，
         // 坏配置（高难缺字段、下限超过上限、普通本配了高难三项）能在这一步直接看出来。
         if (dungeonTableState)
@@ -82,10 +88,14 @@ internal static class ConfigTableCli
                 var path = dungeonDropTablePath
                     ?? Path.GetFullPath(Path.Combine(
                         Path.GetDirectoryName(Path.GetFullPath(configPath))!, "dungeon_drops.json"));
+                // B2：把物品品阶与品阶顺序一起传进去，装备掉落越出 grade_min..grade_max 就 config_error。
+                var grades = GradeTable.Load("config/grades.json");
                 var table = DungeonDropTable.Load(
                     path,
                     items.All.Select(item => item.Id),
-                    currencies.All.Select(currency => currency.Id));
+                    currencies.All.Select(currency => currency.Id),
+                    grades.ItemGrades(items),
+                    grades.Ordered.ToDictionary(g => g.Id, g => g.Order, StringComparer.Ordinal));
                 Console.WriteLine("dungeon_drop_table_state=ok version=" + table.Version
                     + " dungeons=" + table.DungeonCount);
                 foreach (var id in new[] { "abyss", "lair", "world_boss" })

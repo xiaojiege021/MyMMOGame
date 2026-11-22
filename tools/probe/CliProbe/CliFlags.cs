@@ -193,6 +193,12 @@ internal static class CliFlags
     public static bool auctionState = false;
     public static string? auctionConfigPath = null;
     public static bool shopList = false;
+    // B2：品阶表与套装表的只读核对（两份新配置的正本）。
+    public static bool gradeTableState = false;
+    public static bool setTableState = false;
+    // B2：给「穿到几件加多少」一个不连库的算法入口（--set-bonus <套编号> <件数>）。
+    public static string? setBonusSetId = null;
+    public static int setBonusPieces = 0;
     public static string? shopConfigPath = null;
     // P3-4a2 通行证：list 只读配置不连库；state 连库读回；买与领另有两个直连入口，
     // 玩法路径走网关 /shop/buy 与 /season/pass/claim，这两个只给核对用。

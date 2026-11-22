@@ -98,10 +98,11 @@ bad_set = ["%s:%s" % (x.get("id"), x.get("set_id")) for x in items
            if x.get("set_id") and (x.get("kind") != "equipment"
                                    or not re.fullmatch(r"set_[a-z0-9_]+", x.get("set_id") or ""))]
 report("set_id_shape", not bad_set, ";".join(bad_set[:8]))
-# B2 之前全表留空：字段先在，套装件数 / 效果等 B2 定。
+# K5 时全表留空、等 B2 定；B2 起这条改成「填了就要对得上」：
+# 具体对账（每套件数 / 同套同品阶 / 加成递增）在第 6 段，这里只挡「一件都没填」。
 nonempty_set = [x.get("id") for x in items if x.get("set_id")]
-report("set_id_pending_b2", not nonempty_set,
-       "已经填了套装（B2 之前应全空）：%s" % ",".join(nonempty_set[:8]))
+report("set_id_filled_by_b2", bool(nonempty_set),
+       "B2 已落地，但 items.json 里没有一件写 set_id")
 
 # v1.172：图标地址不进配置（第 17 节 17.1），谁把它写回 items.json 就红。
 with_icon = [x.get("id") for x in items if "icon" in x]
@@ -199,6 +200,137 @@ allsh = read("tools/check/check-all.sh")
 report("check_all_registers_k5", re.search(r"^\s*k5\)", allsh, re.M) is not None
        and re.search(r"\bk5\b", allsh) is not None, "check-all.sh 没挂 k5")
 
+# ---------------------------------------------------------------- 6. B2 品阶与套装
+SIX = ["white", "green", "blue", "purple", "orange", "red"]
+grades = cfg("config/grades.json")
+glist = grades.get("grades") or []
+report("grade_six", [g.get("id") for g in glist] == SIX,
+       "六档不齐或顺序不对：%s" % ",".join(str(g.get("id")) for g in glist))
+report("grade_order", [g.get("order") for g in glist] == list(range(1, len(SIX) + 1)),
+       "order 不是 1..6：%s" % [g.get("order") for g in glist])
+report("grade_monotonic",
+       all(glist[i]["base_attack"] > glist[i - 1]["base_attack"]
+           and glist[i]["require_level"] > glist[i - 1]["require_level"]
+           for i in range(1, len(glist))),
+       "基准攻击或等级带没有随品阶递增")
+gorder = {g.get("id"): g for g in glist if g.get("id") in SIX}
+
+equips = [x for x in items if x.get("kind") == "equipment"]
+over_attack = ["%s:%s>%s" % (x["id"], x.get("attack"), gorder[x["grade"]]["base_attack"])
+               for x in equips if x.get("grade") in gorder
+               and (x.get("attack") or 0) > gorder[x["grade"]]["base_attack"]]
+report("grade_attack_cap", not over_attack, ";".join(over_attack[:6]))
+
+over_level = ["%s:%s>%s" % (x["id"], x.get("require_level"), gorder[x["grade"]]["require_level"])
+              for x in equips if x.get("grade") in gorder
+              and (x.get("require_level") or 0) > gorder[x["grade"]]["require_level"]]
+report("grade_level_band", not over_level, ";".join(over_level[:6]))
+
+sets = cfg("config/sets.json")
+slist = sets.get("sets") or []
+report("set_schema", sets.get("schema") == "set-bonus/1", "schema=%s" % sets.get("schema"))
+per_grade = {g: 0 for g in SIX}
+for one in slist:
+    if one.get("grade") in per_grade:
+        per_grade[one["grade"]] += 1
+# 方案 #s8 写「每档 3–4 套」；核对表默认值取 3。这里按方案的区间核，不钉死具体套数。
+report("set_per_grade", all(3 <= per_grade[g] <= 4 for g in SIX),
+       "每档套数=%s" % json.dumps(per_grade, ensure_ascii=False))
+
+pieces_of = {}
+for x in items:
+    if x.get("set_id"):
+        pieces_of.setdefault(x["set_id"], []).append(x)
+sids = {one.get("id") for one in slist}
+report("set_covers_all_items", set(pieces_of) == sids,
+       "物品有套但表里没有=%s；表里有套但物品没有=%s"
+       % (sorted(set(pieces_of) - sids)[:6], sorted(sids - set(pieces_of))[:6]))
+
+short = [one["id"] for one in slist
+         if len(pieces_of.get(one["id"], [])) < max([b["pieces"] for b in one.get("bonuses") or []] or [0])]
+report("set_piece_enough", not short, "门槛比实际件数高：%s" % ",".join(short[:6]))
+
+mixed = ["%s:%s" % (one["id"], p["id"]) for one in slist
+         for p in pieces_of.get(one["id"], []) if p.get("grade") != one.get("grade")]
+report("set_same_grade", not mixed, "同套混品阶：%s" % ",".join(mixed[:6]))
+
+bad_bonus = [one["id"] for one in slist
+             if not one.get("bonuses")
+             or any(b["pieces"] < 1 or b["attack"] < 1 for b in one["bonuses"])
+             or [b["pieces"] for b in one["bonuses"]] != sorted({b["pieces"] for b in one["bonuses"]})]
+report("set_bonus_ascending", not bad_bonus, "加成门槛不是严格递增的正数：%s" % ",".join(bad_bonus[:6]))
+
+# 每套三件：武器 / 衣服 / 饰品各一件（本卡口径，方案里没写每套几件，用户 2026-11-22 定 3 件）
+bad_shape = []
+for one in slist:
+    slots = sorted(str(p.get("slot")) for p in pieces_of.get(one["id"], []))
+    if slots != ["accessory", "armor", "weapon"]:
+        bad_shape.append("%s:%s" % (one["id"], ",".join(slots)))
+report("set_three_slots", not bad_shape, "套内不是武器 + 衣服 + 饰品：%s" % ";".join(bad_shape[:6]))
+
+# 掉落按品阶：每个声明了带的副本，带内至少有装备掉落，且没有越带的
+dd = cfg("config/dungeon_drops.json")
+drop_bad, drop_ok = [], 0
+for entry in dd.get("entries") or []:
+    lo, hi = entry.get("grade_min"), entry.get("grade_max")
+    if not lo and not hi:
+        continue
+    lo_order = gorder.get(lo, {}).get("order", 0)
+    hi_order = gorder.get(hi, {}).get("order", 0)
+    if lo_order == 0 or hi_order == 0 or lo_order > hi_order:
+        drop_bad.append("%s:band" % entry.get("dungeon_id"))
+        continue
+    got = 0
+    for line in entry.get("lines") or []:
+        item = by_id.get(line.get("item_id")) or {}
+        if item.get("kind") != "equipment":
+            continue
+        got += 1
+        grade_order = gorder.get(item.get("grade"), {}).get("order", 0)
+        if not (lo_order <= grade_order <= hi_order):
+            drop_bad.append("%s:%s" % (entry.get("dungeon_id"), item.get("id")))
+    if got == 0:
+        drop_bad.append("%s:no_equipment" % entry.get("dungeon_id"))
+    drop_ok += 1
+report("drop_grade_band", not drop_bad and drop_ok >= 1,
+       "越带或没装备：%s" % ",".join(drop_bad[:6]))
+
+# 制作按品阶：配方写 grade 就必须与成品一致，成品是装备就必须写 grade
+rec = cfg("config/recipes.json")
+rec_bad = []
+for r in rec.get("recipes") or []:
+    out = by_id.get((r.get("output") or {}).get("item_id")) or {}
+    grade = r.get("grade")
+    if out.get("kind") == "equipment":
+        if not grade or grade != out.get("grade"):
+            rec_bad.append("%s:grade=%s" % (r.get("id"), grade))
+    elif grade:
+        rec_bad.append("%s:non_equipment" % r.get("id"))
+report("recipe_grade_matches", not rec_bad, ";".join(rec_bad[:6]))
+report("recipe_no_grade_roll",
+       all("grade_roll" not in (r or {}) for r in rec.get("recipes") or []),
+       "grade_roll 归 B3，B2 不许出现")
+
+code_blob = read("src/Character/GradeTable.cs") + read("src/Character/SetTable.cs")
+cfg_blob = read("config/grades.json") + read("config/sets.json")
+report("no_reforge_entry",
+       not any(w and w in (code_blob + cfg_blob) for w in ("重铸", "精铸", "洗词条"))
+       and "reforge" not in code_blob.lower(),
+       "出现了重铸 / 精铸 / 洗词条入口（方案 9 明写砍掉）")
+
+# 代码里不写第二份数值：品阶顺序与基准只从配置读
+report("set_bonus_into_equip_attack",
+       "EquipAttack = (int)worn.TotalAttack" in read("src/Character/CharacterGrpcService.cs"),
+       "套装加成没并进 equip_attack（快照里读不到）")
+report("grade_code_no_literal",
+       not re.search(r"\b(20|40|80|140|220|320)\b", read("src/Character/GradeTable.cs")),
+       "GradeTable 里出现了品阶基准的数字（应只从 grades.json 读）")
+report("set_no_literal_bonus",
+       not re.search(r"\b(20|40|80|140|220|320)\b", read("src/Character/SetTable.cs")),
+       "SetTable 里出现了品阶基准的数字")
+
+print("INFO sets=%d per_grade=%s drop_bands=%d"
+      % (len(slist), json.dumps(per_grade, ensure_ascii=False), drop_ok))
 print("INFO items=%d equipment=%d parts=%d 15_level_weapons=%d"
       % (len(ids), len(equipment), len(parts), len(fifteen)))
 print("PASS static_end")
@@ -279,6 +411,12 @@ newcase() {
 run_bad() {
   local case_dir="$1" flag="$2"
   ( cd "$case_dir" && "$DOTNET" "$CHARACTER_DLL" "$flag" 2>&1 )
+}
+
+# 带值的开关（--xxx path）要拆成两个参数，run_bad 的单参数写法会把整串当成一个 flag。
+run_bad_args() {
+  local case_dir="$1"; shift
+  ( cd "$case_dir" && "$DOTNET" "$CHARACTER_DLL" "$@" 2>&1 )
 }
 
 CASE="$(newcase unknown_grade)"
@@ -370,5 +508,114 @@ fi
 ADDED_CS="$(run_bad "$CASE" --crystal-state)"
 grep -q 'k5_probe_blade:weapon' <<< "$ADDED_CS" \
   && ok "新装备的部位也只改 crystal.json 就生效" || bad "新装备部位没生效"
+
+echo "== 7. B2 只读入口：品阶与套装 =="
+GL="$("$DOTNET" "$CHARACTER_DLL" --grade-list 2>&1)"
+if [ "$(grep -c '^grade=' <<< "$GL")" = "6" ] && grep -q '^grade_table_state=ok' <<< "$GL"; then
+  ok "品阶表读出六档（顺序 / 等级带 / 基准攻击 / 每档件数与套数）"
+else
+  bad "品阶表只读入口不对：$(head -2 <<< "$GL" | tr '\n' ' ')"
+fi
+GRADES_IN_JSON="$(ROOT="$ROOT" python3 - <<'PY'
+import json, os
+root = os.environ["ROOT"]
+g = json.load(open(os.path.join(root, "config/grades.json"), encoding="utf-8"))
+s = json.load(open(os.path.join(root, "config/sets.json"), encoding="utf-8"))
+items = json.load(open(os.path.join(root, "config/items.json"), encoding="utf-8"))["items"]
+print("%d %d %d" % (len(g["grades"]), len(s["sets"]),
+                    sum(1 for i in items if i.get("kind") == "equipment")))
+PY
+)"
+read -r G_N S_N E_N <<< "$GRADES_IN_JSON"
+E_N="${E_N%$'
+'}"
+if grep -q "grade_table_state=ok version=1 grades=${G_N}" <<< "$GL" \
+   && [ "$(grep -c "^set=" <<< "$GL")" = "0" ]; then
+  ok "品阶清单条数现取（${G_N} 档 / ${E_N} 件装备）"
+else
+  bad "品阶清单条数不对：$(head -1 <<< "$GL")"
+fi
+
+SL="$("$DOTNET" "$CHARACTER_DLL" --set-list 2>&1)"
+if grep -q "^set_table_state=ok version=1 sets=${S_N}\$" <<< "$SL" \
+   && [ "$(grep -c '^set=' <<< "$SL")" = "$S_N" ]; then
+  ok "套装清单条数现取（${S_N} 套）"
+else
+  bad "套装清单条数不对：$(head -2 <<< "$SL" | tr '\n' ' ')"
+fi
+# 每套三件、门槛 2 / 3，且加成随件数递增（清单是 ASCII，名字在另一行字段里，不参与比对）
+# 清单里带中文套装名（GBK），grep 必须 -a 按字节读，否则整段被当二进制跳过。
+BAD_SET="$(printf '%s\n' "$SL" | LC_ALL=C grep -a '^set=' | LC_ALL=C grep -acv ' pieces=3 bonuses=2:[0-9]*/3:[0-9]*$')"
+[ "$BAD_SET" = "0" ] && ok "每套三件、2 件 / 3 件两档加成都在" \
+  || bad "有 ${BAD_SET} 套的件数或加成形状不对：$(printf '%s\n' "$SL" | LC_ALL=C grep -a '^set=' | LC_ALL=C grep -av ' pieces=3 bonuses=2:[0-9]*/3:[0-9]*$' | head -2 | iconv -f gbk -t utf-8 -c)"
+
+# 件数门槛的算法（不连库）：1 件不该有加成，2 件 / 3 件按配置递增。
+SET_PICK="$(python3 -c 'import json;d=json.load(open("config/sets.json",encoding="utf-8"))["sets"][0];print(d["id"], d["bonuses"][0]["pieces"], d["bonuses"][0]["attack"], d["bonuses"][-1]["pieces"], d["bonuses"][-1]["attack"])' | tr -d '\r')"
+read -r SET_ID P2 A2 P3 A3 <<< "$SET_PICK"
+GOT0="$("$DOTNET" "$CHARACTER_DLL" --set-bonus "$SET_ID" 1 2>&1 | sed -n 's/.* attack=\([0-9]*\) .*/\1/p')"
+GOT2="$("$DOTNET" "$CHARACTER_DLL" --set-bonus "$SET_ID" "$P2" 2>&1 | sed -n 's/.* attack=\([0-9]*\) .*/\1/p')"
+GOT3="$("$DOTNET" "$CHARACTER_DLL" --set-bonus "$SET_ID" "$P3" 2>&1 | sed -n 's/.* attack=\([0-9]*\) .*/\1/p')"
+if [ "$GOT0" = "0" ] && [ "$GOT2" = "$A2" ] && [ "$GOT3" = "$A3" ]; then
+  ok "套装门槛按件数生效：1 件 0、${P2} 件 ${A2}、${P3} 件 ${A3}（与配置一致）"
+else
+  bad "套装门槛不对：1 件 ${GOT0:-?}、${P2} 件 ${GOT2:-?}（应 ${A2}）、${P3} 件 ${GOT3:-?}（应 ${A3}）"
+fi
+
+echo "== 8. B2 坏配置都起不来 =="
+CASE="$(newcase set_piece_short)"
+ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
+import json, os
+p = os.path.join(os.environ["CASE"], "config/sets.json")
+d = json.load(open(p, encoding="utf-8"))
+d["sets"][0]["bonuses"].append({"pieces": 9, "attack": 999})
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+PY
+assert_bad_config "$(run_bad "$CASE" --grade-list)" "套装门槛超过实际件数：起不来"
+
+CASE="$(newcase set_mixed_grade)"
+ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
+import json, os
+p = os.path.join(os.environ["CASE"], "config/items.json")
+d = json.load(open(p, encoding="utf-8"))
+next(x for x in d["items"] if x["id"] == "robe_white_melee")["grade"] = "green"
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+PY
+assert_bad_config "$(run_bad "$CASE" --grade-list)" "同套混品阶：起不来"
+
+CASE="$(newcase grade_attack_over)"
+ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
+import json, os
+p = os.path.join(os.environ["CASE"], "config/items.json")
+d = json.load(open(p, encoding="utf-8"))
+next(x for x in d["items"] if x["id"] == "saber_white_melee")["attack"] = 999
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+PY
+assert_bad_config "$(run_bad "$CASE" --grade-list)" "装备攻击超过本档基准：起不来"
+
+CASE="$(newcase drop_out_of_band)"
+ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
+import json, os
+p = os.path.join(os.environ["CASE"], "config/dungeon_drops.json")
+d = json.load(open(p, encoding="utf-8"))
+# 深渊是 white..green，塞一件红装进去就该被挡住
+entry = next(e for e in d["entries"] if e["dungeon_id"] == "abyss")
+entry["lines"].append({"item_id": "saber_red_melee", "count": 1})
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+PY
+assert_bad_config "$(run_bad_args "$CASE" --dungeon-drop-table-path config/dungeon_drops.json)" \
+  "装备掉落越出品阶带：起不来"
+
+CASE="$(newcase recipe_grade_mismatch)"
+ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
+import json, os
+p = os.path.join(os.environ["CASE"], "config/recipes.json")
+d = json.load(open(p, encoding="utf-8"))
+r = next(x for x in d["recipes"] if x.get("profession") == "blacksmith")
+r["output"]["item_id"] = "saber_white_melee"
+r["output"]["count"] = 1
+r["grade"] = "blue"
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+PY
+assert_bad_config "$(run_bad "$CASE" --recipe-list)" "配方 grade 与成品不一致：起不来"
 
 finish "$TITLE"

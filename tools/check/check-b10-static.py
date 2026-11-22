@@ -134,6 +134,20 @@ bag_screen = read("client/MMOGame/Assets/HotUpdate/Ui/UiBagScreen.cs")
 want("CrystalFlat" not in bag_screen and "EnhanceCoef" not in bag_screen,
      "背包屏在本地算强化 / 结晶（界面只展示服务端确认的结果）")
 
+# 7. B2：套装加成只由角色服算，并进 equip_attack；战斗服不读套装表。
+equip_repo = read("src/Character/EquipRepository.cs")
+want("wornBySet" in equip_repo and "sets.BonusFor" in equip_repo,
+     "已穿汇总没按套数加成（套装效果没接进 EquipAttack）")
+want("record WornTotals(long Attack, long SetBonus" in equip_repo,
+     "WornTotals 没有单独一列套装加成（分不出「装备和」与「套装加成」）")
+service_cs = read("src/Character/CharacterGrpcService.cs")
+want("EquipAttack = (int)worn.TotalAttack" in service_cs,
+     "DescribeBattleProfile 的 equip_attack 没把套装加成并进去")
+battle_all = "".join(read(p) for p in (
+    "src/Battle/Config.cs", "src/Battle/Encounter.cs", "src/Battle/BattleProfileClient.cs"))
+want("sets.json" not in battle_all and "SetTable" not in battle_all,
+     "战斗服自己读套装表了（第 4 类：跨进程数值口径只许角色服一处写）")
+
 if fails:
     for one in fails:
         print("b10_static=fail " + one)

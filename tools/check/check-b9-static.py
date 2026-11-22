@@ -165,7 +165,9 @@ want("Combat?.Attack ?? Template?.Attack ?? (Class.Attack() + (Profile?.EquipAtt
 profile = read("src/Battle/BattleProfileClient.cs")
 want("int EquipAttack = 0" in profile and "reply.EquipAttack" in profile,
      "战斗服快照没有 equip_attack")
-want("DescribeBattleProfileResponse" in service and "EquipAttack = (int)worn.Attack" in service,
+# B2：套装加成并进同一格，填的很可能是 worn.TotalAttack；两种写法都认，钉的是「填了这一格」。
+want("DescribeBattleProfileResponse" in service
+     and re.search(r"EquipAttack\s*=\s*\(int\)worn\.(TotalAttack|Attack)", service) is not None,
      "角色服的战斗快照没有填 equip_attack")
 want("WornTotalsAsync" in service, "角色服的战斗快照没有走已穿装备汇总（B10 起一次读完三样）")
 

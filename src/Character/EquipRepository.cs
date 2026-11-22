@@ -20,7 +20,11 @@ public sealed record EquipOutcome(
 /// B10：已穿装备的三样事实值，一次查询读完。战斗快照与只读核对口都读这一个形状；
 /// 折算成伤害系数 / 万分比是调用方的事，仓储只做加法。
 /// </summary>
-public sealed record WornTotals(long Attack, int EnhanceTotal, long CrystalFlatAttack);
+public sealed record WornTotals(long Attack, long SetBonus, int EnhanceTotal, long CrystalFlatAttack)
+{
+    /// <summary>进伤害的那一截：装备固定攻击 + 套装加成。强化与结晶另算，不在这一格里。</summary>
+    public long TotalAttack => Attack + SetBonus;
+}
 
 /// <summary>
 /// 穿戴的唯一写入口。一条记录 = 「这个角色这个部位穿的是哪一行背包」，
@@ -186,7 +190,7 @@ public sealed class EquipRepository(NpgsqlDataSource dataSource)
     /// 防御 / 功能两类不进伤害公式。
     /// </summary>
     public async Task<WornTotals> WornTotalsAsync(
-        long characterId, ItemTable items, CrystalTable crystals, CancellationToken stopping)
+        long characterId, ItemTable items, CrystalTable crystals, SetTable sets, CancellationToken stopping)
     {
         await using var connection = await dataSource.OpenConnectionAsync(stopping);
         // 一件装备一行；装了结晶的装备会因为 left join 出现多行，所以装备那一截按格号去重。
@@ -206,13 +210,21 @@ public sealed class EquipRepository(NpgsqlDataSource dataSource)
         var enhanceTotal = 0;
         var crystalFlat = 0L;
         var counted = new HashSet<short>();
+        // B2：套装效果按「现在穿着几件」现数，不落库、不记历史。同一部位只算一件
+        // （character_equip 的主键已经把同部位限成一件），脱下这一行就不在结果里。
+        var wornBySet = new Dictionary<string, int>(StringComparer.Ordinal);
         while (await reader.ReadAsync(stopping))
         {
             var slot = reader.GetInt16(0);
             if (counted.Add(slot))
             {
-                attack += items.Find(reader.GetString(1))?.Attack ?? 0;
+                var def = items.Find(reader.GetString(1));
+                attack += def?.Attack ?? 0;
                 enhanceTotal += reader.GetInt32(2);
+                if (def is not null && def.SetId.Length > 0)
+                {
+                    wornBySet[def.SetId] = wornBySet.GetValueOrDefault(def.SetId) + 1;
+                }
             }
 
             if (reader.IsDBNull(3))
@@ -227,7 +239,7 @@ public sealed class EquipRepository(NpgsqlDataSource dataSource)
             }
         }
 
-        return new WornTotals(attack, enhanceTotal, crystalFlat);
+        return new WornTotals(attack, sets.BonusFor(wornBySet), enhanceTotal, crystalFlat);
     }
 
     /// <summary>

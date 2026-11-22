@@ -1,0 +1,22 @@
+{
+  "card": "B2",
+  "check": "check-k5.sh",
+  "mutations": [
+    {
+      "id": "有 1 件就按最高档加（件数门槛失效）",
+      "file": "src/Character/SetTable.cs",
+      "kind": "text-replace",
+      "find": "            if (wornPieces >= bonus.Pieces && bonus.Attack > best)",
+      "replace": "            if (wornPieces >= 1 && bonus.Attack > best)",
+      "expect": "check-k5.sh 的「套装门槛按件数生效」应变红"
+    },
+    {
+      "id": "套装加成不并进 equip_attack（只在配置里好看）",
+      "file": "src/Character/CharacterGrpcService.cs",
+      "kind": "text-replace",
+      "find": "            EquipAttack = (int)worn.TotalAttack,",
+      "replace": "            EquipAttack = (int)worn.Attack,",
+      "expect": "check-k5.sh 的 set_bonus_into_equip_attack 应变红"
+    }
+  ]
+}

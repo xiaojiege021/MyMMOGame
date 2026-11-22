@@ -192,8 +192,8 @@ public sealed class ItemTable
         return new ItemTable(map, wire.Version);
     }
 
-    /// <summary>套装编号：set_ 开头，后面只许小写字母、数字、下划线。</summary>
-    static bool IsSetId(string value)
+    /// <summary>套装编号：set_ 开头，后面只许小写字母、数字、下划线。B2 的 SetTable 也用它，只留一份。</summary>
+    internal static bool IsSetId(string value)
     {
         if (!value.StartsWith("set_", StringComparison.Ordinal) || value.Length <= 4)
         {

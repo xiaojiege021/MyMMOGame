@@ -147,9 +147,15 @@ public sealed class ConfigLoadingTests
 
         Assert.False(table.IsMissing);
         Assert.True(table.Pending);
-        Assert.Equal(3, table.DungeonCount);
-        Assert.Equal(2, table.LinesFor("abyss").Count);
-        Assert.Equal(2, table.LinesFor("world_boss").Count);
+
+        // B2 起掉落表按品阶补了装备行，条数不再写死：以同一份正本里的 entries 为准。
+        var raw = ReadReal("dungeon_drops.json")["entries"]!.AsArray();
+        Assert.Equal(raw.Count, table.DungeonCount);
+        foreach (var entry in raw)
+        {
+            var id = entry!["dungeon_id"]!.GetValue<string>();
+            Assert.Equal(entry["lines"]!.AsArray().Count, table.LinesFor(id).Count);
+        }
         Assert.True(table.MatchesReported("abyss", table.LinesFor("abyss")));
         Assert.False(table.MatchesReported("abyss", [new DropLineDef("crystal_attack", 1)]));
     }

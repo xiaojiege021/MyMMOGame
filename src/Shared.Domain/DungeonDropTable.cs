@@ -23,7 +23,7 @@ public sealed class DungeonDropTable
 
     static readonly HashSet<string> EntryKeys = new(StringComparer.Ordinal)
     {
-        "dungeon_id", "lines",
+        "dungeon_id", "grade_min", "grade_max", "lines",
     };
 
     static readonly HashSet<string> LineKeys = new(StringComparer.Ordinal)
@@ -65,17 +65,23 @@ public sealed class DungeonDropTable
     /// <summary>
     /// 表存在就读、不存在就降级。knownItemIds / currencyIds 由调用方决定传不传：
     /// 角色服传（表外物品、灵石币种在加载期就挡住），战斗服不传（只报事实）。
+    /// B2：itemGrade（物品编号 → 品阶）与 gradeOrder（品阶 → 顺序）也只有认识品阶的进程传，
+    /// 传了才校验「装备掉落落在本副本的 grade_min..grade_max 带内」，战斗服只报事实不传。
     /// </summary>
     public static DungeonDropTable LoadIfPresent(
         string path,
         IEnumerable<string>? knownItemIds = null,
-        IEnumerable<string>? currencyIds = null)
-        => File.Exists(path) ? Load(path, knownItemIds, currencyIds) : Missing();
+        IEnumerable<string>? currencyIds = null,
+        IReadOnlyDictionary<string, string>? itemGrade = null,
+        IReadOnlyDictionary<string, int>? gradeOrder = null)
+        => File.Exists(path) ? Load(path, knownItemIds, currencyIds, itemGrade, gradeOrder) : Missing();
 
     public static DungeonDropTable Load(
         string path,
         IEnumerable<string>? knownItemIds = null,
-        IEnumerable<string>? currencyIds = null)
+        IEnumerable<string>? currencyIds = null,
+        IReadOnlyDictionary<string, string>? itemGrade = null,
+        IReadOnlyDictionary<string, int>? gradeOrder = null)
     {
         var items = knownItemIds?.ToHashSet(StringComparer.Ordinal);
         var currencies = currencyIds?.ToHashSet(StringComparer.Ordinal);
@@ -138,6 +144,32 @@ public sealed class DungeonDropTable
                     throw new ConfigException(path + "：副本 " + dungeonId + " 重复");
                 }
 
+                // B2：品阶带。两个键要么都写、要么都不写；写了就必须是本表认得的品阶，
+                // 且下限不高于上限。装备掉落的品阶必须落在带内——这是「掉落按品阶」的唯一口径。
+                var gradeMin = (Str(entry, "grade_min") ?? "").Trim();
+                var gradeMax = (Str(entry, "grade_max") ?? "").Trim();
+                if (gradeMin.Length == 0 != (gradeMax.Length == 0))
+                {
+                    throw new ConfigException(path + "：grade_min 与 grade_max 必须成对写（副本 " + dungeonId + "）");
+                }
+
+                var lowOrder = 0;
+                var highOrder = 0;
+                // 不认识品阶的进程（战斗服）只报事实：声明了带也不校验，传了品阶顺序才校验。
+                if (gradeMin.Length > 0 && gradeOrder is not null)
+                {
+                    if (!gradeOrder.TryGetValue(gradeMin, out lowOrder) || !gradeOrder.TryGetValue(gradeMax, out highOrder))
+                    {
+                        throw new ConfigException(
+                            path + "：副本 " + dungeonId + " 的品阶带不在品阶表里（" + gradeMin + ".." + gradeMax + "）");
+                    }
+
+                    if (lowOrder > highOrder)
+                    {
+                        throw new ConfigException(path + "：副本 " + dungeonId + " 的 grade_min 高于 grade_max");
+                    }
+                }
+
                 if (!entry.TryGetProperty("lines", out var linesEl) || linesEl.ValueKind != JsonValueKind.Array)
                 {
                     throw new ConfigException(path + "：lines 必须是数组");
@@ -168,6 +200,16 @@ public sealed class DungeonDropTable
                     if (items is not null && !items.Contains(itemId))
                     {
                         throw new ConfigException(path + "：物品不在 items 表 item=" + itemId);
+                    }
+
+                    // 只有「认识品阶」的进程才校验带：装备必须落在带内，材料 / 结晶这类不带品阶的不受限。
+                    if (lowOrder > 0 && itemGrade is not null
+                        && itemGrade.TryGetValue(itemId, out var dropGrade)
+                        && gradeOrder.TryGetValue(dropGrade, out var dropOrder)
+                        && (dropOrder < lowOrder || dropOrder > highOrder))
+                    {
+                        throw new ConfigException(
+                            path + "：副本 " + dungeonId + " 的装备掉落越出品阶带（" + itemId + " 是 " + dropGrade + "）");
                     }
 
                     if (lines.Any(l => l.ItemId == itemId))

@@ -1,8 +1,8 @@
 {
   "schema": "recipe-table/1",
-  "version": 2,
+  "version": 3,
   "pending": true,
-  "note": "B1（v2）：炼丹六条换成真实配方——回春丹 / 凝神丹沿用 K3 的编号，另加气血丹 / 回灵丹 / 筑基丹 / 破镜丹，材料是灵草、血参、玄参三档药材（后两档的采集点在 config/gather.json）。六种丹的回复值与档位在 config/pill.json，本表只写怎么做；铁匠 / 裁缝 / 巧匠六条仍是 K3 占位，B3 定稿前不改。 K3 生产 / 配方的唯一内容正本。四个副职按方案 12 章的「炼丹 → 铁匠 → 裁缝 → 巧匠」；unlock_level 是角色等级（B3 接副职等级时另加字段，不改这一格的含义）。材料 / 产出 / 费用 / 成功率 / 制作耗时 / 解锁全部只在这份文件里：加一个配方 = 加一条，代码不动。方案只写定「药给炼丹、矿给铁匠」，没给裁缝 / 巧匠的材料来源与任何具体配方；本表 8 条都是 K3 的占位，success_pct 与 craft_time_s 是暂取值，整表 pending 摘掉之前不当作方案数。grade_roll 是 B3「胚子做成装备时掷一次」的位置，K3 不接：配置里写了会起不来，免得静默忽略一次随机。",
+  "note": "B1（v2）：炼丹六条换成真实配方——回春丹 / 凝神丹沿用 K3 的编号，另加气血丹 / 回灵丹 / 筑基丹 / 破镜丹，材料是灵草、血参、玄参三档药材（后两档的采集点在 config/gather.json）。六种丹的回复值与档位在 config/pill.json，本表只写怎么做；铁匠 / 裁缝 / 巧匠六条仍是 K3 占位，B3 定稿前不改。 K3 生产 / 配方的唯一内容正本。四个副职按方案 12 章的「炼丹 → 铁匠 → 裁缝 → 巧匠」；unlock_level 是角色等级（B3 接副职等级时另加字段，不改这一格的含义）。材料 / 产出 / 费用 / 成功率 / 制作耗时 / 解锁全部只在这份文件里：加一个配方 = 加一条，代码不动。方案只写定「药给炼丹、矿给铁匠」，没给裁缝 / 巧匠的材料来源与任何具体配方；本表 8 条都是 K3 的占位，success_pct 与 craft_time_s 是暂取值，整表 pending 摘掉之前不当作方案数。grade_roll 是 B3「胚子做成装备时掷一次」的位置，K3 不接：配置里写了会起不来，免得静默忽略一次随机。 B2（v3）：产出装备的配方必须写 grade，且与本表产物在 items.json 里的品阶一致；产出不是装备的配方不许写 grade（品阶只有 items.json 一份，配方不另存数值）。制作掷点 grade_roll 仍归 B3，写了就起不来。",
   "professions": [
     { "id": "alchemy", "name": "炼丹" },
     { "id": "blacksmith", "name": "铁匠" },
@@ -95,6 +95,7 @@
       "inputs": [{ "item_id": "ore_iron", "count": 3 }],
       "fee": { "gold": 20 },
       "output": { "item_id": "sword_trial", "count": 1 },
+      "grade": "white",
       "success_pct": 100,
       "craft_time_s": 10,
       "note": "十级试炼长剑。方案写定矿给铁匠，具体件数 / 费用是 K3 占位。"
@@ -109,6 +110,7 @@
       ],
       "fee": { "gold": 60 },
       "output": { "item_id": "staff_trade", "count": 1 },
+      "grade": "green",
       "success_pct": 75,
       "craft_time_s": 20,
       "note": "十五级行商法杖。产出编号沿用 items.json，不另造装备。"
@@ -131,6 +133,7 @@
       "inputs": [{ "item_id": "herb_ling", "count": 4 }],
       "fee": { "gold": 20 },
       "output": { "item_id": "robe_trial", "count": 1 },
+      "grade": "white",
       "success_pct": 100,
       "craft_time_s": 10,
       "note": "十级试炼法袍。方案没给裁缝材料，先用灵草占位；B3 换。"
@@ -145,6 +148,7 @@
       ],
       "fee": { "gold": 30 },
       "output": { "item_id": "ring_trial", "count": 1 },
+      "grade": "white",
       "success_pct": 90,
       "craft_time_s": 12,
       "note": "十级试炼指环。方案没给巧匠材料，先用矿石 + 功能结晶占位；B3 换。"

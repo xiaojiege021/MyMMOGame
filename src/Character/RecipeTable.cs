@@ -271,6 +271,27 @@ public sealed class RecipeTable
                     + " 一件次超过堆叠上限 " + outputItem.StackMax);
             }
 
+            // B2：制作按品阶。产出是装备时必须写 grade 且与成品一致（数值仍只在 items.json，
+            // 这里只挡「配方与成品对不上」）；产出不是装备的不许写 grade，避免多一份品阶口径。
+            var recipeGrade = (raw.Grade ?? "").Trim();
+            if (outputItem.IsEquipment)
+            {
+                if (recipeGrade.Length == 0)
+                {
+                    throw new ConfigException("配方 " + id + " 产出的是装备，必须写 grade");
+                }
+
+                if (!string.Equals(recipeGrade, outputItem.Grade, StringComparison.Ordinal))
+                {
+                    throw new ConfigException("配方 " + id + " 的 grade 与成品不一致：配方 " + recipeGrade
+                        + "，成品 " + outputId + " 是 " + outputItem.Grade);
+                }
+            }
+            else if (recipeGrade.Length > 0)
+            {
+                throw new ConfigException("配方 " + id + " 的产出不是装备，不许写 grade");
+            }
+
             var success = raw.SuccessPct
                 ?? throw new ConfigException("配方 " + id + " 缺 success_pct");
             if (double.IsNaN(success) || double.IsInfinity(success) || success < 0.0 || success > 100.0)
@@ -382,6 +403,10 @@ public sealed class RecipeTable
 
         [JsonPropertyName("craft_time_s")]
         public int? CraftTimeS { get; init; }
+
+        // B2：产出装备的配方要声明品阶，与成品一致；产出不是装备的不许写。
+        [JsonPropertyName("grade")]
+        public string? Grade { get; init; }
 
         [JsonPropertyName("grade_roll")]
         public JsonElement? GradeRoll { get; init; }

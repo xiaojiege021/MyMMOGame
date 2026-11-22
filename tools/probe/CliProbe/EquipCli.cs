@@ -75,8 +75,11 @@ internal static class EquipCli
             var currencies = CurrencyTable.Load("config/currency.json");
             var enhance = EnhanceTable.Load("config/enhance.json", items, currencies);
             var crystals = CrystalTable.Load("config/crystal.json", items);
+            // B2：套装加成与起服同一套算法（SetTable 只查门槛，件数从库里现数）。
+            var grades = GradeTable.Load("config/grades.json");
+            var sets = SetTable.Load("config/sets.json", items, grades);
             var worn = await equips.WornTotalsAsync(
-                equipRowOf, items, crystals, CancellationToken.None);
+                equipRowOf, items, crystals, sets, CancellationToken.None);
 
             await using var connection = await ctx.DataSource.OpenConnectionAsync();
             await using var command = new NpgsqlCommand(
@@ -95,7 +98,9 @@ internal static class EquipCli
                 + " attack=" + worn.Attack
                 + " enhance=" + worn.EnhanceTotal
                 + " enhance_coef_bps=" + enhance.CoefBpsFor(worn.EnhanceTotal)
-                + " crystal_flat=" + worn.CrystalFlatAttack);
+                + " crystal_flat=" + worn.CrystalFlatAttack
+                + " set_bonus=" + worn.SetBonus
+                + " attack_total=" + worn.TotalAttack);
         }
 
         return 0;
