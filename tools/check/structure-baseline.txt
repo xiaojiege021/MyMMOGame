@@ -14,11 +14,12 @@
 #   ratio = check_lines ÷ biz_lines（整数百分比）
 #   dup_sites = 11 种 helper 在各卡脚本里「重定义」的总份数（同一种抄进 N 个脚本算 N 份）
 # 更新时间：2026-11-19，v1.202 结构治理收敛（口径变更后重新建账）
+#           2026-11-22，K2+Q13 收口后重记（check 49589 / 业务 62349 = 79%，比基线 81 变好，落账）
 
 scripts=133
-check_lines=49360
-biz_lines=60335
-ratio=81
+check_lines=49589
+biz_lines=62349
+ratio=79
 max_script_lines=934
 dup_sites=152
 latest_log_card=非卡片记录 · 2026-11-19（结构治理：合卡 + 索引式派工 + 结构预算闸）

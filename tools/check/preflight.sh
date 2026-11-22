@@ -42,8 +42,8 @@ while IFS= read -r g; do
     bad "非法 GUID（长度 ${#g}）：$g"
     bad_guid=1
   fi
-done < <(find client/MMOGame/Assets -name '*.meta' -type f -print0 2>/dev/null \
-  | xargs -0 grep -h '^guid:' 2>/dev/null | awk '{print $2}')
+done < <(find client/MMOGame/Assets -name '*.meta' -type f 2>/dev/null \
+  | while IFS= read -r f; do grep -h '^guid:' "$f"; done | awk '{print $2}')
 if [ "$bad_guid" -eq 0 ]; then
   ok "所有 .meta 的 GUID 都是 32 位十六进制"
 fi

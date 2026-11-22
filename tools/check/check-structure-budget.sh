@@ -108,9 +108,11 @@ judge "最长脚本行数" "$max_lines" "$(base_num max_script_lines)" min "$TAR
 
 # ── 3. check 行数 ÷ 手写业务代码 ───────────────────────────────────
 check_lines=$( { cat tools/check/*.sh; cat tools/check/*.py; } 2>/dev/null | wc -l | tr -d ' ')
+# 不走 xargs：Git Bash 下 `getconf ARG_MAX` 为 undefined，xargs 会断言失败并输出 0 行，
+# 这台机就会把「数到了 0 行」当成「数不到」，闸门变成假绿 / 假红。
 biz_lines=$(find src -name '*.cs' -not -path '*/obj/*' -not -path '*/bin/*' \
-  -not -path '*/Generated/*' -not -path '*.Tests/*' -print0 2>/dev/null \
-  | xargs -0 cat 2>/dev/null | wc -l | tr -d ' ')
+  -not -path '*/Generated/*' -not -path '*.Tests/*' 2>/dev/null \
+  | while IFS= read -r f; do cat "$f"; done | wc -l | tr -d ' ')
 if [ "${biz_lines:-0}" -gt 0 ]; then
   ratio=$((check_lines * 100 / biz_lines))
   printf '       参考：check %s 行 / 手写业务 %s 行（这两个数只作分母与账目，不单独判红）\n' \
