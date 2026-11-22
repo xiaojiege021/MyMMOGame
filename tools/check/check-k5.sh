@@ -25,6 +25,15 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+# Windows 上 dotnet 重定向输出走 GBK；带中文名的断言按平台转码，不「先试 UTF-8 再退 GBK」。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -208,8 +217,12 @@ fi
 
 echo "== 3. 只读入口：新字段真的被代码读到 =="
 IL="$("$DOTNET" "$CHARACTER_DLL" --item-list 2>&1)"; ilrc=$?
-ITEM_COUNT="$(python3 -c 'import json; print(len(json.load(open("config/items.json"))["items"]))')"
-[ "$ilrc" = "0" ] && grep -q "^item_table_state=ok version=5 items=${ITEM_COUNT}\$" <<< "$IL" \
+# 版本号与件数一律现取：本卡（B7+B8）把 items.json 从 v5 抬到 v6，写死 v5 就假红。
+ITEM_COUNT="$(python3 -c 'import json; print(len(json.load(open("config/items.json"))["items"]))' | tr -d '\r')"
+ITEM_VER="$(python3 -c 'import json; print(json.load(open("config/items.json"))["version"])' | tr -d '\r')"
+# Windows 上 dotnet 重定向输出走 GBK：带中文名的两行（行商长刀 / 行商法剑）先转码再比。
+ILU="$(printf '%s' "$IL" | utf8)"
+[ "$ilrc" = "0" ] && grep -q "^item_table_state=ok version=${ITEM_VER} items=${ITEM_COUNT}\$" <<< "$IL" \
   && ok "物品表 v4 读出 ${ITEM_COUNT} 件（不连库）" \
   || bad "只读入口不对（rc=${ilrc}）：$(head -2 <<< "$IL" | tr '\n' ' ')"
 if [ "$(grep -c '^item=' <<< "$IL")" = "$ITEM_COUNT" ]; then
@@ -217,10 +230,10 @@ if [ "$(grep -c '^item=' <<< "$IL")" = "$ITEM_COUNT" ]; then
 else
   bad "物品清单条数不对：$(grep -c '^item=' <<< "$IL") / ${ITEM_COUNT}"
 fi
-grep -q '^item=sword_trade kind=equipment grade=green set=- name=行商长刀 ' <<< "$IL" \
-  && ok "sword_trade 读出长刀（saber / 15 级）" || bad "sword_trade 读出不对：$(grep '^item=sword_trade' <<< "$IL")"
-grep -q '^item=spirit_sword_trade kind=equipment grade=green set=- name=行商法剑 ' <<< "$IL" \
-  && ok "新增 15 级法剑读出（spirit_sword）" || bad "法剑读出不对：$(grep '^item=spirit_sword_trade' <<< "$IL")"
+grep -q '^item=sword_trade kind=equipment grade=green set=- name=行商长刀 ' <<< "$ILU" \
+  && ok "sword_trade 读出长刀（saber / 15 级）" || bad "sword_trade 读出不对：$(grep '^item=sword_trade' <<< "$ILU")"
+grep -q '^item=spirit_sword_trade kind=equipment grade=green set=- name=行商法剑 ' <<< "$ILU" \
+  && ok "新增 15 级法剑读出（spirit_sword）" || bad "法剑读出不对：$(grep '^item=spirit_sword_trade' <<< "$ILU")"
 grep -q '^item=ore_iron kind=material grade=- ' <<< "$IL" \
   && ok "材料没有品阶（grade=-，空字段不被当成配置错误）" || bad "材料行不对：$(grep '^item=ore_iron' <<< "$IL")"
 
@@ -249,7 +262,7 @@ done
 stop_pid "$START_PID"
 if grep -q '^config_error=' "$STARTUP"; then
   bad "真配置整链加载失败：$(head -1 "$STARTUP")"
-elif grep -q "^items=${ITEM_COUNT} item_table_version=5 " "$STARTUP"; then
+elif grep -q "^items=${ITEM_COUNT} item_table_version=${ITEM_VER} " "$STARTUP"; then
   ok "真配置整链加载通过（物品表 v4 / ${ITEM_COUNT} 件）"
 else
   bad "启动没读到物品表 v4：$(grep '^items=' "$STARTUP" | head -1)"
@@ -347,8 +360,9 @@ crystal["equipment_parts"]["k5_probe_blade"] = "weapon"
 json.dump(crystal, open(os.path.join(base, "crystal.json"), "w", encoding="utf-8"), ensure_ascii=False)
 PY
 ADDED="$(run_bad "$CASE" --item-list)"
+ADDEDU="$(printf '%s' "$ADDED" | utf8)"
 if head -1 <<< "$ADDED" | grep -q "items=$((ITEM_COUNT + 1))" \
-   && grep -q '^item=k5_probe_blade kind=equipment grade=blue .*name=核对用长刀 ' <<< "$ADDED"; then
+   && grep -q '^item=k5_probe_blade kind=equipment grade=blue .*name=核对用长刀 ' <<< "$ADDEDU"; then
   ok "加一件装备只改配置：清单 ${ITEM_COUNT} → $((ITEM_COUNT + 1))，品阶照配置读"
 else
   bad "新装备没生效：$(head -2 <<< "$ADDED" | tr '\n' ' ')"

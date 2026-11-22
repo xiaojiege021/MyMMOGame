@@ -220,6 +220,8 @@ internal static class CliFlags
     public static string? characterSlotsOf = null;
     public static string? wardrobeOf = null;
     public static string? rawSlotAccount = null;
+    // B7+B8：背包扩容现状（按角色读回基础格 / 步长 / 上限 / 买过几次 / 现在几格）。只读。
+    public static long bagExpandStateOf = 0;
     public static int rawSlotValue = 0;
     // C1：只给核对用的主线入口——读进度、用固定事务号交任务、注入一条突破成功事实。
     // 正常路径分别走网关 GET /mainline、POST /mainline/turn-in 和 P3-1a2 的突破链路。

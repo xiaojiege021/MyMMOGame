@@ -102,9 +102,11 @@ print(hashlib.md5(open(sys.argv[1],"rb").read()).hexdigest())' "$1"
 
 # 登记里的路径可以写相对于仓库的（db/migrations.json），也可以写绝对路径
 # （自检时在临时目录造假卡用，不碰真仓库）。
+# 绝对路径原样返回；Windows 盘符路径（C:/…）也算绝对——自检段用的临时目录常在 C:，
+# 只认 "/*" 的话会被拼成 "$ROOT/C:/…" 这种不存在的路径。
 abs_of() {
   case "$1" in
-    /*) printf '%s' "$1" ;;
+    /*|[A-Za-z]:/*) printf '%s' "$1" ;;
     *)  printf '%s/%s' "$ROOT" "$1" ;;
   esac
 }
@@ -232,7 +234,7 @@ for reg in "${regs[@]}"; do
   reg_count="$(printf '%s\n' "$meta" | sed -n '3p')"
   [ -n "$reg_check" ] || reg_check="check-${reg_card}.sh"
   case "$reg_check" in
-    /*) check_path="$reg_check" ;;
+    /*|[A-Za-z]:/*) check_path="$reg_check" ;;
     *)  check_path="$ROOT/tools/check/$reg_check" ;;
   esac
 

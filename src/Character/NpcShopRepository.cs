@@ -177,7 +177,9 @@ public sealed class NpcShopRepository(
 
         var slots = await grants.ReadSlotsForTransactionAsync(
             connection, transaction, characterId, stopping);
-        var slot = GrantRepository.FindDeliverySlot(slots, def, 1, config.BagSlots);
+        var slot = GrantRepository.FindDeliverySlot(slots, def, 1,
+            await BagExpandRepository.SlotsAsync(
+                connection, transaction, characterId, config, stopping));
         if (slot == 0)
         {
             await transaction.RollbackAsync(stopping);
@@ -385,7 +387,9 @@ public sealed class NpcShopRepository(
 
         var slots = await grants.ReadSlotsForTransactionAsync(
             connection, transaction, characterId, stopping);
-        var slot = GrantRepository.FindDeliverySlot(slots, def, count, config.BagSlots);
+        var slot = GrantRepository.FindDeliverySlot(slots, def, count,
+            await BagExpandRepository.SlotsAsync(
+                connection, transaction, characterId, config, stopping));
         if (slot == 0)
         {
             await transaction.RollbackAsync(stopping);

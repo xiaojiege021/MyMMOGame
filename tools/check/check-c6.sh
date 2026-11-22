@@ -27,6 +27,15 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 WD="$ROOT/src/World/bin/Release/net10.0/World.dll"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
+# Windows 上 dotnet 重定向输出走 GBK：副本那行带境界名（元婴），断言前先按平台转码。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 AT=1763380800000   # 2025-11-17T12:00:00Z = 本地 20:00，落在 w2 窗口内；只验纯计算，不连库。
 TMP="$(mktemp -d)"
 TITLE="C6（Shared.Domain）"
@@ -53,9 +62,12 @@ def sources():
     out = {}
     for d in ("src", "tools/probe"):
         for p in glob.glob(os.path.join(root, d, "**", "*.cs"), recursive=True):
-            if "/obj/" in p or "/bin/" in p:
+            # Windows 上 glob 与 relpath 都给反斜杠：先归一成正斜杠再筛 obj/bin、再当键，
+            # 否则过滤不生效、下面按 "src/Shared.Domain/xxx.cs" 比对也永远不等。
+            rel = os.path.relpath(p, root).replace(os.sep, "/")
+            if "/obj/" in rel or "/bin/" in rel:
                 continue
-            out[os.path.relpath(p, root)] = open(p, encoding="utf-8").read()
+            out[rel] = open(p, encoding="utf-8").read()
     return out
 def report(key, cond, info=""):
     print(("PASS " if cond else "FAIL ") + key + ("" if cond else "  " + info))
@@ -136,11 +148,11 @@ else
 fi
 
 echo "== 4. 跨进程同源 =="
-DT="$("$DOTNET" "$CD" --dungeon-table --config config/character.json 2>&1)"
-printf '%s' "$DT" | grep -q '^dungeon_table_state=ok' \
-  && printf '%s' "$DT" | grep -q '^dungeon=abyss_yuanying .*realm=元婴 drill=200' \
+DTU="$("$DOTNET" "$CD" --dungeon-table --config config/character.json 2>&1 | utf8)"
+printf '%s' "$DTU" | grep -q '^dungeon_table_state=ok' \
+  && printf '%s' "$DTU" | grep -q '^dungeon=abyss_yuanying .*realm=元婴 drill=200' \
   && ok "probe 用共享副本表：元婴副本 realm=元婴 drill=200" \
-  || bad "共享副本表读不出来：$(printf '%s' "$DT" | head -3)"
+  || bad "共享副本表读不出来：$(printf '%s' "$DTU" | head -3)"
 
 DD="$("$DOTNET" "$CD" --dungeon-drop-table-path config/dungeon_drops.json \
       --config config/character.json 2>&1)"

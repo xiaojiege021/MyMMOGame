@@ -35,8 +35,11 @@ for dir in src "client/MMOGame/Assets"; do
 "
 done
 
-cs_rows="$(printf '%s' "$cs_list" | grep -v '^$' | xargs wc -l 2>/dev/null \
-  | awk '$2 != "total" { printf "%d\t%s\n", $1, $2 }' | sort -rn)"
+# 不用 `xargs wc -l`：Git Bash 的 `getconf ARG_MAX` 是 undefined，xargs 断言失败后
+# 一行都不输出，报告会静默变成「共 0 个」（本机踩过，与 check-structure-budget.sh 同款）。
+cs_rows="$(printf '%s\n' "$cs_list" | while IFS= read -r f; do
+    [ -n "$f" ] && wc -l "$f" 2>/dev/null
+  done | awk '$2 != "total" { printf "%d\t%s\n", $1, $2 }' | sort -rn)"
 cs_total="$(printf '%s\n' "$cs_rows" | grep -c . || true)"
 
 echo

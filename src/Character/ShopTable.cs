@@ -15,6 +15,7 @@ public enum DeliveryMode
     SeasonPass,
     MonthlyBundle,
     SecondSlot,
+    BagExpand,
 }
 
 /// <summary>
@@ -51,10 +52,14 @@ public sealed class ShopTable
         string StockRule,
         long StockCount,
         bool OnSale,
-        string Note)
+        string Note,
+        int RequireRealmIndex)
     {
         /// <summary>这一条接上发货了吗。没接的走 delivery_pending，一分不扣。</summary>
         public bool Deliverable => Mode != DeliveryMode.None;
+
+        /// <summary>方案 12.1「到达金仙才能买金仙外观」：0 表示这条商品没有境界门槛。</summary>
+        public bool RealmGated => RequireRealmIndex > 0;
     }
 
     public int Version { get; }
@@ -113,6 +118,7 @@ public sealed class ShopTable
         DeliveryMode.SeasonPass => "season_pass",
         DeliveryMode.MonthlyBundle => "monthly_bundle",
         DeliveryMode.SecondSlot => "second_slot",
+        DeliveryMode.BagExpand => "bag_expand",
         _ => "none",
     };
 
@@ -306,6 +312,15 @@ public sealed class ShopTable
         var passId = (row.Delivery?.PassId ?? "").Trim();
         var bundleId = (row.Delivery?.BundleId ?? "").Trim();
 
+        // B7+B8：方案 12.1 的购买门槛（「到达金仙才能买金仙外观」）。
+        // 门槛是配置数值，代码只把它与角色的段序号比大小；不写就是没有门槛。
+        var requireRealm = row.RequireRealm?.EnumIndexMin ?? 0;
+        if (requireRealm < 0 || requireRealm > 99)
+        {
+            throw new ConfigException("shop.json 的商品 " + id
+                + " 的 require_realm.enum_index_min 必须在 0 到 99 之间");
+        }
+
         // 旧字段还在时按「进背包」解释；新旧两套同时出现视为迁移没做完。
         if (row.Delivery is null && deliveryId.Length > 0)
         {
@@ -403,6 +418,16 @@ public sealed class ShopTable
 
                 break;
 
+            case DeliveryMode.BagExpand:
+                // 扩容是状态发货：加格不落包，配了发货物就会看着能买、实际多发一件东西。
+                RequireNoGoods(id, deliveryId, deliveryCount, passId);
+                if (bundleId.Length > 0)
+                {
+                    throw new ConfigException("shop.json 的商品 " + id + " 是 bag_expand，不该写 bundle_id");
+                }
+
+                break;
+
             default:
                 // none：不许留半个发货物，留着就会看着能买、实际发不出东西。
                 if (deliveryId.Length != 0 || deliveryCount != 0
@@ -426,7 +451,7 @@ public sealed class ShopTable
             id, kind, name, price, (row.Currency ?? WrittenCurrency).Trim(), mode,
             deliveryId, deliveryCount, passId, bundleId,
             perCharacter, perDay, rule, stockCount,
-            row.OnSale ?? true, (row.Note ?? "").Trim());
+            row.OnSale ?? true, (row.Note ?? "").Trim(), requireRealm);
     }
 
     static void RequireNoGoods(string id, string deliveryId, int deliveryCount, string other)
@@ -454,8 +479,10 @@ public sealed class ShopTable
             "season_pass" => DeliveryMode.SeasonPass,
             "monthly_bundle" => DeliveryMode.MonthlyBundle,
             "second_slot" => DeliveryMode.SecondSlot,
+            "bag_expand" => DeliveryMode.BagExpand,
             _ => throw new ConfigException("shop.json 的商品 " + id + " 的 delivery.mode 不认识："
-                + mode + "（现在只支持 none / item / season_pass / monthly_bundle / second_slot）"),
+                + mode + "（现在只支持 none / item / season_pass / monthly_bundle / second_slot"
+                + " / bag_expand）"),
         };
     }
 
@@ -536,8 +563,20 @@ public sealed class ShopTable
                 break;
 
             default:
-                // 后面几类（外观、扩容、宗门展示）接发货时照这条走：
+                // 后面几类（外观、祖府、宗门展示）接发货时照这条走：
                 // 免得把装备、材料混进商城（12.1 写定那些绝不上架）。
+                // B7+B8：五类外观与洞府摆件是「发一件对应种类的物品进背包」，
+                // 种类必须就是这一门类本身（不许拿消耗品冒充外观），且到账即绑。
+                if (string.Equals(item.Kind, goods.Kind, StringComparison.Ordinal)
+                    && WardrobeRepository.IsAppearanceKind(goods.Kind)
+                        || string.Equals(item.Kind, "home_decor", StringComparison.Ordinal)
+                        && string.Equals(goods.Kind, "home_decor", StringComparison.Ordinal))
+                {
+                    RequireCountOne(item);
+                    RequireBound(item, goods);
+                    break;
+                }
+
                 if (!string.Equals(goods.Kind, "voucher", StringComparison.Ordinal)
                     && !string.Equals(goods.Kind, "consumable", StringComparison.Ordinal))
                 {
@@ -620,6 +659,9 @@ public sealed class ShopTable
         [JsonPropertyName("on_sale")] public bool? OnSale { get; set; }
         [JsonPropertyName("note")] public string? Note { get; set; }
 
+        // B7+B8：购买门槛（方案 12.1「到达金仙才能买金仙外观」）。
+        [JsonPropertyName("require_realm")] public WireRequireRealm? RequireRealm { get; set; }
+
         // 迁移期兼容字段（配置设计第 3 节）：K1 收口后随配置一起删。
         [JsonPropertyName("kind")] public string? Kind { get; set; }
         [JsonPropertyName("price_yuanbao")] public long PriceYuanbao { get; set; }
@@ -634,6 +676,12 @@ public sealed class ShopTable
         [JsonPropertyName("count")] public int? Count { get; set; }
         [JsonPropertyName("pass_id")] public string? PassId { get; set; }
         [JsonPropertyName("bundle_id")] public string? BundleId { get; set; }
+    }
+
+    /// <summary>购买门槛：境界段序号下限（1 起）。方案 12.1 的门槛数值只存在配置里。</summary>
+    internal sealed class WireRequireRealm
+    {
+        [JsonPropertyName("enum_index_min")] public int EnumIndexMin { get; set; }
     }
 
     internal sealed class WireLimit

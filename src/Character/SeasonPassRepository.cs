@@ -440,7 +440,9 @@ public sealed class SeasonPassRepository(
         }
 
         var free = 0;
-        for (var slot = 1; slot <= config.BagSlots; slot++)
+        var bagSlots = await BagExpandRepository.SlotsAsync(
+            connection, transaction, characterId, config, stopping);
+        for (var slot = 1; slot <= bagSlots; slot++)
         {
             if (!used.Contains(slot))
             {

@@ -85,7 +85,9 @@ import json, os, sys
 root, tmp = os.environ["ROOT"], os.environ["TMP"]
 doc = json.load(open(os.path.join(root, "config/pill.json"), encoding="utf-8"))
 rows = {}
-for line in open(os.path.join(tmp, "pill-list.txt"), encoding="utf-8"):
+# 清单文件是 dotnet 写的（Windows 上是 GBK，行里有丹药名），按 utf-8 读会直接抛
+# UnicodeDecodeError 把整段打成「对不上」；errors="replace" 只影响展示用的名字，比的是 ASCII 字段。
+for line in open(os.path.join(tmp, "pill-list.txt"), encoding="utf-8", errors="replace"):
     if line.startswith("pill="):
         parts = dict(x.split("=", 1) for x in line.strip().split(" "))
         # 行首是 pill=<编号>，字典里就是 item_id，直接拿来当键。

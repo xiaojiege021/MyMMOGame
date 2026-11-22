@@ -100,7 +100,12 @@ def main():
 
     total = 0
     for path in files:
-        rel = os.path.relpath(path, root)
+        # Windows 上核对脚本的临时目录常在 C: 而仓库在 E:，跨盘符算不出相对路径
+        # （自检段正是拿临时目录里的坏样本扫），退化成绝对路径，只影响输出里的文件名。
+        try:
+            rel = os.path.relpath(path, root)
+        except ValueError:
+            rel = path
         for no, rule, info in scan_lines(path):
             total += 1
             if not args.quiet:

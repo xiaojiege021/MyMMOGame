@@ -203,7 +203,8 @@ for base, dirs, files in os.walk("src"):
     dirs[:] = [d for d in dirs if d not in ("bin", "obj", "Generated")]
     for f in files:
         if f.endswith(".cs"):
-            rel = os.path.relpath(os.path.join(base, f), ".")
+            # Windows 上 relpath 用反斜杠，下面的白名单是正斜杠，先归一再比。
+            rel = os.path.relpath(os.path.join(base, f), ".").replace(os.sep, "/")
             t = read(rel)
             if ("effects.json" in t or "effect-table" in t) and rel not in allowed_readers:
                 src_hits.append(rel)

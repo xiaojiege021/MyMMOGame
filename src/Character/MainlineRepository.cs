@@ -197,7 +197,10 @@ public sealed class MainlineRepository(
                 {
                     var slots = await grants.ReadSlotsForTransactionAsync(
                         connection, transaction, characterId, stopping);
-                    var deltas = GrantRepository.PlanItemDeltas(slots, drops, items, config.BagSlots);
+                    var deltas = GrantRepository.PlanItemDeltas(
+                        slots, drops, items,
+                        await BagExpandRepository.SlotsAsync(
+                            connection, transaction, characterId, config, stopping));
                     await grants.ApplyItemDeltasInTransactionAsync(
                         connection, transaction, characterId, deltas, stopping);
                     dropLines = drops.Count;

@@ -53,7 +53,8 @@ for base, _, files in os.walk(os.path.join(root, 'src')):
     for name in files:
         if name.endswith('.cs'):
             path = os.path.join(base, name)
-            source[os.path.relpath(path, root)] = open(path, encoding='utf-8').read()
+            # Windows 上 relpath 用反斜杠，下面按 'src/Character/...' 取键，先归一再存。
+            source[os.path.relpath(path, root).replace(os.sep, '/')] = open(path, encoding='utf-8').read()
 joined = '\n'.join(source.values())
 need('e.slot = i.slot' not in joined, '还有人按 e.slot = i.slot 联强化表')
 need('enhance (character_id, slot, level)' not in joined, '还有按格子写强化等级的语句')

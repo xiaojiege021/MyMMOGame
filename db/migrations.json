@@ -37,7 +37,8 @@
         { "version": 28, "file": "db/character/crystal_slot_follow.sql" },
         { "version": 29, "file": "db/character/equip.sql" },
         { "version": 30, "file": "db/character/pill.sql" },
-        { "version": 31, "file": "db/character/npc_shop.sql" }
+        { "version": 31, "file": "db/character/npc_shop.sql" },
+        { "version": 32, "file": "db/character/bag_expand.sql" }
       ]
     },
     {

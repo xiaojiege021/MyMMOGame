@@ -30,6 +30,16 @@ CHAR_SERVICE_DLL="$ROOT/src/Character/bin/Release/net10.0/""Character.dll"
 GATEWAY_DLL="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 TITLE="Q5（灵石修炼 / 境界任务）"
 HAS_DB="${MMO_Q5_DB:-0}"
+# Windows 上 dotnet 重定向输出走 GBK；带中文的断言（境界门槛「炼体」）必须按平台
+# 转码后再比，不能「先试 UTF-8 再退 GBK」（同 P3-1a1 的口径）。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 TMP="$(mktemp -d)"
 TMP="${TMP//\\//}"
 PIDS=""
@@ -70,13 +80,14 @@ fi
 
 echo "== 3. 只读入口：任务 / 门槛 / 奖励 / 周期键 =="
 CFG="$("$DOTNET" "$PROBE_DLL" --city-task-config 2>&1)"
+CFGU="$(printf '%s' "$CFG" | utf8)"
 printf '%s' "$CFG" | grep -q '^city_task_config_state=ok version=2 ' \
   && ok "任务表读得出来（version=2）" \
   || bad "任务表只读入口不对：$(printf '%s' "$CFG" | head -1)"
 printf '%s' "$CFG" | grep -q 'qiyun_cultivate_daily:qiyun:daily:1:level1:realm-:stone_1=5' \
   && ok "日常任务：次数 1、等级 1、不卡境界、奖励 stone_1=5（全部来自配置）" \
   || bad "日常任务字段不对：$(printf '%s' "$CFG" | head -1)"
-printf '%s' "$CFG" | grep -q 'qiyun_realm_weekly:qiyun:weekly:1:level0:realm炼体:stone_1=20' \
+printf '%s' "$CFGU" | grep -q 'qiyun_realm_weekly:qiyun:weekly:1:level0:realm炼体:stone_1=20' \
   && ok "境界任务：周常、境界门槛炼体、奖励 stone_1=20" \
   || bad "境界任务字段不对：$(printf '%s' "$CFG" | head -1)"
 

@@ -63,7 +63,8 @@ public sealed class MonthlyBundleRepository(
             }
 
             var rows = await ReadInventoryAsync(connection, transaction, characterId, stopping);
-            var plan = Plan(rows, config.BagSlots);
+            var plan = Plan(rows, await BagExpandRepository.SlotsAsync(
+                connection, transaction, characterId, config, stopping));
 
             if (!await DebitYuanbaoAsync(connection, transaction, characterId, price, stopping))
             {

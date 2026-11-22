@@ -17,6 +17,15 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+# Windows 上 dotnet 重定向输出走 GBK：副职名（炼丹 / 铁匠 …）是中文，断言前先按平台转码。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -366,8 +375,10 @@ if "$DOTNET" "$PROBE" --recipe-list > "$TMP/list.txt" 2>&1; then
   else
     bad "有条目缺字段：$(grep -vE '^recipe=.* inputs=.* fee=.* output=.* success_pct=[0-9.]+ craft_time_s=[0-9]+$' "$TMP/list.txt" | grep '^recipe=' | head -1)"
   fi
+  # 副职名是中文：转码后的那一份才比得中（原文件保留给纯 ASCII 断言）。
+  utf8 <"$TMP/list.txt" >"$TMP/list-u8.txt"
   for p in alchemy:炼丹 blacksmith:铁匠 tailor:裁缝 jeweler:巧匠; do
-    grep -q "^recipe_profession=${p%%:*} name=${p##*:} recipes=[0-9]*" "$TMP/list.txt" \
+    grep -q "^recipe_profession=${p%%:*} name=${p##*:} recipes=[0-9]*" "$TMP/list-u8.txt" \
       && ok "副职 ${p%%:*}（${p##*:}）在清单里" \
       || bad "副职 ${p%%:*}（${p##*:}）没出现在清单里"
   done

@@ -20,6 +20,8 @@ namespace Mmo.Net
         public string State;
         public string DeliveryItemId;
         public uint BagSlot;
+        // B7+B8：背包扩容买完之后的格数。别的商品恒 0。
+        public uint BagSlots;
         public bool Bound;
         public bool Duplicate;
         public string DisplayText;
@@ -52,6 +54,11 @@ namespace Mmo.Net
             {
                 text = "没买成：" + reason;
             }
+            else if (string.Equals(Raw(json, "state"), "bag_expanded", StringComparison.Ordinal))
+            {
+                // 扩容是状态发货：不落包，所以不报格号，报「现在一共几格」。
+                text = "背包已扩到 " + ReadLong(json, "bag_slots") + " 格 · 扣 " + charged + " 元宝";
+            }
             else
             {
                 text = "已买到：" + Raw(json, "name") + " · 扣 " + charged + " 元宝"
@@ -75,6 +82,7 @@ namespace Mmo.Net
                 State = Raw(json, "state"),
                 DeliveryItemId = Raw(json, "delivery_item_id"),
                 BagSlot = (uint)ReadLong(json, "bag_slot"),
+                BagSlots = (uint)ReadLong(json, "bag_slots"),
                 Bound = bound,
                 Duplicate = ReadBool(json, "duplicate"),
                 DisplayText = text,

@@ -182,7 +182,8 @@ public sealed class GrantRepository(
             throw new GrantException("stack_overflow");
         }
 
-        if (delta.Slot < 1 || delta.Slot > config.BagSlots)
+        if (delta.Slot < 1 || delta.Slot > await BagExpandRepository.SlotsAsync(
+                connection, transaction, characterId, config, stopping))
         {
             throw new GrantException("slot_out_of_range");
         }

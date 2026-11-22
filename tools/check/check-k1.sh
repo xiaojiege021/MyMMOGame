@@ -58,7 +58,7 @@ FORBIDDEN_121 = ["gold", "enhance_stone", "transfer_stone", "crystal", "spirit_s
                  "pill", "ore", "herb", "equip_blueprint", "equip", "attr_item",
                  "revive_coin", "fatigue", "dungeon_count", "weekly_share",
                  "realm_speed", "guild_tech", "territory_bonus"]
-MODES = ("none", "item", "season_pass", "monthly_bundle", "second_slot")
+MODES = ("none", "item", "season_pass", "monthly_bundle", "second_slot", "bag_expand")
 HOME_CATS = ["outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
              "home_decor", "guild_display", "bag_expand", "teleport_talisman"]
 
@@ -143,12 +143,106 @@ def param_problem(i):
         return [] if d.get("pass_id") == "current" and not d.get("item_id") else ["pass_id"]
     if m == "monthly_bundle":
         return [] if d.get("bundle_id") == "current" and not d.get("item_id") else ["bundle_id"]
-    if m == "second_slot":
+    if m == "second_slot" or m == "bag_expand":
+        # 状态发货：加名额 / 加格都不往背包放东西。
         return [] if not d.get("item_id") and not d.get("pass_id") and not d.get("bundle_id") else ["params"]
     return ["mode"]
 
 bad_param = [i["id"] + ":" + ",".join(param_problem(i)) for i in shop["items"] + home["items"] if param_problem(i)]
 report("every_item_delivery_params", not bad_param, ";".join(bad_param))
+
+# ---------------------------------------------------------------- B7+B8：七类真发货 + 背包扩容
+# 方案 12.1 的八行：五类外观 + 洞府 + 背包真发货，宗门展示暂缓（保持 none）。
+B78_ITEM_CATS = ["outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
+                 "home_decor"]
+by_cat = {i["category"]: i for i in shop["items"]}
+bad = []
+for cat in B78_ITEM_CATS:
+    i = by_cat.get(cat)
+    if not i:
+        bad.append(cat + ":missing")
+        continue
+    d = i.get("delivery") or {}
+    if d.get("mode") != "item":
+        bad.append(cat + ":mode=" + str(d.get("mode")))
+        continue
+    goods = items.get(d.get("item_id") or "")
+    if not goods:
+        bad.append(cat + ":goods=" + str(d.get("item_id")))
+        continue
+    if goods.get("kind") != cat:
+        bad.append(cat + ":kind=" + str(goods.get("kind")))
+    if goods.get("bind") != "always":
+        bad.append(cat + ":bind=" + str(goods.get("bind")))
+report("b7b8_seven_item_delivery", not bad, ";".join(bad))
+
+bag_row = by_cat.get("bag_expand") or {}
+bd = bag_row.get("delivery") or {}
+report("b7b8_bag_expand_state_delivery",
+       bd.get("mode") == "bag_expand" and not bd.get("item_id") and not bd.get("count"),
+       "背包扩容没有按状态发货：%s" % bd)
+
+guild_row = by_cat.get("guild_display") or {}
+gd = guild_row.get("delivery") or {}
+report("b7b8_guild_display_deferred",
+       gd.get("mode") == "none" and not gd.get("item_id"),
+       "宗门展示暂缓没写清（应保持 none，不配发货物）：%s" % gd)
+
+# 购买门槛：境界外观按方案配门槛，别的商品不许带（避免顺手给别的商品加上门槛）。
+gated_cats = sorted(i["category"] for i in shop["items"] if i.get("require_realm"))
+realm_gate = (by_cat.get("realm_skin") or {}).get("require_realm") or {}
+report("b7b8_realm_gate",
+       gated_cats == ["realm_skin"] and int(realm_gate.get("enum_index_min") or 0) >= 1,
+       "带门槛的商品=%s，realm_skin=%s" % (",".join(gated_cats), realm_gate))
+
+# 扩容的步长与上限只在 character.json（代码里没有第二份数字）。
+ch = cfg("config/character.json")
+report("b7b8_bag_config",
+       isinstance(ch.get("bag_expand_step"), int) and ch["bag_expand_step"] > 0
+       and isinstance(ch.get("bag_slots_max"), int)
+       and ch["bag_slots_max"] > int(ch.get("bag_slots") or 0),
+       "character.json 缺 bag_expand_step / bag_slots_max，或上限不大于基础格")
+
+bag_cs = read("src/Character/BagExpandRepository.cs")
+report("b7b8_bag_no_number_in_code",
+       "config.BagExpandStep" in bag_cs and "config.BagSlotsMax" in bag_cs
+       and " * 10" not in bag_cs and "= 80" not in bag_cs,
+       "容量算法没读配置，或把步长 / 上限写死在代码里")
+
+# 钱的写入口（不可逆点 2）：一笔事务里顺序必须是 抢号 → 扣钱 → 加格。
+# 反过来（先加格后扣钱）在扣款失败时就会白送格子；这里按特征串定位，不按整行文本。
+claim_at = bag_cs.find("ClaimTxnAsync(connection, transaction")
+debit_at = bag_cs.find("DebitYuanbaoAsync(connection, transaction")
+grant_at = bag_cs.find("set bag_expand_count = $2")
+report("b7b8_txn_order",
+       -1 < claim_at < debit_at < grant_at,
+       "顺序不是 抢号 → 扣钱 → 加格：claim=%d debit=%d grant=%d" % (claim_at, debit_at, grant_at))
+catch_at = bag_cs.find("catch (BagExpandException ex)")
+catch_body = bag_cs[catch_at:] if catch_at >= 0 else ""
+report("b7b8_txn_rollback",
+       catch_body != "" and "RollbackAsync" in catch_body
+       and "set bag_expand_count = $2" not in catch_body,
+       "失败路径没回滚，或回滚之后还在写格数")
+
+# 接线六处：迁移 32、DDL 两份、proto 字段、网关透传、probe 入口、客户端读回包。
+chars_all = [e for g in cfg("db/migrations.json")["schemas"] if g["key"] == "character"
+            for e in g["entries"]]
+report("b7b8_migration",
+       any(e["version"] == 32 and e["file"] == "db/character/bag_expand.sql" for e in chars_all),
+       "迁移清单里没有 v32 的 bag_expand.sql")
+report("b7b8_ddl",
+       "bag_expand_count" in read("db/character/bag_expand.sql")
+       and "bag_expand_count" in read("db/character/character.sql"),
+       "DDL 缺列，或主迁移没追加同一份")
+report("b7b8_proto",
+       "uint32 bag_slots = 20" in read("proto/mmo/character.proto")
+       and "BagSlots" in read("src/Shared/Generated/Character.cs"),
+       "proto 没加 bag_slots=20，或生成物没重出")
+report("b7b8_wiring",
+       "result.BagSlots" in read("src/Gateway/ShopApi.cs")
+       and "bag_slots" in read("client/MMOGame/Assets/Net/CharacterShop.cs")
+       and '"--bag-expand-state"' in read("tools/probe/CliProbe/CliParser.cs"),
+       "网关没透传 / 客户端没读 / probe 没有 --bag-expand-state")
 
 # 方案写定的「同一种只能是这一件」：编号出处必须与各自的配置对上。
 def one(cat):
@@ -236,13 +330,31 @@ if "$DOTNET" "$CHARACTER_DLL" --shop-list > "$TMP/list.txt" 2>&1; then
   [ "$rows" -ge 18 ] && ok "清单商品不少于 18 条（实际 ${rows}）" \
     || bad "清单商品条数少于 18：$rows"
   # 每条都要有 mode / limit / stock / on_sale 四段（这是「带字段」的可核对形态）。
-  if [ "$(grep -cE '^shop_item=.* mode=(none|item|season_pass|monthly_bundle|second_slot) .* limit=[0-9]+/[0-9]+ stock=(unlimited|daily|weekly).* on_sale=(true|false) ' "$TMP/list.txt")" = "$rows" ]; then
+  if [ "$(grep -cE '^shop_item=.* mode=(none|item|season_pass|monthly_bundle|second_slot|bag_expand) .* limit=[0-9]+/[0-9]+ stock=(unlimited|daily|weekly).* on_sale=(true|false) ' "$TMP/list.txt")" = "$rows" ]; then
     ok "每条都带 mode / limit / stock / on_sale"
   else
     bad "有条目缺字段：$(grep -vE ' mode=.* limit=.* stock=.* on_sale=' "$TMP/list.txt" | head -2 | tr '\n' ' ')"
   fi
   [ "$(grep -c ' mode=item ' "$TMP/list.txt")" -ge 1 ] && ok "item 发货的商品照旧带货" \
     || bad "没有一条 item 发货"
+  # B7+B8：八类逐类对一遍（七类真发货 + 宗门展示 none），发货方式与配置同源。
+  if python3 - "$TMP/list.txt" <<'B78CHK'
+import sys
+rows = {}
+for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
+    if not line.startswith("shop_item="):
+        continue
+    kv = dict(part.split("=", 1) for part in line.strip().split(" ") if "=" in part)
+    rows[kv["kind"]] = kv
+want = {"outfit": "item", "weapon_skin": "item", "realm_skin": "item",
+        "flight_trail": "item", "mount_skin": "item", "home_decor": "item",
+        "bag_expand": "bag_expand", "guild_display": "none"}
+bad = [k for k, m in want.items() if k not in rows or rows[k].get("mode") != m]
+raise SystemExit(1 if bad else 0)
+B78CHK
+  then ok "八类发货方式逐类对得上（七类真发货，宗门展示 none）"
+  else bad "八类里有发货方式不对的：$(LC_ALL=C grep -oE 'kind=[a-z_]+ .*mode=[a-z_]+' "$TMP/list.txt" | head -3 | tr '\n' ' ')"
+  fi
 else
   bad "清单读取失败"; tail -5 "$TMP/list.txt" | detail
 fi
@@ -271,6 +383,9 @@ cases = {
     "stock_rule_unknown": lambda j: item(j, "outfit")["stock"].__setitem__("rule", "monthly"),
     # 白名单与黑名单打架
     "category_overlap": lambda j: j["forbidden"].append("outfit"),
+    # B7+B8：背包扩容是状态发货，配了发货物就起不来（否则会看着能买、实际多发一件）。
+    "bag_expand_with_goods": lambda j: item(j, "bag_expand")["delivery"].__setitem__(
+        "item_id", "bag_basic"),
 }
 for name, mutate in cases.items():
     doc = copy.deepcopy(base)
@@ -280,7 +395,7 @@ for name, mutate in cases.items():
 PY
 
 for case in category_unknown category_forbidden mode_unknown mode_item_no_goods \
-            currency_unknown stock_rule_unknown category_overlap; do
+            currency_unknown stock_rule_unknown category_overlap bag_expand_with_goods; do
   out="$("$DOTNET" "$CHARACTER_DLL" --shop-list --shop-config "$TMP/bad-$case.json" 2>&1)"
   assert_bad_config "$out" "坏清单 ${case}：起不来（$(printf '%s' "$out" | head -1 | cut -c1-52)…）"
 done
@@ -301,7 +416,8 @@ PY
 ADDED="$("$DOTNET" "$CHARACTER_DLL" --shop-list --shop-config "$TMP/added.json" 2>&1)"
 # 用 herestring 而不是管道：19 行输出走管道时 grep -q 提前退出会让 printf 吃 SIGPIPE，
 # 在 set -o pipefail 下整条判断变假（K1 自己踩到的坑）。
-if grep -q 'shop_item=shop_k1_probe_1 .*mode=none.*delivery=pending ' <<< "$ADDED"; then
+# dotnet 重定向输出是 GBK：UTF-8 locale 下 `.*` 跨不过非法字节，这里按字节匹配。
+if LC_ALL=C grep -q 'shop_item=shop_k1_probe_1 .*mode=none.*delivery=pending ' <<< "$ADDED"; then
   ok "新加一条商品：只改配置就出现在清单里，且按 none 回 delivery_pending"
 else
   bad "新加商品没生效：$(printf '%s' "$ADDED" | grep shop_k1_probe_1 | head -1)"
@@ -407,8 +523,10 @@ report("npc_shop_no_price_in_code",
 
 # 接线：迁移 31、DDL、proto、网关、probe 五处都在。
 chars = [e for g in migrations["schemas"] if g["key"] == "character" for e in g["entries"]]
-report("npc_shop_migration", chars[-1]["version"] == 31 and chars[-1]["file"] == "db/character/npc_shop.sql",
-       "最后一版=%s" % chars[-1])
+report("npc_shop_migration",
+       any(e["version"] == 31 and e["file"] == "db/character/npc_shop.sql" for e in chars)
+       and [e["version"] for e in chars] == list(range(1, len(chars) + 1)),
+       "找不到 v31 的 npc_shop.sql，或版本号不连续：最后一版=%s" % chars[-1])
 master = read("db/character/character.sql")
 ddl = read("db/character/npc_shop.sql")
 report("npc_shop_ddl",
@@ -516,7 +634,7 @@ d["shops"][0]["items"].append(
 json.dump(d, open(os.path.join(tmp, "added-npc.json"), "w", encoding="utf-8"), ensure_ascii=False)
 PY
 ADDED_NPC="$("$DOTNET" "$CHARACTER_DLL" --npc-shop-list --npc-shop-table-path "$TMP/added-npc.json" 2>&1)"
-if grep -q 'npc_shop_item shop=npc_general_qiyun item=rename_card .*price=7' <<< "$ADDED_NPC"; then
+if LC_ALL=C grep -q 'npc_shop_item shop=npc_general_qiyun item=rename_card .*price=7' <<< "$ADDED_NPC"; then
   ok "加一件商品：只改配置就进货架，代码不动"
 else
   bad "新加商品没生效：$(grep rename_card <<< "$ADDED_NPC" | head -1)"

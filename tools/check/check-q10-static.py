@@ -104,12 +104,20 @@ want('"effect_single_instance"' in service,
 for reason in ('"same_slot"', '"slot_empty"', '"stack_overflow"', '"row_attached"', '"bag_full"'):
     want(reason in bag, "移动缺拒绝码 " + reason)
 
-# 四个 RPC 的格号上限都从配置来，不在代码里写死背包格数
+# 四个 RPC 的格号上限都从配置来，不在代码里写死背包格数。
+# B7+B8 起格数按角色现取（BagExpandRepository.SlotsAsync），所以只钉「格数一定来自
+# 配置或按角色取的那一处」，不钉具体函数名——写死函数名的话，下一张换来源就又假红。
+SLOT_SOURCE = re.compile(r"config\.BagSlots|\.SlotsAsync\(")
 for method in ("MoveItem", "DiscardItem", "UseItemBatch"):
     body = re.search(r"public override async Task<\w+> %s\((.*?)\n    \}" % method, service, re.S)
     want(body is not None, "角色服缺 " + method + " 实现")
     if body is not None:
-        want("config.BagSlots" in body.group(1), method + " 没有读 config.BagSlots")
+        want(SLOT_SOURCE.search(body.group(1)) is not None,
+             method + " 没有从配置 / 按角色的来源取格数")
+# 来源再往下追一层：真正的格数算法只有一处，且它读的只有 character.json。
+bagrepo = read("src/Character/BagExpandRepository.cs")
+want("config.BagSlots" in bagrepo and "config.BagSlotsMax" in bagrepo and "config.BagExpandStep" in bagrepo,
+     "背包容量算法没读 character.json 的 bag_slots / bag_expand_step / bag_slots_max（格数写死了）")
 
 # 5. 网关四条路由
 gateway = read("src/Gateway/CharacterApi.cs")

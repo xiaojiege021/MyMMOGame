@@ -27,11 +27,16 @@ TOKEN="${MMO_P1_5C7_TOKEN:-}"
 CHARACTER="${MMO_P1_5C7_CHARACTER:-0}"
 HAS_DB="${MMO_P1_5C7_HAS_DB:-0}"
 
-BOOSTER="$(python3 -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["item_id"])')"
-DURATION="$(python3 -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["duration_ms"])')"
-GAIN="$(python3 -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["gain_pct"])')"
-PRICE="$(python3 -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(next(i["price"] for i in d["items"] if i["id"]=="shop_exp_booster_1"))')"
-BASE="$(python3 -c 'import json; print(json.load(open("config/exp.json", encoding="utf-8"))["base_exp"])')"
+# Windows 上 python3 的输出行尾是 \r\n，`$(...)` 只剥 \n：下面几个值后面都要么参与
+# 字符串比较、要么参与算术，拖着 \r 会在 `[ "a" = "a\r" ]` 或 `$(( ))` 上假红，
+# 所以一律先 tr -d 掉（本机踩过，同 P3-4a2 的口径）。
+py() { python3 "$@" | tr -d '\r'; }
+
+BOOSTER="$(py -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["item_id"])')"
+DURATION="$(py -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["duration_ms"])')"
+GAIN="$(py -c 'import json; print(json.load(open("config/exp_booster.json", encoding="utf-8"))["booster"]["gain_pct"])')"
+PRICE="$(py -c 'import json; d=json.load(open("config/shop.json", encoding="utf-8")); print(next(i["price"] for i in d["items"] if i["id"]=="shop_exp_booster_1"))')"
+BASE="$(py -c 'import json; print(json.load(open("config/exp.json", encoding="utf-8"))["base_exp"])')"
 ACTIVE=$((BASE * GAIN / 100))
 DELTA=$((ACTIVE - BASE))
 
@@ -356,12 +361,16 @@ SHOP="$("$DOTNET" "$CHARACTER_DLL" --shop-list 2>&1)"
 # 已接发货的种类以后还会涨（c8 起还会加），只钉「头部两个数字相等且不少于本卡的 5 种」，
 # 不写死 delivered_kinds=5：写死数字的话，下一张卡接第六种发货时这张老卡就会假失败。
 SHOP_HDR="$(printf '%s' "$SHOP" | python3 -c 'import re, sys
-line = sys.stdin.readline()
+# 读字节再解码：清单后面的行带中文（GBK），TextIOWrapper 会整块解码、readline 一进来就炸。
+line = sys.stdin.buffer.readline().decode("utf-8", "replace")
 def f(k):
     m = re.search(r"\b" + k + r"=(\d+)", line)
     return int(m.group(1)) if m else -1
 d, v = f("delivered_kinds"), f("deliverable_items")
 print("ok" if d >= 5 and d == v else "bad")')"
+# Windows 上 python3 的输出行尾是 \r\n，`$(...)` 只剥 \n，SHOP_HDR 会拖成 "ok\r"，
+# 下面那句 `[ "$SHOP_HDR" = "ok" ]` 永远不成立（本机踩过，同 P3-4a2 的口径）。
+SHOP_HDR="${SHOP_HDR%$'\r'}"
 if printf '%s' "$SHOP" | grep -q "delivery=${BOOSTER}x1" && [ "$SHOP_HDR" = "ok" ]; then
   ok "清单里限时经验道具发 ${BOOSTER}x1，前四种发货未被带坏"
 else

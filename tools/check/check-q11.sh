@@ -94,6 +94,9 @@ if not (start <= now < start + datetime.timedelta(seconds=dur)):
 print(int((start + datetime.timedelta(seconds=5)).timestamp() * 1000))
 PY
 )"
+# Windows 上 python3 的输出行尾是 \r\n，`$(...)` 只剥 \n，末位会拖一个 \r；
+# 带 \r 的时间戳传给 `--at` 会让只读入口直接起不来（本机踩过，同 P3-4a2 的口径）。
+AT="${AT%$'\r'}"
 SO="$("$DOTNET" "$WD" --world-boss-state --at "$AT" 2>&1 | utf8)"
 step_ok() {   # $1 = 期望片段，$2 = 说明
   if printf '%s' "$SO" | grep -q "$1"; then ok "$2"
@@ -136,6 +139,9 @@ print(int(day.timestamp() * 1000), int(datetime.datetime(2026, 11, 18, h, m, 5,
 PY
 )
 EOF
+# 同上：`read` 不剥 \r，两个时间戳都要手动抹掉。
+AT_LOCAL="${AT_LOCAL%$'\r'}"
+AT_UTC="${AT_UTC%$'\r'}"
 wk() { printf '%s' "$("$DOTNET" "$WD" --world-boss-state --at "$1" ${2:+--calendar "$2"} 2>&1 | utf8)" | grep -m1 '^world_boss_window='; }
 W_LOCAL="$(wk "$AT_LOCAL")"
 W_UTC="$(wk "$AT_LOCAL" "$UTCCAL")"

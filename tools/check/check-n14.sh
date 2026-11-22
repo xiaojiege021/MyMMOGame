@@ -56,8 +56,18 @@ else
 fi
 
 echo "== 3. 世界服列表口（无库，纯计算） =="
+# Windows 上 dotnet 重定向输出走 GBK：地表编号就是中文（旧天城区 / 焦原），
+# 断言前先按平台转码，否则 `grep "^region_list=id=旧天城区 "` 永远不中。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 list_out() {
-  "$DOTNET" "$WORLD_DLL" --region-list --main-stage "$1" ${2:+--alignment "$2"} 2>&1
+  "$DOTNET" "$WORLD_DLL" --region-list --main-stage "$1" ${2:+--alignment "$2"} 2>&1 | utf8
 }
 row_of() { printf '%s' "$2" | grep "^region_list=id=$1 " || true; }
 
@@ -105,7 +115,7 @@ else
 fi
 
 # 静态口径没被改：不参与解锁的地表仍由配置 open 决定
-if "$DOTNET" "$WORLD_DLL" --region-unlock-state 2>&1 | grep -q 'locked=旧天城区,焦原 static_open=6'; then
+if "$DOTNET" "$WORLD_DLL" --region-unlock-state 2>&1 | utf8 | grep -q 'locked=旧天城区,焦原 static_open=6'; then
   ok "解锁表与静态 open 一行未改（locked=旧天城区,焦原 static_open=6）"
 else
   bad "静态 open / 解锁表口径变了"
@@ -119,7 +129,7 @@ cat >"$TMP/regions.json" <<'JSON'
 {"id":"焦原","name":"焦原","chapters":[11],"neighbors":["栖云城"],"dialogue_ids":[],"open":false,"reason":"region_route_mismatch","unlock_stage":11,"main_stage":11}],
 "speakers":[],"factions":[]}
 JSON
-POUT="$("$DOTNET" "$PROBE_DLL" --regions 200 "@$TMP/regions.json" 2>&1)"
+POUT="$("$DOTNET" "$PROBE_DLL" --regions 200 "@$TMP/regions.json" 2>&1 | utf8)"
 if printf '%s' "$POUT" | grep -q '^regions=3' && printf '%s' "$POUT" | grep -q '^regions_open=2' \
    && printf '%s' "$POUT" | grep -q '^locked=焦原:region_route_mismatch'; then
   ok "客户端拆到 open / reason / unlock_stage（3 条里开 2 块，焦原路线不符）"

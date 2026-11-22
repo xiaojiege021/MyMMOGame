@@ -64,10 +64,13 @@ def report(key, cond, info=""):
 # Q12 加了 rename_item_id（name_rules.json 指到改名卡），同样要在这里登记。
 REF_KEYS = {"item_id", "stone_id", "protect_item_id", "stone_item_id", "rename_item_id"}
 
-# 配置设计 2 节的物品种类，加上通行证已经在用的 appearance_fragment / outfit。
+# 配置设计 2 节的物品种类，加上通行证已经在用的 appearance_fragment / outfit，
+# 以及 K1 起接的五类外观（服装 / 武器幻形 / 境界外观 / 飞行拖尾 / 坐骑外观，
+# 与 WardrobeRepository.AppearanceKinds 同一份口径，B7+B8 把后四种真的挂上了商品）。
 KINDS = {
     "material", "consumable", "equipment", "crystal", "voucher", "title",
     "appearance", "appearance_fragment", "outfit", "home_decor", "tool", "bag",
+    "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
 }
 BINDS = {"none", "on_pickup", "always"}
 

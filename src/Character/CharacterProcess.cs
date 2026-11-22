@@ -417,6 +417,13 @@ public sealed class CharacterProcess(string configPath)
             + " max_slots=" + characterSlotTable.MaxSlots
             + " table=character_slot");
 
+        // B7+B8：背包扩容的事实值。容量是算出来的：基础格 + 买过的次数 × 步长，到上限封顶。
+        Console.WriteLine("bag_capacity=base=" + config.BagSlots
+            + " step=" + config.BagExpandStep
+            + " max=" + config.BagSlotsMax
+            + " product=" + (shopTable.Items.FirstOrDefault(
+                i => i.Mode == DeliveryMode.BagExpand)?.Id ?? ""));
+
         // C1：十二场内容只在这里列一遍事实值，定词正文仍只在 config/dialogue。
         Console.WriteLine("mainline_config=" + (mainlineTable.IsMissing ? "missing" : "ok")
             + " stages=" + mainlineTable.Stages.Count
@@ -596,6 +603,10 @@ public sealed class CharacterProcess(string configPath)
         // 与第二角色栏的名额事务（账号一行、只存总名额）。
         var monthlyBundles = new MonthlyBundleRepository(dataSource, monthlyBundleTable, items, config);
         var characterSlotsRepo = new CharacterSlotRepository(dataSource, characterSlotTable);
+        // B7+B8：背包扩容的唯一写入点。商品编号从商城清单现取（mode=bag_expand 那一条），
+        // 步长与上限只从 character.json 读；代码里没有第二份数字。
+        var bagProduct = shopTable.Items.FirstOrDefault(i => i.Mode == DeliveryMode.BagExpand);
+        var bagExpands = new BagExpandRepository(dataSource, config, bagProduct?.Id ?? "");
         // P3-4b：外观收藏是账号级只读视图，不写库、不改背包归属。
         var wardrobeRepo = new WardrobeRepository(dataSource, items);
         // C1：主线进度的唯一写入点。交任务与只读口共用这一份加载过的十二场正本。
@@ -688,6 +699,7 @@ public sealed class CharacterProcess(string configPath)
         builder.Services.AddSingleton(monthlyBundles);
         builder.Services.AddSingleton(characterSlotTable);
         builder.Services.AddSingleton(characterSlotsRepo);
+        builder.Services.AddSingleton(bagExpands);
         builder.Services.AddSingleton(wardrobeRepo);
         builder.Services.AddSingleton(mainlineTable);
         builder.Services.AddSingleton(mainlines);

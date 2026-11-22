@@ -301,7 +301,8 @@ for base_dir in ("src", "tools/probe/CliProbe"):
                 # C# 里的 SQL 是 \"角色\" 转义文本，别按裸引号去比对；逐行找同一条语句。
                 for line in open(p, encoding="utf-8"):
                     if "delete from" in line and "revive_scroll_cooldown" in line:
-                        hits.append(os.path.relpath(p, root))
+                        # Windows 上 relpath 用反斜杠，钉的是正斜杠的相对路径，先归一再比。
+                        hits.append(os.path.relpath(p, root).replace(os.sep, "/"))
                         break
 report("reset_only_for_check", hits == ["tools/probe/CliProbe/CoreCli.cs"], ",".join(hits))
 
@@ -345,11 +346,14 @@ if "$DOTNET" "$CHARACTER_DLL" --revive-scroll-list > "$TMP/scroll.txt" 2>&1; the
     *) bad "卷轴表头部不对：$head1" ;;
   esac
   # 按空格切词、只认前缀完全相等的那一个（sed 的 .* 会贪婪匹配到别的字段）。
+  # 读 buffer 再按 UTF-8 + replace 解码：这一行带中文名（GBK 字节），
+  # Windows 上 sys.stdin 是 UTF-8，直接 read() 会 UnicodeDecodeError、取回空值。
   word_of() { printf '%s\n' "$head1" | python3 -c 'import sys
 key = sys.argv[1]
-for t in sys.stdin.read().split():
+text = sys.stdin.buffer.read().decode("utf-8", "replace")
+for t in text.split():
     if t.startswith(key + "="):
-        print(t.split("=", 1)[1]); break' "$1"; }
+        sys.stdout.write(t.split("=", 1)[1]); break' "$1"; }
   cd_ms="$(word_of cooldown_ms)"
   hp_pct="$(word_of hp_restore_pct)"
   exp_pct="$(word_of exp_cost_pct)"

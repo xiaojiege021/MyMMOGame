@@ -25,6 +25,15 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+# Windows 上 dotnet 重定向输出走 GBK：NPC / 怪物行里带人名与地名，断言前先按平台转码。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -297,12 +306,15 @@ CL="$("$DOTNET" "$CHARACTER_DLL" --content-list 2>&1)"; clrc=$?
 [ "$clrc" = "0" ] && grep -q '^content_table=ok npcs=11 monsters=12 npc_version=1 monster_version=1$' <<< "$CL" \
   && ok "内容表读出 11 位 NPC / 12 只怪物（不连库）" \
   || bad "内容表只读入口不对（rc=${clrc}）：$(head -2 <<< "$CL" | tr '\n' ' ')"
-grep -q '^npc=npc_qiao_xiaoman name=乔小满 region=枯岚道 role=quest faction=- dialogue=乔小满 shop=- pos=12,0,8 facing=180' <<< "$CL" \
-  && ok "NPC 行带位置 / 所属 / 对话引用" || bad "NPC 行不对：$(grep '^npc=npc_qiao' <<< "$CL")"
-grep -q '^npc=npc_shop_qiyun .* role=merchant .* shop=npc_general_qiyun ' <<< "$CL" \
-  && ok "NPC 商店引用读得到" || bad "商店 NPC 行不对：$(grep '^npc=npc_shop_qiyun' <<< "$CL")"
-grep -q '^monster=mob_kulan_beast name=枯岚凶兽 tier=normal level=5 .* spawn=枯岚道@20,0,30+60s' <<< "$CL" \
-  && ok "普通怪带刷怪点与掉落" || bad "怪物行不对：$(grep '^monster=mob_kulan_beast' <<< "$CL")"
+CLU="$(printf '%s' "$CL" | utf8)"
+grep -q '^npc=npc_qiao_xiaoman name=乔小满 region=枯岚道 role=quest faction=- dialogue=乔小满 shop=- pos=12,0,8 facing=180' <<< "$CLU" \
+  && ok "NPC 行带位置 / 所属 / 对话引用" || bad "NPC 行不对：$(grep '^npc=npc_qiao' <<< "$CLU")"
+# 这一行中间带中文（执事名与地名）：`.*` 在 UTF-8 locale 下跨不过 GBK 的非法字节，
+# 必须用转码后的 CLU 再匹配（同 check-k1 的 LC_ALL=C 口径）。
+grep -q '^npc=npc_shop_qiyun .* role=merchant .* shop=npc_general_qiyun ' <<< "$CLU" \
+  && ok "NPC 商店引用读得到" || bad "商店 NPC 行不对：$(grep '^npc=npc_shop_qiyun' <<< "$CLU")"
+grep -q '^monster=mob_kulan_beast name=枯岚凶兽 tier=normal level=5 .* spawn=枯岚道@20,0,30+60s' <<< "$CLU" \
+  && ok "普通怪带刷怪点与掉落" || bad "怪物行不对：$(grep '^monster=mob_kulan_beast' <<< "$CLU")"
 if [ "$(grep -c '^npc=' <<< "$CL")" = "11" ] && [ "$(grep -c '^monster=' <<< "$CL")" = "12" ]; then
   ok "清单条数与表一致（11 / 12）"
 else
@@ -425,12 +437,13 @@ mon["monsters"].append({
 json.dump(mon, open(os.path.join(base, "monsters.json"), "w", encoding="utf-8"), ensure_ascii=False)
 PY
 ADDED="$(run_content "$CASE")"
+ADDEDU="$(printf '%s' "$ADDED" | utf8)"
 if head -1 <<< "$ADDED" | grep -q 'npcs=12 monsters=13' \
-   && grep -q '^npc=npc_k6_probe name=核对用路人 ' <<< "$ADDED" \
-   && grep -q '^monster=mob_k6_probe name=核对用怪 ' <<< "$ADDED"; then
+   && grep -q '^npc=npc_k6_probe name=核对用路人 ' <<< "$ADDEDU" \
+   && grep -q '^monster=mob_k6_probe name=核对用怪 ' <<< "$ADDEDU"; then
   ok "加一位 NPC + 一只怪只改配置：11/12 → 12/13"
 else
-  bad "新增内容没生效：$(head -2 <<< "$ADDED" | tr '\n' ' ')"
+  bad "新增内容没生效：$(head -2 <<< "$ADDEDU" | tr '\n' ' ')"
 fi
 
 finish "$TITLE"

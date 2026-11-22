@@ -415,13 +415,12 @@ internal static class CliParser
                 characterSlotPath = args[++i];
                 break;
             // 只给核对用：读回这个账号有几个角色位、已经建了几个角色。
-            case "--character-slots" when i + 1 < args.Length:
-                characterSlotsOf = args[++i];
-                break;
+            case "--character-slots" when i + 1 < args.Length: characterSlotsOf = args[++i]; break;
             // 只给核对用：读回这个账号的外观收藏（只读并集，不写库）。
-            case "--wardrobe" when i + 1 < args.Length:
-                wardrobeOf = args[++i];
-                break;
+            case "--wardrobe" when i + 1 < args.Length: wardrobeOf = args[++i]; break;
+            // 只给核对用：读回这个角色的背包扩容现状（基础格 / 步长 / 上限 / 次数 / 现在几格）。
+            // 三行并一行的写法与上面两个同形：CliParser 已到 D1a 的 600 行天花板，同形 flag 不许再各占四行。
+            case "--bag-expand-state" when i + 1 < args.Length: bagExpandStateOf = long.Parse(args[++i]); break;
             // 只给核对 / 种子用：把名额直推到指定值（只增不减，不扣钱）。产品路径不走这里。
             case "--raw-grant-character-slot" when i + 2 < args.Length:
                 rawSlotAccount = args[++i];

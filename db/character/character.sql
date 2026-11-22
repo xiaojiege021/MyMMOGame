@@ -804,3 +804,18 @@ CREATE TABLE IF NOT EXISTS "角色".npc_shop_buyback (
 
 CREATE INDEX IF NOT EXISTS npc_shop_buyback_live
     ON "角色".npc_shop_buyback (character_id, shop_id, sold_at DESC);
+
+-- B7+B8：背包扩容落角色（与 db/character/bag_expand.sql 是同一份幂等 DDL）。
+-- 只加一列：买过几次；容量由 config 的 bag_slots / bag_expand_step / bag_slots_max 算。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS bag_expand_count integer NOT NULL DEFAULT 0;
+
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_bag_expand_count_non_negative;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_bag_expand_count_non_negative CHECK (bag_expand_count >= 0);
+
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_bag_expand_count_sane;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_bag_expand_count_sane CHECK (bag_expand_count <= 1000);

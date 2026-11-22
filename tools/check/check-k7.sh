@@ -24,6 +24,16 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+# Windows 上 dotnet 重定向输出走 GBK：城池行中间带地名，`.*` 在 UTF-8 locale 下
+# 跨不过非法字节，断言前先按平台转码（同 check-k1 的 LC_ALL=C 口径）。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -214,8 +224,9 @@ CITY_OUT="$("$DOTNET" "$CHARACTER_DLL" --city-table 2>&1)"; crc=$?
 [ "$crc" = "0" ] && grep -q 'city_table_state=ok version=2 ' <<< "$CITY_OUT" \
   && ok "城池表 v2 读出（不连库）" \
   || bad "城池表只读入口不对（rc=${crc}）：$(head -2 <<< "$CITY_OUT" | tr '\n' ' ')"
-grep -q '^city=qiyun .*vein=spirit_qiyun_1 owner_sect=db tax_pct=db' <<< "$CITY_OUT" \
-  && ok "配置只回静态三列；归属 / 税率标 db" || bad "城池行不对：$(grep '^city=' <<< "$CITY_OUT")"
+CITY_U="$(printf '%s' "$CITY_OUT" | utf8)"
+grep -q '^city=qiyun .*vein=spirit_qiyun_1 owner_sect=db tax_pct=db' <<< "$CITY_U" \
+  && ok "配置只回静态三列；归属 / 税率标 db" || bad "城池行不对：$(grep '^city=' <<< "$CITY_U")"
 if grep -qE 'tax_pct=[0-9]' <<< "$CITY_OUT"; then
   bad "配置输出里还带着税率数字"
 else

@@ -418,7 +418,8 @@ public sealed class CraftRepository(
                 slots,
                 new[] { new DropLineDef(recipe.OutputItemId, recipe.OutputCount) },
                 items,
-                config.BagSlots);
+                await BagExpandRepository.SlotsAsync(
+                    connection, transaction, characterId, config, stopping));
         }
         catch (GrantException ex)
         {

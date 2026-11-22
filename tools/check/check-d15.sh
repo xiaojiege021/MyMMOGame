@@ -24,7 +24,9 @@ source "$ROOT/tools/check/lib-common.sh"
 LEDGER="docs/不可逆点清单.md"
 MUTATE="tools/check/mutate.sh"
 MUT_DIR="tools/check/mutations"
-TMP="$(mktemp -d)"
+# Windows 上 mktemp 给的是 "C://Users//...//Temp/tmp.xxx"（前缀带反斜杠）：塞进 JSON
+# 会被当成非法转义、传给 python 也可能落到 C://tmp。统一洗成正斜杠（同 check-c1 的口径）。
+TMP="$(mktemp -d)"; TMP="${TMP//\\//}"
 trap 'rm -rf "$TMP"' EXIT
 
 step() { printf '\n== %s ==\n' "$1"; }

@@ -25,6 +25,16 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+# Windows 上 dotnet 重定向输出走 GBK：境界名全是中文（金仙 / 散仙 / 大乘），
+# 转成 UTF-8 再比，grep -F 才比得中（同 P3-1a1 的口径）。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -171,7 +181,7 @@ if ! grep -q '^PASS static_end' "$TMP/static.txt"; then
 fi
 
 echo "== 3. 无库段：展示名 / 别名兼容 / 开关不变 =="
-"$DOTNET" "$CLI" --realm-table --config config/character.json >"$TMP/rt.txt" 2>&1
+"$DOTNET" "$CLI" --realm-table --config config/character.json 2>&1 | utf8 >"$TMP/rt.txt"
 rt_check() {
   local pattern="$1" msg="$2"
   if grep -qF "$pattern" "$TMP/rt.txt"; then

@@ -128,7 +128,9 @@ for dirpath, dirnames, names in os.walk(assets):
         if not name.endswith((".cs", ".txt", ".json")):
             continue
         path = os.path.join(dirpath, name)
-        if path == content_path:
+        # Windows 上 os.path.join 给反斜杠，content_path 里带正斜杠，直接比永远不等，
+        # 于是「生成物自己」也被当成手写文案扫出命中。先归一成正斜杠再比。
+        if path.replace(os.sep, "/") == content_path.replace(os.sep, "/"):
             continue
         body = read(path)
         hit = [t for t in config_texts if t in body]
@@ -161,8 +163,9 @@ for base in ("src", "client/MMOGame/Assets", "tools", "proto", "db", "config"):
             if not name.endswith((".cs", ".py", ".sh", ".json", ".proto", ".sql", ".txt")):
                 continue
             path = os.path.join(dirpath, name)
-            rel = os.path.relpath(path, root)
-            if rel == os.path.relpath(content_path, root) or rel.startswith("config/dialogue/"):
+            rel = os.path.relpath(path, root).replace(os.sep, "/")
+            if rel == os.path.relpath(content_path, root).replace(os.sep, "/") \
+               or rel.startswith("config/dialogue/"):
                 continue
             body = read(path)
             hit = [t for t in config_texts if t in body]

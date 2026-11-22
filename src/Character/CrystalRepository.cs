@@ -404,7 +404,8 @@ public sealed class CrystalRepository(
             + "where i.character_id = $1 and i.slot = g)",
             connection, transaction);
         read.Parameters.AddWithValue(characterId);
-        read.Parameters.AddWithValue(config.BagSlots);
+        read.Parameters.AddWithValue(await BagExpandRepository.SlotsAsync(
+            connection, transaction, characterId, config, stopping));
         var value = await read.ExecuteScalarAsync(stopping);
         return value is null or DBNull ? null : Convert.ToInt32(value);
     }

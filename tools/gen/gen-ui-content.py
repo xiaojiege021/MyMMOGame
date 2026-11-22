@@ -241,10 +241,17 @@ namespace HotUpdate.Ui
 
     out = os.path.abspath(args.out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out, "w", encoding="utf-8") as f:
+    # newline="\n"：Windows 上文本模式会把 \n 翻成 \r\n，生成物与仓库里那份
+    # 逐字比对（C5 / K6）就整篇假红。生成物一律 LF，跨平台逐字节一致。
+    with open(out, "w", encoding="utf-8", newline="\n") as f:
         f.write(body)
+    # Windows 上核对脚本的临时目录常在 C:，而仓库在 E:，跨盘符没有相对路径可算。
+    try:
+        shown = os.path.relpath(out, ROOT)
+    except ValueError:
+        shown = out
     print("wrote=%s regions=%d speakers=%d npcs=%d lines=%d shops=%d" %
-          (os.path.relpath(out, ROOT), len(region_order), len(speakers),
+          (shown, len(region_order), len(speakers),
            len(npcs), total_lines, len(shop_lines)))
 
 

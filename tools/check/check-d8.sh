@@ -100,7 +100,9 @@ report("files_exist", not missing, missing[:3])
 report("files_unique", len(files) == len(set(files)), len(files) - len(set(files)))
 report("files_under_db", all(re.match(r"^db/(character|social|trade)/[^/]+\.sql$", f) for f in files))
 
-on_disk = sorted(glob.glob("db/character/*.sql") + glob.glob("db/social/*.sql") + glob.glob("db/trade/*.sql"))
+# Windows 上 glob 把目录分隔符给成反斜杠，跟迁移清单里的正斜杠永远对不上，先归一。
+on_disk = sorted(p.replace(os.sep, "/") for p in
+                 glob.glob("db/character/*.sql") + glob.glob("db/social/*.sql") + glob.glob("db/trade/*.sql"))
 report("every_sql_registered", set(on_disk) == set(files), sorted(set(on_disk) ^ set(files))[:5])
 
 reapply = [entry["file"] for rows in entries.values() for entry in rows if entry.get("reapply")]

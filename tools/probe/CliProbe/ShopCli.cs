@@ -405,6 +405,22 @@ internal static class ShopCli
             }
         }
 
+        // B7+B8：背包扩容现状。只读：基础格 / 步长 / 上限 / 买过几次 / 现在几格。
+        // 不读 shop.json——这里的 product 只作展示，核对看的是容量算法与库里的次数。
+        if (bagExpandStateOf != 0)
+        {
+            var bagConfig = CharacterConfig.Load(configPath);
+            var bagRepo = new BagExpandRepository(dataSource, bagConfig, "");
+            var state = await bagRepo.DescribeAsync(bagExpandStateOf, CancellationToken.None);
+            Console.WriteLine("bag_expand_state=ok id=" + state.CharacterId
+                + " found=" + (state.Found ? "true" : "false")
+                + " base_slots=" + state.BaseSlots
+                + " step=" + state.Step
+                + " max_slots=" + state.MaxSlots
+                + " count=" + state.Count
+                + " slots=" + state.Slots);
+        }
+
         // P3-4b：第二角色栏与外观收藏。名额的事实值在库里那一行（没有就按配置的基础位），
         // 外观收藏按账号把名下所有角色持有的外观类物品取并集——三个入口都只读，
         // 只有 --raw-grant-character-slot 会写，而它只给种子 / 核对用，不扣钱也不推进产品路径。

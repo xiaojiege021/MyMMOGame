@@ -1,0 +1,22 @@
+{
+  "card": "B7+B8",
+  "check": "check-k1.sh",
+  "mutations": [
+    {
+      "id": "先加格后扣钱（把加格那一段挪到扣款之前）",
+      "file": "src/Character/BagExpandRepository.cs",
+      "kind": "text-replace",
+      "find": "            if (!await DebitYuanbaoAsync(connection, transaction, characterId, price, stopping))\n            {\n                throw new BagExpandException(\"not_enough_yuanbao\");\n            }\n\n            var target = current + 1;\n            await using (var write = new NpgsqlCommand(\n                \"update \\\"角色\\\".character set bag_expand_count = $2 where id = $1\",\n                connection, transaction))\n            {\n                write.Parameters.AddWithValue(characterId);\n                write.Parameters.AddWithValue(target);\n                await write.ExecuteNonQueryAsync(stopping);\n            }\n\n",
+      "replace": "            var target = current + 1;\n            await using (var write = new NpgsqlCommand(\n                \"update \\\"角色\\\".character set bag_expand_count = $2 where id = $1\",\n                connection, transaction))\n            {\n                write.Parameters.AddWithValue(characterId);\n                write.Parameters.AddWithValue(target);\n                await write.ExecuteNonQueryAsync(stopping);\n            }\n\n            if (!await DebitYuanbaoAsync(connection, transaction, characterId, price, stopping))\n            {\n                throw new BagExpandException(\"not_enough_yuanbao\");\n            }\n\n",
+      "expect": "check-k1.sh 的 b7b8_txn_order 应变红"
+    },
+    {
+      "id": "失败路径不回滚（扣了钱 / 加了格都留在半路）",
+      "file": "src/Character/BagExpandRepository.cs",
+      "kind": "text-replace",
+      "find": "        catch (BagExpandException ex)\n        {\n            await transaction.RollbackAsync(stopping);\n",
+      "replace": "        catch (BagExpandException ex)\n        {\n",
+      "expect": "check-k1.sh 的 b7b8_txn_rollback 应变红"
+    }
+  ]
+}

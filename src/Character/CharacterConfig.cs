@@ -8,7 +8,8 @@ namespace Character;
 /// 连接串不在这里，从环境或 /srv/mmo/gamedb.env 读。
 /// </summary>
 public sealed record CharacterConfig(
-    string Listen, int DbPoolMax, int BagSlots, string DungeonTable, string ExpTable,
+    string Listen, int DbPoolMax, int BagSlots, int BagExpandStep, int BagSlotsMax,
+    string DungeonTable, string ExpTable,
     string EnhanceTable, string TransferTable, string CrystalTable, string AuctionTable,
     string ShopTable, string TalismanTable, string ReviveScrollTable, string ExpBoosterTable,
     string UnbindTable, string RechargeTable, string SocialUpstream, string RealmTable,
@@ -112,6 +113,27 @@ public sealed record CharacterConfig(
         if (bagSlots < 1 || bagSlots > 200)
         {
             throw new ConfigException("bag_slots 必须在 1 到 200 之间，现在是 " + bagSlots);
+        }
+
+        // B7+B8：背包扩容的步长与上限。两键不写就是「扩容没开」——老卡的临时配置目录
+        // （只改 bag_slots 试上限的那几张）不必补这两行，容量仍等于 bag_slots。
+        // 步长与上限都是配置数值，代码里没有第二份。
+        var bagExpandStep = wire.BagExpandStep ?? 0;
+        if (bagExpandStep < 0 || bagExpandStep > 200)
+        {
+            throw new ConfigException("bag_expand_step 必须在 0 到 200 之间，现在是 " + bagExpandStep);
+        }
+
+        var bagSlotsMax = wire.BagSlotsMax ?? bagSlots;
+        if (bagSlotsMax < bagSlots || bagSlotsMax > 200)
+        {
+            throw new ConfigException("bag_slots_max 必须不小于 bag_slots 且不超过 200，现在是 "
+                + bagSlotsMax + "（bag_slots=" + bagSlots + "）");
+        }
+
+        if (bagExpandStep > 0 && bagSlotsMax <= bagSlots)
+        {
+            throw new ConfigException("bag_expand_step 大于 0 时 bag_slots_max 必须大于 bag_slots");
         }
 
         // 副本表缺省读仓库那一份；核对脚本可以指到临时副本，改上限做隔离测试。
@@ -332,7 +354,8 @@ public sealed record CharacterConfig(
         }
 
         return new CharacterConfig(
-            listen.TrimEnd('/'), pool, bagSlots, dungeonTable, expTable, enhanceTable,
+            listen.TrimEnd('/'), pool, bagSlots, bagExpandStep, bagSlotsMax,
+            dungeonTable, expTable, enhanceTable,
             transferTable, crystalTable, auctionTable, shopTable, talismanTable,
             reviveScrollTable, expBoosterTable, unbindTable, rechargeTable,
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
@@ -357,6 +380,13 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("bag_slots")]
         public int? BagSlots { get; init; }
+
+        // B7+B8：不写就是扩容没开（老卡的临时配置目录不必补）。
+        [JsonPropertyName("bag_expand_step")]
+        public int? BagExpandStep { get; init; }
+
+        [JsonPropertyName("bag_slots_max")]
+        public int? BagSlotsMax { get; init; }
 
         [JsonPropertyName("dungeon_table")]
         public string? DungeonTable { get; init; }

@@ -882,6 +882,9 @@ message BuyShopItemResponse {
   // P3-4b：第二角色栏买完之后这个账号一共几个角色位（账号级事实值，从库里读回）。
   // 只在 kind=second_slot 这条商品上是有效值：别的商品恒 0，不拿它顶任何数。
   int32 character_slots = 19;
+  // B7+B8：背包扩容买完之后这个角色一共几格（按角色的仓位事实值，从库里读回）。
+  // 只在 bag_expand 这条发货方式上是有效值：别的商品恒 0，不拿它顶任何数。
+  uint32 bag_slots = 20;
 }
 
 message BuyHomeCoinShopRequest {

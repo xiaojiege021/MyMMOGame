@@ -30,13 +30,16 @@ trap cleanup EXIT
 
 # 从「key=value key=value」日志行里按空格切词取一个字段（别用贪婪 sed）。
 field_of() {
+  # 两处 Windows 口径：① 读 buffer 再按 UTF-8 + replace 解码——这一行带中文名（GBK 字节），
+  # 文本模式的 sys.stdin 一进来就 UnicodeDecodeError、取回空值；② 用 sys.stdout.write
+  # 而不是 print，print 带 "\r\n"、`$(...)` 只剥 \n，取回的值会拖着 \r 跟配置比不相等。
   printf '%s\n' "$1" | python3 -c 'import sys
 want = sys.argv[1] + "="
-for line in sys.stdin:
-    for word in line.split():
-        if word.startswith(want):
-            print(word[len(want):]); raise SystemExit
-print("")' "$2"
+text = sys.stdin.buffer.read().decode("utf-8", "replace")
+for word in text.split():
+    if word.startswith(want):
+        sys.stdout.write(word[len(want):]); raise SystemExit
+sys.stdout.write("")' "$2"
 }
 
 echo "== 1. 编译 =="

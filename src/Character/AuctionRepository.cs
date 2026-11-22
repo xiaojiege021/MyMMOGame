@@ -102,7 +102,9 @@ public sealed class AuctionRepository(
                 throw new AuctionException("same_character");
             }
 
-            if (slot < 1 || slot > config.BagSlots || count < 1 || price < 1)
+            var sellerSlots = await BagExpandRepository.SlotsAsync(
+                connection, transaction, sellerId, config, stopping);
+            if (slot < 1 || slot > sellerSlots || count < 1 || price < 1)
             {
                 throw new AuctionException("listing_invalid");
             }
@@ -242,7 +244,8 @@ public sealed class AuctionRepository(
                     connection, transaction))
                 {
                     read.Parameters.AddWithValue(buyerId);
-                    read.Parameters.AddWithValue(config.BagSlots);
+                    read.Parameters.AddWithValue(await BagExpandRepository.SlotsAsync(
+                        connection, transaction, buyerId, config, stopping));
                     free = await read.ExecuteScalarAsync(stopping);
                 }
 

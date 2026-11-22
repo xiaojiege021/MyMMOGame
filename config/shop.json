@@ -1,20 +1,48 @@
 {
   "schema": "shop-table/1",
-  "version": 12,
+  "version": 13,
   "currency": "yuanbao",
-  "note": "商城清单唯一正本（K1 起 v11，Q12 升 v12）。方案 12.1 写定：只收元宝、直接标价、不做抽卡；能上架的只有 categories 里那十九种（Q12 按用户决定追加第十九种 rename_card，改名卡 500 元宝、一张改一次名，方案正文同步追加），forbidden 那串一律不上架——两张表都在本文件里，代码不再写第二份。每条商品按 delivery.mode 决定买到手变成什么：item（进背包，走 ApplyGrant 同一事务）/ season_pass（开本季付费轨，不背包）/ monthly_bundle（一次放两种符，发什么只在 monthly_bundle.json）/ second_slot（账号角色位 +1）/ none（还没接发货，回 delivery_pending、一分不扣）。mode 的取值是代码能力、不是内容：wardrobe / bag_slots / guild_display 三种要等 B7+B8 接上才允许出现在这里，在那之前那八条外观与扩容商品写 none。价格、数量、货币、发货方式、限购、库存只在配置里，代码 / proto / SQL 没有第二份。limit 与 stock 这两个数方案没写定：一次性商品（通行证 / 第二角色栏）填 1 声明「每角色一张」，其余填 0 = 不限；库存一律 unlimited。本卡只把这些字段带齐并在加载期校验范围，真正的限购 / 库存判定在 B7+B8 与 K2，不在这里假装生效。通栏规则照旧：红符必须就是 talisman.json 的 red.item_id、蓝符是 blue.item_id（红符不是红药、蓝符不是蓝药）、复活卷轴是 revive_scroll.json 的 scroll.item_id（不另卖复活币）、经验道具是 exp_booster.json 的 booster.item_id（商城是唯一来源）、解绑道具是 unbind_item.json 的 unbind.item_id、保护券是 enhance.json 的 protect_item_id（与通行证付费轨发的是同一种）、改名卡是 name_rules.json 的 rename_item_id（一张改一次，扣卡在角色服改名事务里），传送符与月叠发的是同一件。新增一件商品只改这个文件，不改代码。",
+  "note": "商城清单唯一正本（K1 起 v11，Q12 升 v12）。方案 12.1 写定：只收元宝、直接标价、不做抽卡；能上架的只有 categories 里那十九种（Q12 按用户决定追加第十九种 rename_card，改名卡 500 元宝、一张改一次名，方案正文同步追加），forbidden 那串一律不上架——两张表都在本文件里，代码不再写第二份。每条商品按 delivery.mode 决定买到手变成什么：item（进背包，走 ApplyGrant 同一事务）/ season_pass（开本季付费轨，不背包）/ monthly_bundle（一次放两种符，发什么只在 monthly_bundle.json）/ second_slot（账号角色位 +1）/ none（还没接发货，回 delivery_pending、一分不扣）。mode 的取值是代码能力、不是内容：wardrobe / bag_slots / guild_display 三种要等 B7+B8 接上才允许出现在这里，在那之前那八条外观与扩容商品写 none。价格、数量、货币、发货方式、限购、库存只在配置里，代码 / proto / SQL 没有第二份。limit 与 stock 这两个数方案没写定：一次性商品（通行证 / 第二角色栏）填 1 声明「每角色一张」，其余填 0 = 不限；库存一律 unlimited。本卡只把这些字段带齐并在加载期校验范围，真正的限购 / 库存判定在 B7+B8 与 K2，不在这里假装生效。通栏规则照旧：红符必须就是 talisman.json 的 red.item_id、蓝符是 blue.item_id（红符不是红药、蓝符不是蓝药）、复活卷轴是 revive_scroll.json 的 scroll.item_id（不另卖复活币）、经验道具是 exp_booster.json 的 booster.item_id（商城是唯一来源）、解绑道具是 unbind_item.json 的 unbind.item_id、保护券是 enhance.json 的 protect_item_id（与通行证付费轨发的是同一种）、改名卡是 name_rules.json 的 rename_item_id（一张改一次，扣卡在角色服改名事务里），传送符与月叠发的是同一件。新增一件商品只改这个文件，不改代码。B7+B8（v12）：八类里七类接上发货——五类外观与洞府走 item（发一件同种类绑定物品进背包，收藏是背包并集只读视图），背包走 bag_expand（加格落角色，不落包），宗门展示仍 none（暂缓，展示位没有落点）。境界外观带 require_realm.enum_index_min（方案 12.1 的购买门槛）。",
   "categories": [
-    "outfit", "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
-    "home_decor", "guild_display", "bag_expand", "teleport_talisman",
-    "red_talisman", "blue_talisman", "revive_scroll", "unbind_item",
-    "exp_booster", "monthly_bundle", "second_slot", "season_pass",
-    "protect_ticket", "rename_card"
+    "outfit",
+    "weapon_skin",
+    "realm_skin",
+    "flight_trail",
+    "mount_skin",
+    "home_decor",
+    "guild_display",
+    "bag_expand",
+    "teleport_talisman",
+    "red_talisman",
+    "blue_talisman",
+    "revive_scroll",
+    "unbind_item",
+    "exp_booster",
+    "monthly_bundle",
+    "second_slot",
+    "season_pass",
+    "protect_ticket",
+    "rename_card"
   ],
   "forbidden": [
-    "gold", "enhance_stone", "transfer_stone", "crystal", "spirit_stone",
-    "pill", "ore", "herb", "equip_blueprint", "equip", "attr_item",
-    "revive_coin", "fatigue", "dungeon_count", "weekly_share",
-    "realm_speed", "guild_tech", "territory_bonus"
+    "gold",
+    "enhance_stone",
+    "transfer_stone",
+    "crystal",
+    "spirit_stone",
+    "pill",
+    "ore",
+    "herb",
+    "equip_blueprint",
+    "equip",
+    "attr_item",
+    "revive_coin",
+    "fatigue",
+    "dungeon_count",
+    "weekly_share",
+    "realm_speed",
+    "guild_tech",
+    "territory_bonus"
   ],
   "items": [
     {
@@ -23,11 +51,20 @@
       "category": "outfit",
       "price": 300,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "outfit_s1",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "只改样子；发货（进外观收藏）在 B7+B8"
+      "note": "B7+B8：服饰外观发 outfit_s1 进背包，收藏按账号并集自动可见。"
     },
     {
       "id": "shop_weapon_skin_1",
@@ -35,11 +72,20 @@
       "category": "weapon_skin",
       "price": 300,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "skin_weapon_s1",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "只改样子，不改装备数值；发货在 B7+B8"
+      "note": "B7+B8：武器幻形只换样子，不改兵器种类与属性。"
     },
     {
       "id": "shop_realm_skin_1",
@@ -47,11 +93,23 @@
       "category": "realm_skin",
       "price": 500,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "skin_realm_jinxian",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "到境界后才能买，不卖境界；发货在 B7+B8"
+      "note": "B7+B8：方案 12.1 写定「到达金仙才能买金仙外观」，门槛在 require_realm（金仙是第 10 段）。",
+      "require_realm": {
+        "enum_index_min": 10
+      }
     },
     {
       "id": "shop_flight_trail_1",
@@ -59,11 +117,20 @@
       "category": "flight_trail",
       "price": 200,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "trail_flight_s1",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "飞行仍由境界开放；发货在 B7+B8"
+      "note": "B7+B8：飞行拖尾只做表现；飞行权限仍由境界开放，没有权限时拖尾不让人飞。"
     },
     {
       "id": "shop_mount_skin_1",
@@ -71,11 +138,20 @@
       "category": "mount_skin",
       "price": 400,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "skin_mount_s1",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "不叠速度、不进战斗；发货在 B7+B8"
+      "note": "B7+B8：坐骑外观纯外观，不叠速度、不进战斗。"
     },
     {
       "id": "shop_home_decor_1",
@@ -83,11 +159,20 @@
       "category": "home_decor",
       "price": 250,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "decor_s1",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "只做展示和生活；发货在 B7+B8"
+      "note": "B7+B8：洞府摆件发进背包，社交服摆放只读可见（C3 的口径），不进战斗、不加属性。"
     },
     {
       "id": "shop_guild_display_1",
@@ -95,11 +180,18 @@
       "category": "guild_display",
       "price": 600,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "none"
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "不卖宗门科技与领地加成；发货在 B7+B8"
+      "note": "B7+B8：宗门展示暂缓——山门 / 旗帜 / 成员披风在社交服没有落点，等宗门展示位那张卡；买它仍回 delivery_pending，一分不扣。"
     },
     {
       "id": "shop_bag_expand_1",
@@ -107,11 +199,18 @@
       "category": "bag_expand",
       "price": 150,
       "currency": "yuanbao",
-      "delivery": { "mode": "none" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "bag_expand"
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
-      "note": "只加格子；按角色加格在 B7+B8"
+      "note": "B7+B8：背包扩容是状态发货——每买一次 +10 格、到 80 格封顶，不往背包放东西；步长与上限在 config/character.json。"
     },
     {
       "id": "shop_teleport_talisman_1",
@@ -119,9 +218,18 @@
       "category": "teleport_talisman",
       "price": 20,
       "currency": "yuanbao",
-      "delivery": { "mode": "item", "item_id": "teleport_talisman", "count": 1 },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "teleport_talisman",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "绑定，只省路程；与月叠发的是同一件"
     },
@@ -131,9 +239,18 @@
       "category": "red_talisman",
       "price": 15,
       "currency": "yuanbao",
-      "delivery": { "mode": "item", "item_id": "talisman_red", "count": 1 },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "talisman_red",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "到账即绑，只回复自己，不复活；编号就是 talisman.json 的 red.item_id"
     },
@@ -143,9 +260,18 @@
       "category": "blue_talisman",
       "price": 15,
       "currency": "yuanbao",
-      "delivery": { "mode": "item", "item_id": "talisman_blue", "count": 1 },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "talisman_blue",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "到账即绑，只回复自己的蓝，不回血不加伤害；编号就是 talisman.json 的 blue.item_id"
     },
@@ -155,9 +281,18 @@
       "category": "revive_scroll",
       "price": 80,
       "currency": "yuanbao",
-      "delivery": { "mode": "item", "item_id": "scroll_revive", "count": 1 },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "scroll_revive",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "绑定，只拉起自己，冷却跨场保留；编号就是 revive_scroll.json 的 scroll.item_id"
     },
@@ -167,9 +302,18 @@
       "category": "unbind_item",
       "price": 120,
       "currency": "yuanbao",
-      "delivery": { "mode": "item", "item_id": "unbind_stone", "count": 1 },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "unbind_stone",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "绑定，只解开装备；编号就是 unbind_item.json 的 unbind.item_id"
     },
@@ -179,9 +323,18 @@
       "category": "exp_booster",
       "price": 60,
       "currency": "yuanbao",
-      "delivery": { "mode": "item", "item_id": "exp_booster", "count": 1 },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "item",
+        "item_id": "exp_booster",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "绑定，到点消失，只加经验，倍率不叠；编号就是 exp_booster.json 的 booster.item_id"
     },
@@ -191,9 +344,17 @@
       "category": "monthly_bundle",
       "price": 300,
       "currency": "yuanbao",
-      "delivery": { "mode": "monthly_bundle", "bundle_id": "current" },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "monthly_bundle",
+        "bundle_id": "current"
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "只有传送符与红符；发什么、每种几张只在 monthly_bundle.json。方案「按月续」只落成每月可再买一次，自动续费没有卡承接，所以这里不限次"
     },
@@ -203,9 +364,16 @@
       "category": "second_slot",
       "price": 800,
       "currency": "yuanbao",
-      "delivery": { "mode": "second_slot" },
-      "limit": { "per_character": 1, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "second_slot"
+      },
+      "limit": {
+        "per_character": 1,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "装备等级境界不共享；名额上限只在 character_slot.json。per_character=1 是「一个账号一个」的声明，判定由 character_slot 表把关"
     },
@@ -215,9 +383,17 @@
       "category": "season_pass",
       "price": 700,
       "currency": "yuanbao",
-      "delivery": { "mode": "season_pass", "pass_id": "current" },
-      "limit": { "per_character": 1, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
+      "delivery": {
+        "mode": "season_pass",
+        "pass_id": "current"
+      },
+      "limit": {
+        "per_character": 1,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
       "on_sale": true,
       "note": "不给金币材料与次数；奖励只在 season_pass.json。per_character=1 是「每季一张」的声明，判定由 season_pass 表把关"
     },
@@ -227,32 +403,41 @@
       "category": "protect_ticket",
       "price": 50,
       "currency": "yuanbao",
-      "delivery": { "mode": "item", "item_id": "ticket_protect", "count": 1 },
-      "limit": { "per_character": 0, "per_day": 0 },
-      "stock": { "rule": "unlimited" },
-    "on_sale": true,
-    "note": "到账即绑，只挡一次掉级；编号就是 enhance.json 的 protect_item_id，与通行证付费轨发的是同一种"
-  },
-  {
-    "id": "shop_rename_card_1",
-    "name": "改名卡",
-    "category": "rename_card",
-    "price": 500,
-    "currency": "yuanbao",
-    "delivery": {
-      "mode": "item",
-      "item_id": "rename_card",
-      "count": 1
+      "delivery": {
+        "mode": "item",
+        "item_id": "ticket_protect",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
+      "on_sale": true,
+      "note": "到账即绑，只挡一次掉级；编号就是 enhance.json 的 protect_item_id，与通行证付费轨发的是同一种"
     },
-    "limit": {
-      "per_character": 0,
-      "per_day": 0
-    },
-    "stock": {
-      "rule": "unlimited"
-    },
-    "on_sale": true,
-    "note": "Q12：一张改一次名，不限时间不限次数；到账即绑，不能上架。物品编号是 name_rules.json 的 rename_item_id，价格只在本文件"
-  }
-]
+    {
+      "id": "shop_rename_card_1",
+      "name": "改名卡",
+      "category": "rename_card",
+      "price": 500,
+      "currency": "yuanbao",
+      "delivery": {
+        "mode": "item",
+        "item_id": "rename_card",
+        "count": 1
+      },
+      "limit": {
+        "per_character": 0,
+        "per_day": 0
+      },
+      "stock": {
+        "rule": "unlimited"
+      },
+      "on_sale": true,
+      "note": "Q12：一张改一次名，不限时间不限次数；到账即绑，不能上架。物品编号是 name_rules.json 的 rename_item_id，价格只在本文件"
+    }
+  ]
 }

@@ -27,6 +27,16 @@ source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BATTLE_DLL="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
+# Windows 上 dotnet 重定向输出走 GBK：技能行里有中文名与门派名，断言前先按平台转码
+# （不能「先试 UTF-8 再退 GBK」，同 P3-1a1 的口径）。
+utf8() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      python3 -c 'import sys; sys.stdout.buffer.write(
+          sys.stdin.buffer.read().decode("gbk", "replace").encode("utf-8"))' ;;
+    *) cat ;;
+  esac
+}
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
@@ -209,6 +219,8 @@ fi
 step "4. 只读入口：--skill-list 打出的基础 15 行"
 "$DOTNET" "$BATTLE_DLL" --skill-list --config config/battle.json >"$TMP/skill-list.txt" 2>&1
 LIST="$TMP/skill-list.txt"
+LISTU="$TMP/skill-list-utf8.txt"
+utf8 <"$LIST" >"$LISTU"
 SKILLS_N=$(grep -oE 'skills=[0-9]+' "$LIST" | head -1 | cut -d= -f2)
 if grep -qE '^skill_table_version=3 ' "$LIST" && [ "${SKILLS_N:-0}" -ge 15 ] \
    && grep -qE ' schools=2$' "$LIST"; then
@@ -224,7 +236,8 @@ else
   bad "打出的技能行数少于 15：${ROWS}"
 fi
 
-WANT="$(python3 - <<'PY'
+# python3 的 print 在 Windows 上是 \r\n，`$(...)` 只剥 \n，逐行比对前先抹掉 \r。
+WANT="$(python3 - <<'PY' | tr -d '\r'
 import json
 d = json.load(open("config/skills.json", encoding="utf-8"))
 for s in sorted(d["skills"], key=lambda x: x["id"]):
@@ -232,15 +245,15 @@ for s in sorted(d["skills"], key=lambda x: x["id"]):
         s["id"], s["name"], s["class_id"], s["school"], s["tier"], s["branch"] or "-"))
 PY
 )"
-if [ "$(grep '^skill_row=' "$LIST")" = "$WANT" ]; then
+if [ "$(grep '^skill_row=' "$LISTU")" = "$WANT" ]; then
   ok "只读入口的 15 行与配置逐条一致（名字 / 门派 / 阶 / 分支）"
 else
   bad "只读入口与配置对不上"
-  diff <(printf '%s\n' "$WANT") <(grep '^skill_row=' "$LIST") | head -6 | detail
+  diff <(printf '%s\n' "$WANT") <(grep '^skill_row=' "$LISTU") | head -6 | detail
 fi
 
-assert_file_contains "$LIST" '^skill_school=id=tiandi name=天地玄黄' "只读入口报出天地玄黄这一派"
-assert_file_contains "$LIST" '^skill_school=id=faze name=法则神通 giver=明霄圣地 / 焦原 tiers=- skills=0' "法则神通在表里但暂时 0 条（待二转 / 觉醒卡）"
+assert_file_contains "$LISTU" '^skill_school=id=tiandi name=天地玄黄' "只读入口报出天地玄黄这一派"
+assert_file_contains "$LISTU" '^skill_school=id=faze name=法则神通 giver=明霄圣地 / 焦原 tiers=- skills=0' "法则神通在表里但暂时 0 条（待二转 / 觉醒卡）"
 
 WANT_SUM="$(python3 - <<'PY'
 import json

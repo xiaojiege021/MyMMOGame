@@ -99,7 +99,8 @@ public static class ShopApi
                     + " slot=" + result.BagSlot
                     + " bound=" + result.Bound
                     + " duplicate=" + result.Duplicate
-                    + " character_slots=" + result.CharacterSlots);
+                    + " character_slots=" + result.CharacterSlots
+                    + " bag_slots=" + result.BagSlots);
 
                 await WriteAsync(context, 200, new
                 {
@@ -122,6 +123,8 @@ public static class ShopApi
                     season_id = result.SeasonId,
                     pass_owned = result.PassOwned,
                     character_slots = result.CharacterSlots,
+                    // B7+B8：背包扩容买完之后的格数（按角色的事实值）。别的商品恒 0。
+                    bag_slots = result.BagSlots,
                 });
             }
             catch (RpcException ex)

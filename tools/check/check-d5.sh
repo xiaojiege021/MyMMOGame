@@ -20,7 +20,9 @@ cd "$ROOT"
 source "$ROOT/tools/check/lib-common.sh"
 
 TITLE="D5（断言口径）"
-TMP="$(mktemp -d)"
+# Windows 上 mktemp 给的是 "C://Users//...//Temp/tmp.xxx"（前缀带反斜杠）：塞进 JSON
+# 会被当成非法转义、传给 python 也可能落到 C://tmp。统一洗成正斜杠（同 check-c1 的口径）。
+TMP="$(mktemp -d)"; TMP="${TMP//\\//}"
 trap 'rm -rf "$TMP"' EXIT
 
 echo "== 1. 政策扫描（0 命中） =="

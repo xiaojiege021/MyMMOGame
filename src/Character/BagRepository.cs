@@ -29,7 +29,8 @@ public sealed record BagSortOutcome(
 public sealed class BagRepository(NpgsqlDataSource dataSource)
 {
     /// <summary>库层 CHECK 的上界（slot 1..200）；配置里的 bag_slots 只更小。</summary>
-    const int MaxBagSlot = 200;
+    // internal：扩容算出的格数也要用它当上界（B7+B8），同一个 200 不留第二份。
+    internal const int MaxBagSlot = 200;
 
     /// <summary>
     /// 排序的种类顺序（Q10 口径：种类 → 品阶 → 物品编号）。新种类追加到末尾，不插队；

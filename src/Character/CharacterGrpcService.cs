@@ -69,6 +69,7 @@ public sealed class CharacterGrpcService(
     MonthlyBundleRepository monthlyBundles,
     CharacterSlotTable characterSlotTable,
     CharacterSlotRepository characterSlots,
+    BagExpandRepository bagExpands,
     WardrobeRepository wardrobe,
     ISeasonSource seasonSource,
     MainlineTable mainlineTable,
@@ -394,7 +395,9 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "stack_overflow"));
         }
 
-        if (request.Slot < 1 || request.Slot > config.BagSlots)
+        if (request.Slot < 1
+            || request.Slot > await bagExpands.SlotsAsync(
+                (long)request.CharacterId, context.CancellationToken))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
         }
@@ -461,7 +464,8 @@ public sealed class CharacterGrpcService(
         var realm = realms.Normalize(facts?.Realm ?? "");
         var response = new ListInventoryResponse
         {
-            BagSlots = (uint)config.BagSlots,
+            // B7+B8：格数按角色现取（基础格 + 买过的扩容），不再是配置里那个单一值。
+            BagSlots = (uint)await bagExpands.SlotsAsync(characterId, context.CancellationToken),
             CharacterName = displayName ?? "",
             Realm = realm,
             RealmDisplay = realms.DisplayName(realm, facts?.Alignment ?? ""),
@@ -1324,7 +1328,9 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
         }
 
-        if (request.Slot < 1 || request.Slot > config.BagSlots)
+        var bagSlotsOfCharacter =
+            await bagExpands.SlotsAsync((long)request.CharacterId, context.CancellationToken);
+        if (request.Slot < 1 || request.Slot > bagSlotsOfCharacter)
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
         }
@@ -1427,8 +1433,10 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
         }
 
-        if (request.FromSlot < 1 || request.FromSlot > config.BagSlots
-            || request.ToSlot < 1 || request.ToSlot > config.BagSlots)
+        var bagSlotsOfCharacter =
+            await bagExpands.SlotsAsync((long)request.CharacterId, context.CancellationToken);
+        if (request.FromSlot < 1 || request.FromSlot > bagSlotsOfCharacter
+            || request.ToSlot < 1 || request.ToSlot > bagSlotsOfCharacter)
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
         }
@@ -1524,8 +1532,10 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
         }
 
-        if (request.Slot < 1 || request.Slot > config.BagSlots
-            || request.CrystalSlot < 1 || request.CrystalSlot > config.BagSlots
+        var bagSlotsOfCharacter =
+            await bagExpands.SlotsAsync((long)request.CharacterId, context.CancellationToken);
+        if (request.Slot < 1 || request.Slot > bagSlotsOfCharacter
+            || request.CrystalSlot < 1 || request.CrystalSlot > bagSlotsOfCharacter
             || request.Socket < 1)
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
@@ -1592,7 +1602,9 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "txn_missing"));
         }
 
-        if (request.Slot < 1 || request.Slot > config.BagSlots || request.Socket < 1)
+        var bagSlotsOfCharacter =
+            await bagExpands.SlotsAsync((long)request.CharacterId, context.CancellationToken);
+        if (request.Slot < 1 || request.Slot > bagSlotsOfCharacter || request.Socket < 1)
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
         }
@@ -1843,6 +1855,9 @@ public sealed class CharacterGrpcService(
 
             case DeliveryMode.SecondSlot:
                 return await BuySecondSlotAsync(account, characterId, item, request.TxnId ?? "", context);
+
+            case DeliveryMode.BagExpand:
+                return await BuyBagExpandAsync(account, characterId, item, request.TxnId ?? "", context);
         }
 
         // 未上架是运营开关（配置里的 on_sale），与「还没接发货」分开报。
@@ -1863,6 +1878,23 @@ public sealed class CharacterGrpcService(
 
             return ShopRejected("delivery_pending", item, balance);
         }
+
+        // B7+B8：方案 12.1「到达金仙才能买金仙外观」。境界是角色服读出来的事实值，
+        // 客户端带不进来；门槛段序号只从 shop.json 的 require_realm 读。
+        if (item.RealmGated)
+        {
+            var facts = await inventory.RealmFactsAsync(account, characterId, context.CancellationToken);
+            var rank = realms.Rank(facts?.Realm ?? "");
+            if (rank < item.RequireRealmIndex)
+            {
+                logger.LogInformation(
+                    "shop_buy_reject account={Account} id={Id} item={Item} kind={Kind}"
+                    + " reason=realm_required rank={Rank} require={Require} balance={Balance}",
+                    account, characterId, item.Id, item.Kind, rank, item.RequireRealmIndex, balance);
+                return ShopRejected("realm_required", item, balance);
+            }
+        }
+
         var txnId = (request.TxnId ?? "").Trim();
         if (txnId.Length == 0 || txnId.Length > GrantRepository.MaxTxnLength)
         {
@@ -1880,7 +1912,8 @@ public sealed class CharacterGrpcService(
         }
 
         var slots = await inventory.ListAsync(characterId, context.CancellationToken);
-        var slot = FindDeliverySlot(slots, goods, item.DeliveryCount, config.BagSlots);
+        var slot = FindDeliverySlot(slots, goods, item.DeliveryCount,
+            await bagExpands.SlotsAsync(characterId, context.CancellationToken));
         if (slot == 0)
         {
             logger.LogInformation(
@@ -2062,7 +2095,8 @@ public sealed class CharacterGrpcService(
         }
 
         var slots = await inventory.ListAsync(characterId, context.CancellationToken);
-        var slot = FindDeliverySlot(slots, goods, item.DeliveryCount, config.BagSlots);
+        var slot = FindDeliverySlot(slots, goods, item.DeliveryCount,
+            await bagExpands.SlotsAsync(characterId, context.CancellationToken));
         if (slot == 0)
         {
             return HomeCoinShopRejected("bag_full", item, balance);
@@ -2392,6 +2426,72 @@ public sealed class CharacterGrpcService(
             Delivered = false,
             State = "slot_added",
             CharacterSlots = outcome.Slots,
+            Duplicate = false,
+        };
+    }
+
+    // ------------------------------------------------------------------ B7+B8 背包扩容
+
+    /// <summary>
+    /// 商城里的背包扩容：状态发货——买下给这个角色加 step 格、到 max_slots 封顶，
+    /// 不往背包放东西，所以回包 delivered 恒为 false，state 用 bag_expanded 区分；
+    /// 扩容后的格数用 bag_slots 带回。步长与上限只从 config/character.json 读。
+    /// </summary>
+    async Task<BuyShopItemResponse> BuyBagExpandAsync(
+        string account, long characterId, ShopTable.Item item, string txnId,
+        ServerCallContext context)
+    {
+        var outcome = await bagExpands.BuyAsync(
+            characterId, txnId, item.PriceYuanbao, context.CancellationToken);
+
+        if (!outcome.Ok)
+        {
+            logger.LogInformation(
+                "shop_buy_reject account={Account} id={Id} item={Item} kind={Kind} reason={Reason}"
+                + " count={Count} slots={Slots} balance={Balance}",
+                account, characterId, item.Id, item.Kind, outcome.Reason, outcome.Count,
+                outcome.Slots, outcome.Balance);
+
+            return new BuyShopItemResponse
+            {
+                Ok = false,
+                Reason = outcome.Reason,
+                ItemId = item.Id,
+                Kind = item.Kind,
+                Name = item.Name,
+                PriceYuanbao = item.PriceYuanbao,
+                Currency = ShopTable.WrittenCurrency,
+                Balance = outcome.Balance,
+                Enough = outcome.Balance >= item.PriceYuanbao,
+                ChargedYuanbao = 0,
+                Delivered = false,
+                State = outcome.Reason,
+                BagSlots = (uint)outcome.Slots,
+                Duplicate = outcome.Duplicate,
+            };
+        }
+
+        logger.LogInformation(
+            "shop_buy account={Account} id={Id} item={Item} kind={Kind} txn={Txn} price={Price}"
+            + " charged={Charged} expands={Count} slots={Slots} balance={Balance}",
+            account, characterId, item.Id, item.Kind, txnId, item.PriceYuanbao,
+            item.PriceYuanbao, outcome.Count, outcome.Slots, outcome.Balance);
+
+        return new BuyShopItemResponse
+        {
+            Ok = true,
+            Reason = "",
+            ItemId = item.Id,
+            Kind = item.Kind,
+            Name = item.Name,
+            PriceYuanbao = item.PriceYuanbao,
+            Currency = ShopTable.WrittenCurrency,
+            Balance = outcome.Balance,
+            Enough = true,
+            ChargedYuanbao = item.PriceYuanbao,
+            Delivered = false,
+            State = "bag_expanded",
+            BagSlots = (uint)outcome.Slots,
             Duplicate = false,
         };
     }
@@ -3451,7 +3551,8 @@ public sealed class CharacterGrpcService(
         }
 
         var bagSlot = (int)request.Slot;
-        if (bagSlot < 1 || bagSlot > config.BagSlots)
+        var bagSlotsOfCharacter = await bagExpands.SlotsAsync(characterId, context.CancellationToken);
+        if (bagSlot < 1 || bagSlot > bagSlotsOfCharacter)
         {
             // 越界格号是参数错，不是业务拒绝：与 Q10 的移动 / 丢弃同一口径。
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
@@ -5201,7 +5302,9 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
         }
 
-        if (request.FromSlot > config.BagSlots || request.ToSlot > config.BagSlots)
+        var bagSlotsOfCharacter =
+            await bagExpands.SlotsAsync((long)request.CharacterId, context.CancellationToken);
+        if (request.FromSlot > bagSlotsOfCharacter || request.ToSlot > bagSlotsOfCharacter)
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
         }
@@ -5211,7 +5314,7 @@ public sealed class CharacterGrpcService(
             (request.Account ?? "").Trim(),
             (int)request.FromSlot,
             (int)request.ToSlot,
-            config.BagSlots,
+            bagSlotsOfCharacter,
             items,
             context.CancellationToken);
 
@@ -5253,7 +5356,8 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
         }
 
-        if (request.Slot > config.BagSlots)
+        if (request.Slot > await bagExpands.SlotsAsync(
+                (long)request.CharacterId, context.CancellationToken))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
         }
@@ -5354,7 +5458,8 @@ public sealed class CharacterGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "request_missing"));
         }
 
-        if (request.Slot > config.BagSlots)
+        if (request.Slot > await bagExpands.SlotsAsync(
+                (long)request.CharacterId, context.CancellationToken))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "slot_out_of_range"));
         }

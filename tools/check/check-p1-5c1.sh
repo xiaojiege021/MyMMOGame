@@ -330,6 +330,86 @@ else:
   else
     bad "元宝被动了：before=${before_yuanbao:-?} after=${after_yuanbao:-?}"
   fi
+  # ---------------------------------------------------------------- B7+B8：七类发货 + 背包扩容
+  # 只跑钱与事务边界最要紧的三条：外观真进包、扩容真加格、境界门槛不扣钱。
+  # 其余几类的发货方式由 check-k1 的静态段逐类对（八类全对一遍），这里不重复花钱。
+  field_of() {
+    printf '%s' "$1" | LC_ALL=C python3 -c 'import json,sys
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    print(""); raise SystemExit
+print(d.get("'"$2"'", ""))'
+  }
+
+  slots_now() {
+    curl -sS --noproxy '*' -m 10 -H "Authorization: Bearer $TOKEN" \
+      "$GATEWAY/inventory?character_id=$CHARACTER" 2>&1
+  }
+
+  step="$(python3 -c 'import json;print(json.load(open("config/character.json", encoding="utf-8")).get("bag_expand_step", 0))')"
+
+  # 1. 服饰外观：item 发货，真进背包（bag_slot 给真落点，state=delivered）
+  yb_before="$(yuanbao_of "$(curl -sS --noproxy '*' -m 10 -H "Authorization: Bearer $TOKEN" \
+    "$GATEWAY/currency?character_id=$CHARACTER" 2>&1)")"
+  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"shop_outfit_1\"}")"
+  body="$(body_of "$resp")"
+  if [ "$(code_of "$resp")" = "200" ] \
+     && [ "$(expect_json "$body" ok=true state=delivered delivered=true)" = "ok" ] \
+     && [ "$(field_of "$body" bag_slot)" -ge 1 ] 2>/dev/null; then
+    ok "服饰外观：item 发货进背包（bag_slot=$(field_of "$body" bag_slot)）"
+  else
+    bad "服饰外观没进包：$body"
+  fi
+  yb_after="$(yuanbao_of "$(curl -sS --noproxy '*' -m 10 -H "Authorization: Bearer $TOKEN" \
+    "$GATEWAY/currency?character_id=$CHARACTER" 2>&1)")"
+  price="$(python3 -c 'import json
+d=json.load(open("config/shop.json", encoding="utf-8"))
+print(next(i["price"] for i in d["items"] if i["id"]=="shop_outfit_1"))')"
+  if [ -n "$yb_before" ] && [ -n "$yb_after" ] && [ "$((yb_before - yb_after))" = "$price" ]; then
+    ok "服饰外观扣元宝 ${price}（${yb_before} → ${yb_after}）"
+  else
+    bad "服饰外观扣款不对：before=${yb_before:-?} after=${yb_after:-?} price=${price}"
+  fi
+
+  # 2. 背包扩容：买一次，/inventory 的 bag_slots 加一个步长
+  inv_before="$(slots_now)"
+  slots_before="$(field_of "$inv_before" bag_slots)"
+  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"shop_bag_expand_1\"}")"
+  body="$(body_of "$resp")"
+  inv_after="$(slots_now)"
+  slots_after="$(field_of "$inv_after" bag_slots)"
+  if [ "$(expect_json "$body" ok=true state=bag_expanded delivered=false)" = "ok" ] \
+     && [ -n "$slots_before" ] && [ "$((slots_after - slots_before))" = "$step" ]; then
+    ok "背包扩容：加 ${step} 格（${slots_before} → ${slots_after}）"
+  else
+    bad "背包扩容没落到角色：$body（${slots_before:-?} → ${slots_after:-?}）"
+  fi
+
+  # 3. 境界门槛：没到金仙买境界外观 → realm_required，一分不扣
+  realm_now="$(field_of "$(slots_now)" realm)"
+  yb_gate="$(yuanbao_of "$(curl -sS --noproxy '*' -m 10 -H "Authorization: Bearer $TOKEN" \
+    "$GATEWAY/currency?character_id=$CHARACTER" 2>&1)")"
+  resp="$(buy "{\"character_id\":$CHARACTER,\"item_id\":\"shop_realm_skin_1\"}")"
+  body="$(body_of "$resp")"
+  yb_gate_after="$(yuanbao_of "$(curl -sS --noproxy '*' -m 10 -H "Authorization: Bearer $TOKEN" \
+    "$GATEWAY/currency?character_id=$CHARACTER" 2>&1)")"
+  case "$realm_now" in
+    # 已经是金仙 / 极境：门槛已过，这一条按「买得到」判（种子账号可能被前面的卡推上去了）
+    金仙|极境)
+      [ "$(expect_json "$body" ok=true state=delivered)" = "ok" ] \
+        && ok "境界外观：角色已在 ${realm_now}，买得到（门槛已过）" \
+        || bad "境界够高却买不到境界外观：$body"
+      ;;
+    *)
+      if [ "$(expect_json "$body" ok=false reason=realm_required charged_yuanbao=0 delivered=false)" = "ok" ] \
+         && [ "$yb_gate" = "$yb_gate_after" ]; then
+        ok "境界外观：${realm_now} 买 → realm_required，元宝不动（${yb_gate}）"
+      else
+        bad "境界门槛没挡住或扣了钱：$body（${yb_gate:-?} → ${yb_gate_after:-?}）"
+      fi
+      ;;
+  esac
 fi
 
 finish "P1-5c1（server）"
