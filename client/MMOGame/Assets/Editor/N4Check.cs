@@ -44,10 +44,27 @@ public static class N4Check
     static string Read(string path) => File.Exists(path) ? File.ReadAllText(path) : string.Empty;
 
     // D3d 之后网关的 HTTP 注册体按域分片（主文件 + Api/<域>/）；只读主文件会漏掉搬走的路由。
+    // D3d/D3h 之后源码按域分片：主文件 + 同域分片目录一起读（与 tools/check 的 src_agg 同口径）。
     static string ReadSplit(string path)
     {
-        var dir = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, "Api", "World");
+        var name = Path.GetFileName(path);
+        var sub = name switch
+        {
+            "CharacterApi.cs" => "Api/Character",
+            "SectApi.cs" => "Api/Sect",
+            "WorldApi.cs" => "Api/World",
+            "SectRepository.cs" => "Sect",
+            "SocialGrpcService.cs" => "Grpc",
+            "WorldGrpcService.cs" => "Grpc",
+            "Program.cs" => "Cli",
+            _ => string.Empty,
+        };
         var text = Read(path);
+        if (sub.Length == 0)
+        {
+            return text;
+        }
+        var dir = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, sub);
         if (!Directory.Exists(dir))
         {
             return text;
@@ -90,7 +107,7 @@ public static class N4Check
         var net = Read(Path.Combine(root, "client/MMOGame/Assets/Net/WorldGather.cs"));
         var proto = Read(Path.Combine(root, "proto/mmo/world.proto"));
         var gateway = ReadSplit(Path.Combine(root, "src/Gateway/WorldApi.cs"));
-        var world = Read(Path.Combine(root, "src/World/WorldGrpcService.cs"));
+        var world = ReadSplit(Path.Combine(root, "src/World/WorldGrpcService.cs"));
 
         Report("proto", proto.Contains("ListGatherNodes") && proto.Contains("GatherNodeInfo"));
         Report("gateway", gateway.Contains("/world/gather/nodes") && gateway.Contains("ListGatherNodesAsync"));

@@ -12,6 +12,24 @@ public static class P13bCheck
 {
     static bool failed;
 
+    // D3h 之后世界服 RPC 也按域分片（主文件 + Grpc/）；只读主文件会漏掉搬走的入口。
+    static string ReadSplit(string path, string sub)
+    {
+        var text = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+        var dir = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, sub);
+        if (!Directory.Exists(dir))
+        {
+            return text;
+        }
+        var files = new DirectoryInfo(dir).GetFiles("*.cs");
+        Array.Sort(files, (a, b) => string.CompareOrdinal(a.Name, b.Name));
+        foreach (var f in files)
+        {
+            text += File.ReadAllText(f.FullName);
+        }
+        return text;
+    }
+
     // D3d 之后网关的 HTTP 注册体按域分片（主文件 + Api/<域>/）；只读主文件会漏掉搬走的路由。
     static string ReadGateway(string path, string domain)
     {
@@ -104,7 +122,7 @@ public static class P13bCheck
         failed |= !wireOk;
 
         // 4. 边界：判定、占用与发奖都在服务端，世界服不写角色库
-        var svc = File.ReadAllText(Path.Combine(root, "src/World/WorldGrpcService.cs"));
+        var svc = ReadSplit(Path.Combine(root, "src/World/WorldGrpcService.cs"), "Grpc");
         var grant = File.ReadAllText(Path.Combine(root, "src/World/GatherGrant.cs"));
         var table = File.ReadAllText(Path.Combine(root, "src/World/GatherTable.cs"));
         var api = ReadGateway(Path.Combine(root, "src/Gateway/WorldApi.cs"), "World");
