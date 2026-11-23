@@ -55,7 +55,7 @@ import json, os, sys, hashlib
 root = sys.argv[1]
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
 def src(p):
-    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     _full = os.path.join(root, p)
     _name = os.path.basename(p)
     if _name in _sub:

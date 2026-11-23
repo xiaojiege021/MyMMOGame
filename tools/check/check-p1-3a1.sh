@@ -255,7 +255,14 @@ assert 'world.json 缺 line_capacity' in config and 'world.json 缺 max_lines_pe
 registry = open(root + '/src/World/LineRegistry.cs', encoding='utf-8').read()
 assert 'config.LineCapacity' in registry and 'config.MaxLinesPerRegion' in registry
 assert 'Npgsql' not in registry and 'Npgsql' not in open(root + '/src/World/WorldProcess.cs', encoding='utf-8').read()
-grpc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
+def __agg(p):
+    """拆分卡之后：主文件 + 同域分片目录一起读（14.8 纪律第 8 条）。"""
+    return open(p, encoding='utf-8').read() + "".join(
+        open(f, encoding='utf-8').read()
+        for f in sorted(__import__('glob').glob(__import__('os').path.join(
+            __import__('os').path.dirname(p), 'Grpc', '*.cs'))))
+
+grpc = __agg(root + '/src/World/WorldGrpcService.cs')
 # P3-5a 起世界服会收到战斗服报回的一个「本场伤害总额」事实值（只用来决定
 # 把哪个宗门名字写在入口上，不结算、不发奖），所以这里只放开这一个字段。
 assert 'Skill' not in grpc

@@ -44,7 +44,7 @@ out = open(sys.argv[1], "w", encoding="utf-8")
 def report(k, cond, info=""):
     out.write(("PASS " if cond else "FAIL ") + k + ("" if cond else "  " + info) + "\n")
 def read(p):
-    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     _name = os.path.basename(p)
     if _name in _sub and os.path.exists(p):
         # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
@@ -53,7 +53,15 @@ def read(p):
             for f in sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), _sub[_name], "*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 def readdir(d):
-    return "\n".join(read(os.path.join(d, f)) for f in sorted(os.listdir(d)) if f.endswith(".cs")) if os.path.isdir(d) else ""
+    # 14.8 D3h：目录里的代码按域分片后，整目录读要下钻一层（跳过 bin/obj），
+    # 否则「没有第二套数字 / 不读副本人数」这类否定断言会漏掉搬走的那部分。
+    if not os.path.isdir(d):
+        return ""
+    files = []
+    for base, dirs, names in os.walk(d):
+        dirs[:] = [x for x in dirs if x not in ("bin", "obj")]
+        files.extend(os.path.join(base, n) for n in names if n.endswith(".cs"))
+    return "\n".join(read(f) for f in sorted(files))
 
 cfg = json.loads(read("config/sect.json"))
 html = read("docs/MMO系统架构方案.html")

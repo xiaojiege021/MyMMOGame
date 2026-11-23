@@ -204,7 +204,14 @@ reader = open(root + '/src/World/RealmReader.cs', encoding='utf-8').read()
 assert 'ListInventoryAsync' in reader and 'reply.Realm' in reader
 reg = open(root + '/src/World/LineRegistry.cs', encoding='utf-8').read()
 assert 'flight_forbidden' in reg and 'public float GroundY' in reg
-svc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
+def __agg(p):
+    """拆分卡之后：主文件 + 同域分片目录一起读（14.8 纪律第 8 条）。"""
+    return open(p, encoding='utf-8').read() + "".join(
+        open(f, encoding='utf-8').read()
+        for f in sorted(__import__('glob').glob(__import__('os').path.join(
+            __import__('os').path.dirname(p), 'Grpc', '*.cs'))))
+
+svc = __agg(root + '/src/World/WorldGrpcService.cs')
 assert 'flight.FlyAsync' in svc and 'flight.CrossAsync' in svc
 hub = open(root + '/src/World/PositionHub.cs', encoding='utf-8').read()
 assert 'SelfFlying' in hub and 'Flying = state.Flying' in hub
@@ -224,7 +231,8 @@ assert 'Realm = realm,' in grpc and 'RealmDisplay = realms.DisplayName(realm' in
 for path in ['src/World/WorldProcess.cs', 'src/World/WorldGrpcService.cs',
              'src/World/FlightGate.cs', 'src/World/FlightTable.cs',
              'src/World/RealmReader.cs', 'src/World/LineRegistry.cs']:
-    assert 'Npgsql' not in open(root + '/' + path, encoding='utf-8').read(), path
+    assert 'Npgsql' not in (__agg(root + '/' + path) if path.endswith('WorldGrpcService.cs')
+                            else open(root + '/' + path, encoding='utf-8').read()), path
 print('static_code=ok character_owns_realm=1 world_no_db=1 gate_server_side=1')
 PY
 then ok "境界只在角色服、判定只在世界服、请求带不进权限、进程边界都落在指定文件里"
@@ -345,11 +353,13 @@ if wait_ready "$TMP/character.log" '^ready name=Character' "角色服" \
 else
   bad "有进程没起来或广播服务没就绪"; tail -12 "$WORLD_LOG" | detail; finish "P1-3c（${MODE}）"
 fi
+# D5 口径：基准节点个数按 config/gather.json 现取（B1 之后是 6 个，不再写死 4）。
+NODES="$(python3 -c 'import json,sys;print(len(json.load(open(sys.argv[1],encoding="utf-8"))["nodes"]))' "$ROOT/config/gather.json")"
 if grep -qF 'flight_config=ok realms=炼体,筑基,结丹 flight_realm=筑基' "$WORLD_LOG" \
    && grep -qF 'position_sync_hz=8' "$WORLD_LOG" \
    && grep -qF 'tier_config=ok near=8 far=20' "$WORLD_LOG" \
-   && grep -qF 'gather_config=ok nodes=4' "$WORLD_LOG"; then
-  ok "启动日志读到飞行门槛，老的 8Hz、三档与四个采集节点没回退"
+   && grep -qF "gather_config=ok nodes=$NODES" "$WORLD_LOG"; then
+  ok "启动日志读到飞行门槛，老的 8Hz、三档与 ${NODES} 个采集节点没回退"
 else
   bad "启动日志缺飞行配置或老配置回退了"; grep -E '^(flight_|tier_|position_|gather_)' "$WORLD_LOG" | detail
 fi

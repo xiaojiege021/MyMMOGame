@@ -57,7 +57,19 @@ echo "== 2. 静态断言（内容正本 / 结构保证 / 老卡不改） =="
 python3 - "$ROOT" "$TMP" >"$TMP/static.out" 2>&1 <<'PY'
 import hashlib, json, os, re, subprocess, sys
 root, tmp = sys.argv[1:3]
-def src(p): return open(os.path.join(root, p), encoding="utf-8").read()
+def src(p):
+    """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World",
+            "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc",
+            "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
+    full = os.path.join(root, p)
+    name = os.path.basename(full)
+    text = open(full, encoding="utf-8").read()
+    if name in _sub:
+        d = os.path.join(os.path.dirname(full), _sub[name])
+        text += "".join(open(f, encoding="utf-8").read()
+                        for f in sorted(__import__("glob").glob(os.path.join(d, "*.cs"))))
+    return text
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
 def sha(p): return hashlib.sha256(open(os.path.join(root, p), "rb").read()).hexdigest()
 checks = []
@@ -94,9 +106,13 @@ ck("「只加内容和配置」：C3 没碰的老配置 / 社交链路 / 客户�
    subprocess.run(["git", "diff", "--name-only", "HEAD", "--",
      "config/season_pass.json", "config/social.json", "config/sect.json",
      "config/gateway.json", "config/mainline.json", "config/gather_spread.json",
-     "src/World", "src/Battle", "client/MMOGame/Assets/Net",
+     # 14.8 D3h：世界服 Program / WorldGrpcService 按域拆分，这两个文件与它们的分片
+     # 目录不在 C3 的「没碰」口径里；其余 src/World 文件仍要求一行未改。
+     "src/World", ":!src/World/Program.cs", ":!src/World/WorldGrpcService.cs",
+     "src/Battle", "client/MMOGame/Assets/Net",
      "client/MMOGame/Assets/HotUpdate", "client/MMOGame/Assets/Editor",
-     "tools/check/check-p2-1a1.sh", "tools/check/check-u7.sh"],
+     # D3h：check-p2-1a1 的整目录读改成下钻一层（社交服按域分片），断言正文没动，同域放行。
+     "tools/check/check-u7.sh"],
      cwd=root, capture_output=True, text=True).stdout.strip() == "")
 ck("social.proto 只新增三个 RPC 与新消息，旧消息一字未改",
    all(s in src("proto/mmo/social.proto") for s in ("rpc PlaceHomeDecor(", "rpc RemoveHomeDecor(", "rpc DescribeHomestead("))

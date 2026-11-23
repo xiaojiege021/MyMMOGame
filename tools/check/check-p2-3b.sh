@@ -44,7 +44,7 @@ def rd(p):
     _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup",
             "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects",
             "Server.cs": "Server",
-            "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+            "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     _name = os.path.basename(p)
     if _name in _sub and os.path.exists(p):
         _d = os.path.join(os.path.dirname(p), _sub[_name])

@@ -169,7 +169,14 @@ registry = open(root + '/src/World/LineRegistry.cs', encoding='utf-8').read()
 assert 'float.IsFinite' in registry and 'config.MaxMoveSpeed' in registry and 'speed_limit' in registry
 hub = open(root + '/src/World/PositionHub.cs', encoding='utf-8').read()
 assert 'config.SyncHz' in hub and 'LineOf' in hub
-grpc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
+def __agg(p):
+    """拆分卡之后：主文件 + 同域分片目录一起读（14.8 纪律第 8 条）。"""
+    return open(p, encoding='utf-8').read() + "".join(
+        open(f, encoding='utf-8').read()
+        for f in sorted(__import__('glob').glob(__import__('os').path.join(
+            __import__('os').path.dirname(p), 'Grpc', '*.cs'))))
+
+grpc = __agg(root + '/src/World/WorldGrpcService.cs')
 assert 'TryIdentity' in grpc and 'x-mmo-account' in grpc and 'not_in_line' in grpc
 proxy = open(root + '/src/Gateway/WorldStreamProxy.cs', encoding='utf-8').read()
 for piece in ['TryResolve', 'ListInventoryAsync', 'expiresAt', 'x-mmo-account', 'config.WorldUpstream', 'WebSocketCloseStatus.PolicyViolation']:

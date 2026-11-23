@@ -62,7 +62,7 @@ def read_src(p):
     """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
     _sub = {"Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects",
             "CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup",
-            "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+            "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     name = os.path.basename(p)
     if name in _sub:
         base = os.path.dirname(p)

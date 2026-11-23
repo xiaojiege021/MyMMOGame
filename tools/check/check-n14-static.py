@@ -8,7 +8,7 @@ root = os.environ.get("ROOT") or os.path.abspath(os.path.join(os.path.dirname(__
 
 
 # 14.8 拆分卡之后：网关的 HTTP 注册体按域分片（主文件 + Api/<域>/），断言文本不变，只改读法。
-_SUB = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+_SUB = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
 
 
 def read(*parts):

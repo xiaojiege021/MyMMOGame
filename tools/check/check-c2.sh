@@ -57,7 +57,19 @@ echo "== 2. 静态断言（内容正本 / 结构保证 / 老卡不改） =="
 python3 - "$ROOT" "$TMP" >"$TMP/static.out" 2>&1 <<'PY'
 import json, os, re, subprocess, sys
 root, tmp = sys.argv[1:3]
-def src(p): return open(os.path.join(root, p), encoding="utf-8").read()
+def src(p):
+    """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World",
+            "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc",
+            "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
+    full = os.path.join(root, p)
+    name = os.path.basename(full)
+    text = open(full, encoding="utf-8").read()
+    if name in _sub:
+        d = os.path.join(os.path.dirname(full), _sub[name])
+        text += "".join(open(f, encoding="utf-8").read()
+                        for f in sorted(__import__("glob").glob(os.path.join(d, "*.cs"))))
+    return text
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
 checks = []
 def ck(name, cond): checks.append((name, bool(cond)))
@@ -113,21 +125,30 @@ old = subprocess.run(["git", "diff", "--name-only", "HEAD", "--",
     "config/gather.json", "config/items.json", "config/flight.json", "config/realms.json",
     "config/world.json", "config/region", "proto/mmo/world.proto",
     "client/MMOGame/Assets/Net", "client/MMOGame/Assets/HotUpdate", "client/MMOGame/Assets/Editor",
-    "src/World/WorldGrpcService.cs", "src/World/GatherGrant.cs", "src/World/GatherNodeRegistry.cs",
-    "tools/check/check-p1-3b.sh", "tools/check/check-p1-3c.sh", "tools/check/check-p3-2a.sh",
+    "src/World/GatherGrant.cs", "src/World/GatherNodeRegistry.cs",
+    # D3h 把 check-p1-3b / p1-3c 的读法改成「主文件 + 分片目录」，这两份与本次的拆分同域，
+    # 不再列进「一行未改」；采集判定本身由下面那条按目录读的断言继续守。
+    # check-p3-2a 也只剩「补一条拆分读法」的改动（D3h），同域放行；它的断言正文没动。
+
     "tools/check/check-u4.sh"], cwd=root, capture_output=True, text=True).stdout.strip()
 ck("老配置 / proto / 客户端 / 采集判定 / 老核对脚本一行未改", old == "")
+# D3h 把世界服 RPC 拆进 src/World/Grpc/（WorldGrpcService.cs 变成主文件 + 分片），
+# 「采集判定没被顺手改」改成按目录读内容，不再拿这份文件在不在 diff 里当证据。
+ck("采集判定仍在世界服（判定三件套：灵石拒收 / 占位 / 交角色服发货）",
+   all(x in open(root + "/src/World/Grpc/Catalog.cs", encoding="utf-8").read()
+       for x in ("spirit_stone_forbidden", "nodes.TryClaim", "grants.GrantAsync")))
 # D5 口径：不再用整目录 diff 证明「没动库」。C2 真正要守的是「采集不建表、不进角色库」，
 # D8 补主迁移会合法改 db/character，所以把这一条换成内容断言。
 import glob as _glob
 _db_character = "".join(open(p, encoding="utf-8").read() for p in _glob.glob("db/character/*.sql"))
 ck("角色库里没有采集表 / 采集列（采集只在世界服与配置里）", "gather" not in _db_character.lower())
-ck("gather.json 仍是 P1-3b 的四个节点、灵石矿脉一个",
-   len(base["nodes"]) == 4 and sum(n["kind"] == "spirit_stone" for n in base["nodes"]) == 1)
-ck("老卡写死的 nodes=4 断言仍在（本卡没有去改老脚本）",
-   "gather_state=ok nodes=4" in src("tools/check/check-p1-3b.sh")
-   and "gather_config=ok nodes=4" in src("tools/check/check-p1-3c.sh")
-   and "len(ga[\"nodes\"]) == 4" in src("tools/check/check-p3-2a.sh"))
+# D5 口径：会随卡增长的集合只写下限（B1 把基准点从 4 涨到 6）。
+ck("gather.json 仍是 P1-3b 的基准节点（≥4）、灵石矿脉一个",
+   len(base["nodes"]) >= 4 and sum(n["kind"] == "spirit_stone" for n in base["nodes"]) == 1)
+ck("采集节点数不再写死在老脚本里（D5 口径：期望值现取）",
+   "gather_state=ok nodes=4" not in src("tools/check/check-p1-3b.sh")
+   and "gather_config=ok nodes=4" not in src("tools/check/check-p1-3c.sh")
+   and 'len(ga["nodes"]) == 4' not in src("tools/check/check-p3-2a.sh"))
 
 code = src("src/World/GatherSpreadTable.cs")
 ck("加载期硬校验地表 / 境界 / 覆盖 / 可交易材料",
@@ -178,8 +199,9 @@ while IFS= read -r want; do
 done <"$TMP/regions.expect"
 [ -z "$MISSING" ] && ok "只读入口逐块地表与配置 / flight.json 一致" || bad "只读入口逐块对不上：$MISSING"
 OLD="$("$DOTNET" "$WORLD_DLL" --gather-state 2>&1)"
-printf '%s' "$OLD" | grep -qF 'gather_state=ok nodes=4 ore=ore_iron:2 herb=herb_ling:3 respawn_s=2 forbidden=1' \
-  && ok "老只读口仍是 nodes=4 的 P1-3b 口径" || bad "老只读口被 C2 改了：$OLD"
+# 基准点个数按配置现取（B1 之后是 6 个），其余口径钉住 P1-3b 的三档与灵石拒收。
+printf '%s' "$OLD" | grep -qE "gather_state=ok nodes=$BASE_N ore=ore_iron:2 herb=herb_ling:3 respawn_s=2 forbidden=1" \
+  && ok "老只读口仍是 P1-3b 口径（nodes=${BASE_N} 个基准点）" || bad "老只读口被 C2 改了：$OLD"
 
 echo "== 4. 坏配置（加载期就起不来）与缺表降级 =="
 python3 - "$ROOT" "$TMP" <<'PY'

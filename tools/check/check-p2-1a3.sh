@@ -42,7 +42,7 @@ out = open(sys.argv[1], "w", encoding="utf-8")
 def report(k, cond, info=""):
     out.write(("PASS " if cond else "FAIL ") + k + ("" if cond else "  " + info) + "\n")
 def read(p):
-    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     _name = os.path.basename(p)
     if _name in _sub and os.path.exists(p):
         # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
@@ -97,7 +97,9 @@ report("founder_not_in_roster", create_seg.count("insert into") == 1 and "master
 report("not_leader_master", "select founder_character_id from" not in repo and repo.count("select master_character_id from") >= 4, "Appoint/Dismiss/Transfer/Leave 的掌门判定都改查 master_character_id")
 leave_seg = repo[repo.find("public async Task<LeadershipOutcome> LeaveAsync"):repo.find("// ---- 只读：DescribeLeadership")]
 report("leave_rules", all(x in leave_seg for x in ["master_cannot_leave", "resign_first", "not_member", "sect_not_found", r'delete from \"社交\".sect_member', "characterId == master"]), "退出：掌门不能直接退/有职位先辞/非成员拒/弟子删行，master_cannot_leave 用 master_character_id 判")
-new_seg = repo[repo.find("// ---- 写：传位"):]
+# 14.8 D3e：宗门读写按域进了 Sect/ 分片（聚合读按文件名排序），这里改成用同一文件里的
+# 两个分节注释界定「传位 + 退出」这两段，断言口径不变、也不再依赖分片在文件里的位置。
+new_seg = repo[repo.find("// ---- 写：传位"):repo.find("// ---- 只读：DescribeLeadership")]
 report("repo_no_attributes", not re.search(r"set\s+(level|realm|damage|exp|attribute|hp)\s*=", new_seg, re.I)
        and '"角色"' not in new_seg, "传位/退出不写等级/境界/伤害/经验/属性列、不碰角色 schema")
 report("not_vice_master_rule", "position = 'vice_master' for update" in seg, "not_vice_master 用「目标在名册且 position='vice_master'」判")

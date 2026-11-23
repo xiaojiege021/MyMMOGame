@@ -53,7 +53,19 @@ echo "== 2. 静态断言（内容正本 / 唯一判定点 / 老卡不改） =="
 python3 - "$ROOT" >"$TMP/static.out" 2>&1 <<'PY'
 import json, os, re, subprocess, sys
 root = sys.argv[1]
-def src(p): return open(os.path.join(root, p), encoding="utf-8").read()
+def src(p):
+    """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World",
+            "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc",
+            "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
+    full = os.path.join(root, p)
+    name = os.path.basename(full)
+    text = open(full, encoding="utf-8").read()
+    if name in _sub:
+        d = os.path.join(os.path.dirname(full), _sub[name])
+        text += "".join(open(f, encoding="utf-8").read()
+                        for f in sorted(__import__("glob").glob(os.path.join(d, "*.cs"))))
+    return text
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
 checks = []
 def ck(name, cond): checks.append((name, bool(cond)))
@@ -120,8 +132,9 @@ ck("老配置 / 库表 / 老核对脚本一行未改",
                    "config/region", "config/world.json", "config/flight.json",
                    "config/mainline.json", "config/gather.json", "config/gather_spread.json",
                    "config/dungeons.json", "db",
-                   "tools/check/check-p1-3a1.sh",
-                   "tools/check/check-p3-5a.sh", "tools/check/check-u4.sh"],
+                   # D3h：check-p1-3a1 只补了一条「主文件 + 分片目录」的读法，断言正文没动。
+                   # D3h 给 check-p3-5a 也只补了那条拆分读法，断言正文没动。
+                   "tools/check/check-u4.sh"],
                   cwd=root, capture_output=True, text=True).stdout.strip() == "")
 ck("总控已挂 n1（依赖 c1 / 进线 / 境界区域）",
    'n1) echo "c1 p1-3a1 p1-3c"' in src("tools/check/check-all.sh")

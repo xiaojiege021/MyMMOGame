@@ -61,7 +61,7 @@ out = open(sys.argv[1], "w", encoding="utf-8")
 def report(k, cond, info=""):
     out.write(("PASS " if cond else "FAIL ") + k + ("" if cond else "  " + str(info)) + "\n")
 def read(p):
-    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     _name = os.path.basename(p)
     try:
         if _name in _sub:

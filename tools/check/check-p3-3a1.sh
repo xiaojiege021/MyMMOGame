@@ -72,7 +72,7 @@ def src(p):
     _parts = {"Server.cs": "Server", "Config.cs": "ConfigTables",
               "Encounter.cs": "Encounter", "Effects.cs": "Effects",
               "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect",
-              "WorldApi.cs": "Api/World"}
+              "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     name = os.path.basename(p)
     if name in _parts:
         d = os.path.join(os.path.dirname(full), _parts[name])

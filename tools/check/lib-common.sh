@@ -175,6 +175,11 @@ split_parts() {
     */Gateway/CharacterApi.cs) dir="${path%/CharacterApi.cs}/Api/Character" ;;
     */Gateway/SectApi.cs)      dir="${path%/SectApi.cs}/Api/Sect" ;;
     */Gateway/WorldApi.cs)     dir="${path%/WorldApi.cs}/Api/World" ;;
+    */Social/SectRepository.cs)  dir="${path%/SectRepository.cs}/Sect" ;;
+    */Social/SocialGrpcService.cs) dir="${path%/SocialGrpcService.cs}/Grpc" ;;
+    */World/WorldGrpcService.cs) dir="${path%/WorldGrpcService.cs}/Grpc" ;;
+    */Social/Program.cs)       dir="${path%/Program.cs}/Cli" ;;
+    */World/Program.cs)        dir="${path%/Program.cs}/Cli" ;;
     *) printf '%s\n' "$path"; return ;;
   esac
   printf '%s\n' "$path"

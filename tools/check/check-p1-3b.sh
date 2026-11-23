@@ -135,7 +135,14 @@ client = open(root + '/client/MMOGame/Assets/Net/WorldGather.cs', encoding='utf-
 assert 'RequestBody(string nodeId)' in client and 'Escape(nodeId' in client
 assert 'Ok = ok,' in client
 assert 'GatherTable' not in client and 'ApplyGrant' not in client and 'Math.Sqrt' not in client
-svc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
+def __agg(p):
+    """拆分卡之后：主文件 + 同域分片目录一起读（14.8 纪律第 8 条）。"""
+    return open(p, encoding='utf-8').read() + "".join(
+        open(f, encoding='utf-8').read()
+        for f in sorted(__import__('glob').glob(__import__('os').path.join(
+            __import__('os').path.dirname(p), 'Grpc', '*.cs'))))
+
+svc = __agg(root + '/src/World/WorldGrpcService.cs')
 assert 'spirit_stone_forbidden' in svc and 'nodes.TryClaim' in svc and 'grants.GrantAsync' in svc
 print('client_static=ok nodes=' + str(len(cfg['nodes'])) + ' forbidden=' + str(len(by['spirit_stone'])))
 PY
@@ -210,7 +217,13 @@ assert 'bool ok = 1' in resp and 'string reason' in resp and 'string txn_id' in 
 table = open(root + '/src/World/GatherTable.cs', encoding='utf-8').read()
 assert '不许配产物或刷新字段' in table and '缺 kind=' in table
 assert 'gather.json 节点 ' in table and '缺 item_id' in table
-svc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
+def __agg(p):
+    """拆分卡之后：主文件 + 同域分片目录一起读（14.8 纪律第 8 条）。"""
+    return open(p, encoding='utf-8').read() + "".join(
+        open(f, encoding='utf-8').read()
+        for f in sorted(__import__('glob').glob(__import__('os').path.join(
+            __import__('os').path.dirname(p), 'Grpc', '*.cs'))))
+svc = __agg(root + '/src/World/WorldGrpcService.cs')
 assert 'GatherTable.SpiritStone' in svc and 'spirit_stone_forbidden' in svc
 assert 'nodes.TryClaim' in svc and 'nodes.Release' in svc and 'grants.GrantAsync' in svc
 assert 'Guid.NewGuid().ToString("N")' in svc
@@ -227,7 +240,8 @@ assert 'GatherTable.Load(' in proc and 'GrpcGatherGrant' in proc
 for path in ['src/World/WorldProcess.cs', 'src/World/WorldGrpcService.cs',
              'src/World/GatherTable.cs', 'src/World/GatherGrant.cs',
              'src/World/GatherNodeRegistry.cs']:
-    assert 'Npgsql' not in open(root + '/' + path, encoding='utf-8').read(), path
+    assert 'Npgsql' not in (__agg(root + '/' + path) if path.endswith('WorldGrpcService.cs')
+                            else open(root + '/' + path, encoding='utf-8').read()), path
 print('static_code=ok nodes=' + str(len(cfg['nodes']))
       + ' server_owns_gather=1 character_owns_bag=1 world_no_db=1')
 PY
@@ -342,10 +356,12 @@ if wait_ready "$TMP/character.log" '^ready name=Character' "角色服" \
 else
   finish "P1-3b（${MODE}）"
 fi
-if grep -qF 'gather_config=ok nodes=4 kinds=ore,herb,spirit_stone forbidden=1' "$TMP/world.log" \
+# D5 口径：基准节点个数按 config/gather.json 现取（B1 之后是 6 个，不再写死 4）。
+NODES="$(python3 -c 'import json,sys;print(len(json.load(open(sys.argv[1],encoding="utf-8"))["nodes"]))' "$ROOT/config/gather.json")"
+if grep -qF "gather_config=ok nodes=$NODES kinds=ore,herb,spirit_stone forbidden=1" "$TMP/world.log" \
    && wait_line "$TMP/world.log" '^position_sync_hz=8$' \
    && grep -qF 'tier_config=ok near=8 far=20' "$TMP/world.log"; then
-  ok "世界服读到四个采集节点，老的 8Hz 与三档阈值没回退"
+  ok "世界服读到 ${NODES} 个采集节点，老的 8Hz 与三档阈值没回退"
 else
   bad "世界服启动日志里的采集/老配置不对"; grep -E '^(gather_|tier_|position_)' "$TMP/world.log" | detail
 fi

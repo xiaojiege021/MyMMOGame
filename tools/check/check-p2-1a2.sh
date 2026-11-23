@@ -43,7 +43,7 @@ out = open(sys.argv[1], "w", encoding="utf-8")
 def report(k, cond, info=""):
     out.write(("PASS " if cond else "FAIL ") + k + ("" if cond else "  " + info) + "\n")
 def read(p):
-    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     _name = os.path.basename(p)
     if _name in _sub and os.path.exists(p):
         # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
