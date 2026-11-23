@@ -38,6 +38,21 @@ def R(k, c, i=""):
     out.write(("PASS " if c else "FAIL ") + k + ("" if c else "  " + str(i)) + "\n")
 
 def rd(p):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    _name = __import__("os").path.basename(p)
+    if _name in _sub:
+        # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
+        _os = __import__("os"); _g = __import__("glob")
+        _b = p if _os.path.isabs(p) else _os.path.join(_os.getcwd(), p)
+        if not _os.path.exists(_b):
+            _d = _os.path.dirname(_os.getcwd())
+            while _d and not _os.path.exists(_os.path.join(_d, p)):
+                _nd = _os.path.dirname(_d)
+                if _nd == _d: break
+                _d = _nd
+            _b = _os.path.join(_d, p)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     p = os.path.join(root, p)
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
@@ -117,8 +132,8 @@ done
 
 echo "== 4. 无库段：--realm-table 炼体 9 阶 / 默认 4 阶 =="
 "$DOTNET" "$CD" --realm-table $CC >"$TMP/rt.txt" 2>&1
-python3 - "$TMP/rt.txt" "$TMP/rt-check.txt" <<'PY'
-import re, sys
+python3 - "$TMP/rt.txt" "$TMP/rt-check.txt" "$ROOT" <<'PY'
+import json, re, sys
 lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
 out = open(sys.argv[2], "w", encoding="utf-8")
 
@@ -145,7 +160,9 @@ R("default_passive", [x[2] for x in default] == [0, 80, 160, 250])
 R("default_promote", [x[3] for x in default] == [1, 5, 10, 15])
 R("group_lian", "sub_phase_group=炼体 count=9 breakthrough_min_index=8" in lines)
 R("group_star", "sub_phase_group=* count=4 breakthrough_min_index=2" in lines)
-R("state_version", any(l.startswith("realm_table_state=ok version=4 ") for l in lines))
+# D5 口径：版本号现取配置，不写死当时的事实（B1 把 realms.json 的 version 从 4 提到 5 之后这里红过）。
+want_ver = json.load(open(sys.argv[3] + "/config/realms.json", encoding="utf-8"))["version"]
+R("state_version", any(l.startswith("realm_table_state=ok version=%d " % want_ver) for l in lines))
 PY
 while IFS= read -r line; do
   case "$line" in
