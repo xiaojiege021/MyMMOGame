@@ -7,8 +7,13 @@
 # 且在没有 gamedb 的机器上也必须全绿。需要真库或真机的卡（p1-4b、p1-5a 等）
 # 不在这里跑，留给笔记本与 Mac 的收尾回归。
 #
-#   bash tools/check/ci.sh            # CI 与本地都跑这一条
+#   bash tools/check/ci.sh            # CI 与本地都跑这一条（全量，约 13 分钟）
+#   bash tools/check/ci.sh --changed  # 日常：只跑改动涉及到的卡（约 1/5 时间）
 #   bash tools/check/ci.sh --list     # 只列出本 CI 覆盖的卡
+#
+# 卡是串行的：47 张卡里有十几张要起进程，端口是固定的（61000 / 62000 / 60001），
+# 并行会互相抢端口，所以省时间只能靠「少跑几张」，不能靠「同时跑」。
+# 改 proto / 迁移 / 网关入口 / lib-common.sh 时一律用全量，不要用 --changed。
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -21,10 +26,91 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 # contract = D16 契约闸，脚本按 14.11.3 命名为 check-contract.sh。
 CHECKS="b1 b9 b10 c2-realm c4 c5 c6 c7 contract d1a d1b d5 d8 d15 invariants k1 k3 k4 k5 k6 k7 n6 n7 n13 n14 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 s1"
 
-if [ "${1:-}" = "--list" ]; then
-  printf '%s\n' $CHECKS
-  exit 0
+MODE="full"
+case "${1:-}" in
+  "") ;;
+  --list) printf '%s\n' $CHECKS; exit 0 ;;
+  --changed) MODE="changed" ;;
+  *) echo "unknown argument: $1" >&2; exit 2 ;;
+esac
+
+# ── --changed：按改动文件挑卡 ──────────────────────────────────────
+# 判据只有两条，宁可退回全量也不猜：
+#   1. 改动的是 check-<卡>.sh —— 那一张卡必跑（改了自己的核对脚本）
+#   2. 卡脚本里实际读取过的文件名（read("src/.../X.cs") 这种）命中改动文件
+# 不做「同目录传播」：src/Character/ 一条就命中 37/47，等于全量，白算。
+# 一张都没命中时退回全量，避免「改了没人读的文件」被静默跳过。
+# 这两张是全局闸：改了任何业务代码都该复检。
+ALWAYS="contract invariants"
+
+affected_cards() {
+  local files c f base srcs hit out forced others
+  if [ -n "${CI_CHANGED_FILES:-}" ]; then
+    # 测试钩子：CI 里也可以直接传文件列表，配合 --changed 用
+    files="$(printf '%s\n' $CI_CHANGED_FILES | sed '/^$/d' | sort -u)"
+  else
+    files="$(
+      {
+        git diff --name-only HEAD 2>/dev/null
+        git diff --name-only --cached 2>/dev/null
+        git ls-files --others --exclude-standard 2>/dev/null
+      } | sort -u
+    )"
+  fi
+  # 没有可比改动：跑全量最稳
+  [ -n "$files" ] || { printf '%s\n' $CHECKS; return; }
+  # 这几类一改，所有卡的语义都可能变：直接全量
+  if printf '%s\n' "$files" | grep -qE \
+    '^(proto/|db/|config/|\.github/|\.gitea/|tools/probe/|global\.json)'; then
+    printf '%s\n' $CHECKS
+    return
+  fi
+  # tools/check 下除了「某张卡自己的脚本」之外的东西（ci.sh / lib-common.sh / 公共 py 等）：全量
+  if printf '%s\n' "$files" | grep -qE '^tools/check/'; then
+    others="$(printf '%s\n' "$files" | grep -E '^tools/check/' \
+      | grep -vE '^tools/check/check-[a-z0-9.-]+\.sh$')"
+    if [ -n "$others" ]; then
+      printf '%s\n' $CHECKS
+      return
+    fi
+  fi
+  # 纯文档改动（docs/、根目录 *.md、.workbuddy/）：没有卡会因此变，跑 0 张
+  if ! printf '%s\n' "$files" | grep -qvE '^(docs/|\.workbuddy/|\.cursor/|[A-Za-z0-9_.-]+\.md$)'; then
+    return
+  fi
+
+  # 改了哪几张卡自己的脚本
+  forced="$(printf '%s\n' "$files" | sed -n 's#^tools/check/check-\(.*\)\.sh$#\1#p' | sort -u)"
+
+  out=""
+  for c in $CHECKS; do
+    hit=0
+    case " $ALWAYS " in *" $c "*) hit=1 ;; esac
+    case " $(printf '%s' "$forced" | tr '\n' ' ') " in *" $c "*) hit=1 ;; esac
+    srcs="tools/check/check-$c.sh"
+    [ -f "tools/check/check-$c-static.py" ] && srcs="$srcs tools/check/check-$c-static.py"
+    if [ "$hit" = "0" ]; then
+      while IFS= read -r f; do
+        [ -n "$f" ] || continue
+        base="${f##*/}"
+        if grep -qF -- "$base" $srcs 2>/dev/null; then hit=1; break; fi
+      done <<EOF
+$files
+EOF
+    fi
+    [ "$hit" = "1" ] && out="${out}${c}
+"
+  done
+  # 一张都没命中：说明这批改动没有任何卡读过，退回全量而不是跑 0 张
+  [ -n "$out" ] || { printf '%s\n' $CHECKS; return; }
+  printf '%s' "$out"
+}
+
+if [ "$MODE" = "changed" ]; then
+  CHECKS="$(affected_cards)"
 fi
+set -- $CHECKS
+NCARDS=$#
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -62,7 +148,10 @@ else
   exit 1
 fi
 
-step "2. 无库段核对（$(printf '%s\n' $CHECKS | wc -l | tr -d ' ') 张卡）"
+if [ "$MODE" = "changed" ]; then
+  echo "       模式 --changed：改动命中 ${NCARDS} 张卡（判不准会退回全量）"
+fi
+step "2. 无库段核对（${NCARDS} 张卡）"
 for c in $CHECKS; do
   log="$TMP/$c.log"
   if bash tools/check/check-$c.sh >"$log" 2>&1; then
@@ -93,7 +182,7 @@ else
   FAIL=$((FAIL + 1))
 fi
 
-printf '\nCI 结果：%s 张卡 + 1 项结构预算，%s 项未过\n' "$(printf '%s\n' $CHECKS | wc -l | tr -d ' ')" "$FAIL"
+printf '\nCI 结果：%s 张卡 + 1 项结构预算，%s 项未过\n' "$NCARDS" "$FAIL"
 if [ "$FAIL" -ne 0 ]; then
   echo "红：见上面 FAIL 行；需要真库 / 真机的段不在这里跑。"
   exit 1

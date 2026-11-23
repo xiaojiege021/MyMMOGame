@@ -10,7 +10,7 @@ agent_created: true
 
 ## 派工前先读（只读这几段）
 
-按顺序读，读完就停，不整份翻：
+按顺序读，读完就停，不整份翻。检索禁区、每卡文件预算、收尾用哪条 CI 都写在仓库根的 `AGENTS.md`，派工里不再重复一遍：
 
 1. `docs/任务队列.md` 顶部四个指针 + 这一张的行
 2. `docs/开发架构.md` 第 10 节（派工规则、10.1 结构预算、10.2 合卡准入、10.3 结构体检）与第 11 节（这张卡的交付与完成标准），以及本卡在 14.x 的那一行
@@ -44,7 +44,8 @@ agent_created: true
 
 ## 结构预算（10.1），每卡派工前看一眼
 
-- 新卡脚本目标 ≤350 行；能往 `lib-common.sh` 提 helper 就不新写脚本，不许重定义 `ok` / `bad` / `expect_json` / `finish` 这些已有的
+- **优先往既有域脚本里追加用例，不新开 `check-*.sh`**。现在 140 个脚本、50,301 行，是手写业务的 76%，再加就是第二套框架
+- 确需新开时脚本 ≤350 行；能往 `lib-common.sh` 提 helper 就不新写，不许重定义 `ok` / `bad` / `expect_json` / `finish` 这些已有的
 - 单卡新增 check 行数 ≤300；超了就是在造第二套框架，停下来合域
 - 日志 ≤50 行，只留「改了什么 / 怎么验 / 契约变化」
 - 派工前跑 `bash tools/check/check-structure-budget.sh`：红了先还结构债，再派新卡
@@ -63,6 +64,7 @@ agent_created: true
    每条标准后面补一条「证据」：跑什么命令、看哪一行输出；必须真服或真机的当场标出来，
    实现阶段顺手做，不留到收尾（P1-5c7 第 5 条就是这么补出一次提交的）
 6. **核对方式**：跑哪个脚本、看什么输出。有 `tools/check/check-*.sh` 的写清命令。
+   日常收尾用 `bash tools/check/ci.sh --changed`（只跑改动涉及的卡）；改了 proto / 迁移 / 网关签名 / 公共库的一律用全量 `bash tools/check/ci.sh`。
    静态断言不许写死 `delivered_kinds=数字`，也不许把「还没接发货」绑死某个商品编号
    （`tools/check/preflight.sh` 第 4 道闸门会拦）；起服相关的用 `tools/env/service-harness.sh`，
    坏表 / 坏清单用 `tools/check/lib-common.sh` 的 helper；新卡脚本目标 ≤350 行
