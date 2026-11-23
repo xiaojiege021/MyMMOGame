@@ -19,6 +19,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="../../../client/MMOGame/Assets/Net/WorldEntry.cs" />
+    <!-- D13 起 WorldEntry 拆成主文件 + Net/WorldEntry/ 里的 partial 分片；
+         探针仍然只编客户端那一份，把分片一起带上，不另抄一份解析器。 -->
+    <Compile Include="../../../client/MMOGame/Assets/Net/WorldEntry/*.cs" />
   </ItemGroup>
 
 </Project>

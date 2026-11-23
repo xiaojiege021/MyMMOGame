@@ -30,16 +30,18 @@ echo "== 1. 静态断言 =="
 if ROOT="$ROOT" python3 - >"$TMP/static.out" 2>&1 <<'PY'
 import os
 import re
+import sys
 
 root = os.environ['ROOT']
+sys.path.insert(0, root + '/tools/check')
+from lib_read import read_text
 assets = root + '/client/MMOGame/Assets'
 ui = assets + '/HotUpdate/Ui'
 net = assets + '/Net'
 
 
 def read(path):
-    with open(path, encoding='utf-8') as f:
-        return f.read()
+    return read_text(path)
 
 
 screens = ['UiPartyRoomScreen.cs', 'UiLootScreen.cs', 'UiReconnectScreen.cs', 'UiWorldBossScreen.cs']

@@ -5,6 +5,8 @@ import re
 import sys
 
 root = os.environ.get("ROOT") or os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.insert(0, os.path.join(root, "tools", "check"))
+from lib_read import read_text
 assets = os.path.join(root, "client", "MMOGame", "Assets")
 ui = os.path.join(assets, "HotUpdate", "Ui")
 net = os.path.join(assets, "Net")
@@ -16,7 +18,7 @@ for n in ("HomesteadPlantEntry.cs", "HomeCoinShopEntry.cs", "HomesteadEntry.cs")
 assert os.path.exists(os.path.join(assets, "Editor", "U10Check.cs")), "missing U10Check.cs"
 
 home = open(os.path.join(ui, "UiHomesteadScreen.cs"), encoding="utf-8").read()
-flow = open(os.path.join(ui, "UiSocialFlow.cs"), encoding="utf-8").read()
+flow = read_text(os.path.join(ui, "UiSocialFlow.cs"))
 codex = open(os.path.join(ui, "UiSocialCodex.cs"), encoding="utf-8").read()
 plant = open(os.path.join(net, "HomesteadPlantEntry.cs"), encoding="utf-8").read()
 coin = open(os.path.join(net, "HomeCoinShopEntry.cs"), encoding="utf-8").read()

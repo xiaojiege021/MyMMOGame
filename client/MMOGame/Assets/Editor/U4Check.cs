@@ -39,8 +39,9 @@ public static class U4Check
 
     static string Client(string root, string relative)
     {
+        // D13 之后客户端 Ui / 战斗 HUD 按域分片：主文件 + 同域目录一起读（断言文本不变）。
         var path = Path.Combine(root, "client/MMOGame/Assets", relative);
-        return File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+        return SplitRead.Of(path);
     }
 
     static string Repo(string root, string relative)

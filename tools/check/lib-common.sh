@@ -180,6 +180,15 @@ split_parts() {
     */World/WorldGrpcService.cs) dir="${path%/WorldGrpcService.cs}/Grpc" ;;
     */Social/Program.cs)       dir="${path%/Program.cs}/Cli" ;;
     */World/Program.cs)        dir="${path%/Program.cs}/Cli" ;;
+    # D13 客户端：Ui 三个大文件 + 战斗 HUD / 战斗会话 + 表世界拆装层。
+    # 同一张表还有两份：tools/check/lib_read.py 的 PARTS（python 段）与
+    # client/MMOGame/Assets/Editor/SplitRead.cs（Unity 编辑器自检）。改一处要同步改三处。
+    */HotUpdate/Ui/UiShell.cs)      dir="${path%/UiShell.cs}/Shell" ;;
+    */HotUpdate/Ui/UiSocialFlow.cs) dir="${path%/UiSocialFlow.cs}/Flow" ;;
+    */HotUpdate/Ui/UiWorldFlow.cs)  dir="${path%/UiWorldFlow.cs}/World" ;;
+    */HotUpdate/BattleHud.cs)       dir="${path%/BattleHud.cs}/Hud" ;;
+    */HotUpdate/BattleClient.cs)    dir="${path%/BattleClient.cs}/Session" ;;
+    */Net/WorldEntry.cs)            dir="${path%/WorldEntry.cs}/WorldEntry" ;;
     *) printf '%s\n' "$path"; return ;;
   esac
   printf '%s\n' "$path"

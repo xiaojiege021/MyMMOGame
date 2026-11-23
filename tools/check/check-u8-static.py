@@ -5,6 +5,8 @@ import re
 import sys
 
 root = os.environ.get("ROOT") or os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.insert(0, os.path.join(root, "tools", "check"))
+from lib_read import read_text
 assets = os.path.join(root, "client", "MMOGame", "Assets")
 ui = os.path.join(assets, "HotUpdate", "Ui")
 
@@ -24,7 +26,7 @@ hub = open(os.path.join(ui, "UiEntryHub.cs"), encoding="utf-8").read()
 hud = open(os.path.join(ui, "UiWorldHudScreen.cs"), encoding="utf-8").read()
 entry = open(os.path.join(ui, "UiEntryFlow.cs"), encoding="utf-8").read()
 settle = open(os.path.join(ui, "UiSettleScreen.cs"), encoding="utf-8").read()
-world = open(os.path.join(ui, "UiWorldFlow.cs"), encoding="utf-8").read()
+world = read_text(os.path.join(ui, "UiWorldFlow.cs"))
 selfcheck = open(os.path.join(ui, "UiEntryHubSelfCheck.cs"), encoding="utf-8").read()
 
 assert 'ReadyLog = "u8_entry_hub=ready"' in hub, "hub ready log"

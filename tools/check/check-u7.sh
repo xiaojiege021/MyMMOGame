@@ -30,8 +30,11 @@ echo "== 1. 静态断言 =="
 if ROOT="$ROOT" python3 - >"$TMP/static.out" 2>&1 <<'PY'
 import os
 import re
+import sys
 
 root = os.environ['ROOT']
+sys.path.insert(0, root + '/tools/check')
+from lib_read import read_text
 assets = root + '/client/MMOGame/Assets'
 ui = assets + '/HotUpdate/Ui'
 net = assets + '/Net'
@@ -63,7 +66,7 @@ codex = open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
 assert 'config/' not in codex, 'config read in codex'
 assert not cap_assign.search(codex), 'hardcoded cap in codex'
 
-flow = open(ui + '/UiSocialFlow.cs', encoding='utf-8').read()
+flow = read_text(ui + '/UiSocialFlow.cs')
 for token in ('SectGuild.ParseSect', 'SectGuild.ParsePosition', 'SectGuild.ParseLeadership',
               'SectGuild.ParseUpgrade', 'WorldBossEntry.Parse'):
     assert token in flow, 'missing ' + token
@@ -86,7 +89,7 @@ assert 'PlantingGap' not in social_codex and 'CodexGap' not in social_codex
 assert 'VersusGap' not in social_codex, '竞技场缺口文案还留着'
 
 # 战斗侧只加一条「收到才处理」的分支；副本链路不发这条消息。
-battle_client = open(assets + '/HotUpdate/BattleClient.cs', encoding='utf-8').read()
+battle_client = read_text(assets + '/HotUpdate/BattleClient.cs')
 assert 'BodyOneofCase.SiegeView' in battle_client, '战斗客户端缺 SiegeView 分支'
 assert 'UiSocialFlow.Feed' in battle_client, 'SiegeView 没交给社交屏'
 

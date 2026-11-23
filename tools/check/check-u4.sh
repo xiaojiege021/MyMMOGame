@@ -57,13 +57,15 @@ if [ "$HAVE_CLIENT" = "1" ]; then
 
   echo "== 1. 静态断言：展示表对配置、档位不自己算、HUD 不动 =="
   python3 - > "$TMP/static.txt" <<'PY'
-import glob, json, os, re
+import glob, json, os, re, sys
 
 root = os.environ['ROOT']
+sys.path.insert(0, root + '/tools/check')
+from lib_read import read_text
 
 def client(rel):
     p = os.path.join(root, 'client/MMOGame/Assets', rel)
-    return open(p, encoding='utf-8').read() if os.path.exists(p) else ''
+    return read_text(p)
 
 def repo(rel):
     p = os.path.join(root, rel)

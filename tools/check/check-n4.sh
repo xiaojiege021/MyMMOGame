@@ -46,7 +46,7 @@ import json, os
 root = os.environ["ROOT"]
 
 def read(rel):
-    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
+    _sub = {"UiShell.cs": "Shell", "UiSocialFlow.cs": "Flow", "UiWorldFlow.cs": "World", "BattleHud.cs": "Hud", "BattleClient.cs": "Session", "WorldEntry.cs": "WorldEntry", "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
     p = os.path.join(root, rel)
     _name = os.path.basename(p)
     if _name in _sub and os.path.exists(p):

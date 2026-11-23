@@ -118,8 +118,8 @@ else
 fi
 
 echo "== 2. 静态断言（客户端）=="
-CLIENT="$ROOT/client/MMOGame/Assets/HotUpdate/BattleClient.cs"
-HUD="$ROOT/client/MMOGame/Assets/HotUpdate/BattleHud.cs"
+CLIENT="$(src_agg "$ROOT/client/MMOGame/Assets/HotUpdate/BattleClient.cs")"
+HUD="$(src_agg "$ROOT/client/MMOGame/Assets/HotUpdate/BattleHud.cs")"
 
 if grep -q '"class=" + ClassId' "$CLIENT" && grep -q 'Url.Contains' "$CLIENT"; then
   ok "职业参数拼进连接地址，已带 query 的地址也不拼坏"

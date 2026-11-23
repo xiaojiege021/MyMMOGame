@@ -153,8 +153,8 @@ else
 fi
 
 echo "== 3. 静态断言 =="
-HUD="$ROOT/client/MMOGame/Assets/HotUpdate/BattleHud.cs"
-CLIENT="$ROOT/client/MMOGame/Assets/HotUpdate/BattleClient.cs"
+HUD="$(src_agg "$ROOT/client/MMOGame/Assets/HotUpdate/BattleHud.cs")"
+CLIENT="$(src_agg "$ROOT/client/MMOGame/Assets/HotUpdate/BattleClient.cs")"
 HERO="$ROOT/client/MMOGame/Assets/HotUpdate/HeroAvatar.cs"
 
 if grep -q 'info.ForeswingMs' "$CLIENT" && ! grep -qE 'ForeswingMs = [0-9]+;' "$CLIENT"; then

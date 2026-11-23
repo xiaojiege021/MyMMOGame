@@ -61,14 +61,16 @@ if [ "$HAVE_CLIENT" = "1" ]; then
 
 echo "== 1. 四屏静态断言 =="
 if ROOT="$ROOT" python3 - >"$TMP/static.out" 2>&1 <<'PY'
-import json, os, re
+import json, os, re, sys
 
 root = os.environ['ROOT']
+sys.path.insert(0, root + '/tools/check')
+from lib_read import read_text
 assets = root + '/client/MMOGame/Assets'
 ui = assets + '/HotUpdate/Ui'
 
 def read(p):
-    return open(p, encoding='utf-8').read()
+    return read_text(p)
 
 names = ['UiBattleCodex.cs', 'UiDungeonFlow.cs', 'UiDungeonScreen.cs',
          'UiSettleScreen.cs', 'UiPartyScreen.cs', 'UiBattleSelfCheck.cs']

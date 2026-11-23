@@ -41,7 +41,9 @@ public static class N4Check
         failed |= !ok;
     }
 
-    static string Read(string path) => File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+    // D13 之后客户端 Ui / 战斗 HUD / 表世界拆装层也按域分片：主文件 + 同域目录一起读
+    // （与 tools/check 的 src_agg、lib_read.py 同口径，断言文本不变）。
+    static string Read(string path) => SplitRead.Of(path);
 
     // D3d 之后网关的 HTTP 注册体按域分片（主文件 + Api/<域>/）；只读主文件会漏掉搬走的路由。
     // D3d/D3h 之后源码按域分片：主文件 + 同域分片目录一起读（与 tools/check 的 src_agg 同口径）。

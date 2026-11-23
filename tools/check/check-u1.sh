@@ -97,7 +97,8 @@ missing = [t for t in tokens if '"%s"' % t not in server]
 assert not missing, 'not in server: ' + ','.join(missing)
 
 # 骨架不许自己发明色值：颜色只有 UiPalette 一份正本。
-for p in glob.glob(ui + '/*.cs'):
+# D13 之后 Ui 按屏分成 Ui/Shell、Ui/Flow、Ui/World 三个子目录，扫的时候要把子目录带上。
+for p in glob.glob(ui + '/**/*.cs', recursive=True):
     if os.path.basename(p) == 'UiPalette.cs':
         continue
     text = open(p, encoding='utf-8').read()

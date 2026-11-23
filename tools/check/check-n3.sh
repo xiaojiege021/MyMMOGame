@@ -34,12 +34,15 @@ if [ -z "$PYBIN" ]; then
 fi
 if ROOT="$ROOT" "$PYBIN" - >"$TMP/static.out" 2>&1 <<'PY'
 import os
+import sys
 
 root = os.environ["ROOT"]
+sys.path.insert(0, root + "/tools/check")
+from lib_read import read_text
 ui = root + "/client/MMOGame/Assets/HotUpdate/Ui"
 net = root + "/client/MMOGame/Assets/Net"
 sect = open(ui + "/UiSectScreen.cs", encoding="utf-8").read()
-flow = open(ui + "/UiSocialFlow.cs", encoding="utf-8").read()
+flow = read_text(ui + "/UiSocialFlow.cs")
 guild = open(net + "/SectGuild.cs", encoding="utf-8").read()
 codex = open(ui + "/UiSocialCodex.cs", encoding="utf-8").read()
 proto = open(root + "/proto/mmo/social.proto", encoding="utf-8").read()

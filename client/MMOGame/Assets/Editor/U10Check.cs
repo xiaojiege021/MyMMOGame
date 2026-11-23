@@ -44,7 +44,9 @@ public static class U10Check
         failed |= !ok;
     }
 
-    static string Read(string path) => File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+    // D13 之后客户端 Ui / 战斗 HUD / 表世界拆装层也按域分片：主文件 + 同域目录一起读
+    // （与 tools/check 的 src_agg、lib_read.py 同口径，断言文本不变）。
+    static string Read(string path) => SplitRead.Of(path);
 
     static void CheckFiles(string root)
     {

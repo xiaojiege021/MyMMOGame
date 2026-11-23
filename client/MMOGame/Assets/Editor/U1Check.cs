@@ -223,7 +223,7 @@ public static class U1Check
 
         // 手写 .meta 的 GUID 必须正好 32 位十六进制，多一位 Unity 会忽略整个文件夹。
         var metas = new List<string>();
-        foreach (var file in Directory.GetFiles(Path.Combine(assets, "HotUpdate/Ui"), "*.meta"))
+        foreach (var file in Directory.GetFiles(Path.Combine(assets, "HotUpdate/Ui"), "*.meta", SearchOption.AllDirectories))
         {
             metas.Add(file);
         }
