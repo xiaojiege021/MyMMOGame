@@ -19,6 +19,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
@@ -32,10 +33,6 @@ PASS=0
 FAIL=0
 TMP="$(mktemp -d)"
 GATEWAY_PID=""
-
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-detail() { sed 's/^/       /'; }
 
 cleanup() {
   if [ -n "$GATEWAY_PID" ] && kill -0 "$GATEWAY_PID" 2>/dev/null; then
@@ -249,12 +246,6 @@ login() {
   curl -s -m 10 -w '\n%{http_code}' -X POST "http://127.0.0.1:${PORT}/login" \
     -H 'Content-Type: application/json' \
     -d "{\"account\":\"$1\",\"password\":\"$2\"}"
-}
-
-split_response() {
-  local response="$1"
-  BODY="${response%$'\n'*}"
-  CODE="${response##*$'\n'}"
 }
 
 token_of() {

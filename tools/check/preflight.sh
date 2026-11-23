@@ -21,10 +21,9 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 
+source "$ROOT/tools/check/lib-common.sh"
 FAIL=0
 PASS=0
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
 warn(){ printf '  ..   %s\n' "$1"; }
 
 echo "== 前置闸门 =="

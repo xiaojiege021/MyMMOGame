@@ -17,6 +17,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
@@ -35,10 +36,6 @@ cleanup() {
   rm -rf "$TMP"
 }
 trap cleanup EXIT
-
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-detail() { printf '       %s\n' "$1"; }
 
 stop_battle() {
   if [ -n "$BATTLE_PID" ] && kill -0 "$BATTLE_PID" 2>/dev/null; then

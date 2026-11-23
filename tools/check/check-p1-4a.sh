@@ -13,6 +13,7 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
+source "$ROOT/tools/check/lib-common.sh"
 export ROOT
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -43,24 +44,6 @@ NEW_ID=""
 ID=""
 OTHER_ID=""
 
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-detail() { sed 's/^/       /'; }
-
-stop_pid() {
-  local pid="$1"
-  [ -n "$pid" ] || return 0
-  if kill -0 "$pid" 2>/dev/null; then
-    kill -TERM "$pid" 2>/dev/null || true
-    for _ in $(seq 1 20); do
-      kill -0 "$pid" 2>/dev/null || break
-      sleep 0.1
-    done
-    kill -KILL "$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
-  fi
-}
-
 cleanup() {
   stop_pid "$GATEWAY_PID"
   stop_pid "$CHARACTER_PID"
@@ -74,62 +57,6 @@ cleanup() {
   rm -rf "$TMP"
 }
 trap cleanup EXIT
-
-body_of() { printf '%s' "${1%$'\n'*}"; }
-code_of() { printf '%s' "${1##*$'\n'}"; }
-
-json_field() {
-  printf '%s' "$1" | python3 -c 'import json,sys
-try:
-    v = json.load(sys.stdin).get("'"$2"'", "")
-    if isinstance(v, bool): v = str(v).lower()
-    print(v)
-except Exception:
-    print("")'
-}
-
-expect_json() {
-  local body="$1"
-  shift
-  printf '%s' "$body" | EXPECT="$*" python3 -c '
-import json, os, sys
-try:
-    d = json.load(sys.stdin)
-except Exception:
-    print("bad_json"); sys.exit(1)
-for pair in os.environ["EXPECT"].split():
-    key, want = pair.split("=", 1)
-    got = d.get(key, "")
-    if isinstance(got, bool): got = "true" if got else "false"
-    try:
-        if float(got) == float(want): continue
-    except (TypeError, ValueError):
-        pass
-    if str(got) == want: continue
-    print("mismatch %s got=%r want=%r" % (key, got, want))
-    sys.exit(1)
-print("ok")'
-}
-
-login_token() {
-  curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/login" \
-    -H 'Content-Type: application/json' \
-    -d "{\"account\":\"$1\",\"password\":\"${TEST_PASSWORD}\"}" \
-    | python3 -c 'import json,sys
-try: print(json.load(sys.stdin).get("token",""))
-except Exception: print("")'
-}
-
-create_char() {
-  local resp
-  resp="$(curl -s -m 10 -w '\n%{http_code}' -X POST \
-    "http://127.0.0.1:${GATEWAY_PORT}/character?token=$1" \
-    -H 'Content-Type: application/json' \
-    -d "{\"name\":\"$2\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
-  [ "$(code_of "$resp")" = "200" ] || return 1
-  NEW_ID="$(json_field "$(body_of "$resp")" character_id)"
-  [ -n "$NEW_ID" ]
-}
 
 enhance() {
   local token="$1" char="$2" stone="$3" extra="${4:-}"
@@ -163,32 +90,6 @@ expect_state() {
   local want="$1 $2 $3 $4 $5" label="$6" got
   got="$(enhance_state)"
   if [ "$got" = "$want" ]; then ok "$label"; else bad "${label}：state=[$got] 期望=[$want]"; fi
-}
-
-wait_ready() {
-  local log="$1" pattern="$2" label="$3"
-  for _ in $(seq 1 120); do
-    if grep -q "$pattern" "$log" 2>/dev/null; then return 0; fi
-    sleep 0.1
-  done
-  bad "$label 没起来"; tail -12 "$log" | detail
-  return 1
-}
-
-wait_line() {
-  local log="$1" pattern="$2"
-  for _ in $(seq 1 40); do
-    if grep -q "$pattern" "$log" 2>/dev/null; then return 0; fi
-    sleep 0.1
-  done
-  return 1
-}
-
-finish() {
-  echo
-  echo "P1-4a（${MODE}）核对：$PASS 项通过，$FAIL 项未通过"
-  [ "$FAIL" = "0" ] || exit 1
-  exit 0
 }
 
 # ---------------------------------------------------------------- 客户端段
@@ -230,7 +131,7 @@ PY
   echo "== C2. Unity 编辑器自检：请求与回包拆装 =="
   if [ ! -x "$UNITY" ]; then
     bad "找不到 Unity：$UNITY"
-    finish
+    finish "P1-4a（${MODE}）"
   fi
   if "$UNITY" -batchmode -quit -projectPath "$ROOT/client/MMOGame" \
       -executeMethod P14aCheck.Run -logFile "$TMP/unity.log" >/dev/null 2>&1; then
@@ -247,7 +148,7 @@ PY
       grep "p14a_${key}" "$TMP/unity.log" | tail -2 | detail
     fi
   done
-  finish
+  finish "P1-4a（${MODE}）"
 fi
 
 # ---------------------------------------------------------------- 服务端段
@@ -375,7 +276,7 @@ fi
 
 if [ -z "${MMO_GAMEDB:-}" ] && [ ! -f /srv/mmo/gamedb.env ]; then
   bad "没有 gamedb 凭据，连服段跑不了（这一段要在笔记本上跑）"
-  finish
+  finish "P1-4a（${MODE}）"
 fi
 
 echo "== 4. 建表、播种与临时配置 =="
@@ -431,7 +332,7 @@ if wait_ready "$CHARACTER_LOG" '^ready name=Character' "角色服" \
    && wait_line "$CHARACTER_LOG" 'rates=1,1,1'; then
   ok "角色服与网关起来，强化表按临时配置读成全成功"
 else
-  bad "进程没起来或强化表没读到临时配置"; tail -12 "$CHARACTER_LOG" | detail; finish
+  bad "进程没起来或强化表没读到临时配置"; tail -12 "$CHARACTER_LOG" | detail; finish "P1-4a（${MODE}）"
 fi
 
 TOKEN="$(login_token "$ACCOUNT")"
@@ -558,7 +459,7 @@ PY
 if restart_character "0,0,0" "$TMP/character2.log" && wait_line "$CHARACTER_LOG" 'rates=0,0,0'; then
   ok "改概率后重启角色服即生效：三档全 0（只改配置，没改代码）"
 else
-  bad "重启后没读到新概率"; grep 'enhance_table_version' "$CHARACTER_LOG" | detail; finish
+  bad "重启后没读到新概率"; grep 'enhance_table_version' "$CHARACTER_LOG" | detail; finish "P1-4a（${MODE}）"
 fi
 FAIL_OK=1
 for pair in "11 10" "10 9" "9 8"; do
@@ -599,7 +500,7 @@ BODY="$(body_of "$resp")"
 if restart_character "1,1,1" "$TMP/character3.log" && wait_line "$CHARACTER_LOG" 'rates=1,1,1'; then
   ok "再把概率改回全 1 并重启，同样即时生效"
 else
-  bad "第二次重启没读到新概率"; finish
+  bad "第二次重启没读到新概率"; finish "P1-4a（${MODE}）"
 fi
 resp="$(enhance "$TOKEN" "$ID" stone_enhance_mid)"
 BODY="$(body_of "$resp")"
@@ -647,4 +548,4 @@ done
 r="$(add_gold -999999999)"
 [ "$(code_of "$r")" != "200" ] && ok "P1-1b4 不回退：金币减成负数被拒" || bad "余额能写成负数：$(body_of "$r")"
 
-finish
+finish "P1-4a（${MODE}）"

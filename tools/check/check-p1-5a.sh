@@ -58,26 +58,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-login_token() {
-  curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/login" \
-    -H 'Content-Type: application/json' \
-    -d "{\"account\":\"$1\",\"password\":\"${TEST_PASSWORD}\"}" \
-    | python3 -c 'import json,sys
-try: print(json.load(sys.stdin).get("token",""))
-except Exception: print("")'
-}
-
-create_char() {
-  local resp
-  resp="$(curl -s -m 10 -w '\n%{http_code}' -X POST \
-    "http://127.0.0.1:${GATEWAY_PORT}/character?token=$1" \
-    -H 'Content-Type: application/json' \
-    -d "{\"name\":\"$2\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
-  [ "$(code_of "$resp")" = "200" ] || return 1
-  NEW_ID="$(json_field "$(body_of "$resp")" character_id)"
-  [ -n "$NEW_ID" ]
-}
-
 add_item() {
   curl -s -m 10 -w '\n%{http_code}' -X POST \
     "http://127.0.0.1:${GATEWAY_PORT}/inventory/add?token=$1" \

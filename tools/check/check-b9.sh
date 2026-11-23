@@ -164,15 +164,6 @@ else
   tail -12 "$TMP/character.log" | detail; finish "$TITLE"
 fi
 
-login_token() {
-  curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/login" \
-    -H 'Content-Type: application/json' \
-    -d "{\"account\":\"$1\",\"password\":\"${TEST_PASSWORD}\"}" \
-    | python3 -c 'import json,sys
-try: print(json.load(sys.stdin).get("token",""))
-except Exception: print("")'
-}
-
 post() {
   curl -s -m 10 -w '\n%{http_code}' -X POST "http://127.0.0.1:${GATEWAY_PORT}$1?token=${TOKEN}" \
     -H 'Content-Type: application/json' -d "$2"

@@ -23,6 +23,7 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
+source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
@@ -58,24 +59,6 @@ GATEWAY_PID=""
 HAVE_DB=""
 BG_PIDS=()
 
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-detail() { sed 's/^/       /'; }
-
-stop_pid() {
-  local pid="$1"
-  [ -n "$pid" ] || return 0
-  if kill -0 "$pid" 2>/dev/null; then
-    kill -TERM "$pid" 2>/dev/null || true
-    for _ in $(seq 1 20); do
-      kill -0 "$pid" 2>/dev/null || break
-      sleep 0.1
-    done
-    kill -KILL "$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
-  fi
-}
-
 cleanup() {
   for pid in "${BG_PIDS[@]:-}"; do stop_pid "$pid"; done
   stop_pid "$GATEWAY_PID"
@@ -92,46 +75,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-split_response() {
-  BODY="${1%$'\n'*}"
-  CODE="${1##*$'\n'}"
-}
-
 # curl -w '\n%{http_code}' 的回包拆开用；BSD head 不认 -n -1，别用管道截。
-body_of() { printf '%s' "${1%$'\n'*}"; }
-code_of() { printf '%s' "${1##*$'\n'}"; }
-
-json_field() {
-  printf '%s' "$1" | python3 -c 'import json,sys
-try:
-    v = json.load(sys.stdin).get("'"$2"'", "")
-    print(v)
-except Exception:
-    print("")'
-}
-
-login_token() {
-  curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/login" \
-    -H 'Content-Type: application/json' \
-    -d "{\"account\":\"$1\",\"password\":\"${TEST_PASSWORD}\"}" \
-    | python3 -c 'import json,sys
-try:
-    print(json.load(sys.stdin).get("token",""))
-except Exception:
-    print("")'
-}
-
-create_char() {
-  local resp
-  resp="$(curl -s -m 10 -w '\n%{http_code}' -X POST \
-    "http://127.0.0.1:${GATEWAY_PORT}/character?token=$1" \
-    -H 'Content-Type: application/json' \
-    -d "{\"name\":\"$2\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
-  split_response "$resp"
-  NEW_ID="$(json_field "$BODY" character_id)"
-  [ "$CODE" = "200" ] && [ -n "$NEW_ID" ]
-}
-
 settle_exp() {
   # $1=令牌（空串不带） $2=角色 $3=事务号 $4=人数 $5=来源
   local token="$1" url="http://127.0.0.1:${GATEWAY_PORT}/exp/settle"

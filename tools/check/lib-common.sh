@@ -14,6 +14,8 @@
 #   ok <msg> / bad <msg> / detail          计数与输出
 #   stop_pid <pid>                          收进程
 #   body_of <resp> / code_of <resp>         curl 响应拆码
+#   split_response <resp>                   拆成全局 BODY / CODE
+#   login_token <account>                   走网关换令牌（须先定义 GATEWAY_PORT / TEST_PASSWORD）
 #   json_field <json> <key>                 取一个 JSON 字段
 #   expect_json <body> key=val ...          断言若干 key=val（数值/布尔/字符串兼容）
 #   wait_ready <log> <pattern> <label>      等服务起来，超时打 FAIL 并贴日志尾
@@ -47,6 +49,40 @@ stop_pid() {
 
 body_of() { printf '%s' "${1%$'\n'*}"; }
 code_of() { printf '%s' "${1##*$'\n'}"; }
+
+# split_response <curl 响应>：拆成全局 BODY / CODE。
+#   curl -w '\n%{http_code}' 的输出从右边拆；调用方直接读 $BODY / $CODE。
+split_response() {
+  BODY="${1%$'\n'*}"
+  CODE="${1##*$'\n'}"
+}
+
+# login_token <账号>：走网关换令牌，打印 token（失败打印空串，不判红）。
+#   调用方须先定义 GATEWAY_PORT 与 TEST_PASSWORD。
+login_token() {
+  curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/login" \
+    -H 'Content-Type: application/json' \
+    -d "{\"account\":\"$1\",\"password\":\"${TEST_PASSWORD}\"}" \
+    | python3 -c 'import json,sys
+try:
+    print(json.load(sys.stdin).get("token",""))
+except Exception:
+    print("")'
+}
+
+# create_char <token> <name>：走网关建角色，编号放进全局 NEW_ID。
+#   成功（HTTP 200 且拿到 character_id）返回 0；失败返回 1。
+#   调用方须先定义 GATEWAY_PORT。
+create_char() {
+  local resp
+  resp="$(curl -s -m 10 -w '\n%{http_code}' -X POST \
+    "http://127.0.0.1:${GATEWAY_PORT}/character?token=$1" \
+    -H 'Content-Type: application/json' \
+    -d "{\"name\":\"$2\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
+  [ "$(code_of "$resp")" = "200" ] || return 1
+  NEW_ID="$(json_field "$(body_of "$resp")" character_id)"
+  [ -n "$NEW_ID" ]
+}
 
 json_field() {
   printf '%s' "$1" | python3 -c 'import json,sys

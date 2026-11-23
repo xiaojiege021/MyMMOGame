@@ -19,6 +19,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
@@ -36,24 +37,6 @@ TMP="$(mktemp -d)"
 CHARACTER_PID=""
 GATEWAY_PID=""
 HAVE_DB=""
-
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-detail() { sed 's/^/       /'; }
-
-stop_pid() {
-  local pid="$1"
-  [ -n "$pid" ] || return 0
-  if kill -0 "$pid" 2>/dev/null; then
-    kill -TERM "$pid" 2>/dev/null || true
-    for _ in $(seq 1 20); do
-      kill -0 "$pid" 2>/dev/null || break
-      sleep 0.1
-    done
-    kill -KILL "$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
-  fi
-}
 
 # 测试角色与本轮用到的账号都不留在库里。
 cleanup() {
@@ -76,19 +59,6 @@ post_character() {
   [ -n "$token" ] && url="${url}?token=${token}"
   curl -s -m 10 -w '\n%{http_code}' -X POST "$url" \
     -H 'Content-Type: application/json' -d "$body"
-}
-
-split_response() {
-  BODY="${1%$'\n'*}"
-  CODE="${1##*$'\n'}"
-}
-
-json_field() {
-  printf '%s' "$1" | python3 -c 'import json,sys
-try:
-    print(json.load(sys.stdin).get("'"$2"'", ""))
-except Exception:
-    print("")'
 }
 
 echo "== 1. 编译 =="

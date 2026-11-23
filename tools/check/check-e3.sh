@@ -10,6 +10,7 @@
 
 set -uo pipefail
 
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib-common.sh"
 INSTANCE=${1:-Gateway}
 UNIT="mmo@${INSTANCE}.service"
 APP_ROOT=${APP_ROOT:-/srv/mmo/app}
@@ -25,8 +26,6 @@ FAIL=0
 STAGE=""
 
 say()  { printf '\n%s\n' "$1"; }
-ok()   { PASS=$((PASS+1)); printf '  PASS  %s\n' "$1"; }
-bad()  { FAIL=$((FAIL+1)); printf '  FAIL  %s\n' "$1"; }
 info() { printf '        %s\n' "$1"; }
 
 cleanup() { [ -n "$STAGE" ] && rm -rf "$STAGE" "$STAGE".v2 "$STAGE".log "$STAGE".v2.log; }

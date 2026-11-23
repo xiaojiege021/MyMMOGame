@@ -17,11 +17,14 @@
 #           2026-11-22，K2+Q13 收口后重记（check 49589 / 业务 62349 = 79%，比基线 81 变好，落账）
 #           2026-11-23，U14–U17 新增同域脚本 check-u14.sh（133 → 134，四屏共用一个脚本；
 #                       不塞 check-u3.sh（已 330 行）/ check-u7.sh，仍按 10.1「新域才准新建」）
+#           2026-11-23，D14 公共库收口：dup_sites 152 → 0、max 934 → 880、占比 79 → 77、
+#                       check_lines 50465 → 49327（helper 归口 + login_token / split_response /
+#                       create_char 下沉；脚本数 134 不变，未新增脚本）
 
 scripts=134
-check_lines=50465
+check_lines=49327
 biz_lines=63367
-ratio=79
-max_script_lines=934
-dup_sites=152
-latest_log_card=非卡片记录 · 2026-11-19（结构治理：合卡 + 索引式派工 + 结构预算闸）
+ratio=77
+max_script_lines=880
+dup_sites=0
+latest_log_card=D14 · v1.207 · 2026-11-23（tools/check 公共库：helper 归口 + 脚手架下沉）

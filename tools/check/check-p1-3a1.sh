@@ -14,6 +14,7 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
+source "$ROOT/tools/check/lib-common.sh"
 export ROOT
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -41,24 +42,6 @@ GATEWAY_PID=""
 HAVE_DB=""
 BG_PIDS=()
 
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-detail() { sed 's/^/       /'; }
-
-stop_pid() {
-  local pid="$1"
-  [ -n "$pid" ] || return 0
-  if kill -0 "$pid" 2>/dev/null; then
-    kill -TERM "$pid" 2>/dev/null || true
-    for _ in $(seq 1 20); do
-      kill -0 "$pid" 2>/dev/null || break
-      sleep 0.1
-    done
-    kill -KILL "$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
-  fi
-}
-
 cleanup() {
   for pid in "${BG_PIDS[@]:-}"; do stop_pid "$pid"; done
   stop_pid "$GATEWAY_PID"
@@ -75,47 +58,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-split_response() {
-  BODY="${1%$'\n'*}"
-  CODE="${1##*$'\n'}"
-}
-
-body_of() { printf '%s' "${1%$'\n'*}"; }
-code_of() { printf '%s' "${1##*$'\n'}"; }
-
-json_field() {
-  printf '%s' "$1" | python3 -c 'import json,sys
-try:
-    v = json.load(sys.stdin).get("'"$2"'", "")
-    if isinstance(v, (list, dict)):
-        v = ",".join(str(x) for x in v)
-    print(v)
-except Exception:
-    print("")'
-}
-
-login_token() {
-  curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/login" \
-    -H 'Content-Type: application/json' \
-    -d "{\"account\":\"$1\",\"password\":\"${TEST_PASSWORD}\"}" \
-    | python3 -c 'import json,sys
-try:
-    print(json.load(sys.stdin).get("token",""))
-except Exception:
-    print("")'
-}
-
-create_char() {
-  local resp
-  resp="$(curl -s -m 10 -w '\n%{http_code}' -X POST \
-    "http://127.0.0.1:${GATEWAY_PORT}/character?token=$1" \
-    -H 'Content-Type: application/json' \
-    -d "{\"name\":\"$2\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
-  split_response "$resp"
-  NEW_ID="$(json_field "$BODY" character_id)"
-  [ "$CODE" = "200" ] && [ -n "$NEW_ID" ]
-}
-
 world_enter() {
   # $1=令牌（空串不带） $2=角色 $3=区域 $4=额外伪造字段（可空）
   local token="$1" url="http://127.0.0.1:${GATEWAY_PORT}/world/enter"
@@ -130,13 +72,6 @@ world_leave() {
     "http://127.0.0.1:${GATEWAY_PORT}/world/leave?token=$1" \
     -H 'Content-Type: application/json' \
     -d "{\"character_id\":${2}}"
-}
-
-finish() {
-  echo
-  echo "P1-3a1（${MODE}）核对：$PASS 项通过，$FAIL 项未通过"
-  [ "$FAIL" = "0" ] || exit 1
-  exit 0
 }
 
 if [ "$MODE" = "client" ]; then
@@ -229,7 +164,7 @@ PY
   echo "== C2. Unity 编辑器自检：八块地表进同一组 Launch AB =="
   if [ ! -x "$UNITY" ]; then
     bad "找不到 Unity：$UNITY"
-    finish
+    finish "P1-3a1（${MODE}）"
   fi
   PROJ="$ROOT/client/MMOGame"
   if "$UNITY" -batchmode -quit -projectPath "$PROJ" \
@@ -247,13 +182,13 @@ PY
       grep "p13a1_${key}" "$TMP/unity.log" | tail -2 | detail
     fi
   done
-  finish
+  finish "P1-3a1（${MODE}）"
 fi
 
 echo "== 1. 编译 =="
 if [ -z "$DOTNET" ]; then
   bad "找不到 dotnet"
-  finish
+  finish "P1-3a1（${MODE}）"
 fi
 
 BUILD_OK=1
@@ -352,13 +287,13 @@ fi
 echo "== 3. 环境与启动 =="
 if [ -z "${MMO_GAMEDB:-}" ] && [ ! -f /srv/mmo/gamedb.env ]; then
   bad "没有 gamedb 凭据，连服段跑不了（这一段要在笔记本上跑）"
-  finish
+  finish "P1-3a1（${MODE}）"
 fi
 if ! "$DOTNET" "$GATEWAY_DLL" --migrate --sql db/character/account.sql --config config/gateway.json >"$TMP/migrate1.log" 2>&1; then
-  bad "账号表建表失败"; tail -8 "$TMP/migrate1.log" | detail; finish
+  bad "账号表建表失败"; tail -8 "$TMP/migrate1.log" | detail; finish "P1-3a1（${MODE}）"
 fi
 if ! "$DOTNET" "$CHARACTER_DLL" --migrate --config config/character.json >"$TMP/migrate2.log" 2>&1; then
-  bad "角色表建表失败"; tail -8 "$TMP/migrate2.log" | detail; finish
+  bad "角色表建表失败"; tail -8 "$TMP/migrate2.log" | detail; finish "P1-3a1（${MODE}）"
 fi
 HAVE_DB=1
 for acct in "$ACCOUNT" "$OTHER"; do
@@ -398,21 +333,12 @@ PY
 "$DOTNET" "$WORLD_DLL" --config "$TMP/world.json" >"$TMP/world.log" 2>&1 & WORLD_PID=$!
 "$DOTNET" "$GATEWAY_DLL" --config "$TMP/gateway.json" >"$TMP/gateway.log" 2>&1 & GATEWAY_PID=$!
 
-wait_ready() {
-  local log="$1" pattern="$2" label="$3"
-  for _ in $(seq 1 120); do
-    if grep -q "$pattern" "$log" 2>/dev/null; then return 0; fi
-    sleep 0.1
-  done
-  bad "$label 没起来"; tail -12 "$log" | detail
-  return 1
-}
 if wait_ready "$TMP/character.log" '^ready name=Character' "角色服" \
    && wait_ready "$TMP/world.log" '^ready name=World' "世界服" \
    && wait_ready "$TMP/gateway.log" '^ready name=Gateway' "网关"; then
   ok "角色服、世界服、网关三个进程都起来"
 else
-  finish
+  finish "P1-3a1（${MODE}）"
 fi
 if grep -q '^region_table_version=1 regions=8 dialogues=9 speakers=9 factions=5$' "$TMP/world.log" \
    && grep -q '^line_capacity=4 max_lines_per_region=3$' "$TMP/world.log" \
@@ -592,4 +518,4 @@ else
   bad "经验结算规则被改了：$BODY"
 fi
 
-finish
+finish "P1-3a1（${MODE}）"

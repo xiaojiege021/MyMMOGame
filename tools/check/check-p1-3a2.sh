@@ -12,6 +12,7 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
+source "$ROOT/tools/check/lib-common.sh"
 export ROOT
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -41,24 +42,6 @@ HAVE_DB=""
 TOKEN=""
 OTHER_TOKEN=""
 
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-detail() { sed 's/^/       /'; }
-
-stop_pid() {
-  local pid="$1"
-  [ -n "$pid" ] || return 0
-  if kill -0 "$pid" 2>/dev/null; then
-    kill -TERM "$pid" 2>/dev/null || true
-    for _ in $(seq 1 20); do
-      kill -0 "$pid" 2>/dev/null || break
-      sleep 0.1
-    done
-    kill -KILL "$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
-  fi
-}
-
 cleanup() {
   stop_pid "$GATEWAY_PID"
   stop_pid "$WORLD_PID"
@@ -73,43 +56,6 @@ cleanup() {
   rm -rf "$TMP"
 }
 trap cleanup EXIT
-
-body_of() { printf '%s' "${1%$'\n'*}"; }
-code_of() { printf '%s' "${1##*$'\n'}"; }
-
-json_field() {
-  printf '%s' "$1" | python3 -c 'import json,sys
-try:
-    v = json.load(sys.stdin).get("'"$2"'", "")
-    if isinstance(v, (list, dict)):
-        v = ",".join(str(x) for x in v)
-    print(v)
-except Exception:
-    print("")'
-}
-
-login_token() {
-  curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/login" \
-    -H 'Content-Type: application/json' \
-    -d "{\"account\":\"$1\",\"password\":\"${TEST_PASSWORD}\"}" \
-    | python3 -c 'import json,sys
-try:
-    print(json.load(sys.stdin).get("token",""))
-except Exception:
-    print("")'
-}
-
-create_char() {
-  local resp
-  resp="$(curl -s -m 10 -w '\n%{http_code}' -X POST \
-    "http://127.0.0.1:${GATEWAY_PORT}/character?token=$1" \
-    -H 'Content-Type: application/json' \
-    -d "{\"name\":\"$2\",\"race\":\"mai\",\"class_id\":\"warrior\"}")"
-  body_of "$resp" | grep -q 'character_id' || return 1
-  [ "$(code_of "$resp")" = "200" ] || return 1
-  NEW_ID="$(json_field "$(body_of "$resp")" character_id)"
-  [ -n "$NEW_ID" ]
-}
 
 world_enter() {
   curl -s -m 10 -w '\n%{http_code}' -X POST \
@@ -133,13 +79,6 @@ probe() {
   else
     bad "${name}：${out:0:220}"
   fi
-}
-
-finish() {
-  echo
-  echo "P1-3a2（${MODE}）核对：$PASS 项通过，$FAIL 项未通过"
-  [ "$FAIL" = "0" ] || exit 1
-  exit 0
 }
 
 if [ "$MODE" = "client" ]; then
@@ -174,7 +113,7 @@ PY
   echo "== C2. Unity 编辑器自检：周围的人能看到移动 =="
   if [ ! -x "$UNITY" ]; then
     bad "找不到 Unity：$UNITY"
-    finish
+    finish "P1-3a2（${MODE}）"
   fi
   if "$UNITY" -batchmode -quit -projectPath "$ROOT/client/MMOGame" \
       -executeMethod P13a2Check.Run -logFile "$TMP/unity.log" >/dev/null 2>&1; then
@@ -191,13 +130,13 @@ PY
       grep "p13a2_${key}" "$TMP/unity.log" | tail -2 | detail
     fi
   done
-  finish
+  finish "P1-3a2（${MODE}）"
 fi
 
 echo "== 1. 编译 =="
 if [ -z "$DOTNET" ]; then
   bad "找不到 dotnet"
-  finish
+  finish "P1-3a2（${MODE}）"
 fi
 BUILD_OK=1
 for proj in src/World/World.csproj src/Gateway/Gateway.csproj src/Character/Character.csproj src/Battle/Battle.csproj tools/probe/WorldProbe/WorldProbe.csproj; do
@@ -274,13 +213,13 @@ fi
 echo "== 3. 环境与启动 =="
 if [ -z "${MMO_GAMEDB:-}" ] && [ ! -f /srv/mmo/gamedb.env ]; then
   bad "没有 gamedb 凭据，连服段跑不了（这一段要在笔记本上跑）"
-  finish
+  finish "P1-3a2（${MODE}）"
 fi
 if ! "$DOTNET" "$GATEWAY_DLL" --migrate --sql db/character/account.sql --config config/gateway.json >"$TMP/migrate1.log" 2>&1; then
-  bad "账号表建表失败"; tail -8 "$TMP/migrate1.log" | detail; finish
+  bad "账号表建表失败"; tail -8 "$TMP/migrate1.log" | detail; finish "P1-3a2（${MODE}）"
 fi
 if ! "$DOTNET" "$CHARACTER_DLL" --migrate --config config/character.json >"$TMP/migrate2.log" 2>&1; then
-  bad "角色表建表失败"; tail -8 "$TMP/migrate2.log" | detail; finish
+  bad "角色表建表失败"; tail -8 "$TMP/migrate2.log" | detail; finish "P1-3a2（${MODE}）"
 fi
 HAVE_DB=1
 for acct in "$ACCOUNT" "$OTHER"; do
@@ -320,29 +259,12 @@ PY
 "$DOTNET" "$WORLD_DLL" --config "$TMP/world.json" >"$TMP/world.log" 2>&1 & WORLD_PID=$!
 "$DOTNET" "$GATEWAY_DLL" --config "$TMP/gateway.json" >"$TMP/gateway.log" 2>&1 & GATEWAY_PID=$!
 
-wait_ready() {
-  local log="$1" pattern="$2" label="$3"
-  for _ in $(seq 1 120); do
-    if grep -q "$pattern" "$log" 2>/dev/null; then return 0; fi
-    sleep 0.1
-  done
-  bad "$label 没起来"; tail -12 "$log" | detail
-  return 1
-}
-wait_line() {
-  local log="$1" pattern="$2"
-  for _ in $(seq 1 40); do
-    if grep -q "$pattern" "$log" 2>/dev/null; then return 0; fi
-    sleep 0.1
-  done
-  return 1
-}
 if wait_ready "$TMP/character.log" '^ready name=Character' "角色服" \
    && wait_ready "$TMP/world.log" '^ready name=World' "世界服" \
    && wait_ready "$TMP/gateway.log" '^ready name=Gateway' "网关"; then
   ok "角色服、世界服、网关三个进程都起来"
 else
-  finish
+  finish "P1-3a2（${MODE}）"
 fi
 # 广播服务是托管后台服务，ready 之后才打这一行，断言要等它。
 if wait_line "$TMP/world.log" '^position_sync_hz=8$' \
@@ -383,20 +305,20 @@ resp="$(world_enter "$TOKEN" "${IDS[0]}" "枯岚道")"
 if [ "$(code_of "$resp")" = "200" ] && [ "$(json_field "$(body_of "$resp")" line_id)" = "枯岚道#1" ]; then
   ok "A 进 枯岚道#1"
 else
-  bad "A 进线失败：$(body_of "$resp")"; finish
+  bad "A 进线失败：$(body_of "$resp")"; finish "P1-3a2（${MODE}）"
 fi
 resp="$(world_enter "$TOKEN" "${IDS[1]}" "枯岚道")"
 if [ "$(json_field "$(body_of "$resp")" line_id)" = "枯岚道#1" ] \
    && [ "$(json_field "$(body_of "$resp")" line_size)" = "2" ]; then
   ok "B 进同一条分线，人数 2"
 else
-  bad "B 进线失败：$(body_of "$resp")"; finish
+  bad "B 进线失败：$(body_of "$resp")"; finish "P1-3a2（${MODE}）"
 fi
 resp="$(world_enter "$TOKEN" "${IDS[2]}" "栖云城")"
 if [ "$(json_field "$(body_of "$resp")" line_id)" = "栖云城#1" ]; then
   ok "C 在另一区域的另一条分线，供隔离核对"
 else
-  bad "C 进线失败：$(body_of "$resp")"; finish
+  bad "C 进线失败：$(body_of "$resp")"; finish "P1-3a2（${MODE}）"
 fi
 
 echo "== 6. 周围的人能看到移动 =="
@@ -432,7 +354,7 @@ if [ "$(json_field "$(body_of "$resp")" line_id)" = "枯岚道#1" ] \
    && [ "$(json_field "$(body_of "$resp2")" line_size)" = "2" ]; then
   ok "重启后分线重新分配，网关到世界服的通道照常工作"
 else
-  bad "重启后进线不对：$(body_of "$resp") / $(body_of "$resp2")"; finish
+  bad "重启后进线不对：$(body_of "$resp") / $(body_of "$resp2")"; finish "P1-3a2（${MODE}）"
 fi
 probe rate --hz 5 --window-ms 2000
 
@@ -468,4 +390,4 @@ else
   bad "经验结算规则被改了：$(body_of "$resp")"
 fi
 
-finish
+finish "P1-3a2（${MODE}）"

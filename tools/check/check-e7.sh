@@ -14,6 +14,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/check/lib-common.sh"
 UNITY="${UNITY:-/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity}"
 PROJ="$ROOT/client/MMOGame"
 PKG="$PROJ/Packages/com.code-philosophy.hybridclr"
@@ -25,9 +26,6 @@ BUILD=0
 
 PASS=0
 FAIL=0
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-
 if [ ! -x "$UNITY" ]; then
   echo "找不到 Unity：$UNITY" >&2
   exit 1

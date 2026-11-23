@@ -14,6 +14,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/check/lib-common.sh"
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
@@ -53,11 +54,6 @@ cleanup() {
   rm -rf "$TMP"
 }
 trap cleanup EXIT
-
-ok()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
-bad() { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1"; }
-
-detail() { sed 's/^/       /'; }
 
 echo "== 1. 生成物和 proto 对得上 =="
 if bash "$ROOT/tools/gen/gen-proto.sh" --into "$TMP/gen" >"$TMP/gen.log" 2>&1; then
