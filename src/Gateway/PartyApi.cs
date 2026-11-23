@@ -274,6 +274,12 @@ public static class PartyApi
         max_size = reply.MaxSize,
         all_ready = reply.AllReady,
         ready_deadline_ms = reply.ReadyDeadlineMs,
+        // Q8 的分配口径本来就是 PartyResponse 的只读事实（社交服按 config/party.json 给），
+        // U14 照抄上屏，所以这里一并带出去。客户端只显示，掷点仍在战斗服。
+        loot_mode = reply.LootMode,
+        loot_roll = reply.LootRoll,
+        roll_min = reply.RollMin,
+        roll_max = reply.RollMax,
         members = reply.Members.Select(m => new
         {
             character_id = m.CharacterId,

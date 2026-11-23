@@ -68,6 +68,13 @@ namespace Mmo.Net
         /// <summary>这次进本在角色服写下的记录编号。</summary>
         public string EntryId;
 
+        /// <summary>
+        /// Q9/U16：进本被拒时服务端给的逃跑惩罚剩余秒数（`deserter_remaining_s`）。
+        /// 客户端只按它走针显示，不拿进场时刻自己减，也不拿宽限 / 窗口时长去算。
+        /// 没被罚就是 0。
+        /// </summary>
+        public int DeserterRemainingS;
+
         public string Error;
 
         public bool Allowed => Kind == EnterKind.Allowed;
@@ -126,6 +133,7 @@ namespace Mmo.Net
                     WeeklyShareCap = ReadInt(body, "weekly_share_cap"),
                     RewardShares = ReadInt(body, "reward_shares"),
                     EntryId = Raw(body, "entry_id"),
+                    DeserterRemainingS = ReadInt(body, "deserter_remaining_s"),
                 };
 
                 if (!allowed && outcome.Reason.Length == 0)

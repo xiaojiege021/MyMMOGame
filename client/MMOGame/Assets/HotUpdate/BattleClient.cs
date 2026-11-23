@@ -679,6 +679,14 @@ namespace HotUpdate
                     Ui.UiSocialFlow.Feed(message.SiegeView);
                     break;
                 }
+
+                // 掉落归属（Q8 的 LootAssigned）：personal 模式不发这条，need_greed 才发。
+                // 归属与点数都在战斗服，这里只把回包交给掷点屏，不补算、不改归属。
+                case ServerMessage.BodyOneofCase.LootAssigned:
+                {
+                    Ui.UiLootFlow.Feed(message.LootAssigned);
+                    break;
+                }
             }
         }
 

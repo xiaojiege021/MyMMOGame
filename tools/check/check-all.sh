@@ -117,6 +117,9 @@ deps_of() {
     u12) echo "u7 u8 n5" ;;
     # U13 段内阶屏：依赖 U5 的境界屏与 N13 的两条境界子阶口（表尾第 97 行）。
     u13) echo "u5 n13" ;;
+    # U14–U17 四屏：组队读社交服队员状态（Q7），掷点读战斗服归属（Q8），
+    # 重连读逃跑罚时（Q9），世界 Boss 入口读只读口（Q11）；骨架与皮肤来自 U1。
+    u14) echo "u1 q7 q8 q9 q11" ;;
     # C1 是主顺序之外的卡，排在第 25 行 P1-2a 之后，不占 1–77 行序号。
     c1) echo "p1-2a p1-1b5 p3-1a2" ;;
     # C2 排在第 33 行 P1-3b 之后：等它能把矿石 / 药材写进背包才派；
@@ -230,7 +233,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 c4 d1a d1b d4 d5 d8 d15 c6 s1 c7 contract invariants q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 b9 b10 b1"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 c4 d1a d1b d4 d5 d8 d15 c6 s1 c7 contract invariants q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 b9 b10 b1"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {
@@ -266,7 +269,7 @@ closure() {
 # 报成回归失败，也别假装跑过；它们在本机 Mac 上单独跑。
 client_card_needs_unity() {
   case "$1" in
-    e7|e8|p0-1a|p0-1b|p0-1c|p0-1d|p0-2a|p0-2b|p0-3c|u1|u2|u3|u4|u5|u6|u7|u8|u9|u10|u11|u12|u13|n14) return 0 ;;
+    e7|e8|p0-1a|p0-1b|p0-1c|p0-1d|p0-2a|p0-2b|p0-3c|u1|u2|u3|u4|u5|u6|u7|u8|u9|u10|u11|u12|u13|u14|n14) return 0 ;;
     *) return 1 ;;
   esac
 }

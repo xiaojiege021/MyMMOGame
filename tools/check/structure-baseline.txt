@@ -15,10 +15,12 @@
 #   dup_sites = 11 种 helper 在各卡脚本里「重定义」的总份数（同一种抄进 N 个脚本算 N 份）
 # 更新时间：2026-11-19，v1.202 结构治理收敛（口径变更后重新建账）
 #           2026-11-22，K2+Q13 收口后重记（check 49589 / 业务 62349 = 79%，比基线 81 变好，落账）
+#           2026-11-23，U14–U17 新增同域脚本 check-u14.sh（133 → 134，四屏共用一个脚本；
+#                       不塞 check-u3.sh（已 330 行）/ check-u7.sh，仍按 10.1「新域才准新建」）
 
-scripts=133
-check_lines=49589
-biz_lines=62349
+scripts=134
+check_lines=50465
+biz_lines=63367
 ratio=79
 max_script_lines=934
 dup_sites=152

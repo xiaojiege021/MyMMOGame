@@ -209,6 +209,16 @@ namespace HotUpdate.Ui
                 case "codex":
                     shell.ShowPage("英灵图鉴", s => { DrawSocialNav(s, "codex"); UiHeroCodexScreen.Build(s, flow); });
                     break;
+                case "party":
+                {
+                    var partyFlow = UiPartyFlow.Ensure(shell);
+                    partyFlow.Bind(_token, _characterId);
+                    shell.ShowPage("组队", s => { DrawSocialNav(s, "party"); UiPartyRoomScreen.Build(s, partyFlow); });
+                    break;
+                }
+                case "boss":
+                    shell.ShowPage("世界 Boss 入口", s => { DrawSocialNav(s, "boss"); UiWorldBossScreen.Build(s, flow); });
+                    break;
                 default:
                     shell.ShowPage("宗门", s => { DrawSocialNav(s, "sect"); UiSectScreen.Build(s, flow); });
                     break;
@@ -227,6 +237,18 @@ namespace HotUpdate.Ui
                 case "settle":
                     shell.ShowPage("战斗结算", s => { DrawDungeonNav(s, "settle"); UiSettleScreen.Build(s, flow); });
                     break;
+                case "loot":
+                {
+                    var loot = UiLootFlow.Ensure();
+                    shell.ShowPage("掉落归属", s => { DrawDungeonNav(s, "loot"); UiLootScreen.Build(s, loot); });
+                    break;
+                }
+                case "reconnect":
+                {
+                    var back = UiReconnectFlow.Ensure();
+                    shell.ShowPage("断线重连", s => { DrawDungeonNav(s, "reconnect"); UiReconnectScreen.Build(s, back); });
+                    break;
+                }
                 default:
                     shell.ShowPage("裂隙", s => { DrawDungeonNav(s, "dungeon"); UiDungeonScreen.Build(s, flow); });
                     break;
@@ -277,7 +299,8 @@ namespace HotUpdate.Ui
             DrawNav(shell, new[]
             {
                 ("宗门", "sect"), ("城战", "siege"), ("竞技", "arena"),
-                ("洞府", "homestead"), ("图鉴", "codex"), ("返回", "world"),
+                ("洞府", "homestead"), ("图鉴", "codex"), ("组队", "party"),
+                ("Boss", "boss"), ("返回", "world"),
             }, current, which =>
             {
                 if (which == "world")
@@ -294,7 +317,8 @@ namespace HotUpdate.Ui
         {
             DrawNav(shell, new[]
             {
-                ("裂隙", "dungeon"), ("小队", "party"), ("结算", "settle"), ("返回", "world"),
+                ("裂隙", "dungeon"), ("小队", "party"), ("掷点", "loot"),
+                ("重连", "reconnect"), ("结算", "settle"), ("返回", "world"),
             }, current, which =>
             {
                 if (which == "world")
