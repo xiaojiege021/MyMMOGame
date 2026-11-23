@@ -237,7 +237,8 @@ assert 'BeginTransactionAsync' in repo and 'Math.Max(0, levelBefore - 1)' in rep
 assert 'protect_rate' not in repo and 'coupon_rate' not in repo
 svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'request.UseCoupon' in svc and 'SuccessRate = outcome.Tier.SuccessRate' in svc
-api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/CharacterApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/Character/*.cs')))
 assert 'bool? UseCoupon' in api and 'UseCoupon = body.UseCoupon ?? false' in api
 assert 'MapPost("/character/enhance"' in api and 'OwnsAsync(client, account' in api
 assert 'Guid.NewGuid()' in api and 'Npgsql' not in api
@@ -251,7 +252,8 @@ assert program.count('coupon_bind=always') == 1
 assert process.count('coupon_bind=always') == 1
 for path in ('src/Character/EnhanceRepository.cs', os.environ["AGG_CHARGRPC"],
              'src/Gateway/CharacterApi.cs'):
-    body = open(path if path.startswith('/') else root + '/' + path, encoding='utf-8').read()
+    body = api if path == 'src/Gateway/CharacterApi.cs' else open(
+        path if path.startswith('/') else root + '/' + path, encoding='utf-8').read()
     # success_rate = result.SuccessRate 只是回包字段映射，不算第二套数字；
     # 要挡的是把概率写成常量的那种赋值。
     assert '0.8' not in body and not re.search(r'success_rate\s*=\s*[0-9]', body), path

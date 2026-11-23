@@ -214,7 +214,8 @@ assert 'EnhanceOutcome outcome' in svc and 'enhances.ApplyAsync' in svc
 process = open(os.environ["AGG_CHARPROC"], encoding='utf-8').read()
 assert 'EnhanceTable.Load(config.EnhanceTable' in process
 assert 'AddSingleton(services.Enhances)' in process
-api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/CharacterApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/Character/*.cs')))
 assert 'public sealed record EnhanceBody(' in api and 'bool? UseCoupon' in api
 assert 'MapPost("/character/enhance"' in api
 assert 'OwnsAsync(client, account' in api
@@ -224,7 +225,8 @@ assert 'Npgsql' not in api
 # 概率数字只出现在配置里，服务端代码不写第二套
 for path in ('src/Character/EnhanceTable.cs', 'src/Character/EnhanceRepository.cs',
              os.environ["AGG_CHARGRPC"], 'src/Gateway/CharacterApi.cs'):
-    body = open(path if path.startswith('/') else root + '/' + path, encoding='utf-8').read()
+    body = api if path == 'src/Gateway/CharacterApi.cs' else open(
+        path if path.startswith('/') else root + '/' + path, encoding='utf-8').read()
     # success_rate = result.SuccessRate 只是回包字段映射，不算第二套数字；
     # 要挡的是把概率写成常量的那种赋值。
     assert '0.8' not in body and not re.search(r'success_rate\s*=\s*[0-9]', body), path

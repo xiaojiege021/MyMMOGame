@@ -217,7 +217,8 @@ assert 'Guid.NewGuid().ToString("N")' in svc
 grant = open(root + '/src/World/GatherGrant.cs', encoding='utf-8').read()
 assert 'ApplyGrantRequest' in grant and 'ItemDelta' in grant
 assert 'Slot = (uint)node.BagSlot' in grant and 'Count = node.Count' in grant
-api = open(root + '/src/Gateway/WorldApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/WorldApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/World/*.cs')))
 assert 'public sealed record GatherBody(ulong? CharacterId, string? NodeId)' in api
 assert 'OwnsAsync(characters, account, body.CharacterId.Value, context)' in api
 assert 'GatherRequest' in api and 'NodeId = body.NodeId.Trim()' in api
@@ -273,9 +274,11 @@ config_reject "灵石矿脉配了产物起不来" bad-spirit-item.json "gather.j
 config_reject "删掉灵石矿脉起不来（不许绕开规则）" bad-no-spirit.json "gather.json 缺 kind=spirit_stone 的节点"
 config_reject "节点编号重复起不来" bad-dup-id.json "gather.json 里有重复节点编号 ore_kulan_1"
 config_reject "缺角色服上游起不来" bad-no-upstream.json "gather.json 的 character_upstream 必须是 http(s) 地址："
+# 节点数是配置现值（B1 起从 4 个涨到 6 个），现取，不写死。
+NODES="$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))["nodes"]))' "$ROOT/config/gather.json")"
 STATE="$("$DOTNET" "$WORLD_DLL" --gather-state --config config/world.json 2>&1)"
-if printf '%s' "$STATE" | grep -qF 'gather_state=ok nodes=4 ore=ore_iron:2 herb=herb_ling:3 respawn_s=2 forbidden=1'; then
-  ok "只读入口读到配置：矿石 2、药材 3、刷新 2 秒、灵石矿脉 1 个"
+if printf '%s' "$STATE" | grep -qF "gather_state=ok nodes=$NODES ore=ore_iron:2 herb=herb_ling:3 respawn_s=2 forbidden=1"; then
+  ok "只读入口读到配置：节点 $NODES 个（矿石 2、药材 3、刷新 2 秒、灵石矿脉 1 个）"
 else
   bad "只读入口输出不对：${STATE:0:150}"
 fi

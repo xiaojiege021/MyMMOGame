@@ -61,7 +61,14 @@ out = open(sys.argv[1], "w", encoding="utf-8")
 def report(k, cond, info=""):
     out.write(("PASS " if cond else "FAIL ") + k + ("" if cond else "  " + str(info)) + "\n")
 def read(p):
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+    _name = os.path.basename(p)
     try:
+        if _name in _sub:
+            # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
+            return open(p, encoding="utf-8").read() + "".join(
+                open(f, encoding="utf-8").read()
+                for f in sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), _sub[_name], "*.cs"))))
         return open(p, encoding="utf-8").read()
     except Exception:
         return ""

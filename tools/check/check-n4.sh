@@ -46,7 +46,14 @@ import json, os
 root = os.environ["ROOT"]
 
 def read(rel):
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
     p = os.path.join(root, rel)
+    _name = os.path.basename(p)
+    if _name in _sub and os.path.exists(p):
+        # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
+        return open(p, encoding="utf-8").read() + "".join(
+            open(f, encoding="utf-8").read()
+            for f in sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), _sub[_name], "*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 proto = read("proto/mmo/world.proto")

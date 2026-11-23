@@ -14,6 +14,24 @@ public static class P14cCheck
 {
     static bool failed;
 
+    // D3d 之后网关的 HTTP 注册体按域分片（主文件 + Api/<域>/）；只读主文件会漏掉搬走的路由。
+    static string ReadGateway(string path, string domain)
+    {
+        var text = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+        var dir = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, "Api", domain);
+        if (!Directory.Exists(dir))
+        {
+            return text;
+        }
+        var files = Directory.GetFiles(dir, "*.cs");
+        Array.Sort(files, StringComparer.Ordinal);
+        foreach (var f in files)
+        {
+            text += File.ReadAllText(f);
+        }
+        return text;
+    }
+
     public static void Run()
     {
         // Assets -> MMOGame -> client -> 仓库根，要退三层。
@@ -118,7 +136,7 @@ public static class P14cCheck
         // 4. 边界：来源判定与绑定只在角色服、同一笔事务、客户端不算等级与绑定
         var repo = File.ReadAllText(Path.Combine(root, "src/Character/TransferRepository.cs"));
         var table = File.ReadAllText(Path.Combine(root, "src/Character/TransferTable.cs"));
-        var api = File.ReadAllText(Path.Combine(root, "src/Gateway/CharacterApi.cs"));
+        var api = ReadGateway(Path.Combine(root, "src/Gateway/CharacterApi.cs"), "Character");
         var process = File.ReadAllText(Path.Combine(root, "src/Character/CharacterProcess.cs"));
         var program = File.ReadAllText(Path.Combine(root, "src/Character/Program.cs"));
         var client = File.ReadAllText(Path.Combine(Application.dataPath, "Net/CharacterTransfer.cs"));

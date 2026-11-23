@@ -54,7 +54,16 @@ python3 - "$ROOT" >"$TMP/static.out" 2>&1 <<'PY'
 import json, os, sys, hashlib
 root = sys.argv[1]
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
-def src(p): return open(os.path.join(root, p), encoding="utf-8").read()
+def src(p):
+    _sub = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+    _full = os.path.join(root, p)
+    _name = os.path.basename(p)
+    if _name in _sub:
+        # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
+        return open(_full, encoding="utf-8").read() + "".join(
+            open(f, encoding="utf-8").read()
+            for f in sorted(__import__("glob").glob(os.path.join(os.path.dirname(_full), _sub[_name], "*.cs"))))
+    return open(_full, encoding="utf-8").read()
 checks = []
 def ck(name, cond): checks.append((name, bool(cond)))
 se, cu, ci, ga, au = cfg("config/stone_exchange.json"), cfg("config/currency.json"), cfg("config/city.json"), cfg("config/gather.json"), cfg("config/auction.json")
@@ -79,7 +88,8 @@ ck("城池登记里没有个人采集点/商品字段", all(not any(k in c for k
 ck("城池表只留静态三列（K7）", all(set(c) <= {"city_id", "name", "vein_id"} for c in ci["cities"]))
 ck("归属与税率不在配置里（K7）",
    all(k not in c for c in ci["cities"] for k in ("owner_sect", "tax_pct")))
-ck("gather.json 仍是四节点、灵石矿脉一个（不撞 p1-3b）", len(ga["nodes"]) == 4 and len(veins) == 1)
+# B1 起节点会随卡增长，只钉下限与「灵石矿脉只有一个」，不写死四节点（D5 口径）。
+ck("gather.json 节点没少、灵石矿脉一个（不撞 p1-3b）", len(ga["nodes"]) >= 4 and len(veins) == 1)
 ck("auction.json 税率与版本没动（不撞 p1-5a）", 5 <= au["tax_rate_pct"] <= 8 and au["gold_kind"] == "gold" and au["version"] == 1)
 mig = src("db/character/character.sql")
 ck("主迁移自包含：兑换流水/城池账/灵石挂单都在", all(t in mig for t in

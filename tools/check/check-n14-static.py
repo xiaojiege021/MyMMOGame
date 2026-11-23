@@ -7,9 +7,20 @@ import sys
 root = os.environ.get("ROOT") or os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
 
+# 14.8 拆分卡之后：网关的 HTTP 注册体按域分片（主文件 + Api/<域>/），断言文本不变，只改读法。
+_SUB = {"CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
+
+
 def read(*parts):
-    with open(os.path.join(root, *parts), encoding="utf-8") as handle:
-        return handle.read()
+    path = os.path.join(root, *parts)
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    sub = _SUB.get(os.path.basename(path))
+    if sub:
+        import glob
+        text += "".join(open(f, encoding="utf-8").read()
+                        for f in sorted(glob.glob(os.path.join(os.path.dirname(path), sub, "*.cs"))))
+    return text
 
 
 proto = read("proto", "mmo", "world.proto")

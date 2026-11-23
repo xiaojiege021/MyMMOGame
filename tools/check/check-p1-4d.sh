@@ -285,7 +285,8 @@ assert '一行都不碰强化等级、绑定、金币和装备本身' in repo
 svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'InstallCrystal(' in svc and 'RemoveCrystal(' in svc
 assert 'crystals.InstallAsync' in svc and 'crystals.RemoveAsync' in svc
-api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/CharacterApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/Character/*.cs')))
 assert 'public sealed record InstallCrystalBody(' in api
 assert 'public sealed record RemoveCrystalBody(' in api
 assert 'MapPost("/character/crystal/install"' in api

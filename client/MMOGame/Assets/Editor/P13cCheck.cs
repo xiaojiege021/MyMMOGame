@@ -13,6 +13,24 @@ public static class P13cCheck
 {
     static bool failed;
 
+    // D3d 之后网关的 HTTP 注册体按域分片（主文件 + Api/<域>/）；只读主文件会漏掉搬走的路由。
+    static string ReadGateway(string path, string domain)
+    {
+        var text = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+        var dir = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, "Api", domain);
+        if (!Directory.Exists(dir))
+        {
+            return text;
+        }
+        var files = Directory.GetFiles(dir, "*.cs");
+        Array.Sort(files, StringComparer.Ordinal);
+        foreach (var f in files)
+        {
+            text += File.ReadAllText(f);
+        }
+        return text;
+    }
+
     public static void Run()
     {
         // Assets -> MMOGame -> client -> 仓库根，要退三层。
@@ -105,7 +123,7 @@ public static class P13cCheck
         var gate = File.ReadAllText(Path.Combine(root, "src/World/FlightGate.cs"));
         var table = File.ReadAllText(Path.Combine(root, "src/World/FlightTable.cs"));
         var reader = File.ReadAllText(Path.Combine(root, "src/World/RealmReader.cs"));
-        var api = File.ReadAllText(Path.Combine(root, "src/Gateway/WorldApi.cs"));
+        var api = ReadGateway(Path.Combine(root, "src/Gateway/WorldApi.cs"), "World");
         var client = File.ReadAllText(Path.Combine(Application.dataPath, "Net/WorldFlight.cs"));
         var boundaryOk = gate.Contains("realms.ReadAsync")
                          && gate.Contains("registry.SetFlight")

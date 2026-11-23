@@ -15,7 +15,8 @@ def read(path):
     """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
     _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup",
             "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects",
-            "Server.cs": "Server"}
+            "Server.cs": "Server",
+            "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
     full = os.path.join(ROOT, path)
     name = os.path.basename(path)
     if name in _sub:

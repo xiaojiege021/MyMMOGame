@@ -53,7 +53,7 @@ fi
 
 step "2. 配置静态：15 个技能改名并挂门派 / 分支"
 STATIC_OUT="$(python3 - <<'PY'
-import json, re, sys
+import json, os, re, sys
 
 ok_count = 0
 fail_count = 0
@@ -61,7 +61,8 @@ fail_count = 0
 def read_src(p):
     """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
     _sub = {"Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects",
-            "CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+            "CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup",
+            "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World"}
     name = os.path.basename(p)
     if name in _sub:
         base = os.path.dirname(p)

@@ -70,7 +70,9 @@ def src(p):
     """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
     full = os.path.join(root, p)
     _parts = {"Server.cs": "Server", "Config.cs": "ConfigTables",
-              "Encounter.cs": "Encounter", "Effects.cs": "Effects"}
+              "Encounter.cs": "Encounter", "Effects.cs": "Effects",
+              "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect",
+              "WorldApi.cs": "Api/World"}
     name = os.path.basename(p)
     if name in _parts:
         d = os.path.join(os.path.dirname(full), _parts[name])

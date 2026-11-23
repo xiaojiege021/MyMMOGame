@@ -208,7 +208,8 @@ svc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
 assert 'flight.FlyAsync' in svc and 'flight.CrossAsync' in svc
 hub = open(root + '/src/World/PositionHub.cs', encoding='utf-8').read()
 assert 'SelfFlying' in hub and 'Flying = state.Flying' in hub
-api = open(root + '/src/Gateway/WorldApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/WorldApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/World/*.cs')))
 assert 'FlyBody(ulong? CharacterId, bool? WantFly)' in api
 assert 'CrossRegionBody(ulong? CharacterId, string? TargetRegion)' in api
 assert api.count('OwnsAsync(characters, account, body.CharacterId.Value, context)') >= 2

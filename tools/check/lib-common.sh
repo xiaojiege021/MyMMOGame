@@ -172,6 +172,9 @@ split_parts() {
     */Battle/Encounter.cs)     dir="${path%/Encounter.cs}/Encounter" ;;
     */Battle/Effects.cs)       dir="${path%/Effects.cs}/Effects" ;;
     */Battle/Server.cs)        dir="${path%/Server.cs}/Server" ;;
+    */Gateway/CharacterApi.cs) dir="${path%/CharacterApi.cs}/Api/Character" ;;
+    */Gateway/SectApi.cs)      dir="${path%/SectApi.cs}/Api/Sect" ;;
+    */Gateway/WorldApi.cs)     dir="${path%/WorldApi.cs}/Api/World" ;;
     *) printf '%s\n' "$path"; return ;;
   esac
   printf '%s\n' "$path"

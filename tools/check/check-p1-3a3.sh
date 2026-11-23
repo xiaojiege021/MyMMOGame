@@ -180,7 +180,8 @@ assert 'tiers.For(self, avatar)' in hub and 'AppearanceTier = tier' in hub
 assert 'DisplayName = state.DisplayName' in hub
 registry = open(root + '/src/World/LineRegistry.cs', encoding='utf-8').read()
 assert 'string DisplayName' in registry and 'previous.DisplayName' in registry
-api = open(root + '/src/Gateway/WorldApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/WorldApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/World/*.cs')))
 assert 'ResolveAsync' in api and 'DisplayName = displayName' in api and 'OwnsAsync' in api
 svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'DisplayNameAsync' in svc and 'CharacterName = displayName' in svc

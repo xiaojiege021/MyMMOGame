@@ -260,7 +260,8 @@ grpc = open(root + '/src/World/WorldGrpcService.cs', encoding='utf-8').read()
 # 把哪个宗门名字写在入口上，不结算、不发奖），所以这里只放开这一个字段。
 assert 'Skill' not in grpc
 assert not re.search(r'Damage(?!Total)', grpc)
-api = open(root + '/src/Gateway/WorldApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/WorldApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/World/*.cs')))
 assert 'OwnsAsync' in api and 'config.WorldUpstream' in api and 'invalid_token' in api
 gcfg = open(root + '/src/Gateway/GatewayConfig.cs', encoding='utf-8').read()
 assert 'world_upstream' in gcfg and 'DefaultWorldUpstream' in gcfg

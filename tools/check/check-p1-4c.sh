@@ -270,7 +270,8 @@ assert '(fromSlot, 0), (toSlot, fromLevelBefore)' in repo
 assert 'Random' not in repo, '转移必定成功，不能掷点'
 svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'TransferEnhance(' in svc and 'transfers.ApplyAsync' in svc
-api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
+api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/CharacterApi.cs']
+              + sorted(__import__('glob').glob(root + '/src/Gateway/Api/Character/*.cs')))
 assert 'public sealed record TransferBody(ulong? CharacterId, uint? FromSlot, uint? ToSlot)' in api
 assert 'MapPost("/character/transfer"' in api and 'OwnsAsync(client, account' in api
 assert 'Guid.NewGuid()' in api and 'Npgsql' not in api

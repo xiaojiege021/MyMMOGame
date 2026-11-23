@@ -13,6 +13,24 @@ public static class P14aCheck
 {
     static bool failed;
 
+    // D3d 之后网关的 HTTP 注册体按域分片（主文件 + Api/<域>/）；只读主文件会漏掉搬走的路由。
+    static string ReadGateway(string path, string domain)
+    {
+        var text = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+        var dir = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, "Api", domain);
+        if (!Directory.Exists(dir))
+        {
+            return text;
+        }
+        var files = Directory.GetFiles(dir, "*.cs");
+        Array.Sort(files, StringComparer.Ordinal);
+        foreach (var f in files)
+        {
+            text += File.ReadAllText(f);
+        }
+        return text;
+    }
+
     public static void Run()
     {
         // Assets -> MMOGame -> client -> 仓库根，要退三层。
@@ -103,7 +121,7 @@ public static class P14aCheck
         // 4. 边界：读表与落库只在角色服，网关复核归属并生成事务号，客户端不算概率
         var table = File.ReadAllText(Path.Combine(root, "src/Character/EnhanceTable.cs"));
         var repo = File.ReadAllText(Path.Combine(root, "src/Character/EnhanceRepository.cs"));
-        var api = File.ReadAllText(Path.Combine(root, "src/Gateway/CharacterApi.cs"));
+        var api = ReadGateway(Path.Combine(root, "src/Gateway/CharacterApi.cs"), "Character");
         var process = File.ReadAllText(Path.Combine(root, "src/Character/CharacterProcess.cs"));
         var client = File.ReadAllText(Path.Combine(Application.dataPath, "Net/CharacterEnhance.cs"));
         var boundaryOk = table.Contains("WrittenMaxLevel")

@@ -147,7 +147,7 @@ PROTO="$ROOT/proto/mmo/character.proto"
 TABLE="$ROOT/src/Shared.Domain/DungeonTable.cs"
 REPO="$ROOT/src/Character/HotSpringRepository.cs"
 SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
-API="$ROOT/src/Gateway/CharacterApi.cs"
+API="$(src_agg src/Gateway/CharacterApi.cs)"
 
 RECOVERY="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["hot_spring_recovery"])' "$CFG")"
 CAP="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["fatigue_daily_cap"])' "$CFG")"
