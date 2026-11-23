@@ -46,6 +46,20 @@ def R(k, c, i=""):
     out.write(("PASS " if c else "FAIL ") + k + ("" if c else "  " + i) + "\n")
 
 def rd(p):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup", "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects", "Server.cs": "Server"}
+    _name = __import__("os").path.basename(p)
+    if _name in _sub:
+        _os = __import__("os"); _g = __import__("glob")
+        _b = p if _os.path.isabs(p) else _os.path.join(_os.getcwd(), p)
+        if not _os.path.exists(_b):
+            _d = _os.path.dirname(_os.getcwd())
+            while _d and not _os.path.exists(_os.path.join(_d, p)):
+                _nd = _os.path.dirname(_d)
+                if _nd == _d: break
+                _d = _nd
+            _b = _os.path.join(_d, p)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
         return "".join(open(x, encoding="utf-8").read() for x in

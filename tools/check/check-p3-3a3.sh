@@ -62,6 +62,20 @@ python3 - "$ROOT" >"$TMP/static.txt" 2>&1 <<'PY'
 import hashlib, json, os, re, sys
 root = sys.argv[1]
 def rd(p):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup", "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects", "Server.cs": "Server"}
+    _name = __import__("os").path.basename(p)
+    if _name in _sub:
+        _os = __import__("os"); _g = __import__("glob")
+        _b = p if _os.path.isabs(p) else _os.path.join(_os.getcwd(), p)
+        if not _os.path.exists(_b):
+            _d = _os.path.dirname(_os.getcwd())
+            while _d and not _os.path.exists(_os.path.join(_d, p)):
+                _nd = _os.path.dirname(_d)
+                if _nd == _d: break
+                _d = _nd
+            _b = _os.path.join(_d, p)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     q = os.path.join(root, p)
     return open(q, encoding="utf-8").read() if os.path.exists(q) else ""
 def cfg(p): return json.loads(rd(p))
@@ -123,7 +137,8 @@ ddl1, ddl2 = rd("db/social/sect_tech.sql"), rd("db/social/social.sql")
 emit("ddl_in_both_files", "CREATE TABLE IF NOT EXISTS \"社交\".sect_tech" in ddl1 and "sect_tech" in ddl2)
 emit("ddl_no_shop_or_tax", not re.search(r"shop|price|ingot|tax|reward", ddl1.lower()))
 # 禁售与公平竞技那一层不改
-emit("no_sell_tech", "宗门科技" in rd("config/shop.json") or "guild_tech" in rd("src/Character/ShopTable.cs"))
+# 断言名与注释都是「禁售」：宗门科技不许出现在商城清单 / 商城表里（原来漏了 not，一直在反着判）。
+emit("no_sell_tech", not ("宗门科技" in rd("config/shop.json") or "guild_tech" in rd("src/Character/ShopTable.cs")))
 emit("bf_and_arena_untouched", abs(float(cfg("config/battlefield.json")["balance"]["ratio"]) - 1.3) < 1e-9)
 PY
 while IFS= read -r line; do

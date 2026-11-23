@@ -58,6 +58,17 @@ import json, re, sys
 ok_count = 0
 fail_count = 0
 
+def read_src(p):
+    """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
+    _sub = {"Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects",
+            "CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    name = os.path.basename(p)
+    if name in _sub:
+        base = os.path.dirname(p)
+        files = [p] + sorted(__import__("glob").glob(os.path.join(base, _sub[name], "*.cs")))
+        return "".join(open(f, encoding="utf-8").read() for f in files if os.path.exists(f))
+    return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
+
 def ok(msg):
     global ok_count
     ok_count += 1
@@ -166,7 +177,7 @@ else:
 
 # ⑦ 代码里不许出现门派 / 分支 / 技能的第三份名单
 for path in ("src/Battle/Config.cs", "src/Battle/Program.cs"):
-    body = open(path, encoding="utf-8").read()
+    body = read_src(path)
     hit_branch = [b for b in branches if '"%s"' % b in body]
     hit_name = [n for n in names if '"%s"' % n in body]
     hit_old = [n for n in old_names if n in body]
@@ -176,7 +187,7 @@ for path in ("src/Battle/Config.cs", "src/Battle/Program.cs"):
         ok("%s 里没有第二份分支 / 技能名单" % path)
 
 # ⑧ 下发仍按职业，不按分支过滤
-config_cs = open("src/Battle/Config.cs", encoding="utf-8").read()
+config_cs = read_src("src/Battle/Config.cs")
 if "s.ClassId == classId" in config_cs and "ForClass" in config_cs:
     ok("ForClass 仍按职业下发，没按分支过滤")
 else:

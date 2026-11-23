@@ -178,7 +178,7 @@ else
 fi
 
 if grep -q 'DungeonTable.Load(config.DungeonTable)' "$(src_agg src/Character/CharacterProcess.cs)" \
-   && grep -q 'DungeonTable.Load' "$ROOT/src/Battle/Config.cs" \
+   && grep -q 'DungeonTable.Load' "$(src_agg src/Battle/Config.cs)" \
    && grep -q 'dungeons.FatigueDailyCap' "$SVC"; then
   ok "两服仍读同一份副本表，日上限从配置读而不是写死在角色服里"
 else

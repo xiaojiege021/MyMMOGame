@@ -61,8 +61,21 @@ ROOT="$ROOT" python3 - "$TMP" <<'PY' > "$TMP/static.txt" 2>&1
 import json, os, re, sys
 
 root = os.environ["ROOT"]
+def method_body(text, signature):
+    """取一个方法的完整括号体（D3c 之后 Encounter 是拼出来的，不能用分节注释界定）。"""
+    i = text.find(signature)
+    j = text.find("{", i) if i >= 0 else -1
+    if j < 0:
+        return ""
+    depth = 0
+    for k in range(j, len(text)):
+        depth += 1 if text[k] == "{" else (-1 if text[k] == "}" else 0)
+        if depth == 0:
+            return text[i:k + 1]
+    return ""
+
 def read(p):
-    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup", "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects", "Server.cs": "Server"}
     _name = __import__("os").path.basename(p)
     if _name in _sub:
         # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
@@ -221,11 +234,9 @@ report("consume_request_body",
        "请求体里混进了服务端算的数")
 
 enc = files["src/Battle/Encounter.cs"]
-u_start = enc.find("public ServerMessage UseTalisman(")
-u_end = enc.find("// ---- 时间推进 ----", u_start)
-use_body = enc[u_start:u_end] if u_start >= 0 and u_end > u_start else ""
+use_body = method_body(enc, "public ServerMessage UseTalisman(")
 report("one_pool_only",
-       u_start >= 0 and u_end > u_start
+       bool(use_body)
        and "member.Hp +=" in use_body
        and "member.Mana +=" in use_body
        and "TargetId" not in use_body
@@ -252,7 +263,8 @@ report("separate_groups",
        and "member.HealGroupReadyAtMs =" in use_body,
        "红蓝没有各写各的组")
 report("no_revive_on_self",
-       'if (member.Down)' in use_body and 'return "caster_down"' in use_body)
+       'if (member.Down)' in use_body and '"caster_down"' in use_body,
+       "倒地的人不能用符把自己拉起来")
 report("no_damage_route",
        "member.DamageDealt" not in use_body and "EffectiveThreat" not in use_body)
 

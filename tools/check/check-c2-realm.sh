@@ -70,7 +70,7 @@ import json, os, re
 root = os.environ["ROOT"]
 
 def read(p):
-    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup", "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects", "Server.cs": "Server"}
     _name = __import__("os").path.basename(p)
     if _name in _sub:
         # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。

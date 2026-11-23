@@ -93,8 +93,8 @@ fi
 
 echo "== 2. 静态断言 =="
 CFG="$ROOT/config/dungeons.json"
-BATTLE_CFG="$ROOT/src/Battle/Config.cs"
-BATTLE_SRV="$ROOT/src/Battle/Server.cs"
+BATTLE_CFG="$(src_agg src/Battle/Config.cs)"
+BATTLE_SRV="$(src_agg src/Battle/Server.cs)"
 CHAR_SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 
 if grep -q '"id": "main"' "$CFG" && grep -q '"max_players": 1' "$CFG" \

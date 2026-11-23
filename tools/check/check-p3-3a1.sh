@@ -66,7 +66,17 @@ python3 - "$ROOT" >"$TMP/static.txt" 2>&1 <<'PY'
 import json, os, sys, re
 root = sys.argv[1]
 def cfg(p): return json.load(open(os.path.join(root, p), encoding="utf-8"))
-def src(p): return open(os.path.join(root, p), encoding="utf-8").read()
+def src(p):
+    """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
+    full = os.path.join(root, p)
+    _parts = {"Server.cs": "Server", "Config.cs": "ConfigTables",
+              "Encounter.cs": "Encounter", "Effects.cs": "Effects"}
+    name = os.path.basename(p)
+    if name in _parts:
+        d = os.path.join(os.path.dirname(full), _parts[name])
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [full] + sorted(__import__("glob").glob(os.path.join(d, "*.cs"))))
+    return open(full, encoding="utf-8").read()
 def emit(k, c, i=""):
     print(("PASS " if c else "FAIL ") + k + ("" if c else "  " + str(i)[:160]))
 sg, bf, bc = cfg("config/siege.json"), cfg("config/battlefield.json"), cfg("config/battle.json")

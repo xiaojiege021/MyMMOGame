@@ -168,6 +168,10 @@ split_parts() {
     */CharacterGrpcService.cs) dir="${path%/CharacterGrpcService.cs}/Grpc" ;;
     */RealmTable.cs)           dir="${path%/RealmTable.cs}/Realm" ;;
     */CharacterProcess.cs)     dir="${path%/CharacterProcess.cs}/Startup" ;;
+    */Battle/Config.cs)        dir="${path%/Config.cs}/ConfigTables" ;;
+    */Battle/Encounter.cs)     dir="${path%/Encounter.cs}/Encounter" ;;
+    */Battle/Effects.cs)       dir="${path%/Effects.cs}/Effects" ;;
+    */Battle/Server.cs)        dir="${path%/Server.cs}/Server" ;;
     *) printf '%s\n' "$path"; return ;;
   esac
   printf '%s\n' "$path"

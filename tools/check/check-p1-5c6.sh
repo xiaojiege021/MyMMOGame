@@ -62,8 +62,21 @@ ROOT="$ROOT" python3 - "$TMP" <<'PY' > "$TMP/static.txt" 2>&1
 import json, os, re, sys
 
 root = os.environ["ROOT"]
+def method_body(text, signature):
+    """取一个方法的完整括号体（D3c 之后 Encounter 是拼出来的，不能用分节注释界定）。"""
+    i = text.find(signature)
+    j = text.find("{", i) if i >= 0 else -1
+    if j < 0:
+        return ""
+    depth = 0
+    for k in range(j, len(text)):
+        depth += 1 if text[k] == "{" else (-1 if text[k] == "}" else 0)
+        if depth == 0:
+            return text[i:k + 1]
+    return ""
+
 def read(p):
-    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup", "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects", "Server.cs": "Server"}
     _name = __import__("os").path.basename(p)
     if _name in _sub:
         # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
@@ -270,9 +283,7 @@ report("no_target_in_request",
        "请求段里出现了 target：" + use_req.replace("\n", " ")[:120])
 
 enc = files["src/Battle/Encounter.cs"]
-b_start = enc.find("public ServerMessage UseReviveScroll(")
-b_end = enc.find("// ---- 卷轴用毕 ----", b_start)
-body = enc[b_start:b_end] if b_start >= 0 and b_end > b_start else ""
+body = method_body(enc, "public ServerMessage UseReviveScroll(")
 report("self_only",
        b_start >= 0 and b_end > b_start
        and "TargetId" not in body and "target." not in body

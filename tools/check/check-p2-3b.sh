@@ -40,6 +40,15 @@ def R(k, c, i=""):
     o.write(("PASS " if c else "FAIL ") + k + ("" if c else "  " + i) + "\n")
 
 def rd(p):
+    """读一份可能被拆分（partial）过的源码：主文件 + 分片目录一起读（14.8 纪律第 8 条）。"""
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup",
+            "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects",
+            "Server.cs": "Server"}
+    _name = os.path.basename(p)
+    if _name in _sub and os.path.exists(p):
+        _d = os.path.join(os.path.dirname(p), _sub[_name])
+        return "".join(open(f, encoding="utf-8").read()
+                       for f in [p] + sorted(__import__("glob").glob(os.path.join(_d, "*.cs"))))
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
 def js(p):

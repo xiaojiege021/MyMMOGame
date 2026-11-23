@@ -149,8 +149,8 @@ BATTLE_TABLE="$ROOT/src/Shared.Domain/DungeonTable.cs"
 REPO="$ROOT/src/Character/WeeklyShareRepository.cs"
 SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 API="$ROOT/src/Gateway/CharacterApi.cs"
-ENCOUNTER="$ROOT/src/Battle/Encounter.cs"
-BATTLE_SRV="$ROOT/src/Battle/Server.cs"
+ENCOUNTER="$(src_agg src/Battle/Encounter.cs)"
+BATTLE_SRV="$(src_agg src/Battle/Server.cs)"
 FATIGUE_REPO="$ROOT/src/Character/DungeonEntryRepository.cs"
 SPRING_REPO="$ROOT/src/Character/HotSpringRepository.cs"
 
@@ -258,7 +258,7 @@ fi
 
 if grep -q 'partySize <= 1 ? 1.0' "$ENCOUNTER" \
    && grep -q 'DungeonTable.Load(config.DungeonTable)' "$(src_agg src/Character/CharacterProcess.cs)" \
-   && grep -q 'DungeonTable.Load' "$ROOT/src/Battle/Config.cs"; then
+   && grep -q 'DungeonTable.Load' "$(src_agg src/Battle/Config.cs)"; then
   ok "单人倍率固定 1（练习场与老客户端不变），两服仍读同一份副本表"
 else
   bad "单人不带 party_size 的行为可能被改，或两服副本表分叉"

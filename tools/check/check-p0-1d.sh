@@ -101,7 +101,7 @@ else
   bad "取消请求或回执的字段号被改过"
 fi
 
-ENC="$ROOT/src/Battle/Encounter.cs"
+ENC="$(src_agg src/Battle/Encounter.cs)"
 # P0-3 起冷却挪到每个成员自己的表上（member.ReadyAtMs），
 # 但「取消成功要把这一手的冷却退回出手前的值」这条规则没变。
 if grep -q 'bool accepted = 3;' "$PROTO" 2>/dev/null && grep -q 'ReadyAtMs\[pending.Skill.Id\] = pending.PrevReadyAtMs;' "$ENC"; then

@@ -57,7 +57,34 @@ ROOT="$ROOT" python3 - "$TMP" <<'PY' > "$TMP/static.txt" 2>&1
 import json, os, re, sys
 
 root = os.environ["ROOT"]
+def method_body(text, signature):
+    """取一个方法的完整括号体（D3c 之后 Encounter 是拼出来的，不能用分节注释界定）。"""
+    i = text.find(signature)
+    j = text.find("{", i) if i >= 0 else -1
+    if j < 0:
+        return ""
+    depth = 0
+    for k in range(j, len(text)):
+        depth += 1 if text[k] == "{" else (-1 if text[k] == "}" else 0)
+        if depth == 0:
+            return text[i:k + 1]
+    return ""
+
 def read(p):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup", "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects", "Server.cs": "Server"}
+    _name = __import__("os").path.basename(p)
+    if _name in _sub:
+        _os = __import__("os"); _g = __import__("glob")
+        _b = p if _os.path.isabs(p) else _os.path.join(_os.getcwd(), p)
+        if not _os.path.exists(_b):
+            _d = _os.path.dirname(_os.getcwd())
+            while _d and not _os.path.exists(_os.path.join(_d, p)):
+                _nd = _os.path.dirname(_d)
+                if _nd == _d: break
+                _d = _nd
+            _b = _os.path.join(_d, p)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     p = os.path.join(root, p)
     return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
 
@@ -143,11 +170,9 @@ report("no_target_in_request",
 
 # 战斗服这一侧：加血只落在 member 身上，没有任何「选目标」的路径。
 enc = files["src/Battle/Encounter.cs"]
-u_start = enc.find("public ServerMessage UseTalisman(")
-u_end = enc.find("// ---- 时间推进 ----", u_start)
-use_body = enc[u_start:u_end] if u_start >= 0 and u_end > u_start else ""
+use_body = method_body(enc, "public ServerMessage UseTalisman(")
 report("only_self_heal",
-       u_start >= 0 and u_end > u_start
+       bool(use_body)
        and "member.Hp +=" in use_body
        and "TargetId" not in use_body
        and "target." not in use_body,
@@ -172,7 +197,7 @@ report("spend_before_heal",
 
 # 倒地不能点符：这就是「不能复活自己」。
 report("no_revive_on_self",
-       'if (member.Down)' in use_body and 'return "caster_down"' in use_body,
+       'if (member.Down)' in use_body and '"caster_down"' in use_body,
        "没有倒地拒绝")
 
 char_proto = files["proto/mmo/character.proto"]

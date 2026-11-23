@@ -27,6 +27,20 @@ import sys
 
 
 def read(path):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup", "Config.cs": "ConfigTables", "Encounter.cs": "Encounter", "Effects.cs": "Effects", "Server.cs": "Server"}
+    _name = __import__("os").path.basename(path)
+    if _name in _sub:
+        _os = __import__("os"); _g = __import__("glob")
+        _b = path if _os.path.isabs(path) else _os.path.join(_os.getcwd(), path)
+        if not _os.path.exists(_b):
+            _d = _os.path.dirname(_os.getcwd())
+            while _d and not _os.path.exists(_os.path.join(_d, path)):
+                _nd = _os.path.dirname(_d)
+                if _nd == _d: break
+                _d = _nd
+            _b = _os.path.join(_d, path)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     try:
         return open(path, encoding="utf-8").read()
     except Exception:
@@ -198,6 +212,9 @@ report("checkall_cards", re.search(r'ALL_CARDS="[^"]*\bq1\b', allsh, re.S) is no
 allowed_readers = {"src/Battle/Config.cs", "src/Battle/Effects.cs",
                    "src/Battle/DamagePipeline.cs", "src/Battle/Encounter.cs",
                    "src/Battle/Program.cs"}
+# D3c/D3f 把上面这几个文件按域拆成了目录：拆出去的仍是「同一处配置加载 / 效果层」，
+# 按目录放行，别按文件名逐个补（每拆一次就要来改一遍白名单）。
+allowed_prefixes = ("src/Battle/ConfigTables/", "src/Battle/Effects/", "src/Battle/Encounter/")
 src_hits = []
 for base, dirs, files in os.walk("src"):
     dirs[:] = [d for d in dirs if d not in ("bin", "obj", "Generated")]
@@ -206,7 +223,8 @@ for base, dirs, files in os.walk("src"):
             # Windows 上 relpath 用反斜杠，下面的白名单是正斜杠，先归一再比。
             rel = os.path.relpath(os.path.join(base, f), ".").replace(os.sep, "/")
             t = read(rel)
-            if ("effects.json" in t or "effect-table" in t) and rel not in allowed_readers:
+            if (("effects.json" in t or "effect-table" in t) and rel not in allowed_readers
+                    and not rel.startswith(allowed_prefixes)):
                 src_hits.append(rel)
 report("only_q2_reader", not src_hits, src_hits[:3])
 PY

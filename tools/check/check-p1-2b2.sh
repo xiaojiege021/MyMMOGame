@@ -218,7 +218,7 @@ fi
 if grep -q 'if (!dungeon.ChargesFatigue)' "$SVC" \
    && grep -q 'FatiguePerPlayer \* partySize' "$ROOT/src/Character/DungeonEntryRepository.cs" \
    && grep -q 'DungeonTable.Load(config.DungeonTable)' "$(src_agg src/Character/CharacterProcess.cs)" \
-   && grep -q 'DungeonTable.Load' "$ROOT/src/Battle/Config.cs"; then
+   && grep -q 'DungeonTable.Load' "$(src_agg src/Battle/Config.cs)"; then
   ok "主线不扣疲劳、深渊按人数倍增、两服读同一份副本表，都没被本行改掉"
 else
   bad "前面的进本规则被温泉改动了"
