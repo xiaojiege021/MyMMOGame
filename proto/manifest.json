@@ -53,7 +53,7 @@
     },
     {
       "proto": "proto/mmo/common.proto",
-      "sha256": "f86fdee9b145d190016c943ae5bc726effe8cb34d11291595b359f201ecb84da",
+      "sha256": "623ee46442d1480662467b32a47b5d93edc6a8e9dcfe2829f2c8997307abb089",
       "services": 0,
       "outputs": {
         "server": [
