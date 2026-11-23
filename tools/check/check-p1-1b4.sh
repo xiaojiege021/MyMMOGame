@@ -97,7 +97,7 @@ fi
 echo "== 2. 静态断言 =="
 SQL="$ROOT/db/character/currency.sql"
 CFG="$ROOT/config/currency.json"
-SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 REPO="$ROOT/src/Character/CurrencyRepository.cs"
 
 for kind in gold stone_1 stone_2 stone_3 stone_4 stone_5 yuanbao; do

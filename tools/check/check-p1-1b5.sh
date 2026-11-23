@@ -107,7 +107,7 @@ fi
 echo "== 2. 静态断言 =="
 SQL="$ROOT/db/character/transaction.sql"
 REPO="$ROOT/src/Character/GrantRepository.cs"
-SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 
 if grep -q 'txn_id' "$SQL" && grep -qi 'primary key' "$SQL"; then
   ok "事务号是主键，同一个号只可能落一行"

@@ -147,7 +147,7 @@ PROTO="$ROOT/proto/mmo/character.proto"
 CHAR_TABLE="$ROOT/src/Shared.Domain/DungeonTable.cs"
 BATTLE_TABLE="$ROOT/src/Shared.Domain/DungeonTable.cs"
 REPO="$ROOT/src/Character/WeeklyShareRepository.cs"
-SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 API="$ROOT/src/Gateway/CharacterApi.cs"
 ENCOUNTER="$ROOT/src/Battle/Encounter.cs"
 BATTLE_SRV="$ROOT/src/Battle/Server.cs"
@@ -257,7 +257,7 @@ else
 fi
 
 if grep -q 'partySize <= 1 ? 1.0' "$ENCOUNTER" \
-   && grep -q 'DungeonTable.Load(config.DungeonTable)' "$ROOT/src/Character/CharacterProcess.cs" \
+   && grep -q 'DungeonTable.Load(config.DungeonTable)' "$(src_agg src/Character/CharacterProcess.cs)" \
    && grep -q 'DungeonTable.Load' "$ROOT/src/Battle/Config.cs"; then
   ok "单人倍率固定 1（练习场与老客户端不变），两服仍读同一份副本表"
 else

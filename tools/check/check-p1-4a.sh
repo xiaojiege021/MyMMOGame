@@ -14,6 +14,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARPROC="$(src_agg src/Character/CharacterProcess.cs)"; export AGG_CHARPROC
 AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 export ROOT
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
@@ -210,9 +211,9 @@ assert 'Random.Shared.NextDouble()' in repo
 assert '没有失败累计必成' in repo
 svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'EnhanceOutcome outcome' in svc and 'enhances.ApplyAsync' in svc
-process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
+process = open(os.environ["AGG_CHARPROC"], encoding='utf-8').read()
 assert 'EnhanceTable.Load(config.EnhanceTable' in process
-assert 'AddSingleton(enhances)' in process
+assert 'AddSingleton(services.Enhances)' in process
 api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
 assert 'public sealed record EnhanceBody(' in api and 'bool? UseCoupon' in api
 assert 'MapPost("/character/enhance"' in api

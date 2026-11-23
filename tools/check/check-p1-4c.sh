@@ -19,6 +19,7 @@ export ROOT
 # 公共函数库：ok/bad/detail/stop_pid/body_of/code_of/json_field/expect_json/
 # wait_ready/wait_line/finish，签名与既有核对脚本一致，别再复制一份。
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARPROC="$(src_agg src/Character/CharacterProcess.cs)"; export AGG_CHARPROC
 AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
@@ -276,7 +277,7 @@ assert 'Guid.NewGuid()' in api and 'Npgsql' not in api
 program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
     open(p, encoding='utf-8').read()
     for p in sorted(__import__('glob').glob(root + '/tools/probe/CliProbe/*.cs')))
-process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
+process = open(os.environ["AGG_CHARPROC"], encoding='utf-8').read()
 assert 'case "--transfer-state"' in program and 'case "--transfer-level"' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。
 for name in ('transfer_stone=', 'transfer_stone_cost=', 'transfer_gold='):

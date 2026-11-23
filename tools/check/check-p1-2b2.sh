@@ -146,7 +146,7 @@ SQL="$ROOT/db/character/character.sql"
 PROTO="$ROOT/proto/mmo/character.proto"
 TABLE="$ROOT/src/Shared.Domain/DungeonTable.cs"
 REPO="$ROOT/src/Character/HotSpringRepository.cs"
-SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 API="$ROOT/src/Gateway/CharacterApi.cs"
 
 RECOVERY="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["hot_spring_recovery"])' "$CFG")"
@@ -217,7 +217,7 @@ fi
 
 if grep -q 'if (!dungeon.ChargesFatigue)' "$SVC" \
    && grep -q 'FatiguePerPlayer \* partySize' "$ROOT/src/Character/DungeonEntryRepository.cs" \
-   && grep -q 'DungeonTable.Load(config.DungeonTable)' "$ROOT/src/Character/CharacterProcess.cs" \
+   && grep -q 'DungeonTable.Load(config.DungeonTable)' "$(src_agg src/Character/CharacterProcess.cs)" \
    && grep -q 'DungeonTable.Load' "$ROOT/src/Battle/Config.cs"; then
   ok "主线不扣疲劳、深渊按人数倍增、两服读同一份副本表，都没被本行改掉"
 else

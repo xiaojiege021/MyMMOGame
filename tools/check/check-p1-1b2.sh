@@ -84,7 +84,7 @@ fi
 
 echo "== 2. 静态断言 =="
 SQL="$ROOT/db/character/character.sql"
-SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 REPO="$ROOT/src/Character/CharacterRepository.cs"
 
 if grep -qE 'level[[:space:]]+integer[[:space:]]+NOT NULL[[:space:]]+DEFAULT[[:space:]]+1[[:space:]]+CHECK[[:space:]]*\(level BETWEEN 1 AND 100\)' "$SQL"; then

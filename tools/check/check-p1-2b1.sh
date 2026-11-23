@@ -129,7 +129,7 @@ echo "== 2. 静态断言 =="
 CFG="$ROOT/config/dungeons.json"
 SQL="$ROOT/db/character/character.sql"
 ENTRY_REPO="$ROOT/src/Character/DungeonEntryRepository.cs"
-SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 
 if grep -q '"id": "abyss"' "$CFG" && grep -q '"max_players": 4' "$CFG" \
    && grep -q '"charges_fatigue": true' "$CFG" \
@@ -177,7 +177,7 @@ else
   bad "主线可能被扣疲劳"
 fi
 
-if grep -q 'DungeonTable.Load(config.DungeonTable)' "$ROOT/src/Character/CharacterProcess.cs" \
+if grep -q 'DungeonTable.Load(config.DungeonTable)' "$(src_agg src/Character/CharacterProcess.cs)" \
    && grep -q 'DungeonTable.Load' "$ROOT/src/Battle/Config.cs" \
    && grep -q 'dungeons.FatigueDailyCap' "$SVC"; then
   ok "两服仍读同一份副本表，日上限从配置读而不是写死在角色服里"

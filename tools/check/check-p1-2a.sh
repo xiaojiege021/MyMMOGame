@@ -95,7 +95,7 @@ echo "== 2. 静态断言 =="
 CFG="$ROOT/config/dungeons.json"
 BATTLE_CFG="$ROOT/src/Battle/Config.cs"
 BATTLE_SRV="$ROOT/src/Battle/Server.cs"
-CHAR_SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+CHAR_SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 
 if grep -q '"id": "main"' "$CFG" && grep -q '"max_players": 1' "$CFG" \
    && grep -q '"charges_fatigue": false' "$CFG" && grep -q '"takes_weekly_share": false' "$CFG"; then
@@ -104,7 +104,7 @@ else
   bad "主线的人数或扣减规则不在配置里"
 fi
 
-if grep -q 'DungeonTable.Load' "$BATTLE_CFG" && grep -q 'DungeonTable.Load' "$ROOT/src/Character/CharacterProcess.cs"; then
+if grep -q 'DungeonTable.Load' "$BATTLE_CFG" && grep -q 'DungeonTable.Load' "$(src_agg src/Character/CharacterProcess.cs)"; then
   ok "战斗服与角色服读同一份副本表"
 else
   bad "两个服各读各的，人数口径会分叉"

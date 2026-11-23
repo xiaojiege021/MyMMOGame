@@ -13,6 +13,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARPROC="$(src_agg src/Character/CharacterProcess.cs)"; export AGG_CHARPROC
 AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
@@ -251,7 +252,7 @@ assert 'auction_ingot_listing' in listing and 'on conflict (list_txn)' in listin
 program = open(root + '/src/Character/Program.cs', encoding='utf-8').read() + ''.join(
     open(p, encoding='utf-8').read()
     for p in sorted(__import__('glob').glob(root + '/tools/probe/CliProbe/*.cs')))
-process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
+process = open(os.environ["AGG_CHARPROC"], encoding='utf-8').read()
 assert 'case "--ingot-ledger"' in program and 'new IngotRepository(' in process
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。收窄到拍卖那两段
 # Console.WriteLine：全文件数 gold_kind= 会被强化/转移的旧日志撞到。

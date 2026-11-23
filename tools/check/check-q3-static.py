@@ -14,6 +14,21 @@ os.chdir(root)
 
 
 def read(path):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    _name = __import__("os").path.basename(path)
+    if _name in _sub:
+        # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
+        _os = __import__("os"); _g = __import__("glob")
+        _b = path if _os.path.isabs(path) else _os.path.join(_os.getcwd(), path)
+        if not _os.path.exists(_b):
+            _d = _os.path.dirname(_os.getcwd())
+            while _d and not _os.path.exists(_os.path.join(_d, path)):
+                _nd = _os.path.dirname(_d)
+                if _nd == _d: break
+                _d = _nd
+            _b = _os.path.join(_d, path)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     return open(path, encoding="utf-8").read() if os.path.exists(path) else ""
 
 

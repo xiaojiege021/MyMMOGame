@@ -91,7 +91,7 @@ fi
 echo "== 2. 静态断言 =="
 SQL="$ROOT/db/character/inventory.sql"
 ITEMS="$ROOT/config/items.json"
-SVC="$ROOT/src/Character/CharacterGrpcService.cs"
+SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
 
 if grep -q '"bind"' "$ITEMS" && grep -q 'on_pickup' "$ITEMS" && grep -q 'always' "$ITEMS"; then
   ok "物品表带绑定规则：不绑 / 拾取即绑 / 到账即绑"
