@@ -19,6 +19,7 @@ export ROOT
 # 公共函数库：ok/bad/detail/stop_pid/body_of/code_of/json_field/expect_json/
 # wait_ready/wait_line/finish，签名与既有核对脚本一致，别再复制一份。
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -266,7 +267,7 @@ assert 'stone_insufficient' in repo and 'gold_insufficient' in repo
 assert 'bound = true, bound_at = now()' in repo
 assert '(fromSlot, 0), (toSlot, fromLevelBefore)' in repo
 assert 'Random' not in repo, '转移必定成功，不能掷点'
-svc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
+svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'TransferEnhance(' in svc and 'transfers.ApplyAsync' in svc
 api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
 assert 'public sealed record TransferBody(ulong? CharacterId, uint? FromSlot, uint? ToSlot)' in api

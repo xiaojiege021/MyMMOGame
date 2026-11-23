@@ -15,6 +15,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 export ROOT
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -215,7 +216,7 @@ proc = open(root + '/src/World/WorldProcess.cs', encoding='utf-8').read()
 assert 'FlightTable.Load(' in proc and 'GrpcRealmReader' in proc and 'flight_config=ok' in proc
 inv = open(root + '/src/Character/InventoryRepository.cs', encoding='utf-8').read()
 assert 'select realm from' in inv and 'RealmAsync' in inv
-grpc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
+grpc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 # C2（v1.168）起 /inventory 同时回规范名与展示名（立魔第十段是散仙），
 # 这里断言的是「境界从库里读出来直接回」，不再钉当时那一行写法。
 assert 'Realm = realm,' in grpc and 'RealmDisplay = realms.DisplayName(realm' in grpc

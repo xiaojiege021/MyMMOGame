@@ -152,8 +152,44 @@ wait_line() {
 #       跑角色服只读入口；调用方须先定义 DOTNET 与 CHARACTER_DLL。
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# split_parts <源码路径> / src_agg <源码路径> —— 拆分卡（14.8 D2a–d 起）之后，
+#   一个类型可能由「主文件 + 分项目录里的 partial 分片」组成。核对脚本仍按老路径
+#   传主文件：split_parts 展开成一份文件清单，src_agg 把它们拼成一份临时文本并
+#   打印该路径。断言文本一个字不改，改的只是「怎么读」。
+#   - 主文件没有同名分项目录时，原样返回，行为与拆分前一致；
+#   - 临时文件写在 $TMP（脚本一般已定义）或 $TMPDIR，不进仓库、不进 git。
+#   - shell 段：SVC="$(src_agg src/Character/CharacterGrpcService.cs)"
+#   - python 段：export 过的 AGG_* 变量指向同一份聚合文本。
+# ---------------------------------------------------------------------------
+split_parts() {
+  local path="$1" dir=""
+  case "$path" in
+    */CharacterGrpcService.cs) dir="${path%/CharacterGrpcService.cs}/Grpc" ;;
+    */RealmTable.cs)           dir="${path%/RealmTable.cs}/Realm" ;;
+    */CharacterProcess.cs)     dir="${path%/CharacterProcess.cs}/Startup" ;;
+    *) printf '%s\n' "$path"; return ;;
+  esac
+  printf '%s\n' "$path"
+  local f
+  for f in "$dir"/*.cs; do [ -f "$f" ] && printf '%s\n' "$f"; done
+}
+
+src_agg() {
+  local path="$1" parts out f n
+  [ -f "$path" ] || path="${ROOT:-.}/$path"
+  parts="$(split_parts "$path")"
+  n="$(printf '%s\n' "$parts" | wc -l | tr -d ' ')"
+  if [ "$n" -le 1 ]; then printf '%s' "$path"; return; fi
+  out="${TMP:-${TMPDIR:-/tmp}}/agg-$(basename "$path")"
+  : > "$out"
+  for f in $parts; do cat "$f" >> "$out"; printf '\n' >> "$out"; done
+  printf '%s' "$out"
+}
+
 assert_file_contains() {
   local file="$1" pattern="$2" msg="$3"
+  file="$(src_agg "$file")"
   if [ -f "$file" ] && grep -qE -- "$pattern" "$file"; then
     ok "$msg"
   else
@@ -176,6 +212,7 @@ assert_bad_config() {
 #   改别的配置 / proto 不会把这张卡打红。
 assert_interface() {
   local file="$1" pattern="$2" msg="$3"
+  file="$(src_agg "$file")"
   if [ -f "$file" ] && grep -qE -- "$pattern" "$file"; then
     ok "$msg"
   else

@@ -19,6 +19,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -62,6 +63,10 @@ import json, os, re, sys
 
 root = os.environ["ROOT"]
 def read(p):
+    if p.endswith("src/Character/CharacterGrpcService.cs"):
+        # 14.8 D2a–d：服务按域拆成 Grpc/*.cs，静态断言按主文件 + 分片合起来看。
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Grpc/*.cs"))))
     p = os.path.join(root, p)
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。
@@ -83,7 +88,7 @@ files = {
     "src/Character/ReviveScrollRepository.cs": read("src/Character/ReviveScrollRepository.cs"),
     "src/Character/ExpSettlementRepository.cs": read("src/Character/ExpSettlementRepository.cs"),
     "src/Character/ShopTable.cs": read("src/Character/ShopTable.cs"),
-    "src/Character/CharacterGrpcService.cs": read("src/Character/CharacterGrpcService.cs"),
+    "src/Character/CharacterGrpcService.cs": read(os.environ["AGG_CHARGRPC"]),
     "src/Character/Program.cs": read("src/Character/Program.cs"),
     "src/Battle/ReviveScrollUse.cs": read("src/Battle/ReviveScrollUse.cs"),
     "src/Battle/Encounter.cs": read("src/Battle/Encounter.cs"),

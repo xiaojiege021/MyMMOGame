@@ -76,6 +76,10 @@ import glob, json, os, re
 
 root = os.environ["ROOT"]
 def read(p):
+    if p.endswith("src/Character/CharacterGrpcService.cs"):
+        # 14.8 D2a–d：服务按域拆成 Grpc/*.cs，静态断言按主文件 + 分片合起来看。
+        return "".join(open(x, encoding="utf-8").read() for x in
+                       [p] + sorted(__import__("glob").glob(os.path.join(os.path.dirname(p), "Grpc/*.cs"))))
     p = os.path.join(root, p)
     if p.endswith("src/Character/Program.cs"):
         # D1a 把 CLI 拆进 Cli/：静态断言按 Program + Cli/* 合起来看（名字与内容未变）。

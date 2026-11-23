@@ -10,6 +10,7 @@ unset HTTP_PROXY http_proxy HTTPS_PROXY https_proxy ALL_PROXY all_proxy
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
@@ -114,7 +115,7 @@ ck("月叠表白名单就是两种符，并点名挡住蓝符 / 卷轴 / 经验�
    and all(w in table_cs for w in ('"blue_talisman"', '"revive_scroll"', '"exp_booster"'))
    and "方案 12.1" in table_cs)
 repo_cs = src("src/Character/MonthlyBundleRepository.cs")
-svc_cs = src("src/Character/CharacterGrpcService.cs")
+svc_cs = src(os.environ["AGG_CHARGRPC"])
 ck("月叠发货只在一个仓储里：先抢事务号 → 扣款 → 逐格写入（同一个事务）",
    "grant_txn (txn_id, character_id)" in repo_cs and "amount >= $2" in repo_cs
    and repo_cs.index("ClaimTxnAsync") < repo_cs.index("DebitYuanbaoAsync")

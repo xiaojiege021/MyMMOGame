@@ -19,6 +19,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -58,7 +59,7 @@ currency_config = os.path.join(root, "config/currency.json")
 items_config = os.path.join(root, "config/items.json")
 enhance_config = os.path.join(root, "config/enhance.json")
 table_cs = os.path.join(root, "src/Character/ShopTable.cs")
-service_cs = os.path.join(root, "src/Character/CharacterGrpcService.cs")
+service_cs = os.environ["AGG_CHARGRPC"]
 grant_cs = os.path.join(root, "src/Character/GrantRepository.cs")
 api_cs = os.path.join(root, "src/Gateway/ShopApi.cs")
 program_cs = os.path.join(root, "src/Character/Program.cs")

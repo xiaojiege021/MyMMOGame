@@ -22,6 +22,7 @@ export ROOT
 # 公共函数库：ok/bad/detail/stop_pid/body_of/code_of/json_field/expect_json/
 # wait_ready/wait_line/finish，签名与既有核对脚本一致，别再复制一份。
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 # Windows 上 dotnet 重定向输出走 GBK；中文断言先按平台转码成 UTF-8 再比（与 check-p3-4a2.sh 同款）。
 utf8() {
@@ -233,7 +234,7 @@ assert 'var protectedLevel = !success && useCoupon' in repo
 assert 'table.ProtectItemId' in repo and 'coupon_insufficient' in repo
 assert 'BeginTransactionAsync' in repo and 'Math.Max(0, levelBefore - 1)' in repo
 assert 'protect_rate' not in repo and 'coupon_rate' not in repo
-svc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
+svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'request.UseCoupon' in svc and 'SuccessRate = outcome.Tier.SuccessRate' in svc
 api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()
 assert 'bool? UseCoupon' in api and 'UseCoupon = body.UseCoupon ?? false' in api
@@ -247,9 +248,9 @@ assert 'case "--coupon-count"' in program and 'CouponCountAsync' in program
 # 启动日志与只读入口必须同形，否则 wait_line 等不到。
 assert program.count('coupon_bind=always') == 1
 assert process.count('coupon_bind=always') == 1
-for path in ('src/Character/EnhanceRepository.cs', 'src/Character/CharacterGrpcService.cs',
+for path in ('src/Character/EnhanceRepository.cs', os.environ["AGG_CHARGRPC"],
              'src/Gateway/CharacterApi.cs'):
-    body = open(root + '/' + path, encoding='utf-8').read()
+    body = open(path if path.startswith('/') else root + '/' + path, encoding='utf-8').read()
     # success_rate = result.SuccessRate 只是回包字段映射，不算第二套数字；
     # 要挡的是把概率写成常量的那种赋值。
     assert '0.8' not in body and not re.search(r'success_rate\s*=\s*[0-9]', body), path

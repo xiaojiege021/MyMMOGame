@@ -21,6 +21,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -73,7 +74,7 @@ files = {
     "src/Battle/Encounter.cs": read("src/Battle/Encounter.cs"),
     "proto/mmo/battle.proto": read("proto/mmo/battle.proto"),
     "proto/mmo/character.proto": read("proto/mmo/character.proto"),
-    "src/Character/CharacterGrpcService.cs": read("src/Character/CharacterGrpcService.cs"),
+    "src/Character/CharacterGrpcService.cs": read(os.environ["AGG_CHARGRPC"]),
 }
 report("files", all(files.values()),
        "missing " + ",".join(k for k, v in files.items() if not v))

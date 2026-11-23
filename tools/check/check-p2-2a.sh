@@ -9,6 +9,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
@@ -80,7 +81,7 @@ R("repo_txn", heb.count("BeginTransactionAsync") == 1 and heb.count("await trans
 R("repo_only_entry", not [w for w in ("set fatigue", "set weekly_share", "set level", "currency", "inventory") if w in low],
   "只写进本记录：疲劳/周份额/等级/货币/背包一概不出现")
 
-grpc = rd("src/Character/CharacterGrpcService.cs"); srv = rd("src/Battle/Server.cs")
+grpc = rd(os.environ["AGG_CHARGRPC"]); srv = rd("src/Battle/Server.cs")
 R("double_side", "party_too_small" in grpc and "hard_entries_exhausted" in grpc and "party_too_small" in srv,
   "角色服两个 reason + 战斗服 party_too_small 都在")
 

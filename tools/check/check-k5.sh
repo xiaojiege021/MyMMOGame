@@ -25,6 +25,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 # Windows 上 dotnet 重定向输出走 GBK；带中文名的断言按平台转码，不「先试 UTF-8 再退 GBK」。
 utf8() {
   case "$(uname -s)" in
@@ -320,7 +321,7 @@ report("no_reforge_entry",
 
 # 代码里不写第二份数值：品阶顺序与基准只从配置读
 report("set_bonus_into_equip_attack",
-       "EquipAttack = (int)worn.TotalAttack" in read("src/Character/CharacterGrpcService.cs"),
+       "EquipAttack = (int)worn.TotalAttack" in read(os.environ["AGG_CHARGRPC"]),
        "套装加成没并进 equip_attack（快照里读不到）")
 report("grade_code_no_literal",
        not re.search(r"\b(20|40|80|140|220|320)\b", read("src/Character/GradeTable.cs")),

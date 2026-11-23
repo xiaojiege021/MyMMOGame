@@ -20,6 +20,7 @@ utf8() {
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
@@ -77,7 +78,7 @@ R("advance_gate", "CheckAdvance" in rt and "realm_max" in rt)
 R("ordered_switches", "十一段要按顺序开放" in rt)
 R("old_realm_rejected", "旧副本不提高境界门槛" in rt)
 
-grpc = rd(os.path.join(root, "src", "Character", "CharacterGrpcService.cs"))
+grpc = rd(os.environ["AGG_CHARGRPC"])
 R("enter_gate", "realms.CheckDungeon(dungeon.Realm" in grpc and "RealmAsync" in grpc)
 cfg = rd(os.path.join(root, "src", "Character", "CharacterConfig.cs"))
 R("realm_config", "config/realms.json" in cfg and "RealmTable" in cfg)

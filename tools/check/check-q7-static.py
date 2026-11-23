@@ -26,6 +26,15 @@ def report(k, cond, info=""):
 
 
 def read(p):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    _name = __import__("os").path.basename(p)
+    if _name in _sub:
+        # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
+        _os = __import__("os"); _g = __import__("glob")
+        _r = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+        _b = p if _os.path.isabs(p) else _os.path.join(_r, p)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     try:
         return open(p, encoding="utf-8").read()
     except Exception:

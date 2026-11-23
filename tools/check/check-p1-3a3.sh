@@ -13,6 +13,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 export ROOT
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -181,7 +182,7 @@ registry = open(root + '/src/World/LineRegistry.cs', encoding='utf-8').read()
 assert 'string DisplayName' in registry and 'previous.DisplayName' in registry
 api = open(root + '/src/Gateway/WorldApi.cs', encoding='utf-8').read()
 assert 'ResolveAsync' in api and 'DisplayName = displayName' in api and 'OwnsAsync' in api
-svc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
+svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'DisplayNameAsync' in svc and 'CharacterName = displayName' in svc
 proxy = open(root + '/src/Gateway/WorldStreamProxy.cs', encoding='utf-8').read()
 assert 'appearance_tier' not in proxy and 'TryResolve' in proxy

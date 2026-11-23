@@ -13,6 +13,7 @@ unset HTTP_PROXY http_proxy HTTPS_PROXY https_proxy ALL_PROXY all_proxy
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
@@ -103,7 +104,7 @@ R("failure_keeps_realm", "if (success)" in repo and "realm = $2" in repo)
 R("realm_phase_gate", "realm_phase_not_enough" in repo and "BreakthroughMinIndex" in rt)
 R("gate_dungeon", "CheckDungeon(dungeonRealm, realm)" in repo)
 
-grpc = rd(os.path.join(root, "src", "Character", "CharacterGrpcService.cs"))
+grpc = rd(os.environ["AGG_CHARGRPC"])
 R("grpc_entries", "AdvanceRealm(" in grpc and "SettleDrill(" in grpc and "realmAdvances" in grpc)
 proto = rd(os.path.join(root, "proto", "mmo", "character.proto"))
 R("proto_rpcs", "rpc AdvanceRealm(" in proto and "rpc SettleDrill(" in proto)

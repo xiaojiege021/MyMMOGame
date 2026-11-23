@@ -9,6 +9,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
@@ -112,7 +113,7 @@ R("advance_tx_for_update", "for update" in repo and "branch_locked" in repo)
 R("advance_level_45", "BranchAdvanceLevel = 45" in repo)
 R("advance_idempotent", "step >= 2" in repo and "branch_step = 2" in repo)
 
-grpc = rd(os.path.join(root, "src", "Character", "CharacterGrpcService.cs"))
+grpc = rd(os.environ["AGG_CHARGRPC"])
 R("grpc_advance", "AdvanceBranch(" in grpc and "branch_not_found" in grpc)
 R("grpc_can_equip", "CanEquip(" in grpc and "EquipRules.Check" in grpc)
 

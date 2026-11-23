@@ -8,6 +8,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -55,7 +56,7 @@ drop_cfg = rd("config/dungeon_drops.json")
 exp_repo = rd("src/Character/ExpSettlementRepository.cs")
 battle_enc = rd("src/Battle/Encounter.cs")
 battle_exp = rd("src/Battle/ExpSettlement.cs")
-grpc = rd("src/Character/CharacterGrpcService.cs")
+grpc = rd(os.environ["AGG_CHARGRPC"])
 proto = rd("proto/mmo/character.proto")
 allcards = rd("tools/check/check-all.sh")
 

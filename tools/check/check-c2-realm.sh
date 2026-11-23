@@ -25,6 +25,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 # Windows 上 dotnet 重定向输出走 GBK：境界名全是中文（金仙 / 散仙 / 大乘），
 # 转成 UTF-8 再比，grep -F 才比得中（同 P3-1a1 的口径）。
 utf8() {
@@ -104,7 +105,7 @@ report("inventory_facts",
        "RealmFactsAsync" in inv and 'select realm, coalesce(alignment, \'\')' in inv,
        "InventoryRepository 没读 realm + alignment")
 
-svc = read("src/Character/CharacterGrpcService.cs")
+svc = read(os.environ["AGG_CHARGRPC"])
 report("inventory_uses_display",
        "inventory.RealmFactsAsync" in svc and "realms.Normalize" in svc
        and "RealmDisplay = realms.DisplayName(realm, facts?.Alignment ?? \"\")" in svc,

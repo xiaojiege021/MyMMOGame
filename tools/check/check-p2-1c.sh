@@ -9,6 +9,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
@@ -69,7 +70,7 @@ R("settle_single_commit", (lambda b: b.count("BeginTransactionAsync") == 1 and b
   "SettleAsync 一笔事务、一次 CommitAsync、无中间提交")
 R("settle_only_exp", "set level = $2, exp = $3" in repo, "结算只写 level/exp，不碰伤害/掉落/疲劳/次数")
 R("settle_no_damage", not re.search(r"(damage|attack|hp|health)\s*=\s*\$", repo, re.I), "结算 SQL 不含伤害/血量写入")
-grpc = rd("src/Character/CharacterGrpcService.cs")
+grpc = rd(os.environ["AGG_CHARGRPC"])
 R("same_sect_judge", "ComputeAllSameSectAsync" in grpc and "DescribeCharacterSectAsync" in grpc, "角色服逐人问社交服判同门")
 R("judge_before_settle", grpc.find("ComputeAllSameSectAsync(request.MemberIds") < grpc.find("expSettlements.SettleAsync"),
   "判同门（跨服）在结算之前、且在 DB 行锁事务之外")

@@ -14,6 +14,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 export ROOT
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -207,7 +208,7 @@ assert 'wrong_stone' in repo and 'at_cap' in repo and 'gold_insufficient' in rep
 assert 'Math.Max(0, levelBefore - 1)' in repo
 assert 'Random.Shared.NextDouble()' in repo
 assert '没有失败累计必成' in repo
-svc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
+svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'EnhanceOutcome outcome' in svc and 'enhances.ApplyAsync' in svc
 process = open(root + '/src/Character/CharacterProcess.cs', encoding='utf-8').read()
 assert 'EnhanceTable.Load(config.EnhanceTable' in process
@@ -221,8 +222,8 @@ assert 'Npgsql' not in api
 # 客户端 Net 层的检查放在客户端段，笔记本连服段不需要整个 Unity 工程。
 # 概率数字只出现在配置里，服务端代码不写第二套
 for path in ('src/Character/EnhanceTable.cs', 'src/Character/EnhanceRepository.cs',
-             'src/Character/CharacterGrpcService.cs', 'src/Gateway/CharacterApi.cs'):
-    body = open(root + '/' + path, encoding='utf-8').read()
+             os.environ["AGG_CHARGRPC"], 'src/Gateway/CharacterApi.cs'):
+    body = open(path if path.startswith('/') else root + '/' + path, encoding='utf-8').read()
     # success_rate = result.SuccessRate 只是回包字段映射，不算第二套数字；
     # 要挡的是把概率写成常量的那种赋值。
     assert '0.8' not in body and not re.search(r'success_rate\s*=\s*[0-9]', body), path

@@ -125,7 +125,7 @@ else
   bad "找不到角色服的写入点"
 fi
 
-if grep -q 'BelongsTo' "$ROOT/src/Character/CharacterGrpcService.cs"; then
+if grep -q 'BelongsTo' "$(src_agg src/Character/CharacterGrpcService.cs)"; then
   ok "分支要校验属于该职业"
 else
   bad "分支没有校验归属"

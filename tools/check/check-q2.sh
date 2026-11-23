@@ -14,6 +14,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 PROBE="$ROOT/tools/probe/BattleProbe/bin/Release/net10.0/BattleProbe.dll"
@@ -88,7 +89,7 @@ R("skill_effect_block", "List<EffectSpec> Effects" in skill and "effect_table" i
   and "不在效果表里" in skill)
 R("boss_defense", "public long Defense" in rd("src/Shared.Domain/BossConfig.cs"))
 
-grpc = rd("src/Character/CharacterGrpcService.cs")
+grpc = rd(os.environ["AGG_CHARGRPC"])
 R("character_passive", "PassivePctBps = passive.Found" in grpc)
 R("battle_profile_passive", "reply.PassivePctBps" in rd("src/Battle/BattleProfileClient.cs"))
 

@@ -14,6 +14,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -280,7 +281,7 @@ assert 'Random' not in repo, '装上拆下不掷点'
 assert 'delete from' in repo and '.crystal_socket' in repo
 assert 'set count = count + 1' in repo
 assert '一行都不碰强化等级、绑定、金币和装备本身' in repo
-svc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
+svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'InstallCrystal(' in svc and 'RemoveCrystal(' in svc
 assert 'crystals.InstallAsync' in svc and 'crystals.RemoveAsync' in svc
 api = open(root + '/src/Gateway/CharacterApi.cs', encoding='utf-8').read()

@@ -17,6 +17,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 # Windows 上 dotnet 重定向输出走 GBK：副职名（炼丹 / 铁匠 …）是中文，断言前先按平台转码。
 utf8() {
   case "$(uname -s)" in
@@ -232,7 +233,7 @@ report("process_print_recipe", "recipe_table_version=" in process,
 report("process_wires_craft", "new CraftRepository(" in process
        and "AddSingleton(crafts)" in process, "CraftRepository 不在进程装配里")
 
-svc = read("src/Character/CharacterGrpcService.cs")
+svc = read(os.environ["AGG_CHARGRPC"])
 report("service_four_rpcs",
        all(x in svc for x in ("Task<DescribeRecipesResponse> DescribeRecipes",
                               "Task<StartCraftResponse> StartCraft",

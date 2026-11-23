@@ -27,6 +27,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -271,7 +272,7 @@ report("code_no_item_id_literals", not item_hits,
        ";".join("%s:%s" % x for x in item_hits[:8]))
 
 # 与门类同名的编号只许留在校验器里：业务服务（购买 / 发货 / 制造）里出现就是分支。
-service = read("src/Character/CharacterGrpcService.cs")
+service = read(os.environ["AGG_CHARGRPC"])
 bad_service = [c for c in categories if '"%s"' % c in service]
 report("code_service_no_category_literals", not bad_service, ",".join(bad_service))
 

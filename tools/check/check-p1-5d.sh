@@ -14,6 +14,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -85,7 +86,7 @@ report("main_migration", "recharge_order" in read("db/character/character.sql"),
 
 table_cs = read("src/Character/RechargeTable.cs")
 repo = read("src/Character/RechargeRepository.cs")
-svc = read("src/Character/CharacterGrpcService.cs")
+svc = read(os.environ["AGG_CHARGRPC"])
 proto = read("proto/mmo/character.proto")
 program = read("src/Character/Program.cs")
 gateway = read("src/Gateway/GatewayProcess.cs")

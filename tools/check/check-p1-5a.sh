@@ -13,6 +13,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -232,7 +233,7 @@ for code in ('listing_not_found', 'listing_sold', 'same_character', 'bound_item'
 assert 'delete from' in repo and '.auction_listing' in repo
 assert 'set state = ' in repo and 'auction_settlement' in repo
 assert 'Random' not in repo
-svc = open(root + '/src/Character/CharacterGrpcService.cs', encoding='utf-8').read()
+svc = open(os.environ["AGG_CHARGRPC"], encoding='utf-8').read()
 assert 'SettleAuction(' in svc and 'auctions.SettleAsync' in svc
 api = open(root + '/src/Gateway/AuctionApi.cs', encoding='utf-8').read()
 assert 'MapPost("/auction/list"' in api and 'MapPost("/auction/buy"' in api

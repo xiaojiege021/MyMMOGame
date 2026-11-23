@@ -11,6 +11,7 @@ unset HTTP_PROXY http_proxy HTTPS_PROXY https_proxy ALL_PROXY all_proxy
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 GL="$ROOT/src/Global/bin/Release/net10.0/Global.dll"
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
@@ -110,7 +111,7 @@ ck("顶层与各层只有允许出现的键（金币/材料/能量一类字段�
    and all(set(st) == {"stage", "rewards"} for s, t in tracks for st in groups[s][t])
    and all(set(r) == {"kind", "item_id", "count"} for s, t, r in rewards))
 table, repo = src("src/Character/SeasonPassTable.cs"), src("src/Character/SeasonPassRepository.cs")
-svc, api = src("src/Character/CharacterGrpcService.cs"), src("src/Gateway/PassApi.cs")
+svc, api = src(os.environ["AGG_CHARGRPC"]), src("src/Gateway/PassApi.cs")
 ck("加载期硬校验在（两轨种类 / 券编号 / 券张数 / 季存在 / 阶连续 / 键白名单）",
    all(w in table for w in ("方案 12.1 写定的两轨内容", "不许另立", "很少几张",
                             "不在 season.json 里", "阶号必须从 1 起连续", "不许出现")))

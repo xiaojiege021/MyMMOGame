@@ -22,6 +22,15 @@ fails = []
 
 
 def read(path):
+    _sub = {"CharacterGrpcService.cs": "Grpc", "RealmTable.cs": "Realm", "CharacterProcess.cs": "Startup"}
+    _name = __import__("os").path.basename(path)
+    if _name in _sub:
+        # 14.8 拆分卡之后：主文件 + 分片目录一起读（断言文本不变，只改读法）。
+        _os = __import__("os"); _g = __import__("glob")
+        _r = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+        _b = path if _os.path.isabs(path) else _os.path.join(_r, path)
+        return "".join(open(f, encoding="utf-8").read() for f in
+                       [_b] + sorted(_g.glob(_os.path.join(_os.path.dirname(_b), _sub[_name], "*.cs"))))
     with open(os.path.join(root, path), encoding="utf-8") as handle:
         return handle.read()
 

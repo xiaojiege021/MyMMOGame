@@ -15,6 +15,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -68,7 +69,7 @@ items = {x["id"]: x for x in cfg("config/items.json")["items"]}
 currencies = [c["id"] for c in cfg("config/currency.json")["currencies"]]
 shop_cs = read("src/Character/ShopTable.cs")
 home_cs = read("src/Character/HomeCoinShopTable.cs")
-svc = read("src/Character/CharacterGrpcService.cs")
+svc = read(os.environ["AGG_CHARGRPC"])
 
 # ---------------------------------------------------------------- 1. 配置字段
 # 版本号只增不减：K1 收口时是 11，后面的卡（Q12 加改名卡）会往上走，不钉具体数字。

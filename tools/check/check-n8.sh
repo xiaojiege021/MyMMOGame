@@ -8,6 +8,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
@@ -53,7 +54,7 @@ R("world_boss_in_drop_table", len(wb) == 1 and len(wb[0].get("lines", [])) >= 1)
 R("encounter_drop_key", '"world_boss"' in rd("src/Battle/Encounter.cs")
     and "SettlementSource" in rd("src/Battle/Encounter.cs"))
 R("drop_dungeon_not_real", "WorldBossDropDungeonId" in rd("src/Character/ExpSettlementRepository.cs")
-    and "dungeon_unknown" in rd("src/Character/CharacterGrpcService.cs"))
+    and "dungeon_unknown" in rd(os.environ["AGG_CHARGRPC"]))
 R("n6_path", "MatchesReported" in rd("src/Shared.Domain/DungeonDropTable.cs")
     and "SettleDropLine" in rd("src/Battle/ExpSettlement.cs"))
 R("no_world_boss_in_dungeons",

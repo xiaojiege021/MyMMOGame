@@ -8,6 +8,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
@@ -68,7 +69,7 @@ caps = [l["member_cap"] for l in sect["levels"]]
 R("sect_levels_caps", caps == [10, 30, 60, 100, 200], "sect.json 五档名册上限一字未改")
 R("two_calibers", caps[-1] == 200 and byid["sect"]["max_players"] == 4 and caps[-1] != 4, "member_cap=200 与 sect.max_players=4 两份口径")
 R("no_200_as_limit", all(r.get("max_players") != 200 for r in rows), "dungeons.json 无 200 作为进本上限")
-svc = rd("src/Character/CharacterGrpcService.cs"); bsrv = rd("src/Battle/Server.cs")
+svc = rd(os.environ["AGG_CHARGRPC"]); bsrv = rd("src/Battle/Server.cs")
 ctbl = rd("src/Shared.Domain/DungeonTable.cs"); btbl = ctbl
 judge = svc + bsrv + ctbl + btbl
 R("no_200_in_code", not re.search(r"(?:MaxPlayers|max_players|limit|partySize|party_size)[^\n]{0,24}\b200\b|\b200\b[^\n]{0,24}(?:MaxPlayers|max_players|limit|partySize|party_size)", judge), "判定/副本表源码里不出现 200 作为进本上限")
