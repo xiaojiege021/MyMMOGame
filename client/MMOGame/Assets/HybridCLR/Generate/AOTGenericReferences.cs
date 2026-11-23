@@ -31,6 +31,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Action<HotUpdate.Ui.SiegeRow>
     // System.Action<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Action<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Action<HotUpdate.Ui.UiLootRow>
     // System.Action<Mmo.Net.AuctionOutcome>
     // System.Action<Mmo.Net.BagSlotView>
     // System.Action<Mmo.Net.CurrencyRow>
@@ -43,6 +44,10 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Action<Mmo.Net.HomesteadPlantView>
     // System.Action<Mmo.Net.IngotOutcome>
     // System.Action<Mmo.Net.LeadershipOutcome>
+    // System.Action<Mmo.Net.NpcActionOutcome>
+    // System.Action<Mmo.Net.NpcShopGoodsRow>
+    // System.Action<Mmo.Net.NpcShopOutcome>
+    // System.Action<Mmo.Net.PartyMemberFactView>
     // System.Action<Mmo.Net.PositionOutcome>
     // System.Action<Mmo.Net.RechargeOrderOutcome>
     // System.Action<Mmo.Net.RechargeSettleOutcome>
@@ -61,24 +66,30 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Collections.Generic.ArraySortHelper<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.ArraySortHelper<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.ArraySortHelper<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.ArraySortHelper<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.ArraySortHelper<Mmo.Net.BagSlotView>
     // System.Collections.Generic.ArraySortHelper<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.ArraySortHelper<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.ArraySortHelper<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.ArraySortHelper<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.ArraySortHelper<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.ArraySortHelper<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.ArraySortHelper<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.ArraySortHelper<Mmo.Net.RosterMember>
     // System.Collections.Generic.ArraySortHelper<int>
     // System.Collections.Generic.ArraySortHelper<object>
     // System.Collections.Generic.Comparer<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.Comparer<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.Comparer<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.Comparer<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.Comparer<Mmo.Net.BagSlotView>
     // System.Collections.Generic.Comparer<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.Comparer<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.Comparer<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.Comparer<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.Comparer<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.Comparer<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.Comparer<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.Comparer<Mmo.Net.RosterMember>
     // System.Collections.Generic.Comparer<int>
     // System.Collections.Generic.Comparer<object>
@@ -86,48 +97,60 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Collections.Generic.ICollection<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.ICollection<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.ICollection<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.ICollection<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.ICollection<Mmo.Net.BagSlotView>
     // System.Collections.Generic.ICollection<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.ICollection<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.ICollection<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.ICollection<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.ICollection<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.ICollection<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.ICollection<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.ICollection<Mmo.Net.RosterMember>
     // System.Collections.Generic.ICollection<int>
     // System.Collections.Generic.ICollection<object>
     // System.Collections.Generic.IComparer<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.IComparer<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IComparer<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.IComparer<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.IComparer<Mmo.Net.BagSlotView>
     // System.Collections.Generic.IComparer<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.IComparer<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.IComparer<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.IComparer<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.IComparer<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.IComparer<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.IComparer<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.IComparer<Mmo.Net.RosterMember>
     // System.Collections.Generic.IComparer<int>
     // System.Collections.Generic.IComparer<object>
     // System.Collections.Generic.IEnumerable<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.IEnumerable<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IEnumerable<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.IEnumerable<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.IEnumerable<Mmo.Net.BagSlotView>
     // System.Collections.Generic.IEnumerable<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.IEnumerable<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.IEnumerable<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.IEnumerable<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.IEnumerable<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.IEnumerable<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.IEnumerable<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.IEnumerable<Mmo.Net.RosterMember>
     // System.Collections.Generic.IEnumerable<int>
     // System.Collections.Generic.IEnumerable<object>
     // System.Collections.Generic.IEnumerator<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.IEnumerator<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IEnumerator<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.IEnumerator<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.IEnumerator<Mmo.Net.BagSlotView>
     // System.Collections.Generic.IEnumerator<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.IEnumerator<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.IEnumerator<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.IEnumerator<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.IEnumerator<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.IEnumerator<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.IEnumerator<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.IEnumerator<Mmo.Net.RosterMember>
     // System.Collections.Generic.IEnumerator<int>
     // System.Collections.Generic.IEnumerator<object>
@@ -135,48 +158,62 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Collections.Generic.IList<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.IList<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.IList<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.IList<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.IList<Mmo.Net.BagSlotView>
     // System.Collections.Generic.IList<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.IList<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.IList<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.IList<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.IList<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.IList<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.IList<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.IList<Mmo.Net.RosterMember>
     // System.Collections.Generic.IList<int>
     // System.Collections.Generic.IList<object>
+    // System.Collections.Generic.IReadOnlyCollection<object>
+    // System.Collections.Generic.IReadOnlyList<object>
     // System.Collections.Generic.List.Enumerator<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.List.Enumerator<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.List.Enumerator<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.List.Enumerator<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.List.Enumerator<Mmo.Net.BagSlotView>
     // System.Collections.Generic.List.Enumerator<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.List.Enumerator<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.List.Enumerator<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.List.Enumerator<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.List.Enumerator<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.List.Enumerator<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.List.Enumerator<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.List.Enumerator<Mmo.Net.RosterMember>
     // System.Collections.Generic.List.Enumerator<int>
     // System.Collections.Generic.List.Enumerator<object>
     // System.Collections.Generic.List<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.List<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.List<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.List<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.List<Mmo.Net.BagSlotView>
     // System.Collections.Generic.List<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.List<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.List<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.List<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.List<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.List<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.List<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.List<Mmo.Net.RosterMember>
     // System.Collections.Generic.List<int>
     // System.Collections.Generic.List<object>
     // System.Collections.Generic.ObjectComparer<HotUpdate.Ui.SiegeRow>
     // System.Collections.Generic.ObjectComparer<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.Generic.ObjectComparer<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.Generic.ObjectComparer<HotUpdate.Ui.UiLootRow>
     // System.Collections.Generic.ObjectComparer<Mmo.Net.BagSlotView>
     // System.Collections.Generic.ObjectComparer<Mmo.Net.CurrencyRow>
     // System.Collections.Generic.ObjectComparer<Mmo.Net.GatherNodeRow>
     // System.Collections.Generic.ObjectComparer<Mmo.Net.HeroCodexEntryView>
     // System.Collections.Generic.ObjectComparer<Mmo.Net.HomesteadPlacementView>
     // System.Collections.Generic.ObjectComparer<Mmo.Net.HomesteadPlantView>
+    // System.Collections.Generic.ObjectComparer<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.Generic.ObjectComparer<Mmo.Net.PartyMemberFactView>
     // System.Collections.Generic.ObjectComparer<Mmo.Net.RosterMember>
     // System.Collections.Generic.ObjectComparer<int>
     // System.Collections.Generic.ObjectComparer<object>
@@ -184,24 +221,30 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Collections.ObjectModel.ReadOnlyCollection<HotUpdate.Ui.SiegeRow>
     // System.Collections.ObjectModel.ReadOnlyCollection<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Collections.ObjectModel.ReadOnlyCollection<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Collections.ObjectModel.ReadOnlyCollection<HotUpdate.Ui.UiLootRow>
     // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.BagSlotView>
     // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.CurrencyRow>
     // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.GatherNodeRow>
     // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.HeroCodexEntryView>
     // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.HomesteadPlacementView>
     // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.HomesteadPlantView>
+    // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.NpcShopGoodsRow>
+    // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.PartyMemberFactView>
     // System.Collections.ObjectModel.ReadOnlyCollection<Mmo.Net.RosterMember>
     // System.Collections.ObjectModel.ReadOnlyCollection<int>
     // System.Collections.ObjectModel.ReadOnlyCollection<object>
     // System.Comparison<HotUpdate.Ui.SiegeRow>
     // System.Comparison<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Comparison<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Comparison<HotUpdate.Ui.UiLootRow>
     // System.Comparison<Mmo.Net.BagSlotView>
     // System.Comparison<Mmo.Net.CurrencyRow>
     // System.Comparison<Mmo.Net.GatherNodeRow>
     // System.Comparison<Mmo.Net.HeroCodexEntryView>
     // System.Comparison<Mmo.Net.HomesteadPlacementView>
     // System.Comparison<Mmo.Net.HomesteadPlantView>
+    // System.Comparison<Mmo.Net.NpcShopGoodsRow>
+    // System.Comparison<Mmo.Net.PartyMemberFactView>
     // System.Comparison<Mmo.Net.RosterMember>
     // System.Comparison<int>
     // System.Comparison<object>
@@ -209,6 +252,8 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Func<byte>
     // System.Func<int,object,Mmo.Net.AuctionOutcome>
     // System.Func<int,object,Mmo.Net.IngotOutcome>
+    // System.Func<int,object,Mmo.Net.NpcActionOutcome>
+    // System.Func<int,object,Mmo.Net.NpcShopOutcome>
     // System.Func<int,object,Mmo.Net.RechargeOrderOutcome>
     // System.Func<int,object,Mmo.Net.RechargeSettleOutcome>
     // System.Func<int,object,Mmo.Net.ShopOutcome>
@@ -238,12 +283,15 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
     // System.Predicate<HotUpdate.Ui.SiegeRow>
     // System.Predicate<HotUpdate.Ui.UiDungeonFlow.PartyRow>
     // System.Predicate<HotUpdate.Ui.UiHomesteadPlantSelfCheck.PlantRow>
+    // System.Predicate<HotUpdate.Ui.UiLootRow>
     // System.Predicate<Mmo.Net.BagSlotView>
     // System.Predicate<Mmo.Net.CurrencyRow>
     // System.Predicate<Mmo.Net.GatherNodeRow>
     // System.Predicate<Mmo.Net.HeroCodexEntryView>
     // System.Predicate<Mmo.Net.HomesteadPlacementView>
     // System.Predicate<Mmo.Net.HomesteadPlantView>
+    // System.Predicate<Mmo.Net.NpcShopGoodsRow>
+    // System.Predicate<Mmo.Net.PartyMemberFactView>
     // System.Predicate<Mmo.Net.RosterMember>
     // System.Predicate<int>
     // System.Predicate<object>
@@ -272,20 +320,23 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 
     public void RefMethods()
     {
+        // object[] System.Array.Empty<object>()
         // System.Collections.Generic.IEnumerable<object> System.Linq.Enumerable.Select<object,object>(System.Collections.Generic.IEnumerable<object>,System.Func<object,object>)
         // object[] System.Linq.Enumerable.ToArray<object>(System.Collections.Generic.IEnumerable<object>)
         // System.Collections.Generic.IEnumerable<object> System.Linq.Enumerable.Iterator<object>.Select<object>(System.Func<object,object>)
-        // System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<object>,HotUpdate.BattleClient.<ConnectAsync>d__140>(System.Runtime.CompilerServices.TaskAwaiter<object>&,HotUpdate.BattleClient.<ConnectAsync>d__140&)
-        // System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder<System.Threading.Tasks.VoidTaskResult>.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<object>,HotUpdate.BattleClient.<ConnectAsync>d__140>(System.Runtime.CompilerServices.TaskAwaiter<object>&,HotUpdate.BattleClient.<ConnectAsync>d__140&)
-        // System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start<HotUpdate.BattleClient.<ConnectAsync>d__140>(HotUpdate.BattleClient.<ConnectAsync>d__140&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<Fire>d__150>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<Fire>d__150&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<OnDestroy>d__151>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<OnDestroy>d__151&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<Start>d__138>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<Start>d__138&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<SwitchClass>d__141>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<SwitchClass>d__141&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<Fire>d__150>(HotUpdate.BattleClient.<Fire>d__150&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<OnDestroy>d__151>(HotUpdate.BattleClient.<OnDestroy>d__151&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<Start>d__138>(HotUpdate.BattleClient.<Start>d__138&)
-        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<SwitchClass>d__141>(HotUpdate.BattleClient.<SwitchClass>d__141&)
+        // System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<object>,HotUpdate.BattleClient.<ConnectAsync>d__154>(System.Runtime.CompilerServices.TaskAwaiter<object>&,HotUpdate.BattleClient.<ConnectAsync>d__154&)
+        // System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder<System.Threading.Tasks.VoidTaskResult>.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<object>,HotUpdate.BattleClient.<ConnectAsync>d__154>(System.Runtime.CompilerServices.TaskAwaiter<object>&,HotUpdate.BattleClient.<ConnectAsync>d__154&)
+        // System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start<HotUpdate.BattleClient.<ConnectAsync>d__154>(HotUpdate.BattleClient.<ConnectAsync>d__154&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<Fire>d__157>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<Fire>d__157&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<OnDestroy>d__165>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<OnDestroy>d__165&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<Start>d__152>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<Start>d__152&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,HotUpdate.BattleClient.<SwitchClass>d__159>(System.Runtime.CompilerServices.TaskAwaiter&,HotUpdate.BattleClient.<SwitchClass>d__159&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<object>,HotUpdate.Ui.UiReconnectFlow.<ReconnectNow>d__31>(System.Runtime.CompilerServices.TaskAwaiter<object>&,HotUpdate.Ui.UiReconnectFlow.<ReconnectNow>d__31&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<Fire>d__157>(HotUpdate.BattleClient.<Fire>d__157&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<OnDestroy>d__165>(HotUpdate.BattleClient.<OnDestroy>d__165&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<Start>d__152>(HotUpdate.BattleClient.<Start>d__152&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.BattleClient.<SwitchClass>d__159>(HotUpdate.BattleClient.<SwitchClass>d__159&)
+        // System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<HotUpdate.Ui.UiReconnectFlow.<ReconnectNow>d__31>(HotUpdate.Ui.UiReconnectFlow.<ReconnectNow>d__31&)
         // object UnityEngine.Component.GetComponent<object>()
         // object[] UnityEngine.Component.GetComponentsInChildren<object>(bool)
         // object UnityEngine.GameObject.AddComponent<object>()
