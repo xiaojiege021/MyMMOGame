@@ -51,6 +51,10 @@ bash tools/check/ci.sh               # 合并前：全量 47 张卡，约 13 分
 dotnet build src/MMOGame.sln -c Release   # 编译一次收齐
 ```
 
+`--changed` 按「未提交的改动」挑卡（`git diff HEAD` + 暂存 + 未跟踪文件），
+**提交之后再跑会退回全量**；它不看已提交的历史，也不是「分支相对 main 的 diff」。
+要复核整个分支的改动，提交后直接跑全量。
+
 改 proto、DB 迁移、gRPC 签名、网关入口的，一律用全量，不用 `--changed`。
 
 ## 5. 文档按索引读

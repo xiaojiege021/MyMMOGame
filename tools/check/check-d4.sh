@@ -79,6 +79,37 @@ while IFS= read -r line; do
   esac
 done < "$TMP/static.txt"
 
+echo "== 2b. --changed 选卡（行为回归） =="
+# 用 CI_CHANGED_FILES 钩子喂三组改动、不真跑 47 张卡，验证：
+#   分片文件命中所属主文件的卡（修的是「分片对 --changed 不可见」的假绿漏洞）。
+sel() { CI_CHANGED_FILES="$1" CI_ONLY_PLAN=1 bash tools/check/ci.sh --changed 2>/dev/null | grep -v '^$'; }
+has() { printf '%s\n' "$1" | grep -qx "$2"; }
+
+# 分片 Session/ClientInbox.cs 属于 BattleClient.cs，应命中读 BattleClient 的 n14/q2
+hits="$(sel "client/MMOGame/Assets/HotUpdate/Session/ClientInbox.cs")"
+if has "$hits" n14 && has "$hits" q2; then
+  ok "改分片 ClientInbox.cs 命中 n14/q2"
+else
+  bad "改分片 ClientInbox.cs 没命中 n14/q2（实际：$(printf '%s' "$hits" | tr '\n' ' ')）"
+fi
+
+# 主文件对照：改 BattleClient.cs 也命中 n14/q2，保证新旧判据一致
+hits2="$(sel "client/MMOGame/Assets/HotUpdate/BattleClient.cs")"
+if has "$hits2" n14 && has "$hits2" q2; then
+  ok "改主文件 BattleClient.cs 命中 n14/q2"
+else
+  bad "改主文件 BattleClient.cs 没命中 n14/q2（实际：$(printf '%s' "$hits2" | tr '\n' ' ')）"
+fi
+
+# 没人读的全新文件 → 退回全量（不能只跑 contract/invariants 两张）
+full_sel="$(sel "src/Foo/Bar.cs")"
+full_all="$(bash tools/check/ci.sh --list)"
+if [ "$(printf '%s\n' "$full_sel" | sort)" = "$(printf '%s\n' "$full_all" | sort)" ]; then
+  ok "没人读的文件退回全量（与 --list 一致）"
+else
+  bad "没人读的文件没退回全量（跑了 $(printf '%s\n' "$full_sel" | grep -c '^') 张）"
+fi
+
 echo "== 3. 真跑 ci.sh =="
 if [ "${MMO_D4_SKIP_CI:-0}" = "1" ]; then
   printf '  ..   跳过（MMO_D4_SKIP_CI=1）\n'

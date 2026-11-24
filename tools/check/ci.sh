@@ -37,14 +37,49 @@ esac
 # ── --changed：按改动文件挑卡 ──────────────────────────────────────
 # 判据只有两条，宁可退回全量也不猜：
 #   1. 改动的是 check-<卡>.sh —— 那一张卡必跑（改了自己的核对脚本）
-#   2. 卡脚本里实际读取过的文件名（read("src/.../X.cs") 这种）命中改动文件
+#   2. 卡脚本里实际读取过的文件名命中改动文件。拆分之后卡用聚合读
+#      （split_parts / lib_read.PARTS），分片文件的名字不进卡脚本，所以先把
+#      「分片文件 → 主文件」反查出来：改分片就等于改它的主文件。
 # 不做「同目录传播」：src/Character/ 一条就命中 37/47，等于全量，白算。
-# 一张都没命中时退回全量，避免「改了没人读的文件」被静默跳过。
-# 这两张是全局闸：改了任何业务代码都该复检。
+# 除 ALWAYS 外一张卡都没命中就退回全量，避免「改了没人读的文件」被静默跳过。
+# ALWAYS 这两张是全局闸：改了任何业务代码都该复检。
 ALWAYS="contract invariants"
 
+# 分片目录 → 主文件 basename 的反向映射，现从 lib-common.sh 的 split_parts 表反推，
+# 不另起一份表（那份表已有 bash / python / Unity 三份，再加一份必漂）。
+# 依赖 split_parts 里 `*/X.cs) dir="${path%/X.cs}/D"` 这一行写法，格式变了会整表落空。
+# 输出两列「子目录 主文件basename」；一个子目录挂多个主文件时逐行列出（Grpc / Cli）。
+split_part_map() {
+  sed -n '/^split_parts()/,/^}/p' tools/check/lib-common.sh 2>/dev/null \
+  | awk '
+    /^[[:space:]]*\*\/.*\.cs\)[[:space:]]*dir="/ {
+        s = $0
+        k = index(s, "dir=\"${path%/")
+        if (k == 0) next
+        rest = substr(s, k + 13)
+        m = substr(rest, 1, index(rest, ".cs}") - 1) ".cs"
+        j = index(s, "}/")
+        d = substr(s, j + 2)
+        d = substr(d, 1, index(d, "\"") - 1)
+        printf "%s %s\n", d, m
+    }' | sort -u
+}
+
+# 一个改动文件要 grep 卡脚本的 basename 集合：
+#   1) 文件自己的 basename；2) 它落在某分片目录里时，所属主文件的 basename。
+grep_bases_for() {
+  local f="$1" map="$2" sub main
+  printf '%s\n' "${f##*/}"
+  while IFS=' ' read -r sub main; do
+    [ -n "$sub" ] || continue
+    case "$f" in */"$sub"/*) printf '%s\n' "$main" ;; esac
+  done <<EOF
+$map
+EOF
+}
+
 affected_cards() {
-  local files c f base srcs hit out forced others
+  local files c f base srcs hit out forced others map is_always hit_non_always
   if [ -n "${CI_CHANGED_FILES:-}" ]; then
     # 测试钩子：CI 里也可以直接传文件列表，配合 --changed 用
     files="$(printf '%s\n' $CI_CHANGED_FILES | sed '/^$/d' | sort -u)"
@@ -81,28 +116,37 @@ affected_cards() {
 
   # 改了哪几张卡自己的脚本
   forced="$(printf '%s\n' "$files" | sed -n 's#^tools/check/check-\(.*\)\.sh$#\1#p' | sort -u)"
+  map="$(split_part_map)"
 
   out=""
+  hit_non_always=0
   for c in $CHECKS; do
     hit=0
-    case " $ALWAYS " in *" $c "*) hit=1 ;; esac
+    is_always=0
+    case " $ALWAYS " in *" $c "*) is_always=1 ;; esac
     case " $(printf '%s' "$forced" | tr '\n' ' ') " in *" $c "*) hit=1 ;; esac
+    [ "$is_always" = "1" ] && hit=1
     srcs="tools/check/check-$c.sh"
     [ -f "tools/check/check-$c-static.py" ] && srcs="$srcs tools/check/check-$c-static.py"
     if [ "$hit" = "0" ]; then
       while IFS= read -r f; do
         [ -n "$f" ] || continue
-        base="${f##*/}"
-        if grep -qF -- "$base" $srcs 2>/dev/null; then hit=1; break; fi
+        for base in $(grep_bases_for "$f" "$map"); do
+          if grep -qF -- "$base" $srcs 2>/dev/null; then hit=1; break; fi
+        done
+        [ "$hit" = "1" ] && break
       done <<EOF
 $files
 EOF
     fi
-    [ "$hit" = "1" ] && out="${out}${c}
+    if [ "$hit" = "1" ]; then
+      out="${out}${c}
 "
+      [ "$is_always" = "0" ] && hit_non_always=1
+    fi
   done
-  # 一张都没命中：说明这批改动没有任何卡读过，退回全量而不是跑 0 张
-  [ -n "$out" ] || { printf '%s\n' $CHECKS; return; }
+  # 真实代码改动却除 ALWAYS 外一张卡都没命中：改了没人读的文件（或反查落空），退回全量。
+  [ "$hit_non_always" = "0" ] && { printf '%s\n' $CHECKS; return; }
   printf '%s' "$out"
 }
 
@@ -111,6 +155,12 @@ if [ "$MODE" = "changed" ]; then
 fi
 set -- $CHECKS
 NCARDS=$#
+
+# 只打印选中的卡就退出，不真跑（check-d4.sh 用它对 --changed 选卡做行为回归）。
+if [ "${CI_ONLY_PLAN:-0}" = "1" ]; then
+  printf '%s\n' $CHECKS
+  exit 0
+fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
