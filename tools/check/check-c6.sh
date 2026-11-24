@@ -10,7 +10,8 @@
 #      旧路径已删，三个服与 probe 都引用同一个工程；共享工程不反向引用服务。
 #   2. 字段与调用：DungeonDef 带 Realm / Drill；两服都调同一个 Load；
 #      世界服传已开放地表、战斗服只算窗口。
-#   3. 单测：src/Shared.Domain.Tests 覆盖三张表并跑到全绿。
+#   3. 领域单测：src/Shared.Domain.Tests 覆盖三张表，src/Battle.Tests（D6）覆盖
+#      四段伤害与配置校验；两个工程都跑到全绿，都不连库。
 #   4. 跨进程：probe / 战斗服 / 世界服读同一份正本，同一时刻算出同一把场次钥匙。
 #
 #   bash tools/check/check-c6.sh
@@ -144,6 +145,25 @@ report("单测覆盖三张表", all(k in tests for k in ("DungeonTable", "Dungeo
 report("单测用例 >= 10", tests.count("[Fact]") >= 10, str(tests.count("[Fact]")))
 report("单测引用 Shared.Domain",
        "Shared.Domain/Shared.Domain.csproj" in rd("src/Shared.Domain.Tests/Shared.Domain.Tests.csproj"))
+
+# D6 起并进本卡的同一段：伤害（DamagePipeline）与校验（EffectTable / BattleConfig）的单测。
+d6dmg = rd("src/Battle.Tests/DamagePipelineTests.cs")
+d6cfg = rd("src/Battle.Tests/ConfigValidationTests.cs")
+d6proj = rd("src/Battle.Tests/Battle.Tests.csproj")
+report("伤害单测覆盖四段 / 恒等回退 / 减免与夹取 / 取整",
+       all(k in d6dmg for k in ("DamagePipeline.Compute", "EffectTable.Missing",
+                                "DefenseMitigation", "PenetrationCapPct", "Rounded")))
+report("校验单测覆盖效果表与战斗配置",
+       all(k in d6cfg for k in ("EffectTable.Load", "BattleConfig.Load", "ConfigException")))
+report("领域单测用例 >= 20", d6dmg.count("[Fact]") + d6cfg.count("[Fact]") >= 20,
+       str(d6dmg.count("[Fact]") + d6cfg.count("[Fact]")))
+report("Battle.Tests 只引 Battle、不带库驱动",
+       "../Battle/Battle.csproj" in d6proj
+       and "Npgsql" not in d6proj and "GAMEDB" not in d6dmg + d6cfg)
+report("单测工程在 sln 里（--no-build 才跑得到）", "Battle.Tests" in rd("src/MMOGame.sln"))
+_chk = [l for l in rd("tools/check/ci.sh").splitlines() if l.startswith("CHECKS=")]
+report("ci.sh 的 CHECKS 名单里有 c6（单测随 CI 跑）",
+       bool(_chk) and " c6 " in _chk[0] + " ")
 PY
 while IFS= read -r line; do
   case "$line" in
@@ -153,14 +173,19 @@ while IFS= read -r line; do
   esac
 done < "$TMP/static.txt"
 
-echo "== 3. 配置加载单测 =="
-if "$DOTNET" test src/Shared.Domain.Tests/Shared.Domain.Tests.csproj -c Release --no-build \
-     --nologo -v q >"$TMP/test.log" 2>&1; then
-  COUNT="$(grep -oE '(通过|Passed): *[0-9]+' "$TMP/test.log" | tail -1 | grep -oE '[0-9]+' || true)"
-  ok "配置加载单测全绿（${COUNT:-19} 项）"
-else
-  bad "配置加载单测有红项"; grep -E '失败|Failed|error' "$TMP/test.log" | head -8 | detail
-fi
+echo "== 3. 领域单测（配置加载 / 伤害 / 校验）=="
+# D6：两个工程都跑，任一个红都算这张卡红。条数不钉，只打印实际通过数。
+run_tests() {
+  local proj="$1" label="$2" log="$TMP/test-$2.log" count
+  if "$DOTNET" test "$proj" -c Release --no-build --nologo -v q >"$log" 2>&1; then
+    count="$(grep -oE '(通过|Passed): *[0-9]+' "$log" | tail -1 | grep -oE '[0-9]+' || true)"
+    ok "${label} 单测全绿（${count:-?} 项）"
+  else
+    bad "${label} 单测有红项"; grep -E '失败|Failed|error' "$log" | head -8 | detail
+  fi
+}
+run_tests src/Shared.Domain.Tests/Shared.Domain.Tests.csproj "Shared.Domain"
+run_tests src/Battle.Tests/Battle.Tests.csproj "Battle"
 
 echo "== 4. 跨进程同源 =="
 DTU="$("$DOTNET" "$CD" --dungeon-table --config config/character.json 2>&1 | utf8)"

@@ -222,6 +222,9 @@ for base, dirs, files in os.walk("src"):
         if f.endswith(".cs"):
             # Windows 上 relpath 用反斜杠，下面的白名单是正斜杠，先归一再比。
             rel = os.path.relpath(os.path.join(base, f), ".").replace(os.sep, "/")
+            # D6：单测工程只是把同一份正本加载一遍来验，不是运行期的第二套口径。
+            if ".Tests/" in rel:
+                continue
             t = read(rel)
             if (("effects.json" in t or "effect-table" in t) and rel not in allowed_readers
                     and not rel.startswith(allowed_prefixes)):

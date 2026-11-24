@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- D6：战斗域的伤害 / 配置校验单测。只引用 Battle 工程，
+       不连库、不起服、不读网络；CI 与本地跑的是同一份。
+       Battle 是 Exe 且引了 AspNetCore，这里跟着带同一个 FrameworkReference。 -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Battle.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Battle/Battle.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Battle" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 正本配置随测试输出一起带过去：单测读的就是仓库里那一份，不另造一份数字。
+         战斗配置按文件名相对解析表路径，所以整目录带过去，新增表不用改这里。 -->
+    <None Include="../../config/*.json" Link="config/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

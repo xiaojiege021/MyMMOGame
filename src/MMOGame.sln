@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Domain", "Shared.Dom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Domain.Tests", "Shared.Domain.Tests\Shared.Domain.Tests.csproj", "{4A6B64BB-68BF-40CD-8F86-59F088D2880C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battle.Tests", "Battle.Tests\Battle.Tests.csproj", "{07985583-36C0-4604-9B07-6BDF0FC8E8C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,18 @@ Global
 		{4A6B64BB-68BF-40CD-8F86-59F088D2880C}.Release|x64.Build.0 = Release|Any CPU
 		{4A6B64BB-68BF-40CD-8F86-59F088D2880C}.Release|x86.ActiveCfg = Release|Any CPU
 		{4A6B64BB-68BF-40CD-8F86-59F088D2880C}.Release|x86.Build.0 = Release|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Debug|x64.Build.0 = Debug|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Debug|x86.Build.0 = Debug|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Release|x64.ActiveCfg = Release|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Release|x64.Build.0 = Release|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Release|x86.ActiveCfg = Release|Any CPU
+		{07985583-36C0-4604-9B07-6BDF0FC8E8C7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
