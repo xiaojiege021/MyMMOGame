@@ -1,7 +1,7 @@
 {
   "schema": "monster-table/1",
-  "version": 2,
-  "note": "K6：怪物实体的唯一正本。level / tier / stats / skills / drops / spawn 全在这里；tier 只认 normal / elite / boss / world_boss，normal / elite 必须有 spawn，boss 的入口在副本表，spawn 里的 region 必须在 config/region/*.json 里，drops 的 item_id 必须在 config/items.json 里，skills 必须是 config/skills.json 里已有的编号。八块地表的普通 / 精英怪各一条，四个副本 Boss 各一条；世界 Boss 的数值仍在 config/world_boss.json，本表不写第二份。数值（血量 / 攻击 / 防御 / 掉率 / 刷新）是 K6 的占位，方案没写定，B15 按内容层再定；代码只读。B15 起（v2）spawn 多一个 count：一个刷怪点就是一组怪，同点一次刷几张，必填、1..20（上限是结构值，写多了会和地表容量打架；缺字段起不来，不给代码兜底）；先铺枯岚道 / 承露门 / 外环隙三块地表的组与精英，其余五块仍是单只。主线副本的首领 boss_main_trial 也进本表（内容层这一条），场次血量与出手仍在 config/battle.json 的 boss 段落，两处的名字与血量由 check-k6 钉住，不各写一套。",
+  "version": 3,
+  "note": "K6：怪物实体的唯一正本。level / tier / stats / skills / drops / spawn 全在这里；tier 只认 normal / elite / boss / world_boss，normal / elite 必须有 spawn，boss 的入口在副本表，spawn 里的 region 必须在 config/region/*.json 里，drops 的 item_id 必须在 config/items.json 里，skills 必须是 config/skills.json 里已有的编号。八块地表的普通 / 精英怪各一条，四个副本 Boss 各一条；世界 Boss 的数值仍在 config/world_boss.json，本表不写第二份。数值（血量 / 攻击 / 防御 / 掉率 / 刷新）是 K6 的占位，方案没写定，B15 按内容层再定；代码只读。B15 起（v2）spawn 多一个 count：一个刷怪点就是一组怪，同点一次刷几张，必填、1..20（上限是结构值，写多了会和地表容量打架；缺字段起不来，不给代码兜底）；先铺枯岚道 / 承露门 / 外环隙三块地表的组与精英，其余五块仍是单只（v3 批次二补齐：八块地表都是「一组普通怪 + 一只精英」）。主线副本的首领 boss_main_trial 也进本表（内容层这一条），场次血量与出手仍在 config/battle.json 的 boss 段落，两处的名字与血量由 check-k6 钉住，不各写一套。",
   "monsters": [
     {
       "id": "mob_kulan_beast",
@@ -94,7 +94,7 @@
         "y": 0,
         "z": 24,
         "respawn_s": 45,
-        "count": 1
+        "count": 3
       },
       "note": "镇外夜行的鼠；数值与掉率为 K6 占位。"
     },
@@ -159,7 +159,7 @@
         "y": 0,
         "z": 14,
         "respawn_s": 120,
-        "count": 1
+        "count": 2
       },
       "note": "演武场木桩；数值与掉率为 K6 占位。"
     },
@@ -199,6 +199,36 @@
       "note": "旧天城区的残影；数值与掉率为 K6 占位。"
     },
     {
+      "id": "mob_jiutian_patrol",
+      "name": "旧天巡卒",
+      "level": 38,
+      "tier": "normal",
+      "stats": {
+        "hp": 3200,
+        "attack": 220,
+        "defense": 80
+      },
+      "skills": [
+        1201
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_low",
+          "count": 2,
+          "chance_pct": 30
+        }
+      ],
+      "spawn": {
+        "region": "旧天城区",
+        "x": 22,
+        "y": 0,
+        "z": 28,
+        "respawn_s": 150,
+        "count": 2
+      },
+      "note": "B15 批次二：旧天城区的普通组怪，与 mob_jiutian_shade 同区、低一档；数值待定、进配置。"
+    },
+    {
       "id": "mob_jiaoyuan_fire_beast",
       "name": "焦原火兽",
       "level": 40,
@@ -234,6 +264,36 @@
       "note": "焦原的火兽；数值与掉率为 K6 占位。"
     },
     {
+      "id": "mob_jiaoyuan_ash_beast",
+      "name": "焦原灰兽",
+      "level": 38,
+      "tier": "normal",
+      "stats": {
+        "hp": 3000,
+        "attack": 210,
+        "defense": 75
+      },
+      "skills": [
+        1202
+      ],
+      "drops": [
+        {
+          "item_id": "ore_iron",
+          "count": 2,
+          "chance_pct": 35
+        }
+      ],
+      "spawn": {
+        "region": "焦原",
+        "x": 24,
+        "y": 0,
+        "z": 38,
+        "respawn_s": 150,
+        "count": 3
+      },
+      "note": "B15 批次二：焦原的普通组怪，与 mob_jiaoyuan_fire_beast 同区、低一档；数值待定、进配置。"
+    },
+    {
       "id": "mob_longchao_whelp",
       "name": "龙巢幼兽",
       "level": 45,
@@ -267,6 +327,36 @@
         "count": 1
       },
       "note": "龙巢门口的幼兽；数值与掉率为 K6 占位。"
+    },
+    {
+      "id": "mob_longchao_scale_beast",
+      "name": "龙巢石鳞兽",
+      "level": 43,
+      "tier": "normal",
+      "stats": {
+        "hp": 3600,
+        "attack": 250,
+        "defense": 95
+      },
+      "skills": [
+        1203
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_mid",
+          "count": 1,
+          "chance_pct": 25
+        }
+      ],
+      "spawn": {
+        "region": "龙巢门口",
+        "x": 16,
+        "y": 0,
+        "z": 26,
+        "respawn_s": 210,
+        "count": 2
+      },
+      "note": "B15 批次二：龙巢门口的普通组怪，与 mob_longchao_whelp 同区、低一档；数值待定、进配置。"
     },
     {
       "id": "mob_kulan_elite",
@@ -367,6 +457,76 @@
         "count": 1
       },
       "note": "B15：外环隙的精英，第一座巢穴地表入口前的守门怪；数值待定、进配置。"
+    },
+    {
+      "id": "mob_tingyao_owl",
+      "name": "听谣夜枭",
+      "level": 6,
+      "tier": "elite",
+      "stats": {
+        "hp": 1200,
+        "attack": 48,
+        "defense": 20
+      },
+      "skills": [
+        1001
+      ],
+      "drops": [
+        {
+          "item_id": "herb_ling",
+          "count": 2,
+          "chance_pct": 40
+        },
+        {
+          "item_id": "ore_iron",
+          "count": 1,
+          "chance_pct": 30
+        }
+      ],
+      "spawn": {
+        "region": "听谣镇",
+        "x": 46,
+        "y": 0,
+        "z": 30,
+        "respawn_s": 120,
+        "count": 1
+      },
+      "note": "B15 批次二：听谣镇的精英，与 mob_tingyao_night_rat 同区的头目；数值待定、进配置。"
+    },
+    {
+      "id": "mob_qiyun_guard",
+      "name": "栖云巡城甲",
+      "level": 15,
+      "tier": "elite",
+      "stats": {
+        "hp": 3600,
+        "attack": 120,
+        "defense": 55
+      },
+      "skills": [
+        1101
+      ],
+      "drops": [
+        {
+          "item_id": "stone_enhance_low",
+          "count": 2,
+          "chance_pct": 45
+        },
+        {
+          "item_id": "ore_iron",
+          "count": 2,
+          "chance_pct": 35
+        }
+      ],
+      "spawn": {
+        "region": "栖云城",
+        "x": 24,
+        "y": 0,
+        "z": 20,
+        "respawn_s": 180,
+        "count": 1
+      },
+      "note": "B15 批次二：栖云城的精英，与 mob_qiyun_dummy 同区的守城甲；数值待定、进配置。"
     },
     {
       "id": "boss_main_trial",

@@ -241,8 +241,9 @@ report("main_boss_matches_battle",
            main_boss.get("name"), (main_boss.get("stats") or {}).get("hp"),
            battle_boss.get("name"), battle_boss.get("hp_max")))
 
-# B15 批次一先铺的三块地表：每块至少一只精英，且至少有一个点是一组（count >= 2）。
-group_regions = ("枯岚道", "承露门", "外环隙")
+# B15 批次二起八块地表同一口径：每块至少一只精英，且至少有一个点是一组（count >= 2）。
+# 批次一先铺了枯岚道 / 承露门 / 外环隙，批次二补齐听谣镇 / 栖云城 / 旧天城区 / 焦原 / 龙巢门口。
+group_regions = sorted(region_ids)
 bad_group = []
 for region in group_regions:
     got = [x for x in mons if (x.get("spawn") or {}).get("region") == region]
@@ -251,6 +252,19 @@ for region in group_regions:
     if not any((x.get("spawn") or {}).get("count", 1) >= 2 for x in got):
         bad_group.append(region + ":group")
 report("region_content_groups", not bad_group, ",".join(bad_group))
+
+# B15 批次二：四个真副本 + 世界 Boss 各有一行掉落；主线是教学关卡，N7 写定不进本表。
+# 行内至少一件 items.json 里的东西，品阶带由 check-k5 的 drop_grade_band 逐行核。
+ddrop = cfg("config/dungeon_drops.json")
+dd_ids = [e.get("dungeon_id") for e in (ddrop.get("entries") or [])]
+need_drop = ("abyss", "lair", "sect", "dragon", "world_boss")
+missing_drop = [d for d in need_drop if d not in dd_ids]
+bad_drop_line = [e.get("dungeon_id") for e in (ddrop.get("entries") or [])
+                 if e.get("dungeon_id") in need_drop
+                 and not any(line.get("item_id") in item_ids for line in (e.get("lines") or []))]
+report("dungeon_drops_cover",
+       not missing_drop and not bad_drop_line and len(dd_ids) == len(set(dd_ids)),
+       "缺=%s 空行=%s" % (",".join(missing_drop), ",".join(bad_drop_line)))
 
 # ---------------------------------------------------------------- 3. 地名与坐标
 layout = cfg("tools/gen/ui_map_layout.json")
@@ -417,7 +431,7 @@ fi
 PIDS="$PIDS $!"
 if wait_line "$TMP/battle.log" 'monster_table='; then
   grep -q "^monster_table=ok version=$MVER monsters=$MONS\$" "$TMP/battle.log" \
-    && ok "战斗服启动读到 $MONS 只怪物（B15 批次一：8 块地表 + 3 只精英 + 5 个副本 Boss）" \
+    && ok "战斗服启动读到 $MONS 只怪物（B15 批次二：8 块地表各一组 + 精英 + 5 个副本 Boss）" \
     || bad "战斗服怪物行不对：$(grep '^monster_table=' "$TMP/battle.log" | head -1)"
   # B15：启动日志逐条打出副本 → 内容 Boss 的绑定，绑定读不到就是起服期校验漏了。
   grep -q '^dungeon_boss=main boss_id=boss_main_trial$' "$TMP/battle.log" \
