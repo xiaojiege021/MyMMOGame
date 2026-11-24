@@ -314,9 +314,16 @@ public sealed partial class CharacterGrpcService
             Moved = (uint)Math.Max(0, outcome.Moved),
         };
 
+        // 回包是「排完之后的整份背包」，客户端直接抄进去、不再补发一次只读请求，
+        // 所以这一份里也得有这一行正穿在哪个部位：漏了的话排一次序，屏上的穿戴标就没了。
+        // 穿戴表按 inventory.slot 现读（排序只改 slot 一列），必须在 SortAsync 提交之后取。
+        var worn = await equips.EquippedByBagSlotAsync(
+            (long)request.CharacterId, context.CancellationToken);
         foreach (var slot in outcome.Slots)
         {
-            response.Slots.Add(ToProtoSlot(slot));
+            var row = ToProtoSlot(slot);
+            row.EquippedSlot = worn.TryGetValue(slot.Slot, out var where) ? where : "";
+            response.Slots.Add(row);
         }
 
         return response;

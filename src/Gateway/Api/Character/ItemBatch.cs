@@ -65,6 +65,8 @@ public static partial class CharacterApi
                         item_id = s.ItemId,
                         count = s.Count,
                         bound = s.Bound,
+                        // 排完序的整份背包：这一行穿在哪由角色服给，网关只转发，不漏字段。
+                        equipped_slot = s.EquippedSlot,
                     }),
                 });
             }

@@ -355,10 +355,14 @@ namespace HotUpdate.Ui
             "{\"ok\":false,\"reason\":\"duplicate\",\"item_id\":\"ore_iron\",\"count_left\":150," +
             "\"duplicate\":true}";
 
+        // 排序回包也是整份背包，带 equipped_slot（网关 /inventory/sort 原样转发），
+        // 排完序屏上照样认得出第 1 格穿着武器。
         const string SortOkJson =
             "{\"ok\":true,\"reason\":\"\",\"moved\":2,\"slots\":[" +
-            "{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true}," +
-            "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true}]}";
+            "{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true," +
+            "\"equipped_slot\":\"weapon\"}," +
+            "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true," +
+            "\"equipped_slot\":\"\"}]}";
 
         // B9：穿上 / 脱下。部位、装备攻击之和、格号都是网关回包里的字段。
         const string EquipOkJson =
