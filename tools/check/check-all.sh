@@ -172,6 +172,9 @@ deps_of() {
     # D10 是 14.6 表第 11 行：网关校验中间件，前置 D2a–d+D3g（网关拆分，无独立脚本）。
     # 它是全路由口径的改造，回归靠 d5（断言纪律）与 contract（协议 / 清单没动）兜。
     d10) echo "d5 contract" ;;
+    # D7 是 14.6 表第 13 行：文档单一状态源。只读四份文档，不碰代码与配置，
+    # 也没有功能卡前置；依赖 d5（断言口径：断言只钉事实在不在）。
+    d7) echo "d5" ;;
     # D16 是 14.11.3：契约闸（proto 清单 + 队列风险列）。脚本按 14.11.3 叫 check-contract.sh，
     # 所以卡名用 contract；前置 D15（四类判据与变异器）与 D8（清单只追加的口径）。
     contract) echo "d8 d15" ;;
@@ -237,7 +240,7 @@ p1-4a p1-4b p1-4c p1-4d \
 p1-5a p1-5b p1-5c1 p1-5c2 p1-5c3 p1-5c4 p1-5c5 p1-5c6 p1-5c7 p1-5c8 p1-5d \
 p2-1a1 p2-1a2 p2-1a3 p2-1a4 p2-1b p2-1c p2-2a p2-3a p2-3b p2-4a \
 p3-1a1 p3-1a2 p3-2a p3-3a1 p3-3a2 p3-3a3 p3-3a4 p3-4a1 p3-4a2 p3-4b p3-5a \
-u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 c4 d1a d1b d4 d5 d8 d15 c6 s1 c7 contract invariants q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 b9 b10 b1 d10"
+u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 c1 c2 c3 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 r1 k1 k3 k4 k5 k6 k7 c2-realm c5 c4 d1a d1b d4 d5 d7 d8 d15 c6 s1 c7 contract invariants q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 b9 b10 b1 d10"
 
 # 已存在的核对脚本（只回归真正存在的卡）。
 exists_card() {

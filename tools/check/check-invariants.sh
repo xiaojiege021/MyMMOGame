@@ -118,7 +118,7 @@ report("checkall_cards", re.search(r'ALL_CARDS="[^"]*\binvariants\b', allsh, re.
 arch = read("docs/开发架构.md")
 report("arch_doc_and_script", "docs/不变量清单.md" in arch and "check-invariants.sh" in arch)
 report("arch_close_rule", "--invariants" in arch and "风险含 `2`" in arch)
-report("arch_close_record", "收口记录（v1.182）" in arch)
+report("arch_close_record", "的 D17 条目" in arch)
 queue = read("docs/任务队列.md")
 report("queue_row_d17", re.search(r"\| 19b \| 1 \| D17 \|[^\n]*\| (进行中|完成) \|", queue) is not None)
 PY

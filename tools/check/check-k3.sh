@@ -370,8 +370,10 @@ report("config_doc_k3",
 ledger = read("docs/数值台账.md")
 report("ledger_registered", "`recipes.json`" in ledger, "数值台账表 A 没登记 recipes.json")
 dev = read("docs/开发架构.md")
-report("dev_doc_k3", re.search(r"\| 7 \| K3 \|.*v1\.180", dev) is not None,
-       "开发架构 14.7 的 K3 行没写收口版本")
+report("dev_doc_k3",
+       re.search(r"\| 7 \| K3 \| 生产 / 配方", dev) is not None
+       and "config/recipes.json" in dev,
+       "开发架构 14.7 的 K3 行缺完成标准（生产 / 配方 + recipes.json）")
 log = read("docs/开发日志.md")
 report("log_k3", re.search(r"^### K3 · v1\.180", log, re.M) is not None,
        "开发日志没有 K3 条目")

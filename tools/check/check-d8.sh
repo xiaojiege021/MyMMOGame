@@ -155,7 +155,9 @@ queue = read("docs/任务队列.md")
 report("queue_row_done",
        re.search(r"\| 18 \| 1 \| D8 \| 迁移版本表 \|[^\n]*\| 完成 \|", queue) is not None)
 checklist = read("docs/跑偏与缺失核对表.md")
-report("checklist_d8_closed", re.search(r"\| D8 \|.*已收口", checklist) is not None)
+report("checklist_d8_row", re.search(r"\| D8 \| 没有迁移版本表", checklist) is not None)
+log = read("docs/开发日志.md")
+report("log_d8_entry", re.search(r"^### D8 · v1\.177", log, re.M) is not None)
 report("wrapper_exists", os.path.exists("tools/env/db-migrate.sh"))
 
 ci = read("tools/check/ci.sh")
