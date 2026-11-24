@@ -30,7 +30,7 @@ public static class WorldStreamProxy
 
     static async Task HandleAsync(HttpContext context, TokenStore tokens, GatewayConfig config)
     {
-        var token = TokenFrom(context.Request);
+        var token = GatewayAuth.TokenFrom(context.Request);
         if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out var account, out var expiresAt))
         {
             Console.WriteLine("world_stream_reject reason=token");
@@ -50,21 +50,19 @@ public static class WorldStreamProxy
         var characters = new CharacterClient(characterChannel);
         try
         {
-            // 与 /world/enter 同口径：复核这个角色确实属于这个账号。
-            await characters.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            Console.WriteLine("world_stream_reject account=" + account + " reason=character_not_found");
-            await WriteAsync(context, 404, new { error = "character_not_found" });
-            return;
+            // 与 /world/enter 同口径：复核这个角色确实属于这个账号（归属只走 GatewayAuth 那一份）。
+            if (!await GatewayAuth.OwnsAsync(characters, account, characterId, context))
+            {
+                Console.WriteLine(
+                    "world_stream_reject account=" + account + " reason=character_not_found");
+                await WriteAsync(context, 404, new { error = "character_not_found" });
+                return;
+            }
         }
         catch (RpcException ex)
         {
-            Console.WriteLine("world_stream_reject account=" + account + " reason=upstream " + ex.StatusCode);
+            Console.WriteLine("world_stream_reject account=" + account
+                + " reason=upstream " + ex.StatusCode);
             await WriteAsync(context, 503, new { error = "character_upstream_unavailable" });
             return;
         }
@@ -255,22 +253,6 @@ public static class WorldStreamProxy
             // 对面已经断了，收尾不因此失败。
         }
     }
-
-    static string? TokenFrom(HttpRequest request)
-    {
-        var fromQuery = request.Query["token"].ToString();
-        if (!string.IsNullOrEmpty(fromQuery))
-        {
-            return fromQuery;
-        }
-
-        var header = request.Headers.Authorization.ToString();
-        const string prefix = "Bearer ";
-        return header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-            ? header[prefix.Length..].Trim()
-            : null;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

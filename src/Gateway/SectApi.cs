@@ -113,48 +113,6 @@ public static partial class SectApi
         upgrade_cost = r.UpgradeCost,
         txn_id = r.TxnId,
     };
-
-    // 复用角色服已有的只读背包口复核归属，不为宗门另起一套身份数据。
-    static async Task<bool> OwnsAsync(
-        CharacterService.CharacterServiceClient client,
-        string account, ulong characterId, HttpContext context)
-    {
-        try
-        {
-            await client.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-            return true;
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

@@ -13,11 +13,7 @@ public static partial class CharacterApi
         // 只改格号，所以不丢也不串。业务拒绝一律 HTTP 200 + ok=false。
         app.MapPost("/inventory/move", async context =>
         {
-            if (!TryAuthorize(context, tokens, "inventory_move", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             MoveItemBody? body;
             try
@@ -91,11 +87,7 @@ public static partial class CharacterApi
         // 网关不替玩家确认。事务号可以客户端带，没带就现生成。
         app.MapPost("/inventory/discard", async context =>
         {
-            if (!TryAuthorize(context, tokens, "inventory_discard", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             DiscardItemBody? body;
             try

@@ -14,11 +14,7 @@ public static partial class SectApi
         // 面板只读：任务、次数、奖励、周期键全由社交服给事实值，网关一个都不算。
         app.MapGet("/sect/tasks", async context =>
         {
-            if (!Authorize(context, tokens, "sect_tasks", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             if (!ulong.TryParse(context.Request.Query["character_id"].ToString(), out var characterId)
                 || characterId == 0
@@ -31,7 +27,7 @@ public static partial class SectApi
 
             try
             {
-                if (!await OwnsAsync(character, account, characterId, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, characterId, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -89,11 +85,7 @@ public static partial class SectApi
 
         app.MapPost("/sect/tasks/complete", async context =>
         {
-            if (!Authorize(context, tokens, "sect_task_complete", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             SectTaskBody? body;
             try
@@ -117,7 +109,7 @@ public static partial class SectApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

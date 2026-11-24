@@ -14,11 +14,7 @@ public static partial class CharacterApi
         // 部位不对、位号越界、位已占用等业务拒绝也是 200 + ok=false。
         app.MapPost("/character/crystal/install", async context =>
         {
-            if (!TryAuthorize(context, tokens, "crystal_install", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             InstallCrystalBody? body;
             try
@@ -43,7 +39,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -86,11 +82,7 @@ public static partial class CharacterApi
         // 拆下：结晶回背包复用，不扣金币、不消耗、不改强化与绑定。
         app.MapPost("/character/crystal/remove", async context =>
         {
-            if (!TryAuthorize(context, tokens, "crystal_remove", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             RemoveCrystalBody? body;
             try
@@ -114,7 +106,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

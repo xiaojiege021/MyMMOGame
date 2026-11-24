@@ -30,11 +30,7 @@ public static class CityTaskApi
 
         app.MapGet("/city/tasks", async context =>
         {
-            if (!Authorize(context, tokens, "city_tasks", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             var characterId = ParseId(context.Request.Query["character_id"].ToString());
             if (characterId == 0)
@@ -45,7 +41,7 @@ public static class CityTaskApi
 
             try
             {
-                if (!await OwnsAsync(character, account, characterId, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, characterId, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -110,11 +106,7 @@ public static class CityTaskApi
 
         app.MapPost("/city/tasks/complete", async context =>
         {
-            if (!Authorize(context, tokens, "city_task_complete", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CompleteBody? body;
             try
@@ -138,7 +130,7 @@ public static class CityTaskApi
             var taskId = body.TaskId!.Trim();
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -206,47 +198,6 @@ public static class CityTaskApi
 
     static ulong ParseId(string raw) =>
         ulong.TryParse(raw, out var value) ? value : 0;
-
-    static async Task<bool> OwnsAsync(
-        CharacterService.CharacterServiceClient client,
-        string account, ulong characterId, HttpContext context)
-    {
-        try
-        {
-            await client.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-            return true;
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

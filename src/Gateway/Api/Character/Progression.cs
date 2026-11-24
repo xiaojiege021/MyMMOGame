@@ -12,11 +12,7 @@ public static partial class CharacterApi
         // 进本。主线 1 人、不扣疲劳不占份额；人数与规则都在角色服的副本表里。
         app.MapPost("/dungeon/enter", async context =>
         {
-            if (!TryAuthorize(context, tokens, "dungeon_enter", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             EnterDungeonBody? body;
             try
@@ -99,11 +95,7 @@ public static partial class CharacterApi
         // 温泉。恢复多少由角色服按配置定，请求里只有角色编号；网关不碰库。
         app.MapPost("/hot-spring", async context =>
         {
-            if (!TryAuthorize(context, tokens, "hot_spring", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             HotSpringBody? body;
             try
@@ -162,11 +154,7 @@ public static partial class CharacterApi
         // 网关只鉴权与转发，多传的经验/加成字段不会被读进请求。
         app.MapPost("/exp/settle", async context =>
         {
-            if (!TryAuthorize(context, tokens, "exp_settle", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             SettleExpBody? body;
             try

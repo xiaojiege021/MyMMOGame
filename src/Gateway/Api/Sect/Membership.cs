@@ -13,11 +13,7 @@ public static partial class SectApi
         // N2：名册只读。认令牌后只转发 sect_id，职位和人数上限都在社交服。
         app.MapGet("/sect/roster", async context =>
         {
-            if (!Authorize(context, tokens, "sect_roster", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             if (!ulong.TryParse(context.Request.Query["sect_id"].ToString(), out var sectId)
                 || sectId == 0)
@@ -65,11 +61,7 @@ public static partial class SectApi
 
         app.MapPost("/sect/create", async context =>
         {
-            if (!Authorize(context, tokens, "sect_create", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CreateBody? body;
             try
@@ -92,7 +84,7 @@ public static partial class SectApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

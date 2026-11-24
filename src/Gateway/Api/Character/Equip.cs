@@ -14,11 +14,7 @@ public static partial class CharacterApi
         // class_mismatch / not_equipment / already_equipped），越界格号由角色服按参数错回 4xx。
         app.MapPost("/character/equip", async context =>
         {
-            if (!TryAuthorize(context, tokens, "character_equip", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             EquipItemBody? body;
             try
@@ -80,11 +76,7 @@ public static partial class CharacterApi
         // B9：按部位脱下。脱下不换格，bag_slot 就是它原来那一格。
         app.MapPost("/character/unequip", async context =>
         {
-            if (!TryAuthorize(context, tokens, "character_unequip", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             UnequipItemBody? body;
             try

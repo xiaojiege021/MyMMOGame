@@ -27,12 +27,6 @@ public static class SeasonApi
 
         app.MapGet("/season/current", async context =>
         {
-            if (!Authorize(context, tokens, "season_current", out _))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
-
             try
             {
                 var window = calendar.SeasonOf(DateTimeOffset.UtcNow);
@@ -64,29 +58,6 @@ public static class SeasonApi
             }
         });
     }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

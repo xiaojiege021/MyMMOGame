@@ -209,8 +209,10 @@ gateway_src = read("src/Gateway/PartyApi.cs")
 routes = ["/party", "/party/invite", "/party/respond", "/party/ready/start",
           "/party/ready", "/party/leave", "/party/disband"]
 report("gateway_routes", all('"' + r + '"' in gateway_src for r in routes), routes)
-# 只读一条 + 六条写入口共用 MapWrite 里的那一次 = 两处调用，外加各自的 static 定义。
-report("gateway_authorizes", gateway_src.count("Authorize(") >= 2, gateway_src.count("Authorize("))
+# D10 起鉴权只写一处：这两处调用都走 GatewayAuth.AccountOf（管道里解析过一次的账号），
+# 文件里不该再有第二份鉴权定义。
+report("gateway_authorizes", gateway_src.count("GatewayAuth.AccountOf(") >= 2,
+       gateway_src.count("GatewayAuth.AccountOf("))
 report("gateway_owns", gateway_src.count("OwnsAsync(") >= 2, gateway_src.count("OwnsAsync("))
 report("gateway_no_party_math",
        not re.search(r"MaxSize\s*[<>]|party_full|party_too_large", gateway_src),

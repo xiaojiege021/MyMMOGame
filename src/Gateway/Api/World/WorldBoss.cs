@@ -17,11 +17,7 @@ public static partial class WorldApi
         // 开门与否只由世界服的时钟与窗口决定，这条路由不接任何「请开门」的参数。
         app.MapGet("/world/worldboss", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_worldboss", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             try
             {

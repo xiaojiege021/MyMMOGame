@@ -14,11 +14,7 @@ public static partial class SectApi
         // 请求体只带 character_id / sect_id，网关一个数值都不算、不碰社交库/角色库。
         app.MapPost("/sect/upgrade", async context =>
         {
-            if (!Authorize(context, tokens, "sect_upgrade", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             UpgradeBody? body;
             try
@@ -41,7 +37,7 @@ public static partial class SectApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

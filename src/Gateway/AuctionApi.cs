@@ -44,11 +44,7 @@ public static class AuctionApi
 
         app.MapPost("/auction/list", async context =>
         {
-            if (!Authorize(context, tokens, "auction_list", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             ListBody? body;
             try
@@ -73,7 +69,7 @@ public static class AuctionApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -125,11 +121,7 @@ public static class AuctionApi
 
         app.MapPost("/auction/buy", async context =>
         {
-            if (!Authorize(context, tokens, "auction_buy", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             BuyBody? body;
             try
@@ -152,7 +144,7 @@ public static class AuctionApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -208,11 +200,7 @@ public static class AuctionApi
         // P1-5b：元宝寄售挂单。元宝没有格位，请求只带角色、元宝数量与金币总价。
         app.MapPost("/auction/ingot/list", async context =>
         {
-            if (!Authorize(context, tokens, "auction_ingot_list", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             IngotListBody? body;
             try
@@ -236,7 +224,7 @@ public static class AuctionApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -286,11 +274,7 @@ public static class AuctionApi
         // P1-5b：买元宝。只带买方角色与挂单号；标价、元宝、税率与到账都带不进来。
         app.MapPost("/auction/ingot/buy", async context =>
         {
-            if (!Authorize(context, tokens, "auction_ingot_buy", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             IngotBuyBody? body;
             try
@@ -313,7 +297,7 @@ public static class AuctionApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -372,11 +356,7 @@ public static class AuctionApi
         // 归属沿用角色服只读背包口复核，事务号由网关生成，客户端带不进税率、税额或到账。
         app.MapPost("/auction/stone/list", async context =>
         {
-            if (!Authorize(context, tokens, "stone_list", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             StoneListBody? body;
             try
@@ -401,7 +381,7 @@ public static class AuctionApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -455,11 +435,7 @@ public static class AuctionApi
         // P3-2a：买灵石。只带买方角色与挂单号；档位、数量、标价、税率与到账都在服务端。
         app.MapPost("/auction/stone/buy", async context =>
         {
-            if (!Authorize(context, tokens, "stone_buy", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             StoneBuyBody? body;
             try
@@ -482,7 +458,7 @@ public static class AuctionApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -541,48 +517,6 @@ public static class AuctionApi
             }
         });
     }
-
-    // 复用角色服已有的只读背包口复核归属，不为拍卖另起一套身份数据。
-    static async Task<bool> OwnsAsync(
-        CharacterService.CharacterServiceClient client,
-        string account, ulong characterId, HttpContext context)
-    {
-        try
-        {
-            await client.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-            return true;
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

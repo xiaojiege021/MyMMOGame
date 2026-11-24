@@ -22,11 +22,7 @@ public static class HomeCoinShopApi
 
         app.MapPost("/home-coin/shop/buy", async context =>
         {
-            if (!Authorize(context, tokens, "home_coin_shop", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             BuyBody? body;
             try
@@ -80,29 +76,6 @@ public static class HomeCoinShopApi
             }
         });
     }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

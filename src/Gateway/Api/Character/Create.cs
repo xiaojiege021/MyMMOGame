@@ -11,13 +11,7 @@ public static partial class CharacterApi
     {
         app.MapPost("/character", async context =>
         {
-            var token = TokenFrom(context.Request);
-            if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out var account, out _))
-            {
-                Console.WriteLine("character_reject reason=token");
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CreateBody? body;
             try
@@ -97,13 +91,7 @@ public static partial class CharacterApi
         // 写等级。上限 100 由角色服判，网关只转；越界是 400，不是静默改成 100。
         app.MapPost("/character/level", async context =>
         {
-            var token = TokenFrom(context.Request);
-            if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out var account, out _))
-            {
-                Console.WriteLine("level_reject reason=token");
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             LevelBody? body;
             try

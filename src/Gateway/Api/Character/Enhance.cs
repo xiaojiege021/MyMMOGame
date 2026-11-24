@@ -11,11 +11,7 @@ public static partial class CharacterApi
     {
         app.MapPost("/character/enhance", async context =>
         {
-            if (!TryAuthorize(context, tokens, "enhance", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             EnhanceBody? body;
             try
@@ -39,7 +35,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -107,11 +103,7 @@ public static partial class CharacterApi
         // 业务拒绝（来源不高于目标、格子空、不是装备、石头或金币不够）也是 200 + ok=false。
         app.MapPost("/character/transfer", async context =>
         {
-            if (!TryAuthorize(context, tokens, "transfer", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             TransferBody? body;
             try
@@ -135,7 +127,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

@@ -96,7 +96,7 @@ R("no_new_readonly", "--sect-dungeon" not in rd("src/Character/Program.cs") and 
 R("char_reject", "partySize > dungeon.MaxPlayers" in svc and '"party_too_large"' in svc, "角色服 party_too_large 复用")
 R("battle_reject", '"party_full"' in bsrv and "party.Connections.Count >= dungeon.MaxPlayers" in bsrv, "战斗服 party_full 复用")
 api = rd("src/Gateway/CharacterApi.cs")
-R("gateway_route", 'MapPost("/dungeon/enter"' in api and "DungeonId = body.DungeonId" in api and "TryAuthorize" in api, "网关 /dungeon/enter 已能传 dungeon=sect")
+R("gateway_route", 'MapPost("/dungeon/enter"' in api and "DungeonId = body.DungeonId" in api and "GatewayAuth.AccountOf(context)" in api, "网关 /dungeon/enter 已能传 dungeon=sect")
 R("no_proto_change", not re.search(r"\bsect\b|宗门秘境", rd("proto/mmo/character.proto")), "不改 proto/生成物/客户端 Net 层")
 u3 = rd("tools/check/check-u3.sh")
 R("u3_narrowed", "shown = [r for r in rows" in u3 and "len(rows) == 3" not in u3 and "for absent in" in u3, "check-u3.sh 写死 len(rows)==3 已按语义收窄")

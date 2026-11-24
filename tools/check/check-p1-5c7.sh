@@ -225,7 +225,9 @@ report("gateway_one_route",
        gw.count('app.MapPost("/exp-booster/use"') == 1
        and files["src/Gateway/GatewayProcess.cs"].count("ExpBoosterApi.Map(") == 1)
 report("gateway_auth_and_txn",
-       "TryResolve" in gw and "ListInventoryAsync" in gw
+       # D10 起网关认令牌 / 复核归属只走 GatewayAuth 那一份（管道解析 + 单点归属），
+       # 断言仍是「这个入口认令牌、复核归属、生成事务号」，口径没放松。
+       "GatewayAuth.AccountOf(context)" in gw and "GatewayAuth.OwnsAsync(" in gw
        and 'txnId = "exp_booster_use:" + Guid.NewGuid()' in gw
        and "UseBody(ulong? CharacterId, string? ItemId)" in gw,
        "网关认令牌、复核归属、生成事务号，请求体只有两个字段")

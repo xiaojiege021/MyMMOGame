@@ -12,11 +12,7 @@ public static partial class CharacterApi
         // 往背包里放东西。绑定不绑定由物品表定，请求里说不了。
         app.MapPost("/inventory/add", async context =>
         {
-            if (!TryAuthorize(context, tokens, "inventory_add", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             AddItemBody? body;
             try
@@ -74,11 +70,7 @@ public static partial class CharacterApi
         // 读整个背包。
         app.MapGet("/inventory", async context =>
         {
-            if (!TryAuthorize(context, tokens, "inventory_list", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             if (!ulong.TryParse(context.Request.Query["character_id"].ToString(), out var characterId)
                 || characterId == 0)
@@ -117,11 +109,7 @@ public static partial class CharacterApi
         // 这一格能不能直接交易。绑定物品这里给 false + bound_item。
         app.MapPost("/inventory/can-trade", async context =>
         {
-            if (!TryAuthorize(context, tokens, "inventory_trade", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CanTradeBody? body;
             try

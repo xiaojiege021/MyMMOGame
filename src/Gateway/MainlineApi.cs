@@ -29,11 +29,7 @@ public static class MainlineApi
         // 只读：角色上的主线场次、立仙或立魔，以及服务端算出的下一场编号。
         app.MapGet("/mainline", async context =>
         {
-            if (!Authorize(context, tokens, "mainline", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             var characterId = ParseId(context.Request.Query["character_id"].ToString());
             if (characterId == 0)
@@ -81,11 +77,7 @@ public static class MainlineApi
         // 交任务：场号、（仅第 10 场的）立仙或立魔、以及那场战斗结算的 txn_id。
         app.MapPost("/mainline/turn-in", async context =>
         {
-            if (!Authorize(context, tokens, "mainline_turn_in", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             TurnInBody? body;
             try
@@ -109,7 +101,7 @@ public static class MainlineApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -159,47 +151,6 @@ public static class MainlineApi
 
     static ulong ParseId(string raw) =>
         ulong.TryParse(raw, out var value) ? value : 0;
-
-    static async Task<bool> OwnsAsync(
-        CharacterService.CharacterServiceClient client,
-        string account, ulong characterId, HttpContext context)
-    {
-        try
-        {
-            await client.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-            return true;
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

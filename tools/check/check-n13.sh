@@ -169,8 +169,10 @@ if wait_ready "$TMP/gw-nodb.log" 'ready name=Gateway' "网关（无库）"; then
   R4="$(req POST "$BASE/realm/phase/promote" '{}' )"
   [ "$(code_of "$R4")" = "401" ] && ok "升阶口先认令牌再校验请求体" || bad "升阶口回 $(code_of "$R4")"
 
-  grep -q 'realm_phase_reject reason=token' "$TMP/gw-nodb.log" \
-    && grep -q 'realm_phase_promote_reject reason=token' "$TMP/gw-nodb.log" \
+  # D10 起令牌拒绝由管道统一打一行 `auth_reject path=... reason=token`（不再逐路由带标签），
+  # 断言的仍是「这两条路径的无令牌请求被网关拒过」，口径没放松。
+  grep -q 'auth_reject path=/realm/phase reason=token' "$TMP/gw-nodb.log" \
+    && grep -q 'auth_reject path=/realm/phase/promote reason=token' "$TMP/gw-nodb.log" \
     && ok "网关日志留下两条令牌拒绝" || bad "网关日志没有令牌拒绝行"
 fi
 stop_pid "$GWPID"

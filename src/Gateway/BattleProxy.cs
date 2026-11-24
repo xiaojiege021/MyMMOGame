@@ -24,7 +24,7 @@ public static class BattleProxy
 
     static async Task HandleAsync(HttpContext context, TokenStore tokens, GatewayConfig config)
     {
-        var token = TokenFrom(context.Request);
+        var token = GatewayAuth.TokenFrom(context.Request);
         if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out var account, out var expiresAt))
         {
             Console.WriteLine("proxy_reject reason=token"
@@ -165,29 +165,6 @@ public static class BattleProxy
 
         return baseUrl + (baseUrl.Contains('?') ? "&" : "?") + string.Join("&", parts);
     }
-
-    /// <summary>
-    /// 令牌从 query 的 token 取，也认 Authorization: Bearer。
-    /// 客户端走 query 是因为 Android 的 WebSocket 不好在握手时加头。
-    /// </summary>
-    static string? TokenFrom(HttpRequest request)
-    {
-        var fromQuery = request.Query["token"].ToString();
-        if (!string.IsNullOrEmpty(fromQuery))
-        {
-            return fromQuery;
-        }
-
-        var header = request.Headers.Authorization.ToString();
-        const string prefix = "Bearer ";
-        if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-        {
-            return header[prefix.Length..].Trim();
-        }
-
-        return null;
-    }
-
     static async Task CloseQuietlyAsync(WebSocket socket, WebSocketCloseStatus status, string reason)
     {
         if (socket.State is not (WebSocketState.Open or WebSocketState.CloseReceived))

@@ -15,11 +15,7 @@ public static partial class WorldApi
     {
         app.MapPost("/world/enter", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_enter", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             EnterBody? body;
             try
@@ -95,11 +91,7 @@ public static partial class WorldApi
 
         app.MapPost("/world/leave", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_leave", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             LeaveBody? body;
             try
@@ -121,7 +113,7 @@ public static partial class WorldApi
 
             try
             {
-                if (!await OwnsAsync(characters, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(characters, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

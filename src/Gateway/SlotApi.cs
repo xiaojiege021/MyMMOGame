@@ -29,11 +29,7 @@ public static class SlotApi
         // 只读：这个账号有几个角色位、已经建了几个角色。
         app.MapGet("/character/slots", async context =>
         {
-            if (!Authorize(context, tokens, "character_slots", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             try
             {
@@ -71,11 +67,7 @@ public static class SlotApi
         // 只读：外观收藏（同账号下所有角色持有的外观类物品取并集）。
         app.MapGet("/wardrobe", async context =>
         {
-            if (!Authorize(context, tokens, "wardrobe", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             try
             {
@@ -110,29 +102,6 @@ public static class SlotApi
             }
         });
     }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

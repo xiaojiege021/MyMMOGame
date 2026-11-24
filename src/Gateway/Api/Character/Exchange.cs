@@ -14,11 +14,7 @@ public static partial class CharacterApi
         // 事务号由网关生成，客户端带不进来，也不带任何数值字段。
         app.MapPost("/currency/exchange", async context =>
         {
-            if (!TryAuthorize(context, tokens, "currency_exchange", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             ExchangeStoneBody? body;
             try
@@ -41,7 +37,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

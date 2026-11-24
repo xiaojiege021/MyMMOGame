@@ -12,11 +12,7 @@ public static partial class CharacterApi
         // 货币加减。金币、灵石五档、元宝同一个口子，扣成负数由角色服拒。
         app.MapPost("/currency/add", async context =>
         {
-            if (!TryAuthorize(context, tokens, "currency_add", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CurrencyBody? body;
             try
@@ -70,11 +66,7 @@ public static partial class CharacterApi
         // 读回全部币种，没记过账的按 0。
         app.MapGet("/currency", async context =>
         {
-            if (!TryAuthorize(context, tokens, "currency_get", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             if (!ulong.TryParse(context.Request.Query["character_id"].ToString(), out var characterId)
                 || characterId == 0)
@@ -104,11 +96,7 @@ public static partial class CharacterApi
         // 发一笔奖。整笔在角色服的一个事务里，事务号重复就不发第二次。
         app.MapPost("/grant", async context =>
         {
-            if (!TryAuthorize(context, tokens, "grant", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             GrantBody? body;
             try

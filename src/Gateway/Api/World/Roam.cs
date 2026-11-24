@@ -17,11 +17,7 @@ public static partial class WorldApi
         // 没权限时是业务拒绝，回 200 + ok=false，不混进 gRPC 错误码。
         app.MapPost("/world/fly", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_fly", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             FlyBody? body;
             try
@@ -43,7 +39,7 @@ public static partial class WorldApi
 
             try
             {
-                if (!await OwnsAsync(characters, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(characters, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -79,11 +75,7 @@ public static partial class WorldApi
         // 跨区。目标地点编号是客户端唯一能给的；当前区域、相连与门槛都在世界服判。
         app.MapPost("/world/region", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_region", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CrossRegionBody? body;
             try
@@ -106,7 +98,7 @@ public static partial class WorldApi
 
             try
             {
-                if (!await OwnsAsync(characters, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(characters, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

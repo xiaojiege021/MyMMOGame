@@ -203,7 +203,7 @@ fi
 
 if grep -q 'public sealed record SettleExpBody(' "$API" \
    && grep -q 'app.MapPost("/exp/settle"' "$API" \
-   && grep -q 'TryAuthorize(context, tokens, "exp_settle"' "$API" \
+   && grep -q 'GatewayAuth.AccountOf(context)' "$API" \
    && grep -q 'Account = account' "$API" \
    && grep -q 'WriteRpcErrorAsync(context, "exp_settle"' "$API" \
    && grep -q 'rpc SettleExp(SettleExpRequest)' "$PROTO" \

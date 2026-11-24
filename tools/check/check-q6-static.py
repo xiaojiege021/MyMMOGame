@@ -176,8 +176,9 @@ report("gateway_points", "points = reply.Points" in api
        and "points_per_stage = reply.PointsPerStage" in api
        and "required_points = r.RequiredPoints" in api and "unlocked = r.Unlocked" in api,
        "网关只透出服务端事实值")
+# D10 起令牌由管道统一解析（GatewayAuth），路由体只剩 character_id 一个 query 参数。
 report("gateway_query_unchanged",
-       set(re.findall(r'Request\.Query\["([^"]+)"\]', api)) == {"token", "character_id"},
+       set(re.findall(r'Request\.Query\["([^"]+)"\]', api)) == {"character_id"},
        "季 / 点数仍不从 query 读")
 
 flags = read("tools/probe/CliProbe/CliFlags.cs")

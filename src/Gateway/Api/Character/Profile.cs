@@ -19,11 +19,7 @@ public static partial class CharacterApi
         // 也是 200 + ok=false，一分不扣。
         app.MapPost("/character/rename", async context =>
         {
-            if (!TryAuthorize(context, tokens, "rename", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             RenameBody? body;
             try
@@ -46,7 +42,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

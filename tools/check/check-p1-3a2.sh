@@ -179,7 +179,8 @@ def __agg(p):
 grpc = __agg(root + '/src/World/WorldGrpcService.cs')
 assert 'TryIdentity' in grpc and 'x-mmo-account' in grpc and 'not_in_line' in grpc
 proxy = open(root + '/src/Gateway/WorldStreamProxy.cs', encoding='utf-8').read()
-for piece in ['TryResolve', 'ListInventoryAsync', 'expiresAt', 'x-mmo-account', 'config.WorldUpstream', 'WebSocketCloseStatus.PolicyViolation']:
+# D10 起归属复核走 GatewayAuth.OwnsAsync（长连接里那段内联探测已收掉），断言改钉这个唯一入口。
+for piece in ['TryResolve', 'GatewayAuth.OwnsAsync', 'expiresAt', 'x-mmo-account', 'config.WorldUpstream', 'WebSocketCloseStatus.PolicyViolation']:
     assert piece in proxy, piece
 for path in ['src/World/WorldProcess.cs', 'src/World/LineRegistry.cs', 'src/World/PositionHub.cs', 'src/World/PositionBroadcaster.cs']:
     assert 'Npgsql' not in open(root + '/' + path, encoding='utf-8').read(), path

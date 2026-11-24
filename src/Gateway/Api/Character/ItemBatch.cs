@@ -12,11 +12,7 @@ public static partial class CharacterApi
         // Q10：排序。种类 → 品阶 → 物品编号，紧凑到第 1 格；回包是排完之后的整份背包。
         app.MapPost("/inventory/sort", async context =>
         {
-            if (!TryAuthorize(context, tokens, "inventory_sort", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             SortInventoryBody? body;
             try
@@ -80,11 +76,7 @@ public static partial class CharacterApi
         // 角色服只回「这一格能不能用、用了几个」。
         app.MapPost("/inventory/use-batch", async context =>
         {
-            if (!TryAuthorize(context, tokens, "inventory_use", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             UseItemBatchBody? body;
             try

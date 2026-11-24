@@ -38,11 +38,7 @@ public static class ShopApi
 
         app.MapPost("/shop/buy", async context =>
         {
-            if (!Authorize(context, tokens, "shop_buy", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             BuyBody? body;
             try
@@ -66,7 +62,7 @@ public static class ShopApi
             try
             {
                 // 复用角色服已有的只读背包口复核归属，不为商城另起一套身份数据。
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -140,11 +136,7 @@ public static class ShopApi
 
         app.MapGet("/shop/npc", async context =>
         {
-            if (!Authorize(context, tokens, "npc_shop_describe", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             if (!ulong.TryParse(context.Request.Query["character_id"], out var characterId)
                 || characterId == 0)
@@ -157,7 +149,7 @@ public static class ShopApi
 
             try
             {
-                if (!await OwnsAsync(character, account, characterId, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, characterId, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -228,11 +220,7 @@ public static class ShopApi
 
         app.MapPost("/shop/npc/buy", async context =>
         {
-            if (!Authorize(context, tokens, "npc_shop_buy", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             var body = await ReadBodyAsync<NpcBuyBody>(context);
             if (body?.CharacterId is null or 0 || string.IsNullOrWhiteSpace(body.ShopId)
@@ -244,7 +232,7 @@ public static class ShopApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -303,11 +291,7 @@ public static class ShopApi
 
         app.MapPost("/shop/npc/sell", async context =>
         {
-            if (!Authorize(context, tokens, "npc_shop_sell", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             var body = await ReadBodyAsync<NpcSellBody>(context);
             if (body?.CharacterId is null or 0 || string.IsNullOrWhiteSpace(body.ShopId)
@@ -319,7 +303,7 @@ public static class ShopApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -378,11 +362,7 @@ public static class ShopApi
 
         app.MapPost("/shop/npc/buyback", async context =>
         {
-            if (!Authorize(context, tokens, "npc_shop_buyback", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             var body = await ReadBodyAsync<NpcBuybackBody>(context);
             if (body?.CharacterId is null or 0 || string.IsNullOrWhiteSpace(body.ShopId)
@@ -394,7 +374,7 @@ public static class ShopApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -448,11 +428,7 @@ public static class ShopApi
 
         app.MapPost("/shop/npc/repair", async context =>
         {
-            if (!Authorize(context, tokens, "npc_shop_repair", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             var body = await ReadBodyAsync<NpcRepairBody>(context);
             if (body?.CharacterId is null or 0)
@@ -463,7 +439,7 @@ public static class ShopApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -525,47 +501,6 @@ public static class ShopApi
             return null;
         }
     }
-
-    static async Task<bool> OwnsAsync(
-        CharacterService.CharacterServiceClient client,
-        string account, ulong characterId, HttpContext context)
-    {
-        try
-        {
-            await client.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-            return true;
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    static bool Authorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = context.Request.Query["token"].ToString();
-        if (string.IsNullOrEmpty(token))
-        {
-            var header = context.Request.Headers.Authorization.ToString();
-            const string prefix = "Bearer ";
-            if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                token = header[prefix.Length..].Trim();
-            }
-        }
-
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

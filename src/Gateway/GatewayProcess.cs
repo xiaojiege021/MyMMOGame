@@ -64,6 +64,10 @@ public sealed class GatewayProcess(string configPath)
         builder.WebHost.UseUrls(config.Listen);
         var app = builder.Build();
 
+        // D10：令牌只在这道闸里解析一次，解析不出来的就地 401 短路——
+        // 后面的路由体不再各自读令牌、各自回 401。豁免表与拒绝码在 GatewayAuth 里只写一份。
+        GatewayAuth.UseTokenGate(app, tokens);
+
         app.MapGet("/health", () => Results.Json(new { status = "ok", tokens = tokens.Count }));
 
         if (accounts == null)

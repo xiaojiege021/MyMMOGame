@@ -269,7 +269,7 @@ assert 'Skill' not in grpc
 assert not re.search(r'Damage(?!Total)', grpc)
 api = "".join(open(f, encoding='utf-8').read() for f in [root + '/src/Gateway/WorldApi.cs']
               + sorted(__import__('glob').glob(root + '/src/Gateway/Api/World/*.cs')))
-assert 'OwnsAsync' in api and 'config.WorldUpstream' in api and 'invalid_token' in api
+assert 'GatewayAuth.OwnsAsync' in api and 'config.WorldUpstream' in api and 'GatewayAuth.AccountOf(context)' in api
 gcfg = open(root + '/src/Gateway/GatewayConfig.cs', encoding='utf-8').read()
 assert 'world_upstream' in gcfg and 'DefaultWorldUpstream' in gcfg
 print('static_code=ok request_no_line_state=1 world_no_db=1 gateway_owns=1')

@@ -13,11 +13,7 @@ public static partial class CharacterApi
         // 解锁等级都在角色服的 config/recipes.json；网关只认令牌、复核归属，不在本地算。
         app.MapGet("/craft/recipes", async context =>
         {
-            if (!TryAuthorize(context, tokens, "craft_recipes", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             if (!ulong.TryParse(context.Request.Query["character_id"].ToString(), out var characterId)
                 || characterId == 0)
@@ -28,7 +24,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, characterId, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, characterId, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -79,11 +75,7 @@ public static partial class CharacterApi
         // K3：当前有没有活、还差几秒。只读，客户端不能靠它掷点或改结果。
         app.MapGet("/craft/state", async context =>
         {
-            if (!TryAuthorize(context, tokens, "craft_state", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             if (!ulong.TryParse(context.Request.Query["character_id"].ToString(), out var characterId)
                 || characterId == 0)
@@ -94,7 +86,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, characterId, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, characterId, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -128,11 +120,7 @@ public static partial class CharacterApi
         // 客户端不能把一个拒绝当成「已经开始」。
         app.MapPost("/craft/start", async context =>
         {
-            if (!TryAuthorize(context, tokens, "craft_start", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CraftStartBody? body;
             try
@@ -155,7 +143,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
@@ -206,11 +194,7 @@ public static partial class CharacterApi
         // （材料照扣、产出为 0），与「被拒绝、一个字节都没动」分开。
         app.MapPost("/craft/finish", async context =>
         {
-            if (!TryAuthorize(context, tokens, "craft_finish", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             CraftFinishBody? body;
             try
@@ -232,7 +216,7 @@ public static partial class CharacterApi
 
             try
             {
-                if (!await OwnsAsync(client, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(client, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

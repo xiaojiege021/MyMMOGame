@@ -69,52 +69,6 @@ public static partial class WorldApi
             return null;
         }
     }
-
-    // 复用角色服已有的只读方法来复核归属，不为分线另起一套身份数据。
-    static async Task<bool> OwnsAsync(
-        CharacterClient characters, string account, ulong characterId, HttpContext context)
-    {
-        try
-        {
-            await characters.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-            return true;
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    static bool TryAuthorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = TokenFrom(context.Request);
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
-    static string? TokenFrom(HttpRequest request)
-    {
-        var fromQuery = request.Query["token"].ToString();
-        if (!string.IsNullOrEmpty(fromQuery))
-        {
-            return fromQuery;
-        }
-
-        var header = request.Headers.Authorization.ToString();
-        const string prefix = "Bearer ";
-        return header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-            ? header[prefix.Length..].Trim()
-            : null;
-    }
-
     static async Task WriteRpcErrorAsync(HttpContext context, string what, string account, RpcException ex)
     {
         var code = ex.Status.Detail;

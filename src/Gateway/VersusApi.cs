@@ -50,11 +50,7 @@ public static class VersusApi
 
         app.MapPost("/versus/arena/enter", async context =>
         {
-            if (!TryAuthorize(context, tokens, "versus_arena_enter", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             ArenaEnterBody? body;
             try
@@ -88,7 +84,7 @@ public static class VersusApi
                 return;
             }
 
-            if (!await OwnsAsync(characters, account, body.CharacterId.Value, context))
+            if (!await GatewayAuth.OwnsAsync(characters, account, body.CharacterId.Value, context))
             {
                 await WriteAsync(context, 404, new { error = "character_not_found" });
                 return;
@@ -131,11 +127,7 @@ public static class VersusApi
 
         app.MapPost("/versus/battlefield/enter", async context =>
         {
-            if (!TryAuthorize(context, tokens, "versus_battlefield_enter", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             BattlefieldEnterBody? body;
             try
@@ -163,7 +155,7 @@ public static class VersusApi
                 return;
             }
 
-            if (!await OwnsAsync(characters, account, body.CharacterId.Value, context))
+            if (!await GatewayAuth.OwnsAsync(characters, account, body.CharacterId.Value, context))
             {
                 await WriteAsync(context, 404, new { error = "character_not_found" });
                 return;
@@ -222,57 +214,6 @@ public static class VersusApi
             return null;
         }
     }
-
-    static async Task<bool> OwnsAsync(
-        CharacterService.CharacterServiceClient characters,
-        string account,
-        ulong characterId,
-        HttpContext context)
-    {
-        try
-        {
-            await characters.ListInventoryAsync(
-                new ListInventoryRequest { Account = account, CharacterId = characterId },
-                deadline: DateTime.UtcNow.AddSeconds(5),
-                cancellationToken: context.RequestAborted);
-            return true;
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-        {
-            return false;
-        }
-    }
-
-    static bool TryAuthorize(HttpContext context, TokenStore tokens, string what, out string account)
-    {
-        var token = TokenFrom(context.Request);
-        if (!tokens.TryResolve(token, DateTimeOffset.UtcNow, out account, out _))
-        {
-            Console.WriteLine(what + "_reject reason=token");
-            return false;
-        }
-
-        return true;
-    }
-
-    static string? TokenFrom(HttpRequest request)
-    {
-        var fromQuery = request.Query["token"].ToString();
-        if (!string.IsNullOrEmpty(fromQuery))
-        {
-            return fromQuery;
-        }
-
-        var header = request.Headers.Authorization.ToString();
-        const string prefix = "Bearer ";
-        if (header.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-        {
-            return header[prefix.Length..].Trim();
-        }
-
-        return null;
-    }
-
     static async Task WriteAsync(HttpContext context, int status, object body)
     {
         context.Response.StatusCode = status;

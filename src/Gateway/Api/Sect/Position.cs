@@ -23,11 +23,7 @@ public static partial class SectApi
     {
         app.MapPost(path, async context =>
         {
-            if (!Authorize(context, tokens, what, out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             PositionBody? body;
             try
@@ -52,7 +48,7 @@ public static partial class SectApi
 
             try
             {
-                if (!await OwnsAsync(character, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(character, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

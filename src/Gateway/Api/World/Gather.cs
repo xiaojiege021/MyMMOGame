@@ -17,11 +17,7 @@ public static partial class WorldApi
         // 与产物都由世界服判，产物由角色服落进背包。网关不碰库，也不判采集。
         app.MapPost("/world/gather", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_gather", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             GatherBody? body;
             try
@@ -44,7 +40,7 @@ public static partial class WorldApi
 
             try
             {
-                if (!await OwnsAsync(characters, account, body.CharacterId.Value, context))
+                if (!await GatewayAuth.OwnsAsync(characters, account, body.CharacterId.Value, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;

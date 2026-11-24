@@ -16,11 +16,7 @@ public static partial class WorldApi
         // 只读：运行期采集节点全集（基准 + 铺开），供 U4 采集屏列出节点。
         app.MapGet("/world/gather/nodes", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_gather_nodes", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             try
             {
@@ -55,11 +51,7 @@ public static partial class WorldApi
         // 不给就只读静态表（老屏与老核对走这条，一个字不用改）。
         app.MapGet("/world/regions", async context =>
         {
-            if (!TryAuthorize(context, tokens, "world_regions", out var account))
-            {
-                await WriteAsync(context, 401, new { error = "invalid_token" });
-                return;
-            }
+            var account = GatewayAuth.AccountOf(context);
 
             ulong characterId = 0;
             var raw = context.Request.Query["character_id"].ToString();
@@ -71,7 +63,7 @@ public static partial class WorldApi
                     return;
                 }
 
-                if (!await OwnsAsync(characters, account, characterId, context))
+                if (!await GatewayAuth.OwnsAsync(characters, account, characterId, context))
                 {
                     await WriteAsync(context, 404, new { error = "character_not_found" });
                     return;
