@@ -52,7 +52,7 @@ namespace HotUpdate.Ui
                 {
                     LastCodex = HeroCodexOutcome.Failure("http_" + status);
                     HasCodex = false;
-                    Error = "图鉴没读到：" + status;
+                    Error = UiStrings.CodexFlow.T001 + status;
                     Debug.Log("u11_codex=reject status=" + status);
                 }
 

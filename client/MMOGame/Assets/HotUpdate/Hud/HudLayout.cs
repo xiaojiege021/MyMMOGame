@@ -41,7 +41,7 @@ namespace HotUpdate
             _classButtonImage = MakeRect("ClassButton", classRect, new Color(0.32f, 0.22f, 0.55f, 0.85f), root)
                 .GetComponent<Image>();
             _classButtonLabel = MakeText("ClassButtonLabel", classRect, 30, TextAnchor.MiddleCenter, root);
-            _classButtonLabel.text = "换职业";
+            _classButtonLabel.text = UiStrings.HudLayout.T001;
 
             // 玩家血量：左下角。蓝条在它上面，颜色分开，一眼分得清。
             _tipText = MakeText("TipText", new Rect(40f, 40f, 700f, 48f), 26, TextAnchor.MiddleLeft, root);

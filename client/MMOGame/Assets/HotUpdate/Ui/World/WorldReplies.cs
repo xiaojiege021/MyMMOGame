@@ -58,7 +58,7 @@ namespace HotUpdate.Ui
                 Kind = string.Empty,
                 ItemId = string.Empty,
                 TxnId = string.Empty,
-                DisplayText = "采集没发出去：" + error,
+                DisplayText = UiStrings.WorldReplies.T001 + error,
             };
         }
 
@@ -71,7 +71,7 @@ namespace HotUpdate.Ui
                 Reason = error,
                 Realm = string.Empty,
                 RequiredRealm = string.Empty,
-                DisplayText = "飞行没发出去：" + error,
+                DisplayText = UiStrings.WorldReplies.T002 + error,
             };
         }
 
@@ -86,7 +86,7 @@ namespace HotUpdate.Ui
                 LineId = string.Empty,
                 Realm = string.Empty,
                 RequiredRealm = string.Empty,
-                DisplayText = "跨区没发出去：" + error,
+                DisplayText = UiStrings.WorldReplies.T003 + error,
             };
         }
     }

@@ -1,0 +1,31 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiReasonCatalog",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiReasonCatalog.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "归属 / 会话"
+    },
+    {
+      "key": "T002",
+      "text": "世界"
+    },
+    {
+      "key": "T003",
+      "text": "强化 / 转移"
+    },
+    {
+      "key": "T004",
+      "text": "结晶"
+    },
+    {
+      "key": "T005",
+      "text": "拍卖 / 寄售"
+    },
+    {
+      "key": "T006",
+      "text": "幂等 / 配置"
+    }
+  ]
+}

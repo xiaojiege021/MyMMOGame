@@ -1,0 +1,23 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiSkillScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiSkillScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "职业"
+    },
+    {
+      "key": "T002",
+      "text": "职业 "
+    },
+    {
+      "key": "T003",
+      "text": "分支"
+    },
+    {
+      "key": "T004",
+      "text": "分支 "
+    }
+  ]
+}

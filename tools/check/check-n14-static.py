@@ -5,6 +5,8 @@ import re
 import sys
 
 root = os.environ.get("ROOT") or os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.insert(0, os.path.join(root, "tools", "check"))
+from lib_read import ui_text_assert
 
 
 # 14.8 拆分卡之后：网关的 HTTP 注册体按域分片（主文件 + Api/<域>/），断言文本不变，只改读法。
@@ -68,8 +70,10 @@ for key in ("TryRegion", "RegionStateText", "region_route_mismatch"):
     assert key in entry, "WorldEntry 缺 " + key
 assert "WorldEntry.RegionsPath(_characterId)" in flow, "LoadRegions 没带角色号"
 assert "TryRegionState" in flow, "流程层没有开放状态的唯一出口"
-assert 'region.Open ? "已开（配置）" : "未开（配置）"' in screen, \
-    "配置兜底那一支没写明是配置值"
+# D9 之后这两句在 config/ui_text/UiWorldMapScreen.json，断言改成查表 + 查引用。
+assert "region.Open ?" in screen, "配置兜底那一支没写"
+ui_text_assert(root, "UiWorldMapScreen", "已开（配置）", screen, "地图屏")
+ui_text_assert(root, "UiWorldMapScreen", "未开（配置）", screen, "地图屏")
 assert "未开的是第 11 场主线开放" not in screen, "写死第 11 场的那句还留着"
 assert "TryRegionState" in screen, "屏上没有「回包优先 / 配置兜底」两条路"
 

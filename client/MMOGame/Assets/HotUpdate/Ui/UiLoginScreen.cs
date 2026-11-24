@@ -46,7 +46,7 @@ namespace HotUpdate.Ui
                 UiEntryCodex.Seal, UiTextRole.Danger, shell.Size(26f), TextAnchor.MiddleLeft, false);
 
             shell.Label(m.Band(pad + m.Px(196f), m.Px(408f), m.Px(760f), m.Px(48f)),
-                "幕一 · " + UiEntryCodex.ActOne, UiTextRole.Faint, shell.Size(26f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiLoginScreen.T001 + UiEntryCodex.ActOne, UiTextRole.Faint, shell.Size(26f), TextAnchor.MiddleLeft, false);
         }
 
         /// <summary>幕一题记。登入屏固定显示 01 定稿，不随机。</summary>
@@ -67,7 +67,7 @@ namespace HotUpdate.Ui
             var cardH = m.Px(780f);
             var cardX = m.Width - pad - cardW;
             var cardY = (m.Height - cardH) * 0.5f;
-            var card = shell.Panel("入世", new Rect(cardX, cardY, cardW, cardH), shell.Size(40f));
+            var card = shell.Panel(UiStrings.UiLoginScreen.T002, new Rect(cardX, cardY, cardW, cardH), shell.Size(40f));
 
             var inner = m.Px(32f);
             var innerW = cardW - inner * 2f;
@@ -83,26 +83,26 @@ namespace HotUpdate.Ui
             var fieldH = m.Px(112f);
 
             shell.LabelIn(card.Root, new Rect(inner, ySub, innerW, m.Px(36f)),
-                "幕一 · " + UiEntryCodex.ActOne, UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiLoginScreen.T001 + UiEntryCodex.ActOne, UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, false);
 
             shell.Divider(card.Root, new Rect(inner, yDivider, innerW, m.Px(2f)));
 
             var account = new UiTextField(shell, shell.Content,
-                new Rect(cardX + inner, cardY + yAccount, innerW, fieldH), "账 号", "请输入账号", false, 32);
+                new Rect(cardX + inner, cardY + yAccount, innerW, fieldH), UiStrings.UiLoginScreen.T003, UiStrings.UiLoginScreen.T004, false, 32);
 
             var password = new UiTextField(shell, shell.Content,
-                new Rect(cardX + inner, cardY + yPassword, innerW, fieldH), "口 令", "请输入口令", true, 64);
+                new Rect(cardX + inner, cardY + yPassword, innerW, fieldH), UiStrings.UiLoginScreen.T005, UiStrings.UiLoginScreen.T006, true, 64);
 
             var hint = shell.Label(new Rect(cardX + inner, cardY + yHint, innerW, m.Px(48f)),
                 string.Empty, UiTextRole.Danger, shell.Size(24f), TextAnchor.MiddleLeft, false).Label;
 
             var button = shell.Button(new Rect(cardX + inner, cardY + yButton, innerW, m.Px(88f)),
-                "登 入", flow.SubmitLogin, UiButtonKind.Primary);
+                UiStrings.UiLoginScreen.T007, flow.SubmitLogin, UiButtonKind.Primary);
             button.Enabled = false;
             button.Apply(shell.Palette);
 
             shell.Label(new Rect(cardX + inner, cardY + yNote, innerW, m.Px(64f)),
-                "账号或口令不对时不区分原因；连不上网关不重试刷屏。",
+                UiStrings.UiLoginScreen.T008,
                 UiTextRole.Faint, shell.Size(20f), TextAnchor.UpperLeft, true);
 
             flow.BindLogin(account, password, hint, button);

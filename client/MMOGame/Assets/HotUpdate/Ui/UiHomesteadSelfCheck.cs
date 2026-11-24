@@ -55,7 +55,7 @@ namespace HotUpdate.Ui
 
                 if (path.IndexOf("/inventory", StringComparison.Ordinal) >= 0)
                 {
-                    done(200, "{\"bag_slots\":20,\"character_name\":\"洞府自检\",\"realm\":\"炼体\","
+                    done(200, UiStrings.UiHomesteadSelfCheck.T001
                         + "\"slots\":[{\"slot\":1,\"item_id\":\"decor_s2\",\"count\":1,\"bound\":true},"
                         + "{\"slot\":2,\"item_id\":\"ore_iron\",\"count\":2,\"bound\":false}]}");
                     return;
@@ -65,24 +65,24 @@ namespace HotUpdate.Ui
             });
 
             // 尚未请求时有读取按钮，种植块也如实写「尚未请求」。
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadSelfCheck.T002, s => UiHomesteadScreen.Build(s, flow));
             var pending = Text(shell);
-            Report("pending", pending.Contains("尚未请求") && pending.Contains("读取种植"));
-            Debug.Log("u9_self_pending pending=" + pending.Contains("尚未请求"));
+            Report("pending", pending.Contains(UiStrings.UiHomesteadSelfCheck.T003) && pending.Contains(UiStrings.UiHomesteadSelfCheck.T004));
+            Debug.Log("u9_self_pending pending=" + pending.Contains(UiStrings.UiHomesteadSelfCheck.T003));
 
             flow.LoadHomestead();
             flow.LoadHomesteadBag();
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadSelfCheck.T002, s => UiHomesteadScreen.Build(s, flow));
             var empty = Text(shell);
             Report("empty", flow.HasHomestead && flow.LastHomestead.SlotCount == 6
-                && empty.Contains("court_1 · 空") && empty.Contains("hall_1 · 空")
-                && empty.Contains("decor_s2") && empty.Contains("读取种植")
-                && !empty.Contains("无接口"));
+                && empty.Contains(UiStrings.UiHomesteadSelfCheck.T005) && empty.Contains(UiStrings.UiHomesteadSelfCheck.T006)
+                && empty.Contains("decor_s2") && empty.Contains(UiStrings.UiHomesteadSelfCheck.T004)
+                && !empty.Contains(UiStrings.UiHomesteadSelfCheck.T007));
             Debug.Log("u9_self_empty slots=" + flow.LastHomestead.SlotCount
                 + " bag=" + flow.DecorInBag().Count);
 
             flow.PlaceDecor("hall_1", "decor_s2");
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadSelfCheck.T002, s => UiHomesteadScreen.Build(s, flow));
             var after = Text(shell);
             Report("place", flow.LastHomestead.Ok
                 && HomesteadEntry.ItemInSlot(flow.LastHomestead, "hall_1") == "decor_s2"
@@ -90,9 +90,9 @@ namespace HotUpdate.Ui
             Debug.Log("u9_self_place item=" + HomesteadEntry.ItemInSlot(flow.LastHomestead, "hall_1"));
 
             flow.RemoveDecor("hall_1");
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadSelfCheck.T002, s => UiHomesteadScreen.Build(s, flow));
             Report("remove", HomesteadEntry.ItemInSlot(flow.LastHomestead, "hall_1").Length == 0
-                && Text(shell).Contains("hall_1 · 空"));
+                && Text(shell).Contains(UiStrings.UiHomesteadSelfCheck.T006));
 
             // 拒绝：unavailable
             flow.SetSender((path, body, token, done) =>
@@ -102,10 +102,10 @@ namespace HotUpdate.Ui
                     + "\"txn_id\":\"\",\"duplicate\":false}");
             });
             flow.LoadHomestead();
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadSelfCheck.T002, s => UiHomesteadScreen.Build(s, flow));
             Report("unavailable", Text(shell).Contains("homestead_unavailable"));
 
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadSelfCheck.T002, s => UiHomesteadScreen.Build(s, flow));
             var layout = Layout(shell);
             var copy = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);

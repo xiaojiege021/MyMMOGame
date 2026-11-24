@@ -1,0 +1,67 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiFlightScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiFlightScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "飞行与境界锁"
+    },
+    {
+      "key": "T002",
+      "text": "飞行只由境界打开，不由装备、坐骑或商城拖尾打开"
+    },
+    {
+      "key": "T003",
+      "text": "三段大境界（首发）"
+    },
+    {
+      "key": "T004",
+      "text": "config/flight.json 的 flight_realm 写的是 "
+    },
+    {
+      "key": "T005",
+      "text": "（待定）；本屏不读配置判权限，能不能飞只看回包的 can_fly。"
+    },
+    {
+      "key": "T006",
+      "text": "请求字段"
+    },
+    {
+      "key": "T007",
+      "text": "want_fly。伪造 realm / can_fly / account / y 一律无效；"
+    },
+    {
+      "key": "T008",
+      "text": "位置帧直接报高 y 会被 flight_forbidden 拉回 GroundY。"
+    },
+    {
+      "key": "T009",
+      "text": "起飞"
+    },
+    {
+      "key": "T010",
+      "text": "落地"
+    },
+    {
+      "key": "T011",
+      "text": "地表境界要求"
+    },
+    {
+      "key": "T012",
+      "text": "    · 剧情未开"
+    },
+    {
+      "key": "T013",
+      "text": "拖尾"
+    },
+    {
+      "key": "T014",
+      "text": "TrailAllowed 只在 Flying 为真时成立；没有飞行权限时，买了拖尾也不会让人飞。"
+    },
+    {
+      "key": "T015",
+      "text": "画面高度以回包为准 · 拖尾只在能飞时开"
+    }
+  ]
+}

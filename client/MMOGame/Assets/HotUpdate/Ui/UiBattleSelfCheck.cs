@@ -57,7 +57,7 @@ namespace HotUpdate.Ui
 
             try
             {
-                shell.ShowPage("裂隙", s => { built = UiDungeonScreen.Build(s, flow); });
+                shell.ShowPage(UiStrings.UiBattleSelfCheck.T001, s => { built = UiDungeonScreen.Build(s, flow); });
                 CheckDungeonList(built);
                 CheckDungeonInitial(flow);
                 CheckDungeonBody(flow);
@@ -66,10 +66,10 @@ namespace HotUpdate.Ui
                 CheckDungeonErrors(flow);
                 CheckPartySizes(flow);
 
-                shell.ShowPage("战斗结算", s => UiSettleScreen.Build(s, flow));
+                shell.ShowPage(UiStrings.UiBattleSelfCheck.T002, s => UiSettleScreen.Build(s, flow));
                 CheckSettle(flow);
 
-                shell.ShowPage("小队", s => { members = UiPartyScreen.Build(s, flow); });
+                shell.ShowPage(UiStrings.UiBattleSelfCheck.T003, s => { members = UiPartyScreen.Build(s, flow); });
                 CheckParty(members, flow);
 
                 CheckSkinKeepsCopy(shell, flow);
@@ -116,7 +116,7 @@ namespace HotUpdate.Ui
         {
             // 一次都没发过请求时，屏上不拿配置里的数假装已经确认。
             var text = flow.ScreenResultText;
-            Report("dungeon_initial", !flow.HasReply && text.Contains("尚未进本"));
+            Report("dungeon_initial", !flow.HasReply && text.Contains(UiStrings.UiBattleSelfCheck.T004));
             Report("dungeon_enter_enabled", flow.EnterEnabled);
         }
 
@@ -148,10 +148,10 @@ namespace HotUpdate.Ui
                 + "\"weekly_share_remaining\":12,\"weekly_share_cap\":12,\"reward_shares\":2}";
             flow.SubmitEnter();
 
-            var expected = "疲劳 4500 / 6000 · 本次扣 3000 · 本周剩 12 / 12 · 每人 2 份";
+            var expected = UiStrings.UiBattleSelfCheck.T005;
             Report("dungeon_allowed_kind", flow.Last.Kind == Mmo.Net.EnterKind.Allowed);
             Report("dungeon_allowed_copy", flow.ScreenResultText == expected);
-            Report("dungeon_allowed_hint", flow.ScreenHintText.Contains("已进本"));
+            Report("dungeon_allowed_hint", flow.ScreenHintText.Contains(UiStrings.UiBattleSelfCheck.T006));
             Report("dungeon_allowed_cost", flow.Last.FatigueCost == 3000 && flow.Last.RewardShares == 2);
         }
 
@@ -165,7 +165,7 @@ namespace HotUpdate.Ui
             flow.SubmitEnter();
 
             Report("dungeon_refused_kind", flow.Last.Kind == Mmo.Net.EnterKind.Refused);
-            Report("dungeon_refused_hint", flow.ScreenHintText.Contains("疲劳不够"));
+            Report("dungeon_refused_hint", flow.ScreenHintText.Contains(UiStrings.UiBattleSelfCheck.T007));
             // 被拒时屏上的疲劳仍是回包那个 6000，不拿本地值凑。
             Report("dungeon_refused_numbers", flow.ScreenResultText.Contains("6000 / 6000"));
         }
@@ -176,19 +176,19 @@ namespace HotUpdate.Ui
             _nextBody = "{\"error\":\"invalid_token\"}";
             flow.SubmitEnter();
             Report("dungeon_auth", flow.Last.Kind == Mmo.Net.EnterKind.InvalidToken
-                && flow.ScreenHintText.Contains("令牌失效"));
+                && flow.ScreenHintText.Contains(UiStrings.UiBattleSelfCheck.T008));
 
             _nextStatus = 0;
             _nextBody = string.Empty;
             flow.SubmitEnter();
             Report("dungeon_network", flow.Last.Kind == Mmo.Net.EnterKind.Network
-                && flow.ScreenHintText.Contains("连不上网关"));
+                && flow.ScreenHintText.Contains(UiStrings.UiBattleSelfCheck.T009));
 
             _nextStatus = 503;
             _nextBody = "{\"error\":\"db_unavailable\"}";
             flow.SubmitEnter();
             Report("dungeon_unavailable", flow.Last.Kind == Mmo.Net.EnterKind.Unavailable
-                && flow.ScreenHintText.Contains("暂时连不上"));
+                && flow.ScreenHintText.Contains(UiStrings.UiBattleSelfCheck.T010));
         }
 
         static void CheckPartySizes(UiDungeonFlow flow)
@@ -214,16 +214,16 @@ namespace HotUpdate.Ui
 
         static void CheckSettle(UiDungeonFlow flow)
         {
-            Report("settle_initial", flow.ScreenSettleState.Contains("未 结 算"));
+            Report("settle_initial", flow.ScreenSettleState.Contains(UiStrings.UiBattleSelfCheck.T011));
 
             flow.SetSettlement(true, "txn-u3-0001", 120);
-            Report("settle_cleared", flow.ScreenSettleState.Contains("通 关")
-                && !flow.ScreenSettleState.Contains("未 通 关"));
+            Report("settle_cleared", flow.ScreenSettleState.Contains(UiStrings.UiBattleSelfCheck.T012)
+                && !flow.ScreenSettleState.Contains(UiStrings.UiBattleSelfCheck.T013));
             Report("settle_exp_from_reply", flow.ScreenSettleExp.Contains("120"));
             Report("settle_txn_shown", flow.ScreenSettleDrop.Contains("txn-u3-0001"));
 
             flow.SetSettlement(false, "txn-u3-0002", 0);
-            Report("settle_failed", flow.ScreenSettleState.Contains("未 通 关"));
+            Report("settle_failed", flow.ScreenSettleState.Contains(UiStrings.UiBattleSelfCheck.T013));
         }
 
         // ------------------------------------------------------------------ C04
@@ -239,12 +239,12 @@ namespace HotUpdate.Ui
             var four = 0;
             flow.SetParty(new List<UiDungeonFlow.PartyRow>
             {
-                new UiDungeonFlow.PartyRow { Name = "镇岳", ClassId = "tank", Hp = 4200, HpMax = 4200 },
-                new UiDungeonFlow.PartyRow { Name = "顾长息", ClassId = "warrior", Hp = 3820, HpMax = 4200 },
-                new UiDungeonFlow.PartyRow { Name = "阿弦", ClassId = "priest", Hp = 0, HpMax = 3800, Down = true },
-                new UiDungeonFlow.PartyRow { Name = "阮青", ClassId = "archer", Hp = 2100, HpMax = 3500 },
+                new UiDungeonFlow.PartyRow { Name = UiStrings.UiBattleSelfCheck.T014, ClassId = "tank", Hp = 4200, HpMax = 4200 },
+                new UiDungeonFlow.PartyRow { Name = UiStrings.UiBattleSelfCheck.T015, ClassId = "warrior", Hp = 3820, HpMax = 4200 },
+                new UiDungeonFlow.PartyRow { Name = UiStrings.UiBattleSelfCheck.T016, ClassId = "priest", Hp = 0, HpMax = 3800, Down = true },
+                new UiDungeonFlow.PartyRow { Name = UiStrings.UiBattleSelfCheck.T017, ClassId = "archer", Hp = 2100, HpMax = 3500 },
             });
-            shell.ShowPage("小队", s => { four = UiPartyScreen.Build(s, flow); });
+            shell.ShowPage(UiStrings.UiBattleSelfCheck.T003, s => { four = UiPartyScreen.Build(s, flow); });
             Report("party_four", four == 4);
         }
 
@@ -252,7 +252,7 @@ namespace HotUpdate.Ui
 
         static void CheckSkinKeepsCopy(UiShell shell, UiDungeonFlow flow)
         {
-            shell.ShowPage("裂隙", s => UiDungeonScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiBattleSelfCheck.T001, s => UiDungeonScreen.Build(s, flow));
             var light = flow.ScreenResultText + "|" + flow.ScreenHintText + "|" + flow.ScreenSizeText;
 
             shell.SetSkin(UiSkin.Dark, false);

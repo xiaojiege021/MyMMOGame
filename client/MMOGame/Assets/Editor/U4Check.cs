@@ -188,7 +188,7 @@ public static class U4Check
         var wiring = flow.Contains("LoadGatherNodes")
             && netGather.Contains("ParseList")
             && flow.Contains("/world/gather/nodes")
-            && gatherUi.Contains("读取节点表")
+            && UiTextRef.In(root, gatherUi, "UiGatherScreen", "读取节点表")
             && codex.Contains("NoGatherNodesYet")
             && !gatherUi.Contains("config/gather.json");
         Report("codex_nodes", noHardcoded && wiring,
@@ -244,9 +244,11 @@ public static class U4Check
         Report("tier_no_distance", noDistance && noManualCompare,
             "distance=" + noDistance + " compare=" + noManualCompare);
 
-        // 三档的名字只有一份，写在展示表里。
+        // 三档的名字只有一份，写在展示表里（D9 之后在 config/ui_text/UiWorldCodex.json）。
         var codex = Client(root, "HotUpdate/Ui/UiWorldCodex.cs");
-        var labels = codex.Contains("\"完整模型\"") && codex.Contains("\"简模\"") && codex.Contains("\"只留名字\"");
+        var labels = UiTextRef.In(root, codex, "UiWorldCodex", "完整模型")
+                     && UiTextRef.In(root, codex, "UiWorldCodex", "简模")
+                     && UiTextRef.In(root, codex, "UiWorldCodex", "只留名字");
         Report("tier_labels", labels, "labels=3");
     }
 

@@ -226,7 +226,9 @@ public static class U3Check
         var codex = Client(root, "HotUpdate/Ui/UiBattleCodex.cs");
 
         // 掉落不自己造：屏上写的是「以角色服背包回包为准」，不是一张编出来的掉落表。
-        var dropByReply = settle.Contains("SettleDropNote") && codex.Contains("掉落以角色服背包回包为准");
+        // D9 之后这句在 config/ui_text/UiBattleCodex.json，断言改成查表 + 查引用。
+        var dropByReply = settle.Contains("SettleDropNote")
+                          && UiTextRef.In(root, codex, "UiBattleCodex", "掉落以角色服背包回包为准，本地不造物品");
         var noDropTable = !settle.Contains("铁矿") && !settle.Contains("强化石 ×");
         Report("settle_drop", dropByReply && noDropTable, "note=" + dropByReply + " table=" + !noDropTable);
 

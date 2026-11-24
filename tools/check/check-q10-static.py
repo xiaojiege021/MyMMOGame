@@ -16,6 +16,8 @@ import re
 import sys
 
 root = os.environ["ROOT"]
+sys.path.insert(0, os.path.join(root, "tools", "check"))
+from lib_read import ui_text_ref_like
 fails = []
 
 
@@ -154,7 +156,8 @@ screen = read("client/MMOGame/Assets/HotUpdate/Ui/UiBagScreen.cs")
 want("config/" not in screen, "背包屏读了配置")
 want('"slots"' not in screen, "背包屏自己拆 JSON")
 want("ShowConfirm(" in screen, "丢弃没有走确认弹窗")
-want('"丢弃 "' in screen or '"丢弃 " +' in screen, "背包屏没有丢弃按钮")
+# D9 之后按钮文案在 config/ui_text/UiBagScreen.json，屏上只留常量引用。
+want(ui_text_ref_like(root, "UiBagScreen", "丢弃") is not None, "背包屏没有丢弃按钮")
 
 net = read("client/MMOGame/Assets/Net/CharacterBag.cs")
 for token in ("MoveBody", "DiscardBody", "SortBody", "UseBatchBody"):

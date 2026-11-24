@@ -1,0 +1,127 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiHeroCodexSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiHeroCodexSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "乔小满"
+    },
+    {
+      "key": "T002",
+      "text": "苏晚织"
+    },
+    {
+      "key": "T003",
+      "text": "阮青"
+    },
+    {
+      "key": "T004",
+      "text": "阿弦"
+    },
+    {
+      "key": "T005",
+      "text": "闻嫂"
+    },
+    {
+      "key": "T006",
+      "text": "孟七"
+    },
+    {
+      "key": "T007",
+      "text": "澄川"
+    },
+    {
+      "key": "T008",
+      "text": "灰生"
+    },
+    {
+      "key": "T009",
+      "text": "周晚棠"
+    },
+    {
+      "key": "T010",
+      "text": "英灵图鉴"
+    },
+    {
+      "key": "T011",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T012",
+      "text": "读取图鉴"
+    },
+    {
+      "key": "T013",
+      "text": "还没有回包"
+    },
+    {
+      "key": "T014",
+      "text": "已收集"
+    },
+    {
+      "key": "T015",
+      "text": "回包 9 条"
+    },
+    {
+      "key": "T016",
+      "text": "回包 收集 6 / 9 · 万分比 6666 · 被动合计 150 bps · life_assist"
+    },
+    {
+      "key": "T017",
+      "text": "已接 /hero-codex"
+    },
+    {
+      "key": "T018",
+      "text": "\\n已收集 · 被动 20 bps"
+    },
+    {
+      "key": "T019",
+      "text": "\\n已收集 · 被动 30 bps"
+    },
+    {
+      "key": "T020",
+      "text": "\\n未收集 · 被动 0 bps"
+    },
+    {
+      "key": "T021",
+      "text": "被动合计 150 bps"
+    },
+    {
+      "key": "T022",
+      "text": "主线场次 main_stage = 3"
+    },
+    {
+      "key": "T023",
+      "text": "被动种类 passive_kind = life_assist"
+    },
+    {
+      "key": "T024",
+      "text": "回包 收集 8 / 9 · 万分比 8888 · 被动合计 220 bps"
+    },
+    {
+      "key": "T025",
+      "text": "\\n已收集 · 被动 35 bps"
+    },
+    {
+      "key": "T026",
+      "text": "回包里没有条目 · 不补编一位"
+    },
+    {
+      "key": "T027",
+      "text": "服务端这次没给条目（entry_count=0）"
+    },
+    {
+      "key": "T028",
+      "text": "图鉴没读到：404"
+    },
+    {
+      "key": "T029",
+      "text": "再读一次"
+    },
+    {
+      "key": "T030",
+      "text": "没读到"
+    }
+  ]
+}

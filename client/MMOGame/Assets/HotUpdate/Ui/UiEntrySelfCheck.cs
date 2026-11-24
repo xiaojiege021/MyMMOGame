@@ -147,7 +147,7 @@ namespace HotUpdate.Ui
             for (var i = 0; i < labels.Length; i++)
             {
                 if (labels[i].name == "Label" && labels[i].text.Length > 0
-                    && labels[i].text != "登 入" && labels[i].text != "正在校验")
+                    && labels[i].text != UiStrings.UiEntrySelfCheck.T001 && labels[i].text != UiStrings.UiEntrySelfCheck.T002)
                 {
                     // 提示是屏上唯一会随回包变化的短句，按文案表比对即可。
                     if (labels[i].text == UiEntryFlow.HintOf(EntryKind.InvalidCredentials)
@@ -264,10 +264,10 @@ namespace HotUpdate.Ui
             Report("create_incomplete_no_request", Sent.Count == before);
 
             // 齐了才发，且请求里分支为空、不带等级与境界。
-            Reply(200, "{\"character_id\":12,\"name\":\"顾长息\",\"race\":\"chen\","
+            Reply(200, UiStrings.UiEntrySelfCheck.T003
                        + "\"class\":\"warrior\",\"level\":1,\"realm\":\"\"}");
-            flow.FillName("顾长息");
-            flow.SubmitCreate("chen", "warrior", "顾长息");
+            flow.FillName(UiStrings.UiEntrySelfCheck.T004);
+            flow.SubmitCreate("chen", "warrior", UiStrings.UiEntrySelfCheck.T004);
             var branchEmpty = _lastBody.Contains("\"branch\":\"\"");
             var noLevel = !_lastBody.Contains("level") && !_lastBody.Contains("realm");
             var appearanceOk = _lastBody.Contains("\\\"body\\\":\\\"common\\\"");
@@ -294,7 +294,7 @@ namespace HotUpdate.Ui
                 }
             }
 
-            Report("roster_rows", texts.Contains("在世") && texts.Contains("未开启"));
+            Report("roster_rows", texts.Contains(UiStrings.UiEntrySelfCheck.T005) && texts.Contains(UiStrings.UiEntrySelfCheck.T006));
 
             flow.EnterChosen();
             Report("loading_page", flow.Current == UiEntryFlow.Step.Loading && !flow.Entered);

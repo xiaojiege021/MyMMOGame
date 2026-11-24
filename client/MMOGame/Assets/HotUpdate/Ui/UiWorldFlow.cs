@@ -151,19 +151,19 @@ namespace HotUpdate.Ui
             switch (which)
             {
                 case "map":
-                    shell.ShowPage("世界地图", s => UiWorldMapScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldFlow.T001, s => UiWorldMapScreen.Build(s, flow));
                     break;
                 case "dialogue":
-                    shell.ShowPage("对白", s => UiDialogueScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldFlow.T002, s => UiDialogueScreen.Build(s, flow));
                     break;
                 case "gather":
-                    shell.ShowPage("采集", s => UiGatherScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldFlow.T003, s => UiGatherScreen.Build(s, flow));
                     break;
                 case "fly":
-                    shell.ShowPage("飞行", s => UiFlightScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldFlow.T004, s => UiFlightScreen.Build(s, flow));
                     break;
                 default:
-                    shell.ShowPage("表世界", s => UiWorldHudScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldFlow.T005, s => UiWorldHudScreen.Build(s, flow));
                     break;
             }
 

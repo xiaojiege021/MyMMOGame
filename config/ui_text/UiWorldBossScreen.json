@@ -1,0 +1,91 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiWorldBossScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiWorldBossScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "入口 / 名额 / 三个时长都读世界服回包 · 客户端不算名额、不折时区"
+    },
+    {
+      "key": "T002",
+      "text": "入口还没读 · 点「读取入口」问世界服"
+    },
+    {
+      "key": "T003",
+      "text": "入口"
+    },
+    {
+      "key": "T004",
+      "text": "入口未定"
+    },
+    {
+      "key": "T005",
+      "text": "尚未读取"
+    },
+    {
+      "key": "T006",
+      "text": "这一场已打掉"
+    },
+    {
+      "key": "T007",
+      "text": "这一场还开着"
+    },
+    {
+      "key": "T008",
+      "text": "这一刻没开："
+    },
+    {
+      "key": "T009",
+      "text": "原因没给"
+    },
+    {
+      "key": "T010",
+      "text": "已进 "
+    },
+    {
+      "key": "T011",
+      "text": " · 还能进 "
+    },
+    {
+      "key": "T012",
+      "text": "名额看回包"
+    },
+    {
+      "key": "T013",
+      "text": "三个时长（只作说明）"
+    },
+    {
+      "key": "T014",
+      "text": "记名后保留 "
+    },
+    {
+      "key": "T015",
+      "text": " 秒 · 续期 "
+    },
+    {
+      "key": "T016",
+      "text": " 秒 · 掉了 "
+    },
+    {
+      "key": "T017",
+      "text": " 秒算丢"
+    },
+    {
+      "key": "T018",
+      "text": "还没读到入口"
+    },
+    {
+      "key": "T019",
+      "text": "归属"
+    },
+    {
+      "key": "T020",
+      "text": "读取入口"
+    },
+    {
+      "key": "T021",
+      "text": "窗口时刻由世界服与 `config/calendar.json` 持有，界面照回包写，不按本地时钟判开没开。"
+    }
+  ]
+}

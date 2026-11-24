@@ -131,29 +131,29 @@ namespace HotUpdate.Ui
             flow.Bind("selftest-token", 7);
             flow.LoadBag();
             Report("bag", flow.HasBag && flow.Bag.Slots.Count == 2
-                && flow.Bag.CharacterName == "自检角色" && flow.Bag.Realm == "炼体"
-                && flow.Bag.DisplayRealm == "炼体");
+                && flow.Bag.CharacterName == UiStrings.UiUpgradeSelfCheck.T001 && flow.Bag.Realm == UiStrings.UiUpgradeSelfCheck.T002
+                && flow.Bag.DisplayRealm == UiStrings.UiUpgradeSelfCheck.T002);
             Debug.Log("u5_self_bag slots=" + (flow.HasBag ? flow.Bag.Slots.Count : -1));
 
             // C2：第十段立魔按服务端给的展示名显示散仙，规范名仍是金仙；老回包没这一格时退回规范名。
             var demon = CharacterBag.Parse(
-                "{\"slots\":[],\"bag_slots\":20,\"realm\":\"金仙\",\"realm_display\":\"散仙\"}");
+                UiStrings.UiUpgradeSelfCheck.T003);
             var old = CharacterBag.Parse(
-                "{\"slots\":[],\"bag_slots\":20,\"realm\":\"金仙\"}");
-            Report("realm_display", demon.Ok && demon.Realm == "金仙" && demon.DisplayRealm == "散仙"
-                && old.DisplayRealm == "金仙");
+                UiStrings.UiUpgradeSelfCheck.T004);
+            Report("realm_display", demon.Ok && demon.Realm == UiStrings.UiUpgradeSelfCheck.T005 && demon.DisplayRealm == UiStrings.UiUpgradeSelfCheck.T006
+                && old.DisplayRealm == UiStrings.UiUpgradeSelfCheck.T005);
             Debug.Log("u5_self_realm_display realm=" + demon.Realm
                 + " display=" + demon.DisplayRealm + " fallback=" + old.DisplayRealm);
 
             // 七屏都能建起来。
             var built = 0;
-            built += Build(shell, flow, "角色与装备", (s, f) => UiCharacterScreen.Build(s, f));
-            built += Build(shell, flow, "背包", (s, f) => UiBagScreen.Build(s, f));
-            built += Build(shell, flow, "强化", (s, f) => UiEnhanceScreen.Build(s, f));
-            built += Build(shell, flow, "强化转移", (s, f) => UiTransferScreen.Build(s, f));
-            built += Build(shell, flow, "能量结晶", (s, f) => UiCrystalScreen.Build(s, f));
-            built += Build(shell, flow, "技能与分支", (s, f) => UiSkillScreen.Build(s, f));
-            built += Build(shell, flow, "境界突破", (s, f) => UiRealmScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T007, (s, f) => UiCharacterScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T008, (s, f) => UiBagScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T009, (s, f) => UiEnhanceScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T010, (s, f) => UiTransferScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T011, (s, f) => UiCrystalScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T012, (s, f) => UiSkillScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T013, (s, f) => UiRealmScreen.Build(s, f));
             Report("seven", built == 7);
             Debug.Log("u5_self_seven=" + built);
 
@@ -188,19 +188,19 @@ namespace HotUpdate.Ui
 
             // U13：段内阶只读回包，升一阶只发角色号，门槛照回包写、被拒不改屏上那一阶。
             Report("realm_pending",
-                CharacterRealmPhase.PhaseLine(false, default(RealmPhaseOutcome)) == "尚未请求");
+                CharacterRealmPhase.PhaseLine(false, default(RealmPhaseOutcome)) == UiStrings.UiUpgradeSelfCheck.T014);
 
             flow.LoadRealmPhase();
             var rp = flow.LastRealmPhase;
-            Report("realm_phase", flow.RealmPhaseRequested && rp.Ok && rp.Realm == "炼体"
-                && rp.Phase == 0 && rp.PhaseName == "一阶" && rp.PassivePctBps == 0);
+            Report("realm_phase", flow.RealmPhaseRequested && rp.Ok && rp.Realm == UiStrings.UiUpgradeSelfCheck.T002
+                && rp.Phase == 0 && rp.PhaseName == UiStrings.UiUpgradeSelfCheck.T015 && rp.PassivePctBps == 0);
             Debug.Log("u5_self_realm_phase phase=" + rp.Phase + " name=" + rp.PhaseName
                 + " bps=" + rp.PassivePctBps);
 
             flow.PromoteRealmPhase();
             var po = flow.LastPromote;
             Report("promote_ok", po.Ok && po.FromPhase == 0 && po.ToPhase == 1
-                && po.PhaseName == "二阶" && po.PassivePctBps == 30
+                && po.PhaseName == UiStrings.UiUpgradeSelfCheck.T016 && po.PassivePctBps == 30
                 && flow.LastRealmPhase.Phase == 1 && flow.LastRealmPhase.PassivePctBps == 30);
             Debug.Log("u5_self_promote_ok from=" + po.FromPhase + " to=" + po.ToPhase
                 + " name=" + po.PhaseName + " bps=" + po.PassivePctBps);
@@ -268,7 +268,7 @@ namespace HotUpdate.Ui
                 + " body=" + _unequipBody);
 
             // 切皮肤只换颜色：布局与文案一字不差。
-            shell.ShowPage("强化", s => UiEnhanceScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T009, s => UiEnhanceScreen.Build(s, flow));
             var lightLayout = Layout(shell);
             var lightText = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);
@@ -342,8 +342,8 @@ namespace HotUpdate.Ui
             "\"equipped_slot\":\"weapon\"}," +
             "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true," +
             "\"equipped_slot\":\"\"}]," +
-            "\"bag_slots\":40,\"character_name\":\"自检角色\",\"realm\":\"炼体\"," +
-            "\"realm_display\":\"炼体\"}";
+            UiStrings.UiUpgradeSelfCheck.T017 +
+            UiStrings.UiUpgradeSelfCheck.T018;
 
         // Q10：合并成功 / 同号重放的丢弃 / 排完两份 / 连用被拒。字段形状与网关回包一致。
         const string MoveOkJson =
@@ -398,17 +398,17 @@ namespace HotUpdate.Ui
             "\"bound\":false,\"duplicate\":false}";
 
         const string RealmPhaseJson =
-            "{\"ok\":true,\"character_id\":7,\"realm\":\"炼体\",\"realm_phase\":0," +
-            "\"phase_name\":\"一阶\",\"passive_pct_bps\":0}";
+            UiStrings.UiUpgradeSelfCheck.T019 +
+            UiStrings.UiUpgradeSelfCheck.T020;
 
         const string PromoteOkJson =
             "{\"ok\":true,\"reason\":\"\",\"txn_id\":\"realm_phase:selftest-a\",\"character_id\":7," +
-            "\"from_phase\":0,\"to_phase\":1,\"phase_name\":\"二阶\",\"passive_pct_bps\":30," +
+            UiStrings.UiUpgradeSelfCheck.T021 +
             "\"level\":6,\"level_required\":11,\"duplicate\":false}";
 
         const string PromoteRejectJson =
             "{\"ok\":false,\"reason\":\"level_not_enough\",\"txn_id\":\"realm_phase:selftest-b\"," +
-            "\"character_id\":7,\"from_phase\":1,\"to_phase\":1,\"phase_name\":\"二阶\"," +
+            UiStrings.UiUpgradeSelfCheck.T022 +
             "\"passive_pct_bps\":30,\"level\":3,\"level_required\":11,\"duplicate\":false}";
     }
 }

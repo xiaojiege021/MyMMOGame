@@ -66,19 +66,19 @@ namespace HotUpdate.Ui
             switch (Enter.Kind)
             {
                 case WorldEnterKind.Entered:
-                    return Enter.RegionId + " · 第 " + Enter.LineNo + " 线"
-                        + " · " + Enter.LineSize + " / " + Enter.LineCapacity + " 人"
-                        + (Enter.Duplicate ? " · 原来就在这条线" : string.Empty);
+                    return Enter.RegionId + UiStrings.WorldHud.T001 + Enter.LineNo + UiStrings.WorldHud.T002
+                        + " · " + Enter.LineSize + " / " + Enter.LineCapacity + UiStrings.WorldHud.T003
+                        + (Enter.Duplicate ? UiStrings.WorldHud.T004 : string.Empty);
                 case WorldEnterKind.Refused:
-                    return "没进去 · " + UiWorldCodex.ReasonText(Enter.Reason);
+                    return UiStrings.WorldHud.T005 + UiWorldCodex.ReasonText(Enter.Reason);
                 case WorldEnterKind.Network:
-                    return "连不上网关 · 检查网络再试";
+                    return UiStrings.WorldHud.T006;
                 case WorldEnterKind.InvalidToken:
-                    return "令牌失效 · 回登录重来";
+                    return UiStrings.WorldHud.T007;
                 case WorldEnterKind.Unavailable:
-                    return "世界服暂时不可用 · 稍后再试";
+                    return UiStrings.WorldHud.T008;
                 default:
-                    return "进分线没成 · " + Enter.Error;
+                    return UiStrings.WorldHud.T009 + Enter.Error;
             }
         }
 
@@ -92,15 +92,15 @@ namespace HotUpdate.Ui
 
             if (RegionReply.Ok)
             {
-                return "已到 " + RegionReply.RegionId
-                    + (RegionReply.LineId.Length > 0 ? " · 第 " + RegionReply.LineNo + " 线" : string.Empty);
+                return UiStrings.WorldHud.T010 + RegionReply.RegionId
+                    + (RegionReply.LineId.Length > 0 ? UiStrings.WorldHud.T001 + RegionReply.LineNo + UiStrings.WorldHud.T002 : string.Empty);
             }
 
             var tail = RegionReply.RequiredRealm.Length > 0
-                ? "（这块地表要 " + RegionReply.RequiredRealm + "）"
+                ? UiStrings.WorldHud.T011 + RegionReply.RequiredRealm + "）"
                 : string.Empty;
-            return "没跨成 · " + UiWorldCodex.ReasonText(RegionReply.Reason) + tail
-                + (RegionId.Length > 0 ? " · 仍在 " + RegionId : string.Empty);
+            return UiStrings.WorldHud.T012 + UiWorldCodex.ReasonText(RegionReply.Reason) + tail
+                + (RegionId.Length > 0 ? UiStrings.WorldHud.T013 + RegionId : string.Empty);
         }
 
         /// <summary>采集那行。产物与数量照抄回包，没回包就写「尚未采集」。</summary>
@@ -114,11 +114,11 @@ namespace HotUpdate.Ui
             if (GatherReply.Ok)
             {
                 return GatherReply.DisplayText
-                    + " · 入格位 " + GatherReply.BagSlot
-                    + (GatherReply.RespawnSeconds > 0 ? " · " + GatherReply.RespawnSeconds + " 秒后刷新" : string.Empty);
+                    + UiStrings.WorldHud.T014 + GatherReply.BagSlot
+                    + (GatherReply.RespawnSeconds > 0 ? " · " + GatherReply.RespawnSeconds + UiStrings.WorldHud.T015 : string.Empty);
             }
 
-            return "没采到 · " + UiWorldCodex.ReasonText(GatherReply.Reason);
+            return UiStrings.WorldHud.T016 + UiWorldCodex.ReasonText(GatherReply.Reason);
         }
 
         /// <summary>飞行那行。成功后写回包高度，失败写原因与拉回后的高度。</summary>
@@ -131,22 +131,22 @@ namespace HotUpdate.Ui
 
             if (FlyReply.Ok)
             {
-                return (FlyReply.Flying ? "已起飞" : "已落地")
-                    + " · 高度 " + FlyReply.Y.ToString("0.##")
-                    + " · 境界 " + (FlyReply.Realm.Length > 0 ? FlyReply.Realm : "—");
+                return (FlyReply.Flying ? UiStrings.WorldHud.T017 : UiStrings.WorldHud.T018)
+                    + UiStrings.WorldHud.T019 + FlyReply.Y.ToString("0.##")
+                    + UiStrings.WorldHud.T020 + (FlyReply.Realm.Length > 0 ? FlyReply.Realm : "—");
             }
 
-            return "飞不起来 · " + UiWorldCodex.ReasonText(FlyReply.Reason)
-                + (FlyReply.RequiredRealm.Length > 0 ? "（要 " + FlyReply.RequiredRealm + "）" : string.Empty)
-                + " · 已回到地面高度 " + FlyReply.Y.ToString("0.##");
+            return UiStrings.WorldHud.T021 + UiWorldCodex.ReasonText(FlyReply.Reason)
+                + (FlyReply.RequiredRealm.Length > 0 ? UiStrings.WorldHud.T022 + FlyReply.RequiredRealm + "）" : string.Empty)
+                + UiStrings.WorldHud.T023 + FlyReply.Y.ToString("0.##");
         }
 
         /// <summary>屏上写的高度，与 <see cref="ScreenY"/> 同源。</summary>
         public string YLine()
         {
             return HasFly
-                ? "画面高度 " + ScreenY.ToString("0.##") + " · 拖尾 " + (TrailAllowed ? "开" : "关")
-                : "画面高度以回包为准 · 拖尾只在能飞时开";
+                ? UiStrings.WorldHud.T024 + ScreenY.ToString("0.##") + UiStrings.WorldHud.T025 + (TrailAllowed ? UiStrings.WorldHud.T026 : UiStrings.WorldHud.T027)
+                : UiStrings.WorldHud.T028;
         }
     }
 }

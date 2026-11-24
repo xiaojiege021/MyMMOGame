@@ -41,9 +41,11 @@ if [ -z "$PYBIN" ]; then
   bad "找不到 python3"
 else
   ROOT="$ROOT" "$PYBIN" - >"$TMP/static.out" 2>&1 <<'PY'
-import json, os
+import json, os, sys
 
 root = os.environ["ROOT"]
+sys.path.insert(0, os.path.join(root, "tools/check"))
+from lib_read import ui_text_assert
 
 def read(rel):
     _sub = {"UiShell.cs": "Shell", "UiSocialFlow.cs": "Flow", "UiWorldFlow.cs": "World", "BattleHud.cs": "Hud", "BattleClient.cs": "Session", "WorldEntry.cs": "WorldEntry", "CharacterApi.cs": "Api/Character", "SectApi.cs": "Api/Sect", "WorldApi.cs": "Api/World", "SectRepository.cs": "Sect", "SocialGrpcService.cs": "Grpc", "WorldGrpcService.cs": "Grpc", "Program.cs": "Cli"}
@@ -70,7 +72,8 @@ assert "/world/gather/nodes" in gateway and "ListGatherNodesAsync" in gateway
 assert "ListGatherNodes" in world
 assert "ParseList" in net and "GatherNodeRow" in net
 assert "LoadGatherNodes" in flow and "/world/gather/nodes" in flow
-assert "n4_gather_screen=ready" in screen and "读取节点表" in screen
+assert "n4_gather_screen=ready" in screen
+ui_text_assert(root, "UiGatherScreen", "读取节点表", screen, "采集屏")
 assert "NoGatherNodesYet" in codex
 assert "static readonly GatherNode[] Nodes" not in codex
 assert "ore_kulan_1" not in codex or "Id = \"ore_kulan_1\"" not in codex

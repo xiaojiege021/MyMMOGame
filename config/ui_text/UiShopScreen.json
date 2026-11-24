@@ -1,0 +1,123 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiShopScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiShopScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "已选："
+    },
+    {
+      "key": "T002",
+      "text": "能买的"
+    },
+    {
+      "key": "T003",
+      "text": "购买"
+    },
+    {
+      "key": "T004",
+      "text": "买一个不在清单里的"
+    },
+    {
+      "key": "T005",
+      "text": "回包"
+    },
+    {
+      "key": "T006",
+      "text": "结果"
+    },
+    {
+      "key": "T007",
+      "text": "已买到"
+    },
+    {
+      "key": "T008",
+      "text": "被拒："
+    },
+    {
+      "key": "T009",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T010",
+      "text": "标价 / 实扣"
+    },
+    {
+      "key": "T011",
+      "text": "余额"
+    },
+    {
+      "key": "T012",
+      "text": "发到背包"
+    },
+    {
+      "key": "T013",
+      "text": " · 第 "
+    },
+    {
+      "key": "T014",
+      "text": " 格"
+    },
+    {
+      "key": "T015",
+      "text": "没发"
+    },
+    {
+      "key": "T016",
+      "text": "绑定"
+    },
+    {
+      "key": "T017",
+      "text": "状态"
+    },
+    {
+      "key": "T018",
+      "text": "NPC 商店："
+    },
+    {
+      "key": "T019",
+      "text": "没有 NPC 商店"
+    },
+    {
+      "key": "T020",
+      "text": "看货架"
+    },
+    {
+      "key": "T021",
+      "text": "买第一件"
+    },
+    {
+      "key": "T022",
+      "text": "卖第 1 格"
+    },
+    {
+      "key": "T023",
+      "text": "回购最近"
+    },
+    {
+      "key": "T024",
+      "text": "修理"
+    },
+    {
+      "key": "T025",
+      "text": "NPC 回包"
+    },
+    {
+      "key": "T026",
+      "text": "货架"
+    },
+    {
+      "key": "T027",
+      "text": "最后一件"
+    },
+    {
+      "key": "T028",
+      "text": "身上耐久"
+    },
+    {
+      "key": "T029",
+      "text": "只修身上三件 · 修理单价 "
+    }
+  ]
+}

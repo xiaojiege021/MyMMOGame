@@ -1,0 +1,35 @@
+{
+  "schema": "ui-text/1",
+  "group": "HudRefresh",
+  "source": "client/MMOGame/Assets/HotUpdate/Hud/HudRefresh.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "倒地 · "
+    },
+    {
+      "key": "T002",
+      "text": "切换 "
+    },
+    {
+      "key": "T003",
+      "text": "换职业"
+    },
+    {
+      "key": "T004",
+      "text": "回包：命中 -"
+    },
+    {
+      "key": "T005",
+      "text": "被拒："
+    },
+    {
+      "key": "T006",
+      "text": "回包：这一场结束"
+    },
+    {
+      "key": "T007",
+      "text": "阶段："
+    }
+  ]
+}

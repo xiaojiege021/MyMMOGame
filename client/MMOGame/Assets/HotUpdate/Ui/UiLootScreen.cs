@@ -70,7 +70,7 @@ namespace HotUpdate.Ui
 
             var footTop = rowTop + rows.Count * (rowH + rowGap) + m.Px(8f);
             shell.Label(new Rect(pad, m.Height - footTop - m.Px(64f), m.Width - pad * 2f, m.Px(64f)),
-                "归属与点数都在战斗服 · 这一屏只发意图、只公布结果",
+                UiStrings.UiLootScreen.T001,
                 UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             Debug.Log(UiLootCodex.ReadyLog + " rows=" + shown + " mode=" + flow.Mode

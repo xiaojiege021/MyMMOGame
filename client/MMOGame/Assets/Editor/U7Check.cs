@@ -157,8 +157,10 @@ public static class U7Check
         // U9 接了摆放口、U10 接了种植与家园币、U11 接了图鉴、U12 接了竞技场与战场进场。
         // 这里只认「接线后的入口在不在」，不写「已接 / 未接」这种会过期的话。
         Report("wired_entries",
-            homestead.Contains("读取种植") && hero.Contains("读取图鉴")
-            && arenaScreen.Contains("进竞技场") && arenaScreen.Contains("EnterBattlefield"),
+            UiTextRef.In(root, homestead, "UiHomesteadScreen", "读取种植")
+            && UiTextRef.In(root, hero, "UiHeroCodexScreen", "读取图鉴")
+            && UiTextRef.In(root, arenaScreen, "UiArenaScreen", "进竞技场")
+            && arenaScreen.Contains("EnterBattlefield"),
             "种植块、图鉴块或进场口没接回包");
     }
 

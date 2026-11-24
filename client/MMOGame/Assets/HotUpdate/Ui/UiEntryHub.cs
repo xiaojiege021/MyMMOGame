@@ -81,7 +81,7 @@ namespace HotUpdate.Ui
             BindFlows(shell);
             var world = UiWorldFlow.Ensure(shell);
             world.Configure(_token, _characterId);
-            shell.ShowPage("表世界", s => UiWorldHudScreen.Build(s, world));
+            shell.ShowPage(UiStrings.UiEntryHub.T001, s => UiWorldHudScreen.Build(s, world));
             Debug.Log(ReadyLog + " world character=" + _characterId);
         }
 
@@ -126,14 +126,14 @@ namespace HotUpdate.Ui
                     OpenDungeon(shell, "dungeon");
                     break;
                 case 6:
-                    shell.ShowPage("世界地图", s =>
+                    shell.ShowPage(UiStrings.UiEntryHub.T002, s =>
                     {
                         DrawWorldNav(s);
                         UiWorldMapScreen.Build(s, world ?? UiWorldFlow.Ensure(s));
                     });
                     break;
                 default:
-                    shell.Toast("没有这一格");
+                    shell.Toast(UiStrings.UiEntryHub.T003);
                     break;
             }
         }
@@ -147,25 +147,25 @@ namespace HotUpdate.Ui
             switch (which)
             {
                 case "bag":
-                    shell.ShowPage("背包", s => { DrawUpgradeNav(s, "bag"); UiBagScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T004, s => { DrawUpgradeNav(s, "bag"); UiBagScreen.Build(s, flow); });
                     break;
                 case "enhance":
-                    shell.ShowPage("强化", s => { DrawUpgradeNav(s, "enhance"); UiEnhanceScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T005, s => { DrawUpgradeNav(s, "enhance"); UiEnhanceScreen.Build(s, flow); });
                     break;
                 case "transfer":
-                    shell.ShowPage("强化转移", s => { DrawUpgradeNav(s, "transfer"); UiTransferScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T006, s => { DrawUpgradeNav(s, "transfer"); UiTransferScreen.Build(s, flow); });
                     break;
                 case "crystal":
-                    shell.ShowPage("能量结晶", s => { DrawUpgradeNav(s, "crystal"); UiCrystalScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T007, s => { DrawUpgradeNav(s, "crystal"); UiCrystalScreen.Build(s, flow); });
                     break;
                 case "skill":
-                    shell.ShowPage("技能与分支", s => { DrawUpgradeNav(s, "skill"); UiSkillScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T008, s => { DrawUpgradeNav(s, "skill"); UiSkillScreen.Build(s, flow); });
                     break;
                 case "realm":
-                    shell.ShowPage("境界突破", s => { DrawUpgradeNav(s, "realm"); UiRealmScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T009, s => { DrawUpgradeNav(s, "realm"); UiRealmScreen.Build(s, flow); });
                     break;
                 default:
-                    shell.ShowPage("角色与装备", s => { DrawUpgradeNav(s, "character"); UiCharacterScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T010, s => { DrawUpgradeNav(s, "character"); UiCharacterScreen.Build(s, flow); });
                     break;
             }
         }
@@ -177,16 +177,16 @@ namespace HotUpdate.Ui
             switch (which)
             {
                 case "auction":
-                    shell.ShowPage("拍卖与寄售", s => { DrawCommerceNav(s, "auction"); UiAuctionScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T011, s => { DrawCommerceNav(s, "auction"); UiAuctionScreen.Build(s, flow); });
                     break;
                 case "currency":
-                    shell.ShowPage("货币", s => { DrawCommerceNav(s, "currency"); UiCurrencyScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T012, s => { DrawCommerceNav(s, "currency"); UiCurrencyScreen.Build(s, flow); });
                     break;
                 case "pass":
-                    shell.ShowPage("赛季通行证", s => { DrawCommerceNav(s, "pass"); UiPassScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T013, s => { DrawCommerceNav(s, "pass"); UiPassScreen.Build(s, flow); });
                     break;
                 default:
-                    shell.ShowPage("商城", s => { DrawCommerceNav(s, "shop"); UiShopScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T014, s => { DrawCommerceNav(s, "shop"); UiShopScreen.Build(s, flow); });
                     break;
             }
         }
@@ -198,29 +198,29 @@ namespace HotUpdate.Ui
             switch (which)
             {
                 case "siege":
-                    shell.ShowPage("领地城战", s => { DrawSocialNav(s, "siege"); UiSiegeScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T015, s => { DrawSocialNav(s, "siege"); UiSiegeScreen.Build(s, flow); });
                     break;
                 case "arena":
-                    shell.ShowPage("竞技场与战场", s => { DrawSocialNav(s, "arena"); UiArenaScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T016, s => { DrawSocialNav(s, "arena"); UiArenaScreen.Build(s, flow); });
                     break;
                 case "homestead":
-                    shell.ShowPage("家园洞府", s => { DrawSocialNav(s, "homestead"); UiHomesteadScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T017, s => { DrawSocialNav(s, "homestead"); UiHomesteadScreen.Build(s, flow); });
                     break;
                 case "codex":
-                    shell.ShowPage("英灵图鉴", s => { DrawSocialNav(s, "codex"); UiHeroCodexScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T018, s => { DrawSocialNav(s, "codex"); UiHeroCodexScreen.Build(s, flow); });
                     break;
                 case "party":
                 {
                     var partyFlow = UiPartyFlow.Ensure(shell);
                     partyFlow.Bind(_token, _characterId);
-                    shell.ShowPage("组队", s => { DrawSocialNav(s, "party"); UiPartyRoomScreen.Build(s, partyFlow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T019, s => { DrawSocialNav(s, "party"); UiPartyRoomScreen.Build(s, partyFlow); });
                     break;
                 }
                 case "boss":
-                    shell.ShowPage("世界 Boss 入口", s => { DrawSocialNav(s, "boss"); UiWorldBossScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T020, s => { DrawSocialNav(s, "boss"); UiWorldBossScreen.Build(s, flow); });
                     break;
                 default:
-                    shell.ShowPage("宗门", s => { DrawSocialNav(s, "sect"); UiSectScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T021, s => { DrawSocialNav(s, "sect"); UiSectScreen.Build(s, flow); });
                     break;
             }
         }
@@ -232,25 +232,25 @@ namespace HotUpdate.Ui
             switch (which)
             {
                 case "party":
-                    shell.ShowPage("小队", s => { DrawDungeonNav(s, "party"); UiPartyScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T022, s => { DrawDungeonNav(s, "party"); UiPartyScreen.Build(s, flow); });
                     break;
                 case "settle":
-                    shell.ShowPage("战斗结算", s => { DrawDungeonNav(s, "settle"); UiSettleScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T023, s => { DrawDungeonNav(s, "settle"); UiSettleScreen.Build(s, flow); });
                     break;
                 case "loot":
                 {
                     var loot = UiLootFlow.Ensure();
-                    shell.ShowPage("掉落归属", s => { DrawDungeonNav(s, "loot"); UiLootScreen.Build(s, loot); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T024, s => { DrawDungeonNav(s, "loot"); UiLootScreen.Build(s, loot); });
                     break;
                 }
                 case "reconnect":
                 {
                     var back = UiReconnectFlow.Ensure();
-                    shell.ShowPage("断线重连", s => { DrawDungeonNav(s, "reconnect"); UiReconnectScreen.Build(s, back); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T025, s => { DrawDungeonNav(s, "reconnect"); UiReconnectScreen.Build(s, back); });
                     break;
                 }
                 default:
-                    shell.ShowPage("裂隙", s => { DrawDungeonNav(s, "dungeon"); UiDungeonScreen.Build(s, flow); });
+                    shell.ShowPage(UiStrings.UiEntryHub.T026, s => { DrawDungeonNav(s, "dungeon"); UiDungeonScreen.Build(s, flow); });
                     break;
             }
         }
@@ -261,9 +261,9 @@ namespace HotUpdate.Ui
         {
             DrawNav(shell, new[]
             {
-                ("角色", "character"), ("背包", "bag"), ("强化", "enhance"),
-                ("转移", "transfer"), ("结晶", "crystal"), ("技能", "skill"),
-                ("境界", "realm"), ("返回", "world"),
+                (UiStrings.UiEntryHub.T027, "character"), (UiStrings.UiEntryHub.T004, "bag"), (UiStrings.UiEntryHub.T005, "enhance"),
+                (UiStrings.UiEntryHub.T028, "transfer"), (UiStrings.UiEntryHub.T029, "crystal"), (UiStrings.UiEntryHub.T030, "skill"),
+                (UiStrings.UiEntryHub.T031, "realm"), (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {
                 if (which == "world")
@@ -280,8 +280,8 @@ namespace HotUpdate.Ui
         {
             DrawNav(shell, new[]
             {
-                ("商城", "shop"), ("拍卖", "auction"), ("货币", "currency"),
-                ("通行证", "pass"), ("返回", "world"),
+                (UiStrings.UiEntryHub.T014, "shop"), (UiStrings.UiEntryHub.T033, "auction"), (UiStrings.UiEntryHub.T012, "currency"),
+                (UiStrings.UiEntryHub.T034, "pass"), (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {
                 if (which == "world")
@@ -298,9 +298,9 @@ namespace HotUpdate.Ui
         {
             DrawNav(shell, new[]
             {
-                ("宗门", "sect"), ("城战", "siege"), ("竞技", "arena"),
-                ("洞府", "homestead"), ("图鉴", "codex"), ("组队", "party"),
-                ("Boss", "boss"), ("返回", "world"),
+                (UiStrings.UiEntryHub.T021, "sect"), (UiStrings.UiEntryHub.T035, "siege"), (UiStrings.UiEntryHub.T036, "arena"),
+                (UiStrings.UiEntryHub.T037, "homestead"), (UiStrings.UiEntryHub.T038, "codex"), (UiStrings.UiEntryHub.T019, "party"),
+                ("Boss", "boss"), (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {
                 if (which == "world")
@@ -317,8 +317,8 @@ namespace HotUpdate.Ui
         {
             DrawNav(shell, new[]
             {
-                ("裂隙", "dungeon"), ("小队", "party"), ("掷点", "loot"),
-                ("重连", "reconnect"), ("结算", "settle"), ("返回", "world"),
+                (UiStrings.UiEntryHub.T026, "dungeon"), (UiStrings.UiEntryHub.T022, "party"), (UiStrings.UiEntryHub.T039, "loot"),
+                (UiStrings.UiEntryHub.T040, "reconnect"), (UiStrings.UiEntryHub.T041, "settle"), (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {
                 if (which == "world")
@@ -333,7 +333,7 @@ namespace HotUpdate.Ui
 
         static void DrawWorldNav(UiShell shell)
         {
-            DrawNav(shell, new[] { ("返回表世界", "world") }, "world", which => BackToWorld(shell));
+            DrawNav(shell, new[] { (UiStrings.UiEntryHub.T042, "world") }, "world", which => BackToWorld(shell));
         }
 
         static void DrawNav(UiShell shell, (string Label, string Id)[] links, string current, Action<string> onPick)

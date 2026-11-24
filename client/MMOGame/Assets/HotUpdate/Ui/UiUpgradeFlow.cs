@@ -132,14 +132,14 @@ namespace HotUpdate.Ui
                 {
                     Bag = BagOutcome.Failure("status_" + status);
                     HasBag = false;
-                    Error = "背包没读到：" + status;
+                    Error = UiStrings.UiUpgradeFlow.T001 + status;
                     Debug.Log("u5_bag=reject status=" + status);
                 }
                 else
                 {
                     Bag = CharacterBag.Parse(text);
                     HasBag = Bag.Ok;
-                    Error = Bag.Ok ? string.Empty : "背包回包读不出来";
+                    Error = Bag.Ok ? string.Empty : UiStrings.UiUpgradeFlow.T002;
                     Debug.Log("u5_bag=" + (Bag.Ok ? "ok" : "reject")
                         + " slots=" + (Bag.Slots != null ? Bag.Slots.Count : 0)
                         + " bag=" + Bag.BagSlots
@@ -157,7 +157,7 @@ namespace HotUpdate.Ui
         {
             if (_characterId == 0)
             {
-                LastEnhance = new EnhanceOutcome { Reason = "no_character", DisplayText = "还没有角色" };
+                LastEnhance = new EnhanceOutcome { Reason = "no_character", DisplayText = UiStrings.UiUpgradeFlow.T003 };
                 HasEnhance = true;
                 if (done != null) done();
                 return;
@@ -171,7 +171,7 @@ namespace HotUpdate.Ui
                 Busy = false;
                 if (status != 200)
                 {
-                    LastEnhance = new EnhanceOutcome { Reason = "status_" + status, DisplayText = "强化没发出去：" + status };
+                    LastEnhance = new EnhanceOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiUpgradeFlow.T004 + status };
                     Error = LastEnhance.DisplayText;
                     Debug.Log("u5_enhance=reject status=" + status);
                 }
@@ -196,7 +196,7 @@ namespace HotUpdate.Ui
         {
             if (_characterId == 0)
             {
-                LastTransfer = new TransferOutcome { Reason = "no_character", DisplayText = "还没有角色" };
+                LastTransfer = new TransferOutcome { Reason = "no_character", DisplayText = UiStrings.UiUpgradeFlow.T003 };
                 HasTransfer = true;
                 if (done != null) done();
                 return;
@@ -210,7 +210,7 @@ namespace HotUpdate.Ui
                 Busy = false;
                 if (status != 200)
                 {
-                    LastTransfer = new TransferOutcome { Reason = "status_" + status, DisplayText = "转移没发出去：" + status };
+                    LastTransfer = new TransferOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiUpgradeFlow.T005 + status };
                     Error = LastTransfer.DisplayText;
                     Debug.Log("u5_transfer=reject status=" + status);
                 }
@@ -247,7 +247,7 @@ namespace HotUpdate.Ui
         {
             if (_characterId == 0)
             {
-                LastCrystal = new CrystalOutcome { Reason = "no_character", DisplayText = "还没有角色" };
+                LastCrystal = new CrystalOutcome { Reason = "no_character", DisplayText = UiStrings.UiUpgradeFlow.T003 };
                 HasCrystal = true;
                 if (done != null) done();
                 return;
@@ -260,7 +260,7 @@ namespace HotUpdate.Ui
                 Busy = false;
                 if (status != 200)
                 {
-                    LastCrystal = new CrystalOutcome { Reason = "status_" + status, DisplayText = "结晶请求没发出去：" + status };
+                    LastCrystal = new CrystalOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiUpgradeFlow.T006 + status };
                     Error = LastCrystal.DisplayText;
                     Debug.Log("u5_crystal=reject status=" + status);
                 }
@@ -292,7 +292,7 @@ namespace HotUpdate.Ui
             if (_characterId == 0)
             {
                 LastRealmPhase = RealmPhaseOutcome.Failure("no_character");
-                Error = "还没有角色";
+                Error = UiStrings.UiUpgradeFlow.T003;
                 Debug.Log("u13_realm_phase=reject reason=no_character");
                 if (done != null) done();
                 return;
@@ -306,13 +306,13 @@ namespace HotUpdate.Ui
                 if (status != 200)
                 {
                     LastRealmPhase = RealmPhaseOutcome.Failure("status_" + status);
-                    Error = "段内阶没读到：" + status;
+                    Error = UiStrings.UiUpgradeFlow.T007 + status;
                     Debug.Log("u13_realm_phase=reject status=" + status);
                 }
                 else
                 {
                     LastRealmPhase = CharacterRealmPhase.Parse(text);
-                    Error = LastRealmPhase.Ok ? string.Empty : "段内阶回包读不出来";
+                    Error = LastRealmPhase.Ok ? string.Empty : UiStrings.UiUpgradeFlow.T008;
                     Debug.Log("u13_realm_phase=" + (LastRealmPhase.Ok ? "ok" : "reject")
                         + " realm=" + LastRealmPhase.Realm
                         + " phase=" + LastRealmPhase.Phase
@@ -349,13 +349,13 @@ namespace HotUpdate.Ui
                     if (status != 200)
                     {
                         LastPromote = RealmPhaseOutcome.Failure("status_" + status);
-                        Error = "升阶没发出去：" + status;
+                        Error = UiStrings.UiUpgradeFlow.T009 + status;
                         Debug.Log("u13_promote=reject status=" + status);
                     }
                     else
                     {
                         LastPromote = CharacterRealmPhase.Parse(text);
-                        Error = LastPromote.Ok ? string.Empty : "被拒：" + LastPromote.Reason;
+                        Error = LastPromote.Ok ? string.Empty : UiStrings.UiUpgradeFlow.T010 + LastPromote.Reason;
                         Debug.Log("u13_promote=" + (LastPromote.Ok ? "ok" : "reject")
                             + " from=" + LastPromote.FromPhase
                             + " to=" + LastPromote.ToPhase
@@ -376,7 +376,7 @@ namespace HotUpdate.Ui
                         shown.Phase = LastPromote.ToPhase;
                         shown.PhaseName = LastPromote.PhaseName;
                         shown.PassivePctBps = LastPromote.PassivePctBps;
-                        shown.DisplayText = LastPromote.PhaseName + " · 被动 " + LastPromote.PassivePctBps + " bps";
+                        shown.DisplayText = LastPromote.PhaseName + UiStrings.UiUpgradeFlow.T011 + LastPromote.PassivePctBps + " bps";
                         LastRealmPhase = shown;
                         RealmPhaseRequested = true;
                     }
@@ -429,7 +429,7 @@ namespace HotUpdate.Ui
                         LastMove = new MoveOutcome
                         {
                             Reason = "status_" + status,
-                            DisplayText = "移动没发出去：" + status,
+                            DisplayText = UiStrings.UiUpgradeFlow.T012 + status,
                         };
                         Error = LastMove.DisplayText;
                         Debug.Log("q10_move=reject status=" + status);
@@ -465,7 +465,7 @@ namespace HotUpdate.Ui
                         LastDiscard = new DiscardOutcome
                         {
                             Reason = "status_" + status,
-                            DisplayText = "丢弃没发出去：" + status,
+                            DisplayText = UiStrings.UiUpgradeFlow.T013 + status,
                         };
                         Error = LastDiscard.DisplayText;
                         Debug.Log("q10_discard=reject status=" + status);
@@ -498,7 +498,7 @@ namespace HotUpdate.Ui
                         LastSort = new SortOutcome
                         {
                             Reason = "status_" + status,
-                            DisplayText = "排序没发出去：" + status,
+                            DisplayText = UiStrings.UiUpgradeFlow.T014 + status,
                             Slots = new List<BagSlotView>(),
                         };
                         Error = LastSort.DisplayText;
@@ -542,7 +542,7 @@ namespace HotUpdate.Ui
                         LastUseBatch = new UseBatchOutcome
                         {
                             Reason = "status_" + status,
-                            DisplayText = "使用没发出去：" + status,
+                            DisplayText = UiStrings.UiUpgradeFlow.T015 + status,
                         };
                         Error = LastUseBatch.DisplayText;
                         Debug.Log("q10_use=reject status=" + status);
@@ -596,7 +596,7 @@ namespace HotUpdate.Ui
                         LastEquip = new EquipOutcome
                         {
                             Reason = "status_" + status,
-                            DisplayText = "穿戴没发出去：" + status,
+                            DisplayText = UiStrings.UiUpgradeFlow.T016 + status,
                         };
                         Error = LastEquip.DisplayText;
                         Debug.Log("b9_equip=reject status=" + status);
@@ -630,7 +630,7 @@ namespace HotUpdate.Ui
                         LastUnequip = new UnequipOutcome
                         {
                             Reason = "status_" + status,
-                            DisplayText = "脱下没发出去：" + status,
+                            DisplayText = UiStrings.UiUpgradeFlow.T017 + status,
                         };
                         Error = LastUnequip.DisplayText;
                         Debug.Log("b9_unequip=reject status=" + status);
@@ -656,7 +656,7 @@ namespace HotUpdate.Ui
         {
             if (_characterId == 0)
             {
-                Error = "还没有角色";
+                Error = UiStrings.UiUpgradeFlow.T003;
                 Debug.Log("q10_bag=reject reason=no_character path=" + path);
                 if (done != null) done();
                 return;

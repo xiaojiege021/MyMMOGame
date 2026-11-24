@@ -22,10 +22,10 @@ namespace HotUpdate.Ui
         /// <summary>写定规则四行：左边是什么，右边管什么。</summary>
         static readonly string[][] Rules =
         {
-            new[] { "出身", "外观 + 出身对白，无属性" },
-            new[] { "职业", "决定技能与职责" },
-            new[] { "分支", "15 级一转，五职业各两条" },
-            new[] { "境界", "45 级后才开启" },
+            new[] { UiStrings.UiCreateScreen.T001, UiStrings.UiCreateScreen.T002 },
+            new[] { UiStrings.UiCreateScreen.T003, UiStrings.UiCreateScreen.T004 },
+            new[] { UiStrings.UiCreateScreen.T005, UiStrings.UiCreateScreen.T006 },
+            new[] { UiStrings.UiCreateScreen.T007, UiStrings.UiCreateScreen.T008 },
         };
 
         /// <summary>建屏。</summary>
@@ -65,7 +65,7 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 左：出身与名号
 
             shell.Label(m.Band(leftX, top, colW, m.Px(40f)),
-                "出 身 · 四 选 一", UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiCreateScreen.T009, UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, false);
 
             var cardW = (colW - m.Px(24f)) / 2f;
             var cardH = m.Px(150f);
@@ -100,19 +100,19 @@ namespace HotUpdate.Ui
 
             var nameLabelTop = gridTop + cardH * 2f + m.Px(20f) + m.Px(40f);
             shell.Label(m.Band(leftX, nameLabelTop, colW, m.Px(40f)),
-                "名 号 · 至多 " + UiEntryCodex.NameMaxLength + " 字", UiTextRole.Muted,
+                UiStrings.UiCreateScreen.T010 + UiEntryCodex.NameMaxLength + UiStrings.UiCreateScreen.T011, UiTextRole.Muted,
                 shell.Size(24f), TextAnchor.MiddleLeft, false);
 
             var nameRect = m.Band(leftX, nameLabelTop + m.Px(44f), colW, m.Px(112f));
             // 上面已经有一行「名 号」，输入框自己不重复写标签。
-            name = new UiTextField(shell, shell.Content, nameRect, string.Empty, "给这名修士起个名字",
+            name = new UiTextField(shell, shell.Content, nameRect, string.Empty, UiStrings.UiCreateScreen.T012,
                 false, UiEntryCodex.NameMaxLength);
             name.OnChanged = () => sync();
 
             // ---------------------------------------------------------- 右：职责与写定规则
 
             shell.Label(m.Band(rightX, top, colW, m.Px(40f)),
-                "职 责 · 五 选 一", UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiCreateScreen.T013, UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, false);
 
             var chipGap = m.Px(14f);
             var chipW = (colW - chipGap * 4f) / 5f;
@@ -143,13 +143,13 @@ namespace HotUpdate.Ui
             }
 
             shell.Label(m.Band(rightX, chipTop + chipH + m.Px(36f), colW, m.Px(130f)),
-                "出身只改外观与出身对白，不决定阵营、不产生属性差、也不锁职业。"
-                + "15 级一转时才选分支，45 级二转只把这一条往前推。创建时分支留空。",
+                UiStrings.UiCreateScreen.T014
+                + UiStrings.UiCreateScreen.T015,
                 UiTextRole.Faint, shell.Size(22f), TextAnchor.UpperLeft, true);
 
             var ruleTop = chipTop + chipH + m.Px(176f);
             var ruleH = m.Px(104f) + Rules.Length * m.Px(46f);
-            var panel = shell.Panel("写定规则", m.Band(rightX, ruleTop, colW, ruleH), shell.Size(30f));
+            var panel = shell.Panel(UiStrings.UiCreateScreen.T016, m.Band(rightX, ruleTop, colW, ruleH), shell.Size(30f));
             var rowPad = m.Px(28f);
             var rowH = m.Px(46f);
             var y = ruleH - m.Px(84f);
@@ -163,7 +163,7 @@ namespace HotUpdate.Ui
             }
 
             shell.Label(m.Band(rightX, ruleTop + ruleH + m.Px(24f), colW, m.Px(48f)),
-                "不发明：捏脸、性别、模型预览、创角列分支、注册入口。",
+                UiStrings.UiCreateScreen.T017,
                 UiTextRole.Warm, shell.Size(22f), TextAnchor.MiddleLeft, false);
 
             // ---------------------------------------------------------- 底部
@@ -172,10 +172,10 @@ namespace HotUpdate.Ui
                 string.Empty, UiTextRole.Danger, shell.Size(24f), TextAnchor.MiddleRight, false).Label;
 
             shell.Button(new Rect(pad, m.Px(120f), m.Px(300f), m.Px(80f)),
-                "← 返回登入", flow.OpenLogin, UiButtonKind.Quiet);
+                UiStrings.UiCreateScreen.T018, flow.OpenLogin, UiButtonKind.Quiet);
 
             submit = shell.Button(new Rect(m.Width - pad - m.Px(320f), m.Px(120f), m.Px(320f), m.Px(84f)),
-                "入 世", null, UiButtonKind.Primary);
+                UiStrings.UiCreateScreen.T019, null, UiButtonKind.Primary);
             var ready = new Func<bool>(() =>
                 raceId.Length > 0 && classId.Length > 0 && name.Text.Trim().Length > 0);
             submit.OnClick = () => flow.SubmitCreate(raceId, classId, name.Text);

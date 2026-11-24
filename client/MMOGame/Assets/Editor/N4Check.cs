@@ -118,7 +118,7 @@ public static class N4Check
         Report("flow", flow.Contains("LoadGatherNodes") && flow.Contains("NodesOfKind"));
         Report("screen", gatherUi.Contains("n4_gather_screen=ready")
             && gatherUi.Contains("NoGatherNodesYet")
-            && gatherUi.Contains("读取节点表"));
+            && UiTextRef.In(root, gatherUi, "UiGatherScreen", "读取节点表"));
         Report("no_config", !codex.Contains("static readonly GatherNode[] Nodes")
             && !gatherUi.Contains("config/gather.json"));
     }

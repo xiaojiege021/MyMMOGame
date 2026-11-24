@@ -20,11 +20,14 @@
 #           2026-11-23，D14 公共库收口：dup_sites 152 → 0、max 934 → 880、占比 79 → 77、
 #                       check_lines 50465 → 49327（helper 归口 + login_token / split_response /
 #                       create_char 下沉；脚本数 134 不变，未新增脚本）
+#           2026-11-24，D9 客户端文案表收口：检查并进同域 check-c5.sh（C5 文案域），
+#                       **不新开 check-d9.sh**，脚本数 134 → 134；check 49327 → 50756、
+#                       业务 63367 → 64850（D6/D13 攒下来的业务行数一并落账）、占比 77 → 78
 
 scripts=134
-check_lines=49327
-biz_lines=63367
-ratio=77
+check_lines=50720
+biz_lines=64850
+ratio=78
 max_script_lines=880
 dup_sites=0
-latest_log_card=D14 · v1.207 · 2026-11-23（tools/check 公共库：helper 归口 + 脚手架下沉）
+latest_log_card=D9 · v1.214 · 2026-11-24（客户端文案表：1542 处中文串进 config/ui_text）

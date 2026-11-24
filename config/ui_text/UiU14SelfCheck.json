@@ -1,0 +1,99 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiU14SelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiU14SelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "组队"
+    },
+    {
+      "key": "T002",
+      "text": "角色 9"
+    },
+    {
+      "key": "T003",
+      "text": "角色 5"
+    },
+    {
+      "key": "T004",
+      "text": "队长"
+    },
+    {
+      "key": "T005",
+      "text": "已准备"
+    },
+    {
+      "key": "T006",
+      "text": "2 / 4 人"
+    },
+    {
+      "key": "T007",
+      "text": "全队一份"
+    },
+    {
+      "key": "T008",
+      "text": "服务端掷点"
+    },
+    {
+      "key": "T009",
+      "text": "每人各发整份"
+    },
+    {
+      "key": "T010",
+      "text": "掷点"
+    },
+    {
+      "key": "T011",
+      "text": "归角色 9"
+    },
+    {
+      "key": "T012",
+      "text": "需求"
+    },
+    {
+      "key": "T013",
+      "text": "重连"
+    },
+    {
+      "key": "T014",
+      "text": "还剩 42 秒"
+    },
+    {
+      "key": "T015",
+      "text": "还剩 1 秒"
+    },
+    {
+      "key": "T016",
+      "text": "世界 Boss"
+    },
+    {
+      "key": "T017",
+      "text": "荒原祭坛"
+    },
+    {
+      "key": "T018",
+      "text": "已进 3 / 20"
+    },
+    {
+      "key": "T019",
+      "text": "还能进 17"
+    },
+    {
+      "key": "T020",
+      "text": "无人记名"
+    },
+    {
+      "key": "T021",
+      "text": "这一场已打掉"
+    },
+    {
+      "key": "T022",
+      "text": "{\\\"visible\\\":true,\\\"reason\\\":\\\"\\\",\\\"entrance_id\\\":\\\"wb_1\\\",\\\"entrance_name\\\":\\\"荒原祭坛\\\","
+    },
+    {
+      "key": "T023",
+      "text": "\\\"owner_sect_id\\\":7,\\\"owner_sect_name\\\":\\\"云锦\\\",\\\"starts_at_ms\\\":0,"
+    }
+  ]
+}

@@ -60,3 +60,49 @@ def read_text(path):
     if not os.path.exists(path):
         return ""
     return "".join(open(f, encoding="utf-8").read() + "\n" for f in parts(path))
+
+
+# ---------------------------------------------------------------- D9 文案表
+#
+# 屏上的中文不再写在 .cs 里，正本搬到 config/ui_text/<组>.json，源码只留
+# `UiStrings.<组>.<key>` 这样的常量引用。断言原来查「源码里有这句中文」的，
+# 改成「表里有这句 + 源码引用了它的常量」——口径没放松，只是多跳一层。
+
+def ui_text_ref(root, group, text):
+    """文案表里 group 组下 text 的常量引用（如 `UiStrings.UiEntryFlow.T003`）；没有返回 None。"""
+    import json
+    path = os.path.join(root, "config/ui_text", group + ".json")
+    if not os.path.exists(path):
+        return None
+    for entry in json.load(open(path, encoding="utf-8"))["entries"]:
+        if entry["text"] == text:
+            return "UiStrings.%s.%s" % (group, entry["key"])
+    return None
+
+
+def ui_text_assert(root, group, text, source, where=""):
+    """断言「文案表里有这句，且 source（聚合读后的源码）引用了它」。返回引用串。"""
+    ref = ui_text_ref(root, group, text)
+    assert ref, "%s文案表里没有这句：%s" % (where and where + "：", text)
+    assert ref in source, "%s源码没有引用 %s（原文：%s）" % (where and where + "：", ref, text)
+    return ref
+
+
+def ui_text_ref_like(root, group, needle):
+    """子串版：文案表里 text 含 needle 的第一条。原断言用子串匹配时（一句长文案里的一小段）用它。"""
+    import json
+    path = os.path.join(root, "config/ui_text", group + ".json")
+    if not os.path.exists(path):
+        return None
+    for entry in json.load(open(path, encoding="utf-8"))["entries"]:
+        if needle in entry["text"]:
+            return "UiStrings.%s.%s" % (group, entry["key"])
+    return None
+
+
+def ui_text_assert_like(root, group, needle, source, where=""):
+    """断言「表里有一条含 needle 的文案，且 source 引用了它」。"""
+    ref = ui_text_ref_like(root, group, needle)
+    assert ref, "%s文案表里没有含「%s」的条目" % (where and where + "：", needle)
+    assert ref in source, "%s源码没有引用 %s（含：%s）" % (where and where + "：", ref, needle)
+    return ref

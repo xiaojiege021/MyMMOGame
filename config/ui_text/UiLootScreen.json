@@ -1,0 +1,11 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiLootScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiLootScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "归属与点数都在战斗服 · 这一屏只发意图、只公布结果"
+    }
+  ]
+}

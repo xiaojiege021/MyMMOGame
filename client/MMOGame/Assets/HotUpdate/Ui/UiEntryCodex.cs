@@ -15,25 +15,25 @@ namespace HotUpdate.Ui
     public static class UiEntryCodex
     {
         /// <summary>幕一标识，登入与载入两屏共用。</summary>
-        public const string ActOne = "仙路已断";
+        public const string ActOne = UiStrings.UiEntryCodex.T001;
 
         /// <summary>竖排主标题。</summary>
-        public const string Brand = "长生隙";
+        public const string Brand = UiStrings.UiEntryCodex.T002;
 
         /// <summary>主标题右侧的副题。</summary>
-        public const string BrandSub = "表里两界之间那道缝";
+        public const string BrandSub = UiStrings.UiEntryCodex.T003;
 
         /// <summary>印章。</summary>
-        public const string Seal = "云锦";
+        public const string Seal = UiStrings.UiEntryCodex.T004;
 
         /// <summary>题记出处，静态文字，不接接口。</summary>
-        public const string VerseSign = "听谣镇旧谣";
+        public const string VerseSign = UiStrings.UiEntryCodex.T005;
 
         /// <summary>登入屏固定显示的那一首（01 定稿）。</summary>
-        public const string VerseFixedA = "仙路尽头谁为峰";
+        public const string VerseFixedA = UiStrings.UiEntryCodex.T006;
 
         /// <summary>01 定稿的下句。</summary>
-        public const string VerseFixedB = "一见隙开道成空";
+        public const string VerseFixedB = UiStrings.UiEntryCodex.T007;
 
         /// <summary>名号上限，与原型输入框一致。</summary>
         public const int NameMaxLength = 12;
@@ -59,22 +59,22 @@ namespace HotUpdate.Ui
         {
             new Race
             {
-                Id = "chen", Name = "尘民", Origin = "灵气稀薄之后最常见的凡人",
+                Id = "chen", Name = UiStrings.UiEntryCodex.T008, Origin = UiStrings.UiEntryCodex.T009,
                 Appearance = "{\"body\":\"common\",\"mark\":\"none\",\"tone\":\"sun\"}",
             },
             new Race
             {
-                Id = "mai", Name = "脉裔", Origin = "住在还没干涸的灵脉旁边",
+                Id = "mai", Name = UiStrings.UiEntryCodex.T010, Origin = UiStrings.UiEntryCodex.T011,
                 Appearance = "{\"body\":\"slim\",\"mark\":\"jade_crack\",\"tone\":\"pale\"}",
             },
             new Race
             {
-                Id = "lan", Name = "岚民", Origin = "从前走高空航路的人，航路断了以后住在崖上",
+                Id = "lan", Name = UiStrings.UiEntryCodex.T012, Origin = UiStrings.UiEntryCodex.T013,
                 Appearance = "{\"body\":\"tall\",\"mark\":\"none\",\"tone\":\"wind\"}",
             },
             new Race
             {
-                Id = "yuan", Name = "渊户", Origin = "世代守在秘境入口旁边的人家",
+                Id = "yuan", Name = UiStrings.UiEntryCodex.T014, Origin = UiStrings.UiEntryCodex.T015,
                 Appearance = "{\"body\":\"stout\",\"mark\":\"rope\",\"tone\":\"dark\"}",
             },
         };
@@ -82,31 +82,31 @@ namespace HotUpdate.Ui
         /// <summary>五个基础职业，展示顺序按原型。分支不在这里——15 级一转才选。</summary>
         public static readonly Role[] Roles =
         {
-            new Role { Id = "tank", Name = "坦克" },
-            new Role { Id = "warrior", Name = "战士" },
-            new Role { Id = "mage", Name = "法师" },
-            new Role { Id = "archer", Name = "射手" },
-            new Role { Id = "priest", Name = "牧师" },
+            new Role { Id = "tank", Name = UiStrings.UiEntryCodex.T016 },
+            new Role { Id = "warrior", Name = UiStrings.UiEntryCodex.T017 },
+            new Role { Id = "mage", Name = UiStrings.UiEntryCodex.T018 },
+            new Role { Id = "archer", Name = UiStrings.UiEntryCodex.T019 },
+            new Role { Id = "priest", Name = UiStrings.UiEntryCodex.T020 },
         };
 
         /// <summary>听谣镇旧谣 15 首，载入屏从这里抽。</summary>
         public static readonly string[][] Verses =
         {
-            new[] { "仙路尽头谁为峰", "一见隙开道成空" },
-            new[] { "灵气一年薄一寸", "功法一代厚一函" },
-            new[] { "天地玄黄传了一代又一代", "门外旧路断了一年又一年" },
-            new[] { "崖上的人不抬头", "说天上从前有航路" },
-            new[] { "从前走到头的说路还在", "后来没走到的说路本来就在" },
-            new[] { "听说隙里灵气满", "进去的没一个回来改口" },
-            new[] { "独去的人数日子", "结伴的人数名字" },
-            new[] { "带得回山里的石", "带不回身上的境" },
-            new[] { "渊户世代守着门", "先等来的却是收税的人" },
-            new[] { "立仙走旧天城", "立魔过焦原" },
-            new[] { "秘境不生灵气", "只生收税的人" },
-            new[] { "城里挂的是仙榜", "榜下站的是账房" },
-            new[] { "龙巢的门一直开着", "没人问里面，只问谁守门" },
-            new[] { "局是假的", "脚底下的路是真的" },
-            new[] { "云海年年白，光柱年年落", "仰望的人换了几代" },
+            new[] { UiStrings.UiEntryCodex.T006, UiStrings.UiEntryCodex.T007 },
+            new[] { UiStrings.UiEntryCodex.T021, UiStrings.UiEntryCodex.T022 },
+            new[] { UiStrings.UiEntryCodex.T023, UiStrings.UiEntryCodex.T024 },
+            new[] { UiStrings.UiEntryCodex.T025, UiStrings.UiEntryCodex.T026 },
+            new[] { UiStrings.UiEntryCodex.T027, UiStrings.UiEntryCodex.T028 },
+            new[] { UiStrings.UiEntryCodex.T029, UiStrings.UiEntryCodex.T030 },
+            new[] { UiStrings.UiEntryCodex.T031, UiStrings.UiEntryCodex.T032 },
+            new[] { UiStrings.UiEntryCodex.T033, UiStrings.UiEntryCodex.T034 },
+            new[] { UiStrings.UiEntryCodex.T035, UiStrings.UiEntryCodex.T036 },
+            new[] { UiStrings.UiEntryCodex.T037, UiStrings.UiEntryCodex.T038 },
+            new[] { UiStrings.UiEntryCodex.T039, UiStrings.UiEntryCodex.T040 },
+            new[] { UiStrings.UiEntryCodex.T041, UiStrings.UiEntryCodex.T042 },
+            new[] { UiStrings.UiEntryCodex.T043, UiStrings.UiEntryCodex.T044 },
+            new[] { UiStrings.UiEntryCodex.T045, UiStrings.UiEntryCodex.T046 },
+            new[] { UiStrings.UiEntryCodex.T047, UiStrings.UiEntryCodex.T048 },
         };
 
         static readonly List<int> Bag = new List<int>();

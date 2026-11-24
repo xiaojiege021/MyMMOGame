@@ -35,7 +35,7 @@ namespace HotUpdate.Ui
                 UiEntryCodex.ActOne, UiTextRole.Title, shell.Size(56f), TextAnchor.MiddleCenter, false);
 
             shell.Label(m.Band(centerX, m.Px(596f), centerW, m.Px(50f)),
-                "正在进入表世界", UiTextRole.Muted, shell.Size(28f), TextAnchor.MiddleCenter, false);
+                UiStrings.UiLoadingScreen.T001, UiTextRole.Muted, shell.Size(28f), TextAnchor.MiddleCenter, false);
 
             var first = verse != null && verse.Length > 0 ? verse[0] : UiEntryCodex.VerseFixedA;
             var second = verse != null && verse.Length > 1 ? verse[1] : UiEntryCodex.VerseFixedB;
@@ -58,7 +58,7 @@ namespace HotUpdate.Ui
             screen._fill = fillImage.rectTransform;
 
             screen._tip = shell.Label(m.Band(centerX, m.Px(956f), centerW, m.Px(44f)),
-                "正在接引", UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleCenter, false).Label;
+                UiStrings.UiLoadingScreen.T002, UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleCenter, false).Label;
 
             Debug.Log(ReadyLog + " verse=" + first + " bar=" + (int)screen._barWidth);
             return screen;

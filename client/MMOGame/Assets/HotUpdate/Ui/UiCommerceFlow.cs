@@ -133,7 +133,7 @@ namespace HotUpdate.Ui
                 }
                 else
                 {
-                    Error = "货币没读到：" + status;
+                    Error = UiStrings.UiCommerceFlow.T001 + status;
                     Debug.Log("u6_currency=reject status=" + status);
                 }
 
@@ -163,7 +163,7 @@ namespace HotUpdate.Ui
                 }
                 else
                 {
-                    Error = "背包没读到：" + status;
+                    Error = UiStrings.UiCommerceFlow.T002 + status;
                     Debug.Log("u6_bag=reject status=" + status);
                 }
 
@@ -176,7 +176,7 @@ namespace HotUpdate.Ui
             Send<ShopOutcome>("/shop/buy", CharacterShop.RequestBody(_characterId, itemId),
                 (status, text) => status == 200
                     ? CharacterShop.Parse(text)
-                    : new ShopOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
+                    : new ShopOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiCommerceFlow.T003 + status },
                 outcome => { LastShop = outcome; HasShop = true; },
                 "u6_shop", done);
         }
@@ -191,7 +191,7 @@ namespace HotUpdate.Ui
                     {
                         Reason = "status_" + status,
                         Goods = new List<NpcShopGoodsRow>(),
-                        DisplayText = "没发出去：" + status,
+                        DisplayText = UiStrings.UiCommerceFlow.T003 + status,
                     },
                 outcome => { ShopNpc = outcome; HasShopNpc = true; },
                 "u6_npc_shop", done);
@@ -200,24 +200,24 @@ namespace HotUpdate.Ui
         public void NpcBuy(string shopId, string itemId, Action done = null)
         {
             SendNpc("/shop/npc/buy", CharacterNpcShop.BuyBody(_characterId, shopId, itemId),
-                "买了", done);
+                UiStrings.UiCommerceFlow.T004, done);
         }
 
         public void NpcSell(string shopId, int bagSlot, int count, Action done = null)
         {
             SendNpc("/shop/npc/sell",
-                CharacterNpcShop.SellBody(_characterId, shopId, bagSlot, count), "卖了", done);
+                CharacterNpcShop.SellBody(_characterId, shopId, bagSlot, count), UiStrings.UiCommerceFlow.T005, done);
         }
 
         public void NpcBuyback(string shopId, long buybackId, Action done = null)
         {
             SendNpc("/shop/npc/buyback",
-                CharacterNpcShop.BuybackBody(_characterId, shopId, buybackId), "回购了", done);
+                CharacterNpcShop.BuybackBody(_characterId, shopId, buybackId), UiStrings.UiCommerceFlow.T006, done);
         }
 
         public void NpcRepair(Action done = null)
         {
-            SendNpc("/shop/npc/repair", CharacterNpcShop.RepairBody(_characterId), "修好了", done);
+            SendNpc("/shop/npc/repair", CharacterNpcShop.RepairBody(_characterId), UiStrings.UiCommerceFlow.T007, done);
         }
 
         void SendNpc(string path, string body, string what, Action done)
@@ -228,7 +228,7 @@ namespace HotUpdate.Ui
                     : new NpcActionOutcome
                     {
                         Reason = "status_" + status,
-                        DisplayText = "没发出去：" + status,
+                        DisplayText = UiStrings.UiCommerceFlow.T003 + status,
                     },
                 outcome => { LastNpc = outcome; HasNpc = true; },
                 "u6_npc_action", done);
@@ -240,7 +240,7 @@ namespace HotUpdate.Ui
                 CharacterAuction.ListBody(_characterId, slot, count, priceGold),
                 (status, text) => status == 200
                     ? CharacterAuction.Parse(text)
-                    : new AuctionOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
+                    : new AuctionOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiCommerceFlow.T003 + status },
                 outcome =>
                 {
                     LastAuction = outcome;
@@ -256,7 +256,7 @@ namespace HotUpdate.Ui
                 CharacterAuction.BuyBody(_characterId, listingId),
                 (status, text) => status == 200
                     ? CharacterAuction.Parse(text)
-                    : new AuctionOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
+                    : new AuctionOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiCommerceFlow.T003 + status },
                 outcome => { LastAuction = outcome; HasAuction = true; },
                 "u6_auction_buy", done);
         }
@@ -267,7 +267,7 @@ namespace HotUpdate.Ui
                 CharacterAuction.IngotListBody(_characterId, ingotAmount, priceGold),
                 (status, text) => status == 200
                     ? CharacterAuction.ParseIngot(text)
-                    : new IngotOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
+                    : new IngotOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiCommerceFlow.T003 + status },
                 outcome =>
                 {
                     LastIngot = outcome;
@@ -283,7 +283,7 @@ namespace HotUpdate.Ui
                 CharacterAuction.IngotBuyBody(_characterId, listingId),
                 (status, text) => status == 200
                     ? CharacterAuction.ParseIngot(text)
-                    : new IngotOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
+                    : new IngotOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiCommerceFlow.T003 + status },
                 outcome => { LastIngot = outcome; HasIngot = true; },
                 "u6_ingot_buy", done);
         }
@@ -294,7 +294,7 @@ namespace HotUpdate.Ui
                 CharacterRecharge.OrderBody(_characterId, productId),
                 (status, text) => status == 200
                     ? CharacterRecharge.ParseOrder(text)
-                    : new RechargeOrderOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
+                    : new RechargeOrderOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiCommerceFlow.T003 + status },
                 outcome => { LastOrder = outcome; HasOrder = true; },
                 "u6_recharge_order", done);
         }
@@ -305,7 +305,7 @@ namespace HotUpdate.Ui
                 CharacterRecharge.CallbackBody(orderId),
                 (status, text) => status == 200
                     ? CharacterRecharge.ParseSettle(text)
-                    : new RechargeSettleOutcome { Reason = "status_" + status, DisplayText = "没发出去：" + status },
+                    : new RechargeSettleOutcome { Reason = "status_" + status, DisplayText = UiStrings.UiCommerceFlow.T003 + status },
                 outcome => { LastSettle = outcome; HasSettle = true; },
                 "u6_recharge_callback", done);
         }
@@ -325,7 +325,7 @@ namespace HotUpdate.Ui
                 Busy = false;
                 var outcome = parse(status, text);
                 keep(outcome);
-                Error = status == 200 ? string.Empty : "请求失败：" + status;
+                Error = status == 200 ? string.Empty : UiStrings.UiCommerceFlow.T008 + status;
                 Debug.Log(logTag + "=" + (status == 200 ? "ok" : "reject") + " status=" + status);
                 if (done != null) done();
             });

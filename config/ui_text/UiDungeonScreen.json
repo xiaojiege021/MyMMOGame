@@ -1,0 +1,43 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiDungeonScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiDungeonScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "副本 / 战场的唯一通道 · 准入只看等级与境界门禁 · 人数与消耗都由服务端算"
+    },
+    {
+      "key": "T002",
+      "text": "进本人数"
+    },
+    {
+      "key": "T003",
+      "text": "进本人数 1"
+    },
+    {
+      "key": "T004",
+      "text": "人数是这一场几个人，产出与扣除都由服务端乘"
+    },
+    {
+      "key": "T005",
+      "text": "倍率口径"
+    },
+    {
+      "key": "T006",
+      "text": "每人产出 = 单人一份 × 人数；每人扣的疲劳 / 周份额 = 同样倍数。\\n"
+    },
+    {
+      "key": "T007",
+      "text": "一天或一周的总产出不变，省的是次数和时间。"
+    },
+    {
+      "key": "T008",
+      "text": "进入副本"
+    },
+    {
+      "key": "T009",
+      "text": "尚未进本 · 疲劳与份额以回包为准"
+    }
+  ]
+}

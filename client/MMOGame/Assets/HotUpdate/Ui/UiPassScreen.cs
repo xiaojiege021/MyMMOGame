@@ -18,11 +18,11 @@ namespace HotUpdate.Ui
             var m = shell.Metrics;
             var pad = m.Px(120f);
             var top = m.Px(160f);
-            var card = shell.Panel("赛季通行证", m.Band(pad, top + m.Px(56f), m.Width - pad * 2f, m.Px(360f)),
+            var card = shell.Panel(UiStrings.UiPassScreen.T001, m.Band(pad, top + m.Px(56f), m.Width - pad * 2f, m.Px(360f)),
                 shell.Size(32f));
             shell.LabelIn(card.Root,
                 new Rect(m.Px(32f), m.Px(140f), m.Width - pad * 2f - m.Px(64f), m.Px(120f)),
-                "免费轨与付费轨、月叠与第二角色栏都在后面的卡。这一屏只留入口，不做请求。",
+                UiStrings.UiPassScreen.T002,
                 UiTextRole.Faint, shell.Size(26f), TextAnchor.MiddleLeft, true);
 
             Debug.Log(ReadyLog + " placeholder=true");

@@ -102,8 +102,9 @@ public static class U11Check
             "Codex 里还留着缺口文案或本地编的九位");
 
         // 九位名字不许写进屏：回包里没有的条目不能由客户端补一条。
+        // D9 之后自检里的假回包也走文案表，改成查表 + 查引用。
         Report("no_names", screen.IndexOf("乔小满", StringComparison.Ordinal) < 0
-            && selfCheck.IndexOf("乔小满", StringComparison.Ordinal) >= 0,
+            && UiTextRef.In(root, selfCheck, "UiHeroCodexSelfCheck", "乔小满"),
             "屏里写死了名字（或自检没备假回包）");
 
         Report("no_config", screen.IndexOf("config/", StringComparison.Ordinal) < 0

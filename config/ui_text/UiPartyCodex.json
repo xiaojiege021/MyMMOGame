@@ -1,0 +1,35 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiPartyCodex",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiPartyCodex.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "队伍名单还没到 · 队伍是社交服的事，进本之后战斗服另发一份同场名单"
+    },
+    {
+      "key": "T002",
+      "text": "4 人是战斗单元 · 名单 / 队长 / 准备态 / 分配口径都只认 GET /party 回包"
+    },
+    {
+      "key": "T003",
+      "text": "邀请 / 接受 / 准备 / 离队 / 解散都由社交服判，界面只发请求、只显示结果"
+    },
+    {
+      "key": "T004",
+      "text": "队长由社交服按加入顺序继任，界面不改队长"
+    },
+    {
+      "key": "T005",
+      "text": "先填要邀请的角色号"
+    },
+    {
+      "key": "T006",
+      "text": "人数上限看回包"
+    },
+    {
+      "key": "T007",
+      "text": " 人"
+    }
+  ]
+}

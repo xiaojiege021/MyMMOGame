@@ -1,0 +1,27 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiReconnectScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiReconnectScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "逃跑惩罚"
+    },
+    {
+      "key": "T002",
+      "text": "这一行是服务端给的剩余秒数，界面只在本地按秒往下走。\\n"
+    },
+    {
+      "key": "T003",
+      "text": "回包没带这一格就写「服务端还没说过惩罚」，不拿别的时长顶上来。"
+    },
+    {
+      "key": "T004",
+      "text": "重连回原场"
+    },
+    {
+      "key": "T005",
+      "text": "重连"
+    }
+  ]
+}

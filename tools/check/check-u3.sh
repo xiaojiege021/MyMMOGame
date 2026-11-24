@@ -65,7 +65,7 @@ import json, os, re, sys
 
 root = os.environ['ROOT']
 sys.path.insert(0, root + '/tools/check')
-from lib_read import read_text
+from lib_read import read_text, ui_text_assert
 assets = root + '/client/MMOGame/Assets'
 ui = assets + '/HotUpdate/Ui'
 
@@ -98,7 +98,7 @@ shown = [r for r in rows if r['id'] in ('main', 'abyss', 'lair')]
 assert len(shown) == 3, 'config dungeons shown=%d' % len(shown)
 for row in shown:
     assert 'Id = "%s"' % row['id'] in codex, 'dungeon id ' + row['id']
-    assert row['name'] in codex, 'dungeon name ' + row['name']
+    ui_text_assert(root, 'UiBattleCodex', row['name'], codex, 'dungeon name ' + row['id'])
     assert 'MaxPlayers = %d' % row['max_players'] in codex, 'max_players ' + row['id']
     flag = 'true' if row['charges_fatigue'] else 'false'
     assert 'ChargesFatigue = %s' % flag in codex, 'charges_fatigue ' + row['id']

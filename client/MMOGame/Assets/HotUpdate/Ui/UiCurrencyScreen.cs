@@ -21,19 +21,19 @@ namespace HotUpdate.Ui
             var gap = m.Px(48f);
             var leftW = (m.Width - pad * 2f - gap) * 0.46f;
 
-            var wallet = shell.Panel("余额", m.Band(pad, top + m.Px(56f), leftW, m.Px(320f)), shell.Size(32f));
+            var wallet = shell.Panel(UiStrings.UiCurrencyScreen.T001, m.Band(pad, top + m.Px(56f), leftW, m.Px(320f)), shell.Size(32f));
             var rows = flow.Balances;
             UiUpgradeViews.Rows(shell, wallet,
-                new[] { "元宝", "金币", "灵石" },
+                new[] { UiStrings.UiCurrencyScreen.T002, UiStrings.UiCurrencyScreen.T003, UiStrings.UiCurrencyScreen.T004 },
                 new[]
                 {
-                    flow.HasCurrency ? UiCommerceCodex.BalanceOf(rows, "yuanbao") : "尚未读",
-                    flow.HasCurrency ? UiCommerceCodex.BalanceOf(rows, "gold") : "尚未读",
-                    flow.HasCurrency ? UiCommerceCodex.BalanceOf(rows, "spirit_stone") : "尚未读",
+                    flow.HasCurrency ? UiCommerceCodex.BalanceOf(rows, "yuanbao") : UiStrings.UiCurrencyScreen.T005,
+                    flow.HasCurrency ? UiCommerceCodex.BalanceOf(rows, "gold") : UiStrings.UiCurrencyScreen.T005,
+                    flow.HasCurrency ? UiCommerceCodex.BalanceOf(rows, "spirit_stone") : UiStrings.UiCurrencyScreen.T005,
                 },
                 m.Px(56f), m.Px(28f));
 
-            var recharge = shell.Panel("内部充值", m.Band(pad, top + m.Px(56f) + m.Px(360f), leftW, m.Px(420f)),
+            var recharge = shell.Panel(UiStrings.UiCurrencyScreen.T006, m.Band(pad, top + m.Px(56f) + m.Px(360f), leftW, m.Px(420f)),
                 shell.Size(32f));
             for (var i = 0; i < UiCommerceCodex.Recharge.Length; i++)
             {
@@ -41,7 +41,7 @@ namespace HotUpdate.Ui
                 var index = i;
                 shell.ButtonIn(recharge.Root,
                     new Rect(m.Px(24f), m.Px(300f) - i * m.Px(96f), leftW - m.Px(48f), m.Px(76f)),
-                    "建单：" + goods.Name,
+                    UiStrings.UiCurrencyScreen.T007 + goods.Name,
                     () =>
                     {
                         if (!flow.Busy)
@@ -53,7 +53,7 @@ namespace HotUpdate.Ui
 
             shell.ButtonIn(recharge.Root,
                 new Rect(m.Px(24f), m.Px(24f), leftW - m.Px(48f), m.Px(76f)),
-                "回调最近一笔订单",
+                UiStrings.UiCurrencyScreen.T008,
                 () =>
                 {
                     var order = flow.LastOrder.OrderId;
@@ -65,20 +65,20 @@ namespace HotUpdate.Ui
 
             var rightX = pad + leftW + gap;
             var rightW = m.Width - pad - rightX;
-            var result = shell.Panel("回包", m.Band(rightX, top + m.Px(56f), rightW, m.Px(640f)),
+            var result = shell.Panel(UiStrings.UiCurrencyScreen.T009, m.Band(rightX, top + m.Px(56f), rightW, m.Px(640f)),
                 shell.Size(32f));
             var o = flow.LastOrder;
             var st = flow.LastSettle;
-            UiUpgradeViews.Result(shell, result, m.Px(520f), "订单",
-                flow.HasOrder ? (o.Ok ? o.OrderId + " · " + o.Status : "没建成：" + o.Reason) : "尚未建单");
-            UiUpgradeViews.Result(shell, result, m.Px(464f), "商品 / 元宝",
+            UiUpgradeViews.Result(shell, result, m.Px(520f), UiStrings.UiCurrencyScreen.T010,
+                flow.HasOrder ? (o.Ok ? o.OrderId + " · " + o.Status : UiStrings.UiCurrencyScreen.T011 + o.Reason) : UiStrings.UiCurrencyScreen.T012);
+            UiUpgradeViews.Result(shell, result, m.Px(464f), UiStrings.UiCurrencyScreen.T013,
                 flow.HasOrder && o.Ok ? o.ProductId + " / " + o.Yuanbao : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(408f), "回调结果",
-                flow.HasSettle ? (st.Ok ? "已发 " + st.Yuanbao : "没结算：" + st.Reason) : "尚未回调");
-            UiUpgradeViews.Result(shell, result, m.Px(352f), "余额",
+            UiUpgradeViews.Result(shell, result, m.Px(408f), UiStrings.UiCurrencyScreen.T014,
+                flow.HasSettle ? (st.Ok ? UiStrings.UiCurrencyScreen.T015 + st.Yuanbao : UiStrings.UiCurrencyScreen.T016 + st.Reason) : UiStrings.UiCurrencyScreen.T017);
+            UiUpgradeViews.Result(shell, result, m.Px(352f), UiStrings.UiCurrencyScreen.T001,
                 flow.HasSettle ? st.Balance.ToString() : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(296f), "重放",
-                flow.HasSettle ? (st.Duplicate ? "duplicate（没再发）" : "false") : "—");
+            UiUpgradeViews.Result(shell, result, m.Px(296f), UiStrings.UiCurrencyScreen.T018,
+                flow.HasSettle ? (st.Duplicate ? UiStrings.UiCurrencyScreen.T019 : "false") : "—");
 
             Debug.Log(ReadyLog + " balances=" + (flow.HasCurrency ? rows.Count : 0)
                 + " order=" + (flow.HasOrder ? "true" : "false")

@@ -1,0 +1,43 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiReconnectCodex",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiReconnectCodex.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "重连只回原场 · 惩罚倒计时只读服务端给的剩余秒数 · 界面不补算任何时间"
+    },
+    {
+      "key": "T002",
+      "text": "服务端还没说过惩罚"
+    },
+    {
+      "key": "T003",
+      "text": "惩罚已走完 · 可以重新进本"
+    },
+    {
+      "key": "T004",
+      "text": "宽限窗与窗口时长都由服务端持有 · 客户端不折时区、不按进场时刻相减"
+    },
+    {
+      "key": "T005",
+      "text": "还剩 "
+    },
+    {
+      "key": "T006",
+      "text": " 秒"
+    },
+    {
+      "key": "T007",
+      "text": "还没重连过"
+    },
+    {
+      "key": "T008",
+      "text": "回到原来那一场"
+    },
+    {
+      "key": "T009",
+      "text": "重连没成："
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiRosterSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiRosterSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "宗门"
+    },
+    {
+      "key": "T002",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T003",
+      "text": "读取名册"
+    },
+    {
+      "key": "T004",
+      "text": "回包 0 人"
+    },
+    {
+      "key": "T005",
+      "text": "回包 2 人 · 这一截 1-2"
+    },
+    {
+      "key": "T006",
+      "text": "被拒：not_in_sect"
+    },
+    {
+      "key": "T007",
+      "text": "这一截 3-3"
+    }
+  ]
+}

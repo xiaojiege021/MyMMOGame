@@ -161,14 +161,14 @@ namespace HotUpdate.Ui
         public void OpenCreate()
         {
             Current = Step.Create;
-            _shell.ShowPage("立身 · 选出身与职责", shell => UiCreateScreen.Build(shell, this));
+            _shell.ShowPage(UiStrings.UiEntryFlow.T001, shell => UiCreateScreen.Build(shell, this));
         }
 
         /// <summary>开角色栏（A04）。建角成功才走到这里。</summary>
         public void OpenRoster()
         {
             Current = Step.Roster;
-            _shell.ShowPage("角色栏", shell => UiRosterScreen.Build(shell, this));
+            _shell.ShowPage(UiStrings.UiEntryFlow.T002, shell => UiRosterScreen.Build(shell, this));
         }
 
         /// <summary>开载入屏（A03）。选定角色之后才走到这里。</summary>
@@ -281,7 +281,7 @@ namespace HotUpdate.Ui
             var filled = _account != null && _password != null
                 && _account.Text.Trim().Length > 0 && _password.Text.Length > 0;
             _loginButton.Enabled = !Busy && filled;
-            _loginButton.Label.text = Busy ? "正在校验" : "登 入";
+            _loginButton.Label.text = Busy ? UiStrings.UiEntryFlow.T003 : UiStrings.UiEntryFlow.T004;
             _loginButton.Apply(_shell.Palette);
         }
 
@@ -308,7 +308,7 @@ namespace HotUpdate.Ui
             }
 
             _createButton.Enabled = !Busy && _createReady != null && _createReady();
-            _createButton.Label.text = Busy ? "正在立身" : "入 世";
+            _createButton.Label.text = Busy ? UiStrings.UiEntryFlow.T005 : UiStrings.UiEntryFlow.T006;
             _createButton.Apply(_shell.Palette);
         }
 
@@ -358,7 +358,7 @@ namespace HotUpdate.Ui
                 {
                     // 令牌过期回登入，不在这里弹「口令错」。
                     Token = string.Empty;
-                    _shell.Toast("会话已过期，请重新登入");
+                    _shell.Toast(UiStrings.UiEntryFlow.T007);
                     OpenLogin();
                     return;
                 }
@@ -417,7 +417,7 @@ namespace HotUpdate.Ui
                 Debug.Log("u2_loading=refused reason=" + (reason ?? string.Empty));
                 if (_loading != null)
                 {
-                    _loading.SetTip("没能接引，稍后再试");
+                    _loading.SetTip(UiStrings.UiEntryFlow.T008);
                 }
 
                 Entered = false;
@@ -430,7 +430,7 @@ namespace HotUpdate.Ui
             if (_loading != null)
             {
                 _loading.SetProgress(1f);
-                _loading.SetTip("已入世");
+                _loading.SetTip(UiStrings.UiEntryFlow.T009);
             }
 
             UiEntryHub.BindSession(Token, Character.CharacterId);
@@ -543,21 +543,21 @@ namespace HotUpdate.Ui
             switch (kind)
             {
                 case EntryKind.BadRequest:
-                    return "请求没发出去，重试一次";
+                    return UiStrings.UiEntryFlow.T010;
                 case EntryKind.InvalidCredentials:
-                    return "账号或口令不对";
+                    return UiStrings.UiEntryFlow.T011;
                 case EntryKind.InvalidToken:
-                    return "会话已过期，请重新登入";
+                    return UiStrings.UiEntryFlow.T007;
                 case EntryKind.NameTaken:
-                    return "这个名号已经有人用了";
+                    return UiStrings.UiEntryFlow.T012;
                 case EntryKind.Unavailable:
-                    return "暂时连不上，稍后再试";
+                    return UiStrings.UiEntryFlow.T013;
                 case EntryKind.Network:
-                    return "连不上网关";
+                    return UiStrings.UiEntryFlow.T014;
                 case EntryKind.Ok:
                     return string.Empty;
                 default:
-                    return "没成，稍后再试";
+                    return UiStrings.UiEntryFlow.T015;
             }
         }
     }

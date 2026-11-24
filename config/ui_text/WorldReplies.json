@@ -1,0 +1,19 @@
+{
+  "schema": "ui-text/1",
+  "group": "WorldReplies",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/World/WorldReplies.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "采集没发出去："
+    },
+    {
+      "key": "T002",
+      "text": "飞行没发出去："
+    },
+    {
+      "key": "T003",
+      "text": "跨区没发出去："
+    }
+  ]
+}

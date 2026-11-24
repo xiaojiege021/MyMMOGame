@@ -28,16 +28,16 @@ namespace HotUpdate.Ui
             flow.ClearViews();
 
             shell.Label(m.Band(pad, m.Px(80f), m.Width - pad * 2f, m.Px(60f)),
-                "飞行与境界锁", UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiFlightScreen.T001, UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
             shell.Label(m.Band(pad, m.Px(146f), leftW * 1.4f, m.Px(44f)),
-                "飞行只由境界打开，不由装备、坐骑或商城拖尾打开",
+                UiStrings.UiFlightScreen.T002,
                 UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 左：三段境界
 
             var realmTop = m.Px(220f);
             var realmH = m.Px(320f);
-            var realm = shell.Panel("三段大境界（首发）", m.Band(pad, realmTop, leftW, realmH), shell.Size(28f));
+            var realm = shell.Panel(UiStrings.UiFlightScreen.T003, m.Band(pad, realmTop, leftW, realmH), shell.Size(28f));
             for (var i = 0; i < UiWorldCodex.Realms.Length; i++)
             {
                 shell.Chip(realm.Root,
@@ -47,45 +47,45 @@ namespace HotUpdate.Ui
             }
 
             shell.LabelIn(realm.Root, new Rect(m.Px(26f), m.Px(60f), leftW - m.Px(52f), m.Px(100f)),
-                "config/flight.json 的 flight_realm 写的是 " + UiWorldCodex.FlightRealm
-                + "（待定）；本屏不读配置判权限，能不能飞只看回包的 can_fly。",
+                UiStrings.UiFlightScreen.T004 + UiWorldCodex.FlightRealm
+                + UiStrings.UiFlightScreen.T005,
                 UiTextRole.Faint, shell.Size(22f), TextAnchor.UpperLeft, true);
 
             var askTop = realmTop + realmH + m.Px(20f);
             var askH = m.Px(260f);
-            var ask = shell.Panel("请求字段", m.Band(pad, askTop, leftW, askH), shell.Size(26f));
+            var ask = shell.Panel(UiStrings.UiFlightScreen.T006, m.Band(pad, askTop, leftW, askH), shell.Size(26f));
             shell.LabelIn(ask.Root, new Rect(m.Px(26f), askH - m.Px(150f), leftW - m.Px(52f), m.Px(110f)),
-                "want_fly。伪造 realm / can_fly / account / y 一律无效；"
-                + "位置帧直接报高 y 会被 flight_forbidden 拉回 GroundY。",
+                UiStrings.UiFlightScreen.T007
+                + UiStrings.UiFlightScreen.T008,
                 UiTextRole.Body, shell.Size(23f), TextAnchor.UpperLeft, true);
 
             var upY = m.Px(60f);
             var upBtn = shell.ButtonIn(ask.Root,
                 new Rect(m.Px(26f), upY, m.Px(240f), m.Px(88f)),
-                "起飞", () => flow.Fly(true), UiButtonKind.Primary);
+                UiStrings.UiFlightScreen.T009, () => flow.Fly(true), UiButtonKind.Primary);
             var downBtn = shell.ButtonIn(ask.Root,
                 new Rect(m.Px(286f), upY, m.Px(240f), m.Px(88f)),
-                "落地", () => flow.Fly(false), UiButtonKind.Quiet);
+                UiStrings.UiFlightScreen.T010, () => flow.Fly(false), UiButtonKind.Quiet);
 
             // ---------------------------------------------------------- 右：地表境界要求
 
             var listTop = m.Px(220f);
             var listH = m.Px(560f);
-            var list = shell.Panel("地表境界要求", m.Band(rightX, listTop, rightW, listH), shell.Size(28f));
+            var list = shell.Panel(UiStrings.UiFlightScreen.T011, m.Band(rightX, listTop, rightW, listH), shell.Size(28f));
             for (var i = 0; i < UiWorldCodex.Regions.Length; i++)
             {
                 var region = UiWorldCodex.Regions[i];
                 shell.LabelIn(list.Root,
                     new Rect(m.Px(28f), listH - m.Px(140f) - i * m.Px(52f), rightW - m.Px(56f), m.Px(48f)),
-                    region.Name + "    " + region.Realm + (region.Open ? "" : "    · 剧情未开"),
+                    region.Name + "    " + region.Realm + (region.Open ? "" : UiStrings.UiFlightScreen.T012),
                     region.Open ? UiTextRole.Body : UiTextRole.Faint,
                     shell.Size(23f), TextAnchor.MiddleLeft, false);
             }
 
             var trailTop = listTop + listH + m.Px(20f);
-            var trail = shell.Panel("拖尾", m.Band(rightX, trailTop, rightW, m.Px(220f)), shell.Size(26f));
+            var trail = shell.Panel(UiStrings.UiFlightScreen.T013, m.Band(rightX, trailTop, rightW, m.Px(220f)), shell.Size(26f));
             shell.LabelIn(trail.Root, new Rect(m.Px(28f), m.Px(60f), rightW - m.Px(56f), m.Px(120f)),
-                "TrailAllowed 只在 Flying 为真时成立；没有飞行权限时，买了拖尾也不会让人飞。",
+                UiStrings.UiFlightScreen.T014,
                 UiTextRole.Body, shell.Size(23f), TextAnchor.UpperLeft, true);
 
             // ---------------------------------------------------------- 底：回包两行
@@ -94,7 +94,7 @@ namespace HotUpdate.Ui
             var line = shell.Label(m.Band(rightX, lineTop, rightW, m.Px(52f)),
                 UiWorldCodex.NoFlyYet, UiTextRole.Muted, shell.Size(25f), TextAnchor.MiddleLeft, true);
             var yline = shell.Label(m.Band(rightX, lineTop + m.Px(56f), rightW, m.Px(52f)),
-                "画面高度以回包为准 · 拖尾只在能飞时开", UiTextRole.Faint, shell.Size(23f),
+                UiStrings.UiFlightScreen.T015, UiTextRole.Faint, shell.Size(23f),
                 TextAnchor.MiddleLeft, true);
 
             flow.RegisterView(() =>

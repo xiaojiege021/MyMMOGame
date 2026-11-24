@@ -1,0 +1,79 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiRealmScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiRealmScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "当前"
+    },
+    {
+      "key": "T002",
+      "text": "大境界"
+    },
+    {
+      "key": "T003",
+      "text": "段内阶"
+    },
+    {
+      "key": "T004",
+      "text": "被动"
+    },
+    {
+      "key": "T005",
+      "text": "下一大境界"
+    },
+    {
+      "key": "T006",
+      "text": "尚未读到"
+    },
+    {
+      "key": "T007",
+      "text": "后面的卡"
+    },
+    {
+      "key": "T008",
+      "text": "回包境界"
+    },
+    {
+      "key": "T009",
+      "text": "阶序号"
+    },
+    {
+      "key": "T010",
+      "text": "升阶门槛"
+    },
+    {
+      "key": "T011",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T012",
+      "text": "读一次"
+    },
+    {
+      "key": "T013",
+      "text": "升一阶"
+    },
+    {
+      "key": "T014",
+      "text": "回包"
+    },
+    {
+      "key": "T015",
+      "text": "结果"
+    },
+    {
+      "key": "T016",
+      "text": "重复"
+    },
+    {
+      "key": "T017",
+      "text": "同一笔只升一次"
+    },
+    {
+      "key": "T018",
+      "text": "新的一笔"
+    }
+  ]
+}

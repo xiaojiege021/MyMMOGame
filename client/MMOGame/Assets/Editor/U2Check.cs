@@ -99,7 +99,7 @@ public static class U2Check
         foreach (Match match in Regex.Matches(races, "\"name\"\\s*:\\s*\"([^\"]+)\""))
         {
             var name = match.Groups[1].Value;
-            if (!codex.Contains("Name = \"" + name + "\""))
+            if (!UiTextRef.In(root, codex, "UiEntryCodex", name))
             {
                 missing.Add("name:" + name);
             }
@@ -108,7 +108,7 @@ public static class U2Check
         foreach (Match match in Regex.Matches(races, "\"origin\"\\s*:\\s*\"([^\"]+)\""))
         {
             var origin = match.Groups[1].Value;
-            if (!codex.Contains(origin))
+            if (!UiTextRef.In(root, codex, "UiEntryCodex", origin))
             {
                 missing.Add("origin:" + origin);
             }
@@ -146,6 +146,7 @@ public static class U2Check
         var prototype = File.ReadAllText(Path.Combine(root, "docs/登录界面原型.html"));
 
         // 原型 HINTS 里那四句，客户端要逐字照抄，别在屏里另写一套。
+        // D9 之后中文搬进 config/ui_text/UiEntryFlow.json，断言改成「表里有 + 源码引用了它的常量」。
         var hints = new[]
         {
             "请求没发出去，重试一次", "账号或口令不对", "暂时连不上，稍后再试", "连不上网关",
@@ -154,7 +155,7 @@ public static class U2Check
         var missing = new List<string>();
         foreach (var hint in hints)
         {
-            if (!flow.Contains(hint))
+            if (!UiTextRef.In(root, flow, "UiEntryFlow", hint))
             {
                 missing.Add(hint);
             }

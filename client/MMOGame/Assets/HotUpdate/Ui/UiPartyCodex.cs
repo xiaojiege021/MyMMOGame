@@ -13,23 +13,23 @@ namespace HotUpdate.Ui
         public const string ReadyLog = "u14_party_room=ready";
 
         /// <summary>没回包时的那一句。不拿本机角色凑一队。</summary>
-        public const string EmptyList = "队伍名单还没到 · 队伍是社交服的事，进本之后战斗服另发一份同场名单";
+        public const string EmptyList = UiStrings.UiPartyCodex.T001;
 
-        public const string Notice = "4 人是战斗单元 · 名单 / 队长 / 准备态 / 分配口径都只认 GET /party 回包";
+        public const string Notice = UiStrings.UiPartyCodex.T002;
 
         /// <summary>页脚口径：能做什么、什么不做。</summary>
-        public const string Footer = "邀请 / 接受 / 准备 / 离队 / 解散都由社交服判，界面只发请求、只显示结果";
+        public const string Footer = UiStrings.UiPartyCodex.T003;
 
         /// <summary>队长那一格：队长自己不能接受别人的邀请，也不在这里转让。</summary>
-        public const string LeaderHint = "队长由社交服按加入顺序继任，界面不改队长";
+        public const string LeaderHint = UiStrings.UiPartyCodex.T004;
 
         /// <summary>目标角色号没填时的提示。</summary>
-        public const string TargetMissing = "先填要邀请的角色号";
+        public const string TargetMissing = UiStrings.UiPartyCodex.T005;
 
         /// <summary>名额那一句：人数与上限都用回包的两个数，不写死 4。</summary>
         public static string SlotsLine(int size, int maxSize)
         {
-            return maxSize <= 0 ? "人数上限看回包" : size + " / " + maxSize + " 人";
+            return maxSize <= 0 ? UiStrings.UiPartyCodex.T006 : size + " / " + maxSize + UiStrings.UiPartyCodex.T007;
         }
     }
 }

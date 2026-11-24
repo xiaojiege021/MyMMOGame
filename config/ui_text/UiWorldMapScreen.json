@@ -1,0 +1,75 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiWorldMapScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiWorldMapScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "世界地图与跨区"
+    },
+    {
+      "key": "T002",
+      "text": "文件名即地点编号 · 相连对称 · 剧情未开仍归区域表"
+    },
+    {
+      "key": "T003",
+      "text": "跨区目标"
+    },
+    {
+      "key": "T004",
+      "text": "还没选地表"
+    },
+    {
+      "key": "T005",
+      "text": "相邻地表以 /world/regions 回包为准"
+    },
+    {
+      "key": "T006",
+      "text": "跨过去"
+    },
+    {
+      "key": "T007",
+      "text": "读一次地点表"
+    },
+    {
+      "key": "T008",
+      "text": "请求与拒绝顺序"
+    },
+    {
+      "key": "T009",
+      "text": "请求只带 target_region。身份由网关放进 gRPC header；"
+    },
+    {
+      "key": "T010",
+      "text": "客户端带不进境界、位置、身份。"
+    },
+    {
+      "key": "T011",
+      "text": "相邻："
+    },
+    {
+      "key": "T012",
+      "text": "已开（配置）"
+    },
+    {
+      "key": "T013",
+      "text": "未开（配置）"
+    },
+    {
+      "key": "T014",
+      "text": " · 连 "
+    },
+    {
+      "key": "T015",
+      "text": " 块"
+    },
+    {
+      "key": "T016",
+      "text": "开放以 /world/regions 回包为准：主线第几场、走立仙还是立魔都由世界服的 RegionGate 判。"
+    },
+    {
+      "key": "T017",
+      "text": "还没读地点表：下面按配置里的静态 open 标，读过之后以回包为准。"
+    }
+  ]
+}

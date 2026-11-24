@@ -37,31 +37,31 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- U14 组队
 
             // 一条请求都没发过：写「队伍名单还没到」，不拿自己凑一队。
-            shell.ShowPage("组队", s => UiPartyRoomScreen.Build(s, party));
+            shell.ShowPage(UiStrings.UiU14SelfCheck.T001, s => UiPartyRoomScreen.Build(s, party));
             var pending = Text(shell);
             Report("party_pending", pending.Contains(UiPartyCodex.EmptyList)
-                && pending.IndexOf("角色 9", StringComparison.Ordinal) < 0);
+                && pending.IndexOf(UiStrings.UiU14SelfCheck.T002, StringComparison.Ordinal) < 0);
             Debug.Log("u14_self_pending=" + (pending.Contains(UiPartyCodex.EmptyList) ? "empty" : "missing"));
 
             party.Load(shell.RefreshPage);
-            shell.ShowPage("组队", s => UiPartyRoomScreen.Build(s, party));
+            shell.ShowPage(UiStrings.UiU14SelfCheck.T001, s => UiPartyRoomScreen.Build(s, party));
             var list = Text(shell);
             Report("party_facts",
                 party.Last.Size == 2 && party.Last.MaxSize == 4 && party.Last.InParty
                 && party.Last.Members.Count == 2
-                && list.Contains("角色 5") && list.Contains("角色 9")
-                && list.Contains("队长") && list.Contains("已准备")
-                && list.Contains("2 / 4 人"));
+                && list.Contains(UiStrings.UiU14SelfCheck.T003) && list.Contains(UiStrings.UiU14SelfCheck.T002)
+                && list.Contains(UiStrings.UiU14SelfCheck.T004) && list.Contains(UiStrings.UiU14SelfCheck.T005)
+                && list.Contains(UiStrings.UiU14SelfCheck.T006));
             Debug.Log("u14_self_facts size=" + party.Last.Size + "/" + party.Last.MaxSize
                 + " members=" + party.Last.Members.Count);
 
             // 分配口径照抄回包：need_greed + 服务端掷点 + 区间；personal 走另一句。
             Report("party_loot_mode",
-                list.Contains("全队一份") && list.Contains("服务端掷点") && list.Contains("1–100")
+                list.Contains(UiStrings.UiU14SelfCheck.T007) && list.Contains(UiStrings.UiU14SelfCheck.T008) && list.Contains("1–100")
                 && CharacterParty.LootLine(new PartyOutcome
                 {
                     Ok = true, InParty = true, LootMode = "personal", LootRoll = "none",
-                }).Contains("每人各发整份"));
+                }).Contains(UiStrings.UiU14SelfCheck.T009));
 
             // ---------------------------------------------------------- U15 掷点
 
@@ -70,11 +70,11 @@ namespace HotUpdate.Ui
             assigned.Lines.Add(new LootAssignment { ItemId = "eq_2", Count = 2, WinnerCharacterId = 9 });
             loot.Apply(assigned);
 
-            shell.ShowPage("掷点", s => UiLootScreen.Build(s, loot));
+            shell.ShowPage(UiStrings.UiU14SelfCheck.T010, s => UiLootScreen.Build(s, loot));
             var lootText = Text(shell);
             Report("loot_rows",
                 loot.HasRows && loot.Rows.Count == 2 && loot.CountNobody() == 1
-                && lootText.Contains(UiLootCodex.Nobody) && lootText.Contains("归角色 9")
+                && lootText.Contains(UiLootCodex.Nobody) && lootText.Contains(UiStrings.UiU14SelfCheck.T011)
                 && lootText.Contains("eq_2 × 2")
                 && lootText.Contains(UiLootCodex.Word(UiLootCodex.Need))
                 && lootText.Contains(UiLootCodex.Word(UiLootCodex.Greed))
@@ -84,7 +84,7 @@ namespace HotUpdate.Ui
             // 第四个词发不出去：界面只有 need / greed / pass 三个词。
             Report("loot_three_words",
                 !loot.Decide("eq_1", "roll") && !loot.Decide("eq_1", string.Empty)
-                && UiLootCodex.Word(UiLootCodex.Need) == "需求");
+                && UiLootCodex.Word(UiLootCodex.Need) == UiStrings.UiU14SelfCheck.T012);
             Debug.Log("u15_self_intents=" + loot.Intents);
 
             // ---------------------------------------------------------- U16 重连
@@ -95,14 +95,14 @@ namespace HotUpdate.Ui
                 Reason = "deserter_penalty",
                 DeserterRemainingS = 42,
             });
-            shell.ShowPage("重连", s => UiReconnectScreen.Build(s, reconnect));
+            shell.ShowPage(UiStrings.UiU14SelfCheck.T013, s => UiReconnectScreen.Build(s, reconnect));
             var countdown = Text(shell);
-            Report("reconnect_fact", countdown.Contains("还剩 42 秒"));
+            Report("reconnect_fact", countdown.Contains(UiStrings.UiU14SelfCheck.T014));
             Debug.Log("u16_self_remaining=" + reconnect.Remaining);
 
             reconnect.Advance(41f);
             Report("reconnect_tick", reconnect.Remaining == 1
-                && Text(shell).Contains("还剩 1 秒"));
+                && Text(shell).Contains(UiStrings.UiU14SelfCheck.T015));
             reconnect.Advance(1f);
             Report("reconnect_cleared", reconnect.Remaining == 0
                 && UiReconnectCodex.PenaltyLine(reconnect.HasFact, reconnect.Remaining)
@@ -116,23 +116,23 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- U17 世界 Boss
 
             social.LoadBoss(shell.RefreshPage);
-            shell.ShowPage("世界 Boss", s => UiWorldBossScreen.Build(s, social));
+            shell.ShowPage(UiStrings.UiU14SelfCheck.T016, s => UiWorldBossScreen.Build(s, social));
             var boss = Text(shell);
             Report("boss_facts",
                 social.HasBoss && social.LastBoss.Visible && !social.LastBoss.Killed
-                && boss.Contains("荒原祭坛") && boss.Contains("已进 3 / 20")
-                && boss.Contains("还能进 17") && boss.Contains("无人记名"));
+                && boss.Contains(UiStrings.UiU14SelfCheck.T017) && boss.Contains(UiStrings.UiU14SelfCheck.T018)
+                && boss.Contains(UiStrings.UiU14SelfCheck.T019) && boss.Contains(UiStrings.UiU14SelfCheck.T020));
             Debug.Log("u17_self_current=" + social.LastBoss.Current + "/" + social.LastBoss.Cap
                 + " remaining=" + social.LastBoss.Remaining);
 
             social.SetSender((path, body, token, done) => done(200, BossKilledJson));
             social.LoadBoss(shell.RefreshPage);
-            shell.ShowPage("世界 Boss", s => UiWorldBossScreen.Build(s, social));
-            Report("boss_killed", Text(shell).Contains("这一场已打掉"));
+            shell.ShowPage(UiStrings.UiU14SelfCheck.T016, s => UiWorldBossScreen.Build(s, social));
+            Report("boss_killed", Text(shell).Contains(UiStrings.UiU14SelfCheck.T021));
 
             // ---------------------------------------------------------- 四屏切皮肤
 
-            shell.ShowPage("组队", s => UiPartyRoomScreen.Build(s, party));
+            shell.ShowPage(UiStrings.UiU14SelfCheck.T001, s => UiPartyRoomScreen.Build(s, party));
             var layout = Layout(shell);
             var copy = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);
@@ -199,17 +199,17 @@ namespace HotUpdate.Ui
             "\"loot_mode\":\"need_greed\",\"loot_roll\":\"server\",\"roll_min\":1,\"roll_max\":100}";
 
         const string BossJson =
-            "{\"visible\":true,\"reason\":\"\",\"entrance_id\":\"wb_1\",\"entrance_name\":\"荒原祭坛\"," +
+            UiStrings.UiU14SelfCheck.T022 +
             "\"window_key\":\"w1\",\"cap\":20,\"current\":3,\"remaining\":17," +
             "\"hold_s\":600,\"renew_s\":300,\"lost_s\":120,\"killed\":false," +
             "\"owner_sect_id\":0,\"owner_sect_name\":\"\",\"starts_at_ms\":0," +
             "\"ends_at_ms\":0,\"next_starts_at_ms\":0}";
 
         const string BossKilledJson =
-            "{\"visible\":true,\"reason\":\"\",\"entrance_id\":\"wb_1\",\"entrance_name\":\"荒原祭坛\"," +
+            UiStrings.UiU14SelfCheck.T022 +
             "\"window_key\":\"w1\",\"cap\":20,\"current\":20,\"remaining\":0," +
             "\"hold_s\":600,\"renew_s\":300,\"lost_s\":120,\"killed\":true," +
-            "\"owner_sect_id\":7,\"owner_sect_name\":\"云锦\",\"starts_at_ms\":0," +
+            UiStrings.UiU14SelfCheck.T023 +
             "\"ends_at_ms\":0,\"next_starts_at_ms\":0}";
     }
 }

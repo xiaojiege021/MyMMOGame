@@ -1,0 +1,27 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiWorldFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiWorldFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "世界地图"
+    },
+    {
+      "key": "T002",
+      "text": "对白"
+    },
+    {
+      "key": "T003",
+      "text": "采集"
+    },
+    {
+      "key": "T004",
+      "text": "飞行"
+    },
+    {
+      "key": "T005",
+      "text": "表世界"
+    }
+  ]
+}

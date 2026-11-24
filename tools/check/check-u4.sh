@@ -61,7 +61,7 @@ import glob, json, os, re, sys
 
 root = os.environ['ROOT']
 sys.path.insert(0, root + '/tools/check')
-from lib_read import read_text
+from lib_read import read_text, ui_text_assert
 
 def client(rel):
     p = os.path.join(root, 'client/MMOGame/Assets', rel)
@@ -121,11 +121,13 @@ flow = client('HotUpdate/Ui/UiWorldFlow.cs')
 gather_ui = client('HotUpdate/Ui/UiGatherScreen.cs')
 net_gather = client('Net/WorldGather.cs')
 no_hardcoded = ('Id = "ore_kulan_1"' not in codex and 'static readonly GatherNode[] Nodes' not in codex)
+# D9 之后「读取节点表」在 config/ui_text/UiGatherScreen.json，断言改成查表 + 查引用。
+gather_label = ui_text_assert(root, 'UiGatherScreen', '读取节点表', gather_ui, '采集屏')
 wiring = ('LoadGatherNodes' in flow and 'ParseList' in net_gather
           and '/world/gather/nodes' in flow
           and 'NodesOfKind' in flow
           and 'NoGatherNodesYet' in codex
-          and '读取节点表' in gather_ui
+          and gather_label
           and 'config/gather.json' not in gather_ui)
 say('codex_nodes', no_hardcoded and wiring,
     'hardcoded=%s wiring=%s' % (not no_hardcoded, wiring))

@@ -1,0 +1,15 @@
+{
+  "schema": "ui-text/1",
+  "group": "SectFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/Flow/SectFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "名册没读到："
+    },
+    {
+      "key": "T002",
+      "text": "世界 Boss 入口没读到："
+    }
+  ]
+}

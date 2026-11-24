@@ -42,9 +42,9 @@ namespace HotUpdate.Ui
             flow.ClearViews();
 
             shell.Label(m.Band(pad, m.Px(80f), m.Width - pad * 2f, m.Px(60f)),
-                "对白 · 开口的人", UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiDialogueScreen.T001, UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
             shell.Label(m.Band(pad, m.Px(146f), leftW, m.Px(44f)),
-                "定词照方案 2.7 原文，只留配置，不写进场景",
+                UiStrings.UiDialogueScreen.T002,
                 UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 左：九位
@@ -59,7 +59,7 @@ namespace HotUpdate.Ui
             {
                 var speaker = UiWorldCodex.Speakers[i];
                 var sub = (speaker.Origin.Length > 0 ? speaker.Origin + " · " : string.Empty)
-                    + "第 " + speaker.FirstChapter + " 场"
+                    + UiStrings.UiDialogueScreen.T003 + speaker.FirstChapter + UiStrings.UiDialogueScreen.T004
                     + (speaker.FirstRegion.Length > 0 ? " · " + speaker.FirstRegion : string.Empty);
                 var option = new UiOption(
                     shell.Content, m.Band(pad, listTop + i * (rowH + rowGap), leftW, rowH),
@@ -78,7 +78,7 @@ namespace HotUpdate.Ui
             parts.Meta = shell.Label(m.Band(rightX, m.Px(266f), rightW, m.Px(44f)),
                 string.Empty, UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
-            var first = shell.Panel("第 1 场", m.Band(rightX, m.Px(320f), rightW, m.Px(400f)), shell.Size(26f));
+            var first = shell.Panel(UiStrings.UiDialogueScreen.T005, m.Band(rightX, m.Px(320f), rightW, m.Px(400f)), shell.Size(26f));
             parts.FirstTitle = first.Title;
             parts.FirstText = shell.LabelIn(first.Root,
                 new Rect(m.Px(28f), m.Px(120f), rightW - m.Px(56f), m.Px(230f)),
@@ -87,7 +87,7 @@ namespace HotUpdate.Ui
                 new Rect(m.Px(28f), m.Px(40f), rightW - m.Px(56f), m.Px(70f)),
                 string.Empty, UiTextRole.Faint, shell.Size(22f), TextAnchor.UpperLeft, true);
 
-            var second = shell.Panel("第 2 场", m.Band(rightX, m.Px(740f), rightW, m.Px(400f)), shell.Size(26f));
+            var second = shell.Panel(UiStrings.UiDialogueScreen.T006, m.Band(rightX, m.Px(740f), rightW, m.Px(400f)), shell.Size(26f));
             parts.SecondTitle = second.Title;
             parts.SecondText = shell.LabelIn(second.Root,
                 new Rect(m.Px(28f), m.Px(120f), rightW - m.Px(56f), m.Px(230f)),
@@ -97,8 +97,8 @@ namespace HotUpdate.Ui
                 string.Empty, UiTextRole.Faint, shell.Size(22f), TextAnchor.UpperLeft, true);
 
             shell.Label(new Rect(rightX, m.Height - m.Px(1220f), rightW, m.Px(48f)),
-                "共 " + UiWorldCodex.TotalDialogueLines
-                + " 条定词逐字照 config/dialogue；对白只留配置，不进场景脚本。",
+                UiStrings.UiDialogueScreen.T007 + UiWorldCodex.TotalDialogueLines
+                + UiStrings.UiDialogueScreen.T008,
                 UiTextRole.Muted, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             Show(shell, parts, options, UiWorldCodex.Speakers[0].Name);
@@ -130,29 +130,29 @@ namespace HotUpdate.Ui
 
             parts.Head.Label.text = speaker.Name;
             parts.Meta.Label.text = (speaker.Origin.Length > 0 ? speaker.Origin + " · " : string.Empty)
-                + "第 " + speaker.FirstChapter + " 场"
+                + UiStrings.UiDialogueScreen.T003 + speaker.FirstChapter + UiStrings.UiDialogueScreen.T004
                 + (speaker.FirstRegion.Length > 0 ? " · " + speaker.FirstRegion : string.Empty)
-                + " · 共 " + speaker.LineCount + " 场";
+                + UiStrings.UiDialogueScreen.T009 + speaker.LineCount + UiStrings.UiDialogueScreen.T004;
 
-            parts.FirstTitle.text = "第 " + speaker.Lines[0].Chapter + " 场"
+            parts.FirstTitle.text = UiStrings.UiDialogueScreen.T003 + speaker.Lines[0].Chapter + UiStrings.UiDialogueScreen.T004
                 + (speaker.Lines[0].Region.Length > 0 ? " · " + speaker.Lines[0].Region : string.Empty);
             parts.FirstText.Label.text = "「" + speaker.Text + "」";
-            parts.FirstLimit.Label.text = "限制：" + speaker.Limit;
+            parts.FirstLimit.Label.text = UiStrings.UiDialogueScreen.T010 + speaker.Limit;
 
             // 第二块放配置里的下一条；一位只有一场时如实写「没有第 2 场」，
             // 不拿别人的台词顶上。多场角色的其余几条仍只在配置里。
             if (speaker.Lines.Length > 1)
             {
-                parts.SecondTitle.text = "第 " + speaker.Lines[1].Chapter + " 场"
+                parts.SecondTitle.text = UiStrings.UiDialogueScreen.T003 + speaker.Lines[1].Chapter + UiStrings.UiDialogueScreen.T004
                     + (speaker.Lines[1].Region.Length > 0 ? " · " + speaker.Lines[1].Region : string.Empty);
                 parts.SecondText.Label.text = "「" + speaker.SecondText + "」";
-                parts.SecondLimit.Label.text = "限制：" + speaker.SecondLimit;
+                parts.SecondLimit.Label.text = UiStrings.UiDialogueScreen.T010 + speaker.SecondLimit;
             }
             else
             {
-                parts.SecondTitle.text = "第 2 场";
-                parts.SecondText.Label.text = "这一位只有一场，没有第 2 场。";
-                parts.SecondLimit.Label.text = "不加台词、不补戏";
+                parts.SecondTitle.text = UiStrings.UiDialogueScreen.T006;
+                parts.SecondText.Label.text = UiStrings.UiDialogueScreen.T011;
+                parts.SecondLimit.Label.text = UiStrings.UiDialogueScreen.T012;
             }
         }
 

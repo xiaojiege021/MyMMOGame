@@ -33,13 +33,13 @@ namespace HotUpdate.Ui
                 crystalSlot = rows.Count > 1 ? rows[1].Slot : rows[0].Slot;
             }
 
-            var equip = shell.Panel("装备格", m.Band(pad, top + m.Px(56f), colW, m.Px(360f)), shell.Size(32f));
-            var crystal = shell.Panel("结晶格", m.Band(pad + colW + gap, top + m.Px(56f), colW, m.Px(360f)),
+            var equip = shell.Panel(UiStrings.UiCrystalScreen.T001, m.Band(pad, top + m.Px(56f), colW, m.Px(360f)), shell.Size(32f));
+            var crystal = shell.Panel(UiStrings.UiCrystalScreen.T002, m.Band(pad + colW + gap, top + m.Px(56f), colW, m.Px(360f)),
                 shell.Size(32f));
             BuildPicker(shell, equip, rows, colW, 0, slot => equipSlot = slot, "equip");
             BuildPicker(shell, crystal, rows, colW, rows.Count > 1 ? 1 : 0, slot => crystalSlot = slot, "crystal");
 
-            var sockets = shell.Panel("镶嵌位", m.Band(pad, top + m.Px(56f) + m.Px(400f), m.Width - pad * 2f, m.Px(180f)),
+            var sockets = shell.Panel(UiStrings.UiCrystalScreen.T003, m.Band(pad, top + m.Px(56f) + m.Px(400f), m.Width - pad * 2f, m.Px(180f)),
                 shell.Size(32f));
             for (var i = 0; i < 3; i++)
             {
@@ -47,7 +47,7 @@ namespace HotUpdate.Ui
                 var opt = new UiOption(
                     sockets.Root,
                     new Rect(m.Px(24f) + i * m.Px(240f), m.Px(60f), m.Px(210f), m.Px(72f)),
-                    (i + 1).ToString(), "第 " + (i + 1) + " 位", "",
+                    (i + 1).ToString(), UiStrings.UiCrystalScreen.T004 + (i + 1) + UiStrings.UiCrystalScreen.T005, "",
                     UiOptionKind.Chip, shell.Size(26f), shell.Size(20f));
                 opt.Selected = i == 0;
                 opt.OnPick = picked =>
@@ -60,7 +60,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(m.Width * 0.5f - m.Px(360f), m.Px(300f), m.Px(320f), m.Px(72f)),
-                "装上结晶",
+                UiStrings.UiCrystalScreen.T006,
                 () =>
                 {
                     if (flow.Busy || equipSlot == 0 || crystalSlot == 0)
@@ -73,7 +73,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(m.Width * 0.5f + m.Px(40f), m.Px(300f), m.Px(320f), m.Px(72f)),
-                "拆下结晶",
+                UiStrings.UiCrystalScreen.T007,
                 () =>
                 {
                     if (flow.Busy || equipSlot == 0)
@@ -84,19 +84,19 @@ namespace HotUpdate.Ui
                     flow.RemoveCrystal(equipSlot, socket, shell.RefreshPage);
                 }, UiButtonKind.Normal);
 
-            var result = shell.Panel("回包", m.Band(pad, m.Px(620f), m.Width - pad * 2f, m.Px(420f)),
+            var result = shell.Panel(UiStrings.UiCrystalScreen.T008, m.Band(pad, m.Px(620f), m.Width - pad * 2f, m.Px(420f)),
                 shell.Size(32f));
             var c = flow.LastCrystal;
             var has = flow.HasCrystal;
-            UiUpgradeViews.Result(shell, result, m.Px(310f), "结果",
-                has ? (c.Ok ? (c.Installed ? "已装上" : "已拆下") : "被拒：" + c.Reason) : "尚未请求");
-            UiUpgradeViews.Result(shell, result, m.Px(258f), "类别 / 部位",
+            UiUpgradeViews.Result(shell, result, m.Px(310f), UiStrings.UiCrystalScreen.T009,
+                has ? (c.Ok ? (c.Installed ? UiStrings.UiCrystalScreen.T010 : UiStrings.UiCrystalScreen.T011) : UiStrings.UiCrystalScreen.T012 + c.Reason) : UiStrings.UiCrystalScreen.T013);
+            UiUpgradeViews.Result(shell, result, m.Px(258f), UiStrings.UiCrystalScreen.T014,
                 has ? c.Category + " / " + c.Part : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(206f), "镶嵌位",
-                has ? c.Socket + " / " + c.SocketCount + "（已填 " + c.Filled + "）" : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(154f), "背包结晶",
-                has ? c.CrystalItem + " · 剩 " + c.CrystalLeft : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(102f), "强化 / 金币 / 绑定",
+            UiUpgradeViews.Result(shell, result, m.Px(206f), UiStrings.UiCrystalScreen.T003,
+                has ? c.Socket + " / " + c.SocketCount + UiStrings.UiCrystalScreen.T015 + c.Filled + "）" : "—");
+            UiUpgradeViews.Result(shell, result, m.Px(154f), UiStrings.UiCrystalScreen.T016,
+                has ? c.CrystalItem + UiStrings.UiCrystalScreen.T017 + c.CrystalLeft : "—");
+            UiUpgradeViews.Result(shell, result, m.Px(102f), UiStrings.UiCrystalScreen.T018,
                 has ? c.EnhanceLevel + " / " + c.Gold + " / " + (c.Bound ? "true" : "false") : "—");
 
             Debug.Log(ReadyLog + " equip=" + equipSlot + " crystal=" + crystalSlot
@@ -113,7 +113,7 @@ namespace HotUpdate.Ui
                     panel.Root,
                     new Rect(shell.Metrics.Px(24f), shell.Metrics.Px(56f) + i * shell.Metrics.Px(72f),
                         width - shell.Metrics.Px(48f), shell.Metrics.Px(62f)),
-                    row.Slot.ToString(), "第 " + row.Slot + " 格",
+                    row.Slot.ToString(), UiStrings.UiCrystalScreen.T004 + row.Slot + UiStrings.UiCrystalScreen.T019,
                     row.ItemId + " × " + row.Count,
                     UiOptionKind.Card, shell.Size(26f), shell.Size(20f));
                 opt.Selected = i == selected;

@@ -20,10 +20,10 @@ namespace HotUpdate.Ui
         public const string ReadyLog = "u6_npc_shop_screen=ready";
 
         public const string Note =
-            "买 / 卖 / 回购 / 修理同一个面板 · 标价、库存、回收价、修理费全看 /shop/npc 回包";
+            UiStrings.UiNpcShopCodex.T001;
 
-        public const string SellNote = "白名单外的物品不能卖 · 身上穿着的不能卖";
+        public const string SellNote = UiStrings.UiNpcShopCodex.T002;
 
-        public const string RepairNote = "只修身上三件 · 按缺失耐久扣金币";
+        public const string RepairNote = UiStrings.UiNpcShopCodex.T003;
     }
 }

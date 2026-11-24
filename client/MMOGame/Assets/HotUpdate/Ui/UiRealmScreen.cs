@@ -31,33 +31,33 @@ namespace HotUpdate.Ui
             var promoted = flow.LastPromote;
 
             // 左：大境界与段内阶都只抄回包，没请求就写「尚未请求」。
-            var current = shell.Panel("当前", m.Band(pad, top + m.Px(56f), leftW, m.Px(620f)), shell.Size(34f));
+            var current = shell.Panel(UiStrings.UiRealmScreen.T001, m.Band(pad, top + m.Px(56f), leftW, m.Px(620f)), shell.Size(34f));
             UiUpgradeViews.Rows(shell, current,
-                new[] { "大境界", "段内阶", "被动", "下一大境界" },
+                new[] { UiStrings.UiRealmScreen.T002, UiStrings.UiRealmScreen.T003, UiStrings.UiRealmScreen.T004, UiStrings.UiRealmScreen.T005 },
                 new[]
                 {
-                    realm.Length > 0 ? realm : "尚未读到",
+                    realm.Length > 0 ? realm : UiStrings.UiRealmScreen.T006,
                     CharacterRealmPhase.PhaseLine(flow.RealmPhaseRequested, phase),
                     flow.RealmPhaseRequested && phase.Ok ? phase.PassivePctBps + " bps" : "—",
-                    "后面的卡",
+                    UiStrings.UiRealmScreen.T007,
                 },
                 m.Px(92f), m.Px(32f));
 
             // 右：段内阶这一手。阶序号与门槛都照回包写。
-            var actions = shell.Panel("段内阶", m.Band(rightX, top + m.Px(56f), rightW, m.Px(520f)),
+            var actions = shell.Panel(UiStrings.UiRealmScreen.T003, m.Band(rightX, top + m.Px(56f), rightW, m.Px(520f)),
                 shell.Size(34f));
             UiUpgradeViews.Rows(shell, actions,
-                new[] { "回包境界", "阶序号", "升阶门槛" },
+                new[] { UiStrings.UiRealmScreen.T008, UiStrings.UiRealmScreen.T009, UiStrings.UiRealmScreen.T010 },
                 new[]
                 {
-                    phase.Ok ? phase.Realm : "尚未请求",
+                    phase.Ok ? phase.Realm : UiStrings.UiRealmScreen.T011,
                     phase.Ok ? phase.Phase.ToString() : "—",
                     CharacterRealmPhase.RequiredLine(flow.HasPromote, promoted),
                 },
                 m.Px(84f), m.Px(32f));
 
             shell.ButtonIn(actions.Root,
-                new Rect(m.Px(28f), m.Px(24f), m.Px(320f), m.Px(76f)), "读一次",
+                new Rect(m.Px(28f), m.Px(24f), m.Px(320f), m.Px(76f)), UiStrings.UiRealmScreen.T012,
                 () =>
                 {
                     if (flow.Busy)
@@ -69,7 +69,7 @@ namespace HotUpdate.Ui
                 }, UiButtonKind.Normal);
 
             shell.ButtonIn(actions.Root,
-                new Rect(rightW - m.Px(28f) - m.Px(320f), m.Px(24f), m.Px(320f), m.Px(76f)), "升一阶",
+                new Rect(rightW - m.Px(28f) - m.Px(320f), m.Px(24f), m.Px(320f), m.Px(76f)), UiStrings.UiRealmScreen.T013,
                 () =>
                 {
                     if (flow.Busy)
@@ -81,14 +81,14 @@ namespace HotUpdate.Ui
                 }, UiButtonKind.Primary);
 
             // 右下：升阶回包。被拒时门槛照回包给，按键本身不做本地判断。
-            var result = shell.Panel("回包", m.Band(rightX, top + m.Px(56f) + m.Px(600f), rightW,
+            var result = shell.Panel(UiStrings.UiRealmScreen.T014, m.Band(rightX, top + m.Px(56f) + m.Px(600f), rightW,
                 m.Px(440f)), shell.Size(34f));
-            UiUpgradeViews.Result(shell, result, m.Px(300f), "结果",
+            UiUpgradeViews.Result(shell, result, m.Px(300f), UiStrings.UiRealmScreen.T015,
                 CharacterRealmPhase.PromoteLine(flow.HasPromote, promoted));
-            UiUpgradeViews.Result(shell, result, m.Px(244f), "被动",
+            UiUpgradeViews.Result(shell, result, m.Px(244f), UiStrings.UiRealmScreen.T004,
                 flow.HasPromote && promoted.Ok ? promoted.PassivePctBps + " bps" : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(188f), "重复",
-                flow.HasPromote ? (promoted.Duplicate ? "同一笔只升一次" : "新的一笔") : "—");
+            UiUpgradeViews.Result(shell, result, m.Px(188f), UiStrings.UiRealmScreen.T016,
+                flow.HasPromote ? (promoted.Duplicate ? UiStrings.UiRealmScreen.T017 : UiStrings.UiRealmScreen.T018) : "—");
 
             Debug.Log(ReadyLog + " realm=" + realm
                 + " phase_requested=" + (flow.RealmPhaseRequested ? "true" : "false")

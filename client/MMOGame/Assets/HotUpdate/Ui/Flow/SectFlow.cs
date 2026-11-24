@@ -94,7 +94,7 @@ namespace HotUpdate.Ui
                     else
                     {
                         HasRoster = false;
-                        Error = "名册没读到：" + status.ToString(CultureInfo.InvariantCulture);
+                        Error = UiStrings.SectFlow.T001 + status.ToString(CultureInfo.InvariantCulture);
                         Debug.Log("n3_roster=reject status=" + status.ToString(CultureInfo.InvariantCulture));
                     }
 
@@ -119,7 +119,7 @@ namespace HotUpdate.Ui
                 }
                 else
                 {
-                    Error = "世界 Boss 入口没读到：" + status;
+                    Error = UiStrings.SectFlow.T002 + status;
                     Debug.Log("u7_boss=reject status=" + status);
                 }
 

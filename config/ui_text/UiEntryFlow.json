@@ -1,0 +1,67 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiEntryFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiEntryFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "立身 · 选出身与职责"
+    },
+    {
+      "key": "T002",
+      "text": "角色栏"
+    },
+    {
+      "key": "T003",
+      "text": "正在校验"
+    },
+    {
+      "key": "T004",
+      "text": "登 入"
+    },
+    {
+      "key": "T005",
+      "text": "正在立身"
+    },
+    {
+      "key": "T006",
+      "text": "入 世"
+    },
+    {
+      "key": "T007",
+      "text": "会话已过期，请重新登入"
+    },
+    {
+      "key": "T008",
+      "text": "没能接引，稍后再试"
+    },
+    {
+      "key": "T009",
+      "text": "已入世"
+    },
+    {
+      "key": "T010",
+      "text": "请求没发出去，重试一次"
+    },
+    {
+      "key": "T011",
+      "text": "账号或口令不对"
+    },
+    {
+      "key": "T012",
+      "text": "这个名号已经有人用了"
+    },
+    {
+      "key": "T013",
+      "text": "暂时连不上，稍后再试"
+    },
+    {
+      "key": "T014",
+      "text": "连不上网关"
+    },
+    {
+      "key": "T015",
+      "text": "没成，稍后再试"
+    }
+  ]
+}

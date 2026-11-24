@@ -1,0 +1,31 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiCommerceSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiCommerceSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "商城"
+    },
+    {
+      "key": "T002",
+      "text": "拍卖与寄售"
+    },
+    {
+      "key": "T003",
+      "text": "货币"
+    },
+    {
+      "key": "T004",
+      "text": "赛季通行证"
+    },
+    {
+      "key": "T005",
+      "text": "\\\"bag_slots\\\":40,\\\"character_name\\\":\\\"自检角色\\\",\\\"realm\\\":\\\"炼体\\\"}"
+    },
+    {
+      "key": "T006",
+      "text": "\\\"name\\\":\\\"服饰外观\\\",\\\"price_yuanbao\\\":120,\\\"currency\\\":\\\"yuanbao\\\",\\\"balance\\\":380,"
+    }
+  ]
+}

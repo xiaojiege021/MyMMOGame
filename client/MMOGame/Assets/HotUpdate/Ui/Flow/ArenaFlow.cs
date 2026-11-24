@@ -51,7 +51,7 @@ namespace HotUpdate.Ui
                     {
                         LastArena = VersusOutcome.Failure("http_" + status);
                         HasArena = false;
-                        Error = "竞技场进场没回应：" + status;
+                        Error = UiStrings.ArenaFlow.T001 + status;
                         Debug.Log("u12_arena=reject status=" + status);
                     }
 
@@ -95,7 +95,7 @@ namespace HotUpdate.Ui
                     {
                         LastBattlefield = VersusOutcome.Failure("http_" + status);
                         HasBattlefield = false;
-                        Error = "战场进场没回应：" + status;
+                        Error = UiStrings.ArenaFlow.T002 + status;
                         Debug.Log("u12_battlefield=reject status=" + status);
                     }
 

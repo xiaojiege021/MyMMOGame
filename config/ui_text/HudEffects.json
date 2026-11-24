@@ -1,0 +1,23 @@
+{
+  "schema": "ui-text/1",
+  "group": "HudEffects",
+  "source": "client/MMOGame/Assets/HotUpdate/Hud/HudEffects.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "  盾 "
+    },
+    {
+      "key": "T002",
+      "text": "获得 "
+    },
+    {
+      "key": "T003",
+      "text": " 结束"
+    },
+    {
+      "key": "T004",
+      "text": "效果："
+    }
+  ]
+}

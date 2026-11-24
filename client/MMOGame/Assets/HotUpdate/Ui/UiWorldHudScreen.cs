@@ -32,26 +32,26 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 标题
 
             shell.Label(m.Band(pad, m.Px(80f), wide, m.Px(64f)),
-                "表世界", UiTextRole.Title, shell.Size(52f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiWorldHudScreen.T001, UiTextRole.Title, shell.Size(52f), TextAnchor.MiddleLeft, false);
             var sub = shell.Label(m.Band(pad, m.Px(150f), wide, m.Px(44f)),
                 UiWorldCodex.HudLine, UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 左上：角色面板
 
             var cardW = m.Px(700f);
-            var card = shell.Panel("本角色", m.Band(pad, m.Px(230f), cardW, m.Px(580f)), shell.Size(30f));
+            var card = shell.Panel(UiStrings.UiWorldHudScreen.T002, m.Band(pad, m.Px(230f), cardW, m.Px(580f)), shell.Size(30f));
             var roleText = shell.LabelIn(card.Root,
                 new Rect(m.Px(30f), m.Px(390f), cardW - m.Px(60f), m.Px(120f)),
-                "体力 / 蓝量 / 等级三条只读角色服回包，本地不估、不回写。",
+                UiStrings.UiWorldHudScreen.T003,
                 UiTextRole.Body, shell.Size(26f), TextAnchor.UpperLeft, true);
             var meterNote = shell.LabelIn(card.Root,
                 new Rect(m.Px(30f), m.Px(200f), cardW - m.Px(60f), m.Px(170f)),
-                "三条在这里只是名字：体力（红条）、蓝量（蓝条）、等级 x / 100。\n"
-                + "没有属性回包之前不写数字，免得把配置里的顶格值当成自己的血量。",
+                UiStrings.UiWorldHudScreen.T004
+                + UiStrings.UiWorldHudScreen.T005,
                 UiTextRole.Faint, shell.Size(24f), TextAnchor.UpperLeft, true);
             var realmNote = shell.LabelIn(card.Root,
                 new Rect(m.Px(30f), m.Px(96f), cardW - m.Px(60f), m.Px(96f)),
-                "境界 45 级后开启 · 界面写明还差哪一段",
+                UiStrings.UiWorldHudScreen.T006,
                 UiTextRole.Muted, shell.Size(24f), TextAnchor.UpperLeft, true);
 
             // ---------------------------------------------------------- 右上：同屏三档
@@ -79,15 +79,15 @@ namespace HotUpdate.Ui
 
             shell.LabelIn(tier.Root,
                 new Rect(m.Px(28f), m.Px(310f), tierW - m.Px(56f), m.Px(56f)),
-                "两档距离只在 config/world.json（" + UiWorldCodex.TierNearDistance
-                + " / " + UiWorldCodex.TierFarDistance + "），客户端不拿它算档",
+                UiStrings.UiWorldHudScreen.T007 + UiWorldCodex.TierNearDistance
+                + " / " + UiWorldCodex.TierFarDistance + UiStrings.UiWorldHudScreen.T008,
                 UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 右中：八块地表
 
             var mapTop = m.Px(650f);
             var mapH = m.Px(500f);
-            var map = shell.Panel("八块地表 · 无缝相连", m.Band(tierX, mapTop, tierW, mapH), shell.Size(28f));
+            var map = shell.Panel(UiStrings.UiWorldHudScreen.T009, m.Band(tierX, mapTop, tierW, mapH), shell.Size(28f));
             var dot = new UiText[UiWorldCodex.Regions.Length];
             for (var i = 0; i < UiWorldCodex.Regions.Length; i++)
             {
@@ -96,7 +96,7 @@ namespace HotUpdate.Ui
                 var y = m.Px(70f) + (mapH - m.Px(170f)) * (1f - region.MapY / 100f);
                 dot[i] = shell.LabelIn(map.Root,
                     new Rect(x - m.Px(80f), y, m.Px(160f), m.Px(76f)),
-                    region.Name + "\n" + region.Realm + (region.Open ? "" : " · 未开"),
+                    region.Name + "\n" + region.Realm + (region.Open ? "" : UiStrings.UiWorldHudScreen.T010),
                     region.Open ? UiTextRole.Body : UiTextRole.Faint,
                     shell.Size(20f), TextAnchor.MiddleCenter, false);
             }
@@ -104,7 +104,7 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 左下：附近
 
             var nearTop = m.Height - m.Px(700f);
-            var near = shell.Panel("附近", m.Band(pad, nearTop, cardW, m.Px(380f)), shell.Size(28f));
+            var near = shell.Panel(UiStrings.UiWorldHudScreen.T011, m.Band(pad, nearTop, cardW, m.Px(380f)), shell.Size(28f));
             for (var i = 0; i < UiWorldCodex.HudNearby.Length; i++)
             {
                 shell.LabelIn(near.Root,
@@ -149,7 +149,7 @@ namespace HotUpdate.Ui
                 for (var i = 0; i < dot.Length; i++)
                 {
                     dot[i].Label.text = UiWorldCodex.Regions[i].Name + "\n" + UiWorldCodex.Regions[i].Realm
-                        + (UiWorldCodex.Regions[i].Open ? "" : " · 未开");
+                        + (UiWorldCodex.Regions[i].Open ? "" : UiStrings.UiWorldHudScreen.T010);
                 }
             });
 
@@ -165,10 +165,10 @@ namespace HotUpdate.Ui
         public static string TierLine(AppearanceTier tier)
         {
             var visual = WorldPeerTiers.For(tier, string.Empty);
-            var what = visual.FullModel ? "完整模型" : visual.SimpleModel ? "简模" : "只留名字";
+            var what = visual.FullModel ? UiStrings.UiWorldHudScreen.T012 : visual.SimpleModel ? UiStrings.UiWorldHudScreen.T013 : UiStrings.UiWorldHudScreen.T014;
             return TierNameOf(tier) + " → " + what
-                + " · 名字牌" + (visual.NamePlate ? "开" : "关")
-                + " · 拖尾光效" + (visual.TrailsAndEffects ? "开" : "关");
+                + UiStrings.UiWorldHudScreen.T015 + (visual.NamePlate ? UiStrings.UiWorldHudScreen.T016 : UiStrings.UiWorldHudScreen.T017)
+                + UiStrings.UiWorldHudScreen.T018 + (visual.TrailsAndEffects ? UiStrings.UiWorldHudScreen.T016 : UiStrings.UiWorldHudScreen.T017);
         }
 
         static string TierNameOf(AppearanceTier tier)
@@ -191,16 +191,16 @@ namespace HotUpdate.Ui
             switch (index)
             {
                 case 0:
-                    shell.ShowPage("采集", s => UiGatherScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldHudScreen.T019, s => UiGatherScreen.Build(s, flow));
                     break;
                 case 1:
-                    shell.ShowPage("对白", s => UiDialogueScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldHudScreen.T020, s => UiDialogueScreen.Build(s, flow));
                     break;
                 case 2:
-                    shell.ShowPage("飞行", s => UiFlightScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiWorldHudScreen.T021, s => UiFlightScreen.Build(s, flow));
                     break;
                 default:
-                    shell.Toast("切目标还没有独立屏，这一格先只标名字");
+                    shell.Toast(UiStrings.UiWorldHudScreen.T022);
                     break;
             }
         }

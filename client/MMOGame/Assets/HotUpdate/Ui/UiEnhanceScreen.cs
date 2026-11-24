@@ -30,11 +30,11 @@ namespace HotUpdate.Ui
             var useCoupon = new[] { false };
 
             // 左：可选的背包格。
-            var pick = shell.Panel("选一格", m.Band(pad, top + m.Px(56f), leftW, m.Px(620f)), shell.Size(32f));
+            var pick = shell.Panel(UiStrings.UiEnhanceScreen.T001, m.Band(pad, top + m.Px(56f), leftW, m.Px(620f)), shell.Size(32f));
             var rows = flow.HasBag ? UiUpgradeCodex.FirstSlots(flow.Bag, 6) : new List<Mmo.Net.BagSlotView>();
             var chosenText = shell.LabelIn(pick.Root,
                 new Rect(m.Px(28f), m.Px(28f), leftW - m.Px(56f), m.Px(44f)),
-                rows.Count > 0 ? "已选第 " + rows[0].Slot + " 格" : "尚未读背包",
+                rows.Count > 0 ? UiStrings.UiEnhanceScreen.T002 + rows[0].Slot + UiStrings.UiEnhanceScreen.T003 : UiStrings.UiEnhanceScreen.T004,
                 UiTextRole.Faint, shell.Size(24f), TextAnchor.MiddleLeft, false);
             if (rows.Count > 0)
             {
@@ -47,22 +47,22 @@ namespace HotUpdate.Ui
                 var opt = new UiOption(
                     pick.Root,
                     new Rect(m.Px(24f), m.Px(92f) + i * m.Px(80f), leftW - m.Px(48f), m.Px(68f)),
-                    row.Slot.ToString(), "第 " + row.Slot + " 格",
-                    row.ItemId + " × " + row.Count + (row.Bound ? " · 绑定" : ""),
+                    row.Slot.ToString(), UiStrings.UiEnhanceScreen.T005 + row.Slot + UiStrings.UiEnhanceScreen.T003,
+                    row.ItemId + " × " + row.Count + (row.Bound ? UiStrings.UiEnhanceScreen.T006 : ""),
                     UiOptionKind.Card, shell.Size(26f), shell.Size(20f));
                 opt.Selected = i == 0;
                 var slot = row.Slot;
                 opt.OnPick = picked =>
                 {
                     chosenSlot = slot;
-                    chosenText.Label.text = "已选第 " + slot + " 格";
+                    chosenText.Label.text = UiStrings.UiEnhanceScreen.T002 + slot + UiStrings.UiEnhanceScreen.T003;
                     Debug.Log("u5_enhance_pick slot=" + slot);
                 };
                 shell.Register(opt);
             }
 
             // 右：三档石头 + 券开关 + 开始。
-            var actions = shell.Panel("这一手", m.Band(rightX, top + m.Px(56f), rightW, m.Px(420f)), shell.Size(32f));
+            var actions = shell.Panel(UiStrings.UiEnhanceScreen.T007, m.Band(rightX, top + m.Px(56f), rightW, m.Px(420f)), shell.Size(32f));
             for (var i = 0; i < UiUpgradeCodex.Tiers.Length; i++)
             {
                 var tier = UiUpgradeCodex.Tiers[i];
@@ -82,7 +82,7 @@ namespace HotUpdate.Ui
             }
 
             shell.ButtonIn(actions.Root,
-                new Rect(m.Px(24f), m.Px(24f), m.Px(300f), m.Px(72f)), "不用保护券",
+                new Rect(m.Px(24f), m.Px(24f), m.Px(300f), m.Px(72f)), UiStrings.UiEnhanceScreen.T008,
                 () =>
                 {
                     useCoupon[0] = !useCoupon[0];
@@ -91,7 +91,7 @@ namespace HotUpdate.Ui
 
             shell.ButtonIn(actions.Root,
                 new Rect(rightW - m.Px(24f) - m.Px(260f), m.Px(24f), m.Px(260f), m.Px(72f)),
-                "开始强化",
+                UiStrings.UiEnhanceScreen.T009,
                 () =>
                 {
                     if (flow.Busy || chosenSlot == 0)
@@ -104,21 +104,21 @@ namespace HotUpdate.Ui
                 }, UiButtonKind.Primary);
 
             // 结果：只读回包。
-            var result = shell.Panel("回包", m.Band(rightX, top + m.Px(56f) + m.Px(460f), rightW, m.Px(520f)),
+            var result = shell.Panel(UiStrings.UiEnhanceScreen.T010, m.Band(rightX, top + m.Px(56f) + m.Px(460f), rightW, m.Px(520f)),
                 shell.Size(32f));
             var e = flow.LastEnhance;
             var has = flow.HasEnhance;
-            UiUpgradeViews.Result(shell, result, m.Px(400f), "等级", has ? e.LevelBefore + " → " + e.Level : "尚未请求");
-            UiUpgradeViews.Result(shell, result, m.Px(344f), "结果",
-                has ? (e.Ok ? (e.Success ? "成功" : "失败") : "被拒：" + e.Reason) : "尚未请求");
-            UiUpgradeViews.Result(shell, result, m.Px(288f), "档位 / 石头",
+            UiUpgradeViews.Result(shell, result, m.Px(400f), UiStrings.UiEnhanceScreen.T011, has ? e.LevelBefore + " → " + e.Level : UiStrings.UiEnhanceScreen.T012);
+            UiUpgradeViews.Result(shell, result, m.Px(344f), UiStrings.UiEnhanceScreen.T013,
+                has ? (e.Ok ? (e.Success ? UiStrings.UiEnhanceScreen.T014 : UiStrings.UiEnhanceScreen.T015) : UiStrings.UiEnhanceScreen.T016 + e.Reason) : UiStrings.UiEnhanceScreen.T012);
+            UiUpgradeViews.Result(shell, result, m.Px(288f), UiStrings.UiEnhanceScreen.T017,
                 has ? e.Tier + " / " + e.RequiredStone : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(232f), "石头 / 金币",
+            UiUpgradeViews.Result(shell, result, m.Px(232f), UiStrings.UiEnhanceScreen.T018,
                 has ? e.StoneCost + " / " + e.GoldCost : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(176f), "保护券",
-                has ? (e.CouponUsed + " 张 · 剩 " + e.CouponLeft) : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(120f), "护级",
-                has ? (e.ProtectedLevel ? "挡住了掉级" : "未触发") : "—");
+            UiUpgradeViews.Result(shell, result, m.Px(176f), UiStrings.UiEnhanceScreen.T019,
+                has ? (e.CouponUsed + UiStrings.UiEnhanceScreen.T020 + e.CouponLeft) : "—");
+            UiUpgradeViews.Result(shell, result, m.Px(120f), UiStrings.UiEnhanceScreen.T021,
+                has ? (e.ProtectedLevel ? UiStrings.UiEnhanceScreen.T022 : UiStrings.UiEnhanceScreen.T023) : "—");
 
             Debug.Log(ReadyLog + " slots=" + rows.Count + " tiers=" + UiUpgradeCodex.Tiers.Length
                 + " has=" + (has ? "true" : "false"));

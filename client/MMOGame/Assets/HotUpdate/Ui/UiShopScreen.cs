@@ -27,10 +27,10 @@ namespace HotUpdate.Ui
             var chosen = UiCommerceCodex.Shop[0].Id;
             var chosenText = shell.Label(
                 new Rect(pad, m.Px(300f), leftW, m.Px(40f)),
-                "已选：" + UiCommerceCodex.Shop[0].Name, UiTextRole.Faint, shell.Size(24f),
+                UiStrings.UiShopScreen.T001 + UiCommerceCodex.Shop[0].Name, UiTextRole.Faint, shell.Size(24f),
                 TextAnchor.MiddleLeft, false);
 
-            var list = shell.Panel("能买的", m.Band(pad, top + m.Px(56f), leftW, m.Px(560f)), shell.Size(32f));
+            var list = shell.Panel(UiStrings.UiShopScreen.T002, m.Band(pad, top + m.Px(56f), leftW, m.Px(560f)), shell.Size(32f));
             for (var i = 0; i < UiCommerceCodex.Shop.Length; i++)
             {
                 var goods = UiCommerceCodex.Shop[i];
@@ -45,7 +45,7 @@ namespace HotUpdate.Ui
                 opt.OnPick = picked =>
                 {
                     chosen = id;
-                    chosenText.Label.text = "已选：" + name;
+                    chosenText.Label.text = UiStrings.UiShopScreen.T001 + name;
                     Debug.Log("u6_shop_pick=" + id);
                 };
                 shell.Register(opt);
@@ -53,7 +53,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(pad, m.Px(220f), m.Px(320f), m.Px(72f)),
-                "购买",
+                UiStrings.UiShopScreen.T003,
                 () =>
                 {
                     if (!flow.Busy)
@@ -65,7 +65,7 @@ namespace HotUpdate.Ui
             // 清单外拒绝：按钮只发一个不存在的编号，看回包怎么说。
             shell.Button(
                 new Rect(pad + m.Px(360f), m.Px(220f), m.Px(380f), m.Px(72f)),
-                "买一个不在清单里的",
+                UiStrings.UiShopScreen.T004,
                 () =>
                 {
                     if (!flow.Busy)
@@ -74,21 +74,21 @@ namespace HotUpdate.Ui
                     }
                 }, UiButtonKind.Normal);
 
-            var result = shell.Panel("回包", m.Band(rightX, top + m.Px(56f), rightW, m.Px(520f)),
+            var result = shell.Panel(UiStrings.UiShopScreen.T005, m.Band(rightX, top + m.Px(56f), rightW, m.Px(520f)),
                 shell.Size(32f));
             var s = flow.LastShop;
             var has = flow.HasShop;
-            UiUpgradeViews.Result(shell, result, m.Px(400f), "结果",
-                has ? (s.Ok ? "已买到" : "被拒：" + s.Reason) : "尚未请求");
-            UiUpgradeViews.Result(shell, result, m.Px(344f), "标价 / 实扣",
+            UiUpgradeViews.Result(shell, result, m.Px(400f), UiStrings.UiShopScreen.T006,
+                has ? (s.Ok ? UiStrings.UiShopScreen.T007 : UiStrings.UiShopScreen.T008 + s.Reason) : UiStrings.UiShopScreen.T009);
+            UiUpgradeViews.Result(shell, result, m.Px(344f), UiStrings.UiShopScreen.T010,
                 has ? s.PriceYuanbao + " / " + s.ChargedYuanbao : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(288f), "余额",
+            UiUpgradeViews.Result(shell, result, m.Px(288f), UiStrings.UiShopScreen.T011,
                 has ? s.Balance.ToString() : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(232f), "发到背包",
-                has ? (s.Delivered ? s.DeliveryItemId + " · 第 " + s.BagSlot + " 格" : "没发") : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(176f), "绑定",
+            UiUpgradeViews.Result(shell, result, m.Px(232f), UiStrings.UiShopScreen.T012,
+                has ? (s.Delivered ? s.DeliveryItemId + UiStrings.UiShopScreen.T013 + s.BagSlot + UiStrings.UiShopScreen.T014 : UiStrings.UiShopScreen.T015) : "—");
+            UiUpgradeViews.Result(shell, result, m.Px(176f), UiStrings.UiShopScreen.T016,
                 has ? (s.Bound ? "true" : "false") : "—");
-            UiUpgradeViews.Result(shell, result, m.Px(120f), "状态",
+            UiUpgradeViews.Result(shell, result, m.Px(120f), UiStrings.UiShopScreen.T017,
                 has ? s.State : "—");
 
             // ---------------------------------------------------------- K2+Q13 NPC 商店
@@ -102,8 +102,8 @@ namespace HotUpdate.Ui
             var npcText = shell.Label(
                 new Rect(pad, npcTop, m.Width - pad * 2f, m.Px(40f)),
                 shops.Length > 0
-                    ? "NPC 商店：" + shops[0].Name + " · " + shops[0].Id
-                    : "没有 NPC 商店",
+                    ? UiStrings.UiShopScreen.T018 + shops[0].Name + " · " + shops[0].Id
+                    : UiStrings.UiShopScreen.T019,
                 UiTextRole.Faint, shell.Size(24f), TextAnchor.MiddleLeft, false);
 
             for (var i = 0; i < shops.Length; i++)
@@ -115,7 +115,7 @@ namespace HotUpdate.Ui
                     () =>
                     {
                         npcShop = shop.Id;
-                        npcText.Label.text = "NPC 商店：" + shop.Name + " · " + shop.Id;
+                        npcText.Label.text = UiStrings.UiShopScreen.T018 + shop.Name + " · " + shop.Id;
                         if (!flow.Busy)
                         {
                             flow.LoadNpcShop(shop.Id);
@@ -125,7 +125,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(pad, npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
-                "看货架",
+                UiStrings.UiShopScreen.T020,
                 () =>
                 {
                     if (!flow.Busy)
@@ -136,7 +136,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(pad + m.Px(260f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
-                "买第一件",
+                UiStrings.UiShopScreen.T021,
                 () =>
                 {
                     var goods = flow.HasShopNpc ? flow.ShopNpc.Goods : null;
@@ -150,7 +150,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(pad + m.Px(520f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
-                "卖第 1 格",
+                UiStrings.UiShopScreen.T022,
                 () =>
                 {
                     if (!flow.Busy)
@@ -161,7 +161,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(pad + m.Px(780f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
-                "回购最近",
+                UiStrings.UiShopScreen.T023,
                 () =>
                 {
                     if (!flow.Busy && flow.HasNpc && flow.LastNpc.BuybackId != 0)
@@ -176,7 +176,7 @@ namespace HotUpdate.Ui
 
             shell.Button(
                 new Rect(pad + m.Px(1040f), npcTop + m.Px(56f), m.Px(240f), m.Px(68f)),
-                "修理",
+                UiStrings.UiShopScreen.T024,
                 () =>
                 {
                     if (!flow.Busy)
@@ -185,16 +185,16 @@ namespace HotUpdate.Ui
                     }
                 }, UiButtonKind.Normal);
 
-            var npcResult = shell.Panel("NPC 回包", m.Band(pad, npcTop + m.Px(150f),
+            var npcResult = shell.Panel(UiStrings.UiShopScreen.T025, m.Band(pad, npcTop + m.Px(150f),
                 m.Width - pad * 2f, m.Px(320f)), shell.Size(32f));
             var sn = flow.ShopNpc;
             var hasNpcShop = flow.HasShopNpc;
-            UiUpgradeViews.Result(shell, npcResult, m.Px(220f), "货架",
-                hasNpcShop ? sn.DisplayText : "尚未请求");
-            UiUpgradeViews.Result(shell, npcResult, m.Px(164f), "最后一件",
-                flow.HasNpc ? flow.LastNpc.DisplayText : "尚未请求");
-            UiUpgradeViews.Result(shell, npcResult, m.Px(108f), "身上耐久",
-                hasNpcShop ? "只修身上三件 · 修理单价 " + sn.RepairPricePerPoint : "—");
+            UiUpgradeViews.Result(shell, npcResult, m.Px(220f), UiStrings.UiShopScreen.T026,
+                hasNpcShop ? sn.DisplayText : UiStrings.UiShopScreen.T009);
+            UiUpgradeViews.Result(shell, npcResult, m.Px(164f), UiStrings.UiShopScreen.T027,
+                flow.HasNpc ? flow.LastNpc.DisplayText : UiStrings.UiShopScreen.T009);
+            UiUpgradeViews.Result(shell, npcResult, m.Px(108f), UiStrings.UiShopScreen.T028,
+                hasNpcShop ? UiStrings.UiShopScreen.T029 + sn.RepairPricePerPoint : "—");
 
             Debug.Log(UiNpcShopCodex.ReadyLog + " shops=" + shops.Length
                 + " has=" + (hasNpcShop ? "true" : "false"));

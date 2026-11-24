@@ -22,36 +22,36 @@ namespace HotUpdate.Ui
 
         public static readonly Tier[] Tiers =
         {
-            new Tier { Id = "low", Name = "低级强化石", StoneId = "stone_enhance_low", Range = "+1 → +6" },
-            new Tier { Id = "mid", Name = "中级强化石", StoneId = "stone_enhance_mid", Range = "+7 → +9" },
-            new Tier { Id = "high", Name = "高级强化石", StoneId = "stone_enhance_high", Range = "+10 → +12" },
+            new Tier { Id = "low", Name = UiStrings.UiUpgradeCodex.T001, StoneId = "stone_enhance_low", Range = "+1 → +6" },
+            new Tier { Id = "mid", Name = UiStrings.UiUpgradeCodex.T002, StoneId = "stone_enhance_mid", Range = "+7 → +9" },
+            new Tier { Id = "high", Name = UiStrings.UiUpgradeCodex.T003, StoneId = "stone_enhance_high", Range = "+10 → +12" },
         };
 
         /// <summary>职业与分支：界面只列，不进请求、不产生属性。</summary>
-        public static readonly string[] Classes = { "战士", "弓手", "法师", "牧师", "守护" };
+        public static readonly string[] Classes = { UiStrings.UiUpgradeCodex.T004, UiStrings.UiUpgradeCodex.T005, UiStrings.UiUpgradeCodex.T006, UiStrings.UiUpgradeCodex.T007, UiStrings.UiUpgradeCodex.T008 };
 
         public static readonly string[] Branches =
         {
-            "镇岳（守护）", "古雷（法师）", "破军（战士）", "仙真（牧师）", "穿杨（弓手）",
+            UiStrings.UiUpgradeCodex.T009, UiStrings.UiUpgradeCodex.T010, UiStrings.UiUpgradeCodex.T011, UiStrings.UiUpgradeCodex.T012, UiStrings.UiUpgradeCodex.T013,
         };
 
         public const string EnhanceNote =
-            "上限 +12 · 失败只掉 1 级、不碎、不清零 · 成功率与费用由服务端按配置算，界面只显示回包";
+            UiStrings.UiUpgradeCodex.T014;
 
         public const string TransferNote =
-            "换装不自动带强化 · 来源必须高于目标 · 覆盖不返还 · 绑定跟着这一笔走 · 必定成功";
+            UiStrings.UiUpgradeCodex.T015;
 
         public const string CrystalNote =
-            "三类 · 部位限定 · 可拆卸复用 · 装上与拆下都不改强化、金币与绑定";
+            UiStrings.UiUpgradeCodex.T016;
 
         public const string SkillsNote =
-            "技能与分支由服务端下发；界面只列名字，不排技能、不算伤害。";
+            UiStrings.UiUpgradeCodex.T017;
 
         public const string RealmNote =
-            "段内阶名与被动由角色服按配置算，界面只显示回包；升一阶的门槛（等级）也在服务端，被拒时照回包写还差几级。";
+            UiStrings.UiUpgradeCodex.T018;
 
         /// <summary>四个装备部位（原型 D01）。</summary>
-        public static readonly string[] Parts = { "兵器", "衣甲", "饰品", "结晶位" };
+        public static readonly string[] Parts = { UiStrings.UiUpgradeCodex.T019, UiStrings.UiUpgradeCodex.T020, UiStrings.UiUpgradeCodex.T021, UiStrings.UiUpgradeCodex.T022 };
 
         /// <summary>把背包格按显示顺序取前 N 个候选。</summary>
         public static List<Mmo.Net.BagSlotView> FirstSlots(Mmo.Net.BagOutcome bag, int count)

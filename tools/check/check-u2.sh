@@ -51,8 +51,10 @@ if [ "$HAVE_CLIENT" = "1" ]; then
 
 echo "== 1. 四屏静态断言 =="
 if ROOT="$ROOT" python3 - >"$TMP/static.out" 2>&1 <<'PY'
-import glob, json, os, re
+import glob, json, os, re, sys
 root = os.environ['ROOT']
+sys.path.insert(0, os.path.join(root, 'tools/check'))
+from lib_read import ui_text_assert
 assets = root + '/client/MMOGame/Assets'
 ui = assets + '/HotUpdate/Ui'
 
@@ -81,18 +83,19 @@ assert len(races) == 4, 'config races=%d' % len(races)
 assert len(classes) == 5, 'config classes=%d' % len(classes)
 for r in races:
     assert 'Id = "%s"' % r['id'] in codex, 'race id ' + r['id']
-    assert r['name'] in codex, 'race name ' + r['name']
-    assert r['origin'] in codex, 'race origin ' + r['id']
+    ui_text_assert(root, 'UiEntryCodex', r['name'], codex, 'race name ' + r['id'])
+    ui_text_assert(root, 'UiEntryCodex', r['origin'], codex, 'race origin ' + r['id'])
     body = r['appearance']['body']
     assert '\\"body\\":\\"%s\\"' % body in codex, 'appearance ' + r['id']
 for c in classes:
     assert 'Id = "%s"' % c['id'] in codex, 'class id ' + c['id']
-    assert c['name'] in codex, 'class name ' + c['name']
+    ui_text_assert(root, 'UiEntryCodex', c['name'], codex, 'class name ' + c['id'])
 
-# 四句失败文案照抄原型 HINTS：屏上不另写一套说法。
+# 四句失败文案照抄原型 HINTS：正本在文案表（config/ui_text/UiEntryFlow.json），
+# 屏上不许另写一套说法——断言「表里有这句 + 源码引用了它的常量」。
 proto = read(root + '/docs/登录界面原型.html')
 for hint in ('请求没发出去，重试一次', '账号或口令不对', '暂时连不上，稍后再试', '连不上网关'):
-    assert hint in flow, 'hint missing in flow: ' + hint
+    ui_text_assert(root, 'UiEntryFlow', hint, flow, '登录提示')
     assert hint in proto, 'hint missing in proto: ' + hint
 
 # 界面不本地判登录：不拿口令去比对，令牌只有一处赋值、来源是回包，且不落盘。

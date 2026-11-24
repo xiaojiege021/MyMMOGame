@@ -7,7 +7,7 @@ import sys
 
 root = os.environ.get("ROOT") or os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, os.path.join(root, "tools", "check"))
-from lib_read import read_text
+from lib_read import read_text, ui_text_assert, ui_text_assert_like
 assets = os.path.join(root, "client", "MMOGame", "Assets")
 ui = os.path.join(assets, "HotUpdate", "Ui")
 net = os.path.join(assets, "Net")
@@ -28,7 +28,8 @@ selfcheck = open(os.path.join(ui, "UiArenaSelfCheck.cs"), encoding="utf-8").read
 assert "u12_versus_wired=ready" in screen
 assert "VersusEntry.SummaryLine" in screen
 assert "EnterArena" in screen and "EnterBattlefield" in screen
-assert "进竞技场" in screen and "B 队" in screen
+ui_text_assert(root, "UiArenaScreen", "进竞技场", screen, "竞技场屏")
+ui_text_assert_like(root, "UiArenaScreen", "B 队", screen, "竞技场屏")
 assert "VersusGap" not in screen and "无匹配入口" not in screen, "缺口文案还留着"
 assert "无入口" not in screen, "「无入口」芯片还留着"
 

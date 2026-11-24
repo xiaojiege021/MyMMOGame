@@ -116,14 +116,14 @@ namespace HotUpdate.Ui
             Debug.Log("u6_self_duplicate=" + dup.Duplicate + " balance=" + dup.Balance);
 
             var built = 0;
-            built += Build(shell, flow, "商城", (s, f) => UiShopScreen.Build(s, f));
-            built += Build(shell, flow, "拍卖与寄售", (s, f) => UiAuctionScreen.Build(s, f));
-            built += Build(shell, flow, "货币", (s, f) => UiCurrencyScreen.Build(s, f));
-            built += Build(shell, flow, "赛季通行证", (s, f) => UiPassScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiCommerceSelfCheck.T001, (s, f) => UiShopScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiCommerceSelfCheck.T002, (s, f) => UiAuctionScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiCommerceSelfCheck.T003, (s, f) => UiCurrencyScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiCommerceSelfCheck.T004, (s, f) => UiPassScreen.Build(s, f));
             Report("four", built == 4);
             Debug.Log("u6_self_four=" + built);
 
-            shell.ShowPage("商城", s => UiShopScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiCommerceSelfCheck.T001, s => UiShopScreen.Build(s, flow));
             var layout = Layout(shell);
             var text = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);
@@ -198,11 +198,11 @@ namespace HotUpdate.Ui
         const string BagJson =
             "{\"slots\":[{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true}," +
             "{\"slot\":2,\"item_id\":\"ore_iron\",\"count\":20,\"bound\":false}]," +
-            "\"bag_slots\":40,\"character_name\":\"自检角色\",\"realm\":\"炼体\"}";
+            UiStrings.UiCommerceSelfCheck.T005;
 
         const string ShopOkJson =
             "{\"ok\":true,\"reason\":\"\",\"item_id\":\"shop_outfit_1\",\"kind\":\"outfit\"," +
-            "\"name\":\"服饰外观\",\"price_yuanbao\":120,\"currency\":\"yuanbao\",\"balance\":380," +
+            UiStrings.UiCommerceSelfCheck.T006 +
             "\"enough\":true,\"charged_yuanbao\":120,\"delivered\":true,\"state\":\"delivered\"," +
             "\"delivery_item_id\":\"sword_trial\",\"bag_slot\":1,\"bound\":true,\"duplicate\":false}";
 

@@ -22,7 +22,7 @@ namespace HotUpdate.Ui
         public static int Build(UiShell shell, UiUpgradeFlow flow)
         {
             UiUpgradeViews.Note(shell,
-                "背包 · 格号 / 数量 / 绑定态来自 /inventory 回包；移动、丢弃、排序、批量使用只显示服务端回包");
+                UiStrings.UiBagScreen.T001);
 
             var m = shell.Metrics;
             var pad = m.Px(120f);
@@ -30,13 +30,13 @@ namespace HotUpdate.Ui
             var gap = m.Px(48f);
             var leftW = (m.Width - pad * 2f - gap) * 0.62f;
             var cardH = m.Px(760f);
-            var list = shell.Panel("背包", m.Band(pad, top + m.Px(56f), leftW, cardH), shell.Size(36f));
+            var list = shell.Panel(UiStrings.UiBagScreen.T002, m.Band(pad, top + m.Px(56f), leftW, cardH), shell.Size(36f));
 
             var rows = flow.HasBag ? UiUpgradeCodex.FirstSlots(flow.Bag, 9) : null;
             if (rows == null || rows.Count == 0)
             {
                 shell.LabelIn(list.Root, new Rect(m.Px(32f), cardH - m.Px(120f), leftW - m.Px(64f), m.Px(48f)),
-                    flow.HasBag ? "背包是空的" : "尚未读背包", UiTextRole.Faint, shell.Size(26f),
+                    flow.HasBag ? UiStrings.UiBagScreen.T003 : UiStrings.UiBagScreen.T004, UiTextRole.Faint, shell.Size(26f),
                     TextAnchor.MiddleLeft, false);
             }
             else
@@ -45,8 +45,8 @@ namespace HotUpdate.Ui
                 var values = new string[rows.Count];
                 for (var i = 0; i < rows.Count; i++)
                 {
-                    labels[i] = "第 " + rows[i].Slot + " 格";
-                    values[i] = rows[i].ItemId + " × " + rows[i].Count + (rows[i].Bound ? " · 绑定" : "");
+                    labels[i] = UiStrings.UiBagScreen.T005 + rows[i].Slot + UiStrings.UiBagScreen.T006;
+                    values[i] = rows[i].ItemId + " × " + rows[i].Count + (rows[i].Bound ? UiStrings.UiBagScreen.T007 : "");
                 }
 
                 UiUpgradeViews.Rows(shell, list, labels, values, m.Px(64f), m.Px(32f));
@@ -54,9 +54,9 @@ namespace HotUpdate.Ui
 
             var rightX = pad + leftW + gap;
             var rightW = m.Width - pad - rightX;
-            var side = shell.Panel("容量", m.Band(rightX, top + m.Px(56f), rightW, m.Px(280f)), shell.Size(32f));
+            var side = shell.Panel(UiStrings.UiBagScreen.T008, m.Band(rightX, top + m.Px(56f), rightW, m.Px(280f)), shell.Size(32f));
             UiUpgradeViews.Rows(shell, side,
-                new[] { "容量", "已用", "来源" },
+                new[] { UiStrings.UiBagScreen.T008, UiStrings.UiBagScreen.T009, UiStrings.UiBagScreen.T010 },
                 new[]
                 {
                     flow.HasBag ? flow.Bag.BagSlots.ToString() : "—",
@@ -67,7 +67,7 @@ namespace HotUpdate.Ui
 
             var opsTop = top + m.Px(56f) + m.Px(280f) + m.Px(24f);
             var opsH = m.Px(760f);
-            var ops = shell.Panel("操作", m.Band(rightX, opsTop, rightW, opsH), shell.Size(32f));
+            var ops = shell.Panel(UiStrings.UiBagScreen.T011, m.Band(rightX, opsTop, rightW, opsH), shell.Size(32f));
             BuildOps(shell, flow, ops, rightW, opsH);
 
             Debug.Log(ReadyLog + " rows=" + (rows != null ? rows.Count : 0)
@@ -95,14 +95,14 @@ namespace HotUpdate.Ui
                 flow.BagCount = held;
             }
 
-            UiUpgradeViews.Result(shell, ops, height - m.Px(100f), "来源 / 目标",
-                "第 " + flow.BagFromSlot + " 格 → 第 " + flow.BagToSlot + " 格");
-            UiUpgradeViews.Result(shell, ops, height - m.Px(150f), "这一格 / 数量",
-                (held > 0 ? held + " 个" : "空格") + " / " + flow.BagCount);
-            UiUpgradeViews.Result(shell, ops, height - m.Px(200f), "这一格穿着",
+            UiUpgradeViews.Result(shell, ops, height - m.Px(100f), UiStrings.UiBagScreen.T012,
+                UiStrings.UiBagScreen.T005 + flow.BagFromSlot + UiStrings.UiBagScreen.T013 + flow.BagToSlot + UiStrings.UiBagScreen.T006);
+            UiUpgradeViews.Result(shell, ops, height - m.Px(150f), UiStrings.UiBagScreen.T014,
+                (held > 0 ? held + UiStrings.UiBagScreen.T015 : UiStrings.UiBagScreen.T016) + " / " + flow.BagCount);
+            UiUpgradeViews.Result(shell, ops, height - m.Px(200f), UiStrings.UiBagScreen.T017,
                 WornText(flow, flow.BagFromSlot));
-            UiUpgradeViews.Result(shell, ops, height - m.Px(250f), "装备攻击", EquipAttackText(flow));
-            UiUpgradeViews.Result(shell, ops, height - m.Px(300f), "上次结果", LastText(flow));
+            UiUpgradeViews.Result(shell, ops, height - m.Px(250f), UiStrings.UiBagScreen.T018, EquipAttackText(flow));
+            UiUpgradeViews.Result(shell, ops, height - m.Px(300f), UiStrings.UiBagScreen.T019, LastText(flow));
 
             var gap = m.Px(16f);
             var btnW = (width - pad * 2f - gap * 3f) * 0.25f;
@@ -112,25 +112,25 @@ namespace HotUpdate.Ui
             var row3 = height - m.Px(580f);
             var row4 = height - m.Px(670f);
 
-            shell.ButtonIn(ops.Root, new Rect(pad, row1, btnW, btnH), "来源 −",
+            shell.ButtonIn(ops.Root, new Rect(pad, row1, btnW, btnH), UiStrings.UiBagScreen.T020,
                 () =>
                 {
                     flow.BagFromSlot = Clamp(flow.BagFromSlot - 1, 1u, bagSlots);
                     shell.RefreshPage();
                 }, UiButtonKind.Normal);
-            shell.ButtonIn(ops.Root, new Rect(pad + btnW + gap, row1, btnW, btnH), "来源 +",
+            shell.ButtonIn(ops.Root, new Rect(pad + btnW + gap, row1, btnW, btnH), UiStrings.UiBagScreen.T021,
                 () =>
                 {
                     flow.BagFromSlot = Clamp(flow.BagFromSlot + 1, 1u, bagSlots);
                     shell.RefreshPage();
                 }, UiButtonKind.Normal);
-            shell.ButtonIn(ops.Root, new Rect(pad + (btnW + gap) * 2f, row1, btnW, btnH), "目标 −",
+            shell.ButtonIn(ops.Root, new Rect(pad + (btnW + gap) * 2f, row1, btnW, btnH), UiStrings.UiBagScreen.T022,
                 () =>
                 {
                     flow.BagToSlot = Clamp(flow.BagToSlot - 1, 1u, bagSlots);
                     shell.RefreshPage();
                 }, UiButtonKind.Normal);
-            shell.ButtonIn(ops.Root, new Rect(pad + (btnW + gap) * 3f, row1, btnW, btnH), "目标 +",
+            shell.ButtonIn(ops.Root, new Rect(pad + (btnW + gap) * 3f, row1, btnW, btnH), UiStrings.UiBagScreen.T023,
                 () =>
                 {
                     flow.BagToSlot = Clamp(flow.BagToSlot + 1, 1u, bagSlots);
@@ -138,7 +138,7 @@ namespace HotUpdate.Ui
                 }, UiButtonKind.Normal);
 
             var wideW = (width - pad * 2f - gap) * 0.5f;
-            shell.ButtonIn(ops.Root, new Rect(pad, row2, wideW, btnH), "移到目标格",
+            shell.ButtonIn(ops.Root, new Rect(pad, row2, wideW, btnH), UiStrings.UiBagScreen.T024,
                 () =>
                 {
                     if (flow.Busy)
@@ -149,7 +149,7 @@ namespace HotUpdate.Ui
                     flow.MoveItem(flow.BagFromSlot, flow.BagToSlot,
                         () => AfterOp(shell, flow, flow.LastMove.Ok));
                 }, UiButtonKind.Primary);
-            shell.ButtonIn(ops.Root, new Rect(pad + wideW + gap, row2, wideW, btnH), "排序",
+            shell.ButtonIn(ops.Root, new Rect(pad + wideW + gap, row2, wideW, btnH), UiStrings.UiBagScreen.T025,
                 () =>
                 {
                     if (flow.Busy)
@@ -165,20 +165,20 @@ namespace HotUpdate.Ui
             // 第三行：数量 −/+ 各一格宽，剩下两半给丢弃与批量使用。
             var tailX = pad + (btnW + gap) * 2f;
             var tailW = (width - tailX - pad - gap) * 0.5f;
-            shell.ButtonIn(ops.Root, new Rect(pad, row3, btnW, btnH), "数量 −",
+            shell.ButtonIn(ops.Root, new Rect(pad, row3, btnW, btnH), UiStrings.UiBagScreen.T026,
                 () =>
                 {
                     flow.BagCount = Math.Max(1, flow.BagCount - 1);
                     shell.RefreshPage();
                 }, UiButtonKind.Normal);
-            shell.ButtonIn(ops.Root, new Rect(pad + btnW + gap, row3, btnW, btnH), "数量 +",
+            shell.ButtonIn(ops.Root, new Rect(pad + btnW + gap, row3, btnW, btnH), UiStrings.UiBagScreen.T027,
                 () =>
                 {
                     flow.BagCount = flow.BagCount + 1;
                     shell.RefreshPage();
                 }, UiButtonKind.Normal);
 
-            shell.ButtonIn(ops.Root, new Rect(tailX, row3, tailW, btnH), "丢弃 " + flow.BagCount + " 个",
+            shell.ButtonIn(ops.Root, new Rect(tailX, row3, tailW, btnH), UiStrings.UiBagScreen.T028 + flow.BagCount + UiStrings.UiBagScreen.T015,
                 () =>
                 {
                     if (flow.Busy)
@@ -187,15 +187,15 @@ namespace HotUpdate.Ui
                     }
 
                     // 二次确认：点这个按钮只弹窗，弹窗里再点一次才发请求。
-                    shell.ShowConfirm("丢弃物品",
-                        "第 " + flow.BagFromSlot + " 格的 " + flow.BagCount
-                        + " 个会被销毁，丢掉的东西找不回来。",
-                        "确认丢弃",
+                    shell.ShowConfirm(UiStrings.UiBagScreen.T029,
+                        UiStrings.UiBagScreen.T005 + flow.BagFromSlot + UiStrings.UiBagScreen.T030 + flow.BagCount
+                        + UiStrings.UiBagScreen.T031,
+                        UiStrings.UiBagScreen.T032,
                         () => flow.DiscardItem(flow.BagFromSlot, flow.BagCount,
                             () => AfterOp(shell, flow, flow.LastDiscard.Ok)));
                 }, UiButtonKind.Normal);
             shell.ButtonIn(ops.Root, new Rect(tailX + tailW + gap, row3, tailW, btnH),
-                "用 " + flow.BagCount + " 个",
+                UiStrings.UiBagScreen.T033 + flow.BagCount + UiStrings.UiBagScreen.T015,
                 () =>
                 {
                     if (flow.Busy)
@@ -211,8 +211,8 @@ namespace HotUpdate.Ui
             // 标签跟着 /inventory 的 equipped_slot 走，界面不另记一份穿戴状态。
             var worn = WornSlot(flow, flow.BagFromSlot);
             var equipLabel = worn.Length > 0
-                ? "脱下 " + CharacterBag.SlotName(worn)
-                : "穿上这一件";
+                ? UiStrings.UiBagScreen.T034 + CharacterBag.SlotName(worn)
+                : UiStrings.UiBagScreen.T035;
             shell.ButtonIn(ops.Root, new Rect(pad, row4, width - pad * 2f, btnH), equipLabel,
                 () =>
                 {
@@ -260,7 +260,7 @@ namespace HotUpdate.Ui
         static string WornText(UiUpgradeFlow flow, uint slot)
         {
             var worn = WornSlot(flow, slot);
-            return worn.Length > 0 ? CharacterBag.SlotName(worn) : "没穿";
+            return worn.Length > 0 ? CharacterBag.SlotName(worn) : UiStrings.UiBagScreen.T036;
         }
 
         /// <summary>装备固定攻击之和：只有服务端回包里给过才有数，没请求过写「尚未请求」。</summary>
@@ -271,7 +271,7 @@ namespace HotUpdate.Ui
                 return flow.LastEquip.EquipAttack.ToString();
             }
 
-            return flow.HasUnequip ? flow.LastUnequip.EquipAttack.ToString() : "尚未请求";
+            return flow.HasUnequip ? flow.LastUnequip.EquipAttack.ToString() : UiStrings.UiBagScreen.T037;
         }
 
         /// <summary>成功才重读背包（格号变了）；被拒时只重画结果行，不多发一次只读请求。</summary>
@@ -309,7 +309,7 @@ namespace HotUpdate.Ui
         /// <summary>最近一条回包说明。一次都没发过就写「尚未请求」。</summary>
         static string LastText(UiUpgradeFlow flow)
         {
-            return string.IsNullOrEmpty(flow.LastOpText) ? "尚未请求" : flow.LastOpText;
+            return string.IsNullOrEmpty(flow.LastOpText) ? UiStrings.UiBagScreen.T037 : flow.LastOpText;
         }
 
         static uint Clamp(uint value, uint low, uint high)

@@ -1,0 +1,11 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiReconnectFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiReconnectFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "没有战斗连接"
+    }
+  ]
+}

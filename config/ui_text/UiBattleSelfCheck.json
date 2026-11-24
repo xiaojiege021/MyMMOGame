@@ -1,0 +1,75 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiBattleSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiBattleSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "裂隙"
+    },
+    {
+      "key": "T002",
+      "text": "战斗结算"
+    },
+    {
+      "key": "T003",
+      "text": "小队"
+    },
+    {
+      "key": "T004",
+      "text": "尚未进本"
+    },
+    {
+      "key": "T005",
+      "text": "疲劳 4500 / 6000 · 本次扣 3000 · 本周剩 12 / 12 · 每人 2 份"
+    },
+    {
+      "key": "T006",
+      "text": "已进本"
+    },
+    {
+      "key": "T007",
+      "text": "疲劳不够"
+    },
+    {
+      "key": "T008",
+      "text": "令牌失效"
+    },
+    {
+      "key": "T009",
+      "text": "连不上网关"
+    },
+    {
+      "key": "T010",
+      "text": "暂时连不上"
+    },
+    {
+      "key": "T011",
+      "text": "未 结 算"
+    },
+    {
+      "key": "T012",
+      "text": "通 关"
+    },
+    {
+      "key": "T013",
+      "text": "未 通 关"
+    },
+    {
+      "key": "T014",
+      "text": "镇岳"
+    },
+    {
+      "key": "T015",
+      "text": "顾长息"
+    },
+    {
+      "key": "T016",
+      "text": "阿弦"
+    },
+    {
+      "key": "T017",
+      "text": "阮青"
+    }
+  ]
+}

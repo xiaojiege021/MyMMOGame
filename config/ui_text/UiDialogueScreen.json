@@ -1,0 +1,55 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiDialogueScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiDialogueScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "对白 · 开口的人"
+    },
+    {
+      "key": "T002",
+      "text": "定词照方案 2.7 原文，只留配置，不写进场景"
+    },
+    {
+      "key": "T003",
+      "text": "第 "
+    },
+    {
+      "key": "T004",
+      "text": " 场"
+    },
+    {
+      "key": "T005",
+      "text": "第 1 场"
+    },
+    {
+      "key": "T006",
+      "text": "第 2 场"
+    },
+    {
+      "key": "T007",
+      "text": "共 "
+    },
+    {
+      "key": "T008",
+      "text": " 条定词逐字照 config/dialogue；对白只留配置，不进场景脚本。"
+    },
+    {
+      "key": "T009",
+      "text": " · 共 "
+    },
+    {
+      "key": "T010",
+      "text": "限制："
+    },
+    {
+      "key": "T011",
+      "text": "这一位只有一场，没有第 2 场。"
+    },
+    {
+      "key": "T012",
+      "text": "不加台词、不补戏"
+    }
+  ]
+}

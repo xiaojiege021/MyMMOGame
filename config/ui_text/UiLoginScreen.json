@@ -1,0 +1,39 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiLoginScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiLoginScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "幕一 · "
+    },
+    {
+      "key": "T002",
+      "text": "入世"
+    },
+    {
+      "key": "T003",
+      "text": "账 号"
+    },
+    {
+      "key": "T004",
+      "text": "请输入账号"
+    },
+    {
+      "key": "T005",
+      "text": "口 令"
+    },
+    {
+      "key": "T006",
+      "text": "请输入口令"
+    },
+    {
+      "key": "T007",
+      "text": "登 入"
+    },
+    {
+      "key": "T008",
+      "text": "账号或口令不对时不区分原因；连不上网关不重试刷屏。"
+    }
+  ]
+}

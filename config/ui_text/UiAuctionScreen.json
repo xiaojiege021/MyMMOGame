@@ -1,0 +1,83 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiAuctionScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiAuctionScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "上架哪一格"
+    },
+    {
+      "key": "T002",
+      "text": "第 "
+    },
+    {
+      "key": "T003",
+      "text": " 格"
+    },
+    {
+      "key": "T004",
+      "text": "标价（金币）"
+    },
+    {
+      "key": "T005",
+      "text": "上架"
+    },
+    {
+      "key": "T006",
+      "text": "买下最近挂单"
+    },
+    {
+      "key": "T007",
+      "text": "元宝挂单 100"
+    },
+    {
+      "key": "T008",
+      "text": "买下最近元宝单"
+    },
+    {
+      "key": "T009",
+      "text": "回包"
+    },
+    {
+      "key": "T010",
+      "text": "拍卖"
+    },
+    {
+      "key": "T011",
+      "text": "成交/上架："
+    },
+    {
+      "key": "T012",
+      "text": "被拒："
+    },
+    {
+      "key": "T013",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T014",
+      "text": "标价 / 税 / 净额"
+    },
+    {
+      "key": "T015",
+      "text": "买方 / 卖方金币"
+    },
+    {
+      "key": "T016",
+      "text": "寄售"
+    },
+    {
+      "key": "T017",
+      "text": "已挂/已成交："
+    },
+    {
+      "key": "T018",
+      "text": "元宝 / 金币"
+    },
+    {
+      "key": "T019",
+      "text": "税 / 净额"
+    }
+  ]
+}

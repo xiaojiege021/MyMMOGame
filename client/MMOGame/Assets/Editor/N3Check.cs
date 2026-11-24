@@ -96,8 +96,8 @@ public static class N3Check
             "流程没接名册只读");
 
         Report("screen", sect.Contains("n3_roster_screen=ready")
-            && sect.Contains("尚未请求")
-            && sect.Contains("读取名册")
+            && UiTextRef.In(root, sect, "UiSectScreen", "尚未请求")
+            && UiTextRef.In(root, sect, "UiSectScreen", "读取名册")
             && sect.Contains("SectGuild.RosterLine")
             && sect.Contains("flow.Appoint")
             && sect.IndexOf("config/", StringComparison.Ordinal) < 0

@@ -1,0 +1,31 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiEntrySelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiEntrySelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "登 入"
+    },
+    {
+      "key": "T002",
+      "text": "正在校验"
+    },
+    {
+      "key": "T003",
+      "text": "{\\\"character_id\\\":12,\\\"name\\\":\\\"顾长息\\\",\\\"race\\\":\\\"chen\\\","
+    },
+    {
+      "key": "T004",
+      "text": "顾长息"
+    },
+    {
+      "key": "T005",
+      "text": "在世"
+    },
+    {
+      "key": "T006",
+      "text": "未开启"
+    }
+  ]
+}

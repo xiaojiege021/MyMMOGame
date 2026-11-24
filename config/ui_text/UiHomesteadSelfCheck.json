@@ -1,0 +1,35 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiHomesteadSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiHomesteadSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "{\\\"bag_slots\\\":20,\\\"character_name\\\":\\\"洞府自检\\\",\\\"realm\\\":\\\"炼体\\\","
+    },
+    {
+      "key": "T002",
+      "text": "家园洞府"
+    },
+    {
+      "key": "T003",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T004",
+      "text": "读取种植"
+    },
+    {
+      "key": "T005",
+      "text": "court_1 · 空"
+    },
+    {
+      "key": "T006",
+      "text": "hall_1 · 空"
+    },
+    {
+      "key": "T007",
+      "text": "无接口"
+    }
+  ]
+}

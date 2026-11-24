@@ -31,12 +31,12 @@ namespace HotUpdate.Ui
             });
             flow.Configure("token-n4-self", 88);
 
-            shell.ShowPage("采集", s => UiGatherScreen.Build(s, flow, "矿脉"));
+            shell.ShowPage(UiStrings.UiGatherNodesSelfCheck.T001, s => UiGatherScreen.Build(s, flow, UiStrings.UiGatherNodesSelfCheck.T002));
             Report("pending", !flow.HasGatherNodes);
 
             _nextStatus = 200;
             _nextBody = MockNodesJson();
-            flow.LoadGatherNodes(() => shell.ShowPage("采集", s => UiGatherScreen.Build(s, flow, "矿脉")));
+            flow.LoadGatherNodes(() => shell.ShowPage(UiStrings.UiGatherNodesSelfCheck.T001, s => UiGatherScreen.Build(s, flow, UiStrings.UiGatherNodesSelfCheck.T002)));
 
             Report("path", _lastPath == "/world/gather/nodes");
             Report("count", flow.HasGatherNodes && flow.GatherNodesReply.Count == 18
@@ -60,11 +60,11 @@ namespace HotUpdate.Ui
             Report("spirit_forbidden", found && spirit.Forbidden);
 
             var listed = 0;
-            shell.ShowPage("采集", s => { listed = UiGatherScreen.Build(s, flow, "矿脉"); });
+            shell.ShowPage(UiStrings.UiGatherNodesSelfCheck.T001, s => { listed = UiGatherScreen.Build(s, flow, UiStrings.UiGatherNodesSelfCheck.T002); });
             Report("page", listed == 9);
-            UiGatherScreen.StepWindow("矿脉", 1, 9);
+            UiGatherScreen.StepWindow(UiStrings.UiGatherNodesSelfCheck.T002, 1, 9);
             var listedNext = 0;
-            shell.ShowPage("采集", s => { listedNext = UiGatherScreen.Build(s, flow, "矿脉"); });
+            shell.ShowPage(UiStrings.UiGatherNodesSelfCheck.T001, s => { listedNext = UiGatherScreen.Build(s, flow, UiStrings.UiGatherNodesSelfCheck.T002); });
             Report("page_next", listedNext == 9);
 
             Debug.Log("n4_self_all=" + (_failed ? "fail" : "ok"));
@@ -76,17 +76,17 @@ namespace HotUpdate.Ui
             var items = new List<string>();
             for (var i = 1; i <= 9; i++)
             {
-                items.Add("{\"node_id\":\"ore_n4_" + i + "\",\"kind\":\"ore\",\"region_id\":\"枯岚道\","
+                items.Add("{\"node_id\":\"ore_n4_" + i + UiStrings.UiGatherNodesSelfCheck.T003
                     + "\"item_id\":\"ore_iron\",\"count\":2,\"bag_slot\":1,\"respawn_s\":2}");
             }
 
             for (var i = 1; i <= 8; i++)
             {
-                items.Add("{\"node_id\":\"herb_n4_" + i + "\",\"kind\":\"herb\",\"region_id\":\"听谣镇\","
+                items.Add("{\"node_id\":\"herb_n4_" + i + UiStrings.UiGatherNodesSelfCheck.T004
                     + "\"item_id\":\"herb_ling\",\"count\":3,\"bag_slot\":2,\"respawn_s\":2}");
             }
 
-            items.Add("{\"node_id\":\"spirit_qiyun_1\",\"kind\":\"spirit_stone\",\"region_id\":\"栖云城\","
+            items.Add(UiStrings.UiGatherNodesSelfCheck.T005
                 + "\"item_id\":\"\",\"count\":0,\"bag_slot\":0,\"respawn_s\":0}");
             return "{\"count\":18,\"nodes\":[" + string.Join(",", items.ToArray()) + "]}";
         }

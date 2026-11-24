@@ -1,0 +1,95 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiSocialSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiSocialSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "宗门"
+    },
+    {
+      "key": "T002",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T003",
+      "text": "第 "
+    },
+    {
+      "key": "T004",
+      "text": "第 3 级"
+    },
+    {
+      "key": "T005",
+      "text": "900 → 500（扣 400）"
+    },
+    {
+      "key": "T006",
+      "text": "第 4 级"
+    },
+    {
+      "key": "T007",
+      "text": "领地城战"
+    },
+    {
+      "key": "T008",
+      "text": "2 / 上限 2"
+    },
+    {
+      "key": "T009",
+      "text": "1 个 · 只留队伍颜色和血条"
+    },
+    {
+      "key": "T010",
+      "text": "云锦"
+    },
+    {
+      "key": "T011",
+      "text": "无人记名"
+    },
+    {
+      "key": "T012",
+      "text": "竞技场与战场"
+    },
+    {
+      "key": "T013",
+      "text": "家园洞府"
+    },
+    {
+      "key": "T014",
+      "text": "英灵图鉴"
+    },
+    {
+      "key": "T015",
+      "text": "读取种植"
+    },
+    {
+      "key": "T016",
+      "text": "读取图鉴"
+    },
+    {
+      "key": "T017",
+      "text": "进竞技场"
+    },
+    {
+      "key": "T018",
+      "text": "B 队"
+    },
+    {
+      "key": "T019",
+      "text": "{\\\"ok\\\":true,\\\"reason\\\":\\\"\\\",\\\"sect_id\\\":7,\\\"name\\\":\\\"云锦\\\",\\\"level\\\":3,"
+    },
+    {
+      "key": "T020",
+      "text": "{\\\"ok\\\":true,\\\"reason\\\":\\\"\\\",\\\"sect_id\\\":7,\\\"name\\\":\\\"云锦\\\",\\\"level\\\":4,"
+    },
+    {
+      "key": "T021",
+      "text": "{\\\"visible\\\":true,\\\"reason\\\":\\\"\\\",\\\"entrance_id\\\":\\\"wb_1\\\",\\\"entrance_name\\\":\\\"荒原祭坛\\\","
+    },
+    {
+      "key": "T022",
+      "text": "\\\"owner_sect_name\\\":\\\"云锦\\\",\\\"starts_at_ms\\\":0,\\\"ends_at_ms\\\":0,"
+    }
+  ]
+}

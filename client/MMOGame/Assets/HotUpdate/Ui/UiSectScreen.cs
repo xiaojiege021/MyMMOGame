@@ -39,7 +39,7 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 左：写定规则
 
             var levelsH = m.Px(84f) + UiSocialCodex.Levels.Length * m.Px(46f) + m.Px(64f);
-            var levels = shell.Panel("等级与人数", m.Band(pad, top + m.Px(56f), leftW, levelsH),
+            var levels = shell.Panel(UiStrings.UiSectScreen.T001, m.Band(pad, top + m.Px(56f), leftW, levelsH),
                 shell.Size(30f));
             var y = levelsH - m.Px(84f) - m.Px(40f);
             for (var i = 0; i < UiSocialCodex.Levels.Length; i++)
@@ -49,12 +49,12 @@ namespace HotUpdate.Ui
             }
 
             shell.LabelIn(levels.Root, new Rect(m.Px(28f), m.Px(24f), leftW - m.Px(56f), m.Px(56f)),
-                "上限是数字，只认右侧回包给的 member_cap", UiTextRole.Faint, shell.Size(21f),
+                UiStrings.UiSectScreen.T002, UiTextRole.Faint, shell.Size(21f),
                 TextAnchor.MiddleLeft, false);
 
             var posTop = top + m.Px(56f) + levelsH + gap;
             var posH = m.Px(84f) + UiSocialCodex.Positions.Length * m.Px(46f) + m.Px(64f);
-            var positions = shell.Panel("职位", m.Band(pad, posTop, leftW, posH), shell.Size(30f));
+            var positions = shell.Panel(UiStrings.UiSectScreen.T003, m.Band(pad, posTop, leftW, posH), shell.Size(30f));
             var py = posH - m.Px(84f) - m.Px(40f);
             for (var i = 0; i < UiSocialCodex.Positions.Length; i++)
             {
@@ -64,12 +64,12 @@ namespace HotUpdate.Ui
             }
 
             shell.LabelIn(positions.Root, new Rect(m.Px(28f), m.Px(24f), leftW - m.Px(56f), m.Px(56f)),
-                "席位数字由回包给，客户端不写死", UiTextRole.Faint, shell.Size(21f),
+                UiStrings.UiSectScreen.T004, UiTextRole.Faint, shell.Size(21f),
                 TextAnchor.MiddleLeft, false);
 
             var lineTop = posTop + posH + gap;
             var lineH = m.Px(84f) + UiSocialCodex.Lines.Length * m.Px(46f) + m.Px(16f);
-            var lines = shell.Panel("三条线", m.Band(pad, lineTop, leftW, lineH), shell.Size(30f));
+            var lines = shell.Panel(UiStrings.UiSectScreen.T005, m.Band(pad, lineTop, leftW, lineH), shell.Size(30f));
             var ly = lineH - m.Px(84f) - m.Px(40f);
             for (var i = 0; i < UiSocialCodex.Lines.Length; i++)
             {
@@ -78,41 +78,41 @@ namespace HotUpdate.Ui
             }
 
             var npcTop = lineTop + lineH + gap;
-            var npc = shell.Panel("宗门 NPC", m.Band(pad, npcTop, leftW, m.Px(200f)), shell.Size(30f));
+            var npc = shell.Panel(UiStrings.UiSectScreen.T006, m.Band(pad, npcTop, leftW, m.Px(200f)), shell.Size(30f));
             shell.LabelIn(npc.Root, new Rect(m.Px(28f), m.Px(28f), leftW - m.Px(56f), m.Px(120f)),
                 UiSocialCodex.Npc, UiTextRole.Muted, shell.Size(23f), TextAnchor.UpperLeft, true);
 
             // ---------------------------------------------------------- 右：服务端事实
 
-            var facts = shell.Panel("服务端事实", m.Band(rightX, top + m.Px(56f), rightW, m.Px(464f)),
+            var facts = shell.Panel(UiStrings.UiSectScreen.T007, m.Band(rightX, top + m.Px(56f), rightW, m.Px(464f)),
                 shell.Size(30f));
             var sect = flow.LastSect;
             var upgraded = flow.LastUpgrade;
             var position = flow.LastPosition;
             var leadership = flow.LastLeadership;
 
-            UiUpgradeViews.Result(shell, facts, m.Px(360f), "宗门",
-                flow.HasSect ? (sect.Ok ? sect.Name : "被拒：" + sect.Reason) : "尚未请求");
-            UiUpgradeViews.Result(shell, facts, m.Px(312f), "等级",
-                flow.HasSect ? "第 " + sect.Level + " 级" : "—");
-            UiUpgradeViews.Result(shell, facts, m.Px(264f), "名册 / 上限",
+            UiUpgradeViews.Result(shell, facts, m.Px(360f), UiStrings.UiSectScreen.T008,
+                flow.HasSect ? (sect.Ok ? sect.Name : UiStrings.UiSectScreen.T009 + sect.Reason) : UiStrings.UiSectScreen.T010);
+            UiUpgradeViews.Result(shell, facts, m.Px(312f), UiStrings.UiSectScreen.T011,
+                flow.HasSect ? UiStrings.UiSectScreen.T012 + sect.Level + UiStrings.UiSectScreen.T013 : "—");
+            UiUpgradeViews.Result(shell, facts, m.Px(264f), UiStrings.UiSectScreen.T014,
                 flow.HasSect ? sect.MemberCount + " / " + sect.MemberCap : "—");
-            UiUpgradeViews.Result(shell, facts, m.Px(216f), "建设",
+            UiUpgradeViews.Result(shell, facts, m.Px(216f), UiStrings.UiSectScreen.T015,
                 flow.HasUpgrade
                     ? upgraded.ConstructionBefore + " → " + upgraded.ConstructionAfter
-                        + "（扣 " + upgraded.UpgradeCost + "）"
+                        + UiStrings.UiSectScreen.T016 + upgraded.UpgradeCost + "）"
                     : "—");
-            UiUpgradeViews.Result(shell, facts, m.Px(168f), "职位席位",
+            UiUpgradeViews.Result(shell, facts, m.Px(168f), UiStrings.UiSectScreen.T017,
                 flow.HasPosition
                     ? position.Position + " · " + position.SeatCount + " / " + position.SeatCap
-                        + (position.Ok ? "" : "（被拒：" + position.Reason + "）")
+                        + (position.Ok ? "" : UiStrings.UiSectScreen.T018 + position.Reason + "）")
                     : "—");
-            UiUpgradeViews.Result(shell, facts, m.Px(120f), "掌门",
+            UiUpgradeViews.Result(shell, facts, m.Px(120f), UiStrings.UiSectScreen.T019,
                 flow.HasLeadership
                     ? leadership.OldMaster + " → " + leadership.NewMaster
-                        + " · 名册 " + leadership.MemberCount
+                        + UiStrings.UiSectScreen.T020 + leadership.MemberCount
                     : "—");
-            UiUpgradeViews.Result(shell, facts, m.Px(72f), "最近一条", Latest(flow));
+            UiUpgradeViews.Result(shell, facts, m.Px(72f), UiStrings.UiSectScreen.T021, Latest(flow));
 
             // 两个编号是请求参数，不是事实值；用一格数组装住，点了签才算数。
             var sectChoice = new[] { UiSocialCodex.NumberChoices[0] };
@@ -130,11 +130,11 @@ namespace HotUpdate.Ui
 
             var actsTop = rosterTop + rosterH + gap;
             var actsH = m.Px(640f);
-            var acts = shell.Panel("这一手", m.Band(rightX, actsTop, rightW, actsH), shell.Size(30f));
+            var acts = shell.Panel(UiStrings.UiSectScreen.T022, m.Band(rightX, actsTop, rightW, actsH), shell.Size(30f));
 
             var sectLine = shell.LabelIn(acts.Root,
                 new Rect(m.Px(28f), m.Px(516f), rightW - m.Px(56f), m.Px(36f)),
-                "宗门编号：" + sectId + "（有回包就用回包的）", UiTextRole.Muted, shell.Size(22f),
+                UiStrings.UiSectScreen.T023 + sectId + UiStrings.UiSectScreen.T024, UiTextRole.Muted, shell.Size(22f),
                 TextAnchor.MiddleLeft, false);
 
             for (var i = 0; i < UiSocialCodex.NumberChoices.Length; i++)
@@ -142,20 +142,20 @@ namespace HotUpdate.Ui
                 var value = UiSocialCodex.NumberChoices[i];
                 var opt = new UiOption(acts.Root,
                     new Rect(m.Px(28f) + i * m.Px(180f), m.Px(452f), m.Px(164f), m.Px(58f)),
-                    value.ToString(), "宗门 " + value, "编号", UiOptionKind.Chip,
+                    value.ToString(), UiStrings.UiSectScreen.T025 + value, UiStrings.UiSectScreen.T026, UiOptionKind.Chip,
                     shell.Size(24f), shell.Size(18f));
                 opt.Selected = i == 0;
                 opt.OnPick = picked =>
                 {
                     sectChoice[0] = value;
-                    sectLine.Label.text = "宗门编号：" + SectIdOf(flow, value) + "（有回包就用回包的）";
+                    sectLine.Label.text = UiStrings.UiSectScreen.T023 + SectIdOf(flow, value) + UiStrings.UiSectScreen.T024;
                     Debug.Log("u7_sect_pick_sect=" + value);
                 };
                 shell.Register(opt);
             }
 
             shell.LabelIn(acts.Root, new Rect(m.Px(28f), m.Px(436f), rightW - m.Px(56f), m.Px(36f)),
-                "目标角色：任命、免职、传位都用这个编号", UiTextRole.Muted, shell.Size(22f),
+                UiStrings.UiSectScreen.T027, UiTextRole.Muted, shell.Size(22f),
                 TextAnchor.MiddleLeft, false);
 
             for (var i = 0; i < UiSocialCodex.NumberChoices.Length; i++)
@@ -163,7 +163,7 @@ namespace HotUpdate.Ui
                 var value = UiSocialCodex.NumberChoices[i];
                 var opt = new UiOption(acts.Root,
                     new Rect(m.Px(28f) + i * m.Px(180f), m.Px(372f), m.Px(164f), m.Px(58f)),
-                    "t" + value, "角色 " + value, "编号", UiOptionKind.Chip,
+                    "t" + value, UiStrings.UiSectScreen.T028 + value, UiStrings.UiSectScreen.T026, UiOptionKind.Chip,
                     shell.Size(24f), shell.Size(18f));
                 opt.Selected = i == 0;
                 opt.OnPick = picked =>
@@ -177,8 +177,8 @@ namespace HotUpdate.Ui
             var colW = (rightW - m.Px(56f) - m.Px(24f)) / 2f;
             var labels = new[]
             {
-                "建宗", "加入", "升级", "退出宗门",
-                "任命副掌门", "任命长老", "免职长老", "传位",
+                UiStrings.UiSectScreen.T029, UiStrings.UiSectScreen.T030, UiStrings.UiSectScreen.T031, UiStrings.UiSectScreen.T032,
+                UiStrings.UiSectScreen.T033, UiStrings.UiSectScreen.T034, UiStrings.UiSectScreen.T035, UiStrings.UiSectScreen.T036,
             };
 
             for (var i = 0; i < labels.Length; i++)
@@ -231,7 +231,7 @@ namespace HotUpdate.Ui
                 return flow.LastSect.DisplayText;
             }
 
-            return "尚未请求";
+            return UiStrings.UiSectScreen.T010;
         }
 
         public static void ResetRosterWindow()
@@ -264,7 +264,7 @@ namespace HotUpdate.Ui
             var m = shell.Metrics;
             shell.LabelIn(roster.Root,
                 new Rect(m.Px(28f), height - m.Px(44f), width - m.Px(56f), m.Px(36f)),
-                "逐条名单", UiTextRole.Heading, shell.Size(26f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiSectScreen.T037, UiTextRole.Heading, shell.Size(26f), TextAnchor.MiddleLeft, false);
             shell.LabelIn(roster.Root,
                 new Rect(m.Px(28f), m.Px(168f), width - m.Px(56f), m.Px(32f)),
                 RosterStatus(flow), UiTextRole.Warm, shell.Size(22f), TextAnchor.MiddleLeft, false);
@@ -292,7 +292,7 @@ namespace HotUpdate.Ui
                     var count = members.Count;
                     shell.ButtonIn(roster.Root,
                         new Rect(m.Px(320f), m.Px(16f), m.Px(160f), m.Px(64f)),
-                        "上一截",
+                        UiStrings.UiSectScreen.T038,
                         () =>
                         {
                             StepRosterWindow(-1, count);
@@ -301,7 +301,7 @@ namespace HotUpdate.Ui
                         UiButtonKind.Quiet);
                     shell.ButtonIn(roster.Root,
                         new Rect(m.Px(496f), m.Px(16f), m.Px(160f), m.Px(64f)),
-                        "下一截",
+                        UiStrings.UiSectScreen.T039,
                         () =>
                         {
                             StepRosterWindow(1, count);
@@ -313,7 +313,7 @@ namespace HotUpdate.Ui
 
             shell.ButtonIn(roster.Root,
                 new Rect(m.Px(28f), m.Px(16f), m.Px(280f), m.Px(64f)),
-                "读取名册",
+                UiStrings.UiSectScreen.T040,
                 () =>
                 {
                     if (flow.Busy)
@@ -365,19 +365,19 @@ namespace HotUpdate.Ui
         {
             if (!flow.HasRoster)
             {
-                return "尚未请求";
+                return UiStrings.UiSectScreen.T010;
             }
 
             var roster = flow.LastRoster;
             if (!roster.Ok)
             {
-                return "被拒：" + (roster.Reason ?? string.Empty);
+                return UiStrings.UiSectScreen.T009 + (roster.Reason ?? string.Empty);
             }
 
             var n = roster.Members != null ? roster.Members.Count : 0;
             if (n == 0)
             {
-                return "回包 0 人";
+                return UiStrings.UiSectScreen.T041;
             }
 
             var start = _rosterWindow * RowsPerPage;
@@ -392,8 +392,8 @@ namespace HotUpdate.Ui
                 end = n;
             }
 
-            return "回包 " + n.ToString(CultureInfo.InvariantCulture)
-                + " 人 · 这一截 " + (start + 1).ToString(CultureInfo.InvariantCulture)
+            return UiStrings.UiSectScreen.T042 + n.ToString(CultureInfo.InvariantCulture)
+                + UiStrings.UiSectScreen.T043 + (start + 1).ToString(CultureInfo.InvariantCulture)
                 + "-" + end.ToString(CultureInfo.InvariantCulture);
         }
 

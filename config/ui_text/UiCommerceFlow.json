@@ -1,0 +1,39 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiCommerceFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiCommerceFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "货币没读到："
+    },
+    {
+      "key": "T002",
+      "text": "背包没读到："
+    },
+    {
+      "key": "T003",
+      "text": "没发出去："
+    },
+    {
+      "key": "T004",
+      "text": "买了"
+    },
+    {
+      "key": "T005",
+      "text": "卖了"
+    },
+    {
+      "key": "T006",
+      "text": "回购了"
+    },
+    {
+      "key": "T007",
+      "text": "修好了"
+    },
+    {
+      "key": "T008",
+      "text": "请求失败："
+    }
+  ]
+}

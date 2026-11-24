@@ -31,7 +31,7 @@ namespace HotUpdate.Ui
             var rightW = m.Width - pad - rightX;
 
             shell.Label(new Rect(pad, m.Height - top - m.Px(40f), m.Width - pad * 2f, m.Px(40f)),
-                "副本 / 战场的唯一通道 · 准入只看等级与境界门禁 · 人数与消耗都由服务端算",
+                UiStrings.UiDungeonScreen.T001,
                 UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, false);
 
             // ---------------------------------------------------------- 左：三条副本
@@ -61,10 +61,10 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 右：人数、口径、进本
 
             var boxH = m.Px(300f);
-            var size = shell.Panel("进本人数", m.Band(rightX, rowTop, rightW, boxH), shell.Size(30f));
+            var size = shell.Panel(UiStrings.UiDungeonScreen.T002, m.Band(rightX, rowTop, rightW, boxH), shell.Size(30f));
             var sizeText = shell.LabelIn(size.Root,
                 new Rect(m.Px(28f), boxH - m.Px(130f), rightW - m.Px(56f), m.Px(52f)),
-                "进本人数 1", UiTextRole.Title, shell.Size(34f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiDungeonScreen.T003, UiTextRole.Title, shell.Size(34f), TextAnchor.MiddleLeft, false);
             var minus = shell.ButtonIn(size.Root,
                 new Rect(m.Px(28f), m.Px(40f), m.Px(120f), m.Px(80f)), "−",
                 () => flow.StepParty(-1), UiButtonKind.Quiet);
@@ -72,25 +72,25 @@ namespace HotUpdate.Ui
                 new Rect(m.Px(164f), m.Px(40f), m.Px(120f), m.Px(80f)), "+",
                 () => flow.StepParty(1), UiButtonKind.Quiet);
             shell.LabelIn(size.Root, new Rect(m.Px(300f), m.Px(40f), rightW - m.Px(328f), m.Px(80f)),
-                "人数是这一场几个人，产出与扣除都由服务端乘",
+                UiStrings.UiDungeonScreen.T004,
                 UiTextRole.Faint, shell.Size(22f), TextAnchor.MiddleLeft, true);
 
             var ruleTop = rowTop + boxH + m.Px(20f);
-            var rule = shell.Panel("倍率口径", m.Band(rightX, ruleTop, rightW, m.Px(240f)), shell.Size(30f));
+            var rule = shell.Panel(UiStrings.UiDungeonScreen.T005, m.Band(rightX, ruleTop, rightW, m.Px(240f)), shell.Size(30f));
             shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(96f), rightW - m.Px(56f), m.Px(104f)),
-                "每人产出 = 单人一份 × 人数；每人扣的疲劳 / 周份额 = 同样倍数。\n"
-                + "一天或一周的总产出不变，省的是次数和时间。",
+                UiStrings.UiDungeonScreen.T006
+                + UiStrings.UiDungeonScreen.T007,
                 UiTextRole.Body, shell.Size(24f), TextAnchor.UpperLeft, true);
 
             var enterTop = ruleTop + m.Px(240f) + m.Px(20f);
             var enter = shell.Button(m.Band(rightX, enterTop, rightW, m.Px(104f)),
-                "进入副本", () => flow.SubmitEnter(), UiButtonKind.Primary);
+                UiStrings.UiDungeonScreen.T008, () => flow.SubmitEnter(), UiButtonKind.Primary);
 
             // ---------------------------------------------------------- 底：回包那一行
 
             var resultTop = enterTop + m.Px(104f) + m.Px(24f);
             var result = shell.Label(new Rect(rightX, m.Height - resultTop - m.Px(44f), rightW, m.Px(44f)),
-                "尚未进本 · 疲劳与份额以回包为准", UiTextRole.Body, shell.Size(24f),
+                UiStrings.UiDungeonScreen.T009, UiTextRole.Body, shell.Size(24f),
                 TextAnchor.MiddleLeft, true);
             var hint = shell.Label(new Rect(rightX, m.Height - resultTop - m.Px(100f), rightW, m.Px(44f)),
                 string.Empty, UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, true);

@@ -1,0 +1,75 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiArenaSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiArenaSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "竞技场与战场"
+    },
+    {
+      "key": "T002",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T003",
+      "text": "进竞技场"
+    },
+    {
+      "key": "T004",
+      "text": "A 队"
+    },
+    {
+      "key": "T005",
+      "text": "B 队"
+    },
+    {
+      "key": "T006",
+      "text": "进场路径"
+    },
+    {
+      "key": "T007",
+      "text": "已接 /versus/*"
+    },
+    {
+      "key": "T008",
+      "text": "进场路径 /battle · 模式 duel · 人数 2"
+    },
+    {
+      "key": "T009",
+      "text": "竞技场 · 属性模板统一"
+    },
+    {
+      "key": "T010",
+      "text": "进场路径 /battle · 模式 trio · 人数 6"
+    },
+    {
+      "key": "T011",
+      "text": "人数 2 ·"
+    },
+    {
+      "key": "T012",
+      "text": "服务端：arena_mode_unknown"
+    },
+    {
+      "key": "T013",
+      "text": "竞技场进场没回应：500"
+    },
+    {
+      "key": "T014",
+      "text": "没读到"
+    },
+    {
+      "key": "T015",
+      "text": "尚未请求 · 点「进竞技场」"
+    },
+    {
+      "key": "T016",
+      "text": "场次 bf_m1 · 队伍 a"
+    },
+    {
+      "key": "T017",
+      "text": "战场 · 装备生效"
+    }
+  ]
+}

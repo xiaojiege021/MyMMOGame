@@ -29,9 +29,9 @@ namespace HotUpdate.Ui
             flow.ClearViews();
 
             shell.Label(m.Band(pad, m.Px(80f), m.Width - pad * 2f, m.Px(60f)),
-                "世界地图与跨区", UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiWorldMapScreen.T001, UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
             shell.Label(m.Band(pad, m.Px(146f), leftW, m.Px(44f)),
-                "文件名即地点编号 · 相连对称 · 剧情未开仍归区域表",
+                UiStrings.UiWorldMapScreen.T002,
                 UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 左：八块地表
@@ -66,31 +66,31 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 右：跨区
 
             var boxH = m.Px(340f);
-            var target = shell.Panel("跨区目标", m.Band(rightX, gridTop, rightW, boxH), shell.Size(28f));
+            var target = shell.Panel(UiStrings.UiWorldMapScreen.T003, m.Band(rightX, gridTop, rightW, boxH), shell.Size(28f));
             var targetText = shell.LabelIn(target.Root,
                 new Rect(m.Px(28f), m.Px(190f), rightW - m.Px(56f), m.Px(120f)),
-                "还没选地表", UiTextRole.Title, shell.Size(32f), TextAnchor.UpperLeft, true);
+                UiStrings.UiWorldMapScreen.T004, UiTextRole.Title, shell.Size(32f), TextAnchor.UpperLeft, true);
             var neighbors = shell.LabelIn(target.Root,
                 new Rect(m.Px(28f), m.Px(96f), rightW - m.Px(56f), m.Px(96f)),
-                "相邻地表以 /world/regions 回包为准", UiTextRole.Muted, shell.Size(23f),
+                UiStrings.UiWorldMapScreen.T005, UiTextRole.Muted, shell.Size(23f),
                 TextAnchor.UpperLeft, true);
 
             var goTop = gridTop + boxH + m.Px(20f);
             var cross = shell.Button(m.Band(rightX, goTop, rightW, m.Px(100f)),
-                "跨过去", () => flow.CrossRegion(flow.ChosenRegion), UiButtonKind.Primary);
+                UiStrings.UiWorldMapScreen.T006, () => flow.CrossRegion(flow.ChosenRegion), UiButtonKind.Primary);
 
             var loadTop = goTop + m.Px(100f) + m.Px(16f);
             shell.Button(m.Band(rightX, loadTop, rightW, m.Px(84f)),
-                "读一次地点表", () => flow.LoadRegions(), UiButtonKind.Quiet);
+                UiStrings.UiWorldMapScreen.T007, () => flow.LoadRegions(), UiButtonKind.Quiet);
 
             // ---------------------------------------------------------- 右下：规则
 
             var ruleTop = loadTop + m.Px(84f) + m.Px(20f);
             var ruleH = m.Px(300f);
-            var rule = shell.Panel("请求与拒绝顺序", m.Band(rightX, ruleTop, rightW, ruleH), shell.Size(26f));
+            var rule = shell.Panel(UiStrings.UiWorldMapScreen.T008, m.Band(rightX, ruleTop, rightW, ruleH), shell.Size(26f));
             shell.LabelIn(rule.Root, new Rect(m.Px(26f), ruleH - m.Px(150f), rightW - m.Px(52f), m.Px(110f)),
-                "请求只带 target_region。身份由网关放进 gRPC header；"
-                + "客户端带不进境界、位置、身份。",
+                UiStrings.UiWorldMapScreen.T009
+                + UiStrings.UiWorldMapScreen.T010,
                 UiTextRole.Body, shell.Size(23f), TextAnchor.UpperLeft, true);
             shell.LabelIn(rule.Root, new Rect(m.Px(26f), m.Px(30f), rightW - m.Px(52f), m.Px(120f)),
                 UiWorldCodex.RegionRejectOrder,
@@ -124,13 +124,13 @@ namespace HotUpdate.Ui
                 {
                     targetText.Label.text = region.Name + " · " + region.Realm
                         + " · " + StateText(flow, region);
-                    neighbors.Label.text = "相邻：" + string.Join(" / ", region.Neighbors)
+                    neighbors.Label.text = UiStrings.UiWorldMapScreen.T011 + string.Join(" / ", region.Neighbors)
                         + "\n" + region.Position;
                 }
                 else
                 {
-                    targetText.Label.text = "还没选地表";
-                    neighbors.Label.text = "相邻地表以 /world/regions 回包为准";
+                    targetText.Label.text = UiStrings.UiWorldMapScreen.T004;
+                    neighbors.Label.text = UiStrings.UiWorldMapScreen.T005;
                 }
 
                 cross.Enabled = !flow.Busy && flow.ChosenRegion.Length > 0;
@@ -154,21 +154,21 @@ namespace HotUpdate.Ui
                 return fromReply;
             }
 
-            return region.Open ? "已开（配置）" : "未开（配置）";
+            return region.Open ? UiStrings.UiWorldMapScreen.T012 : UiStrings.UiWorldMapScreen.T013;
         }
 
         static string SubText(UiWorldFlow flow, UiWorldCodex.Region region)
         {
             return region.Realm + " · " + StateText(flow, region)
-                + " · 连 " + region.Neighbors.Length + " 块";
+                + UiStrings.UiWorldMapScreen.T014 + region.Neighbors.Length + UiStrings.UiWorldMapScreen.T015;
         }
 
         /// <summary>底部那行：读到回包就以回包为准，没读到就明说这一屏现在按配置标。</summary>
         static string OpenNote(UiWorldFlow flow)
         {
             return flow.HasRegions
-                ? "开放以 /world/regions 回包为准：主线第几场、走立仙还是立魔都由世界服的 RegionGate 判。"
-                : "还没读地点表：下面按配置里的静态 open 标，读过之后以回包为准。";
+                ? UiStrings.UiWorldMapScreen.T016
+                : UiStrings.UiWorldMapScreen.T017;
         }
     }
 }

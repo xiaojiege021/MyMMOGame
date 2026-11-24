@@ -38,7 +38,7 @@ import sys
 
 root = os.environ["ROOT"]
 sys.path.insert(0, root + "/tools/check")
-from lib_read import read_text
+from lib_read import read_text, ui_text_assert
 ui = root + "/client/MMOGame/Assets/HotUpdate/Ui"
 net = root + "/client/MMOGame/Assets/Net"
 sect = open(ui + "/UiSectScreen.cs", encoding="utf-8").read()
@@ -56,8 +56,10 @@ assert "RosterLine" in guild, "没有逐行原文"
 assert '"/sect/roster?sect_id="' in flow and "SectGuild.ParseRoster" in flow, "流程没走只读名册"
 assert "LoadRoster" in flow and "HasRoster" in flow
 
-assert "尚未请求" in sect, "没回包时没写尚未请求"
-assert "读取名册" in sect and "SectGuild.RosterLine" in sect, "屏没逐条写回包"
+# D9 之后屏上中文在 config/ui_text/UiSectScreen.json，断言改成查表 + 查引用。
+ui_text_assert(root, "UiSectScreen", "尚未请求", sect, "宗门屏")
+ui_text_assert(root, "UiSectScreen", "读取名册", sect, "宗门屏")
+assert "SectGuild.RosterLine" in sect, "屏没逐条写回包"
 assert "n3_roster_screen=ready" in sect
 assert "flow.Appoint" in sect, "任免按钮被拿掉了"
 assert "config/" not in sect and "sect.json" not in sect, "宗门屏读了配置"

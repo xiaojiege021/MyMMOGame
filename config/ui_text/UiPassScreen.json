@@ -1,0 +1,15 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiPassScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiPassScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "赛季通行证"
+    },
+    {
+      "key": "T002",
+      "text": "免费轨与付费轨、月叠与第二角色栏都在后面的卡。这一屏只留入口，不做请求。"
+    }
+  ]
+}

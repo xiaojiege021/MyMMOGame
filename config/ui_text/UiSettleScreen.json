@@ -1,0 +1,43 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiSettleScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiSettleScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "未 结 算"
+    },
+    {
+      "key": "T002",
+      "text": "等战斗服的结算回包"
+    },
+    {
+      "key": "T003",
+      "text": "等级经验"
+    },
+    {
+      "key": "T004",
+      "text": "等结算回包"
+    },
+    {
+      "key": "T005",
+      "text": "掉落"
+    },
+    {
+      "key": "T006",
+      "text": "产出 = 单人一份 × 进本人数，份数在回包里"
+    },
+    {
+      "key": "T007",
+      "text": "消耗"
+    },
+    {
+      "key": "T008",
+      "text": "进本回包没到，消耗口径以回包为准"
+    },
+    {
+      "key": "T009",
+      "text": "返回表世界"
+    }
+  ]
+}

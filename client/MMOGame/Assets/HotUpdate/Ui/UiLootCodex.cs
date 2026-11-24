@@ -23,13 +23,13 @@ namespace HotUpdate.Ui
         /// <summary>这一屏建好的日志行。</summary>
         public const string ReadyLog = "u15_loot=ready";
 
-        public const string Notice = "掷点只在服务端 · 界面不掷、不算、不改 · 意图只有需求 / 贪婪 / 放弃三个词";
+        public const string Notice = UiStrings.UiLootCodex.T001;
 
         /// <summary>归属为 0 时的文案。</summary>
-        public const string Nobody = "没人要";
+        public const string Nobody = UiStrings.UiLootCodex.T002;
 
         /// <summary>没收到归属时的空态。</summary>
-        public const string EmptyList = "没收到掉落归属 · 全队一份的掉落由战斗服下发 LootAssigned，personal 模式不发这条";
+        public const string EmptyList = UiStrings.UiLootCodex.T003;
 
         public const string Need = "need";
 
@@ -43,11 +43,11 @@ namespace HotUpdate.Ui
             switch (decision)
             {
                 case Need:
-                    return "需求";
+                    return UiStrings.UiLootCodex.T004;
                 case Greed:
-                    return "贪婪";
+                    return UiStrings.UiLootCodex.T005;
                 case Pass:
-                    return "放弃";
+                    return UiStrings.UiLootCodex.T006;
                 default:
                     return decision ?? string.Empty;
             }
@@ -84,13 +84,13 @@ namespace HotUpdate.Ui
                 return Nobody;
             }
 
-            return "归角色 " + row.WinnerCharacterId;
+            return UiStrings.UiLootCodex.T007 + row.WinnerCharacterId;
         }
 
         /// <summary>这一行的标题：物品编号 × 件数。两件以上才写「× N」。</summary>
         public static string ItemLine(UiLootRow row)
         {
-            var item = string.IsNullOrEmpty(row.ItemId) ? "未知物品" : row.ItemId;
+            var item = string.IsNullOrEmpty(row.ItemId) ? UiStrings.UiLootCodex.T008 : row.ItemId;
             return row.Count > 1 ? item + " × " + row.Count : item;
         }
     }

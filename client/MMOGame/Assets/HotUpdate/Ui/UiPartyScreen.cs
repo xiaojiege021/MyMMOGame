@@ -30,7 +30,7 @@ namespace HotUpdate.Ui
             var rightW = m.Width - pad - rightX;
 
             shell.Label(new Rect(pad, m.Height - top - m.Px(40f), m.Width - pad * 2f, m.Px(40f)),
-                "4 人是战斗单元，不是进本人数下限 · 名册与血量只认战斗服下发的同场名单",
+                UiStrings.UiPartyScreen.T001,
                 UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, false);
 
             // ---------------------------------------------------------- 左：名单
@@ -44,7 +44,7 @@ namespace HotUpdate.Ui
             {
                 var empty = shell.Panel(null, m.Band(pad, rowTop, leftW, rowH), shell.Size(28f));
                 shell.LabelIn(empty.Root, new Rect(m.Px(28f), m.Px(28f), leftW - m.Px(56f), m.Px(88f)),
-                    "同场名单还没到 · 进本之后战斗服会把这一场的人发下来",
+                    UiStrings.UiPartyScreen.T002,
                     UiTextRole.Faint, shell.Size(24f), TextAnchor.MiddleLeft, true);
             }
             else
@@ -56,13 +56,13 @@ namespace HotUpdate.Ui
                     var panel = shell.Panel(null, band, shell.Size(28f));
 
                     var title = ClassName(row.ClassId);
-                    var name = string.IsNullOrEmpty(row.Name) ? "无名" : row.Name;
+                    var name = string.IsNullOrEmpty(row.Name) ? UiStrings.UiPartyScreen.T003 : row.Name;
                     shell.LabelIn(panel.Root, new Rect(m.Px(28f), rowH - m.Px(72f), leftW - m.Px(200f), m.Px(48f)),
                         name + " · " + title, UiTextRole.Title, shell.Size(32f), TextAnchor.MiddleLeft, false);
 
                     shell.Chip(panel.Root,
                         new Rect(leftW - m.Px(148f), rowH - m.Px(66f), m.Px(120f), m.Px(42f)),
-                        row.Down ? "倒地" : "在队",
+                        row.Down ? UiStrings.UiPartyScreen.T004 : UiStrings.UiPartyScreen.T005,
                         row.Down ? UiChipKind.Error : UiChipKind.Success);
 
                     // 血条：宽度就是回包里的 hp / hpMax，本地不预留、不预测。
@@ -81,7 +81,7 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 右：三处加成与红线
 
             var boxH = m.Px(104f) + UiBattleCodex.ExpSources.Length * m.Px(64f);
-            var bonus = shell.Panel("经验加成三处（都只加等级经验）",
+            var bonus = shell.Panel(UiStrings.UiPartyScreen.T006,
                 m.Band(rightX, rowTop, rightW, boxH), shell.Size(28f));
             var y = boxH - m.Px(96f);
             for (var i = 0; i < UiBattleCodex.ExpSources.Length; i++)
@@ -93,21 +93,21 @@ namespace HotUpdate.Ui
             }
 
             var ruleTop = rowTop + boxH + m.Px(20f);
-            var rule = shell.Panel("只加经验", m.Band(rightX, ruleTop, rightW, m.Px(180f)), shell.Size(28f));
+            var rule = shell.Panel(UiStrings.UiPartyScreen.T007, m.Band(rightX, ruleTop, rightW, m.Px(180f)), shell.Size(28f));
             shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(28f), rightW - m.Px(56f), m.Px(120f)),
-                UiBattleCodex.PartyRule + "。\n组队加成 " + UiBattleCodex.PartyBonusPct
-                + "% 与人数口径写在 `config/exp.json`，界面只显示名目，不乘这一下。",
+                UiBattleCodex.PartyRule + UiStrings.UiPartyScreen.T008 + UiBattleCodex.PartyBonusPct
+                + UiStrings.UiPartyScreen.T009,
                 UiTextRole.Body, shell.Size(23f), TextAnchor.UpperLeft, true);
 
             // ---------------------------------------------------------- 底：两个出口都没接口
 
             var footTop = ruleTop + m.Px(180f) + m.Px(28f);
             shell.ButtonIn(shell.Content, m.Band(rightX, footTop, (rightW - m.Px(20f)) / 2f, m.Px(96f)),
-                "邀请", () => shell.Toast("小队邀请接口属 P2 社交，本卡只显示同场名单"),
+                UiStrings.UiPartyScreen.T010, () => shell.Toast(UiStrings.UiPartyScreen.T011),
                 UiButtonKind.Normal);
             shell.ButtonIn(shell.Content,
                 m.Band(rightX + (rightW - m.Px(20f)) / 2f + m.Px(20f), footTop, (rightW - m.Px(20f)) / 2f, m.Px(96f)),
-                "离开小队", () => shell.Toast("离队接口属 P2 社交，这里不做"),
+                UiStrings.UiPartyScreen.T012, () => shell.Toast(UiStrings.UiPartyScreen.T013),
                 UiButtonKind.Quiet);
 
             Debug.Log(ReadyLog + " members=" + shown + " party=" + flow.Party.Count);
@@ -137,17 +137,17 @@ namespace HotUpdate.Ui
             switch (classId)
             {
                 case "tank":
-                    return "坦克";
+                    return UiStrings.UiPartyScreen.T014;
                 case "warrior":
-                    return "战士";
+                    return UiStrings.UiPartyScreen.T015;
                 case "mage":
-                    return "法师";
+                    return UiStrings.UiPartyScreen.T016;
                 case "archer":
-                    return "射手";
+                    return UiStrings.UiPartyScreen.T017;
                 case "priest":
-                    return "牧师";
+                    return UiStrings.UiPartyScreen.T018;
                 default:
-                    return string.IsNullOrEmpty(classId) ? "未知" : classId;
+                    return string.IsNullOrEmpty(classId) ? UiStrings.UiPartyScreen.T019 : classId;
             }
         }
     }

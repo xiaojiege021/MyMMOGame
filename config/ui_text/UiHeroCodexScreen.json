@@ -1,0 +1,99 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiHeroCodexScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiHeroCodexScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "图鉴回包"
+    },
+    {
+      "key": "T002",
+      "text": "口径"
+    },
+    {
+      "key": "T003",
+      "text": "收集度由主线进度在服务端推，界面不按场次自己算"
+    },
+    {
+      "key": "T004",
+      "text": "被动只作生活协助，不进伤害公式；灵兽同理"
+    },
+    {
+      "key": "T005",
+      "text": "外观收藏"
+    },
+    {
+      "key": "T006",
+      "text": "已收录到的名字"
+    },
+    {
+      "key": "T007",
+      "text": "尚未请求 · 点「读取图鉴」走 /hero-codex"
+    },
+    {
+      "key": "T008",
+      "text": "再读一次"
+    },
+    {
+      "key": "T009",
+      "text": "读取图鉴"
+    },
+    {
+      "key": "T010",
+      "text": "回包里没有条目 · 不补编一位"
+    },
+    {
+      "key": "T011",
+      "text": "回包 "
+    },
+    {
+      "key": "T012",
+      "text": " 条 · 未定的格子留空，不补编条目"
+    },
+    {
+      "key": "T013",
+      "text": "服务端这次没给条目（entry_count="
+    },
+    {
+      "key": "T014",
+      "text": "服务端："
+    },
+    {
+      "key": "T015",
+      "text": "还没有回包：收集度、被动合计都不在这里给。"
+    },
+    {
+      "key": "T016",
+      "text": "没读到"
+    },
+    {
+      "key": "T017",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T018",
+      "text": "主线场次 main_stage = "
+    },
+    {
+      "key": "T019",
+      "text": " · 收集由服务端按场次推，界面不算"
+    },
+    {
+      "key": "T020",
+      "text": "被动种类 passive_kind = "
+    },
+    {
+      "key": "T021",
+      "text": "（回包没带）"
+    },
+    {
+      "key": "T022",
+      "text": " · 不进伤害公式"
+    },
+    {
+      "key": "T023",
+      "text": "已接 /hero-codex"
+    }
+  ]
+}

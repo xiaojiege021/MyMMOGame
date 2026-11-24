@@ -44,7 +44,7 @@ namespace HotUpdate
                 {
                     var member = _client.Party[i];
                     var memberRatio = member.HpMax > 0 ? Mathf.Clamp01((float)member.Hp / member.HpMax) : 0f;
-                    _partyLabels[i].text = (member.Down ? "倒地 · " : "")
+                    _partyLabels[i].text = (member.Down ? UiStrings.HudRefresh.T001 : "")
                         + member.Name + " · " + UiBattleCodex.ClassName(member.ClassId)
                         + "  " + Mathf.RoundToInt(memberRatio * 100f) + "%";
                     _partyFills[i].sizeDelta = new Vector2(340f * memberRatio, 8f);
@@ -68,11 +68,11 @@ namespace HotUpdate
             {
                 var current = _client.Classes.FindIndex(c => c.ClassId == BattleClient.ClassId);
                 var next = _client.Classes[(current + 1) % _client.Classes.Count];
-                _classButtonLabel.text = "切换 " + next.Name;
+                _classButtonLabel.text = UiStrings.HudRefresh.T002 + next.Name;
             }
             else
             {
-                _classButtonLabel.text = "换职业";
+                _classButtonLabel.text = UiStrings.HudRefresh.T003;
             }
 
             // 技能键写字用技能名，跟着当前职业的技能表走。
@@ -109,7 +109,7 @@ namespace HotUpdate
                 _seenDamage = _client.DamageSeq;
                 _damageText.text = "-" + _client.LastDamage;
                 _damageAge = 0f;
-                _logLine = "回包：命中 -" + _client.LastDamage;
+                _logLine = UiStrings.HudRefresh.T004 + _client.LastDamage;
             }
 
             if (_seenReject != _client.RejectSeq)
@@ -117,7 +117,7 @@ namespace HotUpdate
                 _seenReject = _client.RejectSeq;
                 _rejectText.text = _client.LastReject;
                 _rejectAge = 0f;
-                _logLine = "被拒：" + _client.LastReject;
+                _logLine = UiStrings.HudRefresh.T005 + _client.LastReject;
             }
 
             if (_seenEnded != _client.EndedSeq)
@@ -125,7 +125,7 @@ namespace HotUpdate
                 _seenEnded = _client.EndedSeq;
                 _rejectText.text = "CLEARED";
                 _rejectAge = 0f;
-                _logLine = "回包：这一场结束";
+                _logLine = UiStrings.HudRefresh.T006;
             }
 
             // 切阶段飘一行字。血条位置不动，阶段文本只在左上角常驻。
@@ -134,7 +134,7 @@ namespace HotUpdate
                 _seenPhase = _client.PhaseSeq;
                 _rejectText.text = "PHASE " + _client.PhaseName;
                 _rejectAge = 0f;
-                _logLine = "阶段：" + _client.PhaseName;
+                _logLine = UiStrings.HudRefresh.T007 + _client.PhaseName;
             }
 
             _damageAge += Time.unscaledDeltaTime;

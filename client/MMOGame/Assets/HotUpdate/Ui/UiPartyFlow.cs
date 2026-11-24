@@ -148,7 +148,7 @@ namespace HotUpdate.Ui
                 }
                 else
                 {
-                    Error = "请求失败：" + status;
+                    Error = UiStrings.UiPartyFlow.T001 + status;
                     Debug.Log(logTag + "=reject status=" + status);
                 }
 

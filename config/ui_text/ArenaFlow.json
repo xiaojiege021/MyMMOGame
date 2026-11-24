@@ -1,0 +1,15 @@
+{
+  "schema": "ui-text/1",
+  "group": "ArenaFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/Flow/ArenaFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "竞技场进场没回应："
+    },
+    {
+      "key": "T002",
+      "text": "战场进场没回应："
+    }
+  ]
+}

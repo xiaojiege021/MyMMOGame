@@ -34,7 +34,7 @@ import sys
 
 root = os.environ['ROOT']
 sys.path.insert(0, root + '/tools/check')
-from lib_read import read_text
+from lib_read import read_text, ui_text_assert
 assets = root + '/client/MMOGame/Assets'
 ui = assets + '/HotUpdate/Ui'
 net = assets + '/Net'
@@ -60,7 +60,9 @@ for n in screens:
 arena = open(ui + '/UiArenaScreen.cs', encoding='utf-8').read()
 assert '1.3' not in arena and '0.7' not in arena, 'power math in arena screen'
 # U12 接了 N5 的两条进场口。这里只认「接线后的入口在不在」，不写「无匹配入口」这种会过期的话。
-assert '进竞技场' in arena and 'EnterBattlefield' in arena, 'arena screen 缺进场入口'
+# D9 之后「进竞技场」在 config/ui_text/UiArenaScreen.json，断言改成查表 + 查引用。
+ui_text_assert(root, 'UiArenaScreen', '进竞技场', arena, '竞技场屏')
+assert 'EnterBattlefield' in arena, 'arena screen 缺进场入口'
 
 codex = open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
 assert 'config/' not in codex, 'config read in codex'
@@ -84,7 +86,8 @@ hero = open(ui + '/UiHeroCodexScreen.cs', encoding='utf-8').read()
 social_codex = open(ui + '/UiSocialCodex.cs', encoding='utf-8').read()
 # U9 接了摆放、U10 接了种植与家园币、U11 接了图鉴。这里只认「接线后的入口在不在」，
 # 不写「已接 / 未接」这种会过期的话。
-assert '读取种植' in home and '读取图鉴' in hero
+ui_text_assert(root, 'UiHomesteadScreen', '读取种植', home, '家园屏')
+ui_text_assert(root, 'UiHeroCodexScreen', '读取图鉴', hero, '图鉴屏')
 assert 'PlantingGap' not in social_codex and 'CodexGap' not in social_codex
 assert 'VersusGap' not in social_codex, '竞技场缺口文案还留着'
 

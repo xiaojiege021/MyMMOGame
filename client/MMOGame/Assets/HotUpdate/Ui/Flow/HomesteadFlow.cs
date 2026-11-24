@@ -46,7 +46,7 @@ namespace HotUpdate.Ui
                 {
                     LastHomestead = HomesteadOutcome.Failure("http_" + status);
                     HasHomestead = false;
-                    Error = "洞府没读到：" + status;
+                    Error = UiStrings.HomesteadFlow.T001 + status;
                     Debug.Log("u9_homestead=reject status=" + status);
                 }
 
@@ -173,7 +173,7 @@ namespace HotUpdate.Ui
                 {
                     LastPlants = HomesteadPlantOutcome.Failure("http_" + status);
                     HasPlants = false;
-                    Error = "种植没读到：" + status;
+                    Error = UiStrings.HomesteadFlow.T002 + status;
                     Debug.Log("u10_plants=reject status=" + status);
                 }
 
@@ -238,7 +238,7 @@ namespace HotUpdate.Ui
                     {
                         LastPlantAction = HomesteadPlantOutcome.Failure("http_" + status);
                         HasPlantAction = true;
-                        Error = "收取没回应：" + status;
+                        Error = UiStrings.HomesteadFlow.T003 + status;
                         Debug.Log("u10_harvest=reject status=" + status);
                     }
 

@@ -134,7 +134,7 @@ namespace HotUpdate.Ui
             Error = string.Empty;
             if (_link == null)
             {
-                Error = "没有战斗连接";
+                Error = UiStrings.UiReconnectFlow.T001;
                 Debug.Log("u16_reconnect=no_link");
                 return;
             }

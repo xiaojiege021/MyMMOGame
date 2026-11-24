@@ -24,7 +24,7 @@ export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 
 TMP="$(mktemp -d)"
-TITLE="C5（config + client）"
+TITLE="C5+D9（文案：对话 + 界面）"
 trap 'rm -rf "$TMP"' EXIT
 
 echo "== 1. 静态断言：正本、生成物、手写代码 =="
@@ -265,6 +265,167 @@ if [ "$BEFORE" = "$AFTER" ]; then
   ok "真 config/dialogue 一个字节都没动"
 else
   bad "真 config/dialogue 被演练改动了"
+fi
+
+# ════════════════════════════════════════════════════════════════════
+# D9 客户端文案表（14.6 顺序 14）：界面上的中文从 .cs 搬进 config/ui_text/*.json，
+# 源码只留 `UiStrings.<组>.<key>`。与上面 C5 同一域（文案只有一个正本），所以并在这张卡里，
+# 不新开 check-d9.sh（10.1：脚本数不许再涨）。
+# ════════════════════════════════════════════════════════════════════
+
+echo "== 4. D9 正本与生成物自洽 =="
+ROOT="$ROOT" python3 - > "$TMP/d9_static.txt" 2>&1 <<'PY'
+import glob, json, os, re
+
+root = os.environ["ROOT"]
+cfg_dir = os.path.join(root, "config/ui_text")
+out_dir = os.path.join(root, "client/MMOGame/Assets/HotUpdate/Ui/UiStrings")
+client = os.path.join(root, "client/MMOGame/Assets/HotUpdate")
+
+
+def report(key, cond, info=""):
+    print(("PASS " if cond else "FAIL ") + key + ("" if cond else "  " + info))
+
+
+def read(p):
+    return open(p, encoding="utf-8").read()
+
+
+files = sorted(glob.glob(os.path.join(cfg_dir, "*.json")))
+report("d9_config_registered", len(files) >= 70, "组数=%d" % len(files))
+
+bad, total, groups = [], 0, []
+for p in files:
+    doc = json.load(open(p, encoding="utf-8"))
+    name = os.path.basename(p)[:-5]
+    if doc.get("schema") != "ui-text/1":
+        bad.append(name + ":schema")
+    if doc.get("group") != name:
+        bad.append(name + ":group")
+    if not (doc.get("source") or "").startswith("client/MMOGame/Assets/HotUpdate/"):
+        bad.append(name + ":source")
+    entries = doc.get("entries") or []
+    if not entries:
+        bad.append(name + ":empty")
+    keys = [e.get("key") for e in entries]
+    if len(keys) != len(set(keys)):
+        bad.append(name + ":dup_key")
+    for e in entries:
+        if not e.get("text"):
+            bad.append(name + ":empty_text")
+            break
+        if not re.fullmatch(r"T\d{3,4}", e.get("key") or ""):
+            bad.append(name + ":key_format")
+            break
+    total += len(entries)
+    groups.append(name)
+report("d9_config_entries_clean", not bad, ";".join(bad[:6]))
+report("d9_config_entries_floor", total >= 1300, "条数=%d" % total)
+
+shards = sorted(glob.glob(os.path.join(out_dir, "*.cs")))
+shard_groups = sorted(os.path.basename(s)[:-3] for s in shards)
+report("d9_shards_match_config", shard_groups == sorted(groups),
+       "多=%s 少=%s" % (sorted(set(shard_groups) - set(groups))[:4],
+                       sorted(set(groups) - set(shard_groups))[:4]))
+
+hand = []
+for s, g in zip(shards, shard_groups):
+    body = read(s)
+    if "不要手改" not in body or ("config/ui_text/%s.json" % g) not in body:
+        hand.append(g)
+report("d9_shards_declare_generated", not hand, ";".join(hand[:6]))
+
+# 表里有、屏上没用 = 孤儿：改文案时改了也不会生效。
+refs = set()
+for dirpath, dirnames, names in os.walk(client):
+    dirnames[:] = [d for d in dirnames if d not in ("UiStrings", "Generated")]
+    for n in names:
+        if not n.endswith(".cs"):
+            continue
+        for m in re.finditer(r"UiStrings\.(\w+)\.(T\d{3,4})", read(os.path.join(dirpath, n))):
+            refs.add(m.group(1) + "." + m.group(2))
+orphan = []
+for p in files:
+    doc = json.load(open(p, encoding="utf-8"))
+    g = doc["group"]
+    for e in doc.get("entries") or []:
+        if (g + "." + e["key"]) not in refs:
+            orphan.append(g + "." + e["key"])
+report("d9_entries_all_referenced", not orphan,
+       "没人引用=%d 例=%s" % (len(orphan), ";".join(orphan[:5])))
+
+print("INFO d9_groups=%d entries=%d refs=%d" % (len(groups), total, len(refs)))
+print("PASS d9_static_end")
+PY
+
+while read -r tag key rest; do
+  case "$tag" in
+    PASS) ok "$key" ;;
+    FAIL) bad "$key${rest:+ $rest}" ;;
+    INFO) printf '  ..   %s\n' "$key${rest:+ $rest}" ;;
+  esac
+done < "$TMP/d9_static.txt"
+if ! grep -q '^PASS d9_static_end' "$TMP/d9_static.txt"; then
+  bad "D9 静态断言没跑完"; grep -vE '^(PASS|FAIL|INFO) ' "$TMP/d9_static.txt" | tail -6 | detail
+fi
+
+echo "== 5. D9 源码里没有手写中文字面量 =="
+if OUTR="$(python3 tools/gen/gen-ui-text.py --report 2>&1)"; then
+  ok "HotUpdate 下 0 处中文字面量（UiContentTable / UiStrings 除外）"
+else
+  bad "还有中文字面量没进表"
+  printf '%s\n' "$OUTR" | head -8 | detail
+fi
+
+echo "== 6. D9 生成器重跑与提交的分片逐字一致 =="
+if python3 tools/gen/gen-ui-text.py --out "$TMP/d9gen" >/dev/null 2>&1; then
+  if diff -r --exclude='*.meta' "$TMP/d9gen" "$ROOT/client/MMOGame/Assets/HotUpdate/Ui/UiStrings" >"$TMP/d9diff.txt" 2>&1; then
+    ok "生成器重跑逐字一致"
+  else
+    bad "生成物与正本不一致（手改过 / 忘了重跑）"
+    head -6 "$TMP/d9diff.txt" | detail
+  fi
+else
+  bad "生成器跑不起来"; detail < /dev/null
+fi
+
+echo "== 7. D9 改文案演练：只改临时 config，生成物跟着变 =="
+BEFORE="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' config/ui_text/UiFlightScreen.json)"
+mkdir -p "$TMP/d9root/config"
+cp -R config/ui_text "$TMP/d9root/config/ui_text"
+if ROOT="$TMP/d9root" TMPOUT="$TMP/d9mut" python3 - <<'PY' > "$TMP/d9mutate.txt" 2>&1
+import json, os, subprocess, sys
+
+root = os.environ["ROOT"]
+out = os.environ["TMPOUT"]
+path = os.path.join(root, "config/ui_text/UiFlightScreen.json")
+doc = json.load(open(path, encoding="utf-8"))
+first = doc["entries"][0]
+old = first["text"]
+first["text"] = "D9 演练：只在临时配置里"
+doc["entries"].append({"key": "T900", "text": "D9 演练：新加的一条"})
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(doc, f, ensure_ascii=False, indent=2)
+
+subprocess.check_call([sys.executable, "tools/gen/gen-ui-text.py",
+                       "--root", root, "--out", out], stdout=subprocess.DEVNULL)
+body = open(os.path.join(out, "UiFlightScreen.cs"), encoding="utf-8").read()
+assert "D9 演练：只在临时配置里" in body, "改过的那条没进生成物"
+assert old not in body, "旧文案还在生成物里"
+assert "D9 演练：新加的一条" in body, "新加的一条没进生成物"
+print("ok")
+PY
+then
+  ok "只改临时 config，生成物就换成了新文案（屏读的是这张表）"
+else
+  bad "D9 改文案演练失败"
+  head -6 "$TMP/d9mutate.txt" | detail
+fi
+AFTER="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' config/ui_text/UiFlightScreen.json)"
+if [ "$BEFORE" = "$AFTER" ]; then
+  ok "真 config/ui_text 一个字节都没动"
+else
+  bad "真 config/ui_text 被演练改动了"
 fi
 
 finish "$TITLE"

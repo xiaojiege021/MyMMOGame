@@ -168,13 +168,13 @@ namespace HotUpdate.Ui
             switch (which)
             {
                 case "settle":
-                    shell.ShowPage("战斗结算", s => UiSettleScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiDungeonFlow.T001, s => UiSettleScreen.Build(s, flow));
                     break;
                 case "party":
-                    shell.ShowPage("小队", s => UiPartyScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiDungeonFlow.T002, s => UiPartyScreen.Build(s, flow));
                     break;
                 default:
-                    shell.ShowPage("裂隙", s => UiDungeonScreen.Build(s, flow));
+                    shell.ShowPage(UiStrings.UiDungeonFlow.T003, s => UiDungeonScreen.Build(s, flow));
                     break;
             }
 
@@ -351,8 +351,8 @@ namespace HotUpdate.Ui
             if (_sizeText != null)
             {
                 _sizeText.text = known
-                    ? "进本人数 " + PartySize + " / 上限 " + dungeon.MaxPlayers
-                    : "进本人数 " + PartySize;
+                    ? UiStrings.UiDungeonFlow.T004 + PartySize + UiStrings.UiDungeonFlow.T005 + dungeon.MaxPlayers
+                    : UiStrings.UiDungeonFlow.T004 + PartySize;
             }
 
             if (_resultText != null)
@@ -376,18 +376,18 @@ namespace HotUpdate.Ui
         {
             if (!HasReply)
             {
-                return "尚未进本 · 疲劳与份额以回包为准";
+                return UiStrings.UiDungeonFlow.T006;
             }
 
             if (Last.Kind != EnterKind.Allowed && Last.Kind != EnterKind.Refused)
             {
-                return "进本没发出去 · " + DungeonEntry.KindName(Last.Kind);
+                return UiStrings.UiDungeonFlow.T007 + DungeonEntry.KindName(Last.Kind);
             }
 
-            return "疲劳 " + Last.Fatigue + " / " + Last.FatigueDailyCap
-                + " · 本次扣 " + Last.FatigueCost
-                + " · 本周剩 " + Last.WeeklyShareRemaining + " / " + Last.WeeklyShareCap
-                + " · 每人 " + Last.RewardShares + " 份";
+            return UiStrings.UiDungeonFlow.T008 + Last.Fatigue + " / " + Last.FatigueDailyCap
+                + UiStrings.UiDungeonFlow.T009 + Last.FatigueCost
+                + UiStrings.UiDungeonFlow.T010 + Last.WeeklyShareRemaining + " / " + Last.WeeklyShareCap
+                + UiStrings.UiDungeonFlow.T011 + Last.RewardShares + UiStrings.UiDungeonFlow.T012;
         }
 
         /// <summary>被拒原因那一行。能进与没回包时都留空，不占屏。</summary>
@@ -401,19 +401,19 @@ namespace HotUpdate.Ui
             switch (Last.Kind)
             {
                 case EnterKind.Allowed:
-                    return "已进本 · 记录 " + (Last.EntryId.Length > 0 ? Last.EntryId : "—");
+                    return UiStrings.UiDungeonFlow.T013 + (Last.EntryId.Length > 0 ? Last.EntryId : "—");
                 case EnterKind.Refused:
-                    return "进不去 · " + UiBattleCodex.ReasonText(Last.Reason);
+                    return UiStrings.UiDungeonFlow.T014 + UiBattleCodex.ReasonText(Last.Reason);
                 case EnterKind.InvalidToken:
-                    return "令牌失效 · 回登录重来";
+                    return UiStrings.UiDungeonFlow.T015;
                 case EnterKind.Network:
-                    return "连不上网关 · 检查网络再试";
+                    return UiStrings.UiDungeonFlow.T016;
                 case EnterKind.Unavailable:
-                    return "服务端暂时连不上库 · 稍后再试";
+                    return UiStrings.UiDungeonFlow.T017;
                 case EnterKind.BadRequest:
-                    return "请求没发出去 · 人数或副本编号不对";
+                    return UiStrings.UiDungeonFlow.T018;
                 default:
-                    return "服务端拒了这次进本 · " + Last.Error;
+                    return UiStrings.UiDungeonFlow.T019 + Last.Error;
             }
         }
 
@@ -422,47 +422,47 @@ namespace HotUpdate.Ui
         {
             if (_settleState != null)
             {
-                _settleState.text = HasSettlement ? (Cleared ? "通 关" : "未 通 关") : "未 结 算";
+                _settleState.text = HasSettlement ? (Cleared ? UiStrings.UiDungeonFlow.T020 : UiStrings.UiDungeonFlow.T021) : UiStrings.UiDungeonFlow.T022;
             }
 
             if (_settleHead != null)
             {
                 if (!HasSettlement)
                 {
-                    _settleHead.text = "等战斗服的结算回包";
+                    _settleHead.text = UiStrings.UiDungeonFlow.T023;
                 }
                 else
                 {
-                    var name = "副本";
+                    var name = UiStrings.UiDungeonFlow.T024;
                     UiBattleCodex.Dungeon dungeon;
                     if (UiBattleCodex.FindDungeon(ChosenId, out dungeon))
                     {
                         name = dungeon.Name;
                     }
 
-                    _settleHead.text = name + " · " + SettlePartySize + " 人 · 每人 " + SettleRewardShares + " 份";
+                    _settleHead.text = name + " · " + SettlePartySize + UiStrings.UiDungeonFlow.T025 + SettleRewardShares + UiStrings.UiDungeonFlow.T012;
                 }
             }
 
             if (_settleExp != null)
             {
                 _settleExp.text = HasSettlement
-                    ? "等级经验 +" + ExpGain + "（回包给的数，本地不加成、不翻倍）"
-                    : "等结算回包";
+                    ? UiStrings.UiDungeonFlow.T026 + ExpGain + UiStrings.UiDungeonFlow.T027
+                    : UiStrings.UiDungeonFlow.T028;
             }
 
             if (_settleCost != null)
             {
                 _settleCost.text = HasReply
-                    ? "本次扣疲劳 " + Last.FatigueCost + " · 进本后疲劳 " + Last.Fatigue
-                        + " · 本周剩 " + Last.WeeklyShareRemaining + " / " + Last.WeeklyShareCap
-                    : "进本回包没到，消耗口径以回包为准";
+                    ? UiStrings.UiDungeonFlow.T029 + Last.FatigueCost + UiStrings.UiDungeonFlow.T030 + Last.Fatigue
+                        + UiStrings.UiDungeonFlow.T010 + Last.WeeklyShareRemaining + " / " + Last.WeeklyShareCap
+                    : UiStrings.UiDungeonFlow.T031;
             }
 
             if (_settleDrop != null)
             {
                 _settleDrop.text = HasSettlement && SettlementId.Length > 0
-                    ? "结算事务号 " + SettlementId + " · 掉落以角色服背包回包为准"
+                    ? UiStrings.UiDungeonFlow.T032 + SettlementId + UiStrings.UiDungeonFlow.T033
                     : UiBattleCodex.SettleDropNote;
             }
         }

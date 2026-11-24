@@ -18,7 +18,7 @@ namespace HotUpdate.Ui
         /// <summary>九位（与产品表同名，只作这一份假回包的内容，运行期不打开任何配置文件）。</summary>
         static readonly string[] Names =
         {
-            "乔小满", "苏晚织", "阮青", "阿弦", "闻嫂", "孟七", "澄川", "灰生", "周晚棠",
+            UiStrings.UiHeroCodexSelfCheck.T001, UiStrings.UiHeroCodexSelfCheck.T002, UiStrings.UiHeroCodexSelfCheck.T003, UiStrings.UiHeroCodexSelfCheck.T004, UiStrings.UiHeroCodexSelfCheck.T005, UiStrings.UiHeroCodexSelfCheck.T006, UiStrings.UiHeroCodexSelfCheck.T007, UiStrings.UiHeroCodexSelfCheck.T008, UiStrings.UiHeroCodexSelfCheck.T009,
         };
 
         /// <summary>各条在主线首场出现的场次（假回包自己的设定，自检只按它推收没收到）。</summary>
@@ -60,17 +60,17 @@ namespace HotUpdate.Ui
             });
 
             // 一、尚未请求：不画格子、不拿原型里的名字顶上。
-            shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHeroCodexSelfCheck.T010, s => UiHeroCodexScreen.Build(s, flow));
             var pending = Text(shell);
-            Report("pending", pending.Contains("尚未请求") && pending.Contains("读取图鉴")
-                && pending.Contains("还没有回包")
+            Report("pending", pending.Contains(UiStrings.UiHeroCodexSelfCheck.T011) && pending.Contains(UiStrings.UiHeroCodexSelfCheck.T012)
+                && pending.Contains(UiStrings.UiHeroCodexSelfCheck.T013)
                 && !pending.Contains(Names[0])
-                && !pending.Contains("已收集"));
-            Debug.Log("u11_self_pending=" + pending.Contains("读取图鉴"));
+                && !pending.Contains(UiStrings.UiHeroCodexSelfCheck.T014));
+            Debug.Log("u11_self_pending=" + pending.Contains(UiStrings.UiHeroCodexSelfCheck.T012));
 
             // 二、九格与名字：都来自回包，服务端把中文写成 \uXXXX 也要解开。
             flow.LoadHeroCodex();
-            shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHeroCodexSelfCheck.T010, s => UiHeroCodexScreen.Build(s, flow));
             var entries = Text(shell);
             var allNames = true;
             for (var i = 0; i < Names.Length; i++)
@@ -79,68 +79,68 @@ namespace HotUpdate.Ui
             }
 
             Report("entries", flow.HasCodex && flow.LastCodex.Entries.Count == 9
-                && entries.Contains("回包 9 条")
-                && entries.Contains("回包 收集 6 / 9 · 万分比 6666 · 被动合计 150 bps · life_assist")
-                && entries.Contains("已接 /hero-codex")
+                && entries.Contains(UiStrings.UiHeroCodexSelfCheck.T015)
+                && entries.Contains(UiStrings.UiHeroCodexSelfCheck.T016)
+                && entries.Contains(UiStrings.UiHeroCodexSelfCheck.T017)
                 && allNames);
             Debug.Log("u11_self_entries names=" + allNames
                 + " count=" + flow.LastCodex.Entries.Count
                 + " collected=" + flow.LastCodex.CollectedCount);
 
             // 三、收集度：前六位已收集、后三位未收集，都按回包的 collected 写。
-            Report("collected", entries.Contains(Names[0] + "\n已收集 · 被动 20 bps")
-                && entries.Contains(Names[5] + "\n已收集 · 被动 30 bps")
-                && entries.Contains(Names[6] + "\n未收集 · 被动 0 bps")
-                && entries.Contains(Names[8] + "\n未收集 · 被动 0 bps"));
+            Report("collected", entries.Contains(Names[0] + UiStrings.UiHeroCodexSelfCheck.T018)
+                && entries.Contains(Names[5] + UiStrings.UiHeroCodexSelfCheck.T019)
+                && entries.Contains(Names[6] + UiStrings.UiHeroCodexSelfCheck.T020)
+                && entries.Contains(Names[8] + UiStrings.UiHeroCodexSelfCheck.T020));
 
             // 四、被动 bps：每位与合计都照抄回包的万分比，不换算、不乘。
             var entrySix = HeroCodexEntry.EntryAt(flow.LastCodex, 6);
             Report("passive", flow.LastCodex.TotalPassivePctBps == 150
                 && flow.LastCodex.CollectionPctBps == 6666
                 && entrySix != null && entrySix.Value.PassivePctBps == 0
-                && entries.Contains("被动合计 150 bps")
-                && entries.Contains("主线场次 main_stage = 3")
-                && entries.Contains("被动种类 passive_kind = life_assist"));
+                && entries.Contains(UiStrings.UiHeroCodexSelfCheck.T021)
+                && entries.Contains(UiStrings.UiHeroCodexSelfCheck.T022)
+                && entries.Contains(UiStrings.UiHeroCodexSelfCheck.T023));
             Debug.Log("u11_self_passive total=" + flow.LastCodex.TotalPassivePctBps
                 + " pct=" + flow.LastCodex.CollectionPctBps);
 
             // 五、主线推进后重读：收集度跟着回包变，屏上不自己加一位。
             _mainStage = 4;
             flow.LoadHeroCodex();
-            shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHeroCodexSelfCheck.T010, s => UiHeroCodexScreen.Build(s, flow));
             var advanced = Text(shell);
-            Report("advance", advanced.Contains("回包 收集 8 / 9 · 万分比 8888 · 被动合计 220 bps")
-                && advanced.Contains(Names[7] + "\n已收集 · 被动 35 bps")
-                && advanced.Contains(Names[8] + "\n未收集 · 被动 0 bps"));
+            Report("advance", advanced.Contains(UiStrings.UiHeroCodexSelfCheck.T024)
+                && advanced.Contains(Names[7] + UiStrings.UiHeroCodexSelfCheck.T025)
+                && advanced.Contains(Names[8] + UiStrings.UiHeroCodexSelfCheck.T020));
             Debug.Log("u11_self_advance collected=" + flow.LastCodex.CollectedCount);
 
             // 六、回包没给条目：不画格子，也不补编一位。
             _emptyEntries = true;
             flow.LoadHeroCodex();
-            shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHeroCodexSelfCheck.T010, s => UiHeroCodexScreen.Build(s, flow));
             var empty = Text(shell);
             Report("no_entries", flow.LastCodex.Entries.Count == 0
-                && empty.Contains("回包里没有条目 · 不补编一位")
-                && empty.Contains("服务端这次没给条目（entry_count=0）")
+                && empty.Contains(UiStrings.UiHeroCodexSelfCheck.T026)
+                && empty.Contains(UiStrings.UiHeroCodexSelfCheck.T027)
                 && !empty.Contains(Names[0]));
             _emptyEntries = false;
 
             // 七、没读到：写回执，不假装「尚未请求」，也不编一个 0/9。
             _status = 404;
             flow.LoadHeroCodex();
-            shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHeroCodexSelfCheck.T010, s => UiHeroCodexScreen.Build(s, flow));
             var rejected = Text(shell);
-            Report("reject", !flow.HasCodex && rejected.Contains("图鉴没读到：404")
-                && rejected.Contains("再读一次")
-                && rejected.Contains("没读到")
+            Report("reject", !flow.HasCodex && rejected.Contains(UiStrings.UiHeroCodexSelfCheck.T028)
+                && rejected.Contains(UiStrings.UiHeroCodexSelfCheck.T029)
+                && rejected.Contains(UiStrings.UiHeroCodexSelfCheck.T030)
                 && !rejected.Contains(Names[0]));
-            Debug.Log("u11_self_reject=" + rejected.Contains("图鉴没读到：404"));
+            Debug.Log("u11_self_reject=" + rejected.Contains(UiStrings.UiHeroCodexSelfCheck.T028));
 
             // 八、切皮肤只换颜色：布局与文案一字不差。
             _status = 200;
             _mainStage = 3;
             flow.LoadHeroCodex();
-            shell.ShowPage("英灵图鉴", s => UiHeroCodexScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHeroCodexSelfCheck.T010, s => UiHeroCodexScreen.Build(s, flow));
             var layout = Layout(shell);
             var copy = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);

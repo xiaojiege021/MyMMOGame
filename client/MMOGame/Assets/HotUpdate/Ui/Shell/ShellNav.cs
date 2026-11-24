@@ -94,7 +94,7 @@ namespace HotUpdate.Ui
         /// <summary>通用状态屏（原型 G01）。</summary>
         public void OpenStatus()
         {
-            ShowPage("状态与提示", UiStatusScreen.Build);
+            ShowPage(UiStrings.ShellNav.T001, UiStatusScreen.Build);
         }
 
         void ClearPage()

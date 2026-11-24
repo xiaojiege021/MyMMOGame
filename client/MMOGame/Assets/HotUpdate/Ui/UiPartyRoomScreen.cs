@@ -53,15 +53,15 @@ namespace HotUpdate.Ui
                         shell.Size(28f));
 
                     shell.LabelIn(panel.Root, new Rect(m.Px(28f), rowH - m.Px(76f), leftW - m.Px(200f), m.Px(48f)),
-                        "角色 " + row.CharacterId.ToString(CultureInfo.InvariantCulture),
+                        UiStrings.UiPartyRoomScreen.T001 + row.CharacterId.ToString(CultureInfo.InvariantCulture),
                         UiTextRole.Title, shell.Size(30f), TextAnchor.MiddleLeft, false);
 
                     shell.Chip(panel.Root, new Rect(leftW - m.Px(176f), rowH - m.Px(70f), m.Px(148f), m.Px(42f)),
-                        row.IsLeader ? "队长" : "队员",
+                        row.IsLeader ? UiStrings.UiPartyRoomScreen.T002 : UiStrings.UiPartyRoomScreen.T003,
                         row.IsLeader ? UiChipKind.Success : UiChipKind.Mute);
 
                     shell.LabelIn(panel.Root, new Rect(m.Px(28f), m.Px(28f), leftW - m.Px(56f), m.Px(48f)),
-                        row.Ready ? "已准备" : "未准备",
+                        row.Ready ? UiStrings.UiPartyRoomScreen.T004 : UiStrings.UiPartyRoomScreen.T005,
                         row.Ready ? UiTextRole.Jade : UiTextRole.Faint, shell.Size(24f),
                         TextAnchor.MiddleLeft, false);
 
@@ -77,7 +77,7 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 右上：回包那一队
 
             var headH = m.Px(220f);
-            var head = shell.Panel("队伍", m.Band(rightX, rowTop, rightW, headH), shell.Size(30f));
+            var head = shell.Panel(UiStrings.UiPartyRoomScreen.T006, m.Band(rightX, rowTop, rightW, headH), shell.Size(30f));
             var headLine = shell.LabelIn(head.Root,
                 new Rect(m.Px(28f), headH - m.Px(120f), rightW - m.Px(56f), m.Px(56f)),
                 CharacterParty.HeadLine(flow.Tried, flow.Last), UiTextRole.Title, shell.Size(32f),
@@ -86,31 +86,31 @@ namespace HotUpdate.Ui
                 new Rect(m.Px(28f), m.Px(40f), rightW - m.Px(56f), m.Px(56f)),
                 flow.HasReply
                     ? UiPartyCodex.SlotsLine(flow.Last.Size, flow.Last.MaxSize)
-                    : "人数上限看回包",
+                    : UiStrings.UiPartyRoomScreen.T007,
                 UiTextRole.Muted, shell.Size(26f), TextAnchor.MiddleLeft, false);
 
             // ---------------------------------------------------------- 右中：分配口径
 
             var lootTop = rowTop + headH + m.Px(20f);
             var lootH = m.Px(180f);
-            var loot = shell.Panel("分配口径", m.Band(rightX, lootTop, rightW, lootH), shell.Size(30f));
+            var loot = shell.Panel(UiStrings.UiPartyRoomScreen.T008, m.Band(rightX, lootTop, rightW, lootH), shell.Size(30f));
             shell.LabelIn(loot.Root, new Rect(m.Px(28f), m.Px(28f), rightW - m.Px(56f), lootH - m.Px(96f)),
-                flow.HasReply ? CharacterParty.LootLine(flow.Last) : "回包没给分配口径",
+                flow.HasReply ? CharacterParty.LootLine(flow.Last) : UiStrings.UiPartyRoomScreen.T009,
                 UiTextRole.Body, shell.Size(24f), TextAnchor.UpperLeft, true);
 
             // ---------------------------------------------------------- 右下：六个写操作
 
             var fieldTop = lootTop + lootH + m.Px(20f);
             var fieldRect = m.Band(rightX, fieldTop, rightW, m.Px(110f));
-            var target = new UiTextField(shell, shell.Content, fieldRect, "目标角色号",
-                "填要邀请 / 接受的角色号", false, 20);
+            var target = new UiTextField(shell, shell.Content, fieldRect, UiStrings.UiPartyRoomScreen.T010,
+                UiStrings.UiPartyRoomScreen.T011, false, 20);
 
             var actTop = fieldTop + m.Px(110f) + m.Px(18f);
             var half = (rightW - m.Px(16f)) / 2f;
             var third = (rightW - m.Px(32f)) / 3f;
             var onRefresh = (System.Action)shell.RefreshPage;
 
-            shell.ButtonIn(shell.Content, m.Band(rightX, actTop, half, m.Px(88f)), "邀请",
+            shell.ButtonIn(shell.Content, m.Band(rightX, actTop, half, m.Px(88f)), UiStrings.UiPartyRoomScreen.T012,
                 () =>
                 {
                     ulong id;
@@ -123,22 +123,22 @@ namespace HotUpdate.Ui
                     flow.Invite(id, onRefresh);
                 }, UiButtonKind.Primary);
 
-            shell.ButtonIn(shell.Content, m.Band(rightX + half + m.Px(16f), actTop, half, m.Px(88f)), "开始准备",
+            shell.ButtonIn(shell.Content, m.Band(rightX + half + m.Px(16f), actTop, half, m.Px(88f)), UiStrings.UiPartyRoomScreen.T013,
                 () => flow.StartReady(onRefresh), UiButtonKind.Normal);
 
             var act2 = actTop + m.Px(88f) + m.Px(12f);
-            shell.ButtonIn(shell.Content, m.Band(rightX, act2, third, m.Px(88f)), "接受",
+            shell.ButtonIn(shell.Content, m.Band(rightX, act2, third, m.Px(88f)), UiStrings.UiPartyRoomScreen.T014,
                 () => Respond(shell, flow, target, true, onRefresh), UiButtonKind.Normal);
-            shell.ButtonIn(shell.Content, m.Band(rightX + third + m.Px(16f), act2, third, m.Px(88f)), "拒绝",
+            shell.ButtonIn(shell.Content, m.Band(rightX + third + m.Px(16f), act2, third, m.Px(88f)), UiStrings.UiPartyRoomScreen.T015,
                 () => Respond(shell, flow, target, false, onRefresh), UiButtonKind.Quiet);
             shell.ButtonIn(shell.Content,
-                m.Band(rightX + (third + m.Px(16f)) * 2f, act2, third, m.Px(88f)), "我准备好了",
+                m.Band(rightX + (third + m.Px(16f)) * 2f, act2, third, m.Px(88f)), UiStrings.UiPartyRoomScreen.T016,
                 () => flow.SetReady(true, onRefresh), UiButtonKind.Normal);
 
             var act3 = act2 + m.Px(88f) + m.Px(12f);
-            shell.ButtonIn(shell.Content, m.Band(rightX, act3, half, m.Px(88f)), "离队",
+            shell.ButtonIn(shell.Content, m.Band(rightX, act3, half, m.Px(88f)), UiStrings.UiPartyRoomScreen.T017,
                 () => flow.Leave(onRefresh), UiButtonKind.Quiet);
-            shell.ButtonIn(shell.Content, m.Band(rightX + half + m.Px(16f), act3, half, m.Px(88f)), "解散",
+            shell.ButtonIn(shell.Content, m.Band(rightX + half + m.Px(16f), act3, half, m.Px(88f)), UiStrings.UiPartyRoomScreen.T018,
                 () => flow.Disband(onRefresh), UiButtonKind.Quiet);
 
             // ---------------------------------------------------------- 底：回执

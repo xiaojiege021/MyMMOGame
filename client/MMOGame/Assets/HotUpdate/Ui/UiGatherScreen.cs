@@ -30,7 +30,7 @@ namespace HotUpdate.Ui
 
         public static int Build(UiShell shell, UiWorldFlow flow)
         {
-            return Build(shell, flow, "矿脉");
+            return Build(shell, flow, UiStrings.UiGatherScreen.T001);
         }
 
         public static int Build(UiShell shell, UiWorldFlow flow, string tab)
@@ -41,9 +41,9 @@ namespace HotUpdate.Ui
             flow.ClearViews();
 
             shell.Label(m.Band(pad, m.Px(80f), wide, m.Px(60f)),
-                "采集", UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
+                UiStrings.UiGatherScreen.T002, UiTextRole.Title, shell.Size(50f), TextAnchor.MiddleLeft, false);
             shell.Label(m.Band(pad, m.Px(146f), wide, m.Px(44f)),
-                "谁都能学、可同时学 · 不耗疲劳 · 灵石矿脉不开放个人采集",
+                UiStrings.UiGatherScreen.T003,
                 UiTextRole.Muted, shell.Size(24f), TextAnchor.MiddleLeft, true);
 
             var tabTop = m.Px(206f);
@@ -59,7 +59,7 @@ namespace HotUpdate.Ui
                 var picked = name;
                 option.OnPick = _ =>
                 {
-                    shell.ShowPage("采集", s => Build(s, flow, picked));
+                    shell.ShowPage(UiStrings.UiGatherScreen.T002, s => Build(s, flow, picked));
                 };
                 shell.Register(option);
                 options.Add(option);
@@ -93,7 +93,7 @@ namespace HotUpdate.Ui
             else if (total == 0)
             {
                 shell.Label(m.Band(pad, cardTop, wide, m.Px(80f)),
-                    "回包 0 个 · " + kind, UiTextRole.Muted, shell.Size(26f), TextAnchor.MiddleLeft, false);
+                    UiStrings.UiGatherScreen.T004 + kind, UiTextRole.Muted, shell.Size(26f), TextAnchor.MiddleLeft, false);
             }
             else
             {
@@ -110,21 +110,21 @@ namespace HotUpdate.Ui
 
                     shell.LabelIn(card.Root, new Rect(m.Px(24f), cardH - m.Px(150f), cardW - m.Px(48f), m.Px(110f)),
                         node.RegionId + " · " + node.Kind + "\n"
-                        + "产物 " + (node.ItemId.Length > 0 ? node.ItemId + " ×" + node.Count : "无（只登记归属）")
-                        + "\n入格位 " + node.BagSlot + " · 刷新 " + node.RespawnSeconds + "s",
+                        + UiStrings.UiGatherScreen.T005 + (node.ItemId.Length > 0 ? node.ItemId + " ×" + node.Count : UiStrings.UiGatherScreen.T006)
+                        + UiStrings.UiGatherScreen.T007 + node.BagSlot + UiStrings.UiGatherScreen.T008 + node.RespawnSeconds + "s",
                         UiTextRole.Body, shell.Size(24f), TextAnchor.UpperLeft, true);
 
                     if (node.Forbidden)
                     {
                         shell.Chip(card.Root, new Rect(m.Px(24f), m.Px(60f), m.Px(280f), m.Px(64f)),
-                            "禁止个人采集", UiChipKind.Error);
+                            UiStrings.UiGatherScreen.T009, UiChipKind.Error);
                     }
                     else
                     {
                         var id = node.NodeId;
                         buttons.Add(shell.ButtonIn(card.Root,
                             new Rect(m.Px(24f), m.Px(60f), m.Px(220f), m.Px(84f)),
-                            "采集", () => flow.Gather(id), UiButtonKind.Primary));
+                            UiStrings.UiGatherScreen.T002, () => flow.Gather(id), UiButtonKind.Primary));
                     }
                 }
 
@@ -132,35 +132,35 @@ namespace HotUpdate.Ui
                 {
                     var navY = cardTop + cardH + m.Px(12f);
                     shell.Button(m.Band(pad, navY, m.Px(200f), m.Px(72f)),
-                        "上一截", () =>
+                        UiStrings.UiGatherScreen.T010, () =>
                         {
                             StepWindow(tab, -1, total);
-                            shell.ShowPage("采集", s => Build(s, flow, tab));
+                            shell.ShowPage(UiStrings.UiGatherScreen.T002, s => Build(s, flow, tab));
                         }, UiButtonKind.Quiet);
                     shell.Button(m.Band(pad + m.Px(220f), navY, m.Px(200f), m.Px(72f)),
-                        "下一截", () =>
+                        UiStrings.UiGatherScreen.T011, () =>
                         {
                             StepWindow(tab, 1, total);
-                            shell.ShowPage("采集", s => Build(s, flow, tab));
+                            shell.ShowPage(UiStrings.UiGatherScreen.T002, s => Build(s, flow, tab));
                         }, UiButtonKind.Quiet);
                 }
             }
 
             var loadY = cardTop + cardH + (total > CardsPerPage ? m.Px(100f) : m.Px(24f));
             shell.Button(m.Band(pad, loadY, m.Px(320f), m.Px(84f)),
-                "读取节点表",
-                () => flow.LoadGatherNodes(() => shell.ShowPage("采集", s => Build(s, flow, tab))),
+                UiStrings.UiGatherScreen.T012,
+                () => flow.LoadGatherNodes(() => shell.ShowPage(UiStrings.UiGatherScreen.T002, s => Build(s, flow, tab))),
                 UiButtonKind.Quiet);
 
             var ruleTop = loadY + m.Px(84f) + m.Px(24f);
             var line = shell.Label(m.Band(pad, ruleTop, wide, m.Px(56f)),
                 UiWorldCodex.NoGatherYet, UiTextRole.Muted, shell.Size(26f), TextAnchor.MiddleLeft, true);
 
-            var rule = shell.Panel("请求字段与拒绝顺序",
+            var rule = shell.Panel(UiStrings.UiGatherScreen.T013,
                 m.Band(pad, ruleTop + m.Px(72f), wide, m.Px(260f)), shell.Size(26f));
             shell.LabelIn(rule.Root, new Rect(m.Px(26f), m.Px(150f), wide - m.Px(52f), m.Px(90f)),
-                "请求只有 node_id。账号取自令牌，网关复核角色归属；"
-                + "成功复用角色服的入包路径，产物与格位由回包给。",
+                UiStrings.UiGatherScreen.T014
+                + UiStrings.UiGatherScreen.T015,
                 UiTextRole.Body, shell.Size(23f), TextAnchor.UpperLeft, true);
             shell.LabelIn(rule.Root, new Rect(m.Px(26f), m.Px(20f), wide - m.Px(52f), m.Px(120f)),
                 UiWorldCodex.GatherRejectOrder,
@@ -186,19 +186,19 @@ namespace HotUpdate.Ui
         {
             if (!flow.HasGatherNodes)
             {
-                return "节点表 · 尚未请求";
+                return UiStrings.UiGatherScreen.T016;
             }
 
-            return "节点表 · 回包 " + flow.GatherNodesReply.Count + " 个 · 本组 " + kind + " " + total + " 个";
+            return UiStrings.UiGatherScreen.T017 + flow.GatherNodesReply.Count + UiStrings.UiGatherScreen.T018 + kind + " " + total + UiStrings.UiGatherScreen.T019;
         }
 
         static int WindowOf(string tab)
         {
             switch (tab)
             {
-                case "药草":
+                case UiStrings.UiGatherScreen.T020:
                     return _herbWindow;
-                case "灵石矿脉":
+                case UiStrings.UiGatherScreen.T021:
                     return _spiritWindow;
                 default:
                     return _oreWindow;
@@ -215,10 +215,10 @@ namespace HotUpdate.Ui
 
             switch (tab)
             {
-                case "药草":
+                case UiStrings.UiGatherScreen.T020:
                     _herbWindow = Mathf.Clamp(_herbWindow + delta, 0, pages - 1);
                     break;
-                case "灵石矿脉":
+                case UiStrings.UiGatherScreen.T021:
                     _spiritWindow = Mathf.Clamp(_spiritWindow + delta, 0, pages - 1);
                     break;
                 default:

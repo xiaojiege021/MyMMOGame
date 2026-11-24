@@ -1,0 +1,95 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiUpgradeSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiUpgradeSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "自检角色"
+    },
+    {
+      "key": "T002",
+      "text": "炼体"
+    },
+    {
+      "key": "T003",
+      "text": "{\\\"slots\\\":[],\\\"bag_slots\\\":20,\\\"realm\\\":\\\"金仙\\\",\\\"realm_display\\\":\\\"散仙\\\"}"
+    },
+    {
+      "key": "T004",
+      "text": "{\\\"slots\\\":[],\\\"bag_slots\\\":20,\\\"realm\\\":\\\"金仙\\\"}"
+    },
+    {
+      "key": "T005",
+      "text": "金仙"
+    },
+    {
+      "key": "T006",
+      "text": "散仙"
+    },
+    {
+      "key": "T007",
+      "text": "角色与装备"
+    },
+    {
+      "key": "T008",
+      "text": "背包"
+    },
+    {
+      "key": "T009",
+      "text": "强化"
+    },
+    {
+      "key": "T010",
+      "text": "强化转移"
+    },
+    {
+      "key": "T011",
+      "text": "能量结晶"
+    },
+    {
+      "key": "T012",
+      "text": "技能与分支"
+    },
+    {
+      "key": "T013",
+      "text": "境界突破"
+    },
+    {
+      "key": "T014",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T015",
+      "text": "一阶"
+    },
+    {
+      "key": "T016",
+      "text": "二阶"
+    },
+    {
+      "key": "T017",
+      "text": "\\\"bag_slots\\\":40,\\\"character_name\\\":\\\"自检角色\\\",\\\"realm\\\":\\\"炼体\\\","
+    },
+    {
+      "key": "T018",
+      "text": "\\\"realm_display\\\":\\\"炼体\\\"}"
+    },
+    {
+      "key": "T019",
+      "text": "{\\\"ok\\\":true,\\\"character_id\\\":7,\\\"realm\\\":\\\"炼体\\\",\\\"realm_phase\\\":0,"
+    },
+    {
+      "key": "T020",
+      "text": "\\\"phase_name\\\":\\\"一阶\\\",\\\"passive_pct_bps\\\":0}"
+    },
+    {
+      "key": "T021",
+      "text": "\\\"from_phase\\\":0,\\\"to_phase\\\":1,\\\"phase_name\\\":\\\"二阶\\\",\\\"passive_pct_bps\\\":30,"
+    },
+    {
+      "key": "T022",
+      "text": "\\\"character_id\\\":7,\\\"from_phase\\\":1,\\\"to_phase\\\":1,\\\"phase_name\\\":\\\"二阶\\\","
+    }
+  ]
+}

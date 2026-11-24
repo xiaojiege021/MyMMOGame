@@ -36,24 +36,24 @@ namespace HotUpdate.Ui
                 done(404, "{}");
             });
 
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var pending = Text(shell);
-            Report("pending", pending.Contains("尚未请求") && pending.Contains("读取名册")
-                && !pending.Contains("11 · master") && !pending.Contains("回包 0 人"));
-            Debug.Log("n3_self_pending=" + (pending.Contains("尚未请求") ? "尚未请求" : "missing"));
+            Report("pending", pending.Contains(UiStrings.UiRosterSelfCheck.T002) && pending.Contains(UiStrings.UiRosterSelfCheck.T003)
+                && !pending.Contains("11 · master") && !pending.Contains(UiStrings.UiRosterSelfCheck.T004));
+            Debug.Log("n3_self_pending=" + (pending.Contains(UiStrings.UiRosterSelfCheck.T002) ? UiStrings.UiRosterSelfCheck.T002 : "missing"));
 
             _reply = TwoJson;
             flow.LoadRoster(7);
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var first = Text(shell);
             Report("rows", flow.HasRoster && flow.LastRoster.Ok && flow.LastRoster.Members.Count == 2
                 && first.Contains("11 · master") && first.Contains("12 · disciple")
-                && first.Contains("回包 2 人 · 这一截 1-2"));
+                && first.Contains(UiStrings.UiRosterSelfCheck.T005));
             Debug.Log("n3_self_rows=" + (first.Contains("11 · master") ? "11 · master" : "missing"));
 
             _reply = OneJson;
             flow.LoadRoster(7);
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var second = Text(shell);
             Report("rows_second", flow.LastRoster.Members.Count == 1
                 && second.Contains("21 · elder")
@@ -63,25 +63,25 @@ namespace HotUpdate.Ui
 
             _reply = EmptyJson;
             flow.LoadRoster(7);
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var empty = Text(shell);
             Report("empty", flow.LastRoster.Ok && flow.LastRoster.Members.Count == 0
-                && empty.Contains("回包 0 人")
+                && empty.Contains(UiStrings.UiRosterSelfCheck.T004)
                 && !empty.Contains("21 · elder")
                 && !empty.Contains("11 · master"));
 
             _reply = RejectJson;
             flow.LoadRoster(7);
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var rejected = Text(shell);
             Report("reject", !flow.LastRoster.Ok
-                && rejected.Contains("被拒：not_in_sect")
+                && rejected.Contains(UiStrings.UiRosterSelfCheck.T006)
                 && !rejected.Contains("31 ·")
                 && !rejected.Contains("11 · master"));
 
             _reply = CapJson;
             flow.LoadRoster(7);
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var capped = Text(shell);
             // 左栏规则句里本来就有 member_cap 这个词。这里只核对名单没把回包里
             // 多出来的上限数字画上去。
@@ -91,19 +91,19 @@ namespace HotUpdate.Ui
 
             _reply = PageJson;
             flow.LoadRoster(7);
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var page0 = Text(shell);
             UiSectScreen.StepRosterWindow(1, 3);
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var page1 = Text(shell);
             Report("page", page0.Contains("31 · disciple") && page0.Contains("32 · disciple")
                 && !page0.Contains("33 · disciple")
                 && page1.Contains("33 · disciple")
                 && !page1.Contains("31 · disciple")
-                && page1.Contains("这一截 3-3"));
+                && page1.Contains(UiStrings.UiRosterSelfCheck.T007));
             Debug.Log("n3_self_page=" + (page1.Contains("33 · disciple") ? "33" : "missing"));
 
-            shell.ShowPage("宗门", s => UiSectScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiRosterSelfCheck.T001, s => UiSectScreen.Build(s, flow));
             var layout = Layout(shell);
             var copy = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);

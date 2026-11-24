@@ -111,7 +111,9 @@ public static class U1Check
             }
         }
 
-        var themes = source.Contains("晨雾宣纸") && source.Contains("夜山");
+        // 两套皮肤名在 D9 之后进了 config/ui_text/UiPalette.json，断言改成查表 + 查引用。
+        var themes = UiTextRef.In(root, source, "UiPalette", "晨雾宣纸")
+                     && UiTextRef.In(root, source, "UiPalette", "夜山");
         var ok = missing.Count == 0 && blue.Count == 0 && themes && count >= 24;
         Report("palette", ok,
             missing.Count > 0 ? "not_in_proto=" + string.Join(",", missing.ToArray()) : "colors=" + count);

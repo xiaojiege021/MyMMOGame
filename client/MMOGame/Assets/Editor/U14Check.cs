@@ -208,7 +208,8 @@ public static class U14Check
             "入口屏自己折了时区");
 
         Report("boss_killed_state",
-            screen.Contains("这一场已打掉") && screen.Contains("这一刻没开"),
+            UiTextRef.In(root, screen, "UiWorldBossScreen", "这一场已打掉")
+            && UiTextRef.In(root, screen, "UiWorldBossScreen", "这一刻没开："),
             "开没开 / 打没打掉的文案不全");
     }
 

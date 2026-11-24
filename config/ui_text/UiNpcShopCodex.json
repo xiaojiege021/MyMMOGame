@@ -1,0 +1,19 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiNpcShopCodex",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiNpcShopCodex.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "买 / 卖 / 回购 / 修理同一个面板 · 标价、库存、回收价、修理费全看 /shop/npc 回包"
+    },
+    {
+      "key": "T002",
+      "text": "白名单外的物品不能卖 · 身上穿着的不能卖"
+    },
+    {
+      "key": "T003",
+      "text": "只修身上三件 · 按缺失耐久扣金币"
+    }
+  ]
+}

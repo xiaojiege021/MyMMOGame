@@ -62,26 +62,26 @@ namespace HotUpdate.Ui
             });
 
             // 一、尚未请求：不画路径、不画人数，也不给假数字。
-            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiArenaSelfCheck.T001, s => UiArenaScreen.Build(s, flow));
             var pending = Text(shell);
-            Report("pending", pending.Contains("尚未请求")
-                && pending.Contains("进竞技场")
-                && pending.Contains("A 队") && pending.Contains("B 队")
-                && !pending.Contains("进场路径")
-                && !pending.Contains("已接 /versus/*"));
-            Debug.Log("u12_self_pending=" + pending.Contains("进竞技场"));
+            Report("pending", pending.Contains(UiStrings.UiArenaSelfCheck.T002)
+                && pending.Contains(UiStrings.UiArenaSelfCheck.T003)
+                && pending.Contains(UiStrings.UiArenaSelfCheck.T004) && pending.Contains(UiStrings.UiArenaSelfCheck.T005)
+                && !pending.Contains(UiStrings.UiArenaSelfCheck.T006)
+                && !pending.Contains(UiStrings.UiArenaSelfCheck.T007));
+            Debug.Log("u12_self_pending=" + pending.Contains(UiStrings.UiArenaSelfCheck.T003));
 
             // 二、竞技场 1v1：进场路径与人数照抄回包，请求体只带角色号与模式编号。
             flow.EnterArena(UiSocialCodex.ArenaModeIds[0]);
-            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiArenaSelfCheck.T001, s => UiArenaScreen.Build(s, flow));
             var arena = Text(shell);
             Report("arena", flow.HasArena && flow.LastArena.Ok
                 && flow.LastArena.ArenaMode == "duel"
                 && flow.LastArena.PartySize == 2
                 && flow.LastArena.BattlePath == "/battle"
-                && arena.Contains("进场路径 /battle · 模式 duel · 人数 2")
-                && arena.Contains("已接 /versus/*")
-                && arena.Contains("竞技场 · 属性模板统一"));
+                && arena.Contains(UiStrings.UiArenaSelfCheck.T008)
+                && arena.Contains(UiStrings.UiArenaSelfCheck.T007)
+                && arena.Contains(UiStrings.UiArenaSelfCheck.T009));
             Report("body_only", _lastPath == VersusEntry.ArenaPath
                 && _lastBody.Contains("\"character_id\":9")
                 && _lastBody.Contains("\"arena_mode\":\"duel\"")
@@ -93,46 +93,46 @@ namespace HotUpdate.Ui
             // 三、3v3：人数只跟回包走（回包说 6 就 6），屏上不按 1v1 的 2 乘三。
             _arenaJson = ArenaTrioJson;
             flow.EnterArena(UiSocialCodex.ArenaModeIds[1]);
-            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiArenaSelfCheck.T001, s => UiArenaScreen.Build(s, flow));
             var trio = Text(shell);
             Report("no_local_multiply", flow.LastArena.PartySize == 6
-                && trio.Contains("进场路径 /battle · 模式 trio · 人数 6")
-                && !trio.Contains("人数 2 ·"));
+                && trio.Contains(UiStrings.UiArenaSelfCheck.T010)
+                && !trio.Contains(UiStrings.UiArenaSelfCheck.T011));
             Debug.Log("u12_self_trio party_size=" + flow.LastArena.PartySize);
 
             // 四、回包 ok=false：照抄原因，不编一个成功路径，也不把上一次的顶上去。
             _arenaJson = ArenaRejectJson;
             flow.EnterArena(UiSocialCodex.ArenaModeIds[0]);
-            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiArenaSelfCheck.T001, s => UiArenaScreen.Build(s, flow));
             var rejected = Text(shell);
             Report("reason", flow.HasArena && !flow.LastArena.Ok
-                && rejected.Contains("服务端：arena_mode_unknown")
-                && !rejected.Contains("进场路径 /battle · 模式 duel · 人数 2"));
+                && rejected.Contains(UiStrings.UiArenaSelfCheck.T012)
+                && !rejected.Contains(UiStrings.UiArenaSelfCheck.T008));
             Debug.Log("u12_self_reason=" + flow.LastArena.Reason);
 
             // 五、非 200：写回执，不假装「尚未请求」。
             _status = 500;
             flow.EnterArena(UiSocialCodex.ArenaModeIds[0]);
-            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiArenaSelfCheck.T001, s => UiArenaScreen.Build(s, flow));
             var failed = Text(shell);
             Report("reject", !flow.HasArena && flow.ArenaTried
-                && failed.Contains("竞技场进场没回应：500")
-                && failed.Contains("没读到")
-                && !failed.Contains("尚未请求 · 点「进竞技场」"));
-            Debug.Log("u12_self_reject=" + failed.Contains("竞技场进场没回应：500"));
+                && failed.Contains(UiStrings.UiArenaSelfCheck.T013)
+                && failed.Contains(UiStrings.UiArenaSelfCheck.T014)
+                && !failed.Contains(UiStrings.UiArenaSelfCheck.T015));
+            Debug.Log("u12_self_reject=" + failed.Contains(UiStrings.UiArenaSelfCheck.T013));
 
             // 六、战场：两条竞技场口径都失败过，这时再看战场这一条自己成不成。
             //     场次与队伍照抄回包，模式行指到战场那一层。
             _status = 200;
             flow.EnterBattlefield(UiSocialCodex.BattlefieldMatchIds[0], UiSocialCodex.BattlefieldTeams[0]);
-            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiArenaSelfCheck.T001, s => UiArenaScreen.Build(s, flow));
             var field = Text(shell);
             Report("battlefield", flow.HasBattlefield && flow.LastBattlefield.Ok
                 && flow.LastBattlefield.Battlefield == "bf_m1"
                 && flow.LastBattlefield.Team == "a"
                 && _lastPath == VersusEntry.BattlefieldPath
-                && field.Contains("场次 bf_m1 · 队伍 a")
-                && field.Contains("战场 · 装备生效"));
+                && field.Contains(UiStrings.UiArenaSelfCheck.T016)
+                && field.Contains(UiStrings.UiArenaSelfCheck.T017));
             Debug.Log("u12_self_battlefield match=" + flow.LastBattlefield.Battlefield
                 + " team=" + flow.LastBattlefield.Team + " body=" + _lastBody);
 
@@ -140,7 +140,7 @@ namespace HotUpdate.Ui
             _status = 200;
             _arenaJson = ArenaDuelJson;
             flow.EnterArena(UiSocialCodex.ArenaModeIds[0]);
-            shell.ShowPage("竞技场与战场", s => UiArenaScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiArenaSelfCheck.T001, s => UiArenaScreen.Build(s, flow));
             var layout = Layout(shell);
             var copy = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);

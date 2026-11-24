@@ -160,7 +160,7 @@ namespace HotUpdate.Ui
 
             var skinRect = _metrics.Band(width - _metrics.Px(56f) - _metrics.Px(260f), _metrics.Px(28f),
                 _metrics.Px(260f), _metrics.Px(64f));
-            ButtonIn(transform, skinRect, "切换风格", ToggleSkin, UiButtonKind.Normal);
+            ButtonIn(transform, skinRect, UiStrings.ShellTopbar.T001, ToggleSkin, UiButtonKind.Normal);
 
             BuildToast();
             BuildModal();
@@ -225,10 +225,10 @@ namespace HotUpdate.Ui
             var left = cardW - _metrics.Px(48f) - buttonW * 2f - _metrics.Px(20f);
 
             _modalCancel = MakeModalButton(card, cardPos,
-                new Rect(left, _metrics.Px(40f), buttonW, buttonH), "取消", UiButtonKind.Normal, HideModal);
+                new Rect(left, _metrics.Px(40f), buttonW, buttonH), UiStrings.ShellTopbar.T002, UiButtonKind.Normal, HideModal);
             _modalConfirm = MakeModalButton(card, cardPos,
                 new Rect(cardW - _metrics.Px(48f) - buttonW, _metrics.Px(40f), buttonW, buttonH),
-                "确定", UiButtonKind.Primary, ConfirmModal);
+                UiStrings.ShellTopbar.T003, UiButtonKind.Primary, ConfirmModal);
 
             _modalLayer.gameObject.SetActive(false);
         }

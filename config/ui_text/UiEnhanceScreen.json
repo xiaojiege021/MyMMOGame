@@ -1,0 +1,99 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiEnhanceScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiEnhanceScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "选一格"
+    },
+    {
+      "key": "T002",
+      "text": "已选第 "
+    },
+    {
+      "key": "T003",
+      "text": " 格"
+    },
+    {
+      "key": "T004",
+      "text": "尚未读背包"
+    },
+    {
+      "key": "T005",
+      "text": "第 "
+    },
+    {
+      "key": "T006",
+      "text": " · 绑定"
+    },
+    {
+      "key": "T007",
+      "text": "这一手"
+    },
+    {
+      "key": "T008",
+      "text": "不用保护券"
+    },
+    {
+      "key": "T009",
+      "text": "开始强化"
+    },
+    {
+      "key": "T010",
+      "text": "回包"
+    },
+    {
+      "key": "T011",
+      "text": "等级"
+    },
+    {
+      "key": "T012",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T013",
+      "text": "结果"
+    },
+    {
+      "key": "T014",
+      "text": "成功"
+    },
+    {
+      "key": "T015",
+      "text": "失败"
+    },
+    {
+      "key": "T016",
+      "text": "被拒："
+    },
+    {
+      "key": "T017",
+      "text": "档位 / 石头"
+    },
+    {
+      "key": "T018",
+      "text": "石头 / 金币"
+    },
+    {
+      "key": "T019",
+      "text": "保护券"
+    },
+    {
+      "key": "T020",
+      "text": " 张 · 剩 "
+    },
+    {
+      "key": "T021",
+      "text": "护级"
+    },
+    {
+      "key": "T022",
+      "text": "挡住了掉级"
+    },
+    {
+      "key": "T023",
+      "text": "未触发"
+    }
+  ]
+}

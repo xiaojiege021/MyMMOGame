@@ -1,0 +1,15 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiPalette",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiPalette.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "晨雾宣纸"
+    },
+    {
+      "key": "T002",
+      "text": "夜山"
+    }
+  ]
+}

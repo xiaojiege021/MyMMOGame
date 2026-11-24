@@ -29,7 +29,7 @@ namespace HotUpdate.Ui
 
             // 表世界 HUD 七格都能建，且源码侧已接到 Hub（静态段另验）。
             var functions = 0;
-            shell.ShowPage("表世界", s => { functions = UiWorldHudScreen.Build(s, world); });
+            shell.ShowPage(UiStrings.UiEntryHubSelfCheck.T001, s => { functions = UiWorldHudScreen.Build(s, world); });
             Report("hud", functions == UiWorldCodex.HudFunctions.Length && functions == 7);
             Debug.Log("u8_self_hud functions=" + functions);
 
@@ -43,46 +43,46 @@ namespace HotUpdate.Ui
             OpenAndCapture(shell, world, 5, titles);
             OpenAndCapture(shell, world, 6, titles);
             Report("seven", titles.Count == 7
-                && titles.Contains("角色与装备") && titles.Contains("背包")
-                && titles.Contains("技能与分支") && titles.Contains("宗门")
-                && titles.Contains("商城") && titles.Contains("裂隙")
-                && titles.Contains("世界地图"));
+                && titles.Contains(UiStrings.UiEntryHubSelfCheck.T002) && titles.Contains(UiStrings.UiEntryHubSelfCheck.T003)
+                && titles.Contains(UiStrings.UiEntryHubSelfCheck.T004) && titles.Contains(UiStrings.UiEntryHubSelfCheck.T005)
+                && titles.Contains(UiStrings.UiEntryHubSelfCheck.T006) && titles.Contains(UiStrings.UiEntryHubSelfCheck.T007)
+                && titles.Contains(UiStrings.UiEntryHubSelfCheck.T008));
             Debug.Log("u8_self_seven=" + titles.Count + " " + string.Join(",", titles.ToArray()));
 
             // U5 二级：强化 / 境界。
             UiEntryHub.OpenUpgrade(shell, "enhance");
-            Report("u5_enhance", PageTitle(shell) == "强化" && HasButton(shell, "境界"));
+            Report("u5_enhance", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T009 && HasButton(shell, UiStrings.UiEntryHubSelfCheck.T010));
             UiEntryHub.OpenUpgrade(shell, "realm");
-            Report("u5_realm", PageTitle(shell) == "境界突破");
+            Report("u5_realm", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T011);
 
             // U6 二级：拍卖 / 通行证。
             UiEntryHub.OpenCommerce(shell, "auction");
-            Report("u6_auction", PageTitle(shell) == "拍卖与寄售" && HasButton(shell, "通行证"));
+            Report("u6_auction", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T012 && HasButton(shell, UiStrings.UiEntryHubSelfCheck.T013));
             UiEntryHub.OpenCommerce(shell, "pass");
-            Report("u6_pass", PageTitle(shell) == "赛季通行证");
+            Report("u6_pass", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T014);
 
             // U7 二级：洞府 / 图鉴 / 竞技场（本卡只开屏；洞府由 U9/U10 接线、图鉴由 U11 接线、
             // 竞技场与战场由 U12 接线，入口这一层只认「屏能打开且接线后的入口在」）。
             UiEntryHub.OpenSocial(shell, "homestead");
             var home = Text(shell);
-            Report("u7_home", PageTitle(shell) == "家园洞府"
-                && home.Contains("种植") && home.Contains("读取种植"));
+            Report("u7_home", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T015
+                && home.Contains(UiStrings.UiEntryHubSelfCheck.T016) && home.Contains(UiStrings.UiEntryHubSelfCheck.T017));
             UiEntryHub.OpenSocial(shell, "codex");
-            Report("u7_codex", PageTitle(shell) == "英灵图鉴" && Text(shell).Contains("读取图鉴"));
+            Report("u7_codex", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T018 && Text(shell).Contains(UiStrings.UiEntryHubSelfCheck.T019));
             UiEntryHub.OpenSocial(shell, "arena");
             var arena = Text(shell);
-            Report("u7_arena", PageTitle(shell) == "竞技场与战场"
-                && arena.Contains("进竞技场") && arena.Contains("B 队"));
+            Report("u7_arena", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T020
+                && arena.Contains(UiStrings.UiEntryHubSelfCheck.T021) && arena.Contains(UiStrings.UiEntryHubSelfCheck.T022));
 
             // U3 二级：小队，再返回表世界。
             UiEntryHub.OpenDungeon(shell, "party");
-            Report("u3_party", PageTitle(shell) == "小队");
+            Report("u3_party", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T023);
             UiEntryHub.BackToWorld(shell);
-            Report("back_world", PageTitle(shell) == "表世界");
+            Report("back_world", PageTitle(shell) == UiStrings.UiEntryHubSelfCheck.T001);
 
             // 结算屏的返回表世界不再 Toast。
             UiEntryHub.OpenDungeon(shell, "settle");
-            Report("settle_back", HasButton(shell, "返回表世界") && !SourceHasLegacyToast());
+            Report("settle_back", HasButton(shell, UiStrings.UiEntryHubSelfCheck.T024) && !SourceHasLegacyToast());
 
             // 切皮肤只换颜色。
             UiEntryHub.OpenSocial(shell, "sect");

@@ -1,0 +1,39 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiLootCodex",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiLootCodex.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "掷点只在服务端 · 界面不掷、不算、不改 · 意图只有需求 / 贪婪 / 放弃三个词"
+    },
+    {
+      "key": "T002",
+      "text": "没人要"
+    },
+    {
+      "key": "T003",
+      "text": "没收到掉落归属 · 全队一份的掉落由战斗服下发 LootAssigned，personal 模式不发这条"
+    },
+    {
+      "key": "T004",
+      "text": "需求"
+    },
+    {
+      "key": "T005",
+      "text": "贪婪"
+    },
+    {
+      "key": "T006",
+      "text": "放弃"
+    },
+    {
+      "key": "T007",
+      "text": "归角色 "
+    },
+    {
+      "key": "T008",
+      "text": "未知物品"
+    }
+  ]
+}

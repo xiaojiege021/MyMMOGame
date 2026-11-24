@@ -1,0 +1,103 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiEntryHubSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiEntryHubSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "表世界"
+    },
+    {
+      "key": "T002",
+      "text": "角色与装备"
+    },
+    {
+      "key": "T003",
+      "text": "背包"
+    },
+    {
+      "key": "T004",
+      "text": "技能与分支"
+    },
+    {
+      "key": "T005",
+      "text": "宗门"
+    },
+    {
+      "key": "T006",
+      "text": "商城"
+    },
+    {
+      "key": "T007",
+      "text": "裂隙"
+    },
+    {
+      "key": "T008",
+      "text": "世界地图"
+    },
+    {
+      "key": "T009",
+      "text": "强化"
+    },
+    {
+      "key": "T010",
+      "text": "境界"
+    },
+    {
+      "key": "T011",
+      "text": "境界突破"
+    },
+    {
+      "key": "T012",
+      "text": "拍卖与寄售"
+    },
+    {
+      "key": "T013",
+      "text": "通行证"
+    },
+    {
+      "key": "T014",
+      "text": "赛季通行证"
+    },
+    {
+      "key": "T015",
+      "text": "家园洞府"
+    },
+    {
+      "key": "T016",
+      "text": "种植"
+    },
+    {
+      "key": "T017",
+      "text": "读取种植"
+    },
+    {
+      "key": "T018",
+      "text": "英灵图鉴"
+    },
+    {
+      "key": "T019",
+      "text": "读取图鉴"
+    },
+    {
+      "key": "T020",
+      "text": "竞技场与战场"
+    },
+    {
+      "key": "T021",
+      "text": "进竞技场"
+    },
+    {
+      "key": "T022",
+      "text": "B 队"
+    },
+    {
+      "key": "T023",
+      "text": "小队"
+    },
+    {
+      "key": "T024",
+      "text": "返回表世界"
+    }
+  ]
+}

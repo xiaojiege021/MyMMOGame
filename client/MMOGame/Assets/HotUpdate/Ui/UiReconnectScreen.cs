@@ -29,7 +29,7 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 左：惩罚倒计时
 
             var penaltyH = m.Px(320f);
-            var penalty = shell.Panel("逃跑惩罚", m.Band(pad, rowTop, leftW, penaltyH), shell.Size(30f));
+            var penalty = shell.Panel(UiStrings.UiReconnectScreen.T001, m.Band(pad, rowTop, leftW, penaltyH), shell.Size(30f));
             var countdown = shell.LabelIn(penalty.Root,
                 new Rect(m.Px(28f), penaltyH - m.Px(160f), leftW - m.Px(56f), m.Px(88f)),
                 UiReconnectCodex.PenaltyLine(flow.HasFact, flow.Remaining),
@@ -38,20 +38,20 @@ namespace HotUpdate.Ui
 
             shell.LabelIn(penalty.Root,
                 new Rect(m.Px(28f), m.Px(36f), leftW - m.Px(56f), penaltyH - m.Px(220f)),
-                "这一行是服务端给的剩余秒数，界面只在本地按秒往下走。\n"
-                + "回包没带这一格就写「服务端还没说过惩罚」，不拿别的时长顶上来。",
+                UiStrings.UiReconnectScreen.T002
+                + UiStrings.UiReconnectScreen.T003,
                 UiTextRole.Faint, shell.Size(23f), TextAnchor.UpperLeft, true);
 
             // ---------------------------------------------------------- 右：重连
 
-            var reconnect = shell.Panel("重连回原场", m.Band(rightX, rowTop, rightW, m.Px(320f)), shell.Size(30f));
+            var reconnect = shell.Panel(UiStrings.UiReconnectScreen.T004, m.Band(rightX, rowTop, rightW, m.Px(320f)), shell.Size(30f));
             var line = shell.LabelIn(reconnect.Root,
                 new Rect(m.Px(28f), m.Px(150f), rightW - m.Px(56f), m.Px(120f)),
                 UiReconnectCodex.ReconnectLine(flow.Tried, flow.Error),
                 flow.Error.Length == 0 ? UiTextRole.Body : UiTextRole.Danger, shell.Size(26f),
                 TextAnchor.UpperLeft, true);
             shell.ButtonIn(reconnect.Root, new Rect(m.Px(28f), m.Px(36f), rightW - m.Px(56f), m.Px(88f)),
-                "重连", () => { flow.ReconnectNow(); shell.RefreshPage(); }, UiButtonKind.Primary);
+                UiStrings.UiReconnectScreen.T005, () => { flow.ReconnectNow(); shell.RefreshPage(); }, UiButtonKind.Primary);
 
             // ---------------------------------------------------------- 底：口径
 

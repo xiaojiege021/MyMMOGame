@@ -1,0 +1,27 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiGatherNodesSelfCheck",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiGatherNodesSelfCheck.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "采集"
+    },
+    {
+      "key": "T002",
+      "text": "矿脉"
+    },
+    {
+      "key": "T003",
+      "text": "\\\",\\\"kind\\\":\\\"ore\\\",\\\"region_id\\\":\\\"枯岚道\\\","
+    },
+    {
+      "key": "T004",
+      "text": "\\\",\\\"kind\\\":\\\"herb\\\",\\\"region_id\\\":\\\"听谣镇\\\","
+    },
+    {
+      "key": "T005",
+      "text": "{\\\"node_id\\\":\\\"spirit_qiyun_1\\\",\\\"kind\\\":\\\"spirit_stone\\\",\\\"region_id\\\":\\\"栖云城\\\","
+    }
+  ]
+}

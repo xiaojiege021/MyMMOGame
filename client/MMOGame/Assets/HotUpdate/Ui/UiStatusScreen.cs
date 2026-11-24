@@ -22,19 +22,19 @@ namespace HotUpdate.Ui
         /// <summary>登录与会话那五行的 key 与说明。</summary>
         static readonly string[][] SignInRows =
         {
-            new[] { "400", "请求没发出去，重试一次" },
-            new[] { "401", "账号或口令不对（不区分原因）" },
-            new[] { "503", "暂时连不上，稍后再试" },
-            new[] { "网络不可达", "连不上网关" },
-            new[] { "invalid_token / token_expired", "回登录，不弹「口令错」" },
+            new[] { "400", UiStrings.UiStatusScreen.T001 },
+            new[] { "401", UiStrings.UiStatusScreen.T002 },
+            new[] { "503", UiStrings.UiStatusScreen.T003 },
+            new[] { UiStrings.UiStatusScreen.T004, UiStrings.UiStatusScreen.T005 },
+            new[] { "invalid_token / token_expired", UiStrings.UiStatusScreen.T006 },
         };
 
         /// <summary>三种状态样例：状态、说明、标签、标签档位。</summary>
         static readonly string[][] SampleRows =
         {
-            new[] { "提交中", "按钮置灰，防重复点", "禁用" },
-            new[] { "失败", "卡片内一行提示，输入保留、不清口令", "错误" },
-            new[] { "成功", "Toast 一闪而过，不打断当前操作", "成功" },
+            new[] { UiStrings.UiStatusScreen.T007, UiStrings.UiStatusScreen.T008, UiStrings.UiStatusScreen.T009 },
+            new[] { UiStrings.UiStatusScreen.T010, UiStrings.UiStatusScreen.T011, UiStrings.UiStatusScreen.T012 },
+            new[] { UiStrings.UiStatusScreen.T013, UiStrings.UiStatusScreen.T014, UiStrings.UiStatusScreen.T013 },
         };
 
         /// <summary>建这一屏。骨架负责清屏与注册，这里只管排。</summary>
@@ -89,7 +89,7 @@ namespace HotUpdate.Ui
 
         static void BuildSignIn(UiShell shell, Rect rect)
         {
-            var panel = shell.Panel("登录与会话", rect, shell.Size(30f));
+            var panel = shell.Panel(UiStrings.UiStatusScreen.T015, rect, shell.Size(30f));
             var pad = shell.Metrics.Px(28f);
             var rowH = shell.Metrics.Px(44f);
             var keyW = rect.width * 0.42f;
@@ -109,18 +109,18 @@ namespace HotUpdate.Ui
 
         static void BuildConfirmScope(UiShell shell, Rect rect)
         {
-            var panel = shell.Panel("确认弹窗用在哪些动作", rect, shell.Size(30f));
+            var panel = shell.Panel(UiStrings.UiStatusScreen.T016, rect, shell.Size(30f));
             var pad = shell.Metrics.Px(28f);
             shell.LabelIn(panel.Root,
                 new Rect(pad, rect.height - shell.Metrics.Px(84f) - shell.Metrics.Px(132f),
                     rect.width - pad * 2f, shell.Metrics.Px(132f)),
-                "强化转移（覆盖不返还）、解绑、宗门传位、离开副本。文案只陈述结果，不劝诱、不倒计时。",
+                UiStrings.UiStatusScreen.T017,
                 UiTextRole.Body, shell.Size(26f), TextAnchor.UpperLeft, true);
         }
 
         static void BuildReasons(UiShell shell, Rect rect)
         {
-            var panel = shell.Panel("reason 分组（服务端正本）", rect, shell.Size(30f));
+            var panel = shell.Panel(UiStrings.UiStatusScreen.T018, rect, shell.Size(30f));
             var pad = shell.Metrics.Px(28f);
             var rowH = shell.Metrics.Px(44f);
             var width = rect.width - pad * 2f;
@@ -161,7 +161,7 @@ namespace HotUpdate.Ui
 
         static void BuildSamples(UiShell shell, Rect rect)
         {
-            var panel = shell.Panel("状态样例", rect, shell.Size(30f));
+            var panel = shell.Panel(UiStrings.UiStatusScreen.T019, rect, shell.Size(30f));
             var pad = shell.Metrics.Px(28f);
             var rowH = shell.Metrics.Px(56f);
             var chipW = shell.Metrics.Px(120f);
@@ -189,8 +189,8 @@ namespace HotUpdate.Ui
         {
             shell.Label(
                 new Rect(m.Px(56f), m.Height - m.Px(200f), m.Width - m.Px(112f), m.Px(64f)),
-                "表现层三条红线：不发权威判定、不回传伤害数字、不做动作预测；"
-                + "动画只按 foreswing_ms 拉伸播放，事件不触发命中或结算。",
+                UiStrings.UiStatusScreen.T020
+                + UiStrings.UiStatusScreen.T021,
                 UiTextRole.Warm, shell.Size(26f), TextAnchor.MiddleLeft, true);
 
             var buttonW = m.Px(220f);
@@ -199,13 +199,13 @@ namespace HotUpdate.Ui
             var right = m.Width - m.Px(56f);
 
             shell.Button(new Rect(right - buttonW * 2f - m.Px(20f), buttonY, buttonW, buttonH),
-                "演示提示",
-                () => shell.Toast("已保存（演示，不写任何数据）"),
+                UiStrings.UiStatusScreen.T022,
+                () => shell.Toast(UiStrings.UiStatusScreen.T023),
                 UiButtonKind.Normal);
 
             shell.Button(new Rect(right - buttonW, buttonY, buttonW, buttonH),
-                "关闭",
-                () => shell.ShowConfirm("关闭这一页？", "只回到空骨架，不影响任何数值。", "关闭", shell.ClosePage),
+                UiStrings.UiStatusScreen.T024,
+                () => shell.ShowConfirm(UiStrings.UiStatusScreen.T025, UiStrings.UiStatusScreen.T026, UiStrings.UiStatusScreen.T024, shell.ClosePage),
                 UiButtonKind.Primary);
         }
     }

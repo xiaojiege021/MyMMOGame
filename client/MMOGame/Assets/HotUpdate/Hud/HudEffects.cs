@@ -52,7 +52,7 @@ namespace HotUpdate
                 if (effect.Kind == "shield")
                 {
                     // 护盾的吸收量是大数，按快照原值显示，不折算成百分比。
-                    tail += "  盾 " + effect.ShieldLeft;
+                    tail += UiStrings.HudEffects.T001 + effect.ShieldLeft;
                 }
 
                 _selfEffectLabels[i].text = head + "\n" + tail;
@@ -148,7 +148,7 @@ namespace HotUpdate
                 }
                 else
                 {
-                    lines.Add("获得 " + effect.Name + " x" + Mathf.Max(1, (int)effect.Stacks));
+                    lines.Add(UiStrings.HudEffects.T002 + effect.Name + " x" + Mathf.Max(1, (int)effect.Stacks));
                 }
             }
 
@@ -156,7 +156,7 @@ namespace HotUpdate
             {
                 if (FindEffect(current, old.EffectId) == null)
                 {
-                    lines.Add(old.Name + " 结束");
+                    lines.Add(old.Name + UiStrings.HudEffects.T003);
                 }
             }
 
@@ -165,7 +165,7 @@ namespace HotUpdate
 
             if (lines.Count > 0)
             {
-                _logLine = "效果：" + string.Join(" · ", lines.ToArray());
+                _logLine = UiStrings.HudEffects.T004 + string.Join(" · ", lines.ToArray());
             }
         }
 

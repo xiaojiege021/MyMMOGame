@@ -1,0 +1,51 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiCharacterScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiCharacterScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "角色与装备 · 名号 / 境界 / 背包来自 /inventory 回包；部位与装备以服务端为准"
+    },
+    {
+      "key": "T002",
+      "text": "角色"
+    },
+    {
+      "key": "T003",
+      "text": "名号"
+    },
+    {
+      "key": "T004",
+      "text": "境界"
+    },
+    {
+      "key": "T005",
+      "text": "背包"
+    },
+    {
+      "key": "T006",
+      "text": "角色号"
+    },
+    {
+      "key": "T007",
+      "text": "尚未读到"
+    },
+    {
+      "key": "T008",
+      "text": " 格"
+    },
+    {
+      "key": "T009",
+      "text": "尚未读背包"
+    },
+    {
+      "key": "T010",
+      "text": "未绑定"
+    },
+    {
+      "key": "T011",
+      "text": "装备与部位以服务端背包为准"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiCurrencyScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiCurrencyScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "余额"
+    },
+    {
+      "key": "T002",
+      "text": "元宝"
+    },
+    {
+      "key": "T003",
+      "text": "金币"
+    },
+    {
+      "key": "T004",
+      "text": "灵石"
+    },
+    {
+      "key": "T005",
+      "text": "尚未读"
+    },
+    {
+      "key": "T006",
+      "text": "内部充值"
+    },
+    {
+      "key": "T007",
+      "text": "建单："
+    },
+    {
+      "key": "T008",
+      "text": "回调最近一笔订单"
+    },
+    {
+      "key": "T009",
+      "text": "回包"
+    },
+    {
+      "key": "T010",
+      "text": "订单"
+    },
+    {
+      "key": "T011",
+      "text": "没建成："
+    },
+    {
+      "key": "T012",
+      "text": "尚未建单"
+    },
+    {
+      "key": "T013",
+      "text": "商品 / 元宝"
+    },
+    {
+      "key": "T014",
+      "text": "回调结果"
+    },
+    {
+      "key": "T015",
+      "text": "已发 "
+    },
+    {
+      "key": "T016",
+      "text": "没结算："
+    },
+    {
+      "key": "T017",
+      "text": "尚未回调"
+    },
+    {
+      "key": "T018",
+      "text": "重放"
+    },
+    {
+      "key": "T019",
+      "text": "duplicate（没再发）"
+    }
+  ]
+}

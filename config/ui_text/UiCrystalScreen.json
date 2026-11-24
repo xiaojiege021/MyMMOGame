@@ -1,0 +1,83 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiCrystalScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiCrystalScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "装备格"
+    },
+    {
+      "key": "T002",
+      "text": "结晶格"
+    },
+    {
+      "key": "T003",
+      "text": "镶嵌位"
+    },
+    {
+      "key": "T004",
+      "text": "第 "
+    },
+    {
+      "key": "T005",
+      "text": " 位"
+    },
+    {
+      "key": "T006",
+      "text": "装上结晶"
+    },
+    {
+      "key": "T007",
+      "text": "拆下结晶"
+    },
+    {
+      "key": "T008",
+      "text": "回包"
+    },
+    {
+      "key": "T009",
+      "text": "结果"
+    },
+    {
+      "key": "T010",
+      "text": "已装上"
+    },
+    {
+      "key": "T011",
+      "text": "已拆下"
+    },
+    {
+      "key": "T012",
+      "text": "被拒："
+    },
+    {
+      "key": "T013",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T014",
+      "text": "类别 / 部位"
+    },
+    {
+      "key": "T015",
+      "text": "（已填 "
+    },
+    {
+      "key": "T016",
+      "text": "背包结晶"
+    },
+    {
+      "key": "T017",
+      "text": " · 剩 "
+    },
+    {
+      "key": "T018",
+      "text": "强化 / 金币 / 绑定"
+    },
+    {
+      "key": "T019",
+      "text": " 格"
+    }
+  ]
+}

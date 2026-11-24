@@ -1,0 +1,79 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiTransferScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiTransferScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "来源"
+    },
+    {
+      "key": "T002",
+      "text": "目标"
+    },
+    {
+      "key": "T003",
+      "text": "来源第 "
+    },
+    {
+      "key": "T004",
+      "text": " 格 → 目标第 "
+    },
+    {
+      "key": "T005",
+      "text": " 格"
+    },
+    {
+      "key": "T006",
+      "text": "尚未读背包"
+    },
+    {
+      "key": "T007",
+      "text": "确认转移"
+    },
+    {
+      "key": "T008",
+      "text": "已提交，等回包"
+    },
+    {
+      "key": "T009",
+      "text": "回包"
+    },
+    {
+      "key": "T010",
+      "text": "来源 / 目标"
+    },
+    {
+      "key": "T011",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T012",
+      "text": "结果"
+    },
+    {
+      "key": "T013",
+      "text": "已转移："
+    },
+    {
+      "key": "T014",
+      "text": "被拒："
+    },
+    {
+      "key": "T015",
+      "text": "金币 / 转移石"
+    },
+    {
+      "key": "T016",
+      "text": "（剩 "
+    },
+    {
+      "key": "T017",
+      "text": "绑定"
+    },
+    {
+      "key": "T018",
+      "text": "第 "
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "ui-text/1",
+  "group": "HomesteadFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/Flow/HomesteadFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "洞府没读到："
+    },
+    {
+      "key": "T002",
+      "text": "种植没读到："
+    },
+    {
+      "key": "T003",
+      "text": "收取没回应："
+    }
+  ]
+}

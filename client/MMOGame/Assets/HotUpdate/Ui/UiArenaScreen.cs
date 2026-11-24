@@ -33,7 +33,7 @@ namespace HotUpdate.Ui
             // ---------------------------------------------------------- 左：三层
 
             var layersH = m.Px(84f) + UiSocialCodex.Layers.Length * m.Px(96f) + m.Px(16f);
-            var layers = shell.Panel("三种场，三套算法", m.Band(pad, top + m.Px(56f), leftW, layersH),
+            var layers = shell.Panel(UiStrings.UiArenaScreen.T001, m.Band(pad, top + m.Px(56f), leftW, layersH),
                 shell.Size(30f));
             for (var i = 0; i < UiSocialCodex.Layers.Length; i++)
             {
@@ -46,42 +46,42 @@ namespace HotUpdate.Ui
             }
 
             var rewardTop = top + m.Px(56f) + layersH + gap;
-            var reward = shell.Panel("奖励取向", m.Band(pad, rewardTop, leftW, m.Px(220f)), shell.Size(30f));
+            var reward = shell.Panel(UiStrings.UiArenaScreen.T002, m.Band(pad, rewardTop, leftW, m.Px(220f)), shell.Size(30f));
             shell.LabelIn(reward.Root, new Rect(m.Px(28f), m.Px(28f), leftW - m.Px(56f), m.Px(140f)),
                 UiSocialCodex.VersusReward, UiTextRole.Body, shell.Size(23f), TextAnchor.UpperLeft, true);
 
             var ruleTop = rewardTop + m.Px(220f) + gap;
-            var rule = shell.Panel("进场口径", m.Band(pad, ruleTop, leftW, m.Px(280f)), shell.Size(30f));
+            var rule = shell.Panel(UiStrings.UiArenaScreen.T003, m.Band(pad, ruleTop, leftW, m.Px(280f)), shell.Size(30f));
             shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(152f), leftW - m.Px(56f), m.Px(100f)),
                 UiSocialCodex.VersusEnterNote, UiTextRole.Warm, shell.Size(22f), TextAnchor.UpperLeft, true);
             shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(96f), leftW - m.Px(56f), m.Px(40f)),
-                "战力与平衡系数只在战斗服；屏上给的是它回过来的数。",
+                UiStrings.UiArenaScreen.T004,
                 UiTextRole.Muted, shell.Size(21f), TextAnchor.MiddleLeft, true);
             shell.LabelIn(rule.Root, new Rect(m.Px(28f), m.Px(44f), leftW - m.Px(56f), m.Px(40f)),
-                "匹配分组与排队都不在客户端：场次编号只作请求参数。",
+                UiStrings.UiArenaScreen.T005,
                 UiTextRole.Muted, shell.Size(21f), TextAnchor.MiddleLeft, true);
 
             // ---------------------------------------------------------- 右：四个入场
 
             var modes = new[]
             {
-                "竞技场 1v1",
-                "竞技场 3v3",
-                "战场 10v10",
-                "城战 / 领地",
+                UiStrings.UiArenaScreen.T006,
+                UiStrings.UiArenaScreen.T007,
+                UiStrings.UiArenaScreen.T008,
+                UiStrings.UiArenaScreen.T009,
             };
             var notes = new[]
             {
-                "属性模板统一，只留职业与分支 · 不看装备",
-                "同 1v1，人数按队伍配 · 平衡系数由战斗服压",
-                "装备生效，同队战力压缩 · 数值只认回包",
-                "装备全额生效，再加宗门科技 · 见「领地城战」屏",
+                UiStrings.UiArenaScreen.T010,
+                UiStrings.UiArenaScreen.T011,
+                UiStrings.UiArenaScreen.T012,
+                UiStrings.UiArenaScreen.T013,
             };
 
             var cardH = m.Px(148f);
             var listTitleH = m.Px(56f);
             var listH = cardH * modes.Length + m.Px(28f) + listTitleH;
-            var list = shell.Panel("进场口", m.Band(rightX, top + m.Px(56f), rightW, listH), shell.Size(30f));
+            var list = shell.Panel(UiStrings.UiArenaScreen.T014, m.Band(rightX, top + m.Px(56f), rightW, listH), shell.Size(30f));
             for (var i = 0; i < modes.Length; i++)
             {
                 var y = listH - m.Px(84f) - (i + 1) * cardH + m.Px(24f);
@@ -96,7 +96,7 @@ namespace HotUpdate.Ui
                     var mode = UiSocialCodex.ArenaModeIds[i];
                     shell.ButtonIn(list.Root,
                         new Rect(rightW - m.Px(28f) - m.Px(200f), buttonY, m.Px(200f), m.Px(56f)),
-                        "进竞技场",
+                        UiStrings.UiArenaScreen.T015,
                         () => flow.EnterArena(mode, () => shell.RefreshPage()),
                         UiButtonKind.Primary);
                 }
@@ -109,7 +109,7 @@ namespace HotUpdate.Ui
                         shell.ButtonIn(list.Root,
                             new Rect(rightW - m.Px(28f) - (UiSocialCodex.BattlefieldTeams.Length - t)
                                      * m.Px(112f) - t * m.Px(12f), buttonY, m.Px(112f), m.Px(56f)),
-                            team.ToUpperInvariant() + " 队",
+                            team.ToUpperInvariant() + UiStrings.UiArenaScreen.T016,
                             () => flow.EnterBattlefield(match, team, () => shell.RefreshPage()),
                             t == 0 ? UiButtonKind.Primary : UiButtonKind.Normal);
                     }
@@ -118,7 +118,7 @@ namespace HotUpdate.Ui
                 {
                     shell.Chip(list.Root,
                         new Rect(rightW - m.Px(28f) - m.Px(170f), buttonY + m.Px(6f), m.Px(170f), m.Px(44f)),
-                        "看领地层", UiChipKind.Mute);
+                        UiStrings.UiArenaScreen.T017, UiChipKind.Mute);
                 }
             }
 
@@ -126,7 +126,7 @@ namespace HotUpdate.Ui
 
             var factsTop = top + m.Px(56f) + listH + gap;
             var factsH = m.Px(420f);
-            var facts = shell.Panel("进场回包", m.Band(rightX, factsTop, rightW, factsH), shell.Size(30f));
+            var facts = shell.Panel(UiStrings.UiArenaScreen.T018, m.Band(rightX, factsTop, rightW, factsH), shell.Size(30f));
             DrawFacts(shell, flow, facts, rightW, factsH);
 
             Debug.Log(ReadyLog + " modes=" + modes.Length
@@ -152,11 +152,11 @@ namespace HotUpdate.Ui
             var lineH = m.Px(84f);
 
             var arenaText = flow.HasArena
-                ? "竞技场：" + VersusEntrySummary(flow.LastArena)
-                : (flow.ArenaTried ? "竞技场：" + flow.Error : "竞技场：尚未请求 · 点「进竞技场」走 /versus/arena/enter");
+                ? UiStrings.UiArenaScreen.T019 + VersusEntrySummary(flow.LastArena)
+                : (flow.ArenaTried ? UiStrings.UiArenaScreen.T019 + flow.Error : UiStrings.UiArenaScreen.T020);
             var battleText = flow.HasBattlefield
-                ? "战场：" + VersusEntrySummary(flow.LastBattlefield)
-                : (flow.BattlefieldTried ? "战场：" + flow.Error : "战场：尚未请求 · 点「A 队 / B 队」走 /versus/battlefield/enter");
+                ? UiStrings.UiArenaScreen.T021 + VersusEntrySummary(flow.LastBattlefield)
+                : (flow.BattlefieldTried ? UiStrings.UiArenaScreen.T021 + flow.Error : UiStrings.UiArenaScreen.T022);
 
             shell.LabelIn(panel.Root, new Rect(m.Px(28f), height - m.Px(160f), width - m.Px(56f), lineH),
                 arenaText,
@@ -170,13 +170,13 @@ namespace HotUpdate.Ui
             var latest = flow.HasBattlefield ? flow.LastBattlefield : flow.LastArena;
             var any = flow.HasArena || flow.HasBattlefield;
             shell.LabelIn(panel.Root, new Rect(m.Px(28f), m.Px(92f), width - m.Px(56f), m.Px(44f)),
-                any ? VersusEntry.ModeLine(latest) : "这一屏不拿装备面板自己算一份战力顶上去。",
+                any ? VersusEntry.ModeLine(latest) : UiStrings.UiArenaScreen.T023,
                 UiTextRole.Faint, shell.Size(20f), TextAnchor.MiddleLeft, true);
 
             var tried = flow.ArenaTried || flow.BattlefieldTried;
             shell.Chip(panel.Root,
                 new Rect(m.Px(28f), m.Px(24f), m.Px(320f), m.Px(52f)),
-                any ? "已接 /versus/*" : (tried ? "没读到" : "尚未请求"),
+                any ? UiStrings.UiArenaScreen.T024 : (tried ? UiStrings.UiArenaScreen.T025 : UiStrings.UiArenaScreen.T026),
                 any ? UiChipKind.Success : (tried ? UiChipKind.Error : UiChipKind.Mute));
         }
 

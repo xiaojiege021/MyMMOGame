@@ -102,7 +102,7 @@ namespace HotUpdate.Ui
         /// <summary>明亮「晨雾宣纸」。</summary>
         public static readonly UiPalette Light = new UiPalette(
             UiSkin.Light,
-            "晨雾宣纸",
+            UiStrings.UiPalette.T001,
             page: Hex("f4f2e9"),
             card: Alpha(Hex("fffdf6"), 0.90f),
             line: Alpha(Hex("2f6b60"), 0.24f),
@@ -120,7 +120,7 @@ namespace HotUpdate.Ui
         /// <summary>暗黑「夜山」。</summary>
         public static readonly UiPalette Dark = new UiPalette(
             UiSkin.Dark,
-            "夜山",
+            UiStrings.UiPalette.T002,
             page: Hex("08121c"),
             card: Alpha(Hex("08131d"), 0.80f),
             line: Alpha(Hex("9fd8cf"), 0.22f),

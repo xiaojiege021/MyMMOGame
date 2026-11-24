@@ -98,62 +98,62 @@ namespace HotUpdate.Ui
             });
 
             // 一、尚未请求：种植块与家园币块都写「尚未请求」，不拿配置顶一个状态。
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var pending = Text(shell);
-            Report("pending", pending.Contains("尚未请求") && pending.Contains("读取种植")
-                && pending.Contains("余额：还没有回包带过这个数"));
-            Debug.Log("u10_self_pending=" + pending.Contains("读取种植"));
+            Report("pending", pending.Contains(UiStrings.UiHomesteadPlantSelfCheck.T002) && pending.Contains(UiStrings.UiHomesteadPlantSelfCheck.T003)
+                && pending.Contains(UiStrings.UiHomesteadPlantSelfCheck.T004));
+            Debug.Log("u10_self_pending=" + pending.Contains(UiStrings.UiHomesteadPlantSelfCheck.T003));
 
             // 二、读回包：两格空、余额仍未知（只读回包不冒充余额）。
             flow.LoadPlants();
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var empty = Text(shell);
             Report("empty", flow.HasPlants && flow.LastPlants.SlotCount == 2
-                && empty.Contains("garden_1 · 空") && empty.Contains("garden_2 · 空")
-                && empty.Contains("回包 格位 2 · 已种 0")
-                && empty.Contains("余额：还没有回包带过这个数")
-                && empty.Contains("买 hc_shop_teleport_1"));
+                && empty.Contains(UiStrings.UiHomesteadPlantSelfCheck.T005) && empty.Contains(UiStrings.UiHomesteadPlantSelfCheck.T006)
+                && empty.Contains(UiStrings.UiHomesteadPlantSelfCheck.T007)
+                && empty.Contains(UiStrings.UiHomesteadPlantSelfCheck.T004)
+                && empty.Contains(UiStrings.UiHomesteadPlantSelfCheck.T008));
             Debug.Log("u10_self_empty slots=" + flow.LastPlants.SlotCount
                 + " planted=" + flow.LastPlants.Plants.Count);
 
             // 三、种下：格子里长出回包给的作物与生长状态，屏上写「未熟」不写秒数。
             flow.PlantCrop("garden_1", UiSocialCodex.CropIds[0]);
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var planted = Text(shell);
             Report("plant", flow.LastPlantAction.Ok
                 && HomesteadPlantEntry.PlantInSlot(flow.LastPlants, "garden_1") != null
-                && planted.Contains("garden_1 · crop_spirit_herb · 生长中")
-                && planted.Contains("未熟")
-                && !planted.Contains("garden_1 · 空"));
-            Debug.Log("u10_self_plant=" + planted.Contains("生长中"));
+                && planted.Contains(UiStrings.UiHomesteadPlantSelfCheck.T009)
+                && planted.Contains(UiStrings.UiHomesteadPlantSelfCheck.T010)
+                && !planted.Contains(UiStrings.UiHomesteadPlantSelfCheck.T005));
+            Debug.Log("u10_self_plant=" + planted.Contains(UiStrings.UiHomesteadPlantSelfCheck.T011));
 
             // 四、成熟与收取：熟没熟看回包的 mature，收多少与余额照抄。
             MakeMature("garden_1");
             flow.LoadPlants();
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
-            Report("mature", Text(shell).Contains("garden_1 · crop_spirit_herb · 已成熟")
-                && Text(shell).Contains("收取"));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
+            Report("mature", Text(shell).Contains(UiStrings.UiHomesteadPlantSelfCheck.T012)
+                && Text(shell).Contains(UiStrings.UiHomesteadPlantSelfCheck.T013));
 
             flow.HarvestCrop("garden_1");
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var harvested = Text(shell);
             Report("harvest", flow.LastPlantAction.Ok && flow.LastPlantAction.GrantedHomeCoin == 5
-                && harvested.Contains("本次 +5 家园币")
-                && harvested.Contains("回包余额 5 家园币")
-                && harvested.Contains("garden_1 · 空"));
+                && harvested.Contains(UiStrings.UiHomesteadPlantSelfCheck.T014)
+                && harvested.Contains(UiStrings.UiHomesteadPlantSelfCheck.T015)
+                && harvested.Contains(UiStrings.UiHomesteadPlantSelfCheck.T005));
             Debug.Log("u10_self_harvest balance=" + flow.HomeCoinBalance);
 
             // 五、商城：扣多少与余额只认回包；没接发货的一分不扣。
             flow.BuyHomeCoinItem("hc_shop_teleport_1");
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var bought = Text(shell);
             Report("buy", flow.LastHomeCoin.Ok && flow.LastHomeCoin.ChargedHomeCoin == 3
-                && bought.Contains("已买 hc_shop_teleport_1 · 扣 3 家园币 · 余额 2")
-                && bought.Contains("回包余额 2 家园币"));
+                && bought.Contains(UiStrings.UiHomesteadPlantSelfCheck.T016)
+                && bought.Contains(UiStrings.UiHomesteadPlantSelfCheck.T017));
             Debug.Log("u10_self_buy=" + flow.LastHomeCoin.DisplayText);
 
             flow.BuyHomeCoinItem("hc_shop_outfit_1");
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var pendingBuy = Text(shell);
             Report("buy_pending", !flow.LastHomeCoin.Ok
                 && flow.LastHomeCoin.Reason == "delivery_pending"
@@ -168,14 +168,14 @@ namespace HotUpdate.Ui
                     + "\"home_coin_balance\":0}");
             });
             flow.LoadPlants();
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var closed = Text(shell);
-            Report("unavailable", closed.Contains("服务端未开这套种植（plant_unavailable）")
-                && !closed.Contains("garden_1 · 空"));
+            Report("unavailable", closed.Contains(UiStrings.UiHomesteadPlantSelfCheck.T018)
+                && !closed.Contains(UiStrings.UiHomesteadPlantSelfCheck.T005));
             Debug.Log("u10_self_unavailable=" + closed.Contains("plant_unavailable"));
 
             // 七、切皮肤只换颜色：布局与文案一字不差。
-            shell.ShowPage("家园洞府", s => UiHomesteadScreen.Build(s, flow));
+            shell.ShowPage(UiStrings.UiHomesteadPlantSelfCheck.T001, s => UiHomesteadScreen.Build(s, flow));
             var layout = Layout(shell);
             var copy = Text(shell);
             shell.SetSkin(UiSkin.Dark, false);

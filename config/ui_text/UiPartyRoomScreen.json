@@ -1,0 +1,79 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiPartyRoomScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiPartyRoomScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "角色 "
+    },
+    {
+      "key": "T002",
+      "text": "队长"
+    },
+    {
+      "key": "T003",
+      "text": "队员"
+    },
+    {
+      "key": "T004",
+      "text": "已准备"
+    },
+    {
+      "key": "T005",
+      "text": "未准备"
+    },
+    {
+      "key": "T006",
+      "text": "队伍"
+    },
+    {
+      "key": "T007",
+      "text": "人数上限看回包"
+    },
+    {
+      "key": "T008",
+      "text": "分配口径"
+    },
+    {
+      "key": "T009",
+      "text": "回包没给分配口径"
+    },
+    {
+      "key": "T010",
+      "text": "目标角色号"
+    },
+    {
+      "key": "T011",
+      "text": "填要邀请 / 接受的角色号"
+    },
+    {
+      "key": "T012",
+      "text": "邀请"
+    },
+    {
+      "key": "T013",
+      "text": "开始准备"
+    },
+    {
+      "key": "T014",
+      "text": "接受"
+    },
+    {
+      "key": "T015",
+      "text": "拒绝"
+    },
+    {
+      "key": "T016",
+      "text": "我准备好了"
+    },
+    {
+      "key": "T017",
+      "text": "离队"
+    },
+    {
+      "key": "T018",
+      "text": "解散"
+    }
+  ]
+}
