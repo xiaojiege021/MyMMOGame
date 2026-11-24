@@ -310,6 +310,100 @@ else
   bad "好配置的只读入口没输出税率信息"
 fi
 
+echo "== 3b. B5 摆摊：配置、契约与进程边界 =="
+if ROOT="$ROOT" python3 - >"$TMP/stall-static.out" 2>&1 <<'PY'
+import glob, json, os
+root = os.environ['ROOT']
+cfg = json.load(open(root + '/config/stall.json', encoding='utf-8'))
+assert cfg['schema'] == 'stall-table/1'
+assert 5 <= cfg['tax_rate_pct'] <= 8
+assert cfg['slots'] == 8 and cfg['min_level'] == 20 and cfg['cross_server'] is False
+assert '待定' in cfg['note']
+assert not any('recipient' in k or 'tax_account' in k for k in cfg)
+man = json.load(open(root + '/db/migrations.json', encoding='utf-8'))
+trade = [x for x in man['schemas'] if x['key'] == 'trade'][0]
+assert any(e['file'] == 'db/trade/stall.sql' for e in trade['entries'])
+sql = open(root + '/db/trade/stall.sql', encoding='utf-8').read()
+assert 'ADD COLUMN IF NOT EXISTS channel' in sql
+assert 'ADD COLUMN IF NOT EXISTS stall_id' in sql
+assert 'CREATE TABLE IF NOT EXISTS "交易".stall' in sql
+main = open(root + '/db/trade/schema.sql', encoding='utf-8').read()
+assert 'CREATE TABLE IF NOT EXISTS "交易".stall' in main
+table = open(root + '/src/Character/StallTable.cs', encoding='utf-8').read()
+assert 'WrittenMinRatePct = 5' in table and 'WrittenMaxRatePct = 8'
+assert 'cross_server 只能是 false' in table
+repo = open(root + '/src/Character/StallRepository.cs', encoding='utf-8').read()
+assert 'BeginTransactionAsync' in repo and 'for update' in repo
+for code in ('level_too_low', 'stall_exists', 'not_owner', 'stall_closed',
+             'stall_full', 'slot_empty', 'bound_item', 'slot_listed'):
+    assert code in repo, code
+assert '.auction_listing' in repo and "'stall'" in repo
+auction = open(root + '/src/Character/AuctionRepository.cs', encoding='utf-8').read()
+assert 'stalls.TaxRatePct' in auction and 'table.TaxRatePct' in auction
+assert 'channel' in auction
+api = open(root + '/src/Gateway/StallApi.cs', encoding='utf-8').read()
+for route in ('/stall/open', '/stall/close', '/stall/list', '/stall/view',
+              '/stalls', '/stall/buy'):
+    assert '"' + route + '"' in api, route
+# 成交仍提交同一交易事务：网关调的是拍卖那条链，不是自己写库。
+assert 'BuyAuctionAsync(' in api and 'Npgsql' not in api
+chrp = open(root + '/proto/mmo/character.proto', encoding='utf-8').read()
+for rpc in ('OpenStall', 'CloseStall', 'ListStallItem', 'ViewStall'):
+    assert 'rpc ' + rpc + '(' in chrp, rpc
+worldp = open(root + '/proto/mmo/world.proto', encoding='utf-8').read()
+for rpc in ('OpenStall', 'RenewStall', 'CloseStall', 'ListStalls'):
+    assert 'rpc ' + rpc + '(' in worldp, rpc
+# 世界服不碰角色库、不改背包：整个 src/World 不许出现 Npgsql 或背包写入。
+world = ''.join(open(x, encoding='utf-8').read()
+                for x in sorted(glob.glob(root + '/src/World/**/*.cs', recursive=True))
+                if '/obj/' not in x and '/bin/' not in x)
+assert 'Npgsql' not in world
+assert '"角色".inventory' not in world and 'update "角色"' not in world
+assert 'StallRegistry' in world and 'ListStalls' in world
+print('stall_static=ok one_transaction=1 world_no_db=1')
+PY
+then ok "摆摊：配置区间、库表、四条 rpc、成交复用拍卖事务、世界服不碰库"
+else bad "摆摊静态断言失败"; cat "$TMP/stall-static.out" | detail
+fi
+
+echo "== 3c. B5 摆摊配置校验：默认值与写定口径被改都起不来 =="
+ROOT="$ROOT" TMP="$TMP" python3 - <<'PY'
+import copy, json, os
+root, tmp = os.environ['ROOT'], os.environ['TMP']
+base = json.load(open(root + '/config/stall.json', encoding='utf-8'))
+def dump(name, obj):
+    json.dump(obj, open(tmp + '/' + name, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+dump('s-good.json', base)
+w = copy.deepcopy(base); w.pop('tax_rate_pct'); dump('s-no-rate.json', w)
+w = copy.deepcopy(base); w['tax_rate_pct'] = 4; dump('s-low-rate.json', w)
+w = copy.deepcopy(base); w['slots'] = 9; dump('s-slots.json', w)
+w = copy.deepcopy(base); w['min_level'] = 101; dump('s-level.json', w)
+w = copy.deepcopy(base); w['cross_server'] = True; dump('s-cross.json', w)
+w = copy.deepcopy(base); w['tax_account'] = 'system'; dump('s-recipient.json', w)
+w = copy.deepcopy(base); w['note'] = '所有数值均已写定，没有需要说明的项'; dump('s-no-note.json', w)
+w = copy.deepcopy(base); w['schema'] = 'stall-table/2'; dump('s-schema.json', w)
+PY
+stall_reject() {
+  local label="$1" file="$2" expect="$3" out
+  out="$("$DOTNET" "$CHARACTER_DLL" --stall-config --stall-table-path "$TMP/$file" \
+    --config config/character.json 2>&1 | utf8)"
+  if printf '%s' "$out" | grep -qF "$expect"; then ok "$label"; else bad "${label}：${out:0:180}"; fi
+}
+stall_reject "B5 缺 tax_rate_pct 起不来" s-no-rate.json "config_error=stall.json 缺 tax_rate_pct"
+stall_reject "B5 税率 4% 低于写定 5% 起不来" s-low-rate.json "必须落在写定的 5–8 之间"
+stall_reject "B5 格数 9 超过写定 8 起不来" s-slots.json "slots 必须是 1–8"
+stall_reject "B5 等级门槛 101 越界起不来" s-level.json "min_level 必须是 1–100"
+stall_reject "B5 改成跨服起不来" s-cross.json "cross_server 只能是 false"
+stall_reject "B5 给税配收款方起不来" s-recipient.json "不许出现税的收款方字段"
+stall_reject "B5 没写待定说明起不来" s-no-note.json "note 要写明哪些数值待定"
+stall_reject "B5 schema 被改起不来" s-schema.json "schema 必须是 stall-table/1"
+if "$DOTNET" "$CHARACTER_DLL" --stall-config --config config/character.json 2>&1 \
+    | grep -qF 'stall_config=ok version=1 pending=true tax_rate_pct=5'; then
+  ok "B5 只读入口与启动同一套校验：默认 5% / 8 格 / 20 级 / 不跨服"
+else
+  bad "B5 只读入口没输出默认值"
+fi
+
 if [ -z "${MMO_GAMEDB:-}" ] && [ ! -f /srv/mmo/gamedb.env ]; then
   bad "没有 gamedb 凭据，连服段跑不了（这一段要在笔记本上跑）"
   finish "$TITLE"
@@ -570,5 +664,47 @@ resp="$(curl -s -m 10 -X POST "http://127.0.0.1:${GATEWAY_PORT}/inventory/can-tr
 resp="$(add_gold "$BUYER_TOKEN" "$BUYER_ID" -999999999)"
 [ "$(code_of "$resp" | tr -d '\n')" != "200" ] \
   && ok "P1-1b4：金币扣成负数仍被拒" || bad "金币可以扣成负数：$(body_of "$resp")"
+
+# B5 有库段：脚本自己的种子卖方 / 买方，先把卖方等级抬到 20（门槛 20 级），
+# 再走一遍开摊 → 上架 → 看摊 → 成交 → 关摊。只在 MMO_B5_DB=1 时跑。
+if [ "${MMO_B5_DB:-0}" = "1" ]; then
+  echo "== 14. B5 摆摊连库段 =="
+  B5_PRICE=1000
+  B5_TAX=$((B5_PRICE * 5 / 100))
+  b5() { "$DOTNET" "$CHARACTER_DLL" "$@" --config "$TMP/character.json" 2>&1; }
+  b5 --raw-level-write "$ID" 20 >/dev/null 2>&1
+  out="$(b5 --stall-open "$ID" kulan_dao cli)"
+  STALL="$(field_of "$out" stall)"
+  if printf '%s' "$out" | grep -q '^stall_open=ok' && [ "${STALL:-none}" != "none" ]; then
+    ok "B5 开摊成功（20 级门槛、本服地表）stall=${STALL}"
+  else
+    bad "B5 开摊失败：$out"
+  fi
+  out="$(b5 --stall-list "$ID" "$STALL" 1 "$B5_PRICE")"
+  B5_LISTING="$(field_of "$out" listing)"
+  if printf '%s' "$out" | grep -q '^stall_list=ok' && [ "$(field_of "$out" live)" = "1" ]; then
+    ok "B5 上架一件：落在 auction_listing（channel=stall），在售 1 / 8"
+  else
+    bad "B5 上架失败：$out"
+  fi
+  out="$(b5 --stall-view "$STALL")"
+  printf '%s' "$out" | grep -q '^stall_item=slot' \
+    && ok "B5 看摊读得到刚挂的那一件" || bad "B5 看摊没读到挂单：$out"
+  out="$(b5 --stall-buy "$BUYER_ID" "$B5_LISTING")"
+  if printf '%s' "$out" | grep -q '^stall_buy=ok' \
+     && [ "$(field_of "$out" tax)" = "$B5_TAX" ] \
+     && [ "$(field_of "$out" net)" = "$((B5_PRICE - B5_TAX))" ] \
+     && [ "$(field_of "$out" tax_rate_pct)" = "5" ]; then
+    ok "B5 成交走同一笔事务：5% 税 ${B5_TAX}、卖方净额 $((B5_PRICE - B5_TAX))"
+  else
+    bad "B5 成交不对：$out"
+  fi
+  out="$(b5 --stall-view "$STALL")"
+  printf '%s' "$out" | grep -q 'live=0' \
+    && ok "B5 成交后在售归零（世界服只靠这个数刷新显示）" || bad "B5 成交后在售没归零：$out"
+  out="$(b5 --stall-close "$ID" "$STALL")"
+  printf '%s' "$out" | grep -q '^stall_close=ok' \
+    && ok "B5 关摊撤单成功" || bad "B5 关摊失败：$out"
+fi
 
 finish "$TITLE"

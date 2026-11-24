@@ -30,6 +30,7 @@ public sealed class CharacterServices
     public required TransferRepository Transfers { get; init; }
     public required CrystalRepository Crystals { get; init; }
     public required AuctionRepository Auctions { get; init; }
+    public required StallRepository Stalls { get; init; }
     public required IngotRepository Ingots { get; init; }
     public required TalismanRepository Talismans { get; init; }
     public required PillRepository Pills { get; init; }
@@ -50,6 +51,8 @@ public sealed class CharacterServices
     public required WardrobeRepository Wardrobe { get; init; }
     public required MainlineRepository Mainlines { get; init; }
     public required HeroCodexRepository HeroCodex { get; init; }
+    public required MountRepository Mounts { get; init; }
+    public required SpiritBeastRepository SpiritBeasts { get; init; }
     public required GrpcChannel SocialChannel { get; init; }
     public required SocialService.SocialServiceClient Social { get; init; }
     public required GrpcChannel GlobalChannel { get; init; }
@@ -97,7 +100,10 @@ public static class ServiceAssembly
         var enhances = new EnhanceRepository(dataSource, tables.EnhanceTable, tables.Items);
         var transfers = new TransferRepository(dataSource, tables.TransferTable, tables.Items);
         var crystals = new CrystalRepository(dataSource, tables.CrystalTable, tables.Items, config);
-        var auctions = new AuctionRepository(dataSource, tables.AuctionTable, tables.Items, config);
+        // B5：摆摊与拍卖共用同一笔成交事务，税率各自读一份配置；摊位本身单独一笔。
+        var stalls = new StallRepository(dataSource, tables.StallTable, tables.Items, config);
+        var auctions = new AuctionRepository(
+            dataSource, tables.AuctionTable, tables.StallTable, tables.Items, config);
         var ingots = new IngotRepository(dataSource, tables.AuctionTable);
         // 红符的扣减：只动背包这一张，生命在战斗进程里，不在这里。
         var talismans = new TalismanRepository(dataSource);
@@ -145,6 +151,9 @@ public static class ServiceAssembly
         var mainlines = new MainlineRepository(
             dataSource, tables.MainlineTable, tables.MainlineDropTable, grants, tables.Items, config);
         var heroCodex = new HeroCodexRepository(dataSource, tables.HeroCodexTable);
+        // B4：坐骑写 character_mount 一行，灵兽只读背包 —— 两者都不造第二份数值。
+        var mounts = new MountRepository(dataSource);
+        var spiritBeasts = new SpiritBeastRepository(dataSource, tables.Items, tables.SpiritBeastTable);
 
         // P2-1c：判同宗门要问社交服。明文 gRPC（h2c）直连；channel 复用，不每次新建。
         var socialChannel = GrpcChannel.ForAddress(config.SocialUpstream);
@@ -178,6 +187,7 @@ public static class ServiceAssembly
             Transfers = transfers,
             Crystals = crystals,
             Auctions = auctions,
+            Stalls = stalls,
             Ingots = ingots,
             Talismans = talismans,
             Pills = pills,
@@ -198,6 +208,8 @@ public static class ServiceAssembly
             Wardrobe = wardrobeRepo,
             Mainlines = mainlines,
             HeroCodex = heroCodex,
+            Mounts = mounts,
+            SpiritBeasts = spiritBeasts,
             SocialChannel = socialChannel,
             Social = social,
             GlobalChannel = globalChannel,

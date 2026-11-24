@@ -140,6 +140,8 @@ public sealed class WorldProcess(
         var tiers = new AppearanceTierTable(config);
         var hub = new PositionHub(registry, config, tiers);
         var gatherNodes = new GatherNodeRegistry();
+        // B5：摆摊的显示状态只在世界服，进程内存，不落库、不碰背包。
+        var stallStalls = new StallRegistry();
         using var gatherGrants = new GrpcGatherGrant(gatherAll.CharacterUpstream);
         // 境界只在角色服：世界服每次判飞行/跨区都去问，不连角色库，也不自己存境界。
         using var realmReader = new GrpcRealmReader(flights.CharacterUpstream);
@@ -174,6 +176,7 @@ public sealed class WorldProcess(
         builder.Services.AddSingleton(hub);
         builder.Services.AddSingleton(gatherAll);
         builder.Services.AddSingleton(gatherNodes);
+        builder.Services.AddSingleton(stallStalls);
         builder.Services.AddSingleton<IGatherGrant>(gatherGrants);
         builder.Services.AddSingleton(flights);
         builder.Services.AddSingleton(regionGate);

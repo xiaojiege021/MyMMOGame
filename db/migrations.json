@@ -39,7 +39,8 @@
         { "version": 30, "file": "db/character/pill.sql" },
         { "version": 31, "file": "db/character/npc_shop.sql" },
         { "version": 32, "file": "db/character/bag_expand.sql" },
-        { "version": 33, "file": "db/character/craft_roll.sql" }
+        { "version": 33, "file": "db/character/craft_roll.sql" },
+        { "version": 34, "file": "db/character/mount.sql" }
       ]
     },
     {
@@ -68,7 +69,8 @@
         { "version": 2, "file": "db/trade/auction.sql" },
         { "version": 3, "file": "db/trade/ingot.sql" },
         { "version": 4, "file": "db/trade/stone_auction.sql" },
-        { "version": 5, "file": "db/trade/auction_item.sql" }
+        { "version": 5, "file": "db/trade/auction_item.sql" },
+        { "version": 6, "file": "db/trade/stall.sql" }
       ]
     }
   ]

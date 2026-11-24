@@ -1,8 +1,8 @@
 {
   "schema": "dungeon-drops/1",
-  "version": 3,
+  "version": 4,
   "pending": true,
-  "note": "N6 副本与世界 Boss 个人掉落的唯一正本（N8 第 87 行：世界 Boss 每人一份，走本表 dungeon_id=world_boss，不是 config/dungeons.json 里的副本，历练仍不计）。开发架构第 14 节第 85–87 行、方案第 9 章与 10.1/10.4：成品用表内基准值，不走掷点；数量留在配置。战斗服通关后按本表报事实，角色服在同一笔 SettleExp 里经 P1-1b5 的 grant_txn 入包；表外物品、灵石币种一律拒绝。方案没写定每个条目掉什么，数量占位并标 pending=true。顶层与条目白名单，probability / tax / spirit_stone / gold / yuanbao / exp / fatigue / weekly_share 一类键长不出来。 B2（v2）：每个副本条目可声明 grade_min / grade_max，装备掉落（items.json 里带 grade 的物品）必须落在自己的品阶带内，加载期逐行校验——这是「掉落按品阶」的唯一口径，代码里不写第二套品阶顺序。带值按方案第 10 章副本梯度取：深渊 white..green（低级材料本）、巢穴 blue..purple（装备主产）、世界 Boss purple..orange；主线不进本表（N7 写定），宗门秘境与龙巢的掉落行由 B15 批次二补齐（宗门秘境 blue..purple、龙巢 purple..orange，沿用同一条品阶带校验）。新增的装备行都是套装的衣服 / 饰品（数值与同档任意一套相同），兵器仍由制作与后续内容卡补。数量与具体掉哪一件方案没写定，沿用本表既有口径：占位、pending=true。",
+  "note": "N6 副本与世界 Boss 个人掉落的唯一正本（N8 第 87 行：世界 Boss 每人一份，走本表 dungeon_id=world_boss，不是 config/dungeons.json 里的副本，历练仍不计）。开发架构第 14 节第 85–87 行、方案第 9 章与 10.1/10.4：成品用表内基准值，不走掷点；数量留在配置。战斗服通关后按本表报事实，角色服在同一笔 SettleExp 里经 P1-1b5 的 grant_txn 入包；表外物品、灵石币种一律拒绝。方案没写定每个条目掉什么，数量占位并标 pending=true。顶层与条目白名单，probability / tax / spirit_stone / gold / yuanbao / exp / fatigue / weekly_share 一类键长不出来。 B2（v2）：每个副本条目可声明 grade_min / grade_max，装备掉落（items.json 里带 grade 的物品）必须落在自己的品阶带内，加载期逐行校验——这是「掉落按品阶」的唯一口径，代码里不写第二套品阶顺序。带值按方案第 10 章副本梯度取：深渊 white..green（低级材料本）、巢穴 blue..purple（装备主产）、世界 Boss purple..orange；主线不进本表（N7 写定），宗门秘境与龙巢的掉落行由 B15 批次二补齐（宗门秘境 blue..purple、龙巢 purple..orange，沿用同一条品阶带校验）。新增的装备行都是套装的衣服 / 饰品（数值与同档任意一套相同），兵器仍由制作与后续内容卡补。数量与具体掉哪一件方案没写定，沿用本表既有口径：占位、pending=true。 B4（v4）：坐骑与灵兽的获得只走本表——五个副本行各加 2 行（二阶坐骑 / 灵兽），item 全在 items.json（kind=mount / spirit_beast，没有 grade，所以不受品阶带约束），商城不卖玩法坐骑与灵兽（12.1）。一只坐骑 / 一只灵兽的掉落数量仍是占位 1，标 pending。主线仍不进本表（N7 写定），所以灵兽的首只不一定从主线来，只从副本来。",
   "items_config": "items.json",
   "entries": [
     {
@@ -13,7 +13,9 @@
         { "item_id": "stone_enhance_low", "count": 2 },
         { "item_id": "crystal_attack", "count": 1 },
         { "item_id": "robe_green_melee", "count": 1 },
-        { "item_id": "ring_green_melee", "count": 1 }
+        { "item_id": "ring_green_melee", "count": 1 },
+        { "item_id": "beast_tuanyuan", "count": 1 },
+        { "item_id": "beast_moyu", "count": 1 }
       ]
     },
     {
@@ -24,7 +26,9 @@
         { "item_id": "stone_enhance_mid", "count": 1 },
         { "item_id": "stone_transfer", "count": 1 },
         { "item_id": "robe_blue_caster", "count": 1 },
-        { "item_id": "ring_blue_caster", "count": 1 }
+        { "item_id": "ring_blue_caster", "count": 1 },
+        { "item_id": "mount_luyun", "count": 1 },
+        { "item_id": "beast_xuanlu", "count": 1 }
       ]
     },
     {
@@ -35,7 +39,9 @@
         { "item_id": "stone_enhance_mid", "count": 1 },
         { "item_id": "stone_transfer", "count": 1 },
         { "item_id": "robe_blue_melee", "count": 1 },
-        { "item_id": "ring_blue_ranger", "count": 1 }
+        { "item_id": "ring_blue_ranger", "count": 1 },
+        { "item_id": "mount_qingjiao", "count": 1 },
+        { "item_id": "beast_lingxi", "count": 1 }
       ]
     },
     {
@@ -46,7 +52,9 @@
         { "item_id": "stone_enhance_high", "count": 1 },
         { "item_id": "crystal_defense", "count": 1 },
         { "item_id": "robe_purple_caster", "count": 1 },
-        { "item_id": "ring_purple_melee", "count": 1 }
+        { "item_id": "ring_purple_melee", "count": 1 },
+        { "item_id": "mount_liuyan", "count": 1 },
+        { "item_id": "beast_yunhe", "count": 1 }
       ]
     },
     {
@@ -57,7 +65,9 @@
         { "item_id": "crystal_attack", "count": 1 },
         { "item_id": "stone_enhance_low", "count": 1 },
         { "item_id": "robe_purple_ranger", "count": 1 },
-        { "item_id": "ring_purple_ranger", "count": 1 }
+        { "item_id": "ring_purple_ranger", "count": 1 },
+        { "item_id": "mount_jiuxiao", "count": 1 },
+        { "item_id": "beast_jiuwei", "count": 1 }
       ]
     }
   ]

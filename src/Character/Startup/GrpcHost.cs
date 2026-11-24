@@ -54,6 +54,7 @@ public static class GrpcHost
         builder.Services.AddSingleton(tables.Sets);
         builder.Services.AddSingleton(services.Crystals);
         builder.Services.AddSingleton(tables.AuctionTable);
+        builder.Services.AddSingleton(tables.StallTable);
         builder.Services.AddSingleton(tables.ShopTable);
         builder.Services.AddSingleton(tables.HomeCoinShopTable);
         builder.Services.AddSingleton(tables.NpcShopTable);
@@ -71,6 +72,7 @@ public static class GrpcHost
         builder.Services.AddSingleton(services.RealmPhases);
         builder.Services.AddSingleton(tables.RechargeTable);
         builder.Services.AddSingleton(services.Auctions);
+        builder.Services.AddSingleton(services.Stalls);
         builder.Services.AddSingleton(services.Ingots);
         builder.Services.AddSingleton(tables.StoneExchange);
         builder.Services.AddSingleton(tables.CityTable);
@@ -94,6 +96,10 @@ public static class GrpcHost
         builder.Services.AddSingleton(services.Mainlines);
         builder.Services.AddSingleton(tables.HeroCodexTable);
         builder.Services.AddSingleton(services.HeroCodex);
+        builder.Services.AddSingleton(tables.MountTable);
+        builder.Services.AddSingleton(tables.SpiritBeastTable);
+        builder.Services.AddSingleton(services.Mounts);
+        builder.Services.AddSingleton(services.SpiritBeasts);
         builder.Services.AddSingleton(tables.RecipeTable);
         builder.Services.AddSingleton(tables.CityTaskTable);
         builder.Services.AddSingleton(services.CityTasks);

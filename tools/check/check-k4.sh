@@ -72,6 +72,8 @@ KINDS = {
     "material", "consumable", "equipment", "crystal", "voucher", "title",
     "appearance", "appearance_fragment", "outfit", "home_decor", "tool", "bag",
     "weapon_skin", "realm_skin", "flight_trail", "mount_skin",
+    # B4：玩法坐骑与灵兽是两种新的物品种类（与 mount_skin 那种外观不是同一样东西）。
+    "mount", "spirit_beast",
 }
 BINDS = {"none", "on_pickup", "always"}
 

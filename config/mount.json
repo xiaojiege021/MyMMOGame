@@ -1,0 +1,16 @@
+{
+  "schema": "mount-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "B4 玩法坐骑的唯一正本。方案 9.4：玩法坐骑分普通和高级，只差移动速度；商城坐骑只换外观、不叠加速度、不进战斗（12.1 同一句）。所以本表只有两档与一个 speed_bps，没有攻击 / 防御 / 技能 / 冷却这类字段，也不与 battle.json 有任何引用。坐骑是 items.json 里的物品（kind=mount、stack_max=1、到账即绑），获得走副本掉落（config/dungeon_drops.json），商城不卖玩法坐骑。speed_bps 是「相对 world.json 的 max_move_speed 再加多少万分比」，只由世界服算进地表水平位移上限，不改飞行（飞行仍只由境界打开）、不进战斗快照。数值方案没写定：四只坐骑的 speed_bps 与两档区间都是占位，标 pending=true，改这个文件重启角色服与世 界服生效。tiers 的顺序就是档位高低：高级档的下限必须高于普通档的上限，加载期硬校验。",
+  "tiers": [
+    { "id": "normal", "name": "普通", "min_speed_bps": 1000, "max_speed_bps": 3000 },
+    { "id": "advanced", "name": "高级", "min_speed_bps": 3001, "max_speed_bps": 6000 }
+  ],
+  "entries": [
+    { "item_id": "mount_luyun", "name": "踏云驹（占位）", "tier": "normal", "speed_bps": 2000 },
+    { "item_id": "mount_qingjiao", "name": "青角鹿（占位）", "tier": "normal", "speed_bps": 2500 },
+    { "item_id": "mount_liuyan", "name": "流焰狮（占位）", "tier": "advanced", "speed_bps": 4000 },
+    { "item_id": "mount_jiuxiao", "name": "九霄鹤（占位）", "tier": "advanced", "speed_bps": 4500 }
+  ]
+}

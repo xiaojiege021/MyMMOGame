@@ -20,7 +20,10 @@ public sealed record AuctionOutcome(
     string ItemId,
     int Count,
     string State,
-    bool Duplicate);
+    bool Duplicate,
+    int TaxRatePct = 0,
+    string StallId = "",
+    int LiveListings = 0);
 
 /// <summary>只给核对用：从库里独立读回成交前后与全库金币分布。</summary>
 public sealed record AuctionLedger(
@@ -49,6 +52,7 @@ public sealed record AuctionLedger(
 public sealed class AuctionRepository(
     NpgsqlDataSource dataSource,
     AuctionTable table,
+    StallTable stalls,
     ItemTable items,
     CharacterConfig config)
 {
@@ -67,9 +71,11 @@ public sealed class AuctionRepository(
             long price = 0;
             var state = "missing";
             var listingItemId = "";
+            var channel = "auction";
+            var stallId = "";
             var found = false;
             await using (var read = new NpgsqlCommand(
-                "select seller_id, slot, count, price_gold, state, item_id "
+                "select seller_id, slot, count, price_gold, state, item_id, channel, stall_id "
                 + "from \"交易\".auction_listing where listing_id = $1 for update",
                 connection, transaction))
             {
@@ -83,6 +89,8 @@ public sealed class AuctionRepository(
                     price = reader.GetInt64(3);
                     state = reader.GetString(4);
                     listingItemId = reader.GetString(5);
+                    channel = reader.GetString(6);
+                    stallId = reader.GetString(7);
                     found = true;
                 }
             }
@@ -109,7 +117,11 @@ public sealed class AuctionRepository(
                 throw new AuctionException("listing_invalid");
             }
 
-            var tax = table.TaxOf(price);
+            // B5：摆摊与拍卖共用这一笔事务，税率按挂单的 channel 取各自的配置
+            // （摆摊 config/stall.json、拍卖 config/auction.json）。税同样没有收款方。
+            var stallListing = string.Equals(channel, "stall", StringComparison.Ordinal);
+            var rate = stallListing ? stalls.TaxRatePct : table.TaxRatePct;
+            var tax = price * rate / 100;
             var net = price - tax;
 
             // 2. 抢事务号。撞主键说明这一笔已经结过，整笔退回。
@@ -125,7 +137,8 @@ public sealed class AuctionRepository(
                 {
                     await transaction.RollbackAsync(stopping);
                     return new AuctionOutcome(false, "duplicate", listingId, 0, 0, 0, 0, 0,
-                        "", 0, "", true);
+                        "", 0, "", true, channel == "stall" ? stalls.TaxRatePct : table.TaxRatePct,
+                        channel == "stall" ? stallId : "");
                 }
             }
 
@@ -341,10 +354,24 @@ public sealed class AuctionRepository(
 
             var buyerGold = await GoldOfAsync(connection, transaction, buyerId, stopping);
             var sellerGold = await GoldOfAsync(connection, transaction, sellerId, stopping);
+
+            // B5：摆摊成交之后还剩几件，网关拿它刷新世界服的显示（只用于显示）。
+            var liveListings = 0;
+            if (stallListing && stallId.Length > 0)
+            {
+                await using var live = new NpgsqlCommand(
+                    "select count(*) from \"交易\".auction_listing "
+                    + "where stall_id = $1 and state = 'listed'", connection, transaction);
+                live.Parameters.AddWithValue(stallId);
+                var value = await live.ExecuteScalarAsync(stopping);
+                liveListings = value is null || value is DBNull ? 0 : Convert.ToInt32(value);
+            }
+
             await transaction.CommitAsync(stopping);
 
             return new AuctionOutcome(true, "", listingId, price, tax, net,
-                buyerGold, sellerGold, itemId, count, "sold", false);
+                buyerGold, sellerGold, itemId, count, "sold", false,
+                rate, stallListing ? stallId : "", liveListings);
         }
         catch (AuctionException ex)
         {

@@ -73,6 +73,18 @@ internal static class CliFlags
     public static int craftRollCount = 0;
     public static int craftRollCraftCount = 0;
     public static string? craftRollPath = null;
+    // B4：坐骑与灵兽。--companion-config / --mount-speed 只读不连库；
+    // --mount / --dismount / --mount-row / --beast-row 连库核对。
+    public static bool companionConfig = false;
+    public static string? mountSpeedItem = null;
+    public static string? mountTablePath = null;
+    public static string? beastTablePath = null;
+    public static long mountOf = 0;
+    public static int mountBagSlot = 0;
+    public static long dismountOf = 0;
+    public static long mountRowOf = 0;
+    public static long beastRowOf = 0;
+
     // K3：核对用的原始背包写入（绕过业务规则，只给造料 / 清格用，与 --raw-currency-write 同口径）。
     public static long rawItemWriteId = 0;
     public static int rawItemSlot = 0;
@@ -85,6 +97,23 @@ internal static class CliFlags
     public static int bindingSlot = 0;
     public static long rawCurrencyId = 0;
     public static string? rawCurrencyKind = null;
+    // B5：摆摊。--stall-config / --stall-table-path 只读不连库；
+    // --stall-open / --stall-list / --stall-view / --stall-close / --stall-buy 连库核对。
+    public static bool stallConfig = false;
+    public static string? stallTablePath = null;
+    public static long stallOpenOf = 0;
+    public static string? stallOpenRegion = null;
+    public static string? stallOpenTitle = null;
+    public static long stallListOf = 0;
+    public static string? stallListStall = null;
+    public static int stallListSlot = 0;
+    public static long stallListPrice = 0;
+    public static string? stallViewStall = null;
+    public static long stallCloseOf = 0;
+    public static string? stallCloseStall = null;
+    public static long stallBuyOf = 0;
+    public static long stallBuyListing = 0;
+
     public static long rawCurrencyAmount = 0L;
     // K3：核对用的货币加数（走 CurrencyRepository.AddAsync，行不存在会建），
     // 与 --raw-currency-write 的「只改已有行」分开，只为造金币 / 灵石。

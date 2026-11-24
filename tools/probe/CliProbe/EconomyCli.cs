@@ -18,8 +18,11 @@ internal static class EconomyCli
             var auctionCurrencies = CurrencyTable.Load("config/currency.json");
             var auctionTable = AuctionTable.Load(
                 auctionConfigPath ?? characterConfig.AuctionTable, auctionCurrencies);
+            // B5：成交的税率按挂单 channel 取，拍卖这条也要带上摆摊表。
+            var auctionStalls = StallTable.Load(
+                stallTablePath ?? characterConfig.StallTable);
             var auctions = new AuctionRepository(
-                dataSource, auctionTable, auctionItems, characterConfig);
+                dataSource, auctionTable, auctionStalls, auctionItems, characterConfig);
             var ledger = await auctions.StateAsync(
                 auctionBuyerOf, auctionSellerOf, auctionListingOf,
                 auctionTxnOf ?? "", CancellationToken.None);

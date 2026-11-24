@@ -44,6 +44,8 @@ public sealed class FlightGate(
 
         var canFly = index >= table.IndexOf(table.FlightRealm);
         var allowed = !wantFly || canFly;
+        // B4：同一次向角色服问到的坐骑加成也写进分线注册表（换过坐骑的人这一手就同步上了）。
+        registry.SetMountSpeed(account, characterId, realm.MountSpeedBps);
         var change = registry.SetFlight(
             account, characterId, allowed && wantFly, canFly, DateTimeOffset.UtcNow);
         if (!change.Found)
@@ -125,9 +127,27 @@ public sealed class FlightGate(
             return Reject(entered.Reason, realm.Realm, required, current);
         }
 
+        // B4：Enter 会按新区域重建 Member，坐骑加成要跟着重写一次，
+        // 否则跨区之后会退回基线速度（不缓存过期结论，也不丢加成）。
+        registry.SetMountSpeed(account, characterId, realm.MountSpeedBps);
+
         return new RegionDecision(
             true, "", realm.Realm, required,
             new LineState(entered.LineId, entered.RegionId, entered.LineNo));
+    }
+
+    /// <summary>
+    /// B4：进线之后向角色服问一次坐骑加成，写进分线注册表。
+    /// 问不到（角色服没起 / 归属不对）就按 0 处理：不因为坐骑读不出来拦人进线，
+    /// 也不回一个看起来有加成的值。返回写进去的那个数，供调用方打点。
+    /// </summary>
+    public async Task<int> SyncMountSpeedAsync(
+        string account, ulong characterId, CancellationToken stopping)
+    {
+        var realm = await realms.ReadAsync(account, characterId, stopping);
+        var bps = realm.Ok ? realm.MountSpeedBps : 0;
+        registry.SetMountSpeed(account, characterId, bps);
+        return bps;
     }
 
     float GroundY => registry.GroundY;

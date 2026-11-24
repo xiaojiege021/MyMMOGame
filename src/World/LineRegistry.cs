@@ -234,7 +234,12 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
             // 连续两帧挤在同一毫秒时，按一个广播周期给位移额度，不误伤正常上报。
             var elapsed = (now - member.UpdatedAt).TotalSeconds;
             var window = Math.Max(elapsed, 1.0 / config.SyncHz);
-            var allowed = config.MaxMoveSpeed * window;
+            // B4：坐骑只抬「地表」的水平位移上限（方案 9.4「只差移动速度」），
+            // 基线仍是 world.json 的 max_move_speed；加成是角色服回的万分比，客户端带不进。
+            // 飞着的时候不吃这个加成：飞行速度只由 max_move_speed 与境界准入决定，
+            // 坐骑既不开放飞行、也不给飞行提速（12.1：飞行仍由境界开放）。
+            var mountFactor = previous.Flying ? 1.0 : 1.0 + member.MountSpeedBps / 10000.0;
+            var allowed = config.MaxMoveSpeed * mountFactor * window;
             var dx = x - previous.X;
             var dy = y - previous.Y;
             var dz = z - previous.Z;
@@ -309,6 +314,42 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
     }
 
     /// <summary>地面高度就是 world.json 的初始站位高度，飞行拉回也用它，不另写一套数字。</summary>
+    /// <summary>
+    /// 写这个人的坐骑加成。唯一写入方：进线、飞行、跨区三处向角色服问过之后才调；
+    /// 人不在线时回 false，不凭空给一个座位。0 与「没有坐骑」同义。
+    /// </summary>
+    public bool SetMountSpeed(string account, ulong characterId, int speedBps)
+    {
+        lock (gate)
+        {
+            var key = SeatKey(account, characterId);
+            if (!seats.TryGetValue(key, out var lineId)
+                || !lines[lineId].Members.TryGetValue(key, out var member))
+            {
+                return false;
+            }
+
+            member.MountSpeedBps = Math.Max(0, speedBps);
+            return true;
+        }
+    }
+
+    /// <summary>读这个人的坐骑加成，供打点与核对；不在线回 0。</summary>
+    public int MountSpeedBpsOf(string account, ulong characterId)
+    {
+        lock (gate)
+        {
+            var key = SeatKey(account, characterId);
+            if (!seats.TryGetValue(key, out var lineId)
+                || !lines[lineId].Members.TryGetValue(key, out var member))
+            {
+                return 0;
+            }
+
+            return member.MountSpeedBps;
+        }
+    }
+
     public float GroundY => (float)config.SpawnY;
 
     AvatarState Spawn(ulong characterId, string displayName) => new(
@@ -335,5 +376,8 @@ public sealed class LineRegistry(WorldConfig config, WorldCatalog catalog)
     {
         public AvatarState State { get; set; } = state;
         public DateTimeOffset UpdatedAt { get; set; } = updatedAt;
+        // B4：骑着的玩法坐骑给多少万分比提速（角色服回包里读到的数）。
+        // 只在进程内存里，换线 / 跨区 / 重新进线时按角色服现值重写，不落库。
+        public int MountSpeedBps { get; set; }
     }
 }

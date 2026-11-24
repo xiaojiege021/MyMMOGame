@@ -112,6 +112,13 @@ public static class BootReport
             + " gold_kind=" + tables.AuctionTable.GoldKind
             + " rounding=" + tables.AuctionTable.Rounding
             + " ingot_kind=" + tables.AuctionTable.IngotKind);
+        // B5：摆摊与拍卖分开的两份税率，重启后这里能直接核对到。
+        Console.WriteLine("stall_table_version=" + tables.StallTable.Version
+            + " pending=" + (tables.StallTable.Pending ? "true" : "false")
+            + " tax_rate_pct=" + tables.StallTable.TaxRatePct
+            + " slots=" + tables.StallTable.Slots
+            + " min_level=" + tables.StallTable.MinLevel
+            + " cross_server=" + (tables.StallTable.CrossServer ? "true" : "false"));
         // 与 --shop-list 只读入口同形：清单改一条，重启后这里能直接核对到。
         Console.WriteLine("npc_shop_table_version=" + tables.NpcShopTable.Version
             + " shops=" + tables.NpcShopTable.Shops.Count
@@ -294,6 +301,20 @@ public static class BootReport
             + " kind=" + tables.HeroCodexTable.PassiveKind
             + " entries=" + tables.HeroCodexTable.Entries.Count
             + " max_total_passive_pct_bps=" + tables.HeroCodexTable.MaxTotalPassivePctBps);
+        // B4：坐骑两档 / 灵兽三档的现值，与物品表、图鉴上限的对账结果在加载期已经过一遍。
+        Console.WriteLine("mount_table=version=" + tables.MountTable.Version
+            + " pending=" + (tables.MountTable.Pending ? "true" : "false")
+            + " tiers=" + tables.MountTable.Tiers.Count
+            + " entries=" + tables.MountTable.Entries.Count
+            + " speeds=" + string.Join("+", tables.MountTable.Entries.Select(e => e.ItemId + ":" + e.SpeedBps)));
+        Console.WriteLine("spirit_beast=version=" + tables.SpiritBeastTable.Version
+            + " pending=" + (tables.SpiritBeastTable.Pending ? "true" : "false")
+            + " kind=" + tables.SpiritBeastTable.PassiveKind
+            + " tiers=" + tables.SpiritBeastTable.Tiers.Count
+            + " entries=" + tables.SpiritBeastTable.Entries.Count
+            + " life_assist_total=" + tables.SpiritBeastTable.TotalLifeAssistPctBps
+            + " codex_total=" + tables.SpiritBeastTable.HeroCodexPassiveBps
+            + " cap=" + tables.SpiritBeastTable.MaxTotalLifeAssistPctBps);
         foreach (var stage in tables.MainlineTable.Stages)
         {
             Console.WriteLine("mainline_stage=" + stage.Stage

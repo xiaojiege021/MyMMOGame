@@ -25,9 +25,7 @@ internal static class CliParser
             case "--schema" when i + 1 < args.Length: schemaFilter = args[++i]; break;
             case "--schema-status": schemaStatus = true; break;
             case "--character-report" when i + 1 < args.Length: reportName = args[++i]; break;
-            case "--delete-character" when i + 1 < args.Length:
-                deleteName = args[++i];
-                break;
+            case "--delete-character" when i + 1 < args.Length: deleteName = args[++i]; break;
             case "--character-stats": stats = true; break;
             // 只给核对用：绕过接口直写库，验库层 CHECK。不能当运维手段用。
             case "--raw-level-write" when i + 2 < args.Length:
@@ -51,6 +49,8 @@ internal static class CliParser
             case "--recipe-list": case "--recipe-table-path": case "--craft-start": case "--craft-finish": case "--craft-state": case "--craft-txn": case "--craft-roll-sample": case "--craft-roll-path": case "--raw-item-write": case "--raw-currency-add": CraftCli.Parse(args, ref i); break;
             // K2+Q13：NPC 商店的 flag 解析器在 NpcShopCli.Parse（一个文件一个类型 / 行数闸门）。
             case var npcFlag when NpcShopCli.Handles(npcFlag): NpcShopCli.Parse(args, ref i); break;
+            case var companionFlag when CompanionCli.Handles(companionFlag): CompanionCli.Parse(args, ref i); break;
+            case var stallFlag when StallCli.Handles(stallFlag): StallCli.Parse(args, ref i); break;
             // B9：穿 / 脱 / 读已穿。解析在 EquipCli.Parse，与 RPC 同一套判定。
             case "--equip": case "--unequip": case "--equip-row": EquipCli.Parse(args, ref i); break;
             // 只给核对用：把武器锁与职业可用兵器打出来，不连库。坏配置也走这里。

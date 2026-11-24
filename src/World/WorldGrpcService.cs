@@ -12,7 +12,8 @@ namespace World;
 public sealed partial class WorldGrpcService(
     LineRegistry registry, WorldCatalog catalog, PositionHub hub,
     GatherTable gather, GatherNodeRegistry nodes, IGatherGrant grants,
-    FlightGate flight, WorldBossEntrance worldBoss, WorldBossSlots worldBossSlots, RegionGate regions)
+    FlightGate flight, WorldBossEntrance worldBoss, WorldBossSlots worldBossSlots, RegionGate regions,
+    StallRegistry stallStalls)
     : global::Mmo.Proto.World.WorldService.WorldServiceBase
 {
 // 14.8 D3h：六组 RPC 按域拆进 Grpc/ 目录（Line / Catalog / WorldBoss / Travel / Position，

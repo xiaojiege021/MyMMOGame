@@ -195,6 +195,8 @@ public sealed class GlobalGrpcService(
             Count = settled.Count,
             State = settled.State,
             Duplicate = settled.Duplicate,
+            StallId = settled.StallId,
+            LiveListings = settled.LiveListings,
         };
     }
 

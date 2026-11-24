@@ -36,6 +36,11 @@ public static partial class CharacterApi
 
     public sealed record UnequipItemBody(ulong? CharacterId, string? EquipSlot);
 
+    // B4：骑上只给背包格号，下坐骑只给角色号。档位与速度由角色服从 config/mount.json 读。
+    public sealed record MountUpBody(ulong? CharacterId, uint? Slot);
+
+    public sealed record DismountBody(ulong? CharacterId);
+
     public sealed record CurrencyBody(ulong? CharacterId, string? Kind, long? Delta);
 
     public sealed record GrantEntryBody(CurrencyDeltaBody? Currency, ItemDeltaBody? Item);
@@ -113,6 +118,7 @@ public static partial class CharacterApi
         RegisterCrystal(app, client, tokens);
         RegisterExchange(app, client, tokens);
         RegisterCraft(app, client, tokens);
+        RegisterCompanion(app, client, tokens);
     }
 
     static Task WriteCrystalAsync(HttpContext context, CrystalResponse result) =>

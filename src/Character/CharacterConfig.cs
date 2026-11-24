@@ -18,7 +18,7 @@ public sealed record CharacterConfig(
     string CharacterSlotTable, string GlobalUpstream, string MainlineTable,
     string RecipeTable, string CalendarTable, string CityTaskTable,
     string SeasonPassProgressTable, string NameRulesTable, string PillTable,
-    string CraftRollTable)
+    string CraftRollTable, string MountTable, string SpiritBeastTable, string StallTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -57,6 +57,13 @@ public sealed record CharacterConfig(
     // 互相钉「符不超过同级丹」，所以两份表都得能指到临时文件。
     public const string DefaultPillTable = "config/pill.json";
     public const string DefaultCraftRollTable = "config/craft_roll.json";
+    // B4：玩法坐骑与灵兽。与日历 / 城池任务同口径不显式登记进 config/character.json：
+    // 老配置不写这两项也照常起（走仓库根这两份）；核对脚本可指到临时表试坏配置。
+    public const string DefaultMountTable = "config/mount.json";
+    public const string DefaultSpiritBeastTable = "config/spirit_beast.json";
+    // B5：摆摊的税率、格数、等级门槛与「是否跨服」只在 config/stall.json；
+    // 与拍卖同一种写法，核对脚本可以指到临时表试坏配置。
+    public const string DefaultStallTable = "config/stall.json";
     // K3：生产 / 配方的正本。同样不显式登记进 character.json：老卡的临时配置目录里
     // 没有这份表时走默认文件名，仓库根的那一份照常可读。
     public const string DefaultRecipeTable = "config/recipes.json";
@@ -179,6 +186,13 @@ public sealed record CharacterConfig(
         if (auctionTable.Length == 0)
         {
             throw new ConfigException("auction_table 不能为空");
+        }
+
+        // B5：摆摊表与拍卖表分开，税与格数各自读各自的；同一套「指到临时表」的核对口。
+        var stallTable = (wire.StallTable ?? DefaultStallTable).Trim();
+        if (stallTable.Length == 0)
+        {
+            throw new ConfigException("stall_table 不能为空");
         }
 
         // 商城清单也走同一份配置正本；核对脚本可以指到临时表试坏清单。
@@ -356,6 +370,20 @@ public sealed record CharacterConfig(
         }
 
         // B3：制作掷点表。与配方表同口径：老配置不写就走默认文件名。
+        // B4：坐骑与灵兽各一份正本；数值（速度 / 生活协助）只在这两份文件里，
+        // 代码与世界服都不写第二份。核对脚本可指到临时表试坏配置。
+        var mountTable = (wire.MountTable ?? DefaultMountTable).Trim();
+        if (mountTable.Length == 0)
+        {
+            throw new ConfigException("mount_table 不能为空");
+        }
+
+        var spiritBeastTable = (wire.SpiritBeastTable ?? DefaultSpiritBeastTable).Trim();
+        if (spiritBeastTable.Length == 0)
+        {
+            throw new ConfigException("spirit_beast_table 不能为空");
+        }
+
         var craftRollTable = (wire.CraftRollTable ?? DefaultCraftRollTable).Trim();
         if (craftRollTable.Length == 0)
         {
@@ -370,7 +398,8 @@ public sealed record CharacterConfig(
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
             characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable,
-            cityTaskTable, seasonPassProgressTable, nameRulesTable, pillTable, craftRollTable);
+            cityTaskTable, seasonPassProgressTable, nameRulesTable, pillTable, craftRollTable,
+            mountTable, spiritBeastTable, stallTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -414,6 +443,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("auction_table")]
         public string? AuctionTable { get; init; }
+
+        [JsonPropertyName("stall_table")]
+        public string? StallTable { get; init; }
 
         [JsonPropertyName("shop_table")]
         public string? ShopTable { get; init; }
@@ -483,6 +515,12 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("craft_roll_table")]
         public string? CraftRollTable { get; init; }
+
+        [JsonPropertyName("mount_table")]
+        public string? MountTable { get; init; }
+
+        [JsonPropertyName("spirit_beast_table")]
+        public string? SpiritBeastTable { get; init; }
 
         [JsonPropertyName("pill_table")]
         public string? PillTable { get; init; }

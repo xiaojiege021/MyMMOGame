@@ -4,7 +4,11 @@ using Mmo.Proto.Character;
 
 namespace World;
 
-public sealed record RealmResult(bool Ok, string Reason, string Realm);
+/// <summary>
+/// 角色服这一次回的只读事实：境界（判飞行 / 跨区）与坐骑加成（判地表位移上限）。
+/// 两者同一次 ListInventory 回来，世界服不另存一份可以过期的结论。
+/// </summary>
+public sealed record RealmResult(bool Ok, string Reason, string Realm, int MountSpeedBps);
 
 /// <summary>
 /// 飞行与跨区判定前，先向角色服问这个人当前的境界。世界服不连角色库，
@@ -40,16 +44,16 @@ public sealed class GrpcRealmReader : IRealmReader, IDisposable
                 cancellationToken: stopping);
             var realm = (reply.Realm ?? "").Trim();
             return realm.Length == 0
-                ? new RealmResult(false, "realm_unavailable", "")
-                : new RealmResult(true, "", realm);
+                ? new RealmResult(false, "realm_unavailable", "", 0)
+                : new RealmResult(true, "", realm, Math.Max(0, reply.MountSpeedBps));
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
         {
-            return new RealmResult(false, "character_not_found", "");
+            return new RealmResult(false, "character_not_found", "", 0);
         }
         catch (RpcException ex)
         {
-            return new RealmResult(false, "realm_unavailable:" + ex.Status.Detail, "");
+            return new RealmResult(false, "realm_unavailable:" + ex.Status.Detail, "", 0);
         }
     }
 

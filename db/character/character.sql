@@ -864,3 +864,13 @@ CREATE TABLE IF NOT EXISTS "角色".character_profession (
     PRIMARY KEY (character_id, profession),
     CONSTRAINT character_profession_success_le_craft CHECK (success_count <= craft_count)
 );
+
+-- B4：玩法坐骑（同一段也单独在 db/character/mount.sql，版本 34）。
+CREATE TABLE IF NOT EXISTS "角色".character_mount (
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    -- 骑在身上的那一行背包。同一行只能被一个角色骑着，一个角色只能骑一行。
+    inventory_id bigint      NOT NULL REFERENCES "角色".inventory (id) ON DELETE CASCADE,
+    mounted_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id),
+    UNIQUE (inventory_id)
+);

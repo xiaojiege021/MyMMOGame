@@ -81,6 +81,12 @@ internal static class DbCli
             code = await NameCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await CompanionCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
+            code = await StallCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await InvariantCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -136,6 +142,11 @@ internal static class DbCli
     || rawItemWriteId != 0
     // K2+Q13：NPC 商店的连库口，缺了会掉到「启动角色服」那条路。
     || npcShopStateOf != 0 || npcBuyOf != 0 || npcSellOf != 0 || npcBuybackOf != 0
-    || npcRepairOf != 0 || rawDurabilityOf != 0;
+    || npcRepairOf != 0 || rawDurabilityOf != 0
+    // B4：坐骑读写与两行只读都要连库，缺了会掉到「启动角色服」那条路。
+    || mountOf != 0 || dismountOf != 0 || mountRowOf != 0 || beastRowOf != 0
+    // B5：摆摊的五个连库 flag。漏在这里就会掉到「启动角色服」那条路。
+    || stallOpenOf != 0 || stallListOf != 0 || stallViewStall != null
+    || stallCloseOf != 0 || stallBuyOf != 0;
     }
 }

@@ -38,6 +38,9 @@ public sealed partial class CharacterGrpcService(
     SetTable sets,
     AuctionRepository auctions,
     AuctionTable auctionTable,
+    // B5：摊位与挂单的判定口。税率 / 格数 / 门槛的正本随服务注入，不另起一套。
+    StallRepository stalls,
+    StallTable stallTable,
     IngotRepository ingots,
     ShopTable shopTable,
     TalismanTable talismanTable,
@@ -85,7 +88,11 @@ public sealed partial class CharacterGrpcService(
     CityTaskTable? cityTaskTable,
     CityTaskRepository? cityTasks,
     DeserterRepository deserters,
-    NameRulesTable nameRules) : CharacterService.CharacterServiceBase
+    NameRulesTable nameRules,
+    // B4：坐骑的档位与速度只在配置里，读写两条口都要它；灵兽只需仓储（只读背包）。
+    MountTable mountTable,
+    MountRepository mounts,
+    SpiritBeastRepository spiritBeasts) : CharacterService.CharacterServiceBase
 {
 
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。

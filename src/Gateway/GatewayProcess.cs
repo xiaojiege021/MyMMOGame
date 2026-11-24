@@ -88,6 +88,8 @@ public sealed class GatewayProcess(string configPath)
 
         // 拍卖行：认令牌、复核归属，再 gRPC 转给全局服务。
         AuctionApi.Map(app, tokens, config);
+        // B5：摆摊。开摊 / 关摊 / 上架 / 看摊走角色服，显示走世界服，成交复用拍卖那条链。
+        StallApi.Map(app, tokens, config);
         // P3-4a1：赛季当前目标只读口，认令牌后转给全局服务，不读请求参数。
         SeasonApi.Map(app, tokens, config, calendar);
         // P3-4a2：通行证只读与领取。季由角色服向全局服务确认，客户端只带角色号、轨与阶。

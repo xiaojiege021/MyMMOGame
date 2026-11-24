@@ -228,7 +228,10 @@ public sealed partial class CharacterGrpcService
                 Ok = false,
                 Reason = outcome.Reason,
                 ListingId = (ulong)outcome.ListingId,
-                TaxRatePct = auctionTable.TaxRatePct,
+                // B5：摆摊挂单按 stall.json 的税率回；拍卖仍按 auction.json。
+                TaxRatePct = outcome.TaxRatePct > 0 ? outcome.TaxRatePct : auctionTable.TaxRatePct,
+                StallId = outcome.StallId,
+                LiveListings = outcome.LiveListings,
                 Duplicate = outcome.Duplicate,
             };
         }
@@ -243,10 +246,12 @@ public sealed partial class CharacterGrpcService
             NetGold = outcome.NetGold,
             BuyerGold = outcome.BuyerGold,
             SellerGold = outcome.SellerGold,
-            TaxRatePct = auctionTable.TaxRatePct,
+            TaxRatePct = outcome.TaxRatePct > 0 ? outcome.TaxRatePct : auctionTable.TaxRatePct,
             ItemId = outcome.ItemId,
             Count = (uint)outcome.Count,
             State = outcome.State,
+            StallId = outcome.StallId,
+            LiveListings = outcome.LiveListings,
         };
     }
 

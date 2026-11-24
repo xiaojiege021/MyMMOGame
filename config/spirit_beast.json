@@ -1,0 +1,20 @@
+{
+  "schema": "spirit-beast/1",
+  "version": 1,
+  "pending": true,
+  "note": "B4 灵兽的唯一正本。方案 9.4：灵兽分普通、高级、神兽，只做收集、外观和生活协助，不进入伤害公式。本表只写三档、六只与每只的生活协助万分比，没有攻击 / 技能 / 出战 / 伤害字段，也不与 battle.json 有任何引用。收集口径与外观收藏一致（P3-4b）：背包里现在持有这只灵兽就算收集，不建第二张收集表、不记永久解锁。生活协助沿用英灵图鉴的 passive_kind=life_assist，并与图鉴共用同一处上限——hero_codex.json 的 max_total_passive_pct_bps；加载期硬校验「灵兽合计 + 图鉴合计 ≤ 该上限」，所以本表不写第二份上限数字。数值方案没写定：六只的 life_assist_pct_bps 与三档划分都是占位，标 pending=true。灵兽是 items.json 里的物品（kind=spirit_beast、stack_max=1、到账即绑），获得走副本掉落（config/dungeon_drops.json），商城不卖。",
+  "passive_kind": "life_assist",
+  "tiers": [
+    { "id": "normal", "name": "普通" },
+    { "id": "advanced", "name": "高级" },
+    { "id": "divine", "name": "神兽" }
+  ],
+  "entries": [
+    { "item_id": "beast_tuanyuan", "name": "团绒（占位）", "tier": "normal", "life_assist_pct_bps": 4 },
+    { "item_id": "beast_moyu", "name": "墨羽（占位）", "tier": "normal", "life_assist_pct_bps": 5 },
+    { "item_id": "beast_xuanlu", "name": "玄鹿（占位）", "tier": "advanced", "life_assist_pct_bps": 6 },
+    { "item_id": "beast_lingxi", "name": "灵犀（占位）", "tier": "advanced", "life_assist_pct_bps": 7 },
+    { "item_id": "beast_yunhe", "name": "云鹤（占位）", "tier": "divine", "life_assist_pct_bps": 8 },
+    { "item_id": "beast_jiuwei", "name": "九尾（占位）", "tier": "divine", "life_assist_pct_bps": 10 }
+  ]
+}

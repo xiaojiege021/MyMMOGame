@@ -117,6 +117,10 @@ public sealed partial class CharacterGrpcService
             CharacterName = displayName ?? "",
             Realm = realm,
             RealmDisplay = realms.DisplayName(realm, facts?.Alignment ?? ""),
+            // B4：骑着的玩法坐骑给多少万分比提速。世界服判地表位移上限时读这一格；
+            // 没骑回 0，与「没有坐骑」同义，不改飞行（飞行只由境界打开）。
+            MountSpeedBps = await mounts.SpeedBpsAsync(
+                characterId, mountTable, context.CancellationToken),
         };
         // B9：这一行正穿在哪个部位。只读一张穿戴表，不改背包；客户端据此把「穿上 / 脱下」
         // 显示成当前事实，而不是自己记一份。

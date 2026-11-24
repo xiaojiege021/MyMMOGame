@@ -51,6 +51,13 @@ service WorldService {
 
   // Q11：离场 / 散场 / 掉线超时，把名额还回去。只还自己那一个，不动别人的。
   rpc ReleaseWorldBossSlot(ReleaseWorldBossSlotRequest) returns (ReleaseWorldBossSlotResponse);
+
+  // B5 摆摊：世界服只保存「这一刻谁在哪儿摆摊、挂了几件」这一份显示用状态，
+  // 放进程内存，不连角色库、不改任何背包行。挂单、成交与撤单都在角色服。
+  rpc OpenStall(WorldStallOpenRequest) returns (WorldStallResponse);
+  rpc RenewStall(WorldStallRenewRequest) returns (WorldStallResponse);
+  rpc CloseStall(WorldStallCloseRequest) returns (WorldStallResponse);
+  rpc ListStalls(ListStallsRequest) returns (ListStallsResponse);
 }
 
 // 请求里没有分线号、人数、容量或区域配置：客户端改包改不了自己被分到哪条线。
@@ -375,4 +382,56 @@ message ReleaseWorldBossSlotResponse {
   bool ok = 1;
   string reason = 2;
   uint32 current = 3;
+}
+
+
+// B5 摆摊：世界服的显示状态。摊位不跨服，region_id 只存本服地表编号；
+// 买家按区域查，别的区域看不到这个摊。
+message WorldStallOpenRequest {
+  string stall_id = 1;
+  uint64 owner_id = 2;
+  string owner_name = 3;
+  string region_id = 4;
+  double pos_x = 5;
+  double pos_y = 6;
+  string title = 7;
+  int32 live_listings = 8;
+}
+
+message WorldStallRenewRequest {
+  string stall_id = 1;
+  int32 live_listings = 2;
+}
+
+message WorldStallCloseRequest {
+  string stall_id = 1;
+}
+
+message WorldStallResponse {
+  // stall_not_found / stall_closed / region_missing
+  bool ok = 1;
+  string reason = 2;
+  string stall_id = 3;
+  uint32 count = 4;
+}
+
+message StallInfo {
+  string stall_id = 1;
+  uint64 owner_id = 2;
+  string owner_name = 3;
+  string region_id = 4;
+  double pos_x = 5;
+  double pos_y = 6;
+  string title = 7;
+  int32 live_listings = 8;
+}
+
+message ListStallsRequest {
+  // 空串回本服全部在摊；带了就只回这块地表。
+  string region_id = 1;
+}
+
+message ListStallsResponse {
+  uint32 count = 1;
+  repeated StallInfo stalls = 2;
 }

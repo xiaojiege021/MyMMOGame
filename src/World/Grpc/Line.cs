@@ -27,6 +27,12 @@ public sealed partial class WorldGrpcService
             ? new EnterResult(false, access.Reason, "", "", 0, 0, 0, false)
             : registry.Enter(account, request.CharacterId, regionId, request.DisplayName,
                 unlocked: access.Ok);
+        // B4：进线之后取一次坐骑加成写进分线注册表（世界服判地表位移上限要用它）。
+        // 换坐骑后最迟在下一次进线 / 飞行 / 跨区时生效，不需要重连。
+        var mountSpeedBps = result.Entered
+            ? await flight.SyncMountSpeedAsync(account, request.CharacterId, context.CancellationToken)
+            : 0;
+
         Console.WriteLine("world_enter account=" + account
             + " character=" + request.CharacterId
             + " region=" + regionId
@@ -38,7 +44,8 @@ public sealed partial class WorldGrpcService
             + " duplicate=" + result.Duplicate
             + " stage=" + access.MainStage
             + " unlock_stage=" + access.UnlockStage
-            + " alignment=" + (access.Alignment.Length == 0 ? "none" : access.Alignment));
+            + " alignment=" + (access.Alignment.Length == 0 ? "none" : access.Alignment)
+            + " mount_speed_bps=" + mountSpeedBps);
 
         var response = new EnterLineResponse
         {

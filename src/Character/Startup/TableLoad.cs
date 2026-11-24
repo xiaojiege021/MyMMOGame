@@ -21,6 +21,7 @@ public sealed class CharacterTables
     public required GradeTable Grades { get; init; }
     public required SetTable Sets { get; init; }
     public required AuctionTable AuctionTable { get; init; }
+    public required StallTable StallTable { get; init; }
     public required ShopTable ShopTable { get; init; }
     public required NpcShopTable NpcShopTable { get; init; }
     public required HomeCoinShopTable HomeCoinShopTable { get; init; }
@@ -38,6 +39,8 @@ public sealed class CharacterTables
     public required CharacterSlotTable CharacterSlotTable { get; init; }
     public required MainlineTable MainlineTable { get; init; }
     public required HeroCodexTable HeroCodexTable { get; init; }
+    public required MountTable MountTable { get; init; }
+    public required SpiritBeastTable SpiritBeastTable { get; init; }
     public required RecipeTable RecipeTable { get; init; }
 
     /// <summary>B3：制作掷点正本（区间 / 权重档 / 附加属性允许表）。</summary>
@@ -70,6 +73,7 @@ public static class TableLoad
         GradeTable grades;
         SetTable sets;
         AuctionTable auctionTable;
+        StallTable stallTable;
         ShopTable shopTable;
         NpcShopTable npcShopTable;
         HomeCoinShopTable homeCoinShopTable;
@@ -90,6 +94,8 @@ public static class TableLoad
         CalendarTable calendar;
         RecipeTable recipeTable;
         CraftRollTable craftRollTable;
+        MountTable mountTable;
+        SpiritBeastTable spiritBeastTable;
         CityTaskTable cityTaskTable;
         SeasonPassProgressTable seasonPassProgressTable;
         NameRulesTable nameRulesTable;
@@ -127,6 +133,9 @@ public static class TableLoad
             // 方案第 12 章写定的 5%–8% 抽税区间由 AuctionTable 硬校验，
             // 具体税率与取整方式在 config/auction.json，改配置重启生效。
             auctionTable = AuctionTable.Load(config.AuctionTable, currencies);
+            // B5：摆摊的税率区间、格数、等级门槛与「不跨服」由 StallTable 硬校验，
+            // 与拍卖分成两份文件：摆摊 5% / 拍卖 6% 各读各的，改配置重启生效。
+            stallTable = StallTable.Load(config.StallTable);
             // 方案 12.1：红符是绑定的生命回复消耗，回复不超过同级红药，
             // 和红药、牧师治疗共用冷却。回复值与上限都在 config/talisman.json，
             // 超了、物品不在表里、没到账即绑，缺一样就起不来。
@@ -202,6 +211,11 @@ public static class TableLoad
             // B3：制作掷点先于配方区间的对账读进来，再逐条核 attr_min / attr_max。
             craftRollTable = CraftRollTable.Load(config.CraftRollTable, items, grades);
             craftRollTable.CheckRecipes(recipeTable, grades);
+            // B4：玩法坐骑与灵兽。坐骑只差移动速度、灵兽只做收集 / 外观 / 生活协助，
+            // 两份都在加载期与物品表交叉校验（kind、不可叠、档位区间），
+            // 灵兽还要与图鉴合计对一次「一处上限」（hero_codex.json 的 max_total_passive_pct_bps）。
+            mountTable = MountTable.Load(config.MountTable, items);
+            spiritBeastTable = SpiritBeastTable.Load(config.SpiritBeastTable, items, heroCodexTable);
             // Q5/J2：主城修炼 / 境界任务的正本。与启动共用同一份 Load：城池编号必须在
             // config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json 的顺序表里；
             // 缺表降级成「没有任务」，老卡环境照常起。
@@ -243,6 +257,7 @@ public static class TableLoad
             Grades = grades,
             Sets = sets,
             AuctionTable = auctionTable,
+            StallTable = stallTable,
             ShopTable = shopTable,
             NpcShopTable = npcShopTable,
             HomeCoinShopTable = homeCoinShopTable,
@@ -260,6 +275,8 @@ public static class TableLoad
             CharacterSlotTable = characterSlotTable,
             MainlineTable = mainlineTable,
             HeroCodexTable = heroCodexTable,
+            MountTable = mountTable,
+            SpiritBeastTable = spiritBeastTable,
             RecipeTable = recipeTable,
             CraftRollTable = craftRollTable,
             CityTaskTable = cityTaskTable,

@@ -209,7 +209,10 @@ battle["boss"]["phases"] = [
 json.dump(battle, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=2)
 PY
-cp "$ROOT/config/skills.json" "$ROOT/config/classes.json" "$ROOT/config/dungeons.json" "$TMP/"
+# B15 批次一起战斗服按 dungeons.json 的 boss_id 校怪物表：临时目录也得带上它，
+# 否则副本 main 的 boss_main_trial 会被判成「不在怪物表里」而起不来。
+cp "$ROOT/config/skills.json" "$ROOT/config/classes.json" "$ROOT/config/dungeons.json" \
+   "$ROOT/config/monsters.json" "$TMP/"
 
 : > "$TMP/battle.log"
 "$DOTNET" "$BATTLE_DLL" --config "$TMP/battle.json" >>"$TMP/battle.log" 2>&1 &

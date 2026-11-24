@@ -103,6 +103,18 @@ namespace Mmo.Proto.World {
     static readonly grpc::Marshaller<global::Mmo.Proto.World.ReleaseWorldBossSlotRequest> __Marshaller_mmo_world_ReleaseWorldBossSlotRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ReleaseWorldBossSlotRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.World.ReleaseWorldBossSlotResponse> __Marshaller_mmo_world_ReleaseWorldBossSlotResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ReleaseWorldBossSlotResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldStallOpenRequest> __Marshaller_mmo_world_WorldStallOpenRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldStallOpenRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldStallResponse> __Marshaller_mmo_world_WorldStallResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldStallResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldStallRenewRequest> __Marshaller_mmo_world_WorldStallRenewRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldStallRenewRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.WorldStallCloseRequest> __Marshaller_mmo_world_WorldStallCloseRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.WorldStallCloseRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.ListStallsRequest> __Marshaller_mmo_world_ListStallsRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ListStallsRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.World.ListStallsResponse> __Marshaller_mmo_world_ListStallsResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.World.ListStallsResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse> __Method_EnterLine = new grpc::Method<global::Mmo.Proto.World.EnterLineRequest, global::Mmo.Proto.World.EnterLineResponse>(
@@ -207,6 +219,38 @@ namespace Mmo.Proto.World {
         "ReleaseWorldBossSlot",
         __Marshaller_mmo_world_ReleaseWorldBossSlotRequest,
         __Marshaller_mmo_world_ReleaseWorldBossSlotResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.WorldStallOpenRequest, global::Mmo.Proto.World.WorldStallResponse> __Method_OpenStall = new grpc::Method<global::Mmo.Proto.World.WorldStallOpenRequest, global::Mmo.Proto.World.WorldStallResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "OpenStall",
+        __Marshaller_mmo_world_WorldStallOpenRequest,
+        __Marshaller_mmo_world_WorldStallResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.WorldStallRenewRequest, global::Mmo.Proto.World.WorldStallResponse> __Method_RenewStall = new grpc::Method<global::Mmo.Proto.World.WorldStallRenewRequest, global::Mmo.Proto.World.WorldStallResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "RenewStall",
+        __Marshaller_mmo_world_WorldStallRenewRequest,
+        __Marshaller_mmo_world_WorldStallResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.WorldStallCloseRequest, global::Mmo.Proto.World.WorldStallResponse> __Method_CloseStall = new grpc::Method<global::Mmo.Proto.World.WorldStallCloseRequest, global::Mmo.Proto.World.WorldStallResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CloseStall",
+        __Marshaller_mmo_world_WorldStallCloseRequest,
+        __Marshaller_mmo_world_WorldStallResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.World.ListStallsRequest, global::Mmo.Proto.World.ListStallsResponse> __Method_ListStalls = new grpc::Method<global::Mmo.Proto.World.ListStallsRequest, global::Mmo.Proto.World.ListStallsResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ListStalls",
+        __Marshaller_mmo_world_ListStallsRequest,
+        __Marshaller_mmo_world_ListStallsResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -359,6 +403,37 @@ namespace Mmo.Proto.World {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.ReleaseWorldBossSlotResponse> ReleaseWorldBossSlot(global::Mmo.Proto.World.ReleaseWorldBossSlotRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B5 摆摊：世界服只保存「这一刻谁在哪儿摆摊、挂了几件」这一份显示用状态，
+      /// 放进程内存，不连角色库、不改任何背包行。挂单、成交与撤单都在角色服。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.WorldStallResponse> OpenStall(global::Mmo.Proto.World.WorldStallOpenRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.WorldStallResponse> RenewStall(global::Mmo.Proto.World.WorldStallRenewRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.WorldStallResponse> CloseStall(global::Mmo.Proto.World.WorldStallCloseRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.World.ListStallsResponse> ListStalls(global::Mmo.Proto.World.ListStallsRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -924,6 +999,118 @@ namespace Mmo.Proto.World {
       {
         return CallInvoker.AsyncUnaryCall(__Method_ReleaseWorldBossSlot, null, options, request);
       }
+      /// <summary>
+      /// B5 摆摊：世界服只保存「这一刻谁在哪儿摆摊、挂了几件」这一份显示用状态，
+      /// 放进程内存，不连角色库、不改任何背包行。挂单、成交与撤单都在角色服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.WorldStallResponse OpenStall(global::Mmo.Proto.World.WorldStallOpenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return OpenStall(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B5 摆摊：世界服只保存「这一刻谁在哪儿摆摊、挂了几件」这一份显示用状态，
+      /// 放进程内存，不连角色库、不改任何背包行。挂单、成交与撤单都在角色服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.WorldStallResponse OpenStall(global::Mmo.Proto.World.WorldStallOpenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_OpenStall, null, options, request);
+      }
+      /// <summary>
+      /// B5 摆摊：世界服只保存「这一刻谁在哪儿摆摊、挂了几件」这一份显示用状态，
+      /// 放进程内存，不连角色库、不改任何背包行。挂单、成交与撤单都在角色服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.WorldStallResponse> OpenStallAsync(global::Mmo.Proto.World.WorldStallOpenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return OpenStallAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B5 摆摊：世界服只保存「这一刻谁在哪儿摆摊、挂了几件」这一份显示用状态，
+      /// 放进程内存，不连角色库、不改任何背包行。挂单、成交与撤单都在角色服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.WorldStallResponse> OpenStallAsync(global::Mmo.Proto.World.WorldStallOpenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_OpenStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.WorldStallResponse RenewStall(global::Mmo.Proto.World.WorldStallRenewRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RenewStall(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.WorldStallResponse RenewStall(global::Mmo.Proto.World.WorldStallRenewRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_RenewStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.WorldStallResponse> RenewStallAsync(global::Mmo.Proto.World.WorldStallRenewRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return RenewStallAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.WorldStallResponse> RenewStallAsync(global::Mmo.Proto.World.WorldStallRenewRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_RenewStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.WorldStallResponse CloseStall(global::Mmo.Proto.World.WorldStallCloseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CloseStall(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.WorldStallResponse CloseStall(global::Mmo.Proto.World.WorldStallCloseRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CloseStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.WorldStallResponse> CloseStallAsync(global::Mmo.Proto.World.WorldStallCloseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CloseStallAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.WorldStallResponse> CloseStallAsync(global::Mmo.Proto.World.WorldStallCloseRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CloseStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.ListStallsResponse ListStalls(global::Mmo.Proto.World.ListStallsRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListStalls(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.World.ListStallsResponse ListStalls(global::Mmo.Proto.World.ListStallsRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ListStalls, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.ListStallsResponse> ListStallsAsync(global::Mmo.Proto.World.ListStallsRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListStallsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.World.ListStallsResponse> ListStallsAsync(global::Mmo.Proto.World.ListStallsRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ListStalls, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override WorldServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -950,7 +1137,11 @@ namespace Mmo.Proto.World {
           .AddMethod(__Method_RecordWorldBossOwner, serviceImpl.RecordWorldBossOwner)
           .AddMethod(__Method_HoldWorldBossSlot, serviceImpl.HoldWorldBossSlot)
           .AddMethod(__Method_RenewWorldBossSlot, serviceImpl.RenewWorldBossSlot)
-          .AddMethod(__Method_ReleaseWorldBossSlot, serviceImpl.ReleaseWorldBossSlot).Build();
+          .AddMethod(__Method_ReleaseWorldBossSlot, serviceImpl.ReleaseWorldBossSlot)
+          .AddMethod(__Method_OpenStall, serviceImpl.OpenStall)
+          .AddMethod(__Method_RenewStall, serviceImpl.RenewStall)
+          .AddMethod(__Method_CloseStall, serviceImpl.CloseStall)
+          .AddMethod(__Method_ListStalls, serviceImpl.ListStalls).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -973,6 +1164,10 @@ namespace Mmo.Proto.World {
       serviceBinder.AddMethod(__Method_HoldWorldBossSlot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.HoldWorldBossSlotRequest, global::Mmo.Proto.World.HoldWorldBossSlotResponse>(serviceImpl.HoldWorldBossSlot));
       serviceBinder.AddMethod(__Method_RenewWorldBossSlot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.RenewWorldBossSlotRequest, global::Mmo.Proto.World.RenewWorldBossSlotResponse>(serviceImpl.RenewWorldBossSlot));
       serviceBinder.AddMethod(__Method_ReleaseWorldBossSlot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.ReleaseWorldBossSlotRequest, global::Mmo.Proto.World.ReleaseWorldBossSlotResponse>(serviceImpl.ReleaseWorldBossSlot));
+      serviceBinder.AddMethod(__Method_OpenStall, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.WorldStallOpenRequest, global::Mmo.Proto.World.WorldStallResponse>(serviceImpl.OpenStall));
+      serviceBinder.AddMethod(__Method_RenewStall, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.WorldStallRenewRequest, global::Mmo.Proto.World.WorldStallResponse>(serviceImpl.RenewStall));
+      serviceBinder.AddMethod(__Method_CloseStall, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.WorldStallCloseRequest, global::Mmo.Proto.World.WorldStallResponse>(serviceImpl.CloseStall));
+      serviceBinder.AddMethod(__Method_ListStalls, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.World.ListStallsRequest, global::Mmo.Proto.World.ListStallsResponse>(serviceImpl.ListStalls));
     }
 
   }

@@ -133,6 +133,15 @@ service CharacterService {
   // 标价、卖方、物品、税率与税额全在服务端读，客户端一个都带不进来。
   rpc SettleAuction(AuctionSettleRequest) returns (AuctionSettleResponse);
 
+  // B5 摆摊（开发架构 14.5 顺序 12）。摊位在世界服显示，开摊 / 关摊 / 上架 / 查看
+  // 这四件事落在角色服：等级门槛、格数、摊位归属与「在售几件」只有角色服有。
+  // 成交不另开一笔，仍走上面的 SettleAuction（同一套 auction_txn / auction_settlement），
+  // 税按挂单的 channel 取 config/stall.json（摆摊）或 config/auction.json（拍卖）。
+  rpc OpenStall(OpenStallRequest) returns (OpenStallResponse);
+  rpc CloseStall(CloseStallRequest) returns (CloseStallResponse);
+  rpc ListStallItem(ListStallItemRequest) returns (ListStallItemResponse);
+  rpc ViewStall(ViewStallRequest) returns (ViewStallResponse);
+
   // 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
   // 角色服在一笔事务里写买方金币、卖方净额、双方元宝与成交状态；
   // 标价、卖方、元宝币种、税率与税额全在服务端读，客户端一个都带不进来。
@@ -277,6 +286,16 @@ service CharacterService {
   rpc RecordDeserter(RecordDeserterRequest) returns (RecordDeserterResponse);
   // Q9/H4：这个角色还要等多久才能再进本。只读；没被罚过回 remaining_ms = 0。
   rpc DescribeDeserter(DescribeDeserterRequest) returns (DescribeDeserterResponse);
+
+  // B4：玩法坐骑。方案 9.4 写定普通和高级只差移动速度、商城坐骑只换外观不叠速度。
+  // 请求只带背包格号 / 角色号；档位与 speed_bps 只在 config/mount.json，
+  // 客户端带不进任何数值，也不进战斗。拒绝码见 MountResponse.reason。
+  rpc MountUp(MountUpRequest) returns (MountResponse);
+  rpc Dismount(DismountRequest) returns (MountResponse);
+  rpc DescribeMount(DescribeMountRequest) returns (DescribeMountResponse);
+  // B4：灵兽收集度与生活协助合计。只做收集 / 外观 / 生活协助，不进入伤害公式；
+  // 收集口径与外观收藏一致（背包现在持有就算），三档与加成只在 config/spirit_beast.json。
+  rpc DescribeSpiritBeast(DescribeSpiritBeastRequest) returns (DescribeSpiritBeastResponse);
 
   // Q10/I2：背包操作四条。格号从 1 起，上限取 character.json 的 bag_slots。
   // 移动：空格直接挪、两格不同物品交换、同物品在堆叠上限内合并；强化挂在背包行 id 上，
@@ -547,6 +566,9 @@ message ListInventoryResponse {
   // 只读展示名（C2）：第十段按第十场的立仙 / 立魔分路显示——立仙显示金仙、立魔显示散仙；
   // 其余境界与 realm 相同。只给屏用，门槛判定仍读 realm，不用这个字段。
   string realm_display = 5;
+  // B4：骑着的玩法坐骑相对 world.json 的 max_move_speed 再加多少万分比；没骑回 0。
+  // 世界服判地表位移上限时来问，客户端请求体带不进，也没有写入入口（骑上 / 下在下面两条）。
+  int32 mount_speed_bps = 7;
 }
 
 // Q10/I2：移动一格。来源格必须非空，目标格可以是空格、同一件物品（合并）
@@ -801,6 +823,10 @@ message AuctionSettleResponse {
   uint32 count = 11;
   string state = 12;
   bool duplicate = 13;
+  // B5：摆摊成交时带上摊位号与还剩几件，网关据此刷新世界服的显示；
+  // 拍卖成交这两个字段留空 / 0。它们只用于显示，不参与任何判定。
+  string stall_id = 14;
+  int32 live_listings = 15;
 }
 
 // 元宝寄售成交结算。全局服务转发时只带买方角色、挂单号与事务号：
@@ -2093,4 +2119,181 @@ message RepairNpcEquipmentResponse {
   int64 balance = 5;
   repeated NpcRepairRow repaired = 6;
   bool duplicate = 7;
+}
+
+// B4：玩法坐骑。只差移动速度，档位 / 加成 / 拒绝码口径见 config/mount.json。
+message MountUpRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  // 骑的是哪一格背包。
+  uint32 bag_slot = 3;
+}
+
+message DismountRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message MountResponse {
+  bool ok = 1;
+  // character_not_found / slot_empty / not_a_mount / already_mounted / mount_occupied / not_mounted。
+  string reason = 2;
+  string item_id = 3;
+  // normal / advanced，来自 config/mount.json；拒绝时回空串。
+  string tier = 4;
+  int32 speed_bps = 5;
+  uint32 bag_slot = 6;
+}
+
+message DescribeMountRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+// 背包里的一只坐骑。mounted 表示现在骑着的是这一只。
+message MountFact {
+  string item_id = 1;
+  string name = 2;
+  string tier = 3;
+  int32 speed_bps = 4;
+  uint32 bag_slot = 5;
+  bool mounted = 6;
+}
+
+message DescribeMountResponse {
+  bool found = 1;
+  // 没骑时这两个字段回空串与 0，不表示错误。
+  string equipped_item_id = 2;
+  int32 equipped_speed_bps = 3;
+  repeated MountFact owned = 4;
+}
+
+// B4：灵兽只做收集 / 外观 / 生活协助，不进入伤害公式。
+message DescribeSpiritBeastRequest {
+  string account = 1;
+  uint64 character_id = 2;
+}
+
+message SpiritBeastFact {
+  string item_id = 1;
+  string name = 2;
+  // normal / advanced / divine。
+  string tier = 3;
+  // 收集口径与外观收藏一致：背包现在持有就是 true。
+  bool collected = 4;
+  int32 life_assist_pct_bps = 5;
+}
+
+message DescribeSpiritBeastResponse {
+  bool found = 1;
+  int32 collected_count = 2;
+  int32 entry_count = 3;
+  // 收集度万分比：collected_count / entry_count * 10000。
+  int32 collection_pct_bps = 4;
+  int32 total_life_assist_pct_bps = 5;
+  string passive_kind = 6;
+  repeated SpiritBeastFact entries = 7;
+}
+
+// B5 摆摊：开摊。地表、坐标与招牌由客户端带；等级门槛、格数、税率与
+// 「一个摊主同时只开一个摊」都由角色服从库和 config/stall.json 判。
+message OpenStallRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string region_id = 3;
+  double pos_x = 4;
+  double pos_y = 5;
+  string title = 6;
+  // 由网关生成：同一个号重放只回上一次的摊位，不会开两个。
+  string txn_id = 7;
+  // 网关预先生成的摊位号；重放时按它找回同一行。
+  string stall_id = 8;
+}
+
+message OpenStallResponse {
+  // level_too_low / stall_exists / character_not_found / bad_title / region_missing
+  bool ok = 1;
+  string reason = 2;
+  string stall_id = 3;
+  string owner_name = 4;
+  string region_id = 5;
+  double pos_x = 6;
+  double pos_y = 7;
+  string title = 8;
+  int32 live_listings = 9;
+  int32 slots = 10;
+  int32 min_level = 11;
+  int32 tax_rate_pct = 12;
+}
+
+// 关摊：在售的挂单同时撤掉（state = 'cancelled'），物品不搬、仍留在卖方那一格。
+message CloseStallRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string stall_id = 3;
+  string txn_id = 4;
+}
+
+message CloseStallResponse {
+  // stall_not_found / not_owner / stall_closed
+  bool ok = 1;
+  string reason = 2;
+  string stall_id = 3;
+  int32 cancelled_listings = 4;
+}
+
+// 上架：只带摊位、背包格、数量与金币一口价。物品编号、摊主、在售件数从库里读。
+message ListStallItemRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string stall_id = 3;
+  uint32 slot = 4;
+  uint32 count = 5;
+  int64 price_gold = 6;
+  string txn_id = 7;
+}
+
+message ListStallItemResponse {
+  // stall_not_found / not_owner / stall_closed / stall_full / slot_empty /
+  // slot_listed / price_invalid / count_invalid
+  bool ok = 1;
+  string reason = 2;
+  uint64 listing_id = 3;
+  string stall_id = 4;
+  uint32 slot = 5;
+  string item_id = 6;
+  uint32 count = 7;
+  int64 price_gold = 8;
+  int32 live_listings = 9;
+  int32 slots = 10;
+}
+
+message StallListingFact {
+  uint64 listing_id = 1;
+  uint32 slot = 2;
+  string item_id = 3;
+  string item_name = 4;
+  uint32 count = 5;
+  int64 price_gold = 6;
+  bool bound = 7;
+}
+
+// 看摊：只读。买家看到的就是卖家挂上的那几行，价格与数量都由服务端读。
+message ViewStallRequest {
+  string stall_id = 1;
+}
+
+message ViewStallResponse {
+  bool found = 1;
+  string stall_id = 2;
+  uint64 owner_id = 3;
+  string owner_name = 4;
+  string region_id = 5;
+  double pos_x = 6;
+  double pos_y = 7;
+  string title = 8;
+  string state = 9;
+  int32 live_listings = 10;
+  int32 slots = 11;
+  repeated StallListingFact listings = 12;
 }

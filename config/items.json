@@ -1,7 +1,7 @@
 {
   "schema": "item-table/4",
-  "version": 7,
-  "note": "B1（v5）：加两档药材 herb_xue / herb_xuan 与四种丹 pill_qixue / pill_huiling / pill_zhuji / pill_pojing；六种丹的回复值、冷却组与档位在 config/pill.json，本表仍只写「是什么、能不能叠、到账绑不绑」。丹药一律 bind=none：方案 12.1 写定从副本 / 炼丹 / 特殊任务来，可以上拍卖；商城禁售由 shop.json 的 forbidden 列表（含 pill / herb）负责，本表不写第二份。 P3-4a2：通行证两轨的发货物在这儿：免费轨只有称号（title）与外观碎片（appearance_fragment），付费轨只有当季秘境外观（outfit）、洞府摆件（home_decor）与保护券（voucher，仍是 ticket_protect 这一件）。方案没给这些外观起名字，每季一套编号、名字全标占位，改 config/season_pass.json 换成别的编号即可；四种奖励都到账即绑（bind=always），不能上架换成金币或灵石。这些外观 / 称号 / 摆件此刻只作为「到手」的绑定事实进背包，装配与模型表现留给美术与 U 线，本表不写第二套外观数据。 bind 决定到账时是否绑定：none 不绑，on_pickup 拾取即绑（副本装备），always 到账即绑（商城买的符、券、卷轴）。绑定物品不能直接交易，解绑道具只解装备（P1-5c8）。ticket_protect 是方案 9.2 / 12.1 里唯一一种保护券：商城与通行证付费轨以后发的都是这一个编号，到账即绑、不能上架，副本和任务不产出；它只挡一次强化掉级，不加属性、不提高成功率，用的时候按物品编号认，不记来源。P1-4c：stone_transfer 是方案 9.3 与 10 章写定的转移石（巢穴产出、商城不卖），本卡只定物品与用法，掉落发货在后面的卡；sword_trade 是「不绑装备」的样本——方案 9.3 写了非绑来源转非绑目标时目标仍可交易，需要有一件到账不绑的装备可核对，制作与玩家交易在后面的卡。P1-4d：三种 crystal_* 是方案第 9 章第 3 层的攻击 / 防御 / 功能结晶，从副本掉落、商城与宗门 NPC 不卖，发货在后面的卡；robe_trial 与 ring_trial 是护甲、饰品部位的装备样本，用来核对「部位不对的结晶被拒绝」。装备部位归属与结晶类别 / 固定值在 config/crystal.json，不在本表另写一套。 P2-4a：装备带 weapon_kind 与 require_level；不到 15 级的武器全职业可装备，15 级起只能用本职业兵器。 K4：补上 npc_shop.json 早已引用、但此前只在 K5 / B1 计划里的 5 件（tool_pickaxe / tool_hoe / bag_basic / pill_rejuvenate / pill_focus）；这里只给 id / name / kind / stack_max / bind，grade / set_id / icon / desc 已由 K5 补（effect 与数值仍归 B1），价格仍只在 npc_shop.json。 K5（v1.164）：全表加 grade / set_id / desc 三个字段（v1.172 修正：icon 不进配置，见下句），schema 升到 item-table/4。 grade 只认 white / green / blue / purple / orange / red，装备必须有品阶，材料与结晶 / 称号 / 外观这几类可以留空； set_id 现在全表留空，等 B2「装备品阶与套装」定套装件数与效果后再填，字段已在、不用再回填 39 件； 图标地址不进本表：第 17 节 17.1 写定 config 里没有美术字段，客户端按 icon/<物品编号> 自己拼（纯命名约定，文件名即 AB 地址，见 17.2 第 3 条），换图不改配置、也不动服务端；desc 是给背包与提示看的说明。 sword_trade 的编号不变（改编号会打断已有引用），中文名改「行商长刀」、weapon_kind 改 saber； 另补一件 15 级法剑 spirit_sword_trade（weapon_kind=spirit_sword）：W1 把法师 / 牧师本命兵器改成 staff / spirit_sword 之前，还没有职业能在 15 级穿它，这是 W1 的落点，本表只落物品。 装备部位仍只在 crystal.json 的 equipment_parts 一处，items.json 不写第二份 part；价格仍只在 shop.json / npc_shop.json / 配方表。 B7+B8（v6）：商城五类外观与洞府的发货物补齐——新增 skin_weapon_s1 / skin_realm_jinxian / trail_flight_s1 / skin_mount_s1 四件占位外观，服饰复用 outfit_s1、洞府复用 decor_s1；五类外观与洞府摆件一律 bind=always、stack_max=1，到账即进背包、也就是进外观收藏（收藏是背包并集只读视图）。背包扩容不发物品，走 shop.json 的 bag_expand 发货方式，加格落 character.bag_expand_count。 B2（v7）：品阶与套装落地——新增 54 件装备（六档 × 每档 3 套 × 每套 3 件：武器 / 衣服 / 饰品），六档与各档基准攻击在 config/grades.json，套装与 2 件 / 3 件加成在 config/sets.json，本表只写「这件是什么、穿在哪、攻击多少、属哪套」。武器按道给 saber / staff / bow 三种，其余 5 种兵器（长枪 / 重锤 / 斧 / 法剑 / 弩）的同档套装武器是内容欠项，归 B15。新装备一律 bind=on_pickup（方案 12：副本掉落的装备首次拾取绑定）；原有 52 件的 set_id 保持空串（试炼与行商是非套装起步装）。",
+  "version": 8,
+  "note": "B1（v5）：加两档药材 herb_xue / herb_xuan 与四种丹 pill_qixue / pill_huiling / pill_zhuji / pill_pojing；六种丹的回复值、冷却组与档位在 config/pill.json，本表仍只写「是什么、能不能叠、到账绑不绑」。丹药一律 bind=none：方案 12.1 写定从副本 / 炼丹 / 特殊任务来，可以上拍卖；商城禁售由 shop.json 的 forbidden 列表（含 pill / herb）负责，本表不写第二份。 P3-4a2：通行证两轨的发货物在这儿：免费轨只有称号（title）与外观碎片（appearance_fragment），付费轨只有当季秘境外观（outfit）、洞府摆件（home_decor）与保护券（voucher，仍是 ticket_protect 这一件）。方案没给这些外观起名字，每季一套编号、名字全标占位，改 config/season_pass.json 换成别的编号即可；四种奖励都到账即绑（bind=always），不能上架换成金币或灵石。这些外观 / 称号 / 摆件此刻只作为「到手」的绑定事实进背包，装配与模型表现留给美术与 U 线，本表不写第二套外观数据。 bind 决定到账时是否绑定：none 不绑，on_pickup 拾取即绑（副本装备），always 到账即绑（商城买的符、券、卷轴）。绑定物品不能直接交易，解绑道具只解装备（P1-5c8）。ticket_protect 是方案 9.2 / 12.1 里唯一一种保护券：商城与通行证付费轨以后发的都是这一个编号，到账即绑、不能上架，副本和任务不产出；它只挡一次强化掉级，不加属性、不提高成功率，用的时候按物品编号认，不记来源。P1-4c：stone_transfer 是方案 9.3 与 10 章写定的转移石（巢穴产出、商城不卖），本卡只定物品与用法，掉落发货在后面的卡；sword_trade 是「不绑装备」的样本——方案 9.3 写了非绑来源转非绑目标时目标仍可交易，需要有一件到账不绑的装备可核对，制作与玩家交易在后面的卡。P1-4d：三种 crystal_* 是方案第 9 章第 3 层的攻击 / 防御 / 功能结晶，从副本掉落、商城与宗门 NPC 不卖，发货在后面的卡；robe_trial 与 ring_trial 是护甲、饰品部位的装备样本，用来核对「部位不对的结晶被拒绝」。装备部位归属与结晶类别 / 固定值在 config/crystal.json，不在本表另写一套。 P2-4a：装备带 weapon_kind 与 require_level；不到 15 级的武器全职业可装备，15 级起只能用本职业兵器。 K4：补上 npc_shop.json 早已引用、但此前只在 K5 / B1 计划里的 5 件（tool_pickaxe / tool_hoe / bag_basic / pill_rejuvenate / pill_focus）；这里只给 id / name / kind / stack_max / bind，grade / set_id / icon / desc 已由 K5 补（effect 与数值仍归 B1），价格仍只在 npc_shop.json。 K5（v1.164）：全表加 grade / set_id / desc 三个字段（v1.172 修正：icon 不进配置，见下句），schema 升到 item-table/4。 grade 只认 white / green / blue / purple / orange / red，装备必须有品阶，材料与结晶 / 称号 / 外观这几类可以留空； set_id 现在全表留空，等 B2「装备品阶与套装」定套装件数与效果后再填，字段已在、不用再回填 39 件； 图标地址不进本表：第 17 节 17.1 写定 config 里没有美术字段，客户端按 icon/<物品编号> 自己拼（纯命名约定，文件名即 AB 地址，见 17.2 第 3 条），换图不改配置、也不动服务端；desc 是给背包与提示看的说明。 sword_trade 的编号不变（改编号会打断已有引用），中文名改「行商长刀」、weapon_kind 改 saber； 另补一件 15 级法剑 spirit_sword_trade（weapon_kind=spirit_sword）：W1 把法师 / 牧师本命兵器改成 staff / spirit_sword 之前，还没有职业能在 15 级穿它，这是 W1 的落点，本表只落物品。 装备部位仍只在 crystal.json 的 equipment_parts 一处，items.json 不写第二份 part；价格仍只在 shop.json / npc_shop.json / 配方表。 B7+B8（v6）：商城五类外观与洞府的发货物补齐——新增 skin_weapon_s1 / skin_realm_jinxian / trail_flight_s1 / skin_mount_s1 四件占位外观，服饰复用 outfit_s1、洞府复用 decor_s1；五类外观与洞府摆件一律 bind=always、stack_max=1，到账即进背包、也就是进外观收藏（收藏是背包并集只读视图）。背包扩容不发物品，走 shop.json 的 bag_expand 发货方式，加格落 character.bag_expand_count。 B2（v7）：品阶与套装落地——新增 54 件装备（六档 × 每档 3 套 × 每套 3 件：武器 / 衣服 / 饰品），六档与各档基准攻击在 config/grades.json，套装与 2 件 / 3 件加成在 config/sets.json，本表只写「这件是什么、穿在哪、攻击多少、属哪套」。武器按道给 saber / staff / bow 三种，其余 5 种兵器（长枪 / 重锤 / 斧 / 法剑 / 弩）的同档套装武器是内容欠项，归 B15。新装备一律 bind=on_pickup（方案 12：副本掉落的装备首次拾取绑定）；原有 52 件的 set_id 保持空串（试炼与行商是非套装起步装）。 B4（v8）：坐骑与灵兽各落 4 + 6 件物品——kind=mount 是玩法坐骑（普通 / 高级只差移动速度，速度在 config/mount.json），kind=spirit_beast 是灵兽（只做收集 / 外观 / 生活协助，加成在 config/spirit_beast.json）；两类都 stack_max=1、bind=always，没有 grade / slot / attack / set_id，也不进商城（12.1：商城坐骑只换外观，玩法坐骑的速度差不在商城）；沿用 B7+B8 的 skin_mount_s1 是外观，与这四件玩法坐骑是两种东西，不互相顶替。",
   "items": [
     {
       "id": "ore_iron",
@@ -1262,6 +1262,106 @@
       "stack_max": 1,
       "bind": "on_pickup",
       "desc": "B2：天罡套的羽环。红档，饰品部位，80 级可用。"
+    },
+    {
+      "id": "mount_luyun",
+      "name": "踏云驹（占位）",
+      "kind": "mount",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：普通档玩法坐骑占位。只差移动速度，速度见 config/mount.json，不进战斗。"
+    },
+    {
+      "id": "mount_qingjiao",
+      "name": "青角鹿（占位）",
+      "kind": "mount",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：普通档玩法坐骑占位。只差移动速度，速度见 config/mount.json，不进战斗。"
+    },
+    {
+      "id": "mount_liuyan",
+      "name": "流焰狮（占位）",
+      "kind": "mount",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：高级档玩法坐骑占位。比普通档快一档，速度见 config/mount.json，不进战斗。"
+    },
+    {
+      "id": "mount_jiuxiao",
+      "name": "九霄鹤（占位）",
+      "kind": "mount",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：高级档玩法坐骑占位。比普通档快一档，速度见 config/mount.json，不进战斗。"
+    },
+    {
+      "id": "beast_tuanyuan",
+      "name": "团绒（占位）",
+      "kind": "spirit_beast",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：普通档灵兽占位。只做收集 / 外观 / 生活协助，不进伤害公式。"
+    },
+    {
+      "id": "beast_moyu",
+      "name": "墨羽（占位）",
+      "kind": "spirit_beast",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：普通档灵兽占位。只做收集 / 外观 / 生活协助，不进伤害公式。"
+    },
+    {
+      "id": "beast_xuanlu",
+      "name": "玄鹿（占位）",
+      "kind": "spirit_beast",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：高级档灵兽占位。只做收集 / 外观 / 生活协助，不进伤害公式。"
+    },
+    {
+      "id": "beast_lingxi",
+      "name": "灵犀（占位）",
+      "kind": "spirit_beast",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：高级档灵兽占位。只做收集 / 外观 / 生活协助，不进伤害公式。"
+    },
+    {
+      "id": "beast_yunhe",
+      "name": "云鹤（占位）",
+      "kind": "spirit_beast",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：神兽档灵兽占位。只做收集 / 外观 / 生活协助，不进伤害公式。"
+    },
+    {
+      "id": "beast_jiuwei",
+      "name": "九尾（占位）",
+      "kind": "spirit_beast",
+      "grade": "",
+      "set_id": "",
+      "stack_max": 1,
+      "bind": "always",
+      "desc": "B4：神兽档灵兽占位。只做收集 / 外观 / 生活协助，不进伤害公式。"
     }
   ]
 }

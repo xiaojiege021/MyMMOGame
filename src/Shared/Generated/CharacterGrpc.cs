@@ -119,6 +119,22 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionSettleResponse> __Marshaller_mmo_character_AuctionSettleResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionSettleResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.OpenStallRequest> __Marshaller_mmo_character_OpenStallRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.OpenStallRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.OpenStallResponse> __Marshaller_mmo_character_OpenStallResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.OpenStallResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CloseStallRequest> __Marshaller_mmo_character_CloseStallRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CloseStallRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.CloseStallResponse> __Marshaller_mmo_character_CloseStallResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CloseStallResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ListStallItemRequest> __Marshaller_mmo_character_ListStallItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ListStallItemRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ListStallItemResponse> __Marshaller_mmo_character_ListStallItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ListStallItemResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ViewStallRequest> __Marshaller_mmo_character_ViewStallRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ViewStallRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ViewStallResponse> __Marshaller_mmo_character_ViewStallResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ViewStallResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionIngotSettleRequest> __Marshaller_mmo_character_AuctionIngotSettleRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionIngotSettleRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AuctionIngotSettleResponse> __Marshaller_mmo_character_AuctionIngotSettleResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AuctionIngotSettleResponse.Parser));
@@ -299,6 +315,20 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeDeserterResponse> __Marshaller_mmo_character_DescribeDeserterResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeDeserterResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.MountUpRequest> __Marshaller_mmo_character_MountUpRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.MountUpRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.MountResponse> __Marshaller_mmo_character_MountResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.MountResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DismountRequest> __Marshaller_mmo_character_DismountRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DismountRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeMountRequest> __Marshaller_mmo_character_DescribeMountRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeMountRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeMountResponse> __Marshaller_mmo_character_DescribeMountResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeMountResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeSpiritBeastRequest> __Marshaller_mmo_character_DescribeSpiritBeastRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeSpiritBeastRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeSpiritBeastResponse> __Marshaller_mmo_character_DescribeSpiritBeastResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeSpiritBeastResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.MoveItemRequest> __Marshaller_mmo_character_MoveItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.MoveItemRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.MoveItemResponse> __Marshaller_mmo_character_MoveItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.MoveItemResponse.Parser));
@@ -458,6 +488,38 @@ namespace Mmo.Proto.Character {
         "SettleAuction",
         __Marshaller_mmo_character_AuctionSettleRequest,
         __Marshaller_mmo_character_AuctionSettleResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.OpenStallRequest, global::Mmo.Proto.Character.OpenStallResponse> __Method_OpenStall = new grpc::Method<global::Mmo.Proto.Character.OpenStallRequest, global::Mmo.Proto.Character.OpenStallResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "OpenStall",
+        __Marshaller_mmo_character_OpenStallRequest,
+        __Marshaller_mmo_character_OpenStallResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.CloseStallRequest, global::Mmo.Proto.Character.CloseStallResponse> __Method_CloseStall = new grpc::Method<global::Mmo.Proto.Character.CloseStallRequest, global::Mmo.Proto.Character.CloseStallResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CloseStall",
+        __Marshaller_mmo_character_CloseStallRequest,
+        __Marshaller_mmo_character_CloseStallResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ListStallItemRequest, global::Mmo.Proto.Character.ListStallItemResponse> __Method_ListStallItem = new grpc::Method<global::Mmo.Proto.Character.ListStallItemRequest, global::Mmo.Proto.Character.ListStallItemResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ListStallItem",
+        __Marshaller_mmo_character_ListStallItemRequest,
+        __Marshaller_mmo_character_ListStallItemResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ViewStallRequest, global::Mmo.Proto.Character.ViewStallResponse> __Method_ViewStall = new grpc::Method<global::Mmo.Proto.Character.ViewStallRequest, global::Mmo.Proto.Character.ViewStallResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ViewStall",
+        __Marshaller_mmo_character_ViewStallRequest,
+        __Marshaller_mmo_character_ViewStallResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse> __Method_SettleIngot = new grpc::Method<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse>(
@@ -820,6 +882,38 @@ namespace Mmo.Proto.Character {
         __Marshaller_mmo_character_DescribeDeserterResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.MountUpRequest, global::Mmo.Proto.Character.MountResponse> __Method_MountUp = new grpc::Method<global::Mmo.Proto.Character.MountUpRequest, global::Mmo.Proto.Character.MountResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "MountUp",
+        __Marshaller_mmo_character_MountUpRequest,
+        __Marshaller_mmo_character_MountResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DismountRequest, global::Mmo.Proto.Character.MountResponse> __Method_Dismount = new grpc::Method<global::Mmo.Proto.Character.DismountRequest, global::Mmo.Proto.Character.MountResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Dismount",
+        __Marshaller_mmo_character_DismountRequest,
+        __Marshaller_mmo_character_MountResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeMountRequest, global::Mmo.Proto.Character.DescribeMountResponse> __Method_DescribeMount = new grpc::Method<global::Mmo.Proto.Character.DescribeMountRequest, global::Mmo.Proto.Character.DescribeMountResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeMount",
+        __Marshaller_mmo_character_DescribeMountRequest,
+        __Marshaller_mmo_character_DescribeMountResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeSpiritBeastRequest, global::Mmo.Proto.Character.DescribeSpiritBeastResponse> __Method_DescribeSpiritBeast = new grpc::Method<global::Mmo.Proto.Character.DescribeSpiritBeastRequest, global::Mmo.Proto.Character.DescribeSpiritBeastResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeSpiritBeast",
+        __Marshaller_mmo_character_DescribeSpiritBeastRequest,
+        __Marshaller_mmo_character_DescribeSpiritBeastResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.MoveItemRequest, global::Mmo.Proto.Character.MoveItemResponse> __Method_MoveItem = new grpc::Method<global::Mmo.Proto.Character.MoveItemRequest, global::Mmo.Proto.Character.MoveItemResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
@@ -1081,6 +1175,39 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AuctionSettleResponse> SettleAuction(global::Mmo.Proto.Character.AuctionSettleRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B5 摆摊（开发架构 14.5 顺序 12）。摊位在世界服显示，开摊 / 关摊 / 上架 / 查看
+      /// 这四件事落在角色服：等级门槛、格数、摊位归属与「在售几件」只有角色服有。
+      /// 成交不另开一笔，仍走上面的 SettleAuction（同一套 auction_txn / auction_settlement），
+      /// 税按挂单的 channel 取 config/stall.json（摆摊）或 config/auction.json（拍卖）。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.OpenStallResponse> OpenStall(global::Mmo.Proto.Character.OpenStallRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CloseStallResponse> CloseStall(global::Mmo.Proto.Character.CloseStallRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ListStallItemResponse> ListStallItem(global::Mmo.Proto.Character.ListStallItemRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ViewStallResponse> ViewStall(global::Mmo.Proto.Character.ViewStallRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -1634,6 +1761,45 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeDeserterResponse> DescribeDeserter(global::Mmo.Proto.Character.DescribeDeserterRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B4：玩法坐骑。方案 9.4 写定普通和高级只差移动速度、商城坐骑只换外观不叠速度。
+      /// 请求只带背包格号 / 角色号；档位与 speed_bps 只在 config/mount.json，
+      /// 客户端带不进任何数值，也不进战斗。拒绝码见 MountResponse.reason。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.MountResponse> MountUp(global::Mmo.Proto.Character.MountUpRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.MountResponse> Dismount(global::Mmo.Proto.Character.DismountRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeMountResponse> DescribeMount(global::Mmo.Proto.Character.DescribeMountRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B4：灵兽收集度与生活协助合计。只做收集 / 外观 / 生活协助，不进入伤害公式；
+      /// 收集口径与外观收藏一致（背包现在持有就算），三档与加成只在 config/spirit_beast.json。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeSpiritBeastResponse> DescribeSpiritBeast(global::Mmo.Proto.Character.DescribeSpiritBeastRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -2608,6 +2774,126 @@ namespace Mmo.Proto.Character {
       public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AuctionSettleResponse> SettleAuctionAsync(global::Mmo.Proto.Character.AuctionSettleRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_SettleAuction, null, options, request);
+      }
+      /// <summary>
+      /// B5 摆摊（开发架构 14.5 顺序 12）。摊位在世界服显示，开摊 / 关摊 / 上架 / 查看
+      /// 这四件事落在角色服：等级门槛、格数、摊位归属与「在售几件」只有角色服有。
+      /// 成交不另开一笔，仍走上面的 SettleAuction（同一套 auction_txn / auction_settlement），
+      /// 税按挂单的 channel 取 config/stall.json（摆摊）或 config/auction.json（拍卖）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.OpenStallResponse OpenStall(global::Mmo.Proto.Character.OpenStallRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return OpenStall(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B5 摆摊（开发架构 14.5 顺序 12）。摊位在世界服显示，开摊 / 关摊 / 上架 / 查看
+      /// 这四件事落在角色服：等级门槛、格数、摊位归属与「在售几件」只有角色服有。
+      /// 成交不另开一笔，仍走上面的 SettleAuction（同一套 auction_txn / auction_settlement），
+      /// 税按挂单的 channel 取 config/stall.json（摆摊）或 config/auction.json（拍卖）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.OpenStallResponse OpenStall(global::Mmo.Proto.Character.OpenStallRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_OpenStall, null, options, request);
+      }
+      /// <summary>
+      /// B5 摆摊（开发架构 14.5 顺序 12）。摊位在世界服显示，开摊 / 关摊 / 上架 / 查看
+      /// 这四件事落在角色服：等级门槛、格数、摊位归属与「在售几件」只有角色服有。
+      /// 成交不另开一笔，仍走上面的 SettleAuction（同一套 auction_txn / auction_settlement），
+      /// 税按挂单的 channel 取 config/stall.json（摆摊）或 config/auction.json（拍卖）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.OpenStallResponse> OpenStallAsync(global::Mmo.Proto.Character.OpenStallRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return OpenStallAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B5 摆摊（开发架构 14.5 顺序 12）。摊位在世界服显示，开摊 / 关摊 / 上架 / 查看
+      /// 这四件事落在角色服：等级门槛、格数、摊位归属与「在售几件」只有角色服有。
+      /// 成交不另开一笔，仍走上面的 SettleAuction（同一套 auction_txn / auction_settlement），
+      /// 税按挂单的 channel 取 config/stall.json（摆摊）或 config/auction.json（拍卖）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.OpenStallResponse> OpenStallAsync(global::Mmo.Proto.Character.OpenStallRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_OpenStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CloseStallResponse CloseStall(global::Mmo.Proto.Character.CloseStallRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CloseStall(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.CloseStallResponse CloseStall(global::Mmo.Proto.Character.CloseStallRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CloseStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CloseStallResponse> CloseStallAsync(global::Mmo.Proto.Character.CloseStallRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CloseStallAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.CloseStallResponse> CloseStallAsync(global::Mmo.Proto.Character.CloseStallRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CloseStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ListStallItemResponse ListStallItem(global::Mmo.Proto.Character.ListStallItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListStallItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ListStallItemResponse ListStallItem(global::Mmo.Proto.Character.ListStallItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ListStallItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ListStallItemResponse> ListStallItemAsync(global::Mmo.Proto.Character.ListStallItemRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListStallItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ListStallItemResponse> ListStallItemAsync(global::Mmo.Proto.Character.ListStallItemRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ListStallItem, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ViewStallResponse ViewStall(global::Mmo.Proto.Character.ViewStallRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ViewStall(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ViewStallResponse ViewStall(global::Mmo.Proto.Character.ViewStallRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ViewStall, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ViewStallResponse> ViewStallAsync(global::Mmo.Proto.Character.ViewStallRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ViewStallAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ViewStallResponse> ViewStallAsync(global::Mmo.Proto.Character.ViewStallRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ViewStall, null, options, request);
       }
       /// <summary>
       /// 元宝寄售成交结算（开发架构第 14 节第 40 行）。全局服务转过来，
@@ -4798,6 +5084,154 @@ namespace Mmo.Proto.Character {
         return CallInvoker.AsyncUnaryCall(__Method_DescribeDeserter, null, options, request);
       }
       /// <summary>
+      /// B4：玩法坐骑。方案 9.4 写定普通和高级只差移动速度、商城坐骑只换外观不叠速度。
+      /// 请求只带背包格号 / 角色号；档位与 speed_bps 只在 config/mount.json，
+      /// 客户端带不进任何数值，也不进战斗。拒绝码见 MountResponse.reason。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.MountResponse MountUp(global::Mmo.Proto.Character.MountUpRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return MountUp(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B4：玩法坐骑。方案 9.4 写定普通和高级只差移动速度、商城坐骑只换外观不叠速度。
+      /// 请求只带背包格号 / 角色号；档位与 speed_bps 只在 config/mount.json，
+      /// 客户端带不进任何数值，也不进战斗。拒绝码见 MountResponse.reason。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.MountResponse MountUp(global::Mmo.Proto.Character.MountUpRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_MountUp, null, options, request);
+      }
+      /// <summary>
+      /// B4：玩法坐骑。方案 9.4 写定普通和高级只差移动速度、商城坐骑只换外观不叠速度。
+      /// 请求只带背包格号 / 角色号；档位与 speed_bps 只在 config/mount.json，
+      /// 客户端带不进任何数值，也不进战斗。拒绝码见 MountResponse.reason。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.MountResponse> MountUpAsync(global::Mmo.Proto.Character.MountUpRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return MountUpAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B4：玩法坐骑。方案 9.4 写定普通和高级只差移动速度、商城坐骑只换外观不叠速度。
+      /// 请求只带背包格号 / 角色号；档位与 speed_bps 只在 config/mount.json，
+      /// 客户端带不进任何数值，也不进战斗。拒绝码见 MountResponse.reason。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.MountResponse> MountUpAsync(global::Mmo.Proto.Character.MountUpRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_MountUp, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.MountResponse Dismount(global::Mmo.Proto.Character.DismountRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return Dismount(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.MountResponse Dismount(global::Mmo.Proto.Character.DismountRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_Dismount, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.MountResponse> DismountAsync(global::Mmo.Proto.Character.DismountRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DismountAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.MountResponse> DismountAsync(global::Mmo.Proto.Character.DismountRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_Dismount, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeMountResponse DescribeMount(global::Mmo.Proto.Character.DescribeMountRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeMount(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeMountResponse DescribeMount(global::Mmo.Proto.Character.DescribeMountRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeMount, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeMountResponse> DescribeMountAsync(global::Mmo.Proto.Character.DescribeMountRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeMountAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeMountResponse> DescribeMountAsync(global::Mmo.Proto.Character.DescribeMountRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeMount, null, options, request);
+      }
+      /// <summary>
+      /// B4：灵兽收集度与生活协助合计。只做收集 / 外观 / 生活协助，不进入伤害公式；
+      /// 收集口径与外观收藏一致（背包现在持有就算），三档与加成只在 config/spirit_beast.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeSpiritBeastResponse DescribeSpiritBeast(global::Mmo.Proto.Character.DescribeSpiritBeastRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSpiritBeast(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B4：灵兽收集度与生活协助合计。只做收集 / 外观 / 生活协助，不进入伤害公式；
+      /// 收集口径与外观收藏一致（背包现在持有就算），三档与加成只在 config/spirit_beast.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeSpiritBeastResponse DescribeSpiritBeast(global::Mmo.Proto.Character.DescribeSpiritBeastRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeSpiritBeast, null, options, request);
+      }
+      /// <summary>
+      /// B4：灵兽收集度与生活协助合计。只做收集 / 外观 / 生活协助，不进入伤害公式；
+      /// 收集口径与外观收藏一致（背包现在持有就算），三档与加成只在 config/spirit_beast.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeSpiritBeastResponse> DescribeSpiritBeastAsync(global::Mmo.Proto.Character.DescribeSpiritBeastRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeSpiritBeastAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B4：灵兽收集度与生活协助合计。只做收集 / 外观 / 生活协助，不进入伤害公式；
+      /// 收集口径与外观收藏一致（背包现在持有就算），三档与加成只在 config/spirit_beast.json。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeSpiritBeastResponse> DescribeSpiritBeastAsync(global::Mmo.Proto.Character.DescribeSpiritBeastRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeSpiritBeast, null, options, request);
+      }
+      /// <summary>
       /// Q10/I2：背包操作四条。格号从 1 起，上限取 character.json 的 bag_slots。
       /// 移动：空格直接挪、两格不同物品交换、同物品在堆叠上限内合并；强化挂在背包行 id 上，
       /// 这里只改 slot，所以不丢也不串。合并会删掉来源行，来源行有强化就直接拒绝。
@@ -5045,6 +5479,10 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_InstallCrystal, serviceImpl.InstallCrystal)
           .AddMethod(__Method_RemoveCrystal, serviceImpl.RemoveCrystal)
           .AddMethod(__Method_SettleAuction, serviceImpl.SettleAuction)
+          .AddMethod(__Method_OpenStall, serviceImpl.OpenStall)
+          .AddMethod(__Method_CloseStall, serviceImpl.CloseStall)
+          .AddMethod(__Method_ListStallItem, serviceImpl.ListStallItem)
+          .AddMethod(__Method_ViewStall, serviceImpl.ViewStall)
           .AddMethod(__Method_SettleIngot, serviceImpl.SettleIngot)
           .AddMethod(__Method_BuyShopItem, serviceImpl.BuyShopItem)
           .AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl.BuyHomeCoinShopItem)
@@ -5090,6 +5528,10 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_CompleteCityTask, serviceImpl.CompleteCityTask)
           .AddMethod(__Method_RecordDeserter, serviceImpl.RecordDeserter)
           .AddMethod(__Method_DescribeDeserter, serviceImpl.DescribeDeserter)
+          .AddMethod(__Method_MountUp, serviceImpl.MountUp)
+          .AddMethod(__Method_Dismount, serviceImpl.Dismount)
+          .AddMethod(__Method_DescribeMount, serviceImpl.DescribeMount)
+          .AddMethod(__Method_DescribeSpiritBeast, serviceImpl.DescribeSpiritBeast)
           .AddMethod(__Method_MoveItem, serviceImpl.MoveItem)
           .AddMethod(__Method_DiscardItem, serviceImpl.DiscardItem)
           .AddMethod(__Method_SortInventory, serviceImpl.SortInventory)
@@ -5121,6 +5563,10 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_InstallCrystal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.InstallCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(serviceImpl.InstallCrystal));
       serviceBinder.AddMethod(__Method_RemoveCrystal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RemoveCrystalRequest, global::Mmo.Proto.Character.CrystalResponse>(serviceImpl.RemoveCrystal));
       serviceBinder.AddMethod(__Method_SettleAuction, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionSettleRequest, global::Mmo.Proto.Character.AuctionSettleResponse>(serviceImpl.SettleAuction));
+      serviceBinder.AddMethod(__Method_OpenStall, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.OpenStallRequest, global::Mmo.Proto.Character.OpenStallResponse>(serviceImpl.OpenStall));
+      serviceBinder.AddMethod(__Method_CloseStall, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CloseStallRequest, global::Mmo.Proto.Character.CloseStallResponse>(serviceImpl.CloseStall));
+      serviceBinder.AddMethod(__Method_ListStallItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ListStallItemRequest, global::Mmo.Proto.Character.ListStallItemResponse>(serviceImpl.ListStallItem));
+      serviceBinder.AddMethod(__Method_ViewStall, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ViewStallRequest, global::Mmo.Proto.Character.ViewStallResponse>(serviceImpl.ViewStall));
       serviceBinder.AddMethod(__Method_SettleIngot, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AuctionIngotSettleRequest, global::Mmo.Proto.Character.AuctionIngotSettleResponse>(serviceImpl.SettleIngot));
       serviceBinder.AddMethod(__Method_BuyShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyShopItemRequest, global::Mmo.Proto.Character.BuyShopItemResponse>(serviceImpl.BuyShopItem));
       serviceBinder.AddMethod(__Method_BuyHomeCoinShopItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.BuyHomeCoinShopRequest, global::Mmo.Proto.Character.BuyHomeCoinShopResponse>(serviceImpl.BuyHomeCoinShopItem));
@@ -5166,6 +5612,10 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_CompleteCityTask, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CompleteCityTaskRequest, global::Mmo.Proto.Character.CompleteCityTaskResponse>(serviceImpl.CompleteCityTask));
       serviceBinder.AddMethod(__Method_RecordDeserter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.RecordDeserterRequest, global::Mmo.Proto.Character.RecordDeserterResponse>(serviceImpl.RecordDeserter));
       serviceBinder.AddMethod(__Method_DescribeDeserter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeDeserterRequest, global::Mmo.Proto.Character.DescribeDeserterResponse>(serviceImpl.DescribeDeserter));
+      serviceBinder.AddMethod(__Method_MountUp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.MountUpRequest, global::Mmo.Proto.Character.MountResponse>(serviceImpl.MountUp));
+      serviceBinder.AddMethod(__Method_Dismount, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DismountRequest, global::Mmo.Proto.Character.MountResponse>(serviceImpl.Dismount));
+      serviceBinder.AddMethod(__Method_DescribeMount, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeMountRequest, global::Mmo.Proto.Character.DescribeMountResponse>(serviceImpl.DescribeMount));
+      serviceBinder.AddMethod(__Method_DescribeSpiritBeast, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeSpiritBeastRequest, global::Mmo.Proto.Character.DescribeSpiritBeastResponse>(serviceImpl.DescribeSpiritBeast));
       serviceBinder.AddMethod(__Method_MoveItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.MoveItemRequest, global::Mmo.Proto.Character.MoveItemResponse>(serviceImpl.MoveItem));
       serviceBinder.AddMethod(__Method_DiscardItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DiscardItemRequest, global::Mmo.Proto.Character.DiscardItemResponse>(serviceImpl.DiscardItem));
       serviceBinder.AddMethod(__Method_SortInventory, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SortInventoryRequest, global::Mmo.Proto.Character.SortInventoryResponse>(serviceImpl.SortInventory));

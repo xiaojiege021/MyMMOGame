@@ -69,6 +69,10 @@ message BuyAuctionResponse {
   uint32 count = 11;
   string state = 12;
   bool duplicate = 13;
+  // B5：摆摊挂单成交时带上摊位号与还剩几件，网关据此刷新世界服的显示；
+  // 拍卖成交这两个字段留空 / 0，只用于显示，不参与判定。
+  string stall_id = 14;
+  int32 live_listings = 15;
 }
 
 // 元宝寄售挂单：只带卖方角色、要挂的元宝数量与金币总价。
