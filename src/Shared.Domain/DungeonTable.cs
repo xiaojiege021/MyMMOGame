@@ -27,7 +27,8 @@ public sealed record DungeonDef(
     int EntriesPerWeek,
     int RewardPerPlayer,
     string? Realm = null,
-    long Drill = 0)
+    long Drill = 0,
+    string? BossId = null)
 {
     public bool IsHard => Tier == "hard";
 }
@@ -235,6 +236,15 @@ public sealed class DungeonTable
                 throw new ConfigException("副本 " + id + " 的 drill 不能是负数");
             }
 
+            // B15：副本与首领的绑定。写的是怪物表里的 boss 编号（tier=boss），
+            // 内容层按它枚举「这个副本的首领是谁」；本表不搬数值，战斗场次参数
+            // 仍在 config/battle.json，两边交叉校验由战斗服启动时做。
+            var bossId = (item.BossId ?? "").Trim();
+            if (item.BossId is not null && bossId.Length == 0)
+            {
+                throw new ConfigException("副本 " + id + " 的 boss_id 不能为空；没有首领就不写这个字段");
+            }
+
             map[id] = new DungeonDef(
                 id,
                 (item.Name ?? id).Trim(),
@@ -247,7 +257,8 @@ public sealed class DungeonTable
                 entriesPerWeek,
                 rewardPerPlayer,
                 realm.Length == 0 ? null : realm,
-                item.Drill ?? 0);
+                item.Drill ?? 0,
+                bossId.Length == 0 ? null : bossId);
         }
 
         if (map.Count == 0)
@@ -323,5 +334,10 @@ public sealed class DungeonTable
         // 缺省 0 只表示这一条还没配，不抬高旧卡的临时副本表。
         [JsonPropertyName("drill")]
         public long? Drill { get; init; }
+
+        // B15：这个副本的首领，指向 config/monsters.json 里 tier=boss 的那一条。
+        // 不写表示这一条还没定首领（例如等境界开关的元婴深渊）。
+        [JsonPropertyName("boss_id")]
+        public string? BossId { get; init; }
     }
 }

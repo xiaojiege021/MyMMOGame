@@ -6,8 +6,13 @@ namespace Mmo.Shared.Domain;
 /// <summary>一条掉落：物品编号 + 数量 + 概率。物品本体在 config/items.json。</summary>
 public sealed record MonsterDropDef(string ItemId, int Count, int ChancePct);
 
-/// <summary>地表刷怪点：在哪块地表、什么坐标、多久刷一次。</summary>
-public sealed record MonsterSpawnDef(string Region, double X, double Y, double Z, int RespawnS);
+/// <summary>
+/// 地表刷怪点：在哪块地表、什么坐标、多久刷一次、同点几只。
+/// B15 起带 <c>count</c>：一个刷怪点是「一组怪」，同点一次刷出 Count 只，
+/// 缺省 1；客户端按组摆点，服务端只读这一个数字，不在代码里写第二份。
+/// </summary>
+public sealed record MonsterSpawnDef(
+    string Region, double X, double Y, double Z, int RespawnS, int Count = 1);
 
 /// <summary>
 /// 一只怪物：编号、名字、等级、档位、三项基础数值、技能编号、掉落与刷怪点。
@@ -184,8 +189,18 @@ public sealed class MonsterTable
                 {
                     throw new ConfigException(path + "：怪物 " + id + " 的 respawn_s 要在 1..86400 之间");
                 }
+                // B15：一个刷怪点是一组怪。count 是必填字段（配置缺字段起不来，不给代码兜底），
+                // 上限 20：方案没写定组的大小，写多了会和地表容量打架，先卡一个结构上限。
+                var groupCount = monster.Spawn.Count ?? 0;
+                if (groupCount is < 1 or > 20)
+                {
+                    throw new ConfigException(
+                        path + "：怪物 " + id + " 的 spawn.count 必须在 1..20 之间（一组怪至少 1 只，"
+                        + "不写就是缺字段）");
+                }
                 spawn = new MonsterSpawnDef(
-                    region, monster.Spawn.X, monster.Spawn.Y, monster.Spawn.Z, monster.Spawn.RespawnS.Value);
+                    region, monster.Spawn.X, monster.Spawn.Y, monster.Spawn.Z,
+                    monster.Spawn.RespawnS.Value, groupCount);
             }
 
             if (spawn is null && tier is "normal" or "elite")
@@ -242,5 +257,8 @@ public sealed class MonsterTable
         public double Y { get; init; }
         public double Z { get; init; }
         public int? RespawnS { get; init; }
+
+        /// <summary>B15：一个刷怪点同一次刷几只，缺省 1。</summary>
+        public int? Count { get; init; }
     }
 }

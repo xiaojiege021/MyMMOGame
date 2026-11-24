@@ -66,6 +66,7 @@ public sealed partial class BattleConfig
         }
 
         ValidateBossAttacks();
+        ValidateDungeonBossBindings();
 
         if (Arena.RadiusMm <= 0)
         {
@@ -93,6 +94,49 @@ public sealed partial class BattleConfig
         {
             throw new ConfigException(
                 $"{SourcePath}：站位距离 {distance}mm，但技能表里没有一个技能够得着，这场打不完");
+        }
+    }
+
+    /// <summary>
+    /// B15：副本与首领的绑定校验。dungeons.json 的 boss_id 指向 monsters.json 的
+    /// tier=boss 条目；不搬数值，也不许两条副本共用同一只 Boss（否则「五个副本各一个
+    /// Boss」在内容层对不上）。没写 boss_id 的副本（等境界开关的元婴深渊）不校验。
+    /// </summary>
+    void ValidateDungeonBossBindings()
+    {
+        if (Dungeons is null)
+        {
+            return;
+        }
+
+        var claimed = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var dungeon in Dungeons.All)
+        {
+            var bossId = dungeon.BossId;
+            if (string.IsNullOrWhiteSpace(bossId))
+            {
+                continue;
+            }
+
+            var monster = Monsters?.Find(bossId);
+            if (monster is null)
+            {
+                throw new ConfigException(
+                    $"{SourcePath}：副本 {dungeon.Id} 的 boss_id「{bossId}」不在怪物表里"
+                    + "（config/monsters.json）");
+            }
+            if (!monster.IsBoss)
+            {
+                throw new ConfigException(
+                    $"{SourcePath}：副本 {dungeon.Id} 的 boss_id「{bossId}」档位是 {monster.Tier}，"
+                    + "必须是 boss");
+            }
+            if (claimed.TryGetValue(bossId, out var other))
+            {
+                throw new ConfigException(
+                    $"{SourcePath}：副本 {other} 与 {dungeon.Id} 绑了同一只 Boss「{bossId}」");
+            }
+            claimed[bossId] = dungeon.Id;
         }
     }
 

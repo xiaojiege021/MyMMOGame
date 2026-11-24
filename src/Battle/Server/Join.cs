@@ -264,6 +264,10 @@ public sealed partial class BattleServer
         Console.WriteLine(
             $"session_open={party.Encounter.SessionId} caster={charId} class={cls.Id} party={partyKey} boss={config.Boss.Id}"
             + $" party_size={party.PartySize} boss_hp_max={party.Encounter.BossHpMax}"
+            // B15：这一场按副本表认到的内容首领（dungeons.json 的 boss_id）。场次血量与
+            // 出手仍按 config/battle.json 的 boss 建，这里只把「打的是哪个内容 Boss」打出来，
+            // 供核对与真机取证；不属于协议字段，客户端不读。
+            + $" dungeon={dungeon?.Id ?? "none"} dungeon_boss={dungeon?.BossId ?? "none"}"
             + (arenaMode is { } mode
                 ? $" arena_mode={mode.Id} arena_players={mode.Players} stats_source=arena_template branch={branchId}"
                 : ""));

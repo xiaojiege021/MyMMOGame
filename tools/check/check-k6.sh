@@ -157,8 +157,9 @@ report("shop_npc_entities", shop_npcs <= set(ids), "缺=" + ",".join(sorted(shop
 mons = monsters.get("monsters") or []
 mids = [x.get("id") for x in mons]
 report("monster_schema", monsters.get("schema") == "monster-table/1"
-       and monsters.get("version") == 1,
-       "%s v%s" % (monsters.get("schema"), monsters.get("version")))
+       and (monsters.get("version") or 0) >= 2,
+       "%s v%s（B15 起 count / 主线 Boss 进表，版本不低于 2）" % (
+           monsters.get("schema"), monsters.get("version")))
 report("monster_ids", len(mids) == len(set(mids))
        and all(re.fullmatch(r"(mob|boss)_[a-z0-9_]+", i or "") for i in mids), "重复或形状不对")
 report("monster_count_floor", len(mons) >= 12, "只有 %d 只" % len(mons))
@@ -190,6 +191,10 @@ for x in mons:
             badm.append(mid + ":spawn_region")
         if not (isinstance(spawn.get("respawn_s"), int) and 1 <= spawn["respawn_s"] <= 86400):
             badm.append(mid + ":respawn")
+        # B15：一个刷怪点就是一组怪，count 必填、1..20（与 MonsterTable.Load 同口径）。
+        cnt = spawn.get("count")
+        if not (isinstance(cnt, int) and 1 <= cnt <= 20):
+            badm.append(mid + ":spawn_count")
     elif tier in ("normal", "elite"):
         badm.append(mid + ":spawn_missing")
 report("monster_refs_and_fields", not badm, ";".join(sorted(set(badm))[:8]))
@@ -208,6 +213,44 @@ report("dungeon_bosses", len(bosses) >= 4 and not missing_boss
        "boss=%s missing=%s" % (",".join(bosses), ",".join(missing_boss)))
 report("world_boss_not_duplicated", all(not (x.get("tier") == "world_boss") for x in mons),
        "世界 Boss 的数值只在 world_boss.json，不在怪物表写第二份")
+
+# ------------------------------------------------- 2b. 副本 ↔ Boss 绑定（B15 批次一）
+# 口径：dungeons.json 的 boss_id 只存引用，指向本表 tier=boss 的那一条；不搬数值。
+# 五个副本（主线 / 深渊 / 巢穴 / 宗门秘境 / 龙巢）各一个，同一只 Boss 不许被两条副本引用。
+# 元婴深渊是等境界开关的副本，首领留到那一段，不写 boss_id，这里不要求。
+dungeons = cfg("config/dungeons.json")
+by_id = {x.get("id"): x for x in mons}
+bound = {d.get("id"): d.get("boss_id") for d in (dungeons.get("dungeons") or [])
+         if d.get("boss_id")}
+missing_bind = [d for d in ("main", "abyss", "lair", "sect", "dragon") if d not in bound]
+report("dungeon_boss_binding", not missing_bind, "缺=" + ",".join(missing_bind))
+bad_bind = [k for k, v in bound.items()
+            if v not in by_id or by_id[v].get("tier") != "boss"]
+report("dungeon_boss_targets", not bad_bind, ",".join(bad_bind))
+values = list(bound.values())
+dupes = sorted({v for v in values if values.count(v) > 1})
+report("dungeon_boss_unique", not dupes, ",".join(dupes))
+
+# 主线就是 battle.json 那只试炼石像：名字与血量必须一致（结构保证，不各写一套）。
+main_boss = by_id.get(bound.get("main") or "") or {}
+battle_boss = (cfg("config/battle.json").get("boss") or {})
+report("main_boss_matches_battle",
+       main_boss.get("name") == battle_boss.get("name")
+       and (main_boss.get("stats") or {}).get("hp") == battle_boss.get("hp_max"),
+       "怪物表 %s hp=%s / battle.json %s hp_max=%s" % (
+           main_boss.get("name"), (main_boss.get("stats") or {}).get("hp"),
+           battle_boss.get("name"), battle_boss.get("hp_max")))
+
+# B15 批次一先铺的三块地表：每块至少一只精英，且至少有一个点是一组（count >= 2）。
+group_regions = ("枯岚道", "承露门", "外环隙")
+bad_group = []
+for region in group_regions:
+    got = [x for x in mons if (x.get("spawn") or {}).get("region") == region]
+    if not any(x.get("tier") == "elite" for x in got):
+        bad_group.append(region + ":elite")
+    if not any((x.get("spawn") or {}).get("count", 1) >= 2 for x in got):
+        bad_group.append(region + ":group")
+report("region_content_groups", not bad_group, ",".join(bad_group))
 
 # ---------------------------------------------------------------- 3. 地名与坐标
 layout = cfg("tools/gen/ui_map_layout.json")
@@ -316,9 +359,13 @@ else
 fi
 
 echo "== 4. 只读入口：两张内容表 =="
+# 条数现取配置，不写死「当时的 11 / 12、版本 1」：B15 起怪物表会随内容分批长（v2 + 精英 + 主线 Boss）。
+NPCS="$(python3 -c 'import json;print(len(json.load(open("config/npc.json"))["npcs"]))')"
+MONS="$(python3 -c 'import json;print(len(json.load(open("config/monsters.json"))["monsters"]))')"
+MVER="$(python3 -c 'import json;print(json.load(open("config/monsters.json"))["version"])')"
 CL="$("$DOTNET" "$CHARACTER_DLL" --content-list 2>&1)"; clrc=$?
-[ "$clrc" = "0" ] && grep -q '^content_table=ok npcs=11 monsters=12 npc_version=1 monster_version=1$' <<< "$CL" \
-  && ok "内容表读出 11 位 NPC / 12 只怪物（不连库）" \
+[ "$clrc" = "0" ] && grep -q "^content_table=ok npcs=$NPCS monsters=$MONS npc_version=1 monster_version=$MVER\$" <<< "$CL" \
+  && ok "内容表读出 $NPCS 位 NPC / $MONS 只怪物（不连库）" \
   || bad "内容表只读入口不对（rc=${clrc}）：$(head -2 <<< "$CL" | tr '\n' ' ')"
 CLU="$(printf '%s' "$CL" | utf8)"
 grep -q '^npc=npc_qiao_xiaoman name=乔小满 region=枯岚道 role=quest faction=- dialogue=乔小满 shop=- pos=12,0,8 facing=180' <<< "$CLU" \
@@ -329,8 +376,8 @@ grep -q '^npc=npc_shop_qiyun .* role=merchant .* shop=npc_general_qiyun ' <<< "$
   && ok "NPC 商店引用读得到" || bad "商店 NPC 行不对：$(grep '^npc=npc_shop_qiyun' <<< "$CLU")"
 grep -q '^monster=mob_kulan_beast name=枯岚凶兽 tier=normal level=5 .* spawn=枯岚道@20,0,30+60s' <<< "$CLU" \
   && ok "普通怪带刷怪点与掉落" || bad "怪物行不对：$(grep '^monster=mob_kulan_beast' <<< "$CLU")"
-if [ "$(grep -c '^npc=' <<< "$CL")" = "11" ] && [ "$(grep -c '^monster=' <<< "$CL")" = "12" ]; then
-  ok "清单条数与表一致（11 / 12）"
+if [ "$(grep -c '^npc=' <<< "$CL")" = "$NPCS" ] && [ "$(grep -c '^monster=' <<< "$CL")" = "$MONS" ]; then
+  ok "清单条数与表一致（${NPCS} / ${MONS}）"
 else
   bad "清单条数不对：$(grep -c '^npc=' <<< "$CL") / $(grep -c '^monster=' <<< "$CL")"
 fi
@@ -369,9 +416,14 @@ fi
 "$DOTNET" "$BATTLE_DLL" --config "$TMP/battle-config/battle.json" > "$TMP/battle.log" 2>&1 &
 PIDS="$PIDS $!"
 if wait_line "$TMP/battle.log" 'monster_table='; then
-  grep -q '^monster_table=ok version=1 monsters=12$' "$TMP/battle.log" \
-    && ok "战斗服启动读到 12 只怪物" \
+  grep -q "^monster_table=ok version=$MVER monsters=$MONS\$" "$TMP/battle.log" \
+    && ok "战斗服启动读到 $MONS 只怪物（B15 批次一：8 块地表 + 3 只精英 + 5 个副本 Boss）" \
     || bad "战斗服怪物行不对：$(grep '^monster_table=' "$TMP/battle.log" | head -1)"
+  # B15：启动日志逐条打出副本 → 内容 Boss 的绑定，绑定读不到就是起服期校验漏了。
+  grep -q '^dungeon_boss=main boss_id=boss_main_trial$' "$TMP/battle.log" \
+    && grep -q '^dungeon_boss=abyss boss_id=boss_abyss_warden$' "$TMP/battle.log" \
+    && ok "副本 → Boss 绑定进启动日志（主线 / 深渊）" \
+    || bad "副本 → Boss 绑定行缺失：$(grep '^dungeon_boss=' "$TMP/battle.log" | head -3 | tr '\n' ' ')"
 else
   bad "战斗服没起来"; tail -6 "$TMP/battle.log" | detail
 fi
@@ -386,6 +438,20 @@ newcase() {
 run_content() {
   ( cd "$1" && "$DOTNET" "$CHARACTER_DLL" --content-list 2>&1 )
 }
+# 战斗服的坏配置要真起一次进程：校验在监听之前跑，配错了立刻退（不监听就不等到超时）。
+run_battle_bad() {
+  local dir="$1" log="$1/battle.log" pid i=0
+  ( cd "$dir" && "$DOTNET" "$BATTLE_DLL" --config "$dir/config/battle.json" > "$log" 2>&1 ) &
+  pid=$!
+  while kill -0 "$pid" 2>/dev/null && [ "$i" -lt 40 ]; do sleep 0.25; i=$((i + 1)); done
+  if kill -0 "$pid" 2>/dev/null; then
+    kill -TERM "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+    echo "TIMEOUT 起服没有被配置校验挡住"
+    return 0
+  fi
+  cat "$log"
+}
 
 mutate() {
   local case_dir="$1" file="$2" py="$3"
@@ -393,7 +459,8 @@ mutate() {
 import json, os
 path = os.path.join(os.environ["CASE"], "config", os.environ["FILE"])
 doc = json.load(open(path, encoding="utf-8"))
-scope = {"d": doc, "npc": doc.get("npcs"), "mon": doc.get("monsters")}
+scope = {"d": doc, "npc": doc.get("npcs"), "mon": doc.get("monsters"),
+         "dg": doc.get("dungeons")}
 exec(os.environ["CODE"], scope)
 json.dump(doc, open(path, "w", encoding="utf-8"), ensure_ascii=False)
 PY
@@ -431,6 +498,23 @@ CASE="$(newcase monster_no_spawn)"
 mutate "$CASE" monsters.json 'mon[0].pop("spawn")'
 assert_bad_config "$(run_content "$CASE")" "普通怪没刷怪点：起不来"
 
+# B15：副本 ↔ Boss 绑定写在战斗服启动期校验（角色服不读怪物表，不能在那里判）。
+CASE="$(newcase boss_missing)"
+mutate "$CASE" dungeons.json 'dg[0]["boss_id"] = "boss_nope"'
+assert_bad_config "$(run_battle_bad "$CASE")" "boss_id 指向不存在的怪：战斗服起不来"
+
+CASE="$(newcase boss_not_boss)"
+mutate "$CASE" dungeons.json 'dg[0]["boss_id"] = "mob_kulan_beast"'
+assert_bad_config "$(run_battle_bad "$CASE")" "boss_id 指向普通怪：战斗服起不来"
+
+CASE="$(newcase boss_shared)"
+mutate "$CASE" dungeons.json 'dg[1]["boss_id"] = dg[0]["boss_id"]'
+assert_bad_config "$(run_battle_bad "$CASE")" "两条副本绑同一只 Boss：战斗服起不来"
+
+CASE="$(newcase spawn_count_bad)"
+mutate "$CASE" monsters.json 'mon[0]["spawn"]["count"] = 99'
+assert_bad_config "$(run_content "$CASE")" "刷怪点一次 99 只：起不来"
+
 echo "== 7. 新增 NPC / 怪物只改配置 =="
 CASE="$(newcase add_content)"
 ROOT="$ROOT" CASE="$CASE" python3 - <<'PY'
@@ -446,16 +530,16 @@ mon = json.load(open(os.path.join(base, "monsters.json"), encoding="utf-8"))
 mon["monsters"].append({
     "id": "mob_k6_probe", "name": "核对用怪", "level": 1, "tier": "normal",
     "stats": {"hp": 1, "attack": 1, "defense": 0}, "skills": [], "drops": [],
-    "spawn": {"region": "枯岚道", "x": 0, "y": 0, "z": 0, "respawn_s": 60},
+    "spawn": {"region": "枯岚道", "x": 0, "y": 0, "z": 0, "respawn_s": 60, "count": 1},
     "note": "核对用，不进仓库"})
 json.dump(mon, open(os.path.join(base, "monsters.json"), "w", encoding="utf-8"), ensure_ascii=False)
 PY
 ADDED="$(run_content "$CASE")"
 ADDEDU="$(printf '%s' "$ADDED" | utf8)"
-if head -1 <<< "$ADDED" | grep -q 'npcs=12 monsters=13' \
+if head -1 <<< "$ADDED" | grep -q "npcs=$((NPCS + 1)) monsters=$((MONS + 1))" \
    && grep -q '^npc=npc_k6_probe name=核对用路人 ' <<< "$ADDEDU" \
    && grep -q '^monster=mob_k6_probe name=核对用怪 ' <<< "$ADDEDU"; then
-  ok "加一位 NPC + 一只怪只改配置：11/12 → 12/13"
+  ok "加一位 NPC + 一只怪只改配置：$NPCS/$MONS → $((NPCS + 1))/$((MONS + 1))"
 else
   bad "新增内容没生效：$(head -2 <<< "$ADDEDU" | tr '\n' ' ')"
 fi

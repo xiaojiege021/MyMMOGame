@@ -97,6 +97,8 @@ public sealed class BattleProcess(string configPath)
         {
             Console.WriteLine($"dungeon={dungeon.Id} tier={dungeon.Tier}"
                 + $" min_players={dungeon.MinPlayers} max_players={dungeon.MaxPlayers}");
+            // B15：内容层首领绑定单独一行，不动上面那行的既有形状（老脚本按行前缀取数）。
+            Console.WriteLine($"dungeon_boss={dungeon.Id} boss_id={dungeon.BossId ?? "none"}");
         }
         Console.WriteLine($"boss={config.Boss.Id} hp_max={config.Boss.HpMax} exp_on_clear={config.Boss.ExpOnClear}"
             + (config.Boss.Phases is { Count: > 0 } phases ? $" phases={phases.Count}" : ""));
