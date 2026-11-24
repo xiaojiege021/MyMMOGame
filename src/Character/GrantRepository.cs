@@ -164,7 +164,8 @@ public sealed class GrantRepository(
         NpgsqlTransaction transaction,
         long characterId,
         ItemDelta delta,
-        CancellationToken stopping)
+        CancellationToken stopping,
+        CraftRollResult? craftRoll = null)
     {
         var item = items.Find((delta.ItemId ?? "").Trim());
         if (item is null)
@@ -220,6 +221,12 @@ public sealed class GrantRepository(
                 throw new GrantException("stack_overflow");
             }
 
+            // B3：带掷点的产出必须是新占一格。叠到已有行等于把「那一件」的属性丢掉。
+            if (craftRoll is not null)
+            {
+                throw new GrantException("slot_occupied");
+            }
+
             await using var update = new NpgsqlCommand(
                 "update \"角色\".inventory set count = count + $3 "
                 + "where character_id = $1 and slot = $2",
@@ -233,14 +240,20 @@ public sealed class GrantRepository(
 
         var bound = item.BindsOnArrival;
         await using var insert = new NpgsqlCommand(
-            "insert into \"角色\".inventory (character_id, slot, item_id, count, bound, bound_at) "
-            + "values ($1, $2, $3, $4, $5, case when $5 then now() else null end)",
+            "insert into \"角色\".inventory "
+            + "(character_id, slot, item_id, count, bound, bound_at, craft_attr, craft_extras) "
+            + "values ($1, $2, $3, $4, $5, case when $5 then now() else null end, $6, $7::jsonb)",
             connection, transaction);
         insert.Parameters.AddWithValue(characterId);
         insert.Parameters.AddWithValue((short)delta.Slot);
         insert.Parameters.AddWithValue(item.Id);
         insert.Parameters.AddWithValue(delta.Count);
         insert.Parameters.AddWithValue(bound);
+        // B3：不是制作产出的（掉 / 商店 / 任务 / GM）两列都是 NULL，攻击仍按 items.json 算。
+        insert.Parameters.AddWithValue(
+            craftRoll is null ? DBNull.Value : (object)craftRoll.Attr);
+        insert.Parameters.AddWithValue(
+            craftRoll is null ? DBNull.Value : (object)craftRoll.ExtrasJson());
         await insert.ExecuteNonQueryAsync(stopping);
     }
 
@@ -341,11 +354,18 @@ public sealed class GrantRepository(
         NpgsqlTransaction transaction,
         long characterId,
         IReadOnlyList<ItemDelta> deltas,
-        CancellationToken stopping)
+        CancellationToken stopping,
+        CraftRollResult? craftRoll = null)
     {
+        // B3：掷点只属于「那一件」装备，一次只能带在一条产出上（装备不可堆叠）。
+        if (craftRoll is not null && deltas.Count != 1)
+        {
+            throw new GrantException("roll_needs_single_item");
+        }
+
         foreach (var delta in deltas)
         {
-            await ApplyItemAsync(connection, transaction, characterId, delta, stopping);
+            await ApplyItemAsync(connection, transaction, characterId, delta, stopping, craftRoll);
         }
     }
 

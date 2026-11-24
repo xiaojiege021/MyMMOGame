@@ -1757,6 +1757,18 @@ message FinishCraftResponse {
   double success_pct = 9;
   int32 craft_time_s = 10;
   int64 ready_at_unix = 11;
+  // B3：这一手掷出来的主属性（含附加 attack 之和的口径见 CraftExtra）。产出不是装备、
+  // 或者这一手没成，craft_attr 留 0、craft_extras 为空。同一件装备只掷这一次，
+  // 客户端只展示，不能拿去算伤害（伤害仍走 DescribeBattleProfile 的快照）。
+  int32 craft_attr = 12;
+  repeated CraftExtra craft_extras = 13;
+}
+
+// B3：制作掷点的一条附加属性。种类只从该部位 × 该品阶的允许表里来
+// （config/craft_roll.json 的 extras），当前只有 attack 一种。
+message CraftExtra {
+  string attr = 1;
+  int32 value = 2;
 }
 
 message DescribeCraftRequest {

@@ -14,8 +14,15 @@ public sealed record RecipeMaterial(string ItemId, int Count);
 public sealed record RecipeFee(string Kind, long Amount);
 
 /// <summary>
+/// B3：装备配方的那一次掷点区间。下限不低于该品阶基准、上限不超过下一档基准
+/// （方案 9.1），对账在 CraftRollTable.CheckRecipes；这里只装配置里的三个数。
+/// </summary>
+public sealed record RecipeRoll(int AttrMin, int AttrMax, int ExtrasMax);
+
+/// <summary>
 /// 一条配方。材料 / 产出 / 费用 / 成功率 / 耗时 / 解锁等级都在这里，
 /// 代码只按这些字段执行，不按配方编号分支，也不写第二套数值。
+/// Grade 与 Roll 只对产装备的配方有值（B2 的品阶、B3 的掷点）。
 /// </summary>
 public sealed record RecipeDef(
     string Id,
@@ -27,7 +34,9 @@ public sealed record RecipeDef(
     int OutputCount,
     double SuccessPct,
     int CraftTimeS,
-    string Note);
+    string Note,
+    string Grade = "",
+    RecipeRoll? Roll = null);
 
 /// <summary>
 /// config/recipes.json 是生产 / 配方的唯一内容正本（配置设计第 7 节，14.7 的 K3 行）。
@@ -36,8 +45,8 @@ public sealed record RecipeDef(
 /// 每条配方的 profession 必须落在四个里，每个副职至少要有一条配方，否则起不来。
 /// 材料 / 产出必须指向 items.json 的真物品，费用币种必须在 currency.json；
 /// success_pct 与 craft_time_s 只从这份表读，代码里不写第二套概率与时长。
-/// grade_roll（B3 的「胚子做成装备时掷一次」）在 K3 不接：配置写了就起不来，
-/// 免得把一次随机静默丢掉。
+/// grade_roll（B3 的「胚子做成装备时掷一次」）产装备必填、非装备不许写；
+/// 区间与品阶基准的对账在 CraftRollTable.CheckRecipes，代码里不写第二套数字。
 /// </summary>
 public sealed class RecipeTable
 {
@@ -306,15 +315,13 @@ public sealed class RecipeTable
                 throw new ConfigException("配方 " + id + " 的 craft_time_s 必须在 0 到 86400 之间");
             }
 
-            // B3 才做的那一次掷点。K3 不接：写了就起不来，不静默丢掉。
-            if (raw.GradeRoll is { ValueKind: not JsonValueKind.Null and not JsonValueKind.Undefined })
-            {
-                throw new ConfigException("配方 " + id + " 带了 grade_roll：制作掷点归 B3，K3 不接");
-            }
+            // B3：产出装备的配方必须写 grade_roll（方案 9.1 的那一次掷点），
+            // 非装备一条都不许写。区间上限与本档 / 下一档基准的对账在 CraftRollTable.CheckRecipes。
+            var roll = ParseRoll(id, outputItem, raw.GradeRoll);
 
             parsed.Add(new RecipeDef(
                 id, profession, unlockLevel, inputs, fee, outputId, outputCount,
-                success, craftTime, (raw.Note ?? "").Trim()));
+                success, craftTime, (raw.Note ?? "").Trim(), recipeGrade, roll));
             usedProfessions.Add(profession);
         }
 
@@ -327,6 +334,47 @@ public sealed class RecipeTable
         }
 
         return new RecipeTable(wire.Version, wire.Pending, professions, parsed);
+    }
+
+    /// <summary>
+    /// B3：解析 grade_roll。产出装备的配方必填（方案 9.1 的「做成装备那一次掷点」），
+    /// 产出不是装备的一条都不许写；三个数缺一个就起不来，不兜默认值。
+    /// </summary>
+    static RecipeRoll? ParseRoll(string id, ItemDef outputItem, JsonElement? raw)
+    {
+        var has = raw is { ValueKind: not JsonValueKind.Null and not JsonValueKind.Undefined };
+        if (!outputItem.IsEquipment)
+        {
+            if (has)
+            {
+                throw new ConfigException("配方 " + id + " 的产出不是装备，不许写 grade_roll");
+            }
+
+            return null;
+        }
+
+        if (!has)
+        {
+            throw new ConfigException(
+                "配方 " + id + " 产出的是装备，必须写 grade_roll（方案 9.1 的掷点）");
+        }
+
+        RollWire wire;
+        try
+        {
+            wire = raw!.Value.Deserialize<RollWire>()
+                ?? throw new ConfigException("配方 " + id + " 的 grade_roll 解析为空");
+        }
+        catch (JsonException ex)
+        {
+            throw new ConfigException("配方 " + id + " 的 grade_roll 不是合法 JSON：" + ex.Message);
+        }
+
+        var min = wire.AttrMin ?? throw new ConfigException("配方 " + id + " 的 grade_roll 缺 attr_min");
+        var max = wire.AttrMax ?? throw new ConfigException("配方 " + id + " 的 grade_roll 缺 attr_max");
+        var extras = wire.ExtrasMax
+            ?? throw new ConfigException("配方 " + id + " 的 grade_roll 缺 extras_max");
+        return new RecipeRoll(min, max, extras);
     }
 
     static bool ContainsProfession(IReadOnlyList<ProfessionDef> professions, string id)
@@ -413,6 +461,18 @@ public sealed class RecipeTable
 
         [JsonPropertyName("note")]
         public string? Note { get; init; }
+    }
+
+    sealed record RollWire
+    {
+        [JsonPropertyName("attr_min")]
+        public int? AttrMin { get; init; }
+
+        [JsonPropertyName("attr_max")]
+        public int? AttrMax { get; init; }
+
+        [JsonPropertyName("extras_max")]
+        public int? ExtrasMax { get; init; }
     }
 
     sealed record InputWire

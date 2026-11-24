@@ -38,6 +38,15 @@ internal static class CraftCli
             case "--craft-txn" when i + 1 < args.Length:
                 craftTxn = args[++i];
                 break;
+            case "--craft-roll-path" when i + 1 < args.Length:
+                craftRollPath = args[++i];
+                break;
+            // B3：掷点抽样。recipe + 次数 + 熟练度（后两个是整数）。
+            case "--craft-roll-sample" when i + 3 < args.Length:
+                craftRollRecipe = args[++i];
+                int.TryParse(args[++i], out craftRollCount);
+                int.TryParse(args[++i], out craftRollCraftCount);
+                break;
             case "--raw-item-write" when i + 4 < args.Length:
                 long.TryParse(args[++i], out rawItemWriteId);
                 int.TryParse(args[++i], out rawItemSlot);
@@ -65,9 +74,18 @@ internal static class CraftCli
             var characterConfig = CharacterConfig.Load(configPath);
             var items = ItemTable.Load("config/items.json");
             var currencies = CurrencyTable.Load("config/currency.json");
+            var grades = GradeTable.Load("config/grades.json");
             var table = RecipeTable.Load(
                 recipeTablePath ?? characterConfig.RecipeTable, items, currencies);
+            // B3：掷点表与配方区间一起过加载期校验，坏配置在只读段就报出来。
+            var rollTable = CraftRollTable.Load(craftRollPath ?? characterConfig.CraftRollTable, items, grades);
+            rollTable.CheckRecipes(table, grades);
             PrintTable(table);
+            Console.WriteLine("craft_roll_state=ok version=" + rollTable.Version
+                + " pending=" + (rollTable.Pending ? "true" : "false")
+                + " tiers=" + rollTable.SkillTiers.Count
+                + " extra_count_max=" + rollTable.ExtraCountMax
+                + " extras=" + rollTable.Extras.Count);
         }
         catch (ConfigException ex)
         {
@@ -81,6 +99,106 @@ internal static class CraftCli
         }
 
         return 0;
+    }
+
+    /// <summary>
+    /// B3：只读抽样。不连库、不起进程，直接把 CraftRoller 跑 n 次并统计三段分布，
+    /// 用来核「取值不越区间、档位越高高值占比越大、附加属性条数与种类合法」。
+    /// craft_count 是喂给档位选择的熟练度（0 表示这一档都没升）。
+    /// </summary>
+    public static int? TryRollSample()
+    {
+        if (string.IsNullOrEmpty(craftRollRecipe))
+        {
+            return null;
+        }
+
+        if (craftRollCount < 1 || craftRollCount > 100000)
+        {
+            Console.WriteLine("craft_roll_sample=bad reason=count_out_of_range");
+            return 2;
+        }
+
+        try
+        {
+            var characterConfig = CharacterConfig.Load(configPath);
+            var items = ItemTable.Load("config/items.json");
+            var grades = GradeTable.Load("config/grades.json");
+            var currencies = CurrencyTable.Load("config/currency.json");
+            var table = RecipeTable.Load(characterConfig.RecipeTable, items, currencies);
+            var rollTable = CraftRollTable.Load(craftRollPath ?? characterConfig.CraftRollTable, items, grades);
+            rollTable.CheckRecipes(table, grades);
+
+            var recipe = table.Find(craftRollRecipe)
+                ?? throw new ConfigException("没有这条配方：" + craftRollRecipe);
+            var output = items.Find(recipe.OutputItemId)
+                ?? throw new ConfigException("配方的产出不在 items.json 里：" + recipe.OutputItemId);
+            if (!output.IsEquipment || recipe.Roll is null)
+            {
+                Console.WriteLine("craft_roll_sample=bad reason=not_equipment recipe=" + recipe.Id);
+                return 2;
+            }
+
+            var tier = rollTable.TierOf(craftRollCraftCount);
+            var min = recipe.Roll.AttrMin;
+            var max = recipe.Roll.AttrMax;
+            var span = max - min + 1;
+            var lowEnd = min + (span / 3);
+            var midEnd = min + ((span * 2) / 3);
+
+            var low = 0;
+            var mid = 0;
+            var high = 0;
+            var extrasTotal = 0;
+            var extrasMax = 0;
+            var rng = new Random(20261124);
+            for (var n = 0; n < craftRollCount; n++)
+            {
+                var result = CraftRoller.Roll(recipe, output, rollTable, craftRollCraftCount, rng);
+                if (result.Attr < min || result.Attr > max)
+                {
+                    Console.WriteLine("craft_roll_sample=bad reason=out_of_band attr=" + result.Attr);
+                    return 2;
+                }
+
+                if (result.Attr < lowEnd)
+                {
+                    low++;
+                }
+                else if (result.Attr < midEnd)
+                {
+                    mid++;
+                }
+                else
+                {
+                    high++;
+                }
+
+                extrasTotal += result.Extras.Count;
+                extrasMax = Math.Max(extrasMax, result.Extras.Count);
+            }
+
+            Console.WriteLine("craft_roll_sample=ok recipe=" + recipe.Id
+                + " craft_count=" + craftRollCraftCount
+                + " tier=" + tier.MinCrafts + "/" + tier.HighWeight
+                + " n=" + craftRollCount
+                + " min=" + min + " max=" + max
+                + " low=" + low + " mid=" + mid + " high=" + high
+                + " high_pct=" + (100.0 * high / craftRollCount).ToString("F1")
+                + " extras_max=" + extrasMax
+                + " extras_avg=" + (1.0 * extrasTotal / craftRollCount).ToString("F2"));
+            return 0;
+        }
+        catch (ConfigException ex)
+        {
+            Console.WriteLine("config_error=" + ex.Message);
+            return 2;
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine("config_error=" + ex.Message);
+            return 2;
+        }
     }
 
     static void PrintTable(RecipeTable table)
@@ -140,12 +258,15 @@ internal static class CraftCli
         }
 
         var currencies = CurrencyTable.Load("config/currency.json");
+        var grades = GradeTable.Load("config/grades.json");
         var table = RecipeTable.Load(
             recipeTablePath ?? characterConfig.RecipeTable, items, currencies);
+        var rollTable = CraftRollTable.Load(craftRollPath ?? characterConfig.CraftRollTable, items, grades);
+        rollTable.CheckRecipes(table, grades);
         var grants = new GrantRepository(dataSource, items, currencies, characterConfig);
         var inventory = new InventoryRepository(dataSource);
         var crafts = new CraftRepository(
-            dataSource, table, items, characterConfig, grants, inventory);
+            dataSource, table, items, rollTable, characterConfig, grants, inventory);
 
         if (craftStateOf != 0)
         {

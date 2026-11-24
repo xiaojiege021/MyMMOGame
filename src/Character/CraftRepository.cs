@@ -32,7 +32,8 @@ public sealed record CraftFinishOutcome(
     int OutputCount,
     double SuccessPct,
     int CraftTimeS,
-    DateTimeOffset ReadyAt);
+    DateTimeOffset ReadyAt,
+    CraftRollResult? Roll);
 
 /// <summary>只给核对用：一条制作流水。</summary>
 public sealed record CraftLogRow(
@@ -57,11 +58,17 @@ public sealed record CraftStateFacts(
 /// 掷点只在角色服、只在 finish 这一手；成功率、材料、产出、费用、耗时、解锁等级
 /// 都从 RecipeTable 读，请求里带不进来。产出入包复用 GrantRepository 的同一条 SQL
 /// （ApplyItemDeltasInTransactionAsync），不另开一条物品写入。
+///
+/// B3：成功且产出是装备时，同一笔事务里再掷一次属性（方案 9.1）——区间来自配方的
+/// grade_roll、权重来自该副职的累计制作次数、附加属性允许表来自 constant table。
+/// 掷点值写进产出行（inventory.craft_attr / craft_extras），之后强化按它算。
+/// 无论成败，这一次都算一次熟练度（craft_count +1），成功再 +1 success_count。
 /// </summary>
 public sealed class CraftRepository(
     NpgsqlDataSource dataSource,
     RecipeTable table,
     ItemTable items,
+    CraftRollTable craftRoll,
     CharacterConfig config,
     GrantRepository grants,
     InventoryRepository inventory)
@@ -263,15 +270,28 @@ public sealed class CraftRepository(
         // 4. 先确认产出放得下，再掷点。放不下整笔回滚、活留在原地，玩家清格子再来收。
         var deltas = await PlanOutputAsync(connection, transaction, characterId, recipe, stopping);
 
+        var outputItem = items.Find(recipe.OutputItemId)
+            ?? throw new CraftException("recipe_unknown");
+
         // 5. 掷点只在服务端这一行：成功率只来自 config/recipes.json。
         var success = Random.Shared.NextDouble() * 100.0 < recipe.SuccessPct;
+
+        // 5b. B3：成了且产出是装备，同一笔事务里再掷一次属性（方案 9.1）。
+        //     区间来自配方 grade_roll，权重档来自这个副职的累计制作次数。
+        CraftRollResult? roll = null;
+        if (success && outputItem.IsEquipment)
+        {
+            var craftCount = await ProfessionCountAsync(
+                connection, transaction, characterId, recipe.Profession, stopping);
+            roll = CraftRoller.Roll(recipe, outputItem, craftRoll, craftCount, Random.Shared);
+        }
 
         if (success)
         {
             try
             {
                 await grants.ApplyItemDeltasInTransactionAsync(
-                    connection, transaction, characterId, deltas, stopping);
+                    connection, transaction, characterId, deltas, stopping, roll);
             }
             catch (GrantException ex)
             {
@@ -284,6 +304,10 @@ public sealed class CraftRepository(
                         : "recipe_unknown");
             }
         }
+
+        // 5c. 熟练度：成败都算一次动手。与入包、流水同一条事务，回滚时一起回滚。
+        await AddProfessionCountAsync(
+            connection, transaction, characterId, recipe.Profession, success, stopping);
 
         // 6. 写结果：成了带产出，没成留空；success 只在这一处改。
         await using (var update = new NpgsqlCommand(
@@ -312,7 +336,7 @@ public sealed class CraftRepository(
         return new CraftFinishOutcome(
             false, recipe.Id, recipe.Profession, success,
             success ? recipe.OutputItemId : "", success ? recipe.OutputCount : 0,
-            recipe.SuccessPct, recipe.CraftTimeS, readyAt);
+            recipe.SuccessPct, recipe.CraftTimeS, readyAt, roll);
     }
 
     /// <summary>只读：当前有没有活、还差几秒。没有活回 null。</summary>
@@ -476,6 +500,51 @@ public sealed class CraftRepository(
         return await read.ExecuteScalarAsync(stopping) is not null;
     }
 
+    /// <summary>这个副职累计做过几件。没有行就是 0，不做「补一行」的写（读只读）。</summary>
+    static async Task<int> ProfessionCountAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string profession,
+        CancellationToken stopping)
+    {
+        await using var read = new NpgsqlCommand(
+            "select craft_count from \"角色\".character_profession "
+            + "where character_id = $1 and profession = $2",
+            connection, transaction);
+        read.Parameters.AddWithValue(characterId);
+        read.Parameters.AddWithValue(profession);
+        var value = await read.ExecuteScalarAsync(stopping);
+        return value is int count ? count : 0;
+    }
+
+    /// <summary>
+    /// 熟练度 +1；成了再 +1 success_count。只增不减：没有清零 / 洗点 / 降级入口。
+    /// 与入包、craft_log 同一条事务，任何一步回滚都不留半截计数。
+    /// </summary>
+    static async Task AddProfessionCountAsync(
+        NpgsqlConnection connection,
+        NpgsqlTransaction transaction,
+        long characterId,
+        string profession,
+        bool success,
+        CancellationToken stopping)
+    {
+        await using var upsert = new NpgsqlCommand(
+            "insert into \"角色\".character_profession "
+            + "(character_id, profession, craft_count, success_count) "
+            + "values ($1, $2, 1, $3) "
+            + "on conflict (character_id, profession) do update "
+            + "set craft_count = \"角色\".character_profession.craft_count + 1, "
+            + "success_count = \"角色\".character_profession.success_count + $3, "
+            + "updated_at = now()",
+            connection, transaction);
+        upsert.Parameters.AddWithValue(characterId);
+        upsert.Parameters.AddWithValue(profession);
+        upsert.Parameters.AddWithValue(success ? 1 : 0);
+        await upsert.ExecuteNonQueryAsync(stopping);
+    }
+
     static CraftFinishOutcome DuplicateOutcome() =>
-        new(true, "", "", false, "", 0, 0.0, 0, default);
+        new(true, "", "", false, "", 0, 0.0, 0, default, null);
 }

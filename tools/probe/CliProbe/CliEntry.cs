@@ -32,6 +32,9 @@ internal static class CliEntry
         code = CraftCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = CraftCli.TryRollSample();
+        if (code != null) { return code.Value; }
+
         code = EnhanceCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

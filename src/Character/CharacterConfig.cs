@@ -17,7 +17,8 @@ public sealed record CharacterConfig(
     string SeasonPassTable, string SeasonTable, string MonthlyBundleTable,
     string CharacterSlotTable, string GlobalUpstream, string MainlineTable,
     string RecipeTable, string CalendarTable, string CityTaskTable,
-    string SeasonPassProgressTable, string NameRulesTable, string PillTable)
+    string SeasonPassProgressTable, string NameRulesTable, string PillTable,
+    string CraftRollTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -55,6 +56,7 @@ public sealed record CharacterConfig(
     // B1：丹药的正本（六种丹的回复值、池、冷却组与档位）。它要和 talisman.json
     // 互相钉「符不超过同级丹」，所以两份表都得能指到临时文件。
     public const string DefaultPillTable = "config/pill.json";
+    public const string DefaultCraftRollTable = "config/craft_roll.json";
     // K3：生产 / 配方的正本。同样不显式登记进 character.json：老卡的临时配置目录里
     // 没有这份表时走默认文件名，仓库根的那一份照常可读。
     public const string DefaultRecipeTable = "config/recipes.json";
@@ -353,6 +355,13 @@ public sealed record CharacterConfig(
             throw new ConfigException("pill_table 不能为空");
         }
 
+        // B3：制作掷点表。与配方表同口径：老配置不写就走默认文件名。
+        var craftRollTable = (wire.CraftRollTable ?? DefaultCraftRollTable).Trim();
+        if (craftRollTable.Length == 0)
+        {
+            throw new ConfigException("craft_roll_table 不能为空");
+        }
+
         return new CharacterConfig(
             listen.TrimEnd('/'), pool, bagSlots, bagExpandStep, bagSlotsMax,
             dungeonTable, expTable, enhanceTable,
@@ -361,7 +370,7 @@ public sealed record CharacterConfig(
             socialUpstream.TrimEnd('/'), realmTable, stoneExchangeTable, cityTable,
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
             characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable,
-            cityTaskTable, seasonPassProgressTable, nameRulesTable, pillTable);
+            cityTaskTable, seasonPassProgressTable, nameRulesTable, pillTable, craftRollTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -471,6 +480,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("name_rules_table")]
         public string? NameRulesTable { get; init; }
+
+        [JsonPropertyName("craft_roll_table")]
+        public string? CraftRollTable { get; init; }
 
         [JsonPropertyName("pill_table")]
         public string? PillTable { get; init; }

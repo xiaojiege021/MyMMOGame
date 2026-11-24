@@ -222,13 +222,15 @@ public sealed partial class CharacterGrpcService
             };
         }
 
+        // B3：掷点只在这里露给客户端一次（同一件不再掷，也没有重掷入口）。
         logger.LogInformation(
             "craft_finish account={Account} id={Id} recipe={Recipe} txn={Txn} "
-            + "success={Success} output={Output}x{Count}",
+            + "success={Success} output={Output}x{Count} attr={Attr} extras={Extras}",
             account, request.CharacterId, outcome.RecipeId, txnId,
-            outcome.Success, outcome.OutputItemId, outcome.OutputCount);
+            outcome.Success, outcome.OutputItemId, outcome.OutputCount,
+            outcome.Roll?.Attr ?? 0, outcome.Roll?.Extras.Count ?? 0);
 
-        return new FinishCraftResponse
+        var response = new FinishCraftResponse
         {
             Ok = true,
             RecipeId = outcome.RecipeId,
@@ -239,7 +241,17 @@ public sealed partial class CharacterGrpcService
             SuccessPct = outcome.SuccessPct,
             CraftTimeS = outcome.CraftTimeS,
             ReadyAtUnix = outcome.ReadyAt.ToUnixTimeSeconds(),
+            CraftAttr = outcome.Roll?.Attr ?? 0,
         };
+        if (outcome.Roll is not null)
+        {
+            foreach (var extra in outcome.Roll.Extras)
+            {
+                response.CraftExtras.Add(new CraftExtra { Attr = extra.Attr, Value = extra.Value });
+            }
+        }
+
+        return response;
     }
 
 

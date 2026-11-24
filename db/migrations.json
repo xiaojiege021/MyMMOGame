@@ -38,7 +38,8 @@
         { "version": 29, "file": "db/character/equip.sql" },
         { "version": 30, "file": "db/character/pill.sql" },
         { "version": 31, "file": "db/character/npc_shop.sql" },
-        { "version": 32, "file": "db/character/bag_expand.sql" }
+        { "version": 32, "file": "db/character/bag_expand.sql" },
+        { "version": 33, "file": "db/character/craft_roll.sql" }
       ]
     },
     {

@@ -39,6 +39,9 @@ public sealed class CharacterTables
     public required MainlineTable MainlineTable { get; init; }
     public required HeroCodexTable HeroCodexTable { get; init; }
     public required RecipeTable RecipeTable { get; init; }
+
+    /// <summary>B3：制作掷点正本（区间 / 权重档 / 附加属性允许表）。</summary>
+    public required CraftRollTable CraftRollTable { get; init; }
     public required CityTaskTable CityTaskTable { get; init; }
     public required SeasonPassProgressTable SeasonPassProgressTable { get; init; }
     public required NameRulesTable NameRulesTable { get; init; }
@@ -86,6 +89,7 @@ public static class TableLoad
         HeroCodexTable heroCodexTable;
         CalendarTable calendar;
         RecipeTable recipeTable;
+        CraftRollTable craftRollTable;
         CityTaskTable cityTaskTable;
         SeasonPassProgressTable seasonPassProgressTable;
         NameRulesTable nameRulesTable;
@@ -195,6 +199,9 @@ public static class TableLoad
             // K3：生产 / 配方的唯一正本。四个副职、每条配方的材料 / 产出 / 费用 /
             // 成功率 / 耗时 / 解锁等级都在这一份文件里；加一个配方不改代码。
             recipeTable = RecipeTable.Load(config.RecipeTable, items, currencies);
+            // B3：制作掷点先于配方区间的对账读进来，再逐条核 attr_min / attr_max。
+            craftRollTable = CraftRollTable.Load(config.CraftRollTable, items, grades);
+            craftRollTable.CheckRecipes(recipeTable, grades);
             // Q5/J2：主城修炼 / 境界任务的正本。与启动共用同一份 Load：城池编号必须在
             // config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json 的顺序表里；
             // 缺表降级成「没有任务」，老卡环境照常起。
@@ -254,6 +261,7 @@ public static class TableLoad
             MainlineTable = mainlineTable,
             HeroCodexTable = heroCodexTable,
             RecipeTable = recipeTable,
+            CraftRollTable = craftRollTable,
             CityTaskTable = cityTaskTable,
             SeasonPassProgressTable = seasonPassProgressTable,
             NameRulesTable = nameRulesTable,

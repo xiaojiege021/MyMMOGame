@@ -196,7 +196,12 @@ public sealed class EquipRepository(NpgsqlDataSource dataSource)
         // 一件装备一行；装了结晶的装备会因为 left join 出现多行，所以装备那一截按格号去重。
         // 强化等级挂在背包行 id 上（C4），结晶挂在格子上（P1-4d 的 (角色, 格, 镶嵌位)）。
         await using var command = new NpgsqlCommand(
-            "select i.slot, i.item_id, coalesce(e.level, 0)::int, cs.crystal_item_id "
+            "select i.slot, i.item_id, coalesce(e.level, 0)::int, cs.crystal_item_id, "
+            // B3：制作产出的装备读它自己的掷点（主属性 + 附加 attack），不是 items.json 的基准值；
+            // 非制作产出（craft_attr is null）仍按物品表算。
+            + "case when i.craft_attr is null then null "
+            + "else i.craft_attr + coalesce((select sum(coalesce((x->>'value')::int, 0)) "
+            + "from jsonb_array_elements(i.craft_extras) x where x->>'attr' = 'attack'), 0) end "
             + "from \"角色\".character_equip ce "
             + "join \"角色\".inventory i on i.id = ce.inventory_id "
             + "left join \"角色\".enhance e on e.inventory_id = i.id "
@@ -219,7 +224,10 @@ public sealed class EquipRepository(NpgsqlDataSource dataSource)
             if (counted.Add(slot))
             {
                 var def = items.Find(reader.GetString(1));
-                attack += def?.Attack ?? 0;
+                // B3：craft_attr 非空就用那一件掷出来的值（含附加属性），否则用物品表的基准。
+                attack += reader.IsDBNull(4)
+                    ? (def?.Attack ?? 0)
+                    : reader.GetInt32(4);
                 enhanceTotal += reader.GetInt32(2);
                 if (def is not null && def.SetId.Length > 0)
                 {

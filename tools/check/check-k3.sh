@@ -157,8 +157,12 @@ for r in recipes:
     craft_time = r.get("craft_time_s")
     if not isinstance(craft_time, int) or craft_time < 0 or craft_time > 86400:
         bad.append(rid + ":craft_time")
-    if "grade_roll" in r:
-        bad.append(rid + ":grade_roll")
+    # B3 起 grade_roll 是产装备配方的必填项（方案 9.1 的那一次掷点），非装备一律不许写。
+    is_equipment = items.get(oid, {}).get("kind") == "equipment"
+    if is_equipment and not isinstance(r.get("grade_roll"), dict):
+        bad.append(rid + ":grade_roll_missing")
+    if not is_equipment and "grade_roll" in r:
+        bad.append(rid + ":grade_roll_not_equipment")
     for key in RUNTIME_KEYS:
         if key in r:
             bad.append(rid + ":runtime:" + key)
@@ -461,8 +465,19 @@ cases = {
     "profession_without_recipe": lambda d: d.__setitem__(
         "recipes", [r for r in d["recipes"] if r["profession"] != "jeweler"]),
     "profession_order": lambda d: d["professions"][0].__setitem__("id", "cooking"),
-    "grade_roll": lambda d: d["recipes"][0].__setitem__(
-        "grade_roll", {"mode": "fixed", "table": "x"}),
+    "grade_roll_missing": lambda d: [r for r in d["recipes"]
+                                     if r["id"] == "recipe_sword_trial"][0].pop("grade_roll"),
+    "grade_roll_out_of_band": lambda d: [r for r in d["recipes"]
+                                         if r["id"] == "recipe_sword_trial"][0]["grade_roll"]
+                                      .__setitem__("attr_max", 999),
+    "grade_roll_min_below_base": lambda d: [r for r in d["recipes"]
+                                            if r["id"] == "recipe_sword_trial"][0]["grade_roll"]
+                                         .__setitem__("attr_min", 1),
+    "extras_max_over": lambda d: [r for r in d["recipes"]
+                                  if r["id"] == "recipe_sword_trial"][0]["grade_roll"]
+                               .__setitem__("extras_max", 3),
+    "non_equipment_roll": lambda d: d["recipes"][0].__setitem__(
+        "grade_roll", {"attr_min": 1, "attr_max": 2, "extras_max": 0}),
     "no_recipes": lambda d: d.__setitem__("recipes", []),
 }
 for name, mutate in cases.items():
@@ -474,7 +489,8 @@ PY
 
 for case in profession_unknown input_missing fee_currency_unknown output_missing \
             success_over_100 craft_time_negative profession_without_recipe \
-            profession_order grade_roll no_recipes; do
+            profession_order grade_roll_missing grade_roll_out_of_band \
+            grade_roll_min_below_base extras_max_over non_equipment_roll no_recipes; do
   out="$("$DOTNET" "$PROBE" --recipe-list --recipe-table-path "$TMP/bad-$case.json" 2>&1)"
   code=$?
   if [ "$code" = 2 ] && grep -q '^config_error=' <<< "$out"; then
@@ -614,5 +630,231 @@ PY
   grep -q 'reason=no_craft' <<< "$out" && ok "没有活时 finish：no_craft" \
     || bad "没有活时 finish 没挡住：$(head -1 <<< "$out")"
 fi
+
+echo "== 8. B3 制作掷点 =="
+ROOT="$ROOT" python3 - > "$TMP/b3.txt" 2>&1 <<'PY'
+import json, os, re
+
+root = os.environ["ROOT"]
+
+def read(p):
+    p = os.path.join(root, p)
+    return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
+
+def cfg(p):
+    return json.loads(read(p))
+
+def report(key, cond, info=""):
+    print(("PASS " if cond else "FAIL ") + key + ("" if cond else "  " + str(info)))
+
+roll = cfg("config/craft_roll.json")
+items = {x["id"]: x for x in cfg("config/items.json")["items"]}
+grade_doc = cfg("config/grades.json")
+grades = {g["id"]: g for g in grade_doc["grades"]}
+recipes = cfg("config/recipes.json")["recipes"]
+
+report("craft_roll_schema",
+       roll.get("schema") == "craft-roll/1" and int(roll.get("version", 0)) >= 1,
+       roll.get("schema"))
+tiers = roll.get("skill_tiers") or []
+report("craft_roll_tiers",
+       len(tiers) >= 1 and tiers[0].get("min_crafts") == 0
+       and all(tiers[i]["min_crafts"] < tiers[i + 1]["min_crafts"] for i in range(len(tiers) - 1))
+       and all((t.get("high_weight") or 0) >= 1 for t in tiers),
+       tiers)
+ecm = roll.get("extra_count_max")
+report("craft_roll_extra_max", isinstance(ecm, int) and 1 <= ecm <= 2, ecm)
+
+extras = roll.get("extras") or []
+have = {(e["slot"], e["grade"]) for e in extras}
+need = {(i["slot"], i["grade"]) for i in items.values() if i.get("kind") == "equipment"}
+report("extras_cover_equipment", need <= have,
+       ",".join(sorted("%s/%s" % k for k in need - have)))
+report("extras_attrs_written",
+       all(e.get("attr") == "attack" for e in extras),
+       [e.get("attr") for e in extras if e.get("attr") != "attack"][:4])
+
+equip_ids = {r["id"] for r in recipes if items[r["output"]["item_id"]].get("kind") == "equipment"}
+report("equipment_recipes_have_roll",
+       all(isinstance(r.get("grade_roll"), dict) for r in recipes if r["id"] in equip_ids)
+       and all("grade_roll" not in r for r in recipes if r["id"] not in equip_ids),
+       [r["id"] for r in recipes if r["id"] in equip_ids and "grade_roll" not in r])
+
+bad = []
+for r in recipes:
+    if r["id"] not in equip_ids:
+        continue
+    g = r["grade"]
+    base = grades[g]["base_attack"]
+    nxt = [x for x in grade_doc["grades"] if x["order"] == grades[g]["order"] + 1]
+    ceiling = nxt[0]["base_attack"] if nxt else base
+    gr = r["grade_roll"]
+    if gr["attr_min"] < base:
+        bad.append(r["id"] + ":min_below_base")
+    if gr["attr_max"] > ceiling:
+        bad.append(r["id"] + ":max_over_next")
+    if gr["attr_min"] > gr["attr_max"]:
+        bad.append(r["id"] + ":min_over_max")
+    if not isinstance(gr.get("extras_max"), int) or not (0 <= gr["extras_max"] <= ecm):
+        bad.append(r["id"] + ":extras_max")
+report("grade_roll_band", not bad, ";".join(bad[:6]))
+
+mig = read("db/migrations.json")
+sql = read("db/character/craft_roll.sql")
+main_sql = read("db/character/character.sql")
+report("db_craft_roll_migration",
+       "craft_attr" in sql and "craft_extras" in sql and "character_profession" in sql
+       and '"db/character/craft_roll.sql"' in mig and '"version": 33' in mig,
+       "迁移文件或清单没挂上")
+report("db_ddl_idempotent",
+       "IF NOT EXISTS" in sql and "DROP CONSTRAINT IF EXISTS" in sql,
+       "迁移不是幂等 DDL")
+report("db_main_migration_includes",
+       "craft_attr" in main_sql and "character_profession" in main_sql,
+       "老库跑主迁移补不到这两列 / 这张表")
+report("db_roll_paired",
+       "inventory_craft_roll_paired" in sql and "character_profession_success_le_craft" in sql,
+       "同生同灭 / 计数不许倒退的约束没写")
+
+repo = read("src/Character/CraftRepository.cs")
+roller = read("src/Character/CraftRoller.cs")
+equip = read("src/Character/EquipRepository.cs")
+report("roll_called_once", repo.count("CraftRoller.Roll(") == 1, repo.count("CraftRoller.Roll("))
+report("roll_ranges_from_config",
+       "recipe.Roll" in roller and "table.TierOf(" in roller
+       and not re.search(r"rng\.Next\(\s*\d+\s*,\s*\d+\s*\)", roller),
+       "掷点区间疑似写死在代码里")
+report("profession_count_written",
+       "character_profession" in repo and "AddProfessionCountAsync(" in repo,
+       "熟练度没有写入点")
+
+proto = read("proto/mmo/character.proto")
+report("proto_roll_fields",
+       "int32 craft_attr = 12;" in proto
+       and "repeated CraftExtra craft_extras = 13;" in proto,
+       "proto 没加掷点字段")
+report("proto_no_reroll",
+       re.search(r"(?i)\b(reroll|reforge|blood_?forge)\b", proto) is None,
+       "proto 里出现了重掷 / 重铸 / 血炼入口")
+
+sg = read("src/Shared/Generated/Character.cs")
+cg = read("client/MMOGame/Assets/Proto/Generated/Character.cs")
+report("generated_roll_fields",
+       "CraftAttr" in sg and "CraftAttr" in cg
+       and "class CraftExtra" in sg and "class CraftExtra" in cg,
+       "两端生成物没重出，或只出了一端")
+
+report("worn_totals_uses_roll",
+       "craft_attr" in equip and "craft_extras" in equip,
+       "WornTotals 仍只读 items.json 的基准攻击")
+gw = read("src/Gateway/CharacterApi.cs") + read("src/Gateway/Api/Character/Craft.cs")
+report("gateway_roll_passthrough",
+       "craft_attr = result.CraftAttr" in gw and "craft_extras = result.CraftExtras" in gw,
+       "网关没把掷点透传出去")
+
+print("PASS b3_static_end")
+PY
+
+while read -r tag key rest; do
+  case "$tag" in
+    PASS) ok "$key" ;;
+    FAIL) bad "$key${rest:+ $rest}" ;;
+  esac
+done < "$TMP/b3.txt"
+if ! grep -q '^PASS b3_static_end' "$TMP/b3.txt"; then
+  bad "B3 静态断言没跑完"; grep -vE '^(PASS|FAIL) ' "$TMP/b3.txt" | tail -6 | detail
+fi
+
+# 抽样：同一区间三档熟练度，高值占比必须随档位上移；值一个都不许越界。
+S0="$("$DOTNET" "$PROBE" --craft-roll-sample recipe_sword_trial 4000 0 2>&1)"
+S1="$("$DOTNET" "$PROBE" --craft-roll-sample recipe_sword_trial 4000 10 2>&1)"
+S2="$("$DOTNET" "$PROBE" --craft-roll-sample recipe_sword_trial 4000 30 2>&1)"
+B3S0="$S0" B3S1="$S1" B3S2="$S2" python3 - > "$TMP/b3roll.txt" 2>&1 <<'PY'
+import os, re
+
+def parse(text):
+    m = re.match(r"^craft_roll_sample=ok .*?high=(\d+) high_pct=([\d.]+) extras_max=(\d+)", text, re.M)
+    if not m or "min=20 max=38" not in text:
+        return None
+    return int(m.group(1)), float(m.group(2)), int(m.group(3))
+
+def report(key, cond, info=""):
+    print(("PASS " if cond else "FAIL ") + key + ("" if cond else "  " + str(info)))
+
+a = parse(os.environ.get("B3S0", ""))
+b = parse(os.environ.get("B3S1", ""))
+c = parse(os.environ.get("B3S2", ""))
+report("roll_sample_runs", a is not None and b is not None and c is not None,
+       (os.environ.get("B3S0", "")[:60], os.environ.get("B3S1", "")[:60]))
+if a and b and c:
+    report("roll_sample_extras_max", a[2] == 1 and b[2] == 1 and c[2] == 1, (a[2], b[2], c[2]))
+    report("roll_sample_weight_rises", a[1] < b[1] < c[1], (a[1], b[1], c[1]))
+    report("roll_sample_high_share_sane", 5.0 < a[1] < 60.0, a[1])
+print("PASS b3_roll_end")
+PY
+while read -r tag key rest; do
+  case "$tag" in
+    PASS) ok "$key" ;;
+    FAIL) bad "$key${rest:+ $rest}" ;;
+  esac
+done < "$TMP/b3roll.txt"
+if ! grep -q '^PASS b3_roll_end' "$TMP/b3roll.txt"; then
+  bad "B3 抽样断言没跑完"; tail -6 "$TMP/b3roll.txt" | detail
+fi
+
+# 坏配置：配方侧三条 + 掷点表侧三条，都必须起不来。
+ROOT="$ROOT" TMP="$TMP" python3 - <<'PY'
+import copy, json, os
+root, tmp = os.environ["ROOT"], os.environ["TMP"]
+base = json.load(open(os.path.join(root, "config/recipes.json"), encoding="utf-8"))
+roll = json.load(open(os.path.join(root, "config/craft_roll.json"), encoding="utf-8"))
+
+def sword(d):
+    return [r for r in d["recipes"] if r["id"] == "recipe_sword_trial"][0]
+
+cases = {
+    "roll_missing": lambda d: sword(d).pop("grade_roll"),
+    "roll_over_next": lambda d: sword(d)["grade_roll"].__setitem__("attr_max", 999),
+    "roll_extras_over": lambda d: sword(d)["grade_roll"].__setitem__("extras_max", 3),
+}
+for name, mutate in cases.items():
+    doc = copy.deepcopy(base)
+    mutate(doc)
+    json.dump(doc, open(os.path.join(tmp, "b3-bad-%s.json" % name), "w", encoding="utf-8"),
+              ensure_ascii=False)
+
+roll_cases = {
+    "tiers_not_rising": lambda d: d["skill_tiers"].__setitem__(1, {"min_crafts": 0, "high_weight": 2}),
+    "extra_max_three": lambda d: d.__setitem__("extra_count_max", 3),
+    "extras_gap": lambda d: d.__setitem__(
+        "extras", [e for e in d["extras"] if not (e["slot"] == "weapon" and e["grade"] == "red")]),
+}
+for name, mutate in roll_cases.items():
+    doc = copy.deepcopy(roll)
+    mutate(doc)
+    json.dump(doc, open(os.path.join(tmp, "b3-bad-%s.json" % name), "w", encoding="utf-8"),
+              ensure_ascii=False)
+PY
+
+for case in roll_missing roll_over_next roll_extras_over; do
+  out="$("$DOTNET" "$PROBE" --recipe-list --recipe-table-path "$TMP/b3-bad-$case.json" 2>&1)"
+  code=$?
+  if [ "$code" = 2 ] && grep -q '^config_error=' <<< "$out"; then
+    ok "坏配置 ${case}：起不来"
+  else
+    bad "坏配置 ${case} 没起不来：exit=${code} 输出=$(head -1 <<< "$out")"
+  fi
+done
+
+for case in tiers_not_rising extra_max_three extras_gap; do
+  out="$("$DOTNET" "$PROBE" --recipe-list --craft-roll-path "$TMP/b3-bad-$case.json" 2>&1)"
+  code=$?
+  if [ "$code" = 2 ] && grep -q '^config_error=' <<< "$out"; then
+    ok "坏掷点表 ${case}：起不来"
+  else
+    bad "坏掷点表 ${case} 没起不来：exit=${code} 输出=$(head -1 <<< "$out")"
+  fi
+done
+
 
 finish "$TITLE"

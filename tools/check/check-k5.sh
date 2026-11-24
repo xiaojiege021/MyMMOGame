@@ -308,9 +308,18 @@ for r in rec.get("recipes") or []:
     elif grade:
         rec_bad.append("%s:non_equipment" % r.get("id"))
 report("recipe_grade_matches", not rec_bad, ";".join(rec_bad[:6]))
-report("recipe_no_grade_roll",
-       all("grade_roll" not in (r or {}) for r in rec.get("recipes") or []),
-       "grade_roll 归 B3，B2 不许出现")
+# B3 起 grade_roll 是产装备配方的必填项（方案 9.1 的那一次掷点），非装备一律不许写。
+# B2 当时这条是「归 B3、不许出现」，B3 落地后改成同一条口径的对账，不再两处打架。
+roll_bad = []
+for r in rec.get("recipes") or []:
+    out = by_id.get((r.get("output") or {}).get("item_id")) or {}
+    roll = (r or {}).get("grade_roll")
+    if out.get("kind") == "equipment":
+        if not isinstance(roll, dict):
+            roll_bad.append("%s:missing" % r.get("id"))
+    elif roll is not None:
+        roll_bad.append("%s:non_equipment" % r.get("id"))
+report("recipe_grade_roll_shape", not roll_bad, ";".join(roll_bad[:6]))
 
 code_blob = read("src/Character/GradeTable.cs") + read("src/Character/SetTable.cs")
 cfg_blob = read("config/grades.json") + read("config/sets.json")

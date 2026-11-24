@@ -30,13 +30,13 @@
     },
     {
       "proto": "proto/mmo/character.proto",
-      "sha256": "187819e8d740aeb088e870d575ce264a58dae03ce11a8fba879b9b3bb7173f46",
+      "sha256": "d18583c24d115afcbfd18dbe2ba426aa8978e32e5fae9cb70e79eb006c6da3e3",
       "services": 1,
       "outputs": {
         "server": [
           {
             "path": "src/Shared/Generated/Character.cs",
-            "sha256": "0d33fe92618b5c886b293e740c184dbee7c76a73dc8ce96912bcea3d232bd4d7"
+            "sha256": "73036f6b75c7c7525014b29ddf53a34e345e62cb7d1242eb6fd439cb31e78124"
           },
           {
             "path": "src/Shared/Generated/CharacterGrpc.cs",
@@ -46,7 +46,7 @@
         "client": [
           {
             "path": "client/MMOGame/Assets/Proto/Generated/Character.cs",
-            "sha256": "0d33fe92618b5c886b293e740c184dbee7c76a73dc8ce96912bcea3d232bd4d7"
+            "sha256": "73036f6b75c7c7525014b29ddf53a34e345e62cb7d1242eb6fd439cb31e78124"
           }
         ]
       }

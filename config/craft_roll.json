@@ -1,0 +1,32 @@
+{
+  "schema": "craft-roll/1",
+  "version": 1,
+  "pending": true,
+  "note": "B3：制作掷点的唯一正本。方案 9.1 写定「胚子做成装备的那一次服务端掷点，主属性在配方下限与上限之间取值，再掷最多两条附加属性，种类只从该部位与该品阶允许的表里来」。方案没给任何具体区间、权重与附加属性的属性种类：本表的 attr 区间 / 数值区间 / 权重档全是待定值（pending=true），改这份配置重启角色服即生效，代码里不写第二份数字。skill_tiers 按「该副职累计制作次数」选档：low / mid / high 是三段各自的基础权重，本档的 high_weight 乘在高段与中段上（0 次 = 1/1/1 均匀），只改权重，不改区间上限、不改品阶——方案 9.1「制作技能只提高掷到高值的权重」。extras 每条是「部位 × 品阶 × 属性 → 数值区间」，加载期用 items.json 现取的全部装备 slot × grade 做覆盖校验，少一格就起不来。当前装备只有 attack 一种可承载属性（方案没给第二、第三种），所以每条配方 extras_max 先写 1；出现第二种属性时把该配方的 extras_max 提到 2 并在 extras 里加一行，别处不动。不能重铸 / 精铸 / 血炼 / 洗（方案 9.1 明写砍掉），本表也不提供任何重掷参数。",
+  "skill_tiers": [
+    { "min_crafts": 0, "high_weight": 1 },
+    { "min_crafts": 10, "high_weight": 2 },
+    { "min_crafts": 30, "high_weight": 3 }
+  ],
+  "extra_count_max": 2,
+  "extras": [
+    { "slot": "weapon", "grade": "white", "attr": "attack", "min": 2, "max": 6 },
+    { "slot": "weapon", "grade": "green", "attr": "attack", "min": 4, "max": 12 },
+    { "slot": "weapon", "grade": "blue", "attr": "attack", "min": 8, "max": 24 },
+    { "slot": "weapon", "grade": "purple", "attr": "attack", "min": 14, "max": 42 },
+    { "slot": "weapon", "grade": "orange", "attr": "attack", "min": 22, "max": 66 },
+    { "slot": "weapon", "grade": "red", "attr": "attack", "min": 32, "max": 96 },
+    { "slot": "armor", "grade": "white", "attr": "attack", "min": 2, "max": 6 },
+    { "slot": "armor", "grade": "green", "attr": "attack", "min": 4, "max": 12 },
+    { "slot": "armor", "grade": "blue", "attr": "attack", "min": 8, "max": 24 },
+    { "slot": "armor", "grade": "purple", "attr": "attack", "min": 14, "max": 42 },
+    { "slot": "armor", "grade": "orange", "attr": "attack", "min": 22, "max": 66 },
+    { "slot": "armor", "grade": "red", "attr": "attack", "min": 32, "max": 96 },
+    { "slot": "accessory", "grade": "white", "attr": "attack", "min": 2, "max": 6 },
+    { "slot": "accessory", "grade": "green", "attr": "attack", "min": 4, "max": 12 },
+    { "slot": "accessory", "grade": "blue", "attr": "attack", "min": 8, "max": 24 },
+    { "slot": "accessory", "grade": "purple", "attr": "attack", "min": 14, "max": 42 },
+    { "slot": "accessory", "grade": "orange", "attr": "attack", "min": 22, "max": 66 },
+    { "slot": "accessory", "grade": "red", "attr": "attack", "min": 32, "max": 96 }
+  ]
+}

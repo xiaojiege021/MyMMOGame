@@ -73,8 +73,10 @@ public static class ServiceAssembly
         var grants = new GrantRepository(dataSource, tables.Items, tables.Currencies, config, cityTax);
         // K3：制作的两笔事务（start 扣材料 / 费用、finish 掷点入包）都在这一个仓储里；
         // 产出入包复用 grants 的同一条 SQL，钱只用 grants 的货币写法。
+        // B3：制作掷点的区间 / 权重档 / 附加属性允许表也从这里进；仓储不自己读配置文件。
         var crafts = new CraftRepository(
-            dataSource, tables.RecipeTable, tables.Items, config, grants, inventory);
+            dataSource, tables.RecipeTable, tables.Items, tables.CraftRollTable,
+            config, grants, inventory);
         // K2+Q13：NPC 商店的四笔事务（买 / 卖 / 回购 / 修理）。钱与入包都复用 grants 的
         // 那两条 SQL，本类不另开第二条货币 UPDATE，也不在客户端算价。
         var npcShops = new NpcShopRepository(

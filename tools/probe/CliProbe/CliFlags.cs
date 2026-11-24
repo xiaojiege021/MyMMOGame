@@ -67,6 +67,12 @@ internal static class CliFlags
     public static long craftFinishOf = 0;
     public static long craftStateOf = 0;
     public static string? craftTxn = null;
+
+    // B3：制作掷点的抽样（无库，纯函数）。用来核「同一区间里档位越高，高值占比越大」。
+    public static string? craftRollRecipe = null;
+    public static int craftRollCount = 0;
+    public static int craftRollCraftCount = 0;
+    public static string? craftRollPath = null;
     // K3：核对用的原始背包写入（绕过业务规则，只给造料 / 清格用，与 --raw-currency-write 同口径）。
     public static long rawItemWriteId = 0;
     public static int rawItemSlot = 0;

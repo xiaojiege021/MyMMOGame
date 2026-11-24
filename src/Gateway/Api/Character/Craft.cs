@@ -240,6 +240,7 @@ public static partial class CharacterApi
                     + " reason=" + result.Reason
                     + " success=" + result.Success
                     + " output=" + result.OutputItemId + "x" + result.OutputCount
+                    + " attr=" + result.CraftAttr
                     + " duplicate=" + result.Duplicate);
 
                 await WriteAsync(context, 200, new
@@ -255,6 +256,13 @@ public static partial class CharacterApi
                     success_pct = result.SuccessPct,
                     craft_time_s = result.CraftTimeS,
                     ready_at_unix = result.ReadyAtUnix,
+                    // B3：这一手的掷点（产出不是装备或没成时 attr=0、extras 空）。
+                    craft_attr = result.CraftAttr,
+                    craft_extras = result.CraftExtras.Select(e => new
+                    {
+                        attr = e.Attr,
+                        value = e.Value,
+                    }),
                 });
             }
             catch (RpcException ex)
