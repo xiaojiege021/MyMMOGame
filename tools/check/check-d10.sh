@@ -161,9 +161,17 @@ if wait_ready "$TMP/gw-nodb.log" 'ready name=Gateway' "网关（无库）"; then
 
   [ "$(code_of "$H")" = "200" ] && ok "豁免 /health 无令牌 200" || bad "豁免 /health 回 $(code_of "$H")"
 
+  # /login 本身也会回 401（口令错），所以不能只看状态码：要看到登入口自己的拒绝码，
+  # 才说明它进了 handler、没被管道当成「没令牌」拦掉。
   L="$(req POST "$BASE/login" '{"account":"d10","password":"d10-pass"}')"
-  [ "$(code_of "$L")" != "401" ] && ok "豁免 /login 不被管道拦（回 $(code_of "$L")）" \
-    || bad "豁免 /login 被管道拦成 401"
+  LBODY="$(body_of "$L")"
+  if printf '%s' "$LBODY" | grep -q 'invalid_credentials'; then
+    ok "豁免 /login 进了登入口自己的拒绝分支（invalid_credentials）"
+  elif [ "$(code_of "$L")" = "503" ] || [ "$(code_of "$L")" = "200" ]; then
+    ok "豁免 /login 没被管道拦（回 $(code_of "$L")）"
+  else
+    bad "豁免 /login 被管道拦掉：$(code_of "$L") $LBODY"
+  fi
 
   A="$(req GET "$BASE/inventory?character_id=1")"
   [ "$(code_of "$A")" = "401" ] && ok "无令牌 GET /inventory 401" || bad "无令牌 GET /inventory 回 $(code_of "$A")"
