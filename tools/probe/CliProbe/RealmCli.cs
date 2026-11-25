@@ -276,7 +276,8 @@ internal static class RealmCli
                         + " realm=" + snap.Realm
                         + " realm_phase=" + snap.Phase
                         + " phase_name=" + snap.PhaseName
-                        + " passive_pct_bps=" + snap.PassivePctBps);
+                        + " passive_pct_bps=" + snap.PassivePctBps
+                        + " attr_points=" + snap.AttrPoints);
                 }
             }
 
@@ -313,7 +314,9 @@ internal static class RealmCli
                     + " passive_pct_bps=" + outcome.PassivePctBps
                     + " reason=" + outcome.Reason
                     + " level=" + outcome.Level
-                    + " level_required=" + outcome.LevelRequired);
+                    + " level_required=" + outcome.LevelRequired
+                    + " points_awarded=" + outcome.PointsAwarded
+                    + " attr_points=" + outcome.AttrPoints);
             }
         }
 

@@ -207,6 +207,8 @@ public sealed partial class CharacterGrpcService
             Level = outcome.Level,
             LevelRequired = outcome.LevelRequired,
             Duplicate = outcome.Duplicate,
+            PointsAwarded = outcome.PointsAwarded,
+            AttrPoints = outcome.AttrPoints,
         };
     }
 
@@ -233,6 +235,7 @@ public sealed partial class CharacterGrpcService
             RealmPhase = snap.Phase,
             PhaseName = snap.PhaseName,
             PassivePctBps = snap.PassivePctBps,
+            AttrPoints = snap.AttrPoints,
         };
     }
 }

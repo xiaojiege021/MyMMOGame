@@ -1465,6 +1465,10 @@ message PromoteRealmPhaseResponse {
   int32 level = 7;
   int32 level_required = 8;
   bool duplicate = 9;
+  // A8：这一次走到大圆满发出去多少可分配点、发完手上还有多少点。
+  // 没到大圆满、或者这一段早就发过时为 0，attr_points 仍是事实值。
+  int32 points_awarded = 10;
+  int32 attr_points = 11;
 }
 
 message DescribeRealmPassiveRequest {
@@ -1477,6 +1481,8 @@ message DescribeRealmPassiveResponse {
   int32 realm_phase = 3;
   string phase_name = 4;
   int32 passive_pct_bps = 5;
+  // A8：手上还有多少可分配属性点（A9 的加点从这里减）。只读，网关不本地算。
+  int32 attr_points = 6;
 }
 
 // N12：九位开口的人的收集度；解锁场次与被动万分比只在 config/hero_codex.json。

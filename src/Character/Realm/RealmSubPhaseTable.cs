@@ -11,9 +11,14 @@ public sealed record RealmSubPhases(
     IReadOnlyList<string> Names,
     IReadOnlyList<int> PassivePctBps,
     IReadOnlyList<int> PromoteMinLevel,
-    int BreakthroughMinIndex)
+    int BreakthroughMinIndex,
+    int GrandPoints)
 {
     public int Count => Names.Count;
+
+    /// <summary>A8：末阶就是「大圆满」时，走到这一阶才给可分配属性点（炼体末阶是九阶，不给）。</summary>
+    public bool LastIsGrandPhase
+        => Names.Count > 0 && string.Equals(Names[^1], "大圆满", StringComparison.Ordinal);
 
     public string NameAt(int index)
         => index >= 0 && index < Names.Count ? Names[index] : "";
@@ -111,6 +116,31 @@ public sealed partial class RealmTable
                 label + ".breakthrough_min_index 必须落在 0.." + (names.Count - 1));
         }
 
+        // A8：大圆满给多少可分配属性点。末阶不是大圆满的境界（炼体九阶）配了点就是
+        // 「永远发不出去」的死配置，加载期直接挡住；末阶是大圆满的必须至少 1 点。
+        if (item.GrandPoints is null)
+        {
+            throw new ConfigException(label + " 缺 grand_points");
+        }
+
+        var grandPoints = item.GrandPoints.Value;
+        if (grandPoints < 0 || grandPoints > 50)
+        {
+            throw new ConfigException(label + ".grand_points 须在 0–50");
+        }
+
+        var lastIsGrand = string.Equals(names[^1], "大圆满", StringComparison.Ordinal);
+        if (!lastIsGrand && grandPoints != 0)
+        {
+            throw new ConfigException(
+                label + ".grand_points 必须是 0：末阶是「" + names[^1] + "」，不是大圆满");
+        }
+
+        if (lastIsGrand && grandPoints < 1)
+        {
+            throw new ConfigException(label + ".grand_points 至少 1：末阶是大圆满就得给点");
+        }
+
         // * 默认仍是方案 8.1 的四阶：第三阶「后期」、大圆满给满该段 2%–3%。
         if (isDefault)
         {
@@ -125,7 +155,7 @@ public sealed partial class RealmTable
             }
         }
 
-        return new RealmSubPhases(names, passive, promoteLevel, breakthroughMin);
+        return new RealmSubPhases(names, passive, promoteLevel, breakthroughMin, grandPoints);
     }
     /// <summary>读 realms.json 的 sub_phases 段：默认那套 + 每个境界自己那套。</summary>
     static (Dictionary<string, RealmSubPhases> ByRealm, RealmSubPhases Default) Build(
@@ -208,4 +238,8 @@ public sealed partial class RealmTable
 
         [JsonPropertyName("breakthrough_min_index")]
         public int? BreakthroughMinIndex { get; init; }
+
+        // A8：走到大圆满这一阶给多少可分配属性点；末阶不是大圆满的境界必须是 0。
+        [JsonPropertyName("grand_points")]
+        public int? GrandPoints { get; init; }
     }

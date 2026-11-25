@@ -70,6 +70,13 @@ R("breakthrough_index", lian.get("breakthrough_min_index") == 8
   and default.get("breakthrough_min_index") == 2)
 R("version", realms.get("version", 0) >= 4)
 
+# A8：大圆满可分配点。炼体末阶是九阶、不是大圆满，配 0；其余每段末阶是大圆满，至少 1 点。
+gp_lian = lian.get("grand_points", None)
+gp_default = default.get("grand_points", None)
+R("grand_points_config", gp_lian == 0 and isinstance(gp_default, int) and 1 <= gp_default <= 50,
+  "炼体=%s 默认=%s" % (gp_lian, gp_default))
+
+
 phase = rd("src/Character/RealmPhaseRepository.cs")
 adv = rd("src/Character/RealmAdvanceRepository.cs")
 rt = rd("src/Character/RealmTable.cs")
@@ -90,6 +97,18 @@ for dp, _, fs in os.walk(os.path.join(root, "src/Gateway")):
 allcards = rd("tools/check/check-all.sh")
 
 R("ledger", "realm_phase_promote" in phase)
+# A8：发点台账与属性点列都在仓储里；点数只在角色服算（战斗服一行都不读）。
+R("points_ledger", "realm_phase_points" in phase and "attr_points" in phase)
+R("points_proto", "int32 attr_points = 6" in proto and "int32 points_awarded = 10" in proto)
+R("points_gateway_readonly", "/character/attr-points" in gwsrc and "attr_points" in gwsrc)
+battle = ""
+for dp, _, fs in os.walk(os.path.join(root, "src/Battle")):
+    if "/obj" in dp or "/bin" in dp:
+        continue
+    for f in fs:
+        if f.endswith(".cs"):
+            battle += open(os.path.join(dp, f), encoding="utf-8").read()
+R("points_only_character", "attr_points" not in battle and "realm_phase_points" not in battle)
 R("promote_gate", "level_not_enough" in phase and "realm_phase_max" in phase)
 R("advance_gate", "realm_phase_not_enough" in adv and "realm_phase = 0" in adv)
 R("sub_model", "RealmSubPhases" in rt and "PassivePctBps" in rt)
@@ -133,6 +152,31 @@ printf '%s' "$OUT2" | grep -q 'config_error=' && ok "缺 sub_phases 起不来" |
 
 GD="$ROOT/src/Gateway/bin/Release/net10.0/Gateway.dll"
 CG="--config $ROOT/config/gateway.json"
+
+echo "== 4b. A8 坏配置：末阶不是大圆满却配了点 / 大圆满不给点 / 缺字段 =="
+bad_realm() {
+  # bad_realm <说明> <python 改法>
+  local label="$1" mutator="$2"
+  local f="$TMP/bad-gp.json"
+  python3 - "$ROOT/config/realms.json" "$f" "$mutator" <<'PY'
+import json, sys
+j = json.load(open(sys.argv[1], encoding="utf-8"))
+by = j["sub_phases"]["by_realm"]
+exec(sys.argv[3])
+json.dump(j, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+PY
+  local out
+  out="$("$DOTNET" "$CD" --realm-table-path "$f" "$ROOT/config/dungeons.json" $CC 2>&1)" || true
+  if printf '%s' "$out" | grep -q 'config_error=.*grand_points'; then
+    ok "$label"
+  else
+    bad "$label —— 没拦住：$(printf '%s' "$out" | grep -m1 'config_error=' || printf '%s' "$out" | head -1)"
+  fi
+}
+bad_realm "炼体（末阶九阶）配 1 点起不来" 'by["炼体"]["grand_points"] = 1'
+bad_realm "大圆满配 0 点起不来" 'by["*"]["grand_points"] = 0'
+bad_realm "缺 grand_points 起不来" 'by["*"].pop("grand_points", None)'
+bad_realm "grand_points 越界（51）起不来" 'by["*"]["grand_points"] = 51'
 
 if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then
   echo "（跳过真库段：MMO_N10_HAS_DB=1 且配置 MMO_GAMEDB）"
@@ -191,5 +235,47 @@ printf '%s' "$ADV0" | grep -q 'reason=realm_phase_not_enough' \
 PS2="$("$DOTNET" "$CD" --realm-passive-state "$ID" $CC 2>&1 | grep -m1 '^realm_passive_state=')"
 printf '%s' "$PS2" | grep -q 'realm_phase=2 phase_name=三阶 passive_pct_bps=60' \
   && ok "到炼体三阶被动 60bps" || bad "三阶被动不对：$PS2"
+
+echo "== 6. A8 大圆满发点 =="
+# 每段给几点现取配置，不写死 5。
+GP="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1], encoding="utf-8"))["sub_phases"]["by_realm"]["*"]["grand_points"])' "$ROOT/config/realms.json")"
+GP2=$((GP * 2))
+# 换到筑基（四阶境界），直写到大圆满前一阶再按正常升阶走一次。
+"$DOTNET" "$CD" --raw-realm-write "$ID" 筑基 $CC >/dev/null
+"$DOTNET" "$CD" --raw-realm-phase-write "$ID" 2 $CC >/dev/null
+"$DOTNET" "$CD" --raw-level-write "$ID" 15 $CC >/dev/null
+GP0="$("$DOTNET" "$CD" --realm-passive-state "$ID" $CC 2>&1 | grep -m1 '^realm_passive_state=')"
+printf '%s' "$GP0" | grep -q 'phase_name=后期 .*attr_points=0' \
+  && ok "大圆满之前手上 0 点" || bad "大圆满前点数不对：$GP0"
+
+G1="$("$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-gp1" $CC 2>&1 | grep -m1 '^promote_realm_phase=')"
+printf '%s' "$G1" | grep -q "executed=true .*to=3 phase_name=大圆满 .*points_awarded=$GP attr_points=$GP" \
+  && ok "升到大圆满发 5 点（配置现值）" || bad "大圆满发点不对：$G1"
+
+GDUP="$("$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-gp1" $CC 2>&1 | grep -m1 '^promote_realm_phase=')"
+printf '%s' "$GDUP" | grep -q "duplicate=true .*points_awarded=0 attr_points=$GP" \
+  && ok "同一个升阶事务号重放不发第二次" || bad "重放发重了：$GDUP"
+
+GMAX="$("$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-gp2" $CC 2>&1 | grep -m1 '^promote_realm_phase=')"
+printf '%s' "$GMAX" | grep -q "reason=realm_phase_max .*points_awarded=0 attr_points=$GP" \
+  && ok "已在大圆满再升不发点" || bad "大圆满重复发点：$GMAX"
+
+# 存量补齐：直写成大圆满（没走过升阶），下一次升阶动作把这一段补上。
+"$DOTNET" "$CD" --raw-realm-write "$ID" 结丹 $CC >/dev/null
+"$DOTNET" "$CD" --raw-realm-phase-write "$ID" 3 $CC >/dev/null
+GB="$("$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-gp3" $CC 2>&1 | grep -m1 '^promote_realm_phase=')"
+printf '%s' "$GB" | grep -q "reason=realm_phase_max .*points_awarded=$GP attr_points=$GP2" \
+  && ok "存量已在大圆满的一段补发一次（$GP → $GP2）" || bad "存量补齐不对：$GB"
+
+# 炼体末阶是九阶、不是大圆满：不发点。
+"$DOTNET" "$CD" --raw-realm-write "$ID" 炼体 $CC >/dev/null
+"$DOTNET" "$CD" --raw-realm-phase-write "$ID" 8 $CC >/dev/null
+GL="$("$DOTNET" "$CD" --promote-realm-phase "$ID" "$TX-gp4" $CC 2>&1 | grep -m1 '^promote_realm_phase=')"
+printf '%s' "$GL" | grep -q "reason=realm_phase_max .*points_awarded=0 attr_points=$GP2" \
+  && ok "炼体九阶不给点" || bad "炼体也发点了：$GL"
+
+AP="$(curl -s --noproxy '*' "http://127.0.0.1:61000/character/attr-points?character_id=$ID&token=$TOK" 2>/dev/null)"
+printf '%s' "$AP" | grep -q '"ok":true' && printf '%s' "$AP" | grep -q "\"attr_points\":$GP2" \
+  && ok "只读口 /character/attr-points 回 $GP2 点" || bad "只读口不对：$AP"
 
 finish "$TITLE"

@@ -932,3 +932,23 @@ CREATE TABLE IF NOT EXISTS "角色".arena_rank_appearance (
     claimed_at   timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (character_id, season_id, tier_key)
 );
+
+-- A8：大圆满可分配属性点（同一段也单独在 db/character/attr_points.sql，版本 37）。
+-- 每段点数在 config/realms.json 的 sub_phases.by_realm[*].grand_points；
+-- 这一列是手上还有多少点，A9 的加点从这里减，(character_id, realm) 保证一段只发一次。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS attr_points integer NOT NULL DEFAULT 0;
+
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_attr_points_range;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_attr_points_range CHECK (attr_points >= 0);
+
+CREATE TABLE IF NOT EXISTS "角色".realm_phase_points (
+    txn_id       text        NOT NULL PRIMARY KEY,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    realm        text        NOT NULL CHECK (realm <> ''),
+    points       integer     NOT NULL CHECK (points > 0),
+    granted_at   timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT realm_phase_points_once UNIQUE (character_id, realm)
+);

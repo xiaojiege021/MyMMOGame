@@ -90,10 +90,13 @@ for name, text in (("realm_phase.sql", ddl), ("character.sql", main)):
       and "from_phase >= 0 AND from_phase <= 8" in text
       and "to_phase >= 1 AND to_phase <= 8" in text)
 
-dirty = subprocess.run(
-    ["git", "-C", root, "status", "--porcelain", "--", "proto", "client"],
-    capture_output=True, text=True).stdout.strip()
-R("proto_client_untouched", dirty == "", dirty)
+# D5 口径：不拿 git diff 钉整目录（「本卡没动 proto」是当时的事实，不是不变量）。
+# 真正的不变量是两端生成物逐字节相同、且这条 rpc 还在；加字段的卡（A8）也照过。
+server_gen = rd("src/Shared/Generated/Character.cs")
+client_gen = rd("client/MMOGame/Assets/Proto/Generated/Character.cs")
+R("proto_client_same", server_gen == client_gen and len(server_gen) > 0
+  and "DescribeRealmPassive" in client_gen,
+  "server=%d client=%d" % (len(server_gen), len(client_gen)))
 PY
 while IFS= read -r line; do
   case "$line" in

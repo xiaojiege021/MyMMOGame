@@ -85,18 +85,23 @@ for key in realm_pending realm_phase promote_ok promote_reject promote_body; do
 done
 
 echo "== 4. 不做项 =="
-# 这一条守的是「境界子阶这条链不许改配置与玩法」：只看境界 / 职业那两份配置；
-# 别的卡会改物品表、商店表这些跟境界无关的文件，不按整个 config/ 目录比对。
-# proto 与 src 同理（N14 就动了 world.proto），改成断言本卡依赖的两条 rpc 与网关路径仍在。
-if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-  if git -C "$ROOT" diff --quiet -- config/realms.json config/classes.json 2>/dev/null; then
-    ok "境界 / 职业配置一行未改"
-  else
-    bad "这张卡改了境界或职业配置"
-    git -C "$ROOT" diff --name-only -- config/realms.json config/classes.json | detail
-  fi
+# 这一条守的是「境界子阶这条链不许改配置与玩法」。D5 口径：钉内容、不拿 git diff 钉文件——
+# U13 屏上依赖的是阶名与被动那两组值，它们没变就说明玩法没改；
+# 别的卡往 sub_phases 加自己的键（A8 的 grand_points）不该把这条判红。
+if python3 - "$ROOT/config/realms.json" <<'PY'
+import json, sys
+by = json.load(open(sys.argv[1], encoding="utf-8"))["sub_phases"]["by_realm"]
+ok = (by["炼体"]["names"] == ["一阶", "二阶", "三阶", "四阶", "五阶", "六阶", "七阶", "八阶", "九阶"]
+      and by["炼体"]["passive_pct_bps"] == [0, 30, 60, 90, 120, 150, 180, 210, 250]
+      and by["*"]["names"] == ["初期", "中期", "后期", "大圆满"]
+      and by["*"]["passive_pct_bps"] == [0, 80, 160, 250])
+sys.exit(0 if ok else 1)
+PY
+then
+  ok "段内阶的阶名与被动一值未改（境界子阶这条链没动玩法）"
 else
-  echo "  skip 不是 git 仓库，跳过改动比对"
+  bad "境界子阶的阶名或被动被改了"
+  detail "看 config/realms.json 的 sub_phases.by_realm"
 fi
 if grep -q "rpc PromoteRealmPhase" "$ROOT/proto/mmo/character.proto" \
    && grep -q "rpc DescribeRealmPassive" "$ROOT/proto/mmo/character.proto" \
