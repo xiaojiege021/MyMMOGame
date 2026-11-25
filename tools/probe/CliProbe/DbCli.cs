@@ -91,6 +91,9 @@ internal static class DbCli
             code = await StallCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await AttrCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await InvariantCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -128,6 +131,7 @@ internal static class DbCli
     || rawDrillId != 0 || rawMainStageId != 0 || completeQuestOf != 0
     || realmBreakStateOf != 0 || advanceRealmOf != 0 || settleDrillOf != 0
     || rawRealmPhaseId != 0 || realmPassiveStateOf != 0 || promoteRealmPhaseOf != 0
+    || attrPointsStateOf != 0 || allocateAttrOf != 0 || rawAttrPointsOf != 0
     || heroCodexStateOf != 0
     || exchangeStoneOf != 0 || stoneExchangeStateOf != 0 || cityState || cityTaxRowTxn != null
     || stoneListingState

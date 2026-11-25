@@ -349,7 +349,7 @@ internal static class ConfigTableCli
         {
             try
             {
-                var table = ItemTable.Load("config/items.json");
+                var table = ItemTable.Load(itemTablePath ?? "config/items.json");
                 Console.WriteLine("item_table_state=ok version=" + table.Version
                     + " items=" + table.All.Count);
                 foreach (var item in table.All.OrderBy(i => i.Id, StringComparer.Ordinal))

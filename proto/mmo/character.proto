@@ -194,6 +194,10 @@ service CharacterService {
   // P2-4a：二转只把 15 级选定的那条分支往前推一步。45 级才允许，目标必须就是
   // 已经选定的那条；改去另一条分支一律拒绝。分支步数写在角色库里，不靠客户端传。
   rpc AdvanceBranch(AdvanceBranchRequest) returns (AdvanceBranchResponse);
+  // A9：属性加点。只读这条回手上还剩多少点与四属性各加了多少；写那条一次只加一个属性，
+  // 事务号由网关生成、同一个事务号只加一次。点数只在角色服算，战斗服只读快照。
+  rpc DescribeAttributePoints(DescribeAttributePointsRequest) returns (DescribeAttributePointsResponse);
+  rpc AllocateAttributePoints(AllocateAttributePointsRequest) returns (AllocateAttributePointsResponse);
   // P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
   // 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
   rpc CanEquip(CanEquipRequest) returns (CanEquipResponse);
@@ -1262,9 +1266,15 @@ message DescribeBattleProfileResponse {
   // B10：已穿装备上攻击类结晶的固定值之和（config/crystal.json 的 fixed_value）。
   // 方案 7.2 第二段把它除以基础攻击当作一项固定值；防御 / 功能两类不进伤害公式。
   int32 crystal_flat_attack = 11;
-  // B6：已觉醒的那条技能编号（config/awaken.json 的分支映射），0 表示没觉醒。
-  // 战斗服进场时按它在三条职业技能之后追加一条，并且只认本分支那一条。
   int32 awaken_skill_id = 12;
+  // A9：这个角色手动加到四属性上的点数（0 = 没加点）。基础值仍在 config/classes.json
+  // 的职业表里，战斗服把两截相加之后才算生命 / 蓝量 / 攻击 / 治疗 / 仇恨；
+  // 角色服只回加点事实值，不在快照里合成第二份属性数值。
+  // 竞技场模板属性不吃这四格（P2-3a：换装与加点都不改模板）；战场 / 城战 / 副本 / 世界 Boss 吃。
+  int32 attr_strength = 13;
+  int32 attr_agility = 14;
+  int32 attr_spirit = 15;
+  int32 attr_vitality = 16;
 }
 
 // P2-4a：二转。只推进一步已经选定的分支，不另开分支、不改兵器。
@@ -1483,6 +1493,51 @@ message DescribeRealmPassiveResponse {
   int32 passive_pct_bps = 5;
   // A8：手上还有多少可分配属性点（A9 的加点从这里减）。只读，网关不本地算。
   int32 attr_points = 6;
+}
+
+// A9：属性加点的两条消息。四属性键只认 strength / agility / spirit / vitality，
+// 别的键一律 bad_attribute；本版没有洗点 rpc（不做免费洗点），要开就单独派卡。
+message DescribeAttributePointsRequest {
+  uint64 character_id = 1;
+}
+
+message DescribeAttributePointsResponse {
+  bool ok = 1;
+  string class_id = 2;
+  int32 level = 3;
+  // 手上还剩多少可分配点（character.attr_points 的事实值，A8 发的）。
+  int32 attr_points = 4;
+  int32 strength = 5;
+  int32 agility = 6;
+  int32 spirit = 7;
+  int32 vitality = 8;
+}
+
+message AllocateAttributePointsRequest {
+  // 网关转发时填令牌账号；服间直连为空时只按角色编号找。
+  string account = 1;
+  uint64 character_id = 2;
+  string txn_id = 3;
+  // strength / agility / spirit / vitality 之一。
+  string attribute = 4;
+  // 这一次加多少点，至少 1；不够扣就整笔拒绝，不扣半笔。
+  int32 points = 5;
+}
+
+message AllocateAttributePointsResponse {
+  bool ok = 1;
+  // bad_txn / bad_attribute / bad_points / not_enough_points / attr_cap_reached /
+  // character_not_found；空串表示这一笔做成了（或者 duplicate）。
+  string reason = 2;
+  // 同一个事务号重放时为 true：不再扣点、不再加属性。
+  bool duplicate = 3;
+  string class_id = 4;
+  int32 level = 5;
+  int32 attr_points = 6;
+  int32 strength = 7;
+  int32 agility = 8;
+  int32 spirit = 9;
+  int32 vitality = 10;
 }
 
 // N12：九位开口的人的收集度；解锁场次与被动万分比只在 config/hero_codex.json。

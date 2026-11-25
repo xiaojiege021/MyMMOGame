@@ -89,6 +89,7 @@ public static class GrpcHost
         builder.Services.AddSingleton(services.SeasonPasses);
         builder.Services.AddSingleton(tables.ArenaRankTable);
         builder.Services.AddSingleton(services.ArenaRanks);
+        builder.Services.AddSingleton(services.AttrPoints);
         builder.Services.AddSingleton(tables.MonthlyBundleTable);
         builder.Services.AddSingleton(services.MonthlyBundles);
         builder.Services.AddSingleton(tables.CharacterSlotTable);

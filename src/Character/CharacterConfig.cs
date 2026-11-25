@@ -19,7 +19,7 @@ public sealed record CharacterConfig(
     string RecipeTable, string CalendarTable, string CityTaskTable,
     string SeasonPassProgressTable, string NameRulesTable, string PillTable,
     string CraftRollTable, string MountTable, string SpiritBeastTable, string StallTable,
-    string AwakenTable, string ArenaRankTable)
+    string AwakenTable, string ArenaRankTable, string AttrPointTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -71,6 +71,9 @@ public sealed record CharacterConfig(
     // B11：竞技场赛季段位表（档位阈值、每胜加分、排行取前几名、每档专属外观）。
     // 只给角色服读；战斗服只上报「这一场赢了」，不读段位表。
     public const string DefaultArenaRankTable = "config/arena_rank.json";
+    // A9：属性加点的约束（单属性上限、不做免费洗点）。四属性的基础值不在这份文件里，
+    // 仍读 config/classes.json 的职业表；这里只写「手动加的那部分」受什么限制。
+    public const string DefaultAttrPointTable = "config/attr_points.json";
     // K3：生产 / 配方的正本。同样不显式登记进 character.json：老卡的临时配置目录里
     // 没有这份表时走默认文件名，仓库根的那一份照常可读。
     public const string DefaultRecipeTable = "config/recipes.json";
@@ -216,6 +219,14 @@ public sealed record CharacterConfig(
         if (arenaRankTable.Length == 0)
         {
             throw new ConfigException("arena_rank_table 不能为空");
+        }
+
+        // A9：属性加点表。和段位表同口径：老配置不写这一项也照常起（走仓库根这一份），
+        // 核对脚本可指到临时表试坏配置（上限、洗点开关）。
+        var attrPointTable = (wire.AttrPointTable ?? DefaultAttrPointTable).Trim();
+        if (attrPointTable.Length == 0)
+        {
+            throw new ConfigException("attr_point_table 不能为空");
         }
 
         // 商城清单也走同一份配置正本；核对脚本可以指到临时表试坏清单。
@@ -422,7 +433,7 @@ public sealed record CharacterConfig(
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
             characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable,
             cityTaskTable, seasonPassProgressTable, nameRulesTable, pillTable, craftRollTable,
-            mountTable, spiritBeastTable, stallTable, awakenTable, arenaRankTable);
+            mountTable, spiritBeastTable, stallTable, awakenTable, arenaRankTable, attrPointTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -475,6 +486,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("arena_rank_table")]
         public string? ArenaRankTable { get; init; }
+
+        [JsonPropertyName("attr_point_table")]
+        public string? AttrPointTable { get; init; }
 
         [JsonPropertyName("shop_table")]
         public string? ShopTable { get; init; }

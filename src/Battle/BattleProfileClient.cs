@@ -15,7 +15,13 @@ namespace Battle;
 public sealed record BattleProfile(
     string ClassId, string Branch, int Level, int EnhanceTotal, int EnhanceSlots, int BranchStep,
     int PassivePctBps = 0, int EquipAttack = 0, int EnhanceCoefBps = 0, int CrystalFlatAttack = 0,
-    int AwakenSkillId = 0);
+    int AwakenSkillId = 0,
+    // A9：手动加到四属性上的点数（0 = 没加点）。基础值仍读 classes.json，两截相加才算数。
+    int AttrStrength = 0, int AttrAgility = 0, int AttrSpirit = 0, int AttrVitality = 0)
+{
+    /// <summary>A9：加点折算成战斗服认的那一格。没加点时四条都是 0，与 A9 之前逐字相同。</summary>
+    public AttrBonus Bonus => new(AttrStrength, AttrAgility, AttrSpirit, AttrVitality);
+}
 
 public interface IBattleProfileSource : IDisposable
 {
@@ -59,7 +65,8 @@ public sealed class GrpcBattleProfileSource : IBattleProfileSource
                 ? new BattleProfile(
                     reply.ClassId, reply.Branch, reply.Level, reply.EnhanceTotal,
                     reply.EnhanceSlots, reply.BranchStep, reply.PassivePctBps, reply.EquipAttack,
-                    reply.EnhanceCoefBps, reply.CrystalFlatAttack, reply.AwakenSkillId)
+                    reply.EnhanceCoefBps, reply.CrystalFlatAttack, reply.AwakenSkillId,
+                    reply.AttrStrength, reply.AttrAgility, reply.AttrSpirit, reply.AttrVitality)
                 : null;
         }
         catch (RpcException ex)

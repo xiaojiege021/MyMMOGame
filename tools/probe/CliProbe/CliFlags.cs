@@ -406,4 +406,18 @@ internal static class CliFlags
     public static long rawDurabilityOf = 0;
     public static string? rawDurabilitySlot = null;
     public static int rawDurabilityValue = 0;
+
+    // A9：属性加点。--attr-points-config / --attr-point-table-path 只读不连库；
+    // --attr-points-state / --allocate-attr / --raw-attr-points-write 连库核对。
+    public static bool attrPointsConfig = false;
+    public static string? attrPointTablePath = null;
+    public static long attrPointsStateOf = 0;
+    public static long allocateAttrOf = 0;
+    public static string? allocateAttrTxn = null;
+    public static string? allocateAttrKey = null;
+    public static int allocateAttrPoints = 0;
+    public static long rawAttrPointsOf = 0;
+    public static int rawAttrPointsValue = 0;
+    // A9：装备门槛读加点的取证口——物品表可以指到临时表（--item-list 与 --can-equip 共用）。
+    public static string? itemTablePath = null;
 }

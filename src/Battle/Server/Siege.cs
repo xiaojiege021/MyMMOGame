@@ -44,12 +44,14 @@ public sealed partial class BattleServer
 
         var table = config.Siege;
         var level = profile.EnhanceTotal;
-        var rawAttack = (long)Math.Round(realClass.Attack()) + level * table.AttackPerLevel;
-        var rawHp = realClass.HpMax(config.Classes.HpPerVitality) + level * table.HpPerLevel;
-        var rawMana = realClass.ManaMax() + level * table.ManaPerLevel;
-        var rawHeal = (long)Math.Round(realClass.Attributes.Spirit * realClass.HealPerSpirit)
+        // A9：加点先并进职业属性再折算，之后的生命 / 蓝 / 攻击 / 治疗 / 仇恨与战力全部按加了点的算。
+        var bonus = profile.Bonus;
+        var rawAttack = (long)Math.Round(realClass.Attack(bonus)) + level * table.AttackPerLevel;
+        var rawHp = realClass.HpMax(config.Classes.HpPerVitality, bonus) + level * table.HpPerLevel;
+        var rawMana = realClass.ManaMax(bonus) + level * table.ManaPerLevel;
+        var rawHeal = (long)Math.Round(realClass.HealPower(bonus))
                       + level * table.HealPerLevel;
-        var rawThreat = realClass.ThreatStability();
+        var rawThreat = realClass.ThreatStability(bonus);
         var rawPower = table.Power(rawAttack, rawHp, rawMana, rawHeal);
 
         // P3-3a3：只在城战开场读社交服的宗门科技。练习场 / 副本 / 竞技场 / 战场

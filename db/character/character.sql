@@ -952,3 +952,30 @@ CREATE TABLE IF NOT EXISTS "角色".realm_phase_points (
     granted_at   timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT realm_phase_points_once UNIQUE (character_id, realm)
 );
+
+-- A9：属性加点（同一段也单独在 db/character/attr_allocation.sql，版本 38）。
+-- character.attr_points 在这里减，加到的四列在 character_attr_points；一笔一行进台账。
+CREATE TABLE IF NOT EXISTS "角色".character_attr_points (
+    character_id bigint      NOT NULL PRIMARY KEY REFERENCES "角色".character (id) ON DELETE CASCADE,
+    strength     integer     NOT NULL DEFAULT 0,
+    agility      integer     NOT NULL DEFAULT 0,
+    spirit       integer     NOT NULL DEFAULT 0,
+    vitality     integer     NOT NULL DEFAULT 0,
+    updated_at   timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT character_alloc_range CHECK (
+        strength >= 0 AND agility >= 0 AND spirit >= 0 AND vitality >= 0)
+);
+
+CREATE TABLE IF NOT EXISTS "角色".character_attr_ledger (
+    txn_id          text        NOT NULL PRIMARY KEY,
+    character_id    bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    attribute       text        NOT NULL,
+    points          integer     NOT NULL CHECK (points > 0),
+    remaining_after integer     NOT NULL CHECK (remaining_after >= 0),
+    created_at      timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT character_attr_ledger_attribute CHECK (
+        attribute IN ('strength', 'agility', 'spirit', 'vitality'))
+);
+
+CREATE INDEX IF NOT EXISTS character_attr_ledger_character
+    ON "角色".character_attr_ledger (character_id);

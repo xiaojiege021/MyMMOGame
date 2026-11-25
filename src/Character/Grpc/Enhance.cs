@@ -429,7 +429,13 @@ public sealed partial class CharacterGrpcService
             EquipSlot = item.Slot,
         };
 
-        var reason = EquipRules.Check(item, identity.Value.Level, identity.Value.ClassId, branches);
+        // A9：属性门槛读加点——基础值从职业表现取，加点从角色库现读，合成之后再判。
+        var allocated = await attrPoints.AllocationAsync(
+            (long)request.CharacterId, context.CancellationToken);
+        var effective = (classes.AttributesOf(identity.Value.ClassId) ?? ClassAttributes.None)
+            .Plus(allocated.Strength, allocated.Agility, allocated.Spirit, allocated.Vitality);
+        var reason = EquipRules.Check(
+            item, identity.Value.Level, identity.Value.ClassId, branches, effective);
         response.Ok = reason.Length == 0;
         response.Reason = reason;
         return response;

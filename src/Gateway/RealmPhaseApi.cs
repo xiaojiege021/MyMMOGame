@@ -74,54 +74,6 @@ public static class RealmPhaseApi
             }
         });
 
-        // A8：大圆满可分配点数的只读口。段内阶名、被动与点数的唯一算法都在角色服，
-        // 网关只认令牌、复核归属、把角色服回包原样转出去；不加点、不洗点（加点归 A9）。
-        app.MapGet("/character/attr-points", async context =>
-        {
-            var account = GatewayAuth.AccountOf(context);
-
-            if (!ulong.TryParse(context.Request.Query["character_id"].ToString(), out var characterId)
-                || characterId == 0)
-            {
-                await WriteAsync(context, 400, new { error = "bad_request" });
-                return;
-            }
-
-            if (!await GatewayAuth.OwnsAsync(character, account, characterId, context))
-            {
-                await WriteAsync(context, 404, new { error = "character_not_found" });
-                return;
-            }
-
-            try
-            {
-                var reply = await character.DescribeRealmPassiveAsync(
-                    new DescribeRealmPassiveRequest { CharacterId = characterId },
-                    deadline: DateTime.UtcNow.AddSeconds(5),
-                    cancellationToken: context.RequestAborted);
-
-                if (!reply.Ok)
-                {
-                    await WriteAsync(context, 404, new { error = "character_not_found" });
-                    return;
-                }
-
-                await WriteAsync(context, 200, new
-                {
-                    ok = true,
-                    character_id = characterId,
-                    realm = reply.Realm,
-                    realm_phase = reply.RealmPhase,
-                    phase_name = reply.PhaseName,
-                    attr_points = reply.AttrPoints,
-                });
-            }
-            catch (RpcException ex) when (ex.StatusCode == StatusCode.InvalidArgument)
-            {
-                await WriteAsync(context, 400, new { error = "bad_request" });
-            }
-        });
-
         // 升阶：事务号由网关生成，客户端不带；门槛与流水全在角色服。
         app.MapPost("/realm/phase/promote", async context =>
         {

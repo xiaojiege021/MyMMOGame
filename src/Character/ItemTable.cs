@@ -17,6 +17,13 @@ public enum BindRule
 }
 
 /// <summary>
+/// A9：一件装备的属性门槛。Key 只认四属性（strength / agility / spirit / vitality），
+/// Min 是「穿上这件至少要有多少」（职业基础 + 已加点，两截都在判定时现取）。
+/// 本版没有任何一件装备写它（pending），字段先在、以后填数不用再回填全部装备。
+/// </summary>
+public readonly record struct ItemRequirement(string Key, int Min);
+
+/// <summary>
 /// 一件物品的静态定义。价格、发货、掉落不在这里：那些只在商店 / 配方 / 掉落表。
 /// grade / set_id / desc 是 K5 加的展示与品阶字段，代码只读，不按物品编号分支。
 /// 图标地址不进配置（第 17 节 17.1）：客户端按 icon/<物品编号> 自己拼，服务端不认这一格。
@@ -25,8 +32,13 @@ public sealed record ItemDef(
     string Id, string Name, string Kind, int StackMax, BindRule Bind,
     string WeaponKind = "", int RequireLevel = 0,
     string Grade = "", string SetId = "", string Desc = "",
-    string Slot = "", int Attack = 0)
+    string Slot = "", int Attack = 0,
+    IReadOnlyList<ItemRequirement>? RequireAttr = null)
 {
+    /// <summary>装备的属性门槛（A9）。没写的装备回空表，等于「只受等级与职业约束」。</summary>
+    public IReadOnlyList<ItemRequirement> Requirements =>
+        RequireAttr ?? Array.Empty<ItemRequirement>();
+
     /// <summary>有没有品阶。材料、结晶、称号、外观可以不写。</summary>
     public bool HasGrade => Grade.Length > 0;
 
@@ -173,6 +185,32 @@ public sealed class ItemTable
                 throw new ConfigException("装备 " + id + " 的 attack 不能是负数");
             }
 
+            // A9：属性门槛。只有装备能写；键只认四属性；最低值至少 1（写 0 等于没写，
+            // 静默放过会让「门槛」看起来配了却没生效）。本版全表都不写这一格。
+            List<ItemRequirement> requirements = [];
+            if (item.RequireAttr is { Count: > 0 })
+            {
+                if (kind != "equipment")
+                {
+                    throw new ConfigException("只有装备能写 require_attr：" + id);
+                }
+                foreach (var (key, min) in item.RequireAttr)
+                {
+                    if (!AttrPointTable.IsAttribute(key))
+                    {
+                        throw new ConfigException(
+                            "物品 " + id + " 的 require_attr 键不认识：" + key
+                            + "（只认 strength / agility / spirit / vitality）");
+                    }
+                    if (min < 1 || min > AttrPointTable.MaxAttrValue)
+                    {
+                        throw new ConfigException(
+                            "物品 " + id + " 的属性门槛要在 1.." + AttrPointTable.MaxAttrValue + " 之间：" + key);
+                    }
+                    requirements.Add(new ItemRequirement(key, min));
+                }
+            }
+
             if (map.ContainsKey(id))
             {
                 // 配置设计 10.1：同一文件内 id 唯一。重复时以前是后者覆盖前者，
@@ -181,7 +219,9 @@ public sealed class ItemTable
             }
             map[id] = new ItemDef(
                 id, (item.Name ?? id).Trim(), kind, stackMax,
-                item.Bind.Value, weaponKind, requireLevel, grade, setId, desc, slot, attack);
+                item.Bind.Value, weaponKind, requireLevel, grade, setId, desc, slot, attack,
+                requirements.Count == 0 ? null : requirements);
+
         }
 
         if (map.Count == 0)
@@ -262,5 +302,9 @@ public sealed class ItemTable
 
         [JsonPropertyName("attack")]
         public int? Attack { get; init; }
+
+        // A9：装备的属性门槛，形如 { "strength": 120 }；不写就是「只受等级与职业约束」。
+        [JsonPropertyName("require_attr")]
+        public Dictionary<string, int>? RequireAttr { get; init; }
     }
 }

@@ -61,15 +61,22 @@ public sealed class Member : IStatusHost
     /// 没配上游时是 0，与 B9 之前逐字相同。
     /// </summary>
     public double AttackPower() =>
-        Combat?.Attack ?? Template?.Attack ?? (Class.Attack() + (Profile?.EquipAttack ?? 0));
+        Combat?.Attack ?? Template?.Attack
+        ?? (Class.Attack(Bonus) + (Profile?.EquipAttack ?? 0));
+
+    /// <summary>
+    /// A9：这个人的加点。快照还没取到时是四条 0（与 A9 之前一样）；竞技场模板与
+    /// 战场 / 城战的 Combat 不看它——那两条各自已经把属性算死了。
+    /// </summary>
+    public AttrBonus Bonus => Profile?.Bonus ?? AttrBonus.None;
 
     /// <summary>治疗：战场 > 模板 > 精神 × 职业治疗系数。</summary>
     public double HealPower() =>
-        Combat?.HealPower ?? Template?.HealPower ?? Class.Attributes.Spirit * Class.HealPerSpirit;
+        Combat?.HealPower ?? Template?.HealPower ?? Class.HealPower(Bonus);
 
     /// <summary>仇恨稳定值：战场 > 模板 > 体力 × 职业系数。</summary>
     public long ThreatStability() =>
-        Combat?.ThreatStability ?? Template?.ThreatStability ?? Class.ThreatStability();
+        Combat?.ThreatStability ?? Template?.ThreatStability ?? Class.ThreatStability(Bonus);
 
     public long Hp { get; internal set; }
     public long HpMax { get; internal set; }

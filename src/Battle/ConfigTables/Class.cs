@@ -15,6 +15,18 @@ public sealed class ResurrectConfig
     public int SecondTurnExpCostPct { get; init; }
 }
 
+/// <summary>
+/// A9：角色手动加到四属性上的点数（来自角色服快照，0 = 没加点）。
+/// 只与职业表的基础属性相加，战斗服不另存一份属性数值。
+/// 竞技场模板不吃它；副本 / 练习场 / 世界 Boss / 战场 / 城战吃。
+/// </summary>
+public readonly record struct AttrBonus(long Strength, long Agility, long Spirit, long Vitality)
+{
+    public static readonly AttrBonus None = default;
+
+    public bool IsZero => Strength == 0 && Agility == 0 && Spirit == 0 && Vitality == 0;
+}
+
 public sealed class AttributesConfig
 {
     public long Strength { get; init; }
@@ -28,6 +40,15 @@ public sealed class AttributesConfig
         "agility" => Agility,
         "spirit" => Spirit,
         _ => 0,
+    };
+
+    /// <summary>A9：基础 + 加点。加四条，不加任何系数。</summary>
+    public AttributesConfig Plus(AttrBonus bonus) => new()
+    {
+        Strength = Strength + bonus.Strength,
+        Agility = Agility + bonus.Agility,
+        Spirit = Spirit + bonus.Spirit,
+        Vitality = Vitality + bonus.Vitality,
     };
 }
 
@@ -52,13 +73,22 @@ public sealed class ClassDef
     public long ThreatPerVitality { get; init; }
     public List<uint> Skills { get; init; } = [];
 
-    public long HpMax(long hpPerVitality) => Attributes.Vitality * hpPerVitality;
+    // A9：四条公式都先加加点再算。不传 bonus 时与 A9 之前逐字相同（默认参数 = 四条都是 0）。
+    public long HpMax(long hpPerVitality, AttrBonus bonus = default) =>
+        Attributes.Plus(bonus).Vitality * hpPerVitality;
 
-    public double Attack() => Attributes.Get(Primary) * AttackPerPrimary + EquipmentAttack;
+    public double Attack(AttrBonus bonus = default) =>
+        Attributes.Plus(bonus).Get(Primary) * AttackPerPrimary + EquipmentAttack;
 
-    public long ManaMax() => ManaBase + Attributes.Spirit * ManaPerSpirit;
+    public long ManaMax(AttrBonus bonus = default) =>
+        ManaBase + Attributes.Plus(bonus).Spirit * ManaPerSpirit;
 
-    public long ThreatStability() => Attributes.Vitality * ThreatPerVitality;
+    public long ThreatStability(AttrBonus bonus = default) =>
+        Attributes.Plus(bonus).Vitality * ThreatPerVitality;
+
+    /// <summary>HealPower：精神 × 职业系数（法系那条技能从这里取值）。A9 起读加点后的精神。</summary>
+    public double HealPower(AttrBonus bonus = default) =>
+        Attributes.Plus(bonus).Spirit * HealPerSpirit;
 }
 
 public sealed class ClassTable

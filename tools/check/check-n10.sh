@@ -115,6 +115,28 @@ R("sub_model", "RealmSubPhases" in rt and "PassivePctBps" in rt)
 R("proto", "rpc PromoteRealmPhase" in proto and "rpc DescribeRealmPassive" in proto)
 R("gateway_no_local_passive", "realms.json" not in gwsrc and "RealmSubPhases" not in gwsrc)
 R("no_client_passive", "passive_pct" not in rd("client/MMOGame/Assets/HotUpdate/Ui/UiEntrySelfCheck.cs"))
+# A9：属性加点。四属性、上限走配置、不做免费洗点；装备门槛读加点。
+apcfg = json.load(open(os.path.join(root, "config/attr_points.json"), encoding="utf-8"))
+R("attr_config", apcfg.get("schema") == "attr-point-table/1" and apcfg.get("pending") is True
+  and apcfg.get("per_attr_cap") == 0 and apcfg.get("free_respec") is False,
+  "配置=%s" % apcfg)
+R("attr_proto", "rpc AllocateAttributePoints" in proto and "rpc DescribeAttributePoints" in proto
+  and "int32 attr_strength = 13" in proto and "int32 attr_vitality = 16" in proto)
+R("attr_gateway", "/character/attr-points/allocate" in gwsrc
+  and "AllocateAttributePointsRequest" in gwsrc)
+R("attr_no_respec", re.search(r"rpc \w+[Rr]espec", proto) is None and "respec" not in proto)
+apr = rd("src/Character/AttrPointRepository.cs")
+R("attr_ledger", "character_attr_ledger" in apr and "attr_points - $2" in apr)
+R("attr_four_keys", "strength" in apr and "agility" in apr and "spirit" in apr
+  and "vitality" in apr and "AttrPointTable.IsAttribute" in apr)
+R("attr_equip_gate", "attr_not_enough" in rd("src/Character/EquipRules.cs")
+  and "Requirements" in rd("src/Character/EquipRules.cs")
+  and "require_attr" in rd("src/Character/ItemTable.cs"))
+R("attr_battle_composite", "AttrBonus" in battle and "ApplyAttributePoints" in battle
+  and "HealPower(Bonus)" in battle)
+R("attr_schema", "character_attr_points" in rd("db/character/character.sql")
+  and "character_attr_ledger" in rd("db/character/character.sql")
+  and "db/character/attr_allocation.sql" in rd("db/migrations.json"))
 R("all_cards", "n10)" in allcards and re.search(r"\bn10\b", allcards))
 PY
 while IFS= read -r line; do
@@ -177,6 +199,52 @@ bad_realm "炼体（末阶九阶）配 1 点起不来" 'by["炼体"]["grand_poin
 bad_realm "大圆满配 0 点起不来" 'by["*"]["grand_points"] = 0'
 bad_realm "缺 grand_points 起不来" 'by["*"].pop("grand_points", None)'
 bad_realm "grand_points 越界（51）起不来" 'by["*"]["grand_points"] = 51'
+
+echo "== 4c. A9 坏配置：洗点开关 / 上限 / 缺字段 / 未知键 =="
+bad_attr() {
+  # bad_attr <说明> <python 改法>
+  local label="$1" mutator="$2"
+  local f="$TMP/bad-attr.json"
+  python3 - "$ROOT/config/attr_points.json" "$f" "$mutator" <<'PY'
+import json, sys
+j = json.load(open(sys.argv[1], encoding="utf-8"))
+exec(sys.argv[3])
+json.dump(j, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+PY
+  local out
+  out="$("$DOTNET" "$CD" --attr-point-table-path "$f" $CC 2>&1)" || true
+  if printf '%s' "$out" | grep -q 'config_error='; then
+    ok "$label"
+  else
+    bad "$label —— 没拦住：$(printf '%s' "$out" | grep -m1 'config_error=' || printf '%s' "$out" | head -1)"
+  fi
+}
+bad_attr "free_respec=true（免费洗点）起不来" 'j["free_respec"] = True'
+bad_attr "per_attr_cap 越界（100001）起不来" 'j["per_attr_cap"] = 100001'
+bad_attr "缺 free_respec 起不来" 'j.pop("free_respec", None)'
+bad_attr "未知键起不来" 'j["attr_reset_cost"] = 0'
+
+echo "== 4d. A9 坏物品表：非装备写 require_attr / 属性键不认识 =="
+bad_items() {
+  # bad_items <说明> <python 改法>
+  local label="$1" mutator="$2"
+  local f="$TMP/bad-items.json"
+  python3 - "$ROOT/config/items.json" "$f" "$mutator" <<'PY'
+import json, sys
+j = json.load(open(sys.argv[1], encoding="utf-8"))
+exec(sys.argv[3])
+json.dump(j, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+PY
+  local out
+  out="$("$DOTNET" "$CD" --item-list --item-table-path "$f" $CC 2>&1)" || true
+  if printf '%s' "$out" | grep -q 'config_error='; then
+    ok "$label"
+  else
+    bad "$label —— 没拦住：$(printf '%s' "$out" | grep -m1 'config_error=' || printf '%s' "$out" | head -1)"
+  fi
+}
+bad_items "非装备写 require_attr 起不来" 'j["items"][0]["require_attr"] = {"strength": 10}'
+bad_items "属性键不认识起不来" 'next(x for x in j["items"] if x["kind"] == "equipment")["require_attr"] = {"luck": 10}'
 
 if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then
   echo "（跳过真库段：MMO_N10_HAS_DB=1 且配置 MMO_GAMEDB）"
@@ -277,5 +345,92 @@ printf '%s' "$GL" | grep -q "reason=realm_phase_max .*points_awarded=0 attr_poin
 AP="$(curl -s --noproxy '*' "http://127.0.0.1:61000/character/attr-points?character_id=$ID&token=$TOK" 2>/dev/null)"
 printf '%s' "$AP" | grep -q '"ok":true' && printf '%s' "$AP" | grep -q "\"attr_points\":$GP2" \
   && ok "只读口 /character/attr-points 回 $GP2 点" || bad "只读口不对：$AP"
+
+
+echo "== 6b. A9 属性加点 =="
+# 手上剩多少点现取（A8 段跑完之后的事实值），不写死。
+ST="$("$DOTNET" "$CD" --attr-points-state "$ID" $CC 2>&1 | grep -m1 '^attr_points_state=')"
+REM="$(printf '%s' "$ST" | sed -n 's/.* attr_points=\([0-9]*\) .*/\1/p')"
+if [ -n "$REM" ]; then
+  ok "加点只读口可用（手上 $REM 点）"
+else
+  bad "加点只读口不对：$ST"
+  REM=0
+fi
+
+A1="$("$DOTNET" "$CD" --allocate-attr "$ID" "$TX-a1" strength 3 $CC 2>&1 | grep -m1 '^allocate_attr=')"
+LEFT=$((REM - 3))
+if printf '%s' "$A1" | grep -q 'reason=none' && printf '%s' "$A1" | grep -q "attr_points=$LEFT" \
+  && printf '%s' "$A1" | grep -q 'strength=3 '; then
+  ok "加上 3 点力量（手上 $REM → $LEFT）"
+else
+  bad "加点失败：$A1"
+fi
+
+A1D="$("$DOTNET" "$CD" --allocate-attr "$ID" "$TX-a1" strength 3 $CC 2>&1 | grep -m1 '^allocate_attr=')"
+if printf '%s' "$A1D" | grep -q 'duplicate=true' && printf '%s' "$A1D" | grep -q "attr_points=$LEFT" \
+  && printf '%s' "$A1D" | grep -q 'strength=3 '; then
+  ok "同一个加点事务号重放不重复扣点"
+else
+  bad "加点幂等失败：$A1D"
+fi
+
+OVER=$((LEFT + 1))
+A2="$("$DOTNET" "$CD" --allocate-attr "$ID" "$TX-a2" strength "$OVER" $CC 2>&1 | grep -m1 '^allocate_attr=')"
+printf '%s' "$A2" | grep -q 'reason=not_enough_points' && printf '%s' "$A2" | grep -q "attr_points=$LEFT" \
+  && ok "点数不够整笔拒绝（要 $OVER、只有 $LEFT）" || bad "点数不够没拦住：$A2"
+
+A3="$("$DOTNET" "$CD" --allocate-attr "$ID" "$TX-a3" luck 1 $CC 2>&1 | grep -m1 '^allocate_attr=')"
+printf '%s' "$A3" | grep -q 'reason=bad_attribute' \
+  && ok "第五个属性键被拒（只认四属性）" || bad "属性键没拦住：$A3"
+
+A4="$("$DOTNET" "$CD" --allocate-attr "$ID" "$TX-a4" strength 0 $CC 2>&1 | grep -m1 '^allocate_attr=')"
+printf '%s' "$A4" | grep -q 'reason=bad_points' \
+  && ok "加 0 点被拒" || bad "0 点没拦住：$A4"
+
+# 网关：POST 加点 → GET 只读口看到四属性与剩余点数。
+GA="$(curl -s --noproxy '*' -X POST "http://127.0.0.1:61000/character/attr-points/allocate?token=$TOK" \
+  -H 'Content-Type: application/json' \
+  -d "{\"character_id\":$ID,\"attribute\":\"agility\",\"points\":2}" 2>/dev/null)"
+LEFT2=$((LEFT - 2))
+printf '%s' "$GA" | grep -q '"ok":true' && printf '%s' "$GA" | grep -q "\"agility\":2" \
+  && printf '%s' "$GA" | grep -q "\"attr_points\":$LEFT2" \
+  && ok "网关加点：敏捷 +2、手上 $LEFT2" || bad "网关加点不对：$GA"
+
+AP2="$(curl -s --noproxy '*' "http://127.0.0.1:61000/character/attr-points?character_id=$ID&token=$TOK" 2>/dev/null)"
+printf '%s' "$AP2" | grep -q '\"strength\":3' && printf '%s' "$AP2" | grep -q '\"agility\":2' \
+  && printf '%s' "$AP2" | grep -q "\"attr_points\":$LEFT2" \
+  && ok "只读口回四属性加点与剩余点数" || bad "只读口不对：$AP2"
+
+# 本版不做免费洗点：洗点路由不存在（404），proto 里也没有 respec rpc（静态段已断言）。
+CODE="$(curl -s --noproxy '*' -o /dev/null -w '%{http_code}' -X POST \
+  "http://127.0.0.1:61000/character/attr-points/respec?token=$TOK" 2>/dev/null)"
+[ "$CODE" = "404" ] && ok "没有洗点路由（404）" || bad "洗点路由存在？ HTTP $CODE"
+
+echo "== 6c. A9 装备门槛读加点 =="
+GATE="$TMP/a9-items.json"
+python3 - "$ROOT/config/items.json" "$GATE" <<'PY'
+import json, sys
+j = json.load(open(sys.argv[1], encoding="utf-8"))
+src = next(x for x in j["items"] if x["kind"] == "equipment" and x.get("slot") == "armor")
+row = dict(src)
+row["id"] = "a9_gate_armor"
+row["name"] = "A9 门槛护甲"
+row["require_attr"] = {"strength": 150}
+j["items"].append(row)
+json.dump(j, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+PY
+CE1="$("$DOTNET" "$CD" --can-equip "$ID" a9_gate_armor --item-table-path "$GATE" $CC 2>&1 | grep -m1 '^can_equip=')"
+printf '%s' "$CE1" | grep -q 'reason=attr_not_enough' \
+  && ok "属性不够时穿不上（attr_not_enough）" || bad "属性门槛没拦住：$CE1"
+printf '%s' "$CE1" | grep -q 'attr_strength=103' \
+  && ok "门槛读的是基础 100 + 加点 3" || bad "合成属性不对：$CE1"
+
+# 加点补到 150：直写 500 点再正常加 47 点（走加点口，不绕过事务）。
+"$DOTNET" "$CD" --raw-attr-points-write "$ID" 500 $CC >/dev/null
+"$DOTNET" "$CD" --allocate-attr "$ID" "$TX-a5" strength 47 $CC >/dev/null
+CE2="$("$DOTNET" "$CD" --can-equip "$ID" a9_gate_armor --item-table-path "$GATE" $CC 2>&1 | grep -m1 '^can_equip=')"
+printf '%s' "$CE2" | grep -q 'can_equip=ok=true' && printf '%s' "$CE2" | grep -q 'attr_strength=150' \
+  && ok "加点补到 150 之后穿得上" || bad "加点后仍穿不上：$CE2"
 
 finish "$TITLE"

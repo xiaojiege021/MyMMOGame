@@ -36,7 +36,8 @@ public sealed record WornTotals(long Attack, long SetBonus, int EnhanceTotal, lo
 /// 装备固定攻击（方案 7.2 第一段）在这里按已穿装备求和：数值只在 config/items.json，
 /// 角色服只做加法，不落第二份属性。
 /// </summary>
-public sealed class EquipRepository(NpgsqlDataSource dataSource)
+public sealed class EquipRepository(
+    NpgsqlDataSource dataSource, ClassIds classes, AttrPointRepository attrPoints)
 {
     // ------------------------------------------------------------------ 穿
 
@@ -78,7 +79,13 @@ public sealed class EquipRepository(NpgsqlDataSource dataSource)
             return new EquipOutcome(true, "item_not_found", itemId, "", 0, level, classId, bagSlot);
         }
 
-        var reason = EquipRules.Check(item, level, classId, branches);
+        // A9：属性门槛按「职业基础 + 已加点」判。基础值从 config/classes.json 现取，
+        // 加点是 character_attr_points 的事实值，同一笔事务里读，不留第二份属性数值。
+        var allocated = await attrPoints.AllocationInTransactionAsync(
+            connection, transaction, characterId, stopping);
+        var effective = (classes.AttributesOf(classId) ?? ClassAttributes.None)
+            .Plus(allocated.Strength, allocated.Agility, allocated.Spirit, allocated.Vitality);
+        var reason = EquipRules.Check(item, level, classId, branches, effective);
         if (reason.Length > 0)
         {
             // 先读出现值再回滚：被拒时屏上仍要知道现在穿着什么、多高的装备攻击。

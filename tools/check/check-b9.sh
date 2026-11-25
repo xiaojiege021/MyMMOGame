@@ -175,9 +175,13 @@ get_bag() {
 
 expect_field() {
   local want="$1" label="$2" got
+  # 布尔按 JSON 的小写打出来：老写法 print(True) 出来是 Python 的 True，
+  # 于是 expect_field true 一律假红（A9 顺手修，判据不变）。
   got="$(printf '%s' "$3" | python3 -c "import json,sys
 key=sys.argv[1]
-try: print(json.load(sys.stdin).get(key, ''))
+try:
+    v = json.load(sys.stdin).get(key, '')
+    print('true' if v is True else 'false' if v is False else ('' if v is None else v))
 except Exception: print('')" "$4")"
   if [ "$got" = "$want" ]; then ok "$label"; else bad "${label}：$4=[$got] 期望=[$want]"; fi
 }

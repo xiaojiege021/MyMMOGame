@@ -43,7 +43,8 @@
         { "version": 34, "file": "db/character/mount.sql" },
         { "version": 35, "file": "db/character/awaken.sql" },
         { "version": 36, "file": "db/character/arena_rank.sql" },
-        { "version": 37, "file": "db/character/attr_points.sql" }
+        { "version": 37, "file": "db/character/attr_points.sql" },
+        { "version": 38, "file": "db/character/attr_allocation.sql" }
       ]
     },
     {

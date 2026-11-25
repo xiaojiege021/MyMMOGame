@@ -64,7 +64,7 @@ internal static class ProgressCli
 
         if (canEquipOf != 0)
         {
-            var itemTable = ItemTable.Load("config/items.json");
+            var itemTable = ItemTable.Load(itemTablePath ?? "config/items.json");
             var branchTable = BranchTable.Load("config/branches.json");
             var identity = await characters.BattleIdentityAsync(canEquipOf, CancellationToken.None);
             if (identity is null)
@@ -81,12 +81,30 @@ internal static class ProgressCli
                 }
                 else
                 {
-                    var reason = EquipRules.Check(item, identity.Value.Level, identity.Value.ClassId, branchTable);
+                    // A9：属性门槛读加点——与 RPC 同一个判定出口、同一份合成口径。
+                    var canAttrTable = AttrPointTable.Load(
+                        CharacterConfig.Load(configPath).AttrPointTable);
+                    var canAttrRepo = new AttrPointRepository(dataSource, canAttrTable);
+                    var canAllocated = await canAttrRepo.AllocationAsync(
+                        canEquipOf, CancellationToken.None);
+                    var canEffective =
+                        (new ClassIds("config/classes.json").AttributesOf(identity.Value.ClassId)
+                         ?? ClassAttributes.None)
+                        .Plus(canAllocated.Strength, canAllocated.Agility,
+                            canAllocated.Spirit, canAllocated.Vitality);
+                    var reason = EquipRules.Check(
+                        item, identity.Value.Level, identity.Value.ClassId, branchTable, canEffective);
                     Console.WriteLine("can_equip=ok=" + (reason.Length == 0 ? "true" : "false")
                         + " reason=" + (reason.Length == 0 ? "none" : reason)
                         + " id=" + canEquipOf + " item=" + item.Id
                         + " weapon_kind=" + item.WeaponKind + " require_level=" + item.RequireLevel
-                        + " level=" + identity.Value.Level + " class=" + identity.Value.ClassId);
+                        + " level=" + identity.Value.Level + " class=" + identity.Value.ClassId
+                        // A9：判定用的有效属性（基础 + 加点）一起打出来，取证时不用再猜。
+                        + " attr_strength=" + canEffective.Strength
+                        + " attr_agility=" + canEffective.Agility
+                        + " attr_spirit=" + canEffective.Spirit
+                        + " attr_vitality=" + canEffective.Vitality
+                        + " require_attr=" + (item.Requirements.Count == 0 ? "none" : string.Join(",", item.Requirements.Select(r => r.Key + ">=" + r.Min))));
                 }
             }
         }

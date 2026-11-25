@@ -218,6 +218,13 @@ public sealed partial class BattleServer
             }
         }
 
+        // A9：加点与副本同口径——进场在锁外取一次角色快照，把加点后的生命与蓝量补上。
+        // 锁内做服间调用会卡住 tick；这里与 Join.cs 的那一次是同一处出口。
+        if (member is not null)
+        {
+            party.Encounter.PrimeProfile(member);
+        }
+
         if (slot.Ok)
         {
             // 第一次续约带 entered=true：世界服据此把到期时刻从 hold_s 换成 renew_s。

@@ -221,7 +221,35 @@ public sealed partial class Encounter
     /// B6：进场时在锁外把角色快照取一次（觉醒技编号要随开场包下发）。
     /// Open 里只读这份缓存，锁内不做服间调用——一次 gRPC 超时会把 tick 一起卡住。
     /// </summary>
-    public void PrimeProfile(Member member) => ProfileOf(member);
+    public void PrimeProfile(Member member)
+    {
+        ProfileOf(member);
+        ApplyAttributePoints(member);
+    }
+
+    /// <summary>
+    /// A9：加点只影响「按职业表算属性」的那条路（副本 / 练习场 / 世界 Boss）。
+    /// 竞技场模板与战场 / 城战的 Combat 各自已经算死，不吃这一格。
+    /// 进场时在开场包发出去之前补一次，生命与蓝量取满——这一场还没开始掉血。
+    /// </summary>
+    void ApplyAttributePoints(Member member)
+    {
+        if (member.Template is not null || member.Combat is not null)
+        {
+            return;
+        }
+
+        var bonus = member.Bonus;
+        if (bonus.IsZero)
+        {
+            return;
+        }
+
+        member.HpMax = member.Class.HpMax(_config.Classes.HpPerVitality, bonus);
+        member.ManaMax = member.Class.ManaMax(bonus);
+        member.Hp = member.HpMax;
+        member.Mana = member.ManaMax;
+    }
 
     /// <summary>单调时钟，毫秒。冷却和前摇都用它算，不受系统时间跳变影响。</summary>
     static long NowMs() => (long)Stopwatch.GetElapsedTime(0).TotalMilliseconds;

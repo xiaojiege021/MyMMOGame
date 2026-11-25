@@ -39,7 +39,11 @@ internal static class EquipCli
 
         var items = ItemTable.Load("config/items.json");
         var branches = BranchTable.Load("config/branches.json");
-        var equips = new EquipRepository(ctx.DataSource);
+        // A9：属性门槛要读加点，仓储与真实启动同一套依赖（职业表 + 加点仓储）。
+        var classes = new ClassIds("config/classes.json");
+        var attrTable = AttrPointTable.Load(CharacterConfig.Load(configPath).AttrPointTable);
+        var attrPoints = new AttrPointRepository(ctx.DataSource, attrTable);
+        var equips = new EquipRepository(ctx.DataSource, classes, attrPoints);
 
         if (equipOf != 0)
         {

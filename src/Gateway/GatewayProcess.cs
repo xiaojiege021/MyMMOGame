@@ -121,6 +121,8 @@ public sealed class GatewayProcess(string configPath)
         // N13：境界子阶只读口与升阶口。网关只认令牌、复核归属、生成事务号，
         // 段内阶与被动只在角色服按配置算，网关不本地算、伤害公式不接。
         RealmPhaseApi.Map(app, tokens, config);
+        // A9：属性加点（只读口沿用 A8 的路由，加点是 POST）。
+        AttrPointApi.Map(app, tokens, config);
 
         // N5：竞技场与战场的 HTTP 进场口（职业与分支只读角色服，连战斗仍走 /battle）。
         VersusApi.Map(app, tokens, config);

@@ -97,7 +97,9 @@ public sealed partial class CharacterGrpcService(
     AwakenTable awakenTable,
     // B11：段位档位阈值 / 每胜加分 / 排行前几名 / 每档专属外观。
     ArenaRankTable arenaRankTable,
-    ArenaRankRepository arenaRanks) : CharacterService.CharacterServiceBase
+    ArenaRankRepository arenaRanks,
+    // A9：属性加点的唯一写入口（点数扣减 + 四属性相加 + 台账幂等都在它里面）。
+    AttrPointRepository attrPoints) : CharacterService.CharacterServiceBase
 {
 
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。

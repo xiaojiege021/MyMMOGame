@@ -51,7 +51,7 @@ internal static class CliParser
             case var awakenFlag when AwakenCli.Handles(awakenFlag): AwakenCli.Parse(args, ref i); break;
             case var arenaRankFlag when ArenaCli.Handles(arenaRankFlag): ArenaCli.Parse(args, ref i); break;
             case var stallFlag when StallCli.Handles(stallFlag): StallCli.Parse(args, ref i); break;
-            // B9：穿 / 脱 / 读已穿。解析在 EquipCli.Parse，与 RPC 同一套判定。
+            case var attrFlag when AttrCli.Handles(attrFlag): AttrCli.Parse(args, ref i); break;
             case "--equip": case "--unequip": case "--equip-row": EquipCli.Parse(args, ref i); break;
             // 只给核对用：把武器锁与职业可用兵器打出来，不连库。坏配置也走这里。
             case "--weapon-rules": weaponRules = true; break;

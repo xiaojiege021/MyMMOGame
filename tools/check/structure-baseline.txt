@@ -52,7 +52,7 @@
 scripts=137
 check_lines=52304
 biz_lines=69676
-ratio=75
+ratio=74
 max_script_lines=880
 dup_sites=0
 latest_log_card=B11 · v1.223 · 2026-11-25（段位分只增不减、每档一件专属外观、竞技场模板一字不动）

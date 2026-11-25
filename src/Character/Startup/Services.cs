@@ -46,6 +46,7 @@ public sealed class CharacterServices
     public required SeasonPassProgressRepository SeasonPassPoints { get; init; }
     public required SeasonPassRepository SeasonPasses { get; init; }
     public required ArenaRankRepository ArenaRanks { get; init; }
+    public required AttrPointRepository AttrPoints { get; init; }
     public required MonthlyBundleRepository MonthlyBundles { get; init; }
     public required CharacterSlotRepository CharacterSlots { get; init; }
     public required BagExpandRepository BagExpands { get; init; }
@@ -69,9 +70,13 @@ public static class ServiceAssembly
         var inventory = new InventoryRepository(dataSource);
         // Q10：背包操作（移动 / 丢弃 / 排序）的唯一写入点，与 inventory 共用同一个连接池。
         var bags = new BagRepository(dataSource);
+        // A9：属性加点的唯一写入点。点数从 character.attr_points 扣、加到四列，
+        // 单属性上限与「不做免费洗点」从 config/attr_points.json 现取。
+        // 放在装备仓储之前：穿戴的属性门槛要读它（装备门槛读加点）。
+        var attrPoints = new AttrPointRepository(dataSource, tables.AttrPointTable);
         // B9：穿戴的唯一写入点。一条记录 = 这个部位穿的是哪一行背包；
         // 装备固定攻击也在这里按已穿装备求和（数值只在 config/tables.Items.json）。
-        var equips = new EquipRepository(dataSource);
+        var equips = new EquipRepository(dataSource, tables.Classes, attrPoints);
         var currency = new CurrencyRepository(dataSource);
         var cityTax = new CityTaxRepository(dataSource, tables.CityTable, tables.AuctionTable.GoldKind);
         var grants = new GrantRepository(dataSource, tables.Items, tables.Currencies, config, cityTax);
@@ -208,6 +213,7 @@ public static class ServiceAssembly
             SeasonPassPoints = seasonPassPoints,
             SeasonPasses = seasonPasses,
             ArenaRanks = arenaRanks,
+            AttrPoints = attrPoints,
             MonthlyBundles = monthlyBundles,
             CharacterSlots = characterSlotsRepo,
             BagExpands = bagExpands,

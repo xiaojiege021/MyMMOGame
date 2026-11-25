@@ -46,6 +46,9 @@ public sealed class CharacterTables
 
     /// <summary>B11：段位档位 / 每胜加分 / 排行前几名 / 每档专属外观的正本。</summary>
     public required ArenaRankTable ArenaRankTable { get; init; }
+
+    /// <summary>A9：属性加点的约束（单属性上限、不做免费洗点）。四属性的基础值不在它里面。</summary>
+    public required AttrPointTable AttrPointTable { get; init; }
     public required RecipeTable RecipeTable { get; init; }
 
     /// <summary>B3：制作掷点正本（区间 / 权重档 / 附加属性允许表）。</summary>
@@ -103,6 +106,7 @@ public static class TableLoad
         SpiritBeastTable spiritBeastTable;
         AwakenTable awakenTable;
         ArenaRankTable arenaRankTable;
+        AttrPointTable attrPointTable;
         CityTaskTable cityTaskTable;
         SeasonPassProgressTable seasonPassProgressTable;
         NameRulesTable nameRulesTable;
@@ -232,6 +236,9 @@ public static class TableLoad
             arenaRankTable = File.Exists(config.ArenaRankTable)
                 ? ArenaRankTable.Load(config.ArenaRankTable, items)
                 : ArenaRankTable.Missing();
+            // A9：属性加点表。坏配置（上限越界、free_respec=true、未知键、缺字段）一律起不来：
+            // 「不做免费洗点」是这张卡的完成标准之一，不能靠自觉。
+            attrPointTable = AttrPointTable.Load(config.AttrPointTable);
             // Q5/J2：主城修炼 / 境界任务的正本。与启动共用同一份 Load：城池编号必须在
             // config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json 的顺序表里；
             // 缺表降级成「没有任务」，老卡环境照常起。
@@ -295,6 +302,7 @@ public static class TableLoad
             SpiritBeastTable = spiritBeastTable,
             AwakenTable = awakenTable,
             ArenaRankTable = arenaRankTable,
+            AttrPointTable = attrPointTable,
             RecipeTable = recipeTable,
             CraftRollTable = craftRollTable,
             CityTaskTable = cityTaskTable,

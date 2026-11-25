@@ -215,6 +215,14 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.AdvanceBranchResponse> __Marshaller_mmo_character_AdvanceBranchResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AdvanceBranchResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeAttributePointsRequest> __Marshaller_mmo_character_DescribeAttributePointsRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeAttributePointsRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeAttributePointsResponse> __Marshaller_mmo_character_DescribeAttributePointsResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeAttributePointsResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AllocateAttributePointsRequest> __Marshaller_mmo_character_AllocateAttributePointsRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AllocateAttributePointsRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AllocateAttributePointsResponse> __Marshaller_mmo_character_AllocateAttributePointsResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AllocateAttributePointsResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipRequest> __Marshaller_mmo_character_CanEquipRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipResponse> __Marshaller_mmo_character_CanEquipResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipResponse.Parser));
@@ -704,6 +712,22 @@ namespace Mmo.Proto.Character {
         "AdvanceBranch",
         __Marshaller_mmo_character_AdvanceBranchRequest,
         __Marshaller_mmo_character_AdvanceBranchResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeAttributePointsRequest, global::Mmo.Proto.Character.DescribeAttributePointsResponse> __Method_DescribeAttributePoints = new grpc::Method<global::Mmo.Proto.Character.DescribeAttributePointsRequest, global::Mmo.Proto.Character.DescribeAttributePointsResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeAttributePoints",
+        __Marshaller_mmo_character_DescribeAttributePointsRequest,
+        __Marshaller_mmo_character_DescribeAttributePointsResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.AllocateAttributePointsRequest, global::Mmo.Proto.Character.AllocateAttributePointsResponse> __Method_AllocateAttributePoints = new grpc::Method<global::Mmo.Proto.Character.AllocateAttributePointsRequest, global::Mmo.Proto.Character.AllocateAttributePointsResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "AllocateAttributePoints",
+        __Marshaller_mmo_character_AllocateAttributePointsRequest,
+        __Marshaller_mmo_character_AllocateAttributePointsResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse> __Method_CanEquip = new grpc::Method<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(
@@ -1507,6 +1531,25 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AdvanceBranchResponse> AdvanceBranch(global::Mmo.Proto.Character.AdvanceBranchRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// A9：属性加点。只读这条回手上还剩多少点与四属性各加了多少；写那条一次只加一个属性，
+      /// 事务号由网关生成、同一个事务号只加一次。点数只在角色服算，战斗服只读快照。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeAttributePointsResponse> DescribeAttributePoints(global::Mmo.Proto.Character.DescribeAttributePointsRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AllocateAttributePointsResponse> AllocateAttributePoints(global::Mmo.Proto.Character.AllocateAttributePointsRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -3935,6 +3978,78 @@ namespace Mmo.Proto.Character {
         return CallInvoker.AsyncUnaryCall(__Method_AdvanceBranch, null, options, request);
       }
       /// <summary>
+      /// A9：属性加点。只读这条回手上还剩多少点与四属性各加了多少；写那条一次只加一个属性，
+      /// 事务号由网关生成、同一个事务号只加一次。点数只在角色服算，战斗服只读快照。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeAttributePointsResponse DescribeAttributePoints(global::Mmo.Proto.Character.DescribeAttributePointsRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeAttributePoints(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// A9：属性加点。只读这条回手上还剩多少点与四属性各加了多少；写那条一次只加一个属性，
+      /// 事务号由网关生成、同一个事务号只加一次。点数只在角色服算，战斗服只读快照。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeAttributePointsResponse DescribeAttributePoints(global::Mmo.Proto.Character.DescribeAttributePointsRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeAttributePoints, null, options, request);
+      }
+      /// <summary>
+      /// A9：属性加点。只读这条回手上还剩多少点与四属性各加了多少；写那条一次只加一个属性，
+      /// 事务号由网关生成、同一个事务号只加一次。点数只在角色服算，战斗服只读快照。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeAttributePointsResponse> DescribeAttributePointsAsync(global::Mmo.Proto.Character.DescribeAttributePointsRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeAttributePointsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// A9：属性加点。只读这条回手上还剩多少点与四属性各加了多少；写那条一次只加一个属性，
+      /// 事务号由网关生成、同一个事务号只加一次。点数只在角色服算，战斗服只读快照。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeAttributePointsResponse> DescribeAttributePointsAsync(global::Mmo.Proto.Character.DescribeAttributePointsRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeAttributePoints, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AllocateAttributePointsResponse AllocateAttributePoints(global::Mmo.Proto.Character.AllocateAttributePointsRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AllocateAttributePoints(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AllocateAttributePointsResponse AllocateAttributePoints(global::Mmo.Proto.Character.AllocateAttributePointsRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_AllocateAttributePoints, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AllocateAttributePointsResponse> AllocateAttributePointsAsync(global::Mmo.Proto.Character.AllocateAttributePointsRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AllocateAttributePointsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AllocateAttributePointsResponse> AllocateAttributePointsAsync(global::Mmo.Proto.Character.AllocateAttributePointsRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_AllocateAttributePoints, null, options, request);
+      }
+      /// <summary>
       /// P2-4a：这件装备这个人能不能穿。不到 15 级的武器全职业可装备；
       /// 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
       /// </summary>
@@ -5970,6 +6085,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_SettleRechargeOrder, serviceImpl.SettleRechargeOrder)
           .AddMethod(__Method_DescribeBattleProfile, serviceImpl.DescribeBattleProfile)
           .AddMethod(__Method_AdvanceBranch, serviceImpl.AdvanceBranch)
+          .AddMethod(__Method_DescribeAttributePoints, serviceImpl.DescribeAttributePoints)
+          .AddMethod(__Method_AllocateAttributePoints, serviceImpl.AllocateAttributePoints)
           .AddMethod(__Method_CanEquip, serviceImpl.CanEquip)
           .AddMethod(__Method_Awaken, serviceImpl.Awaken)
           .AddMethod(__Method_DescribeAwaken, serviceImpl.DescribeAwaken)
@@ -6060,6 +6177,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_SettleRechargeOrder, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SettleRechargeOrderRequest, global::Mmo.Proto.Character.SettleRechargeOrderResponse>(serviceImpl.SettleRechargeOrder));
       serviceBinder.AddMethod(__Method_DescribeBattleProfile, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse>(serviceImpl.DescribeBattleProfile));
       serviceBinder.AddMethod(__Method_AdvanceBranch, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceBranchRequest, global::Mmo.Proto.Character.AdvanceBranchResponse>(serviceImpl.AdvanceBranch));
+      serviceBinder.AddMethod(__Method_DescribeAttributePoints, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeAttributePointsRequest, global::Mmo.Proto.Character.DescribeAttributePointsResponse>(serviceImpl.DescribeAttributePoints));
+      serviceBinder.AddMethod(__Method_AllocateAttributePoints, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AllocateAttributePointsRequest, global::Mmo.Proto.Character.AllocateAttributePointsResponse>(serviceImpl.AllocateAttributePoints));
       serviceBinder.AddMethod(__Method_CanEquip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(serviceImpl.CanEquip));
       serviceBinder.AddMethod(__Method_Awaken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AwakenRequest, global::Mmo.Proto.Character.AwakenResponse>(serviceImpl.Awaken));
       serviceBinder.AddMethod(__Method_DescribeAwaken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeAwakenRequest, global::Mmo.Proto.Character.DescribeAwakenResponse>(serviceImpl.DescribeAwaken));

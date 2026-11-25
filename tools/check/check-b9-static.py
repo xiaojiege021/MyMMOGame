@@ -175,7 +175,10 @@ want("ParseEquip(text)" in flow and "ParseUnequip(text)" in flow,
 
 # 8. 战斗服：只给副本那一层加装备攻击
 battle = read("src/Battle/Encounter.cs")
-want("Combat?.Attack ?? Template?.Attack ?? (Class.Attack() + (Profile?.EquipAttack ?? 0))" in battle,
+# A9：职业攻击这一截带上加点（Class.Attack(Bonus)），两层优先级与装备那一截一个字没动；
+# 这里仍同时钉「副本 = 职业攻击 + 装备固定攻击」与「战场 / 模板优先」两件事，口径不放松。
+want("Combat?.Attack ?? Template?.Attack" in battle
+     and "Class.Attack(Bonus) + (Profile?.EquipAttack ?? 0)" in battle,
      "副本攻击没有接装备固定攻击（或竞技场模板 / 战场那一层被改了）")
 profile = read("src/Battle/BattleProfileClient.cs")
 want("int EquipAttack = 0" in profile and "reply.EquipAttack" in profile,
