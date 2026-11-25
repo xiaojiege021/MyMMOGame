@@ -53,6 +53,7 @@ namespace HotUpdate.Ui
             public const string T040 = "重连";
             public const string T041 = "结算";
             public const string T042 = "返回表世界";
+            public const string T043 = "属性";
         }
     }
 }

@@ -33,6 +33,11 @@ namespace HotUpdate.Ui
             public const string T020 = "衣甲";
             public const string T021 = "饰品";
             public const string T022 = "结晶位";
+            public const string T023 = "力量";
+            public const string T024 = "敏捷";
+            public const string T025 = "精神";
+            public const string T026 = "体力";
+            public const string T027 = "属性点只加四属性：点数够不够、单属性上限、能不能洗点都在角色服判；这一屏不洗点、不推算总值（基础值见职业表）。";
         }
     }
 }

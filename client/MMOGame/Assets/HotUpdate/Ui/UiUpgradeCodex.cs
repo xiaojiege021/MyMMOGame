@@ -50,6 +50,22 @@ namespace HotUpdate.Ui
         public const string RealmNote =
             UiStrings.UiUpgradeCodex.T018;
 
+        /// <summary>
+        /// A9：四属性的服务端键，顺序与回包里四个字段一致。只作请求参数，
+        /// 白名单与上限都在角色服（`config/attr_points.json`），这里不判。
+        /// </summary>
+        public static readonly string[] Attrs = { "strength", "agility", "spirit", "vitality" };
+
+        /// <summary>四属性的中文名，只用于把回包里的键说成人话。</summary>
+        public static readonly string[] AttrNames =
+        {
+            UiStrings.UiUpgradeCodex.T023, UiStrings.UiUpgradeCodex.T024,
+            UiStrings.UiUpgradeCodex.T025, UiStrings.UiUpgradeCodex.T026,
+        };
+
+        /// <summary>A9：属性屏顶那一行说明。</summary>
+        public const string AttrsNote = UiStrings.UiUpgradeCodex.T027;
+
         /// <summary>四个装备部位（原型 D01）。</summary>
         public static readonly string[] Parts = { UiStrings.UiUpgradeCodex.T019, UiStrings.UiUpgradeCodex.T020, UiStrings.UiUpgradeCodex.T021, UiStrings.UiUpgradeCodex.T022 };
 

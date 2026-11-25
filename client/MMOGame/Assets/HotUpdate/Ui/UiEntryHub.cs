@@ -164,6 +164,9 @@ namespace HotUpdate.Ui
                 case "realm":
                     shell.ShowPage(UiStrings.UiEntryHub.T009, s => { DrawUpgradeNav(s, "realm"); UiRealmScreen.Build(s, flow); });
                     break;
+                case "attr":
+                    shell.ShowPage(UiStrings.UiEntryHub.T043, s => { DrawUpgradeNav(s, "attr"); UiAttrScreen.Build(s, flow); });
+                    break;
                 default:
                     shell.ShowPage(UiStrings.UiEntryHub.T010, s => { DrawUpgradeNav(s, "character"); UiCharacterScreen.Build(s, flow); });
                     break;
@@ -263,7 +266,8 @@ namespace HotUpdate.Ui
             {
                 (UiStrings.UiEntryHub.T027, "character"), (UiStrings.UiEntryHub.T004, "bag"), (UiStrings.UiEntryHub.T005, "enhance"),
                 (UiStrings.UiEntryHub.T028, "transfer"), (UiStrings.UiEntryHub.T029, "crystal"), (UiStrings.UiEntryHub.T030, "skill"),
-                (UiStrings.UiEntryHub.T031, "realm"), (UiStrings.UiEntryHub.T032, "world"),
+                (UiStrings.UiEntryHub.T031, "realm"), (UiStrings.UiEntryHub.T043, "attr"),
+                (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {
                 if (which == "world")

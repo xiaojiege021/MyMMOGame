@@ -90,6 +90,10 @@
     {
       "key": "T022",
       "text": "\\\"character_id\\\":7,\\\"from_phase\\\":1,\\\"to_phase\\\":1,\\\"phase_name\\\":\\\"二阶\\\","
+    },
+    {
+      "key": "T023",
+      "text": "属性与加点"
     }
   ]
 }

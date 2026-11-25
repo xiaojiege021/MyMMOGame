@@ -672,6 +672,115 @@ namespace HotUpdate.Ui
             });
         }
 
+        // ------------------------------------------------------------------ A9 属性加点
+
+        /// <summary>
+        /// A9：属性点只读回包（`GET /character/attr-points`）。四属性是**已加点数**，
+        /// 基础值只在职业表里，客户端不相加、不推算总值。
+        /// </summary>
+        public AttrPointOutcome AttrPoints { get; private set; } = AttrPointOutcome.Failure("not_loaded");
+
+        /// <summary>发过只读请求没有。屏上用它区分「尚未请求」与「没读到」。</summary>
+        public bool AttrPointsRequested { get; private set; }
+
+        /// <summary>A9：加点回包。被拒时四属性与剩余点数照回包原样写回，不自减。</summary>
+        public AttrPointOutcome LastAllocate { get; private set; } = AttrPointOutcome.Failure("not_loaded");
+
+        public bool HasAllocate { get; private set; }
+
+        /// <summary>读属性点状态。进属性屏时调一次；剩余点数与四格已加点全看回包。</summary>
+        public void LoadAttrPoints(Action done = null)
+        {
+            AttrPointsRequested = true;
+            if (_characterId == 0)
+            {
+                AttrPoints = AttrPointOutcome.Failure("no_character");
+                Error = UiStrings.UiUpgradeFlow.T003;
+                Debug.Log("a9_attr_points=reject reason=no_character");
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            _send(CharacterAttr.ReadQuery(_characterId), string.Empty, _token, (status, text) =>
+            {
+                Busy = false;
+                if (status != 200)
+                {
+                    AttrPoints = AttrPointOutcome.Failure("status_" + status);
+                    Error = UiStrings.UiUpgradeFlow.T018 + status;
+                    Debug.Log("a9_attr_points=reject status=" + status);
+                }
+                else
+                {
+                    AttrPoints = CharacterAttr.Parse(text);
+                    Error = AttrPoints.Ok ? string.Empty : UiStrings.UiUpgradeFlow.T019;
+                    Debug.Log("a9_attr_points=" + (AttrPoints.Ok ? "ok" : "reject")
+                        + " attr_points=" + AttrPoints.AttrPoints
+                        + " class_id=" + AttrPoints.ClassId
+                        + " level=" + AttrPoints.Level
+                        + " strength=" + AttrPoints.Strength
+                        + " agility=" + AttrPoints.Agility
+                        + " spirit=" + AttrPoints.Spirit
+                        + " vitality=" + AttrPoints.Vitality
+                        + " reason=" + AttrPoints.Reason);
+                }
+
+                if (done != null) done();
+            });
+        }
+
+        /// <summary>
+        /// A9：加一次点。只发「哪一条属性、加几点」（事务号网关生成）；
+        /// 点数够不够、单属性上限、重复重放全在角色服判。成了就把回包里的
+        /// 剩余点数与四格已加点抄进屏上那份，不本地减、不自己推上限。
+        /// </summary>
+        public void AllocateAttr(string attribute, int points, Action done = null)
+        {
+            if (_characterId == 0)
+            {
+                LastAllocate = AttrPointOutcome.Failure("no_character");
+                HasAllocate = true;
+                Debug.Log("a9_allocate=reject reason=no_character");
+                if (done != null) done();
+                return;
+            }
+
+            Busy = true;
+            Requests++;
+            var body = CharacterAttr.RequestBody(_characterId, attribute, points);
+            _send(CharacterAttr.AllocatePath, body, _token, (status, text) =>
+            {
+                Busy = false;
+                if (status != 200)
+                {
+                    LastAllocate = AttrPointOutcome.Failure("status_" + status);
+                    Error = UiStrings.UiUpgradeFlow.T020 + status;
+                    Debug.Log("a9_allocate=reject status=" + status);
+                }
+                else
+                {
+                    LastAllocate = CharacterAttr.Parse(text);
+                    Error = LastAllocate.Ok ? string.Empty : LastAllocate.DisplayText;
+                    Debug.Log("a9_allocate=" + (LastAllocate.Ok ? "ok" : "reject")
+                        + " attribute=" + LastAllocate.Attribute
+                        + " points=" + LastAllocate.Points
+                        + " duplicate=" + (LastAllocate.Duplicate ? "true" : "false")
+                        + " attr_points=" + LastAllocate.AttrPoints
+                        + " reason=" + LastAllocate.Reason);
+
+                    // 只抄回包：剩余点数与四格已加点都是服务端写定的值。
+                    // 被拒时也抄一次——服务端的现值比屏上那份更权威。
+                    AttrPoints = LastAllocate;
+                    AttrPointsRequested = true;
+                }
+
+                HasAllocate = true;
+                if (done != null) done();
+            });
+        }
+
         // ------------------------------------------------------------------ 真机发送
 
         void SendByUnityWebRequest(string path, string body, string token, Action<int, string> done)

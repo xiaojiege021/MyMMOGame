@@ -28,6 +28,9 @@ namespace HotUpdate.Ui
             public const string T015 = "使用没发出去：";
             public const string T016 = "穿戴没发出去：";
             public const string T017 = "脱下没发出去：";
+            public const string T018 = "属性点没读到：";
+            public const string T019 = "属性点回包读不出来";
+            public const string T020 = "加点没发出去：";
         }
     }
 }

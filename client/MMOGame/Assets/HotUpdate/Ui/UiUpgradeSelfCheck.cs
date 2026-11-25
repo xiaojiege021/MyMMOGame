@@ -33,10 +33,17 @@ namespace HotUpdate.Ui
 
         static string _unequipBody = string.Empty;
 
+        /// <summary>A9：加点请求体。核对要确认里面只有角色号、属性键与点数。</summary>
+        static string _allocBody = string.Empty;
+
+        /// <summary>A9：加点发了几次。第一次回成功，第二次回被拒。</summary>
+        static int _allocCalls;
+
         public static bool Run()
         {
             _failed = false;
             _enhanceCalls = 0;
+            _allocCalls = 0;
             _promoteCalls = 0;
             _promoteBody = string.Empty;
             _bagMoveBody = string.Empty;
@@ -125,6 +132,21 @@ namespace HotUpdate.Ui
                     return;
                 }
 
+                // A9：加点口在前，别被只读口的前缀先吃掉。
+                if (path.IndexOf(CharacterAttr.AllocatePath, StringComparison.Ordinal) >= 0)
+                {
+                    _allocBody = body;
+                    _allocCalls++;
+                    done(200, _allocCalls == 1 ? AttrAllocateOkJson : AttrAllocateRejectJson);
+                    return;
+                }
+
+                if (path.IndexOf(CharacterAttr.ReadPath, StringComparison.Ordinal) >= 0)
+                {
+                    done(200, AttrPointsJson);
+                    return;
+                }
+
                 done(200, CrystalRejectJson);
             });
 
@@ -154,8 +176,9 @@ namespace HotUpdate.Ui
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T011, (s, f) => UiCrystalScreen.Build(s, f));
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T012, (s, f) => UiSkillScreen.Build(s, f));
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T013, (s, f) => UiRealmScreen.Build(s, f));
-            Report("seven", built == 7);
-            Debug.Log("u5_self_seven=" + built);
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T023, (s, f) => UiAttrScreen.Build(s, f));
+            Report("screens", built == 8);
+            Debug.Log("u5_self_screens=" + built);
 
             // 成功：等级 3→4、扣 200 金、1 块石头。
             flow.Enhance(1, "stone_enhance_mid", false);
@@ -266,6 +289,30 @@ namespace HotUpdate.Ui
                 && _unequipBody == "{\"character_id\":7,\"equip_slot\":\"weapon\"}");
             Debug.Log("u5_self_b9_unequip bag_slot=" + uq.BagSlot + " attack=" + uq.EquipAttack
                 + " body=" + _unequipBody);
+
+            // A9：只读口照回包给剩余点数与四格已加点；加点只发属性键与点数。
+            flow.LoadAttrPoints();
+            var ap = flow.AttrPoints;
+            Report("a9_attr_points", flow.AttrPointsRequested && ap.Ok && ap.AttrPoints == 7
+                && ap.Strength == 3 && ap.Agility == 1 && ap.Spirit == 0 && ap.Vitality == 2);
+            Debug.Log("u5_self_a9_attr_points points=" + ap.AttrPoints + " strength=" + ap.Strength
+                + " agility=" + ap.Agility + " spirit=" + ap.Spirit + " vitality=" + ap.Vitality);
+
+            // 加点：请求体只有三项，成功后剩余点数与四格照回包换。
+            flow.AllocateAttr("strength", 3);
+            var al = flow.LastAllocate;
+            Report("a9_allocate_ok", al.Ok && al.AttrPoints == 4 && al.Strength == 6
+                && _allocBody == "{\"character_id\":7,\"attribute\":\"strength\",\"points\":3}");
+            Debug.Log("u5_self_a9_allocate_ok points=" + al.AttrPoints + " strength=" + al.Strength
+                + " body=" + _allocBody);
+
+            // 被拒：拒绝码原样上屏，剩余点数与四格照回包，不自减也不自己加。
+            flow.AllocateAttr("strength", 8);
+            var ar = flow.LastAllocate;
+            Report("a9_allocate_reject", !ar.Ok && ar.Reason == "not_enough"
+                && ar.AttrPoints == 4 && ar.Strength == 6);
+            Debug.Log("u5_self_a9_allocate_reject reason=" + ar.Reason
+                + " points=" + ar.AttrPoints + " strength=" + ar.Strength);
 
             // 切皮肤只换颜色：布局与文案一字不差。
             shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T009, s => UiEnhanceScreen.Build(s, flow));
@@ -414,6 +461,21 @@ namespace HotUpdate.Ui
             "{\"ok\":false,\"reason\":\"level_not_enough\",\"txn_id\":\"realm_phase:selftest-b\"," +
             UiStrings.UiUpgradeSelfCheck.T022 +
             "\"passive_pct_bps\":30,\"level\":3,\"level_required\":11,\"duplicate\":false}";
+
+        // A9：四属性是**已加点数**（角色服 Allocated 那四个值），基础值不在这里。
+        const string AttrPointsJson =
+            "{\"ok\":true,\"character_id\":7,\"class_id\":1,\"level\":12,\"attr_points\":7," +
+            "\"strength\":3,\"agility\":1,\"spirit\":0,\"vitality\":2}";
+
+        const string AttrAllocateOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"duplicate\":false,\"character_id\":7," +
+            "\"attribute\":\"strength\",\"points\":3,\"class_id\":1,\"level\":12,\"attr_points\":4," +
+            "\"strength\":6,\"agility\":1,\"spirit\":0,\"vitality\":2}";
+
+        const string AttrAllocateRejectJson =
+            "{\"ok\":false,\"reason\":\"not_enough\",\"duplicate\":false,\"character_id\":7," +
+            "\"attribute\":\"strength\",\"points\":8,\"class_id\":1,\"level\":12,\"attr_points\":4," +
+            "\"strength\":6,\"agility\":1,\"spirit\":0,\"vitality\":2}";
     }
 }
 #endif

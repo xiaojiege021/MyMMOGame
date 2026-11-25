@@ -1,0 +1,67 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiAttrScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiAttrScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "四属性（已加点数）"
+    },
+    {
+      "key": "T002",
+      "text": " 点"
+    },
+    {
+      "key": "T003",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T004",
+      "text": "剩余可分配"
+    },
+    {
+      "key": "T005",
+      "text": "加一次点"
+    },
+    {
+      "key": "T006",
+      "text": "+1"
+    },
+    {
+      "key": "T007",
+      "text": "+5"
+    },
+    {
+      "key": "T008",
+      "text": "全部"
+    },
+    {
+      "key": "T009",
+      "text": " +1"
+    },
+    {
+      "key": "T010",
+      "text": "读一次"
+    },
+    {
+      "key": "T011",
+      "text": "加点回包"
+    },
+    {
+      "key": "T012",
+      "text": "这一手"
+    },
+    {
+      "key": "T013",
+      "text": "还没加过"
+    },
+    {
+      "key": "T014",
+      "text": "重放"
+    },
+    {
+      "key": "T015",
+      "text": "已记过账，不重复扣点"
+    }
+  ]
+}

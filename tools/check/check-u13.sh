@@ -74,8 +74,9 @@ if ! grep -q "u13_all=" "$TMP/unity.log" 2>/dev/null; then
   grep -E "error CS|Compilation failed" "$TMP/unity.log" 2>/dev/null | head -5 | detail
 fi
 
-echo "== 3. 屏上自检（U13 那四条）=="
-for key in realm_pending realm_phase promote_ok promote_reject promote_body; do
+echo "== 3. 屏上自检（U13 那四条 + A9 加点三条）=="
+for key in realm_pending realm_phase promote_ok promote_reject promote_body \
+           a9_attr_points a9_allocate_ok a9_allocate_reject; do
   if grep -q "u5_self_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "境界自检 u5_self_${key}=ok"
   else
@@ -83,6 +84,62 @@ for key in realm_pending realm_phase promote_ok promote_reject promote_body; do
     grep "u5_self_${key}" "$TMP/unity.log" 2>/dev/null | tail -2 | detail
   fi
 done
+
+echo "== 3b. A9 属性加点屏（U18）=="
+ATTR_NET="$ROOT/client/MMOGame/Assets/Net/CharacterAttr.cs"
+ATTR_SCREEN="$ROOT/client/MMOGame/Assets/HotUpdate/Ui/UiAttrScreen.cs"
+ATTR_CODEX="$ROOT/client/MMOGame/Assets/HotUpdate/Ui/UiUpgradeCodex.cs"
+for f in "$ATTR_NET" "$ATTR_SCREEN" "$ROOT/config/ui_text/UiAttrScreen.json"; do
+  if [ -f "$f" ]; then
+    ok "有 $(basename "$f")"
+  else
+    bad "缺 $(basename "$f")"
+  fi
+done
+
+# 请求体只带三项：事务号由网关生成，剩余点数 / 上限 / 洗点开关都在角色服判。
+if grep -q 'character_id' "$ATTR_NET" && grep -q 'attribute' "$ATTR_NET" && grep -q 'points' "$ATTR_NET" \
+   && ! grep -qE 'txn_id|per_attr_cap|free_respec' "$ATTR_NET"; then
+  ok "加点请求体只有角色号 / 属性键 / 点数（不带事务号、上限、洗点开关）"
+else
+  bad "加点请求体里混进了客户端不该带的东西"
+  grep -nE 'txn_id|per_attr_cap|free_respec' "$ATTR_NET" | head -3 | detail
+fi
+
+if grep -q '"/character/attr-points"' "$ATTR_NET" \
+   && grep -q '"/character/attr-points/allocate"' "$ATTR_NET"; then
+  ok "两条 HTTP 路径与网关一致"
+else
+  bad "属性点路径与网关不一致"
+fi
+
+# 屏上不本地扣点、不出洗点口；点数与四格已加点都只抄回包。
+if ! grep -qE 'attr_points *-|-= *points|points -=|\breadonly .*cap' "$ATTR_SCREEN"; then
+  ok "屏上不本地扣点（剩余点数只抄回包）"
+else
+  bad "屏上出现了本地扣点"
+fi
+if ! grep -qi 'respec' "$ATTR_SCREEN" "$ATTR_NET"; then
+  ok "没有洗点口（A9 不做免费洗点）"
+else
+  bad "出现了洗点口"
+fi
+
+if python3 - "$ATTR_CODEX" <<'PY'
+import re
+import sys
+s = open(sys.argv[1], encoding='utf-8').read()
+m = re.search(r'Attrs\s*=\s*\{([^}]*)\}', s)
+if not m:
+    sys.exit(1)
+keys = re.findall(r'"([a-z]+)"', m.group(1))
+sys.exit(0 if keys == ['strength', 'agility', 'spirit', 'vitality'] else 1)
+PY
+then
+  ok "四属性键恰好四个，顺序与回包字段一致"
+else
+  bad "四属性键与回包字段对不上"
+fi
 
 echo "== 4. 不做项 =="
 # 这一条守的是「境界子阶这条链不许改配置与玩法」。D5 口径：钉内容、不拿 git diff 钉文件——
