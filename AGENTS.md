@@ -37,7 +37,8 @@ WorkBuddy 不加载那个目录；内容已并进本文件，改动只改这里�
 
 - 业务代码 ≤1600 行（开发架构 10.2 合卡判据）
 - **核对脚本优先往既有域脚本追加用例，不新开 `check-*.sh`**。
-  现在 140 个脚本 / 50,301 行，是业务代码的 76%，再加就是第二套框架。
+  现值跑 `bash tools/check/check-structure-budget.sh`，数字读 `tools/check/structure-baseline.txt`
+  （**现取，不抄进文档**），再加就是第二套框架。
   确实要新开时 ≤350 行，且先把公用逻辑提到 `lib-common.sh`
 - 单卡日志 ≤50 行，只留「改了什么 / 怎么验 / 契约变化」
 - 客户端一个屏幕的四件套（Codex / Flow / SelfCheck / Editor 检查）能合就合，
@@ -47,7 +48,7 @@ WorkBuddy 不加载那个目录；内容已并进本文件，改动只改这里�
 
 ```bash
 bash tools/check/ci.sh --changed     # 日常：只跑改动涉及的卡（约 1/5 时间）
-bash tools/check/ci.sh               # 合并前：全量 47 张卡，约 13 分钟
+bash tools/check/ci.sh               # 合并前：全量（卡清单见 ci.sh 的 CHECKS），约 15 分钟
 dotnet build src/MMOGame.sln -c Release   # 编译一次收齐
 ```
 
