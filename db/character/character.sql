@@ -893,3 +893,42 @@ ALTER TABLE "角色".character
 ALTER TABLE "角色".character
     ADD CONSTRAINT character_awaken_pair
     CHECK ((awaken_skill_id = 0) = (awaken_at IS NULL));
+
+-- B11：竞技场赛季段位（同一段也单独在 db/character/arena_rank.sql，版本 36）。
+-- 分数按季存、只增不减；档位阈值与外观编号在 config/arena_rank.json。
+CREATE TABLE IF NOT EXISTS "角色".arena_rank (
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    season_id    text        NOT NULL CHECK (season_id <> ''),
+    score        bigint      NOT NULL DEFAULT 0 CHECK (score >= 0),
+    tier_key     text        NOT NULL CHECK (tier_key <> ''),
+    wins         integer     NOT NULL DEFAULT 0 CHECK (wins >= 0),
+    updated_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, season_id)
+);
+
+CREATE INDEX IF NOT EXISTS arena_rank_season_score
+    ON "角色".arena_rank (season_id, score DESC, character_id);
+
+CREATE TABLE IF NOT EXISTS "角色".arena_rank_ledger (
+    txn_id       text        NOT NULL PRIMARY KEY,
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    season_id    text        NOT NULL CHECK (season_id <> ''),
+    mode         text        NOT NULL CHECK (mode <> ''),
+    score_delta  integer     NOT NULL CHECK (score_delta > 0),
+    score_after  bigint      NOT NULL CHECK (score_after >= 0),
+    tier_key     text        NOT NULL CHECK (tier_key <> ''),
+    awarded_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS arena_rank_ledger_season
+    ON "角色".arena_rank_ledger (character_id, season_id);
+
+CREATE TABLE IF NOT EXISTS "角色".arena_rank_appearance (
+    character_id bigint      NOT NULL REFERENCES "角色".character (id) ON DELETE CASCADE,
+    season_id    text        NOT NULL CHECK (season_id <> ''),
+    tier_key     text        NOT NULL CHECK (tier_key <> ''),
+    item_id      text        NOT NULL CHECK (item_id <> ''),
+    txn_id       text        NOT NULL,
+    claimed_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (character_id, season_id, tier_key)
+);

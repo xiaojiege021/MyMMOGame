@@ -19,7 +19,7 @@ public sealed record CharacterConfig(
     string RecipeTable, string CalendarTable, string CityTaskTable,
     string SeasonPassProgressTable, string NameRulesTable, string PillTable,
     string CraftRollTable, string MountTable, string SpiritBeastTable, string StallTable,
-    string AwakenTable)
+    string AwakenTable, string ArenaRankTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -68,6 +68,9 @@ public sealed record CharacterConfig(
     // B6：觉醒的门槛与「哪条分支解锁哪条技能」。和老卡同口径不显式登记进
     // config/character.json：不写就走仓库根这一份，核对脚本可指到临时表试坏配置。
     public const string DefaultAwakenTable = "config/awaken.json";
+    // B11：竞技场赛季段位表（档位阈值、每胜加分、排行取前几名、每档专属外观）。
+    // 只给角色服读；战斗服只上报「这一场赢了」，不读段位表。
+    public const string DefaultArenaRankTable = "config/arena_rank.json";
     // K3：生产 / 配方的正本。同样不显式登记进 character.json：老卡的临时配置目录里
     // 没有这份表时走默认文件名，仓库根的那一份照常可读。
     public const string DefaultRecipeTable = "config/recipes.json";
@@ -205,6 +208,14 @@ public sealed record CharacterConfig(
         if (awakenTable.Length == 0)
         {
             throw new ConfigException("awaken_table 不能为空");
+        }
+
+        // B11：段位表。可缺省（老卡临时配置目录没有它就降级成 missing）；
+        // 外观编号要和物品表交叉校验，校验在 TableLoad 里与真实启动共用同一条链。
+        var arenaRankTable = (wire.ArenaRankTable ?? DefaultArenaRankTable).Trim();
+        if (arenaRankTable.Length == 0)
+        {
+            throw new ConfigException("arena_rank_table 不能为空");
         }
 
         // 商城清单也走同一份配置正本；核对脚本可以指到临时表试坏清单。
@@ -411,7 +422,7 @@ public sealed record CharacterConfig(
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
             characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable,
             cityTaskTable, seasonPassProgressTable, nameRulesTable, pillTable, craftRollTable,
-            mountTable, spiritBeastTable, stallTable, awakenTable);
+            mountTable, spiritBeastTable, stallTable, awakenTable, arenaRankTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -461,6 +472,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("awaken_table")]
         public string? AwakenTable { get; init; }
+
+        [JsonPropertyName("arena_rank_table")]
+        public string? ArenaRankTable { get; init; }
 
         [JsonPropertyName("shop_table")]
         public string? ShopTable { get; init; }

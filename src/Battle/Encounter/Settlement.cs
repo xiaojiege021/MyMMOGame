@@ -297,6 +297,14 @@ public sealed partial class Encounter
             _expSettlement.SettleParty(
                 _settlementId, SettlementSource, settledSize, memberIds,
                 dungeonId, _qualifiedKills, allocation.ByMember);
+
+            // B11：竞技场模式下这一场打掉 Boss 就是一场胜仗，逐人把段位分交给角色服。
+            // 散场（没打掉）不进这里，不记分也不扣分；分数怎么加、档位怎么升全在
+            // 角色服的 config/arena_rank.json，战斗服不读段位表。
+            if (ArenaModeId.Length > 0 && _bossHp <= 0)
+            {
+                _arenaRank.ReportWin(_settlementId, ArenaModeId, memberIds);
+            }
         }
 
         EndSnapshot = new BattleEnded

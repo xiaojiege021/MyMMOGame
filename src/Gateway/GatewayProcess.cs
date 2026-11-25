@@ -124,6 +124,8 @@ public sealed class GatewayProcess(string configPath)
 
         // N5：竞技场与战场的 HTTP 进场口（职业与分支只读角色服，连战斗仍走 /battle）。
         VersusApi.Map(app, tokens, config);
+        // B11：竞技场赛季段位。只读分 / 档 / 排行 + 领这一季的专属外观。
+        ArenaRankApi.Map(app, tokens, config);
 
         // 表世界分线：认令牌、复核角色归属，再 gRPC 转给世界服。
         WorldApi.Map(app, tokens, config, calendar);

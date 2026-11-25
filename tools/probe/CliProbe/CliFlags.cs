@@ -93,6 +93,20 @@ internal static class CliFlags
     public static string? awakenBranch = null;
     public static long awakenStateOf = 0;
 
+    // B11：竞技场赛季段位。--arena-rank-config / --arena-rank-table-path 只读不连库；
+    // --arena-rank-award / --arena-rank-state / --arena-rank-top 连库核对。
+    public static bool arenaRankConfig = false;
+    public static string? arenaRankTablePath = null;
+    public static long arenaRankOf = 0;
+    public static string? arenaRankMode = null;
+    public static string? arenaRankSeason = null;
+    public static string? arenaRankTxn = null;
+    public static long arenaRankStateOf = 0;
+    public static long arenaRankClaimOf = 0;
+    public static string? arenaRankTierKey = null;
+    public static string? arenaRankTopSeason = null;
+    public static int arenaRankTopLimit = 0;
+
     // K3：核对用的原始背包写入（绕过业务规则，只给造料 / 清格用，与 --raw-currency-write 同口径）。
     public static long rawItemWriteId = 0;
     public static int rawItemSlot = 0;

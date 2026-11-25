@@ -63,7 +63,9 @@ def report(key, cond, info=""):
 
 # 14.7 的 K4 行只写了「物品引用」；这几种键就是当前配置里全部引用方式。
 # Q12 加了 rename_item_id（name_rules.json 指到改名卡），同样要在这里登记。
-REF_KEYS = {"item_id", "stone_id", "protect_item_id", "stone_item_id", "rename_item_id"}
+# B11 加了 appearance_item_id（arena_rank.json 每档的专属外观）。
+REF_KEYS = {"item_id", "stone_id", "protect_item_id", "stone_item_id", "rename_item_id",
+            "appearance_item_id"}
 
 # 配置设计 2 节的物品种类，加上通行证已经在用的 appearance_fragment / outfit，
 # 以及 K1 起接的五类外观（服装 / 武器幻形 / 境界外观 / 飞行拖尾 / 坐骑外观，

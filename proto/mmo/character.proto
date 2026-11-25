@@ -318,6 +318,20 @@ service CharacterService {
   // 「同时只生效一个」的那类拒绝连用；还没接效果的（回春丹、凝神丹、符）回 no_effect，
   // 一个都不扣，等 B1 接。
   rpc UseItemBatch(UseItemBatchRequest) returns (UseItemBatchResponse);
+
+  // B11：竞技场一场通关的段位分。战斗服在竞技场模式下打掉 Boss 时逐人报一次，
+  // 请求只带角色号、幂等号与模式：加多少分、升到哪一档、发什么外观全部由角色服
+  // 按 config/arena_rank.json 现取。季向全局服务确认，客户端带不进分数与档位；
+  // 段位不改竞技场模板属性（P2-3a 一字不变）。
+  rpc ReportArenaResult(ReportArenaResultRequest) returns (ReportArenaResultResponse);
+  // B11：这个角色这一季多少分、当前哪一档、下一档差多少、每档外观领没领。只读。
+  rpc DescribeArenaRank(DescribeArenaRankRequest) returns (DescribeArenaRankResponse);
+  // B11：领本季某一档的专属外观。门槛只认库里记下的分数；同一季同一档只领一次，
+  // 同一事务号重放回 duplicate。物品编号从配置读，客户端带不进来。
+  rpc ClaimArenaAppearance(ClaimArenaAppearanceRequest) returns (ClaimArenaAppearanceResponse);
+  // B11：本季段位排行。只读、只回前 N 名（N 在 config/arena_rank.json），
+  // 名字与职业取角色表事实值，不写库、不缓存、不跨服。
+  rpc DescribeArenaLeaderboard(DescribeArenaLeaderboardRequest) returns (DescribeArenaLeaderboardResponse);
 }
 
 message SettleExpRequest {
@@ -2340,4 +2354,99 @@ message ViewStallResponse {
   int32 live_listings = 10;
   int32 slots = 11;
   repeated StallListingFact listings = 12;
+}
+
+// B11：竞技场一场通关。outcome 目前只认 win——散场（没打完）不记分、
+// 也不扣分，方案没写失败惩罚，这里不自编一套。
+message ReportArenaResultRequest {
+  // 服间直连（战斗服）为空；网关转发时才填，客户端填不了。
+  string account = 1;
+  uint64 character_id = 2;
+  // 幂等号：一场一个人一个号，同一个号重放不再加分。
+  string txn_id = 3;
+  // 竞技场模式（config/arena_match.json 的 modes[].id），只记账、不参与判定。
+  string mode = 4;
+  string outcome = 5;
+}
+
+message ReportArenaResultResponse {
+  bool ok = 1;
+  string reason = 2;
+  string season_id = 3;
+  int64 score = 4;
+  int64 score_delta = 5;
+  string tier_key = 6;
+  string tier_name = 7;
+  // 这一场把档位抬上去了没有；外观仍要单独领，本笔只记分。
+  bool tier_up = 8;
+  int32 wins = 9;
+  bool duplicate = 10;
+}
+
+message DescribeArenaRankRequest {
+  uint64 character_id = 1;
+}
+
+message ArenaRankTierFact {
+  string key = 1;
+  string name = 2;
+  int64 min_score = 3;
+  string appearance_item_id = 4;
+  // reached 只看库里记下的分数；claimed 看库里有没有领过这一档。
+  bool reached = 5;
+  bool claimed = 6;
+}
+
+message DescribeArenaRankResponse {
+  bool ok = 1;
+  string reason = 2;
+  string season_id = 3;
+  int64 score = 4;
+  string tier_key = 5;
+  string tier_name = 6;
+  int32 wins = 7;
+  // 已经到顶时 next_tier_key 为空、next_tier_min_score = 0。
+  string next_tier_key = 8;
+  int64 next_tier_min_score = 9;
+  repeated ArenaRankTierFact tiers = 10;
+}
+
+message ClaimArenaAppearanceRequest {
+  string account = 1;
+  uint64 character_id = 2;
+  string tier_key = 3;
+  string txn_id = 4;
+}
+
+message ClaimArenaAppearanceResponse {
+  bool ok = 1;
+  string reason = 2;
+  string season_id = 3;
+  string tier_key = 4;
+  string item_id = 5;
+  uint32 bag_slot = 6;
+  bool duplicate = 7;
+}
+
+message DescribeArenaLeaderboardRequest {
+  // 0 表示按配置的 top_n；大于它按配置截断。
+  uint32 limit = 1;
+}
+
+message ArenaLeaderboardEntry {
+  uint32 rank = 1;
+  uint64 character_id = 2;
+  string name = 3;
+  string class_id = 4;
+  int64 score = 5;
+  string tier_key = 6;
+  string tier_name = 7;
+}
+
+message DescribeArenaLeaderboardResponse {
+  bool ok = 1;
+  string reason = 2;
+  string season_id = 3;
+  uint32 limit = 4;
+  repeated ArenaLeaderboardEntry entries = 5;
 }

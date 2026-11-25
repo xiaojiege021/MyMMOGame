@@ -45,6 +45,7 @@ public sealed class CharacterServices
     public required SiegeTerritoryRepository SiegeTerritories { get; init; }
     public required SeasonPassProgressRepository SeasonPassPoints { get; init; }
     public required SeasonPassRepository SeasonPasses { get; init; }
+    public required ArenaRankRepository ArenaRanks { get; init; }
     public required MonthlyBundleRepository MonthlyBundles { get; init; }
     public required CharacterSlotRepository CharacterSlots { get; init; }
     public required BagExpandRepository BagExpands { get; init; }
@@ -137,6 +138,10 @@ public static class ServiceAssembly
             dataSource, tables.SeasonPassProgressTable, tables.Calendar);
         var seasonPasses = new SeasonPassRepository(
             dataSource, tables.SeasonPassTable, tables.Items, config, tables.SeasonPassProgressTable);
+        // B11：竞技场段位的唯一写入点。记分与领专属外观各一笔事务；
+        // 加多少分、哪一档、发哪件全从 config/arena_rank.json 现取。
+        var arenaRanks = new ArenaRankRepository(
+            dataSource, tables.ArenaRankTable, tables.Items, config);
         // P3-4b：月叠的唯一写入点（扣元宝 + 两种符一次到账，跨堆叠上限就占多格），
         // 与第二角色栏的名额事务（账号一行、只存总名额）。
         var monthlyBundles = new MonthlyBundleRepository(dataSource, tables.MonthlyBundleTable, tables.Items, config);
@@ -202,6 +207,7 @@ public static class ServiceAssembly
             SiegeTerritories = siegeTerritories,
             SeasonPassPoints = seasonPassPoints,
             SeasonPasses = seasonPasses,
+            ArenaRanks = arenaRanks,
             MonthlyBundles = monthlyBundles,
             CharacterSlots = characterSlotsRepo,
             BagExpands = bagExpands,

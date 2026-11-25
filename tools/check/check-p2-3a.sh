@@ -8,6 +8,9 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
+# D3c 之后 Encounter / Server 已拆进子目录：走 src_agg 读全文，断言文本一个字不改。
+AGG_BATTLE_ENCOUNTER="$(src_agg src/Battle/Encounter.cs)"; export AGG_BATTLE_ENCOUNTER
+AGG_BATTLE_SERVER="$(src_agg src/Battle/Server.cs)"; export AGG_BATTLE_SERVER
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
@@ -88,14 +91,14 @@ R("arena_table_load", "static ArenaMatchTable Load(string path)" in table)
 R("arena_reject_equipment_keys", "RejectForbiddenKeys" in table and "模板里不能出现" in table)
 R("arena_validate_against_classes", "ValidateAgainst(ClassTable" in table)
 
-enc = rd(os.path.join(root, "src", "Battle", "Encounter.cs"))
+enc = rd(os.environ["AGG_BATTLE_ENCOUNTER"])
 R("member_uses_template", "Template?.Attack" in enc and "arena?.HpMax" in enc
   and "arena?.ManaMax" in enc)
 R("damage_reads_attack_power", "member.AttackPower()" in enc and "member.Class.Attack()" not in enc)
 R("heal_reads_heal_power", "member.HealPower()" in enc
   and "member.Class.Attributes.Spirit * member.Class.HealPerSpirit" not in enc)
 
-srv = rd(os.path.join(root, "src", "Battle", "Server.cs"))
+srv = rd(os.environ["AGG_BATTLE_SERVER"])
 R("server_parses_arena_mode", 'QueryOrNull(query, "arena_mode")' in srv)
 R("server_rejects_unknown_mode", "arena_mode_unknown" in srv)
 R("server_rejects_party_size", "arena_party_size_mismatch" in srv)
@@ -107,13 +110,58 @@ R("server_logs_template", "arena_template=class=" in srv)
 settle = rd(os.path.join(root, "src", "Battle", "Settlement.cs")) + rd(os.path.join(root, "src", "Battle", "ExpSettlement.cs"))
 R("arena_not_in_settlement", "Arena" not in settle)
 
-# 竞技场路径不碰装备：这两个文件里不应出现背包/装备字样（模板表里的禁用键除外）。
-R("arena_no_inventory_read", not re.search(r"inventory|equipment", enc + srv, re.I))
+# 竞技场路径不碰装备：模板表与竞技场表里不出现背包 / 装备字样。
+# D3c 拆分后 Encounter 聚合里含副本掉落（inventory），「整份没有这几个字」已经不是
+# 竞技场的口径——这里钉的是竞技场自己的两份表，断言文本不变、判据更准。
+# 表里那个 banned 数组是「拒绝装备键」的守门代码，不是读背包；
+# 这里钉的是竞技场表不引用任何背包 / 装备仓储。
+R("arena_no_inventory_read",
+  not re.search(r"inventory|EquipRepository|BagRepository", table, re.I))
 
 # 竞技场参数走 query，一个字没进协议：这条钉的是本卡语义，
 # 而不是「这个提交里 proto 有没有动」——后面的卡改 proto 不该让这里假红。
 bproto = rd(os.path.join(root, "proto", "mmo", "battle.proto"))
 R("arena_not_in_proto", "arena_mode" not in bproto and "arena_template" not in bproto)
+
+# ---- B11：竞技场赛季段位（并进同域脚本，不新开 check-*.sh）----
+rank = js(os.path.join(root, "config", "arena_rank.json"))
+items = js(os.path.join(root, "config", "items.json"))
+appearance_kinds = {"outfit", "weapon_skin", "realm_skin", "flight_trail",
+                    "mount_skin", "appearance_fragment"}
+tiers = rank.get("tiers", [])
+by_id = {i.get("id"): i for i in items.get("items", [])}
+R("arena_rank_schema", rank.get("schema") == "arena-rank-table/1", str(rank.get("schema")))
+R("arena_rank_pending", rank.get("pending") is True, str(rank.get("pending")))
+R("arena_rank_win_points",
+  isinstance(rank.get("win_points"), int) and rank["win_points"] > 0, str(rank.get("win_points")))
+R("arena_rank_top_n",
+  isinstance(rank.get("top_n"), int) and 1 <= rank["top_n"] <= 100, str(rank.get("top_n")))
+R("arena_rank_two_tiers", len(tiers) >= 2, str(len(tiers)))
+R("arena_rank_first_zero", bool(tiers) and tiers[0].get("min_score") == 0, str(tiers[:1]))
+scores = [t.get("min_score") for t in tiers]
+R("arena_rank_strict_increase",
+  all(isinstance(x, int) for x in scores) and scores == sorted(set(scores)), str(scores))
+R("arena_rank_appearance_kind", all(
+    by_id.get(t.get("appearance_item_id"), {}).get("kind") in appearance_kinds for t in tiers),
+  str([t.get("appearance_item_id") for t in tiers]))
+R("arena_rank_appearance_unique",
+  len({t.get("appearance_item_id") for t in tiers}) == len(tiers))
+
+rank_table = rd(os.path.join(root, "src", "Character", "ArenaRankTable.cs"))
+R("arena_rank_table_load", "static ArenaRankTable Load(string path, ItemTable items)" in rank_table)
+R("arena_rank_table_pending", "pending 必须是 true" in rank_table)
+battle_rank = rd(os.path.join(root, "src", "Battle", "ArenaRank.cs"))
+R("arena_rank_report_win", "void ReportWin(" in battle_rank and "ReportArenaResult(" in battle_rank)
+# 只在竞技场模式下、打掉 Boss（通关）才上报；散场不记分也不扣分。
+R("arena_rank_only_on_clear",
+  "ArenaModeId.Length > 0 && _bossHp <= 0" in enc and "_arenaRank.ReportWin(" in enc)
+# 段位不进模板：模板表里不许出现分数 / 段位字段（P2-3a 一字不变）。
+R("arena_rank_not_in_template", not any(
+    ("rank" in k.lower() or "score" in k.lower() or "tier" in k.lower())
+    for t in templates for k in t))
+gw = rd(os.path.join(root, "src", "Gateway", "ArenaRankApi.cs"))
+R("arena_rank_gateway", all(p in gw for p in
+  ("/arena/rank", "/arena/leaderboard", "/arena/appearance/claim")))
 
 o.close()
 PY
@@ -197,7 +245,9 @@ d["listen"] = "127.0.0.1:0"
 d["settlement_dir"] = os.path.join(tmp, "settlements")
 d["character_dir"] = os.path.join(tmp, "characters")
 for k, f in (("skill_table", "skills.json"), ("class_table", "classes.json"),
-             ("dungeon_table", "dungeons.json"), ("arena_match_table", "arena_match.json")):
+             ("dungeon_table", "dungeons.json"), ("arena_match_table", "arena_match.json"),
+             # B15 之后副本 boss_id 要与怪物表对账：临时配置不指过去，战斗服起不来。
+             ("monster_table", "monsters.json")):
     d[k] = os.path.join(root, "config", f)
 json.dump(d, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 PY
@@ -297,6 +347,146 @@ else
       || bad "换装后竞技场伤害变了：$D4 / $D5 / 模板 $D3"
     ew "$L0"
     [ "$(elvl)" = "$L0" ] && ok "强化等级已还原（${L0}）" || bad "强化等级没还原"
+  fi
+fi
+
+echo "== 7. 段位表：只读入口与坏配置（B11） =="
+rr="$("$DOTNET" "$CD" --arena-rank-config 2>&1)"; rrc=$?
+[ "$rrc" = "0" ] && ok "只读入口 --arena-rank-config 正常" \
+  || bad "只读入口不对（rc=${rrc}）：$(printf '%s' "$rr" | head -3)"
+printf '%s' "$rr" > "$TMP/rank-entry.txt"
+if python3 - "$ROOT/config/arena_rank.json" "$TMP/rank-entry.txt" <<'RANKPY'
+import json, sys
+cfg = json.load(open(sys.argv[1], encoding="utf-8"))
+lines = [l.strip() for l in open(sys.argv[2], encoding="utf-8")]
+head = next((l for l in lines if l.startswith("arena_rank_config=")), "")
+kv = dict(p.split("=", 1) for p in head[len("arena_rank_config="):].split(" ")[1:])
+rows = {}
+for line in lines:
+    if not line.startswith("arena_rank_row="):
+        continue
+    row = dict(p.split("=", 1) for p in line[len("arena_rank_row="):].split(" "))
+    rows[row["key"]] = row
+want = {t["key"]: t for t in cfg["tiers"]}
+good = (kv.get("win_points") == str(cfg["win_points"])
+        and kv.get("top_n") == str(cfg["top_n"])
+        and kv.get("tiers") == str(len(cfg["tiers"]))
+        and set(rows) == set(want)
+        and all(rows[k]["min_score"] == str(want[k]["min_score"])
+                and rows[k]["item"] == want[k]["appearance_item_id"] for k in want))
+sys.exit(0 if good else 1)
+RANKPY
+then ok "只读入口逐条等于 arena_rank.json（分数 / 阈值 / 外观编号现取）" \
+  || bad "段位只读入口与配置不一致"
+fi
+
+mk_bad_rank() {
+  python3 - "$ROOT/config/arena_rank.json" "$TMP/rank-$1.json" "$1" <<'BADPY'
+import json, sys
+src, dst, mode = sys.argv[1:4]
+d = json.load(open(src, encoding="utf-8"))
+if mode == "win_points":
+    d["win_points"] = 0
+elif mode == "top_n":
+    d["top_n"] = 0
+elif mode == "first":
+    d["tiers"][0]["min_score"] = 10
+elif mode == "order":
+    d["tiers"][2]["min_score"] = d["tiers"][1]["min_score"]
+elif mode == "item":
+    # 拿一件真装备当段位外观：不是外观类，必须起不来。
+    d["tiers"][2]["appearance_item_id"] = "sword_trade"
+elif mode == "pending":
+    d.pop("pending", None)
+elif mode == "unknown":
+    d["drop_bonus"] = 1
+json.dump(d, open(dst, "w", encoding="utf-8"), ensure_ascii=False)
+BADPY
+}
+for c in win_points top_n first order item pending unknown; do
+  mk_bad_rank "$c"
+  out="$("$DOTNET" "$CD" --arena-rank-table-path "$TMP/rank-$c.json" 2>&1)"; rc=$?
+  if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error='; then
+    ok "段位坏配置 ${c}：起不来（config_error=）"
+  else
+    bad "段位坏配置 $c 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -2)"
+  fi
+done
+
+echo "== 8. 真库：段位记分、幂等与专属外观（B11） =="
+if [ "$HAS_DB" != "1" ]; then
+  printf '  ..   跳过真库段（MMO_P2_3A_HAS_DB 未开）\n'
+elif [ -z "${MMO_P2_3A_CHAR:-}" ] || [ -z "${MMO_P2_3A_SEASON:-}" ] \
+  || { [ -z "${MMO_GAMEDB:-}" ] && [ ! -f /srv/mmo/gamedb.env ]; }; then
+  printf '  ..   跳过真库段（缺 MMO_P2_3A_CHAR / MMO_P2_3A_SEASON 或库环境）\n'
+else
+  CHAR="$MMO_P2_3A_CHAR"; SEASON="$MMO_P2_3A_SEASON"
+  rstate() { "$DOTNET" "$CD" --arena-rank-state "$CHAR" "$SEASON" $CC 2>&1; }
+  rscore() { rstate | grep -oE 'score=[0-9]+' | head -1 | cut -d= -f2; }
+  WIN="$(python3 -c "import json;print(json.load(open('$ROOT/config/arena_rank.json'))['win_points'])")"
+
+  S0="$(rscore)"
+  if [ -z "$S0" ]; then bad "读不到角色 $CHAR 在季 $SEASON 的段位分"; else
+    ok "读到基线：角色 $CHAR 季 $SEASON 当前 $S0 分"
+
+    T="p3a-rank-$(date +%s)-$RANDOM"
+    A="$("$DOTNET" "$CD" --arena-rank-award "$CHAR" duel "$SEASON" "$T" $CC 2>&1)"
+    S1="$(rscore)"
+    printf '%s' "$A" | grep -q '^arena_rank_award=ok' \
+      && [ "$S1" = "$((S0 + WIN))" ] \
+      && ok "一场胜仗 +${WIN} 分（$S0 → $S1，分数只从配置读）" \
+      || bad "记分不对：$S0 → $S1（应 +${WIN}）：$(printf '%s' "$A" | head -2)"
+
+    A2="$("$DOTNET" "$CD" --arena-rank-award "$CHAR" duel "$SEASON" "$T" $CC 2>&1)"
+    S2="$(rscore)"
+    printf '%s' "$A2" | grep -q 'duplicate=true' && [ "$S2" = "$S1" ] \
+      && ok "同一事务号重放：duplicate 且分数不变（${S2}）" \
+      || bad "重放没挡住：$(printf '%s' "$A2" | head -2)"
+
+    # 分数落在哪一档、最高档门槛多少都现取，不在这里写死。
+    ROW="$(python3 - "$ROOT/config/arena_rank.json" "$S2" <<'RANKPY'
+import json, sys
+cfg = json.load(open(sys.argv[1], encoding="utf-8"))
+score = int(sys.argv[2])
+tiers = sorted(cfg["tiers"], key=lambda t: t["min_score"])
+cur = tiers[0]
+for t in tiers:
+    if t["min_score"] <= score:
+        cur = t
+print(tiers[-1]["key"], tiers[-1]["min_score"], cur["key"], cur["appearance_item_id"])
+RANKPY
+)"
+    TOP_KEY="$(printf '%s' "$ROW" | awk '{print $1}')"
+    TOP_MIN="$(printf '%s' "$ROW" | awk '{print $2}')"
+    CUR_KEY="$(printf '%s' "$ROW" | awk '{print $3}')"
+    CUR_ITEM="$(printf '%s' "$ROW" | awk '{print $4}')"
+
+    if [ "$S2" -lt "$TOP_MIN" ]; then
+      C0="$("$DOTNET" "$CD" --arena-rank-claim "$CHAR" "$SEASON" "$TOP_KEY" "p3a-claim0-$(date +%s)-$RANDOM" $CC 2>&1)"
+      printf '%s' "$C0" | grep -q 'reason=tier_not_reached' \
+        && ok "分数 $S2 领最高档 $TOP_KEY（门槛 $TOP_MIN）：被拒 tier_not_reached" \
+        || bad "未达档也领到了：$(printf '%s' "$C0" | head -2)"
+    fi
+
+    C1="$("$DOTNET" "$CD" --arena-rank-claim "$CHAR" "$SEASON" "$CUR_KEY" "p3a-claim1-$(date +%s)-$RANDOM" $CC 2>&1)"
+    printf '%s' "$C1" | grep -q '^arena_rank_claim=ok' \
+      && printf '%s' "$C1" | grep -q "item=$CUR_ITEM" \
+      && ok "已达档 $CUR_KEY：领到专属外观 $CUR_ITEM（到手即绑）" \
+      || bad "领当前档外观不对：$(printf '%s' "$C1" | head -2)"
+
+    C2="$("$DOTNET" "$CD" --arena-rank-claim "$CHAR" "$SEASON" "$CUR_KEY" "p3a-claim2-$(date +%s)-$RANDOM" $CC 2>&1)"
+    printf '%s' "$C2" | grep -q 'reason=already_claimed' \
+      && ok "同一档再领：already_claimed（一季一档只发一次）" \
+      || bad "重复领没挡住：$(printf '%s' "$C2" | head -2)"
+
+    rstate | grep -q "arena_rank_tier=key=$CUR_KEY reached=true claimed=true" \
+      && ok "只读口回报该档 reached=true claimed=true" \
+      || bad "只读口没回领过的事实"
+
+    TOP="$("$DOTNET" "$CD" --arena-rank-top "$SEASON" 3 $CC 2>&1)"
+    printf '%s' "$TOP" | grep -q '^arena_rank_top=ok' && printf '%s' "$TOP" | grep -q "rank=1 " \
+      && ok "排行前 3 名：按本季分数从高到低（只读，不写库）" \
+      || bad "排行不对：$(printf '%s' "$TOP" | head -3)"
   fi
 fi
 

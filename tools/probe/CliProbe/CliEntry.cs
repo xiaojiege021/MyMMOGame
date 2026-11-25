@@ -68,6 +68,9 @@ internal static class CliEntry
         code = AwakenCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = ArenaCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = StallCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

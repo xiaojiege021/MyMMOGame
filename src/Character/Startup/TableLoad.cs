@@ -43,6 +43,9 @@ public sealed class CharacterTables
     public required SpiritBeastTable SpiritBeastTable { get; init; }
     /// <summary>B6：觉醒门槛与「哪条分支解锁哪条技能」的正本。</summary>
     public required AwakenTable AwakenTable { get; init; }
+
+    /// <summary>B11：段位档位 / 每胜加分 / 排行前几名 / 每档专属外观的正本。</summary>
+    public required ArenaRankTable ArenaRankTable { get; init; }
     public required RecipeTable RecipeTable { get; init; }
 
     /// <summary>B3：制作掷点正本（区间 / 权重档 / 附加属性允许表）。</summary>
@@ -99,6 +102,7 @@ public static class TableLoad
         MountTable mountTable;
         SpiritBeastTable spiritBeastTable;
         AwakenTable awakenTable;
+        ArenaRankTable arenaRankTable;
         CityTaskTable cityTaskTable;
         SeasonPassProgressTable seasonPassProgressTable;
         NameRulesTable nameRulesTable;
@@ -223,6 +227,11 @@ public static class TableLoad
             // branch_skills 必须正好覆盖 branches.json 的全部 10 条分支；
             // 技能编号是不是本分支的觉醒技由战斗服启动期按 skills.json 交叉校验。
             awakenTable = AwakenTable.Load(config.AwakenTable, branches, expTable);
+            // B11：段位表。缺表降级成 missing（竞技场照常打，只是不记段位分）；
+            // 外观编号必须真的在物品表里、而且是外观类，否则起不来。
+            arenaRankTable = File.Exists(config.ArenaRankTable)
+                ? ArenaRankTable.Load(config.ArenaRankTable, items)
+                : ArenaRankTable.Missing();
             // Q5/J2：主城修炼 / 境界任务的正本。与启动共用同一份 Load：城池编号必须在
             // config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json 的顺序表里；
             // 缺表降级成「没有任务」，老卡环境照常起。
@@ -285,6 +294,7 @@ public static class TableLoad
             MountTable = mountTable,
             SpiritBeastTable = spiritBeastTable,
             AwakenTable = awakenTable,
+            ArenaRankTable = arenaRankTable,
             RecipeTable = recipeTable,
             CraftRollTable = craftRollTable,
             CityTaskTable = cityTaskTable,

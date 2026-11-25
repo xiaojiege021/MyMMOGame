@@ -27,7 +27,7 @@ public sealed partial class BattleServer(
     IReviveScrollUse scrolls,
     IBattleProfileSource profiles, ISectTechSource sectTech,
     ISiegeSectSource sectFacts, ISiegeResultSink siegeResult, IWorldBossSink worldBossSink,
-    IDeserterPenalty deserter)
+    IDeserterPenalty deserter, IArenaRank arenaRank)
 {
     /// <summary>20Hz。前摇、冷却、后摇的判定精度都在这个粒度上。</summary>
     const int TickIntervalMs = 50;

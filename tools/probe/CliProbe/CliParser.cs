@@ -1,7 +1,6 @@
 using static Character.Cli.CliFlags;
 namespace Character.Cli;
-
-/// <summary>命令行解析：133 个 flag 名与取值个数保持原样，未知参数回 64。</summary>
+/// <summary>命令行解析：flag 名与取值个数由各域 Cli 自己认领，未知参数回 64。</summary>
 internal static class CliParser
 {
     public static int Parse(string[] args)
@@ -50,6 +49,7 @@ internal static class CliParser
             case var npcFlag when NpcShopCli.Handles(npcFlag): NpcShopCli.Parse(args, ref i); break;
             case var companionFlag when CompanionCli.Handles(companionFlag): CompanionCli.Parse(args, ref i); break;
             case var awakenFlag when AwakenCli.Handles(awakenFlag): AwakenCli.Parse(args, ref i); break;
+            case var arenaRankFlag when ArenaCli.Handles(arenaRankFlag): ArenaCli.Parse(args, ref i); break;
             case var stallFlag when StallCli.Handles(stallFlag): StallCli.Parse(args, ref i); break;
             // B9：穿 / 脱 / 读已穿。解析在 EquipCli.Parse，与 RPC 同一套判定。
             case "--equip": case "--unequip": case "--equip-row": EquipCli.Parse(args, ref i); break;

@@ -85,6 +85,7 @@ internal static class DbCli
             if (code != null) { return code; }
 
             code = await AwakenCli.TryRunDbAsync(ctx);
+            code = await ArenaCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
             code = await StallCli.TryRunDbAsync(ctx);
@@ -152,6 +153,9 @@ internal static class DbCli
     || stallOpenOf != 0 || stallListOf != 0 || stallViewStall != null
     || stallCloseOf != 0 || stallBuyOf != 0
     // B6：觉醒的两条连库口。漏在这里就会掉到「启动角色服」那条路。
-    || awakenOf != 0 || awakenStateOf != 0;
+    || awakenOf != 0 || awakenStateOf != 0
+    // B11：段位的三条连库口。
+    || arenaRankOf != 0 || arenaRankStateOf != 0 || arenaRankClaimOf != 0
+    || arenaRankTopSeason != null;
     }
 }

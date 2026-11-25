@@ -1,0 +1,15 @@
+{
+  "schema": "arena-rank-table/1",
+  "version": 1,
+  "note": "竞技场赛季段位与专属外观的唯一正本（方案 12 章「1v1 / 3v3，属性模板统一，赛季段位与专属外观」、开发架构 11 节 P2-3a / 13 节 P3-4a1 / 14 节第 14 行 B11）。方案只写了「赛季段位与专属外观」这一句，没有给档数、分数、名字和外观编号：本表按 5 档落（开卡默认），全部标 pending，改这份配置就能换档位与阈值，不用改代码。段位分只认竞技场一场通关这个服务端事实：战斗服在竞技场模式下打掉 Boss，按本表的 win_points 给这一场里每个人加一次分；散场不记分、不扣分（方案没写失败惩罚，这里不自编一套）。分数与档位按季存：季编号取全局服务的当前季，角色服不自己认定。档次只决定这一季能领哪一件专属外观（outfit），不进竞技场模板属性——P2-3a 的「换装不改变模板属性」一字不变，段位再高也不加攻击、生命、蓝、治疗与仇恨。表里只许出现这些键：掉落、金币、灵石、强化石、装备、副本次数、属性加成一类字段不许从这份配置里长出来。",
+  "pending": true,
+  "win_points": 30,
+  "top_n": 20,
+  "tiers": [
+    { "key": "r1", "name": "凡尘（占位）", "min_score": 0, "appearance_item_id": "outfit_arena_r1" },
+    { "key": "r2", "name": "淬体（占位）", "min_score": 200, "appearance_item_id": "outfit_arena_r2" },
+    { "key": "r3", "name": "通玄（占位）", "min_score": 600, "appearance_item_id": "outfit_arena_r3" },
+    { "key": "r4", "name": "化境（占位）", "min_score": 1200, "appearance_item_id": "outfit_arena_r4" },
+    { "key": "r5", "name": "绝巅（占位）", "min_score": 2000, "appearance_item_id": "outfit_arena_r5" }
+  ]
+}

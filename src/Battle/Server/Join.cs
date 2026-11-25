@@ -143,12 +143,19 @@ public sealed partial class BattleServer
                     Key = partyKey,
                     Encounter = new Encounter(
                         config, settlements, characters, NextSessionId(), partySize,
-                        expSettlement, talismans, pills, scrolls, profiles, dungeon),
+                        expSettlement, talismans, pills, scrolls, profiles, dungeon,
+                        arenaRank: arenaRank),
                     Ticker = new CancellationTokenSource(),
                     Dungeon = dungeon,
                     PartySize = partySize,
                     ArenaMode = arenaMode,
                 };
+                // B11：竞技场这一场通关后要报段位分。模式只记账，属性仍是模板。
+                if (arenaMode is not null)
+                {
+                    party.Encounter.ArenaModeId = arenaMode.Id;
+                }
+
                 _parties[partyKey] = party;
                 created = true;
             }

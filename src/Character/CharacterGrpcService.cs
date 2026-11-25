@@ -94,7 +94,10 @@ public sealed partial class CharacterGrpcService(
     MountRepository mounts,
     SpiritBeastRepository spiritBeasts,
     // B6：觉醒的门槛与「哪条分支解锁哪条技能」的正本；觉醒时只按它取编号。
-    AwakenTable awakenTable) : CharacterService.CharacterServiceBase
+    AwakenTable awakenTable,
+    // B11：段位档位阈值 / 每胜加分 / 排行前几名 / 每档专属外观。
+    ArenaRankTable arenaRankTable,
+    ArenaRankRepository arenaRanks) : CharacterService.CharacterServiceBase
 {
 
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。

@@ -24,8 +24,10 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 
 # 无库段可跑的卡（新增卡只有在「无 gamedb 也能全绿」时才往这里加）。
 # P2-4a 于 B6（2026-11-25）补进来：它的无库段 65/65 全绿，且技能表改动要靠它挡住。
+# P2-3a 于 B11（2026-11-25）补进来：段位表与竞技场的无库段 74/74 全绿，
+# 骨架拆分后的存量假红一并修掉（改读 src_agg，断言文本不放松）。
 # contract = D16 契约闸，脚本按 14.11.3 命名为 check-contract.sh。
-CHECKS="b1 b4 b9 b10 c2-realm c4 c5 c6 c7 contract d1a d1b d5 d7 d8 d10 d15 invariants k1 k3 k4 k5 k6 k7 n6 n7 n13 n14 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a p2-4a q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 s1"
+CHECKS="b1 b4 b9 b10 c2-realm c4 c5 c6 c7 contract d1a d1b d5 d7 d8 d10 d15 invariants k1 k3 k4 k5 k6 k7 n6 n7 n13 n14 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a p2-3a p2-4a q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 s1"
 
 MODE="full"
 case "${1:-}" in

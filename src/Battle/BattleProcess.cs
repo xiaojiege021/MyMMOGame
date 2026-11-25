@@ -23,6 +23,11 @@ public sealed class BattleProcess(string configPath)
         using IExpSettlement expSettlement = string.IsNullOrEmpty(config.ExpUpstream)
             ? new NoExpSettlement()
             : new GrpcExpSettlement(config.ExpUpstream);
+        // B11：竞技场一场通关的段位分交给角色服。没配上游就是本机口径：
+        // 竞技场照常打，只是不记段位分。
+        using IArenaRank arenaRank = string.IsNullOrEmpty(config.ExpUpstream)
+            ? new NoArenaRank()
+            : new GrpcArenaRank(config.ExpUpstream);
         // 红符要从背包里扣一张，背包只有角色服能写。没配上游就是本机口径：
         // 这一场用不了红符（回 upstream_off），不从别的地方变出一张来。
         using ITalismanSpend talismans = string.IsNullOrEmpty(config.CharacterUpstream)
@@ -184,7 +189,8 @@ public sealed class BattleProcess(string configPath)
         try
         {
             await new BattleServer(config, settlements, characters, expSettlement, talismans,
-                pills, scrolls, profiles, sectTech, siegeSect, siegeResult, worldBoss, deserter)
+                pills, scrolls, profiles, sectTech, siegeSect, siegeResult, worldBoss, deserter,
+                arenaRank)
                 .RunAsync(stopping);
         }
         catch (OperationCanceledException)

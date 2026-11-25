@@ -24,6 +24,7 @@ public sealed partial class Encounter
     readonly IPillSpend _pills;
     readonly IReviveScrollUse _scrolls;
     readonly IBattleProfileSource _profiles;
+    readonly IArenaRank _arenaRank;
     readonly DungeonDef? _dungeon;
     readonly Dictionary<ulong, Member> _members = [];
 
@@ -117,7 +118,7 @@ public sealed partial class Encounter
         BattleConfig config, SettlementStore settlements, ICharacterStore characters,
         ulong sessionId, int partySize, IExpSettlement expSettlement, ITalismanSpend talismans,
         IPillSpend pills, IReviveScrollUse scrolls, IBattleProfileSource profiles, DungeonDef? dungeon,
-        BossConfig? boss = null)
+        BossConfig? boss = null, IArenaRank? arenaRank = null)
     {
         _config = config;
         _settlements = settlements;
@@ -127,6 +128,8 @@ public sealed partial class Encounter
         _pills = pills;
         _scrolls = scrolls;
         _profiles = profiles;
+        // B11：竞技场的段位分上报口。没注入就是本机口径（NoArenaRank），老调用点不受影响。
+        _arenaRank = arenaRank ?? new NoArenaRank();
         _dungeon = dungeon;
         _bossUnit = new BossHost(this);
         // 不传就用配置里那一个 boss：老调用点一个都没变。
@@ -159,6 +162,12 @@ public sealed partial class Encounter
     /// 只改标签，不改基础经验、组队加成、同门加成里任何一个数。
     /// </summary>
     public string SettlementSource { get; set; } = "dungeon";
+
+    /// <summary>
+    /// B11：这一场是不是竞技场、是哪个模式（空串表示不是）。由 Join 在创建那一场时设；
+    /// 只用于「一场通关后报段位分」，不参与属性——竞技场的属性仍是模板（P2-3a）。
+    /// </summary>
+    public string ArenaModeId { get; set; } = "";
 
     /// <summary>
     /// P3-5a：结算时用的人数。世界 Boss 的人数随进场变化，构造那一刻还不知道最后几个人，

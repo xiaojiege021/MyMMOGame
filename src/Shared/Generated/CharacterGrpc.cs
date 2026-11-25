@@ -352,6 +352,22 @@ namespace Mmo.Proto.Character {
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseItemBatchRequest> __Marshaller_mmo_character_UseItemBatchRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseItemBatchRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.UseItemBatchResponse> __Marshaller_mmo_character_UseItemBatchResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.UseItemBatchResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ReportArenaResultRequest> __Marshaller_mmo_character_ReportArenaResultRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ReportArenaResultRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ReportArenaResultResponse> __Marshaller_mmo_character_ReportArenaResultResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ReportArenaResultResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeArenaRankRequest> __Marshaller_mmo_character_DescribeArenaRankRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeArenaRankRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeArenaRankResponse> __Marshaller_mmo_character_DescribeArenaRankResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeArenaRankResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ClaimArenaAppearanceRequest> __Marshaller_mmo_character_ClaimArenaAppearanceRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ClaimArenaAppearanceRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.ClaimArenaAppearanceResponse> __Marshaller_mmo_character_ClaimArenaAppearanceResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.ClaimArenaAppearanceResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest> __Marshaller_mmo_character_DescribeArenaLeaderboardRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse> __Marshaller_mmo_character_DescribeArenaLeaderboardResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse> __Method_CreateCharacter = new grpc::Method<global::Mmo.Proto.Character.CreateCharacterRequest, global::Mmo.Proto.Character.CreateCharacterResponse>(
@@ -968,6 +984,38 @@ namespace Mmo.Proto.Character {
         "UseItemBatch",
         __Marshaller_mmo_character_UseItemBatchRequest,
         __Marshaller_mmo_character_UseItemBatchResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ReportArenaResultRequest, global::Mmo.Proto.Character.ReportArenaResultResponse> __Method_ReportArenaResult = new grpc::Method<global::Mmo.Proto.Character.ReportArenaResultRequest, global::Mmo.Proto.Character.ReportArenaResultResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ReportArenaResult",
+        __Marshaller_mmo_character_ReportArenaResultRequest,
+        __Marshaller_mmo_character_ReportArenaResultResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeArenaRankRequest, global::Mmo.Proto.Character.DescribeArenaRankResponse> __Method_DescribeArenaRank = new grpc::Method<global::Mmo.Proto.Character.DescribeArenaRankRequest, global::Mmo.Proto.Character.DescribeArenaRankResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeArenaRank",
+        __Marshaller_mmo_character_DescribeArenaRankRequest,
+        __Marshaller_mmo_character_DescribeArenaRankResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.ClaimArenaAppearanceRequest, global::Mmo.Proto.Character.ClaimArenaAppearanceResponse> __Method_ClaimArenaAppearance = new grpc::Method<global::Mmo.Proto.Character.ClaimArenaAppearanceRequest, global::Mmo.Proto.Character.ClaimArenaAppearanceResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "ClaimArenaAppearance",
+        __Marshaller_mmo_character_ClaimArenaAppearanceRequest,
+        __Marshaller_mmo_character_ClaimArenaAppearanceResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest, global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse> __Method_DescribeArenaLeaderboard = new grpc::Method<global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest, global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeArenaLeaderboard",
+        __Marshaller_mmo_character_DescribeArenaLeaderboardRequest,
+        __Marshaller_mmo_character_DescribeArenaLeaderboardResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -1904,6 +1952,59 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.UseItemBatchResponse> UseItemBatch(global::Mmo.Proto.Character.UseItemBatchRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B11：竞技场一场通关的段位分。战斗服在竞技场模式下打掉 Boss 时逐人报一次，
+      /// 请求只带角色号、幂等号与模式：加多少分、升到哪一档、发什么外观全部由角色服
+      /// 按 config/arena_rank.json 现取。季向全局服务确认，客户端带不进分数与档位；
+      /// 段位不改竞技场模板属性（P2-3a 一字不变）。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ReportArenaResultResponse> ReportArenaResult(global::Mmo.Proto.Character.ReportArenaResultRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B11：这个角色这一季多少分、当前哪一档、下一档差多少、每档外观领没领。只读。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeArenaRankResponse> DescribeArenaRank(global::Mmo.Proto.Character.DescribeArenaRankRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B11：领本季某一档的专属外观。门槛只认库里记下的分数；同一季同一档只领一次，
+      /// 同一事务号重放回 duplicate。物品编号从配置读，客户端带不进来。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.ClaimArenaAppearanceResponse> ClaimArenaAppearance(global::Mmo.Proto.Character.ClaimArenaAppearanceRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B11：本季段位排行。只读、只回前 N 名（N 在 config/arena_rank.json），
+      /// 名字与职业取角色表事实值，不写库、不缓存、不跨服。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse> DescribeArenaLeaderboard(global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -5601,6 +5702,218 @@ namespace Mmo.Proto.Character {
       {
         return CallInvoker.AsyncUnaryCall(__Method_UseItemBatch, null, options, request);
       }
+      /// <summary>
+      /// B11：竞技场一场通关的段位分。战斗服在竞技场模式下打掉 Boss 时逐人报一次，
+      /// 请求只带角色号、幂等号与模式：加多少分、升到哪一档、发什么外观全部由角色服
+      /// 按 config/arena_rank.json 现取。季向全局服务确认，客户端带不进分数与档位；
+      /// 段位不改竞技场模板属性（P2-3a 一字不变）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ReportArenaResultResponse ReportArenaResult(global::Mmo.Proto.Character.ReportArenaResultRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ReportArenaResult(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：竞技场一场通关的段位分。战斗服在竞技场模式下打掉 Boss 时逐人报一次，
+      /// 请求只带角色号、幂等号与模式：加多少分、升到哪一档、发什么外观全部由角色服
+      /// 按 config/arena_rank.json 现取。季向全局服务确认，客户端带不进分数与档位；
+      /// 段位不改竞技场模板属性（P2-3a 一字不变）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ReportArenaResultResponse ReportArenaResult(global::Mmo.Proto.Character.ReportArenaResultRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ReportArenaResult, null, options, request);
+      }
+      /// <summary>
+      /// B11：竞技场一场通关的段位分。战斗服在竞技场模式下打掉 Boss 时逐人报一次，
+      /// 请求只带角色号、幂等号与模式：加多少分、升到哪一档、发什么外观全部由角色服
+      /// 按 config/arena_rank.json 现取。季向全局服务确认，客户端带不进分数与档位；
+      /// 段位不改竞技场模板属性（P2-3a 一字不变）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ReportArenaResultResponse> ReportArenaResultAsync(global::Mmo.Proto.Character.ReportArenaResultRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ReportArenaResultAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：竞技场一场通关的段位分。战斗服在竞技场模式下打掉 Boss 时逐人报一次，
+      /// 请求只带角色号、幂等号与模式：加多少分、升到哪一档、发什么外观全部由角色服
+      /// 按 config/arena_rank.json 现取。季向全局服务确认，客户端带不进分数与档位；
+      /// 段位不改竞技场模板属性（P2-3a 一字不变）。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ReportArenaResultResponse> ReportArenaResultAsync(global::Mmo.Proto.Character.ReportArenaResultRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ReportArenaResult, null, options, request);
+      }
+      /// <summary>
+      /// B11：这个角色这一季多少分、当前哪一档、下一档差多少、每档外观领没领。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeArenaRankResponse DescribeArenaRank(global::Mmo.Proto.Character.DescribeArenaRankRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeArenaRank(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：这个角色这一季多少分、当前哪一档、下一档差多少、每档外观领没领。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeArenaRankResponse DescribeArenaRank(global::Mmo.Proto.Character.DescribeArenaRankRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeArenaRank, null, options, request);
+      }
+      /// <summary>
+      /// B11：这个角色这一季多少分、当前哪一档、下一档差多少、每档外观领没领。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeArenaRankResponse> DescribeArenaRankAsync(global::Mmo.Proto.Character.DescribeArenaRankRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeArenaRankAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：这个角色这一季多少分、当前哪一档、下一档差多少、每档外观领没领。只读。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeArenaRankResponse> DescribeArenaRankAsync(global::Mmo.Proto.Character.DescribeArenaRankRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeArenaRank, null, options, request);
+      }
+      /// <summary>
+      /// B11：领本季某一档的专属外观。门槛只认库里记下的分数；同一季同一档只领一次，
+      /// 同一事务号重放回 duplicate。物品编号从配置读，客户端带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ClaimArenaAppearanceResponse ClaimArenaAppearance(global::Mmo.Proto.Character.ClaimArenaAppearanceRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ClaimArenaAppearance(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：领本季某一档的专属外观。门槛只认库里记下的分数；同一季同一档只领一次，
+      /// 同一事务号重放回 duplicate。物品编号从配置读，客户端带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.ClaimArenaAppearanceResponse ClaimArenaAppearance(global::Mmo.Proto.Character.ClaimArenaAppearanceRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ClaimArenaAppearance, null, options, request);
+      }
+      /// <summary>
+      /// B11：领本季某一档的专属外观。门槛只认库里记下的分数；同一季同一档只领一次，
+      /// 同一事务号重放回 duplicate。物品编号从配置读，客户端带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ClaimArenaAppearanceResponse> ClaimArenaAppearanceAsync(global::Mmo.Proto.Character.ClaimArenaAppearanceRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ClaimArenaAppearanceAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：领本季某一档的专属外观。门槛只认库里记下的分数；同一季同一档只领一次，
+      /// 同一事务号重放回 duplicate。物品编号从配置读，客户端带不进来。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.ClaimArenaAppearanceResponse> ClaimArenaAppearanceAsync(global::Mmo.Proto.Character.ClaimArenaAppearanceRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ClaimArenaAppearance, null, options, request);
+      }
+      /// <summary>
+      /// B11：本季段位排行。只读、只回前 N 名（N 在 config/arena_rank.json），
+      /// 名字与职业取角色表事实值，不写库、不缓存、不跨服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse DescribeArenaLeaderboard(global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeArenaLeaderboard(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：本季段位排行。只读、只回前 N 名（N 在 config/arena_rank.json），
+      /// 名字与职业取角色表事实值，不写库、不缓存、不跨服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse DescribeArenaLeaderboard(global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeArenaLeaderboard, null, options, request);
+      }
+      /// <summary>
+      /// B11：本季段位排行。只读、只回前 N 名（N 在 config/arena_rank.json），
+      /// 名字与职业取角色表事实值，不写库、不缓存、不跨服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse> DescribeArenaLeaderboardAsync(global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeArenaLeaderboardAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B11：本季段位排行。只读、只回前 N 名（N 在 config/arena_rank.json），
+      /// 名字与职业取角色表事实值，不写库、不缓存、不跨服。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse> DescribeArenaLeaderboardAsync(global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeArenaLeaderboard, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override CharacterServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -5691,7 +6004,11 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_MoveItem, serviceImpl.MoveItem)
           .AddMethod(__Method_DiscardItem, serviceImpl.DiscardItem)
           .AddMethod(__Method_SortInventory, serviceImpl.SortInventory)
-          .AddMethod(__Method_UseItemBatch, serviceImpl.UseItemBatch).Build();
+          .AddMethod(__Method_UseItemBatch, serviceImpl.UseItemBatch)
+          .AddMethod(__Method_ReportArenaResult, serviceImpl.ReportArenaResult)
+          .AddMethod(__Method_DescribeArenaRank, serviceImpl.DescribeArenaRank)
+          .AddMethod(__Method_ClaimArenaAppearance, serviceImpl.ClaimArenaAppearance)
+          .AddMethod(__Method_DescribeArenaLeaderboard, serviceImpl.DescribeArenaLeaderboard).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -5778,6 +6095,10 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DiscardItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DiscardItemRequest, global::Mmo.Proto.Character.DiscardItemResponse>(serviceImpl.DiscardItem));
       serviceBinder.AddMethod(__Method_SortInventory, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.SortInventoryRequest, global::Mmo.Proto.Character.SortInventoryResponse>(serviceImpl.SortInventory));
       serviceBinder.AddMethod(__Method_UseItemBatch, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UseItemBatchRequest, global::Mmo.Proto.Character.UseItemBatchResponse>(serviceImpl.UseItemBatch));
+      serviceBinder.AddMethod(__Method_ReportArenaResult, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ReportArenaResultRequest, global::Mmo.Proto.Character.ReportArenaResultResponse>(serviceImpl.ReportArenaResult));
+      serviceBinder.AddMethod(__Method_DescribeArenaRank, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeArenaRankRequest, global::Mmo.Proto.Character.DescribeArenaRankResponse>(serviceImpl.DescribeArenaRank));
+      serviceBinder.AddMethod(__Method_ClaimArenaAppearance, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.ClaimArenaAppearanceRequest, global::Mmo.Proto.Character.ClaimArenaAppearanceResponse>(serviceImpl.ClaimArenaAppearance));
+      serviceBinder.AddMethod(__Method_DescribeArenaLeaderboard, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeArenaLeaderboardRequest, global::Mmo.Proto.Character.DescribeArenaLeaderboardResponse>(serviceImpl.DescribeArenaLeaderboard));
     }
 
   }
