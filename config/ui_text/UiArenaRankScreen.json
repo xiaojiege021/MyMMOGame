@@ -1,0 +1,99 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiArenaRankScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiArenaRankScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "本季段位"
+    },
+    {
+      "key": "T002",
+      "text": "赛季"
+    },
+    {
+      "key": "T003",
+      "text": "分数"
+    },
+    {
+      "key": "T004",
+      "text": "当前档"
+    },
+    {
+      "key": "T005",
+      "text": "胜场"
+    },
+    {
+      "key": "T006",
+      "text": "下一档"
+    },
+    {
+      "key": "T007",
+      "text": "下一档门槛"
+    },
+    {
+      "key": "T008",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T009",
+      "text": "读取段位"
+    },
+    {
+      "key": "T010",
+      "text": "档位与专属外观"
+    },
+    {
+      "key": "T011",
+      "text": "门槛 "
+    },
+    {
+      "key": "T012",
+      "text": " 分"
+    },
+    {
+      "key": "T013",
+      "text": "外观 "
+    },
+    {
+      "key": "T014",
+      "text": "领取"
+    },
+    {
+      "key": "T015",
+      "text": "已领"
+    },
+    {
+      "key": "T016",
+      "text": "未达"
+    },
+    {
+      "key": "T017",
+      "text": "领取结果"
+    },
+    {
+      "key": "T018",
+      "text": "回执"
+    },
+    {
+      "key": "T019",
+      "text": "背包格"
+    },
+    {
+      "key": "T020",
+      "text": "重放"
+    },
+    {
+      "key": "T021",
+      "text": "已是最高档"
+    },
+    {
+      "key": "T022",
+      "text": "—"
+    },
+    {
+      "key": "T023",
+      "text": "是"
+    }
+  ]
+}

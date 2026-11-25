@@ -47,6 +47,9 @@ namespace HotUpdate.Ui
         public const string PassNote =
             UiStrings.UiCommerceCodex.T019;
 
+        public const string StallNote =
+            UiStrings.UiCommerceCodex.T020;
+
         public static string BalanceOf(System.Collections.Generic.List<Mmo.Net.CurrencyRow> rows, string kind)
         {
             for (var i = 0; i < rows.Count; i++)

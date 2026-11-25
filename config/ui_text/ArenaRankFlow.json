@@ -1,0 +1,19 @@
+{
+  "schema": "ui-text/1",
+  "group": "ArenaRankFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/Flow/ArenaRankFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "段位读取没回应："
+    },
+    {
+      "key": "T002",
+      "text": "排行榜读取没回应："
+    },
+    {
+      "key": "T003",
+      "text": "领取请求没回应："
+    }
+  ]
+}

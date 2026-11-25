@@ -66,6 +66,8 @@ namespace HotUpdate.Ui
         /// <summary>A9：属性屏顶那一行说明。</summary>
         public const string AttrsNote = UiStrings.UiUpgradeCodex.T027;
 
+        public const string CraftNote = UiStrings.UiUpgradeCodex.T028;
+
         /// <summary>四个装备部位（原型 D01）。</summary>
         public static readonly string[] Parts = { UiStrings.UiUpgradeCodex.T019, UiStrings.UiUpgradeCodex.T020, UiStrings.UiUpgradeCodex.T021, UiStrings.UiUpgradeCodex.T022 };
 

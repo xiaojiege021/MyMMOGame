@@ -174,6 +174,20 @@ namespace HotUpdate.Ui
         /// <summary>建宗时提交的名字。只作请求参数，能不能用由社交服判。</summary>
         public const string DemoSectName = UiStrings.UiSocialCodex.T041;
 
+        /// <summary>
+        /// 段位口径（U19 接了 B11 的 `GET /arena/rank`）。分数、当前档、下一档门槛、
+        /// 每档够没够与领没领都只认回包；门槛不在客户端比，也不推算「还差多少分」。
+        /// </summary>
+        public const string RankNote =
+            UiStrings.UiSocialCodex.T042;
+
+        /// <summary>
+        /// 排行口径（U19 接了 B11 的 `GET /arena/leaderboard`）。
+        /// 名次与行顺序照抄回包，客户端不排序、不自己截人数。
+        /// </summary>
+        public const string BoardNote =
+            UiStrings.UiSocialCodex.T043;
+
         /// <summary>可选的宗门编号与目标角色编号（请求参数，不是事实值）。</summary>
         public static readonly ulong[] NumberChoices = { 1, 2, 3 };
     }

@@ -59,6 +59,7 @@ public static class U6Check
         {
             "UiCommerceFlow.cs", "UiCommerceCodex.cs", "UiCommerceSelfCheck.cs",
             "UiShopScreen.cs", "UiAuctionScreen.cs", "UiCurrencyScreen.cs", "UiPassScreen.cs",
+            "UiStallScreen.cs",
         };
         var missing = new List<string>();
         foreach (var name in names)
@@ -83,7 +84,7 @@ public static class U6Check
     static void CheckScreens(string root)
     {
         var ui = Path.Combine(root, "client/MMOGame/Assets/HotUpdate/Ui");
-        var screens = new[] { "UiShopScreen.cs", "UiAuctionScreen.cs", "UiCurrencyScreen.cs", "UiPassScreen.cs" };
+        var screens = new[] { "UiShopScreen.cs", "UiAuctionScreen.cs", "UiCurrencyScreen.cs", "UiPassScreen.cs", "UiStallScreen.cs" };
         var missingLog = new List<string>();
         var readsConfig = new List<string>();
         var localMath = new List<string>();

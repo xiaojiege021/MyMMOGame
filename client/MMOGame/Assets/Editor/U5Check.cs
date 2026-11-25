@@ -64,6 +64,7 @@ public static class U5Check
             "UiUpgradeFlow.cs", "UiUpgradeCodex.cs", "UiUpgradeViews.cs", "UiUpgradeSelfCheck.cs",
             "UiCharacterScreen.cs", "UiBagScreen.cs", "UiEnhanceScreen.cs", "UiTransferScreen.cs",
             "UiCrystalScreen.cs", "UiSkillScreen.cs", "UiRealmScreen.cs", "UiAttrScreen.cs",
+            "UiCraftScreen.cs",
         };
         var missing = new List<string>();
         foreach (var name in names)
@@ -90,6 +91,7 @@ public static class U5Check
         {
             "UiCharacterScreen.cs", "UiBagScreen.cs", "UiEnhanceScreen.cs", "UiTransferScreen.cs",
             "UiCrystalScreen.cs", "UiSkillScreen.cs", "UiRealmScreen.cs", "UiAttrScreen.cs",
+            "UiCraftScreen.cs",
         };
 
         var missingLog = new List<string>();
@@ -146,6 +148,7 @@ public static class U5Check
         {
             "UiCharacterScreen.cs", "UiBagScreen.cs", "UiEnhanceScreen.cs", "UiTransferScreen.cs",
             "UiCrystalScreen.cs", "UiSkillScreen.cs", "UiRealmScreen.cs", "UiAttrScreen.cs",
+            "UiCraftScreen.cs",
         };
         var bad = new List<string>();
         foreach (var name in names)

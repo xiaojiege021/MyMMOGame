@@ -17,6 +17,9 @@ namespace HotUpdate.Ui
             public const string T004 = "赛季通行证";
             public const string T005 = "\"bag_slots\":40,\"character_name\":\"自检角色\",\"realm\":\"炼体\"}";
             public const string T006 = "\"name\":\"服饰外观\",\"price_yuanbao\":120,\"currency\":\"yuanbao\",\"balance\":380,";
+            public const string T007 = "摆摊";
+            public const string T008 = "枯岚道";
+            public const string T009 = "临街小摊";
         }
     }
 }

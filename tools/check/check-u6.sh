@@ -33,11 +33,15 @@ ui = assets + '/HotUpdate/Ui'
 net = assets + '/Net'
 
 names = ['UiCommerceFlow.cs', 'UiCommerceCodex.cs', 'UiCommerceSelfCheck.cs',
-         'UiShopScreen.cs', 'UiAuctionScreen.cs', 'UiCurrencyScreen.cs', 'UiPassScreen.cs']
+         'UiShopScreen.cs', 'UiAuctionScreen.cs', 'UiCurrencyScreen.cs', 'UiPassScreen.cs',
+         'UiStallScreen.cs']
 for n in names:
     assert os.path.exists(ui + '/' + n), 'missing ' + n
-for n in ('CharacterShop.cs', 'CharacterCurrency.cs', 'CharacterRecharge.cs'):
+for n in ('CharacterShop.cs', 'CharacterCurrency.cs', 'CharacterRecharge.cs',
+          'CharacterStall.cs'):
     assert os.path.exists(net + '/' + n), 'missing ' + n
+for n in ('Flow/StallFlow.cs',):
+    assert os.path.exists(ui + '/' + n), 'missing ' + n
 assert os.path.exists(assets + '/Editor/U6Check.cs'), 'missing U6Check.cs'
 
 for n in names:
@@ -64,6 +68,27 @@ assert '.Balance' in currency and '.Duplicate' in currency
 
 proto = open(root + '/proto/mmo/character.proto', encoding='utf-8').read().lower()
 assert 'u6' not in proto
+
+# U20：摆摊六条口与网关一致；请求体只有角色号 / 摊号 / 格号 / 数量 / 单价。
+stall = open(net + '/CharacterStall.cs', encoding='utf-8').read()
+gw = open(root + '/src/Gateway/StallApi.cs', encoding='utf-8').read()
+pairs = [('/stall/open', 'MapPost("/stall/open"'),
+         ('/stall/close', 'MapPost("/stall/close"'),
+         ('/stall/list', 'MapPost("/stall/list"'),
+         ('/stall/view', 'MapGet("/stall/view"'),
+         ('/stalls', 'MapGet("/stalls"'),
+         ('/stall/buy', 'MapPost("/stall/buy"')]
+for path, pattern in pairs:
+    assert '"' + path + '"' in stall, 'client missing ' + path
+    assert pattern in gw, 'gateway missing ' + pattern
+assert 'txn_id' not in stall, 'client sends txn_id'
+stall_screen = open(ui + '/UiStallScreen.cs', encoding='utf-8').read()
+# 屏上不算税、不自己挑摊：税与净额只认回包字段，列表顺序照世界服。
+assert '0.05' not in stall_screen and '0.08' not in stall_screen, 'local tax math'
+assert '.Sort(' not in stall_screen and 'OrderBy' not in stall_screen, 'local sort'
+assert 'UiStallScreen.Build' in open(ui + '/UiEntryHub.cs', encoding='utf-8').read(), 'nav missing'
+assert os.path.exists(root + '/config/ui_text/UiStallScreen.json')
+assert os.path.exists(root + '/config/ui_text/StallFlow.json')
 
 allcards = open(root + '/tools/check/check-all.sh', encoding='utf-8').read()
 assert 'u6' in allcards and 'u6)' in allcards, 'check-all 没有 u6'
@@ -96,7 +121,10 @@ for key in files screens no_config no_tax_math shop_fields auction_fields curren
   fi
 done
 
-for key in currency shop_ok shop_reject auction ingot recharge duplicate four skin_layout skin_copy; do
+for key in currency shop_ok shop_reject auction ingot recharge duplicate four \
+           stall_open stall_open_body stall_list stall_list_body stall_browse stall_view \
+           stall_buy stall_reject five stall_skin_layout stall_skin_copy \
+           skin_layout skin_copy; do
   if grep -q "u6_self_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "四屏自检 u6_self_${key}=ok"
   else

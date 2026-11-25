@@ -1,0 +1,43 @@
+{
+  "schema": "ui-text/1",
+  "group": "StallFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/Flow/StallFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "开摊失败："
+    },
+    {
+      "key": "T002",
+      "text": "还没有摊"
+    },
+    {
+      "key": "T003",
+      "text": "关摊失败："
+    },
+    {
+      "key": "T004",
+      "text": "上架失败："
+    },
+    {
+      "key": "T005",
+      "text": "看摊失败："
+    },
+    {
+      "key": "T006",
+      "text": "读摊位列表失败："
+    },
+    {
+      "key": "T007",
+      "text": "没有选中挂单"
+    },
+    {
+      "key": "T008",
+      "text": "购买失败："
+    },
+    {
+      "key": "T009",
+      "text": "没有角色"
+    }
+  ]
+}

@@ -141,6 +141,96 @@ else
   bad "四属性键与回包字段对不上"
 fi
 
+echo "== 3c. U20 制作屏与背包掷点（B3 界面欠项）=="
+CRAFT_NET="$ROOT/client/MMOGame/Assets/Net/CharacterCraft.cs"
+CRAFT_FLOW="$ROOT/client/MMOGame/Assets/HotUpdate/Ui/Flow/CraftFlow.cs"
+CRAFT_SCREEN="$ROOT/client/MMOGame/Assets/HotUpdate/Ui/UiCraftScreen.cs"
+BAG_SCREEN="$ROOT/client/MMOGame/Assets/HotUpdate/Ui/UiBagScreen.cs"
+for f in "$CRAFT_NET" "$CRAFT_FLOW" "$CRAFT_SCREEN" "$BAG_SCREEN" \
+         "$ROOT/config/ui_text/UiCraftScreen.json" "$ROOT/config/ui_text/CraftFlow.json"; do
+  if [ -f "$f" ]; then
+    ok "有 $(basename "$f")"
+  else
+    bad "缺 $(basename "$f")"
+  fi
+done
+
+# 四条口与网关一致；开始只发角色号与配方编号（事务号网关生成）。
+if grep -q '"/craft/recipes"' "$CRAFT_NET" && grep -q '"/craft/state"' "$CRAFT_NET" \
+   && grep -q '"/craft/start"' "$CRAFT_NET" && grep -q '"/craft/finish"' "$CRAFT_NET" \
+   && grep -q 'MapGet("/craft/recipes"' "$ROOT/src/Gateway/Api/Character/Craft.cs" \
+   && grep -q 'MapGet("/craft/state"' "$ROOT/src/Gateway/Api/Character/Craft.cs" \
+   && grep -q 'MapPost("/craft/start"' "$ROOT/src/Gateway/Api/Character/Craft.cs" \
+   && grep -q 'MapPost("/craft/finish"' "$ROOT/src/Gateway/Api/Character/Craft.cs"; then
+  ok "四条口与网关路径一致（recipes / state / start / finish）"
+else
+  bad "制作四条口与网关不一致"
+fi
+
+if python3 - "$CRAFT_NET" >/dev/null 2>&1 <<'PY'
+import re
+import sys
+s = open(sys.argv[1], encoding='utf-8').read()
+m = re.search(r'public static string StartBody\([^)]*\)\s*\{(.*?)\n        \}', s, re.S)
+if not m:
+    sys.exit(1)
+body = m.group(1)
+ok = ('character_id' in body and 'recipe_id' in body
+      and 'txn_id' not in body and 'craft_attr' not in body and 'craft_extras' not in body)
+sys.exit(0 if ok else 1)
+PY
+then
+  ok "开始制作只带角色号与配方编号（不带事务号，也不许客户端带属性值）"
+else
+  bad "制作请求体里混进了客户端不该带的东西"
+  grep -nE 'txn_id' "$CRAFT_NET" | head -3 | detail
+fi
+
+# 掷点只在角色服：屏上不许随机、不许读掷点表、不把成功率当成本次预告。
+# 别拿 0.5 这类布局系数当证据 —— 面板宽度都是 0.5 对半分。
+if ! grep -qE 'Random\.|CraftRoller|craft_roll' "$CRAFT_SCREEN" "$CRAFT_FLOW"; then
+  ok "屏上与流程都不掷点（掷点只在角色服 FinishCraft 一处）"
+else
+  bad "客户端出现了掷点痕迹"
+  grep -nE 'Random\.|CraftRoller|craft_roll' "$CRAFT_SCREEN" "$CRAFT_FLOW" | head -3 | detail
+fi
+
+if ! grep -q 'config/' "$CRAFT_SCREEN" "$CRAFT_FLOW" "$CRAFT_NET" "$BAG_SCREEN"; then
+  ok "制作与背包都不读配置表（不打开 recipes.json / craft_roll.json）"
+else
+  bad "读了配置表"
+  grep -n 'config/' "$CRAFT_SCREEN" "$CRAFT_FLOW" "$CRAFT_NET" "$BAG_SCREEN" | head -3 | detail
+fi
+
+if grep -q 'UiCraftScreen.Build' "$ROOT/client/MMOGame/Assets/HotUpdate/Ui/UiEntryHub.cs"; then
+  ok "养成二级条挂上制作屏"
+else
+  bad "导航里没挂制作屏"
+fi
+
+# 本卡唯一的协议改动：背包槽加两个只读字段（不新增 rpc、不动既有编号）。
+if grep -q 'int32 craft_attr = 6;' "$ROOT/proto/mmo/character.proto" \
+   && grep -q 'repeated CraftExtra craft_extras = 7;' "$ROOT/proto/mmo/character.proto"; then
+  ok "InventorySlot 带两个只读掷点字段（craft_attr=6 / craft_extras=7）"
+else
+  bad "InventorySlot 缺掷点字段"
+fi
+if grep -q 'CraftAttr = roll.Attr;' "$ROOT/src/Character/Grpc/Inventory.cs" \
+   && grep -q 'craft_attr = s.CraftAttr' "$ROOT/src/Gateway/Api/Character/Inventory.cs"; then
+  ok "角色服填、网关透传（只加字段、不动既有编号）"
+else
+  bad "掷点没有从角色服送到网关回包"
+fi
+
+for key in craft_recipes craft_start craft_state craft_finish craft_not_ready bag_roll; do
+  if grep -q "u5_self_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
+    ok "制作与掷点自检 u5_self_${key}=ok"
+  else
+    bad "制作与掷点自检 u5_self_${key} 没过"
+    grep "u5_self_${key}" "$TMP/unity.log" 2>/dev/null | tail -2 | detail
+  fi
+done
+
 echo "== 4. 不做项 =="
 # 这一条守的是「境界子阶这条链不许改配置与玩法」。D5 口径：钉内容、不拿 git diff 钉文件——
 # U13 屏上依赖的是阶名与被动那两组值，它们没变就说明玩法没改；

@@ -1,9 +1,16 @@
+using System.Text.Json;
 using Npgsql;
 
 namespace Character;
 
 /// <summary>背包的一格。</summary>
 public sealed record BagSlot(int Slot, string ItemId, int Count, bool Bound);
+
+/// <summary>
+/// U20 / B3：这一格制作掷出来的主属性与附加属性。只有制作产出才有这一项，
+/// 非制作产出按物品表算（与 `EquipRepository` 同一口径），这里不给 0 冒充事实。
+/// </summary>
+public sealed record BagRoll(int Attr, List<(string Attr, int Value)> Extras);
 
 /// <summary>
 /// 背包的读写。绑定规则由物品表决定，写库时落 bound 与 bound_at；
@@ -119,6 +126,41 @@ public sealed class InventoryRepository(NpgsqlDataSource dataSource)
         }
 
         return list;
+    }
+
+    /// <summary>
+    /// U20 / B3：背包里每一行制作掷出来的主属性与附加属性。只读 craft_attr 非空的行——
+    /// 非制作产出没有这一项（按物品表算），不必给客户端一个 0 当作事实值。
+    /// 只读，不掷点、不改库；掷点写入在 CraftRepository.FinishAsync 那一笔事务里。
+    /// </summary>
+    public async Task<Dictionary<int, BagRoll>> RollsAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select slot, craft_attr, coalesce(craft_extras, '[]'::jsonb)::text from \"角色\".inventory "
+            + "where character_id = $1 and craft_attr is not null order by slot");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+
+        var rows = new Dictionary<int, BagRoll>();
+        while (await reader.ReadAsync(stopping))
+        {
+            var extras = new List<(string Attr, int Value)>();
+            var raw = reader.IsDBNull(2) ? "[]" : reader.GetString(2);
+            using var doc = JsonDocument.Parse(raw);
+            foreach (var one in doc.RootElement.EnumerateArray())
+            {
+                var attr = one.TryGetProperty("attr", out var a) ? a.GetString() ?? "" : "";
+                var value = one.TryGetProperty("value", out var v) && v.TryGetInt32(out var n) ? n : 0;
+                if (attr.Length > 0)
+                {
+                    extras.Add((attr, value));
+                }
+            }
+
+            rows[reader.GetInt16(0)] = new BagRoll(reader.GetInt32(1), extras);
+        }
+
+        return rows;
     }
 
     /// <summary>

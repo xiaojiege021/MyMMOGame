@@ -1,0 +1,27 @@
+{
+  "schema": "ui-text/1",
+  "group": "CraftFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/Flow/CraftFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "读配方失败："
+    },
+    {
+      "key": "T002",
+      "text": "读状态失败："
+    },
+    {
+      "key": "T003",
+      "text": "开始制作失败："
+    },
+    {
+      "key": "T004",
+      "text": "收取失败："
+    },
+    {
+      "key": "T005",
+      "text": "没有角色"
+    }
+  ]
+}

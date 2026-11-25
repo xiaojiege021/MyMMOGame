@@ -97,6 +97,9 @@ public static partial class CharacterApi
                         item_id = s.ItemId,
                         count = s.Count,
                         bound = s.Bound,
+                        // U20 / B3：制作掷点（主属性 + 附加属性）。非制作产出为 0 / 空。
+                        craft_attr = s.CraftAttr,
+                        craft_extras = s.CraftExtras.Select(e => new { attr = e.Attr, value = e.Value }),
                     }),
                 });
             }

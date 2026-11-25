@@ -167,6 +167,9 @@ namespace HotUpdate.Ui
                 case "attr":
                     shell.ShowPage(UiStrings.UiEntryHub.T043, s => { DrawUpgradeNav(s, "attr"); UiAttrScreen.Build(s, flow); });
                     break;
+                case "craft":
+                    shell.ShowPage(UiStrings.UiEntryHub.T047, s => { DrawUpgradeNav(s, "craft"); UiCraftScreen.Build(s, flow); });
+                    break;
                 default:
                     shell.ShowPage(UiStrings.UiEntryHub.T010, s => { DrawUpgradeNav(s, "character"); UiCharacterScreen.Build(s, flow); });
                     break;
@@ -187,6 +190,9 @@ namespace HotUpdate.Ui
                     break;
                 case "pass":
                     shell.ShowPage(UiStrings.UiEntryHub.T013, s => { DrawCommerceNav(s, "pass"); UiPassScreen.Build(s, flow); });
+                    break;
+                case "stall":
+                    shell.ShowPage(UiStrings.UiEntryHub.T046, s => { DrawCommerceNav(s, "stall"); UiStallScreen.Build(s, flow); });
                     break;
                 default:
                     shell.ShowPage(UiStrings.UiEntryHub.T014, s => { DrawCommerceNav(s, "shop"); UiShopScreen.Build(s, flow); });
@@ -221,6 +227,12 @@ namespace HotUpdate.Ui
                 }
                 case "boss":
                     shell.ShowPage(UiStrings.UiEntryHub.T020, s => { DrawSocialNav(s, "boss"); UiWorldBossScreen.Build(s, flow); });
+                    break;
+                case "rank":
+                    shell.ShowPage(UiStrings.UiEntryHub.T044, s => { DrawSocialNav(s, "rank"); UiArenaRankScreen.Build(s, flow); });
+                    break;
+                case "board":
+                    shell.ShowPage(UiStrings.UiEntryHub.T045, s => { DrawSocialNav(s, "board"); UiArenaBoardScreen.Build(s, flow); });
                     break;
                 default:
                     shell.ShowPage(UiStrings.UiEntryHub.T021, s => { DrawSocialNav(s, "sect"); UiSectScreen.Build(s, flow); });
@@ -267,6 +279,7 @@ namespace HotUpdate.Ui
                 (UiStrings.UiEntryHub.T027, "character"), (UiStrings.UiEntryHub.T004, "bag"), (UiStrings.UiEntryHub.T005, "enhance"),
                 (UiStrings.UiEntryHub.T028, "transfer"), (UiStrings.UiEntryHub.T029, "crystal"), (UiStrings.UiEntryHub.T030, "skill"),
                 (UiStrings.UiEntryHub.T031, "realm"), (UiStrings.UiEntryHub.T043, "attr"),
+                (UiStrings.UiEntryHub.T047, "craft"),
                 (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {
@@ -285,6 +298,7 @@ namespace HotUpdate.Ui
             DrawNav(shell, new[]
             {
                 (UiStrings.UiEntryHub.T014, "shop"), (UiStrings.UiEntryHub.T033, "auction"), (UiStrings.UiEntryHub.T012, "currency"),
+                (UiStrings.UiEntryHub.T046, "stall"),
                 (UiStrings.UiEntryHub.T034, "pass"), (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {
@@ -303,6 +317,7 @@ namespace HotUpdate.Ui
             DrawNav(shell, new[]
             {
                 (UiStrings.UiEntryHub.T021, "sect"), (UiStrings.UiEntryHub.T035, "siege"), (UiStrings.UiEntryHub.T036, "arena"),
+                (UiStrings.UiEntryHub.T044, "rank"), (UiStrings.UiEntryHub.T045, "board"),
                 (UiStrings.UiEntryHub.T037, "homestead"), (UiStrings.UiEntryHub.T038, "codex"), (UiStrings.UiEntryHub.T019, "party"),
                 ("Boss", "boss"), (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>

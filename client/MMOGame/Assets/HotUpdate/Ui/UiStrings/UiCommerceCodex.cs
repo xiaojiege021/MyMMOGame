@@ -30,6 +30,7 @@ namespace HotUpdate.Ui
             public const string T017 = "成交税与净额只读回包 · 上架与购买都不在本地算价、算税";
             public const string T018 = "元宝 / 金币余额只读 /currency · 充值建单与回调都在服务端判，一笔只发一次";
             public const string T019 = "赛季通行证在后面的卡（P3-4a2）；这里只占位，不做任何请求。";
+            public const string T020 = "摆摊：摊位在世界服显示（只有摘要），成交仍走拍卖那一笔角色服事务，税按摆摊配置收；在售件、价格与税都只看回包。";
         }
     }
 }

@@ -571,6 +571,11 @@ message InventorySlot {
   bool bound = 4;
   // B9：这一行正穿在哪个部位（weapon / armor / accessory）。空串表示没穿在身上。
   string equipped_slot = 5;
+  // B3 / U20：这一行是制作产出的装备时，服务端在出产那一次掷出来的主属性与附加属性
+  // （写在那一件上，不是按物品表算的）。不是制作产出就 craft_attr 留 0、craft_extras 为空。
+  // 只读：客户端请求体带不进，也没有写入入口（掷点只在 FinishCraft 一处）。
+  int32 craft_attr = 6;
+  repeated CraftExtra craft_extras = 7;
 }
 
 message ListInventoryRequest {

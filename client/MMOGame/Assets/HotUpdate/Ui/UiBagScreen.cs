@@ -102,6 +102,8 @@ namespace HotUpdate.Ui
             UiUpgradeViews.Result(shell, ops, height - m.Px(200f), UiStrings.UiBagScreen.T017,
                 WornText(flow, flow.BagFromSlot));
             UiUpgradeViews.Result(shell, ops, height - m.Px(250f), UiStrings.UiBagScreen.T018, EquipAttackText(flow));
+            // U20：这一格的制作掷点（主属性 + 附加条数）。不是制作产出就照实写，不拿 0 当结论。
+            UiUpgradeViews.Result(shell, ops, height - m.Px(356f), UiStrings.UiBagScreen.T038, RollText(flow));
             UiUpgradeViews.Result(shell, ops, height - m.Px(300f), UiStrings.UiBagScreen.T019, LastText(flow));
 
             var gap = m.Px(16f);
@@ -289,9 +291,41 @@ namespace HotUpdate.Ui
         /// <summary>这一格现在有几个：只认回包里的数量，没这一格就是 0。</summary>
         static int HeldCount(UiUpgradeFlow flow, uint slot)
         {
+            return SlotView(flow, slot).Count;
+        }
+
+        /// <summary>
+        /// U20：这一格的制作掷点文本。主属性与附加条数是 `/inventory` 那一行的字段，
+        /// 只照抄；不是制作产出（两项都空）就照实写「按物品表算」。
+        /// </summary>
+        static string RollText(UiUpgradeFlow flow)
+        {
+            if (!flow.HasBag)
+            {
+                return UiStrings.UiBagScreen.T037;
+            }
+
+            var row = SlotView(flow, flow.BagFromSlot);
+            if (row.ItemId == null)
+            {
+                return UiStrings.UiBagScreen.T037;
+            }
+
+            if (!row.HasRoll)
+            {
+                return UiStrings.UiBagScreen.T040;
+            }
+
+            var extras = row.CraftExtras != null ? row.CraftExtras.Count : 0;
+            return row.CraftAttr + " / " + extras + UiStrings.UiBagScreen.T041;
+        }
+
+        /// <summary>取这一格的回包行；没有这一格回 default（ItemId 为 null）。</summary>
+        static Mmo.Net.BagSlotView SlotView(UiUpgradeFlow flow, uint slot)
+        {
             if (!flow.HasBag || flow.Bag.Slots == null)
             {
-                return 0;
+                return default(Mmo.Net.BagSlotView);
             }
 
             var slots = flow.Bag.Slots;
@@ -299,11 +333,11 @@ namespace HotUpdate.Ui
             {
                 if (slots[i].Slot == slot)
                 {
-                    return slots[i].Count;
+                    return slots[i];
                 }
             }
 
-            return 0;
+            return default(Mmo.Net.BagSlotView);
         }
 
         /// <summary>最近一条回包说明。一次都没发过就写「尚未请求」。</summary>

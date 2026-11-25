@@ -52,6 +52,8 @@ namespace HotUpdate.Ui
             public const string T039 = "第二角色栏开启后，装备、等级、境界不共享，外观收藏可以共享。";
             public const string T040 = "九格只认 /hero-codex 回包：名字、收集度、被动 bps 都照抄；未定的格子留空，不补编条目";
             public const string T041 = "云锦";
+            public const string T042 = "段位只认 /arena/rank 回包：分数、当前档、下一档门槛与每档领没领都照抄；门槛不在客户端比，外观领取由角色服判";
+            public const string T043 = "排行只认 /arena/leaderboard 回包：名次与行顺序照抄，客户端不排序、不自己截人数";
         }
     }
 }

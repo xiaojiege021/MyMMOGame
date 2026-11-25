@@ -14,7 +14,7 @@ namespace HotUpdate.Ui
     /// 一条都不在这里算——屏上的数要么来自 `/currency`、`/inventory`，
     /// 要么来自 `/shop/buy`、`/auction/*`、`/recharge/*` 的回包。
     /// </summary>
-    public sealed class UiCommerceFlow : MonoBehaviour
+    public sealed partial class UiCommerceFlow : MonoBehaviour
     {
         public const string ReadyLog = "u6_commerce=ready";
 

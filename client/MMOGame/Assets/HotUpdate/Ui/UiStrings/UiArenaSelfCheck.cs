@@ -28,6 +28,8 @@ namespace HotUpdate.Ui
             public const string T015 = "尚未请求 · 点「进竞技场」";
             public const string T016 = "场次 bf_m1 · 队伍 a";
             public const string T017 = "战场 · 装备生效";
+            public const string T018 = "段位";
+            public const string T019 = "排行榜";
         }
     }
 }

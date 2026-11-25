@@ -15,8 +15,26 @@ namespace Mmo.Net
         /// <summary>B9：这一件正穿在哪个部位（weapon / armor / accessory）；空串是没穿。</summary>
         public string EquippedSlot;
 
+        /// <summary>
+        /// B3 / U20：这一件是制作产出时，服务端在出产那一次掷出来的主属性（不是按物品表算的）。
+        /// 0 表示不是制作产出；附加属性最多两条，屏上只照抄，客户端不重掷、不补算。
+        /// </summary>
+        public int CraftAttr;
+
+        public List<CraftExtraView> CraftExtras;
+
         /// <summary>屏上要显示「正穿着」时用它，不本地记一份穿戴状态。</summary>
         public bool IsWorn => !string.IsNullOrEmpty(EquippedSlot);
+
+        /// <summary>这一行有没有制作掷点。没有就走物品表基准，屏上写「非制作产出」。</summary>
+        public bool HasRoll => CraftAttr > 0 || (CraftExtras != null && CraftExtras.Count > 0);
+    }
+
+    /// <summary>制作掷出来的一条附加属性（B3）。键与值都是回包原样，不做换算。</summary>
+    public struct CraftExtraView
+    {
+        public string Attr;
+        public int Value;
     }
 
     /// <summary>移动回包：source / target 是移完之后那两格的现状，界面照抄。</summary>
@@ -139,7 +157,7 @@ namespace Mmo.Net
             var slots = new List<BagSlotView>();
             var start = json.IndexOf("\"slots\"", StringComparison.Ordinal);
             start = json.IndexOf('[', start);
-            var end = start >= 0 ? json.IndexOf(']', start) : -1;
+            var end = start >= 0 ? ArrayEnd(json, start) : -1;
             if (start < 0 || end < 0)
             {
                 return BagOutcome.Failure("bad_reply");
@@ -154,21 +172,15 @@ namespace Mmo.Net
                     break;
                 }
 
-                var close = json.IndexOf('}', open);
+                // U20：一格现在可能嵌 `craft_extras` 对象数组，按顶层配平找结尾，
+                // 不能再用「第一个 }」，否则读到内层对象就把这一格截断、下一格还错位。
+                var close = ObjectEnd(json, open);
                 if (close < 0 || close > end)
                 {
                     break;
                 }
 
-                var one = json.Substring(open, close - open + 1);
-                slots.Add(new BagSlotView
-                {
-                    Slot = (uint)ReadLong(one, "slot"),
-                    ItemId = ReadRaw(one, "item_id"),
-                    Count = (int)ReadLong(one, "count"),
-                    Bound = ReadBool(one, "bound"),
-                    EquippedSlot = ReadRaw(one, "equipped_slot"),
-                });
+                slots.Add(ParseSlot(json.Substring(open, close - open + 1)));
                 at = close + 1;
             }
 
@@ -405,21 +417,13 @@ namespace Mmo.Net
             }
 
             var open = json.IndexOf('{', at);
-            var close = open >= 0 ? json.IndexOf('}', open) : -1;
+            var close = open >= 0 ? ObjectEnd(json, open) : -1;
             if (open < 0 || close < 0)
             {
                 return new BagSlotView();
             }
 
-            var one = json.Substring(open, close - open + 1);
-            return new BagSlotView
-            {
-                Slot = (uint)ReadLong(one, "slot"),
-                ItemId = ReadRaw(one, "item_id"),
-                Count = (int)ReadLong(one, "count"),
-                Bound = ReadBool(one, "bound"),
-                EquippedSlot = ReadRaw(one, "equipped_slot"),
-            };
+            return ParseSlot(json.Substring(open, close - open + 1));
         }
 
         /// <summary>读整份 `slots` 数组；没有这一项就回空表。</summary>
@@ -433,7 +437,7 @@ namespace Mmo.Net
             }
 
             var start = json.IndexOf('[', at);
-            var end = start >= 0 ? json.IndexOf(']', start) : -1;
+            var end = start >= 0 ? ArrayEnd(json, start) : -1;
             if (start < 0 || end < 0)
             {
                 return slots;
@@ -448,26 +452,192 @@ namespace Mmo.Net
                     break;
                 }
 
-                var close = json.IndexOf('}', open);
+                var close = ObjectEnd(json, open);
                 if (close < 0 || close > end)
                 {
                     break;
                 }
 
-                var one = json.Substring(open, close - open + 1);
-                slots.Add(new BagSlotView
-                {
-                    Slot = (uint)ReadLong(one, "slot"),
-                    ItemId = ReadRaw(one, "item_id"),
-                    Count = (int)ReadLong(one, "count"),
-                    Bound = ReadBool(one, "bound"),
-                    EquippedSlot = ReadRaw(one, "equipped_slot"),
-                });
+                slots.Add(ParseSlot(json.Substring(open, close - open + 1)));
                 cursor = close + 1;
             }
 
             slots.Sort((a, b) => a.Slot.CompareTo(b.Slot));
             return slots;
+        }
+
+        /// <summary>
+        /// 拆一格。U20：除了格号 / 物品 / 数量 / 绑定 / 穿戴部位，还读制作掷点
+        /// （`craft_attr` 与最多两条 `craft_extras`）；不是制作产出的行两项为空。
+        /// </summary>
+        static BagSlotView ParseSlot(string one)
+        {
+            var view = new BagSlotView
+            {
+                Slot = (uint)ReadLong(one, "slot"),
+                ItemId = ReadRaw(one, "item_id"),
+                Count = (int)ReadLong(one, "count"),
+                Bound = ReadBool(one, "bound"),
+                EquippedSlot = ReadRaw(one, "equipped_slot"),
+                CraftAttr = (int)ReadLong(one, "craft_attr"),
+                CraftExtras = new List<CraftExtraView>(),
+            };
+
+            var inner = ArrayBody(one, "craft_extras");
+            if (inner.Length == 0)
+            {
+                return view;
+            }
+
+            var depth = 0;
+            var start = -1;
+            var inString = false;
+            for (var i = 0; i < inner.Length; i++)
+            {
+                var c = inner[i];
+                if (inString)
+                {
+                    if (c == '\\')
+                    {
+                        i++;
+                    }
+                    else if (c == '"')
+                    {
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (c == '"')
+                {
+                    inString = true;
+                    continue;
+                }
+
+                if (c == '{')
+                {
+                    if (depth == 0)
+                    {
+                        start = i;
+                    }
+
+                    depth++;
+                    continue;
+                }
+
+                if (c == '}' && depth > 0)
+                {
+                    depth--;
+                    if (depth == 0 && start >= 0)
+                    {
+                        var obj = inner.Substring(start, i - start + 1);
+                        view.CraftExtras.Add(new CraftExtraView
+                        {
+                            Attr = ReadRaw(obj, "attr"),
+                            Value = (int)ReadLong(obj, "value"),
+                        });
+                        start = -1;
+                    }
+                }
+            }
+
+            return view;
+        }
+
+        /// <summary>从 `{` 起按花括号配平找结尾（跳过字符串里的括号）。找不到回 -1。</summary>
+        static int ObjectEnd(string json, int open)
+        {
+            return CloseOf(json, open, '{', '}');
+        }
+
+        /// <summary>从 `[` 起按方括号配平找结尾。找不到回 -1。</summary>
+        static int ArrayEnd(string json, int open)
+        {
+            return CloseOf(json, open, '[', ']');
+        }
+
+        static int CloseOf(string json, int open, char openChar, char closeChar)
+        {
+            var depth = 0;
+            var inString = false;
+            for (var i = open; i < json.Length; i++)
+            {
+                var c = json[i];
+                if (inString)
+                {
+                    if (c == '\\')
+                    {
+                        i++;
+                    }
+                    else if (c == '"')
+                    {
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (c == '"')
+                {
+                    inString = true;
+                    continue;
+                }
+
+                if (c == openChar)
+                {
+                    depth++;
+                    continue;
+                }
+
+                if (c == closeChar)
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>数组字段的方括号内部文本；没有这个字段或不是数组就给空串。</summary>
+        static string ArrayBody(string json, string key)
+        {
+            var needle = "\"" + key + "\"";
+            var at = 0;
+            while (true)
+            {
+                at = json.IndexOf(needle, at, StringComparison.Ordinal);
+                if (at < 0)
+                {
+                    return string.Empty;
+                }
+
+                var colon = at + needle.Length;
+                while (colon < json.Length && char.IsWhiteSpace(json[colon]))
+                {
+                    colon++;
+                }
+
+                if (colon < json.Length && json[colon] == ':')
+                {
+                    break;
+                }
+
+                at += needle.Length;
+            }
+
+            var open = json.IndexOf('[', at + needle.Length);
+            if (open < 0)
+            {
+                return string.Empty;
+            }
+
+            var close = ArrayEnd(json, open);
+            return close > open ? json.Substring(open + 1, close - open - 1) : string.Empty;
         }
 
         static long ReadLong(string json, string key)

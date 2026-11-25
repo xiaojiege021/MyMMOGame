@@ -1,0 +1,79 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiCraftScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiCraftScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "副职"
+    },
+    {
+      "key": "T002",
+      "text": "已读配方 / 条数"
+    },
+    {
+      "key": "T003",
+      "text": "配方（点一条选中）"
+    },
+    {
+      "key": "T004",
+      "text": "选中的配方"
+    },
+    {
+      "key": "T005",
+      "text": "材料 / 费用"
+    },
+    {
+      "key": "T006",
+      "text": "成功率 / 耗时"
+    },
+    {
+      "key": "T007",
+      "text": "开始制作"
+    },
+    {
+      "key": "T008",
+      "text": "收取"
+    },
+    {
+      "key": "T009",
+      "text": "读状态"
+    },
+    {
+      "key": "T010",
+      "text": "回包"
+    },
+    {
+      "key": "T011",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T012",
+      "text": "手上没活"
+    },
+    {
+      "key": "T013",
+      "text": "剩余秒"
+    },
+    {
+      "key": "T014",
+      "text": "这一手的掷点"
+    },
+    {
+      "key": "T016",
+      "text": "产出"
+    },
+    {
+      "key": "T017",
+      "text": "被拒："
+    },
+    {
+      "key": "T018",
+      "text": "刷新配方"
+    },
+    {
+      "key": "T019",
+      "text": "没有配方"
+    }
+  ]
+}

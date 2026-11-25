@@ -1,0 +1,51 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiArenaBoardScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiArenaBoardScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "本季排行榜"
+    },
+    {
+      "key": "T002",
+      "text": "赛季 "
+    },
+    {
+      "key": "T003",
+      "text": " · 条数 "
+    },
+    {
+      "key": "T004",
+      "text": "名次"
+    },
+    {
+      "key": "T005",
+      "text": "角色"
+    },
+    {
+      "key": "T006",
+      "text": "职业"
+    },
+    {
+      "key": "T007",
+      "text": "分数"
+    },
+    {
+      "key": "T008",
+      "text": "档位"
+    },
+    {
+      "key": "T009",
+      "text": "尚未请求"
+    },
+    {
+      "key": "T010",
+      "text": "读取排行"
+    },
+    {
+      "key": "T011",
+      "text": "—"
+    }
+  ]
+}

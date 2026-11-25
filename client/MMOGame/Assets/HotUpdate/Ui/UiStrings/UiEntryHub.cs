@@ -54,6 +54,10 @@ namespace HotUpdate.Ui
             public const string T041 = "结算";
             public const string T042 = "返回表世界";
             public const string T043 = "属性";
+            public const string T044 = "段位";
+            public const string T045 = "排行";
+            public const string T046 = "摆摊";
+            public const string T047 = "制作";
         }
     }
 }

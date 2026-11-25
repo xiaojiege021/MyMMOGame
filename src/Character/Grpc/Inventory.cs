@@ -125,16 +125,30 @@ public sealed partial class CharacterGrpcService
         // B9：这一行正穿在哪个部位。只读一张穿戴表，不改背包；客户端据此把「穿上 / 脱下」
         // 显示成当前事实，而不是自己记一份。
         var worn = await equips.EquippedByBagSlotAsync(characterId, context.CancellationToken);
+        // U20 / B3：制作掷点跟着那一行走（主属性 + 最多两条附加属性）。只读，不重掷；
+        // 非制作产出的行没有这一项，回包里 craft_attr=0、craft_extras 为空。
+        var rolls = await inventory.RollsAsync(characterId, context.CancellationToken);
         foreach (var slot in await inventory.ListAsync(characterId, context.CancellationToken))
         {
-            response.Slots.Add(new InventorySlot
+            var one = new InventorySlot
             {
                 Slot = (uint)slot.Slot,
                 ItemId = slot.ItemId,
                 Count = slot.Count,
                 Bound = slot.Bound,
                 EquippedSlot = worn.TryGetValue(slot.Slot, out var where) ? where : "",
-            });
+            };
+
+            if (rolls.TryGetValue(slot.Slot, out var roll))
+            {
+                one.CraftAttr = roll.Attr;
+                foreach (var extra in roll.Extras)
+                {
+                    one.CraftExtras.Add(new CraftExtra { Attr = extra.Attr, Value = extra.Value });
+                }
+            }
+
+            response.Slots.Add(one);
         }
 
         return response;

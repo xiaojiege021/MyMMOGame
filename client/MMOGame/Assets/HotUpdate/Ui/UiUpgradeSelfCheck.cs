@@ -39,6 +39,12 @@ namespace HotUpdate.Ui
         /// <summary>A9：加点发了几次。第一次回成功，第二次回被拒。</summary>
         static int _allocCalls;
 
+        /// <summary>U20：开始制作的请求体（核对里面只有角色号与配方编号）。</summary>
+        static string _craftStartBody = string.Empty;
+
+        /// <summary>U20：收取发了几次。第一次回成功带掷点，第二次回还没到点。</summary>
+        static int _craftFinishCalls;
+
         public static bool Run()
         {
             _failed = false;
@@ -50,6 +56,8 @@ namespace HotUpdate.Ui
             _bagDiscardBody = string.Empty;
             _equipBody = string.Empty;
             _unequipBody = string.Empty;
+            _craftStartBody = string.Empty;
+            _craftFinishCalls = 0;
 
             UiSkinStore.Reset();
             var shell = UiShell.Ensure();
@@ -147,6 +155,33 @@ namespace HotUpdate.Ui
                     return;
                 }
 
+                // U20 制作：四条口。开始口要排在只读口之前；收取第二次回「还没好」。
+                if (path.IndexOf(CharacterCraft.StartPath, StringComparison.Ordinal) >= 0)
+                {
+                    _craftStartBody = body;
+                    done(200, CraftStartJson);
+                    return;
+                }
+
+                if (path.IndexOf(CharacterCraft.FinishPath, StringComparison.Ordinal) >= 0)
+                {
+                    _craftFinishCalls++;
+                    done(200, _craftFinishCalls == 1 ? CraftFinishJson : CraftFinishNotReadyJson);
+                    return;
+                }
+
+                if (path.IndexOf(CharacterCraft.StatePath, StringComparison.Ordinal) >= 0)
+                {
+                    done(200, CraftStateJson);
+                    return;
+                }
+
+                if (path.IndexOf(CharacterCraft.RecipesPath, StringComparison.Ordinal) >= 0)
+                {
+                    done(200, CraftRecipesJson);
+                    return;
+                }
+
                 done(200, CrystalRejectJson);
             });
 
@@ -156,6 +191,16 @@ namespace HotUpdate.Ui
                 && flow.Bag.CharacterName == UiStrings.UiUpgradeSelfCheck.T001 && flow.Bag.Realm == UiStrings.UiUpgradeSelfCheck.T002
                 && flow.Bag.DisplayRealm == UiStrings.UiUpgradeSelfCheck.T002);
             Debug.Log("u5_self_bag slots=" + (flow.HasBag ? flow.Bag.Slots.Count : -1));
+
+            // U20：制作掷点跟着背包那一行走。第一格带 38 + 两条附加，第二格没有；
+            // 两格都读到了才说明「一格嵌对象数组不会把后面的格截掉」。
+            Report("bag_roll", flow.HasBag && flow.Bag.Slots.Count == 2
+                && flow.Bag.Slots[0].CraftAttr == 38 && flow.Bag.Slots[0].CraftExtras.Count == 2
+                && flow.Bag.Slots[0].CraftExtras[1].Value == 4 && !flow.Bag.Slots[1].HasRoll
+                && flow.Bag.Slots[1].ItemId == "stone_enhance_mid");
+            Debug.Log("u5_self_bag_roll attr=" + (flow.HasBag ? flow.Bag.Slots[0].CraftAttr : 0)
+                + " extras=" + (flow.HasBag ? flow.Bag.Slots[0].CraftExtras.Count : 0)
+                + " second=" + (flow.HasBag ? flow.Bag.Slots[1].ItemId : ""));
 
             // C2：第十段立魔按服务端给的展示名显示散仙，规范名仍是金仙；老回包没这一格时退回规范名。
             var demon = CharacterBag.Parse(
@@ -177,7 +222,8 @@ namespace HotUpdate.Ui
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T012, (s, f) => UiSkillScreen.Build(s, f));
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T013, (s, f) => UiRealmScreen.Build(s, f));
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T023, (s, f) => UiAttrScreen.Build(s, f));
-            Report("screens", built == 8);
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T024, (s, f) => UiCraftScreen.Build(s, f));
+            Report("screens", built == 9);
             Debug.Log("u5_self_screens=" + built);
 
             // 成功：等级 3→4、扣 200 金、1 块石头。
@@ -314,6 +360,39 @@ namespace HotUpdate.Ui
             Debug.Log("u5_self_a9_allocate_reject reason=" + ar.Reason
                 + " points=" + ar.AttrPoints + " strength=" + ar.Strength);
 
+            // U20 制作：配方目录 / 开始 / 状态 / 收取。材料、成功率、倒计时都是回包里的值；
+            // 收取带回这一手的掷点（主属性 38 + 两条附加），屏上照抄。
+            flow.LoadRecipes();
+            var rc = flow.LastRecipes;
+            Report("craft_recipes", rc.Ok && rc.Recipes.Count == 2 && rc.Level == 12
+                && rc.Recipes[0].Unlocked && rc.Recipes[0].SuccessPct == 60
+                && rc.Recipes[0].OutputItemId == "ring_trial" && rc.Recipes[1].UnlockLevel == 20);
+            Debug.Log("u5_self_craft_recipes rows=" + rc.Recipes.Count + " level=" + rc.Level);
+
+            flow.CraftRecipeId = "ring_trial";
+            flow.StartCraft(flow.CraftRecipeId);
+            var cs = flow.LastCraftStart;
+            Report("craft_start", cs.Ok && cs.RecipeId == "ring_trial"
+                && _craftStartBody == "{\"character_id\":7,\"recipe_id\":\"ring_trial\"}");
+            Debug.Log("u5_self_craft_start remaining=" + cs.RemainingS + " body=" + _craftStartBody);
+
+            flow.LoadCraftState();
+            var stt = flow.LastCraftState;
+            Report("craft_state", stt.Ok && stt.Active && stt.RecipeId == "ring_trial" && stt.RemainingS == 30);
+            Debug.Log("u5_self_craft_state active=" + stt.Active + " remaining=" + stt.RemainingS);
+
+            flow.FinishCraft();
+            var cf = flow.LastCraftFinish;
+            Report("craft_finish", cf.Ok && cf.Success && cf.CraftAttr == 38 && cf.CraftExtras.Count == 2
+                && cf.CraftExtras[1].Value == 4 && flow.HasBag);
+            Debug.Log("u5_self_craft_finish attr=" + cf.CraftAttr + " extras=" + cf.CraftExtras.Count);
+
+            // 没到点：被拒，产出与掷点都不该变；界面照拒绝码写。
+            flow.FinishCraft();
+            var nr = flow.LastCraftFinish;
+            Report("craft_not_ready", !nr.Ok && nr.Reason == "craft_not_ready");
+            Debug.Log("u5_self_craft_not_ready reason=" + nr.Reason);
+
             // 切皮肤只换颜色：布局与文案一字不差。
             shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T009, s => UiEnhanceScreen.Build(s, flow));
             var lightLayout = Layout(shell);
@@ -384,9 +463,47 @@ namespace HotUpdate.Ui
             return builder.ToString();
         }
 
+        // U20 制作夹具：两条配方（一条已解锁一条差等级）、开始、状态、收取（带掷点）、没到点。
+        const string CraftRecipesJson =
+            "{\"ok\":true,\"reason\":\"\",\"table_version\":4,\"pending\":true,\"level\":12," +
+            "\"professions\":[{\"id\":\"tailor\",\"name\":\"tailor\"},{\"id\":\"smith\",\"name\":\"smith\"}]," +
+            "\"recipes\":[" +
+            "{\"id\":\"ring_trial\",\"profession\":\"tailor\",\"unlock_level\":5,\"unlocked\":true," +
+            "\"success_pct\":60,\"craft_time_s\":30,\"inputs\":[{\"item_id\":\"ore_iron\",\"count\":2}]," +
+            "\"fee\":[{\"kind\":\"gold\",\"amount\":50}]," +
+            "\"output\":{\"item_id\":\"ring_trial\",\"count\":1},\"note\":\"\"}," +
+            "{\"id\":\"sword_trial\",\"profession\":\"smith\",\"unlock_level\":20,\"unlocked\":false," +
+            "\"success_pct\":45,\"craft_time_s\":60,\"inputs\":[{\"item_id\":\"ore_iron\",\"count\":4}]," +
+            "\"fee\":[{\"kind\":\"gold\",\"amount\":100}]," +
+            "\"output\":{\"item_id\":\"sword_trial\",\"count\":1},\"note\":\"\"}]}";
+
+        const string CraftStartJson =
+            "{\"ok\":true,\"reason\":\"\",\"duplicate\":false,\"recipe_id\":\"ring_trial\"," +
+            "\"profession\":\"tailor\",\"craft_time_s\":30,\"started_at_unix\":1700000000," +
+            "\"ready_at_unix\":1700000030,\"remaining_s\":30}";
+
+        const string CraftStateJson =
+            "{\"ok\":true,\"reason\":\"\",\"active\":true,\"recipe_id\":\"ring_trial\"," +
+            "\"profession\":\"tailor\",\"craft_time_s\":30,\"started_at_unix\":1700000000," +
+            "\"ready_at_unix\":1700000030,\"remaining_s\":30}";
+
+        const string CraftFinishJson =
+            "{\"ok\":true,\"reason\":\"\",\"duplicate\":false,\"recipe_id\":\"ring_trial\"," +
+            "\"profession\":\"tailor\",\"success\":true,\"output_item_id\":\"ring_trial\",\"output_count\":1," +
+            "\"success_pct\":60,\"craft_time_s\":30,\"ready_at_unix\":1700000030,\"craft_attr\":38," +
+            "\"craft_extras\":[{\"attr\":\"attack\",\"value\":6},{\"attr\":\"attack\",\"value\":4}]}";
+
+        const string CraftFinishNotReadyJson =
+            "{\"ok\":false,\"reason\":\"craft_not_ready\",\"duplicate\":false,\"recipe_id\":\"ring_trial\"," +
+            "\"profession\":\"tailor\",\"success\":false,\"output_item_id\":\"\",\"output_count\":0," +
+            "\"success_pct\":60,\"craft_time_s\":30,\"ready_at_unix\":0,\"craft_attr\":0,\"craft_extras\":[]}";
+
+        // U20：第一格是制作产出的装备（带主属性与两条附加），第二格不是。
+        // 这段还守着解析坑：一格嵌了 craft_extras 对象数组，后面的格不能被截断。
         const string BagJson =
             "{\"slots\":[{\"slot\":1,\"item_id\":\"sword_trial\",\"count\":1,\"bound\":true," +
-            "\"equipped_slot\":\"weapon\"}," +
+            "\"equipped_slot\":\"weapon\",\"craft_attr\":38," +
+            "\"craft_extras\":[{\"attr\":\"attack\",\"value\":6},{\"attr\":\"attack\",\"value\":4}]}," +
             "{\"slot\":2,\"item_id\":\"stone_enhance_mid\",\"count\":3,\"bound\":true," +
             "\"equipped_slot\":\"\"}]," +
             UiStrings.UiUpgradeSelfCheck.T017 +

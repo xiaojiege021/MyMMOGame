@@ -48,6 +48,9 @@ namespace HotUpdate.Ui
             public const string T035 = "穿上这一件";
             public const string T036 = "没穿";
             public const string T037 = "尚未请求";
+            public const string T038 = "这一格掷点";
+            public const string T040 = "非制作产出（按物品表算）";
+            public const string T041 = "条附加";
         }
     }
 }

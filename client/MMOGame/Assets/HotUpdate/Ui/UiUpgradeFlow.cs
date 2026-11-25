@@ -18,7 +18,7 @@ namespace HotUpdate.Ui
     /// 与 U3 / U4 同一个形状：发送可以替换（<see cref="SetSender"/>），
     /// 编辑器自检拿它喂假回包，真机走 <see cref="SendByUnityWebRequest"/>。
     /// </summary>
-    public sealed class UiUpgradeFlow : MonoBehaviour
+    public sealed partial class UiUpgradeFlow : MonoBehaviour
     {
         /// <summary>这一层建好的日志行。</summary>
         public const string ReadyLog = "u5_upgrade=ready";

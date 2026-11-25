@@ -38,6 +38,7 @@ namespace HotUpdate.Ui
             public const string T025 = "精神";
             public const string T026 = "体力";
             public const string T027 = "属性点只加四属性：点数够不够、单属性上限、能不能洗点都在角色服判；这一屏不洗点、不推算总值（基础值见职业表）。";
+            public const string T028 = "制作只在出产那一次掷点：主属性与最多两条附加属性由角色服掷、写在那一件上；熟练度只提高高值权重，没有重铸 / 精铸 / 洗。";
         }
     }
 }
