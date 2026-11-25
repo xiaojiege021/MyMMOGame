@@ -170,6 +170,15 @@ namespace HotUpdate.Ui
                 case "craft":
                     shell.ShowPage(UiStrings.UiEntryHub.T047, s => { DrawUpgradeNav(s, "craft"); UiCraftScreen.Build(s, flow); });
                     break;
+                case "awaken":
+                    shell.ShowPage(UiStrings.UiEntryHub.T048, s => { DrawUpgradeNav(s, "awaken"); UiAwakenScreen.Build(s, flow); });
+                    break;
+                case "mount":
+                    shell.ShowPage(UiStrings.UiEntryHub.T049, s => { DrawUpgradeNav(s, "mount"); UiMountScreen.Build(s, flow); });
+                    break;
+                case "beast":
+                    shell.ShowPage(UiStrings.UiEntryHub.T050, s => { DrawUpgradeNav(s, "beast"); UiSpiritBeastScreen.Build(s, flow); });
+                    break;
                 default:
                     shell.ShowPage(UiStrings.UiEntryHub.T010, s => { DrawUpgradeNav(s, "character"); UiCharacterScreen.Build(s, flow); });
                     break;
@@ -280,6 +289,8 @@ namespace HotUpdate.Ui
                 (UiStrings.UiEntryHub.T028, "transfer"), (UiStrings.UiEntryHub.T029, "crystal"), (UiStrings.UiEntryHub.T030, "skill"),
                 (UiStrings.UiEntryHub.T031, "realm"), (UiStrings.UiEntryHub.T043, "attr"),
                 (UiStrings.UiEntryHub.T047, "craft"),
+                (UiStrings.UiEntryHub.T048, "awaken"), (UiStrings.UiEntryHub.T049, "mount"),
+                (UiStrings.UiEntryHub.T050, "beast"),
                 (UiStrings.UiEntryHub.T032, "world"),
             }, current, which =>
             {

@@ -1,0 +1,27 @@
+{
+  "schema": "ui-text/1",
+  "group": "CompanionFlow",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/Flow/CompanionFlow.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "觉醒状态没读到：HTTP "
+    },
+    {
+      "key": "T002",
+      "text": "觉醒没做成：HTTP "
+    },
+    {
+      "key": "T003",
+      "text": "坐骑栏没读到：HTTP "
+    },
+    {
+      "key": "T004",
+      "text": "骑乘没做成：HTTP "
+    },
+    {
+      "key": "T005",
+      "text": "图鉴没读到：HTTP "
+    }
+  ]
+}

@@ -45,6 +45,22 @@ namespace HotUpdate.Ui
         /// <summary>U20：收取发了几次。第一次回成功带掷点，第二次回还没到点。</summary>
         static int _craftFinishCalls;
 
+        /// <summary>U21：三条写口的请求体（觉醒 / 骑上 / 下坐骑）。</summary>
+        static string _awakenBody = string.Empty;
+
+        static string _mountBody = string.Empty;
+
+        static string _dismountBody = string.Empty;
+
+        /// <summary>U21：只读口的回包可以在用例里替换（觉醒状态 / 坐骑栏 / 骑乘结果）。</summary>
+        static string _awakenStateJson = AwakenStateJson;
+
+        static string _awakenActJson = AwakenOkJson;
+
+        static string _mountsJson = MountsJson;
+
+        static string _mountActJson = MountUpOkJson;
+
         public static bool Run()
         {
             _failed = false;
@@ -58,6 +74,13 @@ namespace HotUpdate.Ui
             _unequipBody = string.Empty;
             _craftStartBody = string.Empty;
             _craftFinishCalls = 0;
+            _awakenBody = string.Empty;
+            _mountBody = string.Empty;
+            _dismountBody = string.Empty;
+            _awakenStateJson = AwakenStateJson;
+            _awakenActJson = AwakenOkJson;
+            _mountsJson = MountsJson;
+            _mountActJson = MountUpOkJson;
 
             UiSkinStore.Reset();
             var shell = UiShell.Ensure();
@@ -182,6 +205,47 @@ namespace HotUpdate.Ui
                     return;
                 }
 
+                // U21：坐骑栏要排在 /character/mount 前面（前者是后者的子串）；
+                // 觉醒的 GET 与 POST 同路径，按有没有请求体分。
+                if (path.IndexOf(Companion.MountsPath, StringComparison.Ordinal) >= 0)
+                {
+                    done(200, _mountsJson);
+                    return;
+                }
+
+                if (path.IndexOf(Companion.DismountPath, StringComparison.Ordinal) >= 0)
+                {
+                    _dismountBody = body;
+                    done(200, _mountActJson);
+                    return;
+                }
+
+                if (path.IndexOf(Companion.MountUpPath, StringComparison.Ordinal) >= 0)
+                {
+                    _mountBody = body;
+                    done(200, _mountActJson);
+                    return;
+                }
+
+                if (path.IndexOf(Companion.AwakenPath, StringComparison.Ordinal) >= 0)
+                {
+                    if (body.Length > 0)
+                    {
+                        _awakenBody = body;
+                        done(200, _awakenActJson);
+                        return;
+                    }
+
+                    done(200, _awakenStateJson);
+                    return;
+                }
+
+                if (path.IndexOf(Companion.SpiritPath, StringComparison.Ordinal) >= 0)
+                {
+                    done(200, BeastsJson);
+                    return;
+                }
+
                 done(200, CrystalRejectJson);
             });
 
@@ -223,7 +287,10 @@ namespace HotUpdate.Ui
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T013, (s, f) => UiRealmScreen.Build(s, f));
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T023, (s, f) => UiAttrScreen.Build(s, f));
             built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T024, (s, f) => UiCraftScreen.Build(s, f));
-            Report("screens", built == 9);
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T025, (s, f) => UiAwakenScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T026, (s, f) => UiMountScreen.Build(s, f));
+            built += Build(shell, flow, UiStrings.UiUpgradeSelfCheck.T027, (s, f) => UiSpiritBeastScreen.Build(s, f));
+            Report("screens", built == 12);
             Debug.Log("u5_self_screens=" + built);
 
             // 成功：等级 3→4、扣 200 金、1 块石头。
@@ -392,6 +459,125 @@ namespace HotUpdate.Ui
             var nr = flow.LastCraftFinish;
             Report("craft_not_ready", !nr.Ok && nr.Reason == "craft_not_ready");
             Debug.Log("u5_self_craft_not_ready reason=" + nr.Reason);
+
+            // ------------------------------------------------ 十四、U21 觉醒屏（B6 欠项）
+            //     状态、等级、技能编号与时刻全照抄；没觉醒写「未觉醒」，请求体只有角色号与分支号。
+            _awakenStateJson = AwakenStateJson;
+            _awakenActJson = AwakenOkJson;
+            flow.LoadAwaken();
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T025, s => UiAwakenScreen.Build(s, flow));
+            var awaken = Text(shell);
+            Report("u21_awaken_state", flow.HasAwaken && flow.LastAwaken.Branch == "pojun"
+                && flow.LastAwaken.SkillId == 0 && flow.LastAwaken.Level == 100
+                && flow.LastAwaken.AwakenAtMs == 0
+                && awaken.Contains("pojun") && awaken.Contains("100")
+                && awaken.Contains(UiStrings.UiAwakenScreen.T009));
+            Debug.Log("u21_self_awaken_state branch=" + flow.LastAwaken.Branch
+                + " skill=" + flow.LastAwaken.SkillId + " level=" + flow.LastAwaken.Level);
+
+            // 觉醒这一笔：请求体逐字；成功后按只读口重画（回包换成已觉醒的那一份），
+            // 屏上出现技能编号与「已觉醒」是回包给的，不是本地翻的状态。
+            _awakenStateJson = AwakenedStateJson;
+            flow.Awaken("pojun");
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T025, s => UiAwakenScreen.Build(s, flow));
+            var awakened = Text(shell);
+            Report("u21_awaken_ok", flow.HasAwakenAct && flow.LastAwakenAct.Ok
+                && flow.LastAwakenAct.SkillId == 1004 && flow.LastAwakenAct.Level == 100
+                && flow.HasAwaken && flow.LastAwaken.SkillId == 1004
+                && awakened.Contains(UiStrings.UiAwakenScreen.T024 + "1004")
+                && awakened.Contains(UiStrings.UiAwakenScreen.T010));
+            Report("u21_awaken_body", _awakenBody == "{\"character_id\":7,\"branch_id\":\"pojun\"}");
+            Debug.Log("u21_self_awaken_body=" + _awakenBody);
+
+            // 不够级：原因原样上屏，状态也回到还没觉醒的那一份（进屏先读一次，再点觉醒）。
+            _awakenStateJson = AwakenStateJson;
+            _awakenActJson = AwakenRejectJson;
+            flow.LoadAwaken();
+            flow.Awaken("pojun");
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T025, s => UiAwakenScreen.Build(s, flow));
+            Report("u21_awaken_reject", flow.HasAwakenAct && !flow.LastAwakenAct.Ok
+                && Text(shell).Contains("not_enough_level")
+                && flow.HasAwaken && flow.LastAwaken.SkillId == 0);
+
+            // 十五、U21 坐骑栏（B4 欠项）：当前骑的、速度、清单全照抄；
+            //     骑上只发角色号与格号，成功后坐骑栏按回包重画。
+            _mountsJson = MountsJson;
+            _mountActJson = MountUpOkJson;
+            flow.LoadMounts();
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T026, s => UiMountScreen.Build(s, flow));
+            var mount = Text(shell);
+            Report("u21_mounts", flow.HasMounts && flow.LastMounts.Owned.Count == 2
+                && flow.LastMounts.EquippedItemId == "mount_wind"
+                && flow.LastMounts.EquippedSpeedBps == 2500
+                && mount.Contains("mount_wind") && mount.Contains("2500")
+                && mount.Contains(UiStrings.UiMountScreen.T011)
+                && mount.Contains(UiStrings.UiMountScreen.T012));
+
+            _mountsJson = MountsAfterJson;
+            flow.MountUp(2);
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T026, s => UiMountScreen.Build(s, flow));
+            Report("u21_mount_ok", flow.HasMountAct && flow.LastMountAct.Ok
+                && flow.LastMountAct.ItemId == "mount_cloud"
+                && flow.HasMounts && flow.LastMounts.EquippedItemId == "mount_cloud"
+                && flow.LastMounts.Owned[1].Mounted && !flow.LastMounts.Owned[0].Mounted);
+            Report("u21_mount_body", _mountBody == "{\"character_id\":7,\"slot\":2}");
+            Debug.Log("u21_self_mount_body=" + _mountBody);
+
+            _mountsJson = MountsJson;
+            _mountActJson = DismountOkJson;
+            flow.Dismount();
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T026, s => UiMountScreen.Build(s, flow));
+            Report("u21_dismount", flow.HasMountAct && flow.LastMountAct.Ok
+                && Text(shell).Contains(UiStrings.UiMountScreen.T027));
+            Report("u21_dismount_body", _dismountBody == "{\"character_id\":7}");
+            Debug.Log("u21_self_dismount_body=" + _dismountBody);
+
+            // 空格子：原因原样上屏，不假装「没骑上」是本地的事。
+            _mountActJson = MountRejectJson;
+            flow.MountUp(9);
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T026, s => UiMountScreen.Build(s, flow));
+            Report("u21_mount_reject", flow.HasMountAct && !flow.LastMountAct.Ok
+                && Text(shell).Contains("slot_empty"));
+
+            // 十六、U21 灵兽图鉴（B4 欠项）：收集度、条数、万分比与生活协助照抄，
+            //     已收集与未收集两档都上屏；这一屏没有写口。
+            flow.LoadSpiritBeasts();
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T027, s => UiSpiritBeastScreen.Build(s, flow));
+            var beasts = Text(shell);
+            Report("u21_beasts", flow.HasBeasts && flow.LastBeasts.CollectedCount == 2
+                && flow.LastBeasts.EntryCount == 3 && flow.LastBeasts.Entries.Count == 3
+                && flow.LastBeasts.CollectionPctBps == 6666
+                && flow.LastBeasts.TotalLifeAssistPctBps == 40
+                && beasts.Contains("6666") && beasts.Contains("life_assist")
+                && beasts.Contains(UiStrings.UiSpiritBeastScreen.T011)
+                && beasts.Contains(UiStrings.UiSpiritBeastScreen.T012));
+            Debug.Log("u21_self_beasts collected=" + flow.LastBeasts.CollectedCount
+                + " rows=" + flow.LastBeasts.Entries.Count + " bps=" + flow.LastBeasts.CollectionPctBps);
+
+            // 十七、三屏切皮肤只换颜色：布局与文案一字不差。
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T025, s => UiAwakenScreen.Build(s, flow));
+            var awakenLayout = Layout(shell);
+            var awakenText = Text(shell);
+            shell.SetSkin(UiSkin.Dark, false);
+            Report("u21_awaken_skin_layout", awakenLayout == Layout(shell));
+            Report("u21_awaken_skin_copy", awakenText == Text(shell));
+            shell.SetSkin(UiSkin.Light, false);
+
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T026, s => UiMountScreen.Build(s, flow));
+            var mountLayout = Layout(shell);
+            var mountText = Text(shell);
+            shell.SetSkin(UiSkin.Dark, false);
+            Report("u21_mount_skin_layout", mountLayout == Layout(shell));
+            Report("u21_mount_skin_copy", mountText == Text(shell));
+            shell.SetSkin(UiSkin.Light, false);
+
+            shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T027, s => UiSpiritBeastScreen.Build(s, flow));
+            var beastLayout = Layout(shell);
+            var beastText = Text(shell);
+            shell.SetSkin(UiSkin.Dark, false);
+            Report("u21_beast_skin_layout", beastLayout == Layout(shell));
+            Report("u21_beast_skin_copy", beastText == Text(shell));
+            shell.SetSkin(UiSkin.Light, false);
 
             // 切皮肤只换颜色：布局与文案一字不差。
             shell.ShowPage(UiStrings.UiUpgradeSelfCheck.T009, s => UiEnhanceScreen.Build(s, flow));
@@ -593,6 +779,67 @@ namespace HotUpdate.Ui
             "{\"ok\":false,\"reason\":\"not_enough\",\"duplicate\":false,\"character_id\":7," +
             "\"attribute\":\"strength\",\"points\":8,\"class_id\":1,\"level\":12,\"attr_points\":4," +
             "\"strength\":6,\"agility\":1,\"spirit\":0,\"vitality\":2}";
+
+        // U21：觉醒状态两份（未觉醒 / 已觉醒）、觉醒这一笔成功与被拒、坐骑栏骑上前后两份、
+        // 骑上 / 下坐骑 / 空格子、灵兽图鉴。名字、档位与分支用 ASCII，免得断言里再进一份中文。
+        const string AwakenStateJson =
+            "{\"found\":true,\"branch\":\"pojun\",\"skill_id\":0,\"level\":100,\"awaken_at_ms\":0}";
+
+        const string AwakenedStateJson =
+            "{\"found\":true,\"branch\":\"pojun\",\"skill_id\":1004,\"level\":100," +
+            "\"awaken_at_ms\":1760000000000}";
+
+        const string AwakenOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"branch\":\"pojun\",\"skill_id\":1004," +
+            "\"level\":100,\"duplicate\":false}";
+
+        /// <summary>不到 100 级：等级停在 99，状态仍是没觉醒。</summary>
+        const string AwakenRejectJson =
+            "{\"ok\":false,\"reason\":\"not_enough_level\",\"branch\":\"pojun\",\"skill_id\":0," +
+            "\"level\":99,\"duplicate\":false}";
+
+        /// <summary>骑着一只、背包里还有一只；mounted 只有第一只是 true。</summary>
+        const string MountsJson =
+            "{\"ok\":true,\"character_id\":7,\"equipped_item_id\":\"mount_wind\"," +
+            "\"equipped_speed_bps\":2500,\"owned\":[" +
+            "{\"item_id\":\"mount_wind\",\"name\":\"WindSteed\",\"tier\":\"normal\"," +
+            "\"speed_bps\":2500,\"bag_slot\":1,\"mounted\":true}," +
+            "{\"item_id\":\"mount_cloud\",\"name\":\"CloudSteed\",\"tier\":\"advanced\"," +
+            "\"speed_bps\":4500,\"bag_slot\":2,\"mounted\":false}]}";
+
+        /// <summary>骑上第二只之后再读一次的坐骑栏：mounted 翻到第二只，第一只变 false。</summary>
+        const string MountsAfterJson =
+            "{\"ok\":true,\"character_id\":7,\"equipped_item_id\":\"mount_cloud\"," +
+            "\"equipped_speed_bps\":4500,\"owned\":[" +
+            "{\"item_id\":\"mount_wind\",\"name\":\"WindSteed\",\"tier\":\"normal\"," +
+            "\"speed_bps\":2500,\"bag_slot\":1,\"mounted\":false}," +
+            "{\"item_id\":\"mount_cloud\",\"name\":\"CloudSteed\",\"tier\":\"advanced\"," +
+            "\"speed_bps\":4500,\"bag_slot\":2,\"mounted\":true}]}";
+
+        const string MountUpOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"item_id\":\"mount_cloud\",\"tier\":\"advanced\"," +
+            "\"speed_bps\":4500,\"bag_slot\":2}";
+
+        const string DismountOkJson =
+            "{\"ok\":true,\"reason\":\"\",\"item_id\":\"mount_wind\",\"tier\":\"normal\"," +
+            "\"speed_bps\":2500,\"bag_slot\":1}";
+
+        /// <summary>空格子：回包里物品与档位是空串、速度 0，界面照抄不补。</summary>
+        const string MountRejectJson =
+            "{\"ok\":false,\"reason\":\"slot_empty\",\"item_id\":\"\",\"tier\":\"\"," +
+            "\"speed_bps\":0,\"bag_slot\":0}";
+
+        /// <summary>图鉴三只：两只已收集、一只没有；收集度 2/3 由服务端给 6666 万分比。</summary>
+        const string BeastsJson =
+            "{\"ok\":true,\"character_id\":7,\"collected_count\":2,\"entry_count\":3," +
+            "\"collection_pct_bps\":6666,\"total_life_assist_pct_bps\":40," +
+            "\"passive_kind\":\"life_assist\",\"entries\":[" +
+            "{\"item_id\":\"beast_one\",\"name\":\"BeastOne\",\"tier\":\"normal\"," +
+            "\"collected\":true,\"life_assist_pct_bps\":4}," +
+            "{\"item_id\":\"beast_two\",\"name\":\"BeastTwo\",\"tier\":\"advanced\"," +
+            "\"collected\":true,\"life_assist_pct_bps\":6}," +
+            "{\"item_id\":\"beast_three\",\"name\":\"BeastThree\",\"tier\":\"divine\"," +
+            "\"collected\":false,\"life_assist_pct_bps\":10}]}";
     }
 }
 #endif

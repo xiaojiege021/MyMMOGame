@@ -58,6 +58,9 @@ namespace HotUpdate.Ui
             public const string T045 = "排行";
             public const string T046 = "摆摊";
             public const string T047 = "制作";
+            public const string T048 = "觉醒";
+            public const string T049 = "坐骑";
+            public const string T050 = "灵兽";
         }
     }
 }

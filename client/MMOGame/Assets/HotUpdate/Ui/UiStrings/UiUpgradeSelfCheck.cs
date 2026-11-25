@@ -35,6 +35,9 @@ namespace HotUpdate.Ui
             public const string T022 = "\"character_id\":7,\"from_phase\":1,\"to_phase\":1,\"phase_name\":\"二阶\",";
             public const string T023 = "属性与加点";
             public const string T024 = "制作";
+            public const string T025 = "觉醒";
+            public const string T026 = "坐骑栏";
+            public const string T027 = "灵兽图鉴";
         }
     }
 }

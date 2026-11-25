@@ -65,6 +65,7 @@ public static class U5Check
             "UiCharacterScreen.cs", "UiBagScreen.cs", "UiEnhanceScreen.cs", "UiTransferScreen.cs",
             "UiCrystalScreen.cs", "UiSkillScreen.cs", "UiRealmScreen.cs", "UiAttrScreen.cs",
             "UiCraftScreen.cs",
+            "UiAwakenScreen.cs", "UiMountScreen.cs", "UiSpiritBeastScreen.cs",
         };
         var missing = new List<string>();
         foreach (var name in names)
@@ -72,6 +73,15 @@ public static class U5Check
             if (!File.Exists(Path.Combine(ui, name)))
             {
                 missing.Add(name);
+            }
+        }
+
+        // U21 的两件拆装 / 流程文件：坐骑与灵兽挂交易外的养成域，觉醒并入同一个分部。
+        foreach (var rel in new[] { "HotUpdate/Ui/Flow/CompanionFlow.cs", "Net/Companion.cs" })
+        {
+            if (!File.Exists(Path.Combine(root, "client/MMOGame/Assets", rel)))
+            {
+                missing.Add(rel);
             }
         }
 
@@ -114,6 +124,21 @@ public static class U5Check
         Report("screens", missingLog.Count == 0, "缺 ReadyLog: " + string.Join(",", missingLog.ToArray()));
         Report("no_config", readsConfig.Count == 0, "读了配置或自己拆 JSON: " + string.Join(",", readsConfig.ToArray()));
 
+        // U21 三屏自带 u21_ 前缀的 ReadyLog，单独核一遍（上面那圈只认 u5_）。
+        var u21 = new[] { "UiAwakenScreen.cs", "UiMountScreen.cs", "UiSpiritBeastScreen.cs" };
+        var u21Bad = new List<string>();
+        foreach (var name in u21)
+        {
+            var text = Read(Path.Combine(ui, name));
+            if (text.IndexOf("ReadyLog = \"u21_", StringComparison.Ordinal) < 0
+                || text.IndexOf("config/", StringComparison.Ordinal) >= 0)
+            {
+                u21Bad.Add(name);
+            }
+        }
+
+        Report("u21_screens", u21Bad.Count == 0, "缺 u21 ReadyLog 或读了配置: " + string.Join(",", u21Bad.ToArray()));
+
         // 三个结果屏必须把回包字段原样上屏，证明不是本地算的。
         var enhance = Read(Path.Combine(ui, "UiEnhanceScreen.cs"));
         var transfer = Read(Path.Combine(ui, "UiTransferScreen.cs"));
@@ -149,6 +174,7 @@ public static class U5Check
             "UiCharacterScreen.cs", "UiBagScreen.cs", "UiEnhanceScreen.cs", "UiTransferScreen.cs",
             "UiCrystalScreen.cs", "UiSkillScreen.cs", "UiRealmScreen.cs", "UiAttrScreen.cs",
             "UiCraftScreen.cs",
+            "UiAwakenScreen.cs", "UiMountScreen.cs", "UiSpiritBeastScreen.cs",
         };
         var bad = new List<string>();
         foreach (var name in names)

@@ -90,9 +90,33 @@ assert 'unbind' in proto and 'u5' not in proto
 allcards = open(root + '/tools/check/check-all.sh', encoding='utf-8').read()
 assert 'u5' in allcards and 'u5)' in allcards, 'check-all 没有 u5'
 
-print('u5_static=ok files=%d' % len(names))
+# U21：觉醒 / 坐骑 / 灵兽三屏（B6 / B4 的界面欠项）。挂养成域，不新开文件域。
+u21 = ['UiAwakenScreen.cs', 'UiMountScreen.cs', 'UiSpiritBeastScreen.cs']
+for n in u21:
+    assert os.path.exists(ui + '/' + n), 'missing ' + n
+assert os.path.exists(ui + '/Flow/CompanionFlow.cs'), 'missing CompanionFlow.cs'
+assert os.path.exists(assets + '/Net/Companion.cs'), 'missing Companion.cs'
+
+for n in u21:
+    text = open(ui + '/' + n, encoding='utf-8').read()
+    assert 'ReadyLog = "u21_' in text, 'no u21 ready log in ' + n
+    assert 'config/' not in text, 'config read in ' + n
+    # 万分比与 bps 只拼单位：不折百分比、不乘系数。
+    assert '/ 100' not in text and '* 0.01' not in text, 'local math in ' + n
+
+flow21 = open(ui + '/Flow/CompanionFlow.cs', encoding='utf-8').read()
+for token in ('Companion.ParseState', 'Companion.ParseAwaken', 'Companion.ParseMounts',
+              'Companion.ParseMountAction', 'Companion.ParseSpiritBeasts'):
+    assert token in flow21, 'missing ' + token
+
+hub = open(ui + '/UiEntryHub.cs', encoding='utf-8').read()
+for token in ('"awaken"', '"mount"', '"beast"', 'UiAwakenScreen.Build',
+              'UiMountScreen.Build', 'UiSpiritBeastScreen.Build'):
+    assert token in hub, 'nav missing ' + token
+
+print('u5_static=ok files=%d u21=%d' % (len(names), len(u21)))
 PY
-then ok "七屏齐全、不读配置、不算概率费用、总控已挂 U5"
+then ok "七屏齐全、不读配置、不算概率费用、总控已挂 U5；U21 三屏与六条口齐"
 else bad "U5 静态断言失败"; cat "$TMP/static.out" | detail
 fi
 
@@ -109,7 +133,7 @@ else
   tail -40 "$TMP/unity.log" | detail
 fi
 
-for key in files screens no_config enhance_fields transfer_fields crystal_fields flow_net no_proto no_local_math self; do
+for key in files screens no_config enhance_fields transfer_fields crystal_fields flow_net no_proto no_local_math u21_screens self; do
   if grep -q "u5_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "编辑器自检 u5_${key}=ok"
   else
@@ -118,9 +142,17 @@ for key in files screens no_config enhance_fields transfer_fields crystal_fields
   fi
 done
 
-for key in bag realm_display seven enhance_ok enhance_reject transfer_reject crystal_reject \
+# 「七屏都能建」由 u5_self_screens=N 与 u5_screens 两条核（U21 起 N=12）；
+# 原表里那个 seven 键从来没有代码发出，是存量假红，U21 一并删掉。
+for key in bag realm_display enhance_ok enhance_reject transfer_reject crystal_reject \
            q10_move q10_discard q10_sort q10_use \
-           b9_bag_worn b9_equip b9_unequip skin_layout skin_copy; do
+           b9_bag_worn b9_equip b9_unequip skin_layout skin_copy \
+           u21_awaken_state u21_awaken_ok u21_awaken_body u21_awaken_reject \
+           u21_mounts u21_mount_ok u21_mount_body u21_dismount u21_dismount_body u21_mount_reject \
+           u21_beasts \
+           u21_awaken_skin_layout u21_awaken_skin_copy \
+           u21_mount_skin_layout u21_mount_skin_copy \
+           u21_beast_skin_layout u21_beast_skin_copy; do
   if grep -q "u5_self_${key}=ok" "$TMP/unity.log" 2>/dev/null; then
     ok "七屏自检 u5_self_${key}=ok"
   else

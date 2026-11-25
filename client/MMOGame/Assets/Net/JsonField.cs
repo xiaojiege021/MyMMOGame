@@ -247,5 +247,76 @@ namespace Mmo.Net
 
         public static bool Bool(string json, string key) =>
             string.Equals(Of(json, key), "true", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// 取一个字符串字段并解开 JSON 转义。网关把中文写成 `\u89C9\u9192` 这种形态发出来，
+        /// 不解开屏上显示的是反斜杠加十六进制，看着像名字没进来
+        /// （与 <c>CharacterRealmPhase</c> / <c>HeroCodexEntry</c> 同一道判，U21 起收在这一个 helper 里）。
+        /// </summary>
+        public static string Text(string json, string key) => Unescape(Of(json, key));
+
+        /// <summary>解 JSON 转义：`\uXXXX` 与几个常见控制字符，其余原样保留。</summary>
+        public static string Unescape(string value)
+        {
+            if (string.IsNullOrEmpty(value) || value.IndexOf('\\') < 0)
+            {
+                return value ?? string.Empty;
+            }
+
+            var sb = new System.Text.StringBuilder(value.Length);
+            for (var i = 0; i < value.Length; i++)
+            {
+                if (value[i] != '\\' || i + 1 >= value.Length)
+                {
+                    sb.Append(value[i]);
+                    continue;
+                }
+
+                var next = value[i + 1];
+                if (next == 'u' && i + 5 < value.Length)
+                {
+                    if (int.TryParse(value.Substring(i + 2, 4), System.Globalization.NumberStyles.HexNumber,
+                            System.Globalization.CultureInfo.InvariantCulture, out var code))
+                    {
+                        sb.Append((char)code);
+                        i += 5;
+                        continue;
+                    }
+                }
+
+                switch (next)
+                {
+                    case 'n':
+                        sb.Append('\n');
+                        i++;
+                        continue;
+                    case 't':
+                        sb.Append('\t');
+                        i++;
+                        continue;
+                    case 'r':
+                        sb.Append('\r');
+                        i++;
+                        continue;
+                    case '"':
+                        sb.Append('"');
+                        i++;
+                        continue;
+                    case '\\':
+                        sb.Append('\\');
+                        i++;
+                        continue;
+                    case '/':
+                        sb.Append('/');
+                        i++;
+                        continue;
+                    default:
+                        sb.Append(value[i]);
+                        continue;
+                }
+            }
+
+            return sb.ToString();
+        }
     }
 }

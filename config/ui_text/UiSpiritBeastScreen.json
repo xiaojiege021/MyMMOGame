@@ -1,0 +1,75 @@
+{
+  "schema": "ui-text/1",
+  "group": "UiSpiritBeastScreen",
+  "source": "client/MMOGame/Assets/HotUpdate/Ui/UiSpiritBeastScreen.cs",
+  "entries": [
+    {
+      "key": "T001",
+      "text": "图鉴还没到"
+    },
+    {
+      "key": "T002",
+      "text": "收集"
+    },
+    {
+      "key": "T003",
+      "text": "已收集"
+    },
+    {
+      "key": "T004",
+      "text": "图鉴条数"
+    },
+    {
+      "key": "T005",
+      "text": "收集度"
+    },
+    {
+      "key": "T006",
+      "text": "生活协助合计"
+    },
+    {
+      "key": "T007",
+      "text": "被动口径"
+    },
+    {
+      "key": "T008",
+      "text": "读一次图鉴"
+    },
+    {
+      "key": "T009",
+      "text": "图鉴清单"
+    },
+    {
+      "key": "T010",
+      "text": "图鉴里还没有条目"
+    },
+    {
+      "key": "T011",
+      "text": "已收集"
+    },
+    {
+      "key": "T012",
+      "text": "未收集"
+    },
+    {
+      "key": "T013",
+      "text": " · "
+    },
+    {
+      "key": "T014",
+      "text": " 万分比"
+    },
+    {
+      "key": "T015",
+      "text": " 只"
+    },
+    {
+      "key": "T016",
+      "text": "只画出前 "
+    },
+    {
+      "key": "T017",
+      "text": " 只，回包共 "
+    }
+  ]
+}
