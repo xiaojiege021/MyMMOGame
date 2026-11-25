@@ -84,6 +84,9 @@ internal static class DbCli
             code = await CompanionCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
+            code = await AwakenCli.TryRunDbAsync(ctx);
+            if (code != null) { return code; }
+
             code = await StallCli.TryRunDbAsync(ctx);
             if (code != null) { return code; }
 
@@ -147,6 +150,8 @@ internal static class DbCli
     || mountOf != 0 || dismountOf != 0 || mountRowOf != 0 || beastRowOf != 0
     // B5：摆摊的五个连库 flag。漏在这里就会掉到「启动角色服」那条路。
     || stallOpenOf != 0 || stallListOf != 0 || stallViewStall != null
-    || stallCloseOf != 0 || stallBuyOf != 0;
+    || stallCloseOf != 0 || stallBuyOf != 0
+    // B6：觉醒的两条连库口。漏在这里就会掉到「启动角色服」那条路。
+    || awakenOf != 0 || awakenStateOf != 0;
     }
 }

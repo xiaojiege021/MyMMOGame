@@ -315,6 +315,15 @@ public static class BootReport
             + " life_assist_total=" + tables.SpiritBeastTable.TotalLifeAssistPctBps
             + " codex_total=" + tables.SpiritBeastTable.HeroCodexPassiveBps
             + " cap=" + tables.SpiritBeastTable.MaxTotalLifeAssistPctBps);
+        // B6：觉醒门槛与分支覆盖。min_level 已与 exp.json 的 level_cap 对齐过，
+        // 这里只把结果打出来；技能编号的合法性由战斗服启动期按 skills.json 再验一次。
+        Console.WriteLine("awaken_table=version=" + tables.AwakenTable.Version
+            + " pending=" + (tables.AwakenTable.Pending ? "true" : "false")
+            + " min_level=" + tables.AwakenTable.MinLevel
+            + " gold_cost=" + tables.AwakenTable.GoldCost
+            + " branches=" + tables.AwakenTable.BranchSkills.Count
+            + " skills=" + string.Join("+", tables.AwakenTable.BranchSkills
+                .Select(row => row.BranchId + ":" + row.SkillId)));
         foreach (var stage in tables.MainlineTable.Stages)
         {
             Console.WriteLine("mainline_stage=" + stage.Stage

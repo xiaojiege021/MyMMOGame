@@ -18,7 +18,8 @@ public sealed record CharacterConfig(
     string CharacterSlotTable, string GlobalUpstream, string MainlineTable,
     string RecipeTable, string CalendarTable, string CityTaskTable,
     string SeasonPassProgressTable, string NameRulesTable, string PillTable,
-    string CraftRollTable, string MountTable, string SpiritBeastTable, string StallTable)
+    string CraftRollTable, string MountTable, string SpiritBeastTable, string StallTable,
+    string AwakenTable)
 {
     public const string DefaultDungeonTable = "config/dungeons.json";
     public const string DefaultExpTable = "config/exp.json";
@@ -64,6 +65,9 @@ public sealed record CharacterConfig(
     // B5：摆摊的税率、格数、等级门槛与「是否跨服」只在 config/stall.json；
     // 与拍卖同一种写法，核对脚本可以指到临时表试坏配置。
     public const string DefaultStallTable = "config/stall.json";
+    // B6：觉醒的门槛与「哪条分支解锁哪条技能」。和老卡同口径不显式登记进
+    // config/character.json：不写就走仓库根这一份，核对脚本可指到临时表试坏配置。
+    public const string DefaultAwakenTable = "config/awaken.json";
     // K3：生产 / 配方的正本。同样不显式登记进 character.json：老卡的临时配置目录里
     // 没有这份表时走默认文件名，仓库根的那一份照常可读。
     public const string DefaultRecipeTable = "config/recipes.json";
@@ -193,6 +197,14 @@ public sealed record CharacterConfig(
         if (stallTable.Length == 0)
         {
             throw new ConfigException("stall_table 不能为空");
+        }
+
+        // B6：觉醒表。门槛必须等于 exp.json 的 level_cap，覆盖全部分支；
+        // 与技能表的交叉校验在战斗服启动期（角色服不读技能表，第 7 节）。
+        var awakenTable = (wire.AwakenTable ?? DefaultAwakenTable).Trim();
+        if (awakenTable.Length == 0)
+        {
+            throw new ConfigException("awaken_table 不能为空");
         }
 
         // 商城清单也走同一份配置正本；核对脚本可以指到临时表试坏清单。
@@ -399,7 +411,7 @@ public sealed record CharacterConfig(
             siegeTerritoryTable, seasonPassTable, seasonTable, monthlyBundleTable,
             characterSlotTable, globalUpstream, mainlineTable, recipeTable, calendarTable,
             cityTaskTable, seasonPassProgressTable, nameRulesTable, pillTable, craftRollTable,
-            mountTable, spiritBeastTable, stallTable);
+            mountTable, spiritBeastTable, stallTable, awakenTable);
     }
 
     static readonly JsonSerializerOptions JsonOptions = new()
@@ -446,6 +458,9 @@ public sealed record CharacterConfig(
 
         [JsonPropertyName("stall_table")]
         public string? StallTable { get; init; }
+
+        [JsonPropertyName("awaken_table")]
+        public string? AwakenTable { get; init; }
 
         [JsonPropertyName("shop_table")]
         public string? ShopTable { get; init; }

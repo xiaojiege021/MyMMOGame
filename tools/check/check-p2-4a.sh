@@ -10,6 +10,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"; export ROOT
 source "$ROOT/tools/check/lib-common.sh"
 AGG_CHARGRPC="$(src_agg src/Character/CharacterGrpcService.cs)"; export AGG_CHARGRPC
+# D3c 之后 Encounter 已拆进 Encounter/ 目录：这里同样走 src_agg，断言文本一个字不改。
+AGG_BATTLE_ENCOUNTER="$(src_agg src/Battle/Encounter.cs)"; export AGG_BATTLE_ENCOUNTER
 DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"; [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 BD="$ROOT/src/Battle/bin/Release/net10.0/Battle.dll"
 CD="$ROOT/tools/probe/CliProbe/bin/Release/net10.0/CliProbe.dll"
@@ -25,7 +27,8 @@ trap cleanup EXIT
 
 echo "== 1. 编译 =="
 BUILD_OK=1
-for proj in src/Character/Character.csproj src/Battle/Battle.csproj tools/probe/BattleProbe/BattleProbe.csproj; do
+for proj in src/Character/Character.csproj src/Battle/Battle.csproj \
+            src/Gateway/Gateway.csproj tools/probe/BattleProbe/BattleProbe.csproj; do
   n="$(basename "$proj" .csproj)"
   "$DOTNET" build "$proj" -c Release --nologo -v q >"$TMP/build-$n.log" 2>&1 || {
     BUILD_OK=0; bad "编译失败：$proj"; grep -E 'error ' "$TMP/build-$n.log" | head -4 | detail; }
@@ -117,7 +120,7 @@ grpc = rd(os.environ["AGG_CHARGRPC"])
 R("grpc_advance", "AdvanceBranch(" in grpc and "branch_not_found" in grpc)
 R("grpc_can_equip", "CanEquip(" in grpc and "EquipRules.Check" in grpc)
 
-enc = rd(os.path.join(root, "src", "Battle", "Encounter.cs"))
+enc = rd(os.environ["AGG_BATTLE_ENCOUNTER"])
 R("jielv_cannot_resurrect", 'CannotResurrectBranch = "jielv"' in enc
   and "SkillRejectCannotResurrect" in enc)
 R("shengxi_second_turn", 'ShengxiBranch = "shengxi"' in enc
@@ -138,6 +141,48 @@ ddl = rd(os.path.join(root, "db", "character", "branch_step.sql"))
 main = rd(os.path.join(root, "db", "character", "character.sql"))
 R("ddl_branch_step", "branch_step" in ddl and "BETWEEN 0 AND 2" in ddl)
 R("ddl_in_main", "branch_step" in main)
+
+# ---- B6 觉醒（并进本卡：同一条「分支 + 等级」成长线，不新开脚本）----
+awaken = js(os.path.join(root, "config", "awaken.json"))
+skillsj = js(os.path.join(root, "config", "skills.json"))
+expj = js(os.path.join(root, "config", "exp.json"))
+bclass = {b.get("id"): b.get("class_id") for b in bs}
+rows = awaken.get("branch_skills") or []
+skillmap = {s.get("id"): s for s in skillsj.get("skills") or []}
+asked = [s for s in skillsj.get("skills") or [] if s.get("awaken")]
+R("awaken_schema", awaken.get("schema") == "awaken-table/1")
+R("awaken_min_level_is_cap", awaken.get("min_level") == expj.get("level_cap") == 100)
+R("awaken_free", awaken.get("gold_cost") == 0 and awaken.get("pending") is True)
+R("awaken_covers_branches", sorted(r.get("branch_id") for r in rows) == sorted(bclass))
+R("awaken_skills_one_per_branch", len(asked) == len(rows) == len(bclass) == 10)
+R("awaken_skill_links", all(
+    (skillmap.get(r.get("skill_id")) or {}).get("awaken") is True
+    and (skillmap.get(r.get("skill_id")) or {}).get("branch") == r.get("branch_id")
+    and (skillmap.get(r.get("skill_id")) or {}).get("school") == "faze"
+    and (skillmap.get(r.get("skill_id")) or {}).get("tier") == "tian"
+    and (skillmap.get(r.get("skill_id")) or {}).get("class_id") == bclass.get(r.get("branch_id"))
+    for r in rows))
+R("level_cap_untouched", expj.get("level_cap") == 100)
+
+skc = rd(os.path.join(root, "src", "Battle", "ConfigTables", "Skill.cs"))
+R("forclass_skips_awaken", "classId && !s.Awaken" in skc)
+R("one_awaken_per_branch_guard", "有两条觉醒技" in skc)
+party = rd(os.path.join(root, "src", "Battle", "Encounter", "Party.cs"))
+R("awaken_only_own_branch", "awaken.Awaken" in party
+  and "awaken.Branch, profile.Branch" in party)
+repo2 = rd(os.path.join(root, "src", "Character", "CharacterRepository.cs"))
+R("awaken_locks_character_row", "where id = $1 for update" in repo2
+  and "AwakenAsync" in repo2)
+R("awaken_writes_two_cols_only",
+  "set awaken_skill_id = $2, awaken_at = now()" in repo2)
+R("proto_awaken_rpc", "rpc Awaken(" in proto and "rpc DescribeAwaken(" in proto)
+R("proto_awaken_field", "awaken_skill_id = 12" in proto)
+R("gen_has_awaken", "AwakenRequest" in gen_srv and "DescribeAwaken" in gen_srv)
+awddl = rd(os.path.join(root, "db", "character", "awaken.sql"))
+R("ddl_awaken", "awaken_skill_id" in awddl and "character_awaken_pair" in awddl)
+R("ddl_awaken_in_main", "awaken_skill_id" in main)
+R("gateway_awaken", '"/character/awaken"' in
+  rd(os.path.join(root, "src", "Gateway", "Api", "Character", "Awaken.cs")))
 o.close()
 PY
 while IFS= read -r line; do
@@ -159,7 +204,53 @@ printf '%s' "$wr" | grep -q 'class=warrior kinds=.*saber' \
 printf '%s' "$wr" | grep -qE 'class=tank kinds=.*mace' \
   && ok "坦克的可用兵器含锤（另一个职业的并集）" || bad "坦克兵器不对"
 
-echo "== 4. 坏配置起不来 =="
+echo "== 4. 只读入口 --awaken-config =="
+awc="$("$DOTNET" "$CD" --awaken-config 2>&1)"; awrc=$?
+[ "$awrc" = "0" ] && printf '%s' "$awc" | grep -q '^awaken_config=ok version=1 pending=true min_level=100 gold_cost=0 branches=10' \
+  && ok "觉醒表现值：满级 100 / 免费 / 10 条分支（不连库也能读）" || bad "只读入口不对（rc=${awrc}）：$(printf '%s' "$awc" | head -1)"
+[ "$(printf '%s' "$awc" | grep -c '^awaken_row=branch=')" = "10" ] \
+  && ok "10 条分支各有一条觉醒技" || bad "觉醒技行数不对"
+printf '%s' "$awc" | grep -q 'awaken_row=branch=pojun class=warrior skill=1004' \
+  && ok "破军解锁 1004（技能编号来自 awaken.json，不是代码）" || bad "破军那一条不对"
+
+echo "== 5. 坏配置起不来（觉醒表）=="
+mk_awaken() {
+  python3 - "$ROOT" "$TMP" "$1" <<'PY'
+import json, os, sys
+root, tmp, mode = sys.argv[1], sys.argv[2], sys.argv[3]
+d = json.load(open(os.path.join(root, "config", "awaken.json"), encoding="utf-8"))
+rows = d["branch_skills"]
+if mode == "min99":
+    d["min_level"] = 99
+elif mode == "gold":
+    d["gold_cost"] = 1
+elif mode == "miss":
+    rows.pop()
+elif mode == "dup_branch":
+    rows[1] = dict(rows[0])
+elif mode == "dup_skill":
+    rows[1] = {"branch_id": rows[1]["branch_id"], "skill_id": rows[0]["skill_id"]}
+elif mode == "schema":
+    d["schema"] = "awaken-table/9"
+elif mode == "no_pending_note":
+    d["note"] = "觉醒"
+elif mode == "unknown_branch":
+    rows[0] = {"branch_id": "nosuch", "skill_id": 1404}
+json.dump(d, open(os.path.join(tmp, "aw-" + mode + ".json"), "w", encoding="utf-8"),
+          ensure_ascii=False, indent=2)
+PY
+}
+for c in min99 gold miss dup_branch dup_skill schema no_pending_note unknown_branch; do
+  mk_awaken "$c"
+  out="$("$DOTNET" "$CD" --awaken-config --awaken-table-path "$TMP/aw-$c.json" 2>&1)"; rc=$?
+  if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q '^config_error='; then
+    ok "觉醒坏配置 ${c}：起不来（config_error=）"
+  else
+    bad "觉醒坏配置 ${c} 没挡住（rc=${rc}）：$(printf '%s' "$out" | head -2)"
+  fi
+done
+
+echo "== 6. 坏配置起不来 =="
 mk_bad() {
   python3 - "$ROOT" "$TMP" "$1" <<'PY'
 import json, os, sys
@@ -188,7 +279,7 @@ for c in lock_level lock_missing weapon_no_level; do
   fi
 done
 
-echo "== 5. 真库：二转 / 武器锁 / 诫律不能复活 =="
+echo "== 7. 真库：二转 / 武器锁 / 诫律不能复活 / 觉醒 =="
 if [ "$HAS_DB" != "1" ] || [ -z "${MMO_GAMEDB:-}" ]; then
   printf '  ..   跳过真库段（MMO_P2_4A_HAS_DB 未开或缺 MMO_GAMEDB）\n'
 else
@@ -203,7 +294,9 @@ b["exp_upstream"] = "http://127.0.0.1:62000"
 b["character_upstream"] = "http://127.0.0.1:62000"
 for k, f in (("skill_table", "skills.json"), ("class_table", "classes.json"),
              ("dungeon_table", "dungeons.json"), ("arena_match_table", "arena_match.json"),
-             ("battlefield_table", "battlefield.json")):
+             ("battlefield_table", "battlefield.json"),
+             # B15：副本 boss_id 要与怪物表对账；临时配置不指过去就一个都认不到。
+             ("monster_table", "monsters.json")):
     b[k] = os.path.join(root, "config", f)
 json.dump(b, open(os.path.join(tmp, "battle.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 PY
@@ -211,6 +304,10 @@ PY
   "$DOTNET" "$CD" --migrate --sql "$ROOT/db/character/branch_step.sql" $CC >"$TMP/mig.log" 2>&1 || true
   grep -q '^migrate=ok' "$TMP/mig.log" && ok "真库补 branch_step 列（幂等 DDL）" \
     || bad "branch_step 迁移失败：$(head -2 "$TMP/mig.log")"
+  # B6：觉醒两列同样是幂等 DDL，老库先补上再起角色服。
+  "$DOTNET" "$CD" --migrate --sql "$ROOT/db/character/awaken.sql" $CC >"$TMP/mig-aw.log" 2>&1 || true
+  grep -q '^migrate=ok' "$TMP/mig-aw.log" && ok "真库补 awaken_skill_id / awaken_at 两列（幂等 DDL）" \
+    || bad "觉醒迁移失败：$(head -2 "$TMP/mig-aw.log")"
   "$DOTNET" "$CD" $CC >"$TMP/char.log" 2>&1 &
   PIDS="$PIDS $!"
   wait_ready "$TMP/char.log" '^ready' "角色服" || true
@@ -259,6 +356,8 @@ except Exception: print("")' 2>/dev/null)"
   bstate() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --branch-state "$1" $CC 2>&1 | grep -m1 '^branch_state='; }
   adv() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --advance-branch "$1" "$2" $CC 2>&1 | grep -m1 '^advance_branch='; }
   equip() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --can-equip "$1" "$2" $CC 2>&1 | grep -m1 '^can_equip='; }
+  awaken() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --awaken "$1" "$2" $CC 2>&1 | grep -m1 '^awaken='; }
+  astate() { [ -n "${1:-}" ] || return 0; "$DOTNET" "$CD" --awaken-state "$1" $CC 2>&1 | grep -m1 '^awaken_state='; }
 
   W45="$(mkchar warrior pojun)"; W12="$(mkchar warrior "")"; M45="$(mkchar mage "")"
   T12="$(mkchar tank "")"; P45="$(mkchar priest jielv)"
@@ -319,6 +418,69 @@ except Exception: print("")' 2>/dev/null)"
   grep -q 'reason=SkillRejectCannotResurrect' "$TMP/jielv.log" \
     && ok "诫律牧师拉人：SkillRejectCannotResurrect，人还倒着" \
     || bad "诫律拉起来了：$(head -3 "$TMP/jielv.log")"
+  echo "-- ④ 觉醒：满级才开，一次之后只回 duplicate --"
+  A100="$(mkchar warrior pojun)"
+  [ -n "$A100" ] && ok "造觉醒夹具角色（warrior / pojun）" || bad "觉醒夹具没建起来"
+  lv "$A100" 99
+  r="$(awaken "$A100" pojun)"
+  printf '%s' "$r" | grep -q 'reason=not_enough_level' \
+    && ok "99 级觉醒：not_enough_level（满级才开）" || bad "99 级能觉醒：$r"
+  printf '%s' "$(astate "$A100")" | grep -q 'skill=0' \
+    && ok "被拒之后没留任何觉醒状态（skill=0）" || bad "被拒却写进了状态"
+  lv "$A100" 100
+  r="$(awaken "$A100" pojun)"
+  printf '%s' "$r" | grep -q 'skill=1004' && printf '%s' "$r" | grep -q 'duplicate=false' \
+    && ok "100 级觉醒：破军解锁 1004" || bad "满级觉醒不对：$r"
+  st="$(astate "$A100")"
+  printf '%s' "$st" | grep -q 'branch=pojun skill=1004 level=100' \
+    && ok "只读口读回觉醒状态（分支 / 技能 / 等级没变）" || bad "读回不对：$st"
+  printf '%s' "$st" | grep -qE 'awaken_at_ms=[1-9][0-9]*' \
+    && ok "觉醒时刻已落库（非 0）" || bad "觉醒时刻没写：$st"
+  r="$(awaken "$A100" pojun)"
+  printf '%s' "$r" | grep -q 'duplicate=true' \
+    && ok "重复觉醒只回 duplicate，不二次写库" || bad "重复觉醒不对：$r"
+  r="$(awaken "$A100" xianzhen)"
+  printf '%s' "$r" | grep -q 'reason=branch_locked' \
+    && ok "换一条分支觉醒：branch_locked" || bad "换分支没被拒：$r"
+  printf '%s' "$(bstate "$A100")" | grep -q 'level=100' \
+    && ok "觉醒不改等级（仍 100，不抬上限）" || bad "觉醒改了等级"
+
+  echo "-- ⑤ 开场包：觉醒技只发给已觉醒的本分支 --"
+  "$DOTNET" "$PROBE" --url "$WU/battle" --case b6_awaken \
+    --b6-char "$A100" --b6-class warrior --b6-skill 1004 --expect-units 4 \
+    >"$TMP/aw-live.log" 2>&1
+  grep -q 'verdict=ok' "$TMP/aw-live.log" \
+    && ok "觉醒后开场包 4 条、含本分支觉醒技 1004" \
+    || bad "觉醒后技能不对：$(tail -2 "$TMP/aw-live.log")"
+  "$DOTNET" "$PROBE" --url "$WU/battle" --case b6_awaken \
+    --b6-char "$W12" --b6-class warrior --b6-skill 0 --expect-units 3 \
+    >"$TMP/aw-off.log" 2>&1
+  grep -q 'verdict=ok' "$TMP/aw-off.log" \
+    && ok "未觉醒仍是 3 条（觉醒技不在 ForClass 里）" \
+    || bad "未觉醒拿到了觉醒技：$(tail -2 "$TMP/aw-off.log")"
+
+  echo "-- ⑥ 网关 POST /character/awaken --"
+  A2="$(mkchar mage chixiao)"
+  lv "$A2" 100
+  printf '%s' "$(astate "$A2")" | grep -q 'skill=0' \
+    && ok "没觉醒的法师：skill=0（觉醒不是创号就送）" || bad "没觉醒却有技能"
+  code="$(curl -s --noproxy '*' -o "$TMP/aw.json" -w '%{http_code}' \
+    -X POST "http://127.0.0.1:61000/character/awaken?token=$TOK" \
+    -H 'Content-Type: application/json' \
+    -d "{\"character_id\":$A2,\"branch_id\":\"chixiao\"}" 2>&1)"
+  [ "$code" = "200" ] && grep -qE '"skill_id": *1204' "$TMP/aw.json" \
+    && ok "网关觉醒回 200 且 skill_id=1204" || bad "网关觉醒不对（http=$code）：$(head -c 200 "$TMP/aw.json")"
+  code="$(curl -s --noproxy '*' -o "$TMP/aw2.json" -w '%{http_code}' \
+    -X POST "http://127.0.0.1:61000/character/awaken?token=$TOK" \
+    -H 'Content-Type: application/json' \
+    -d "{\"character_id\":$A2,\"branch_id\":\"chixiao\"}" 2>&1)"
+  [ "$code" = "200" ] && grep -qE '"duplicate": *true' "$TMP/aw2.json" \
+    && ok "网关重复觉醒回 duplicate=true（200 + ok）" || bad "网关重复觉醒不对（http=$code）"
+  code="$(curl -s --noproxy '*' -o "$TMP/aw3.json" -w '%{http_code}' \
+    "http://127.0.0.1:61000/character/awaken?character_id=$A2&token=$TOK" 2>&1)"
+  [ "$code" = "200" ] && grep -qE '"skill_id": *1204' "$TMP/aw3.json" \
+    && ok "网关只读觉醒状态（GET）" || bad "网关 GET 不对（http=$code）"
+
   stop_pid "$(pgrep -f "Gateway.dll $CG" | head -1)" 2>/dev/null || true
 fi
 

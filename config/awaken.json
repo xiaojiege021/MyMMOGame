@@ -1,0 +1,50 @@
+{
+  "schema": "awaken-table/1",
+  "version": 1,
+  "pending": true,
+  "note": "B6 觉醒。方案 8.2 只写定「满级后开放觉醒」，14.5 的完成标准是「满级后开放、不抬等级上限、不另开一套战斗规则」。所以这里只记两件事：门槛（等级到 exp.json 的 level_cap，即满级）与「哪条分支解锁哪一条技能」；技能本体与全部数值仍在 config/skills.json 的 awaken=true 那一组，本表不抄第二份。gold_cost 方案没给数字，先取 0（觉醒免费）——要收费得另开卡把扣款接进觉醒事务，不许只在这里填个正数；觉醒技的倍率 / 蓝耗 / 冷却同属待定，现取与地阶主动同量级的一档。觉醒一次性、不可逆、不洗点；不加等级、不推进境界。",
+  "min_level": 100,
+  "gold_cost": 0,
+  "branch_skills": [
+    {
+      "branch_id": "zhenyue",
+      "skill_id": 1404
+    },
+    {
+      "branch_id": "gulei",
+      "skill_id": 1405
+    },
+    {
+      "branch_id": "pojun",
+      "skill_id": 1004
+    },
+    {
+      "branch_id": "xianzhen",
+      "skill_id": 1005
+    },
+    {
+      "branch_id": "chuanyang",
+      "skill_id": 1104
+    },
+    {
+      "branch_id": "luowang",
+      "skill_id": 1105
+    },
+    {
+      "branch_id": "chixiao",
+      "skill_id": 1204
+    },
+    {
+      "branch_id": "xuanfu",
+      "skill_id": 1205
+    },
+    {
+      "branch_id": "shengxi",
+      "skill_id": 1304
+    },
+    {
+      "branch_id": "jielv",
+      "skill_id": 1305
+    }
+  ]
+}

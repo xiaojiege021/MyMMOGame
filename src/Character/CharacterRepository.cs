@@ -508,6 +508,85 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
     /// <summary>方案写定二转在 45 级，不跟着境界往后挪；这条是规则常量，不是玩法数值。</summary>
     public const int BranchAdvanceLevel = 45;
 
+    /// <summary>
+    /// B6：觉醒。一笔事务锁角色行 → 校验分支 / 是否已经觉醒 / 等级 → 写
+    /// awaken_skill_id 与 awaken_at。技能编号只从 config/awaken.json 的分支映射现取，
+    /// 请求里带不进来；觉醒不加等级、不推进境界、不动金币与背包（本版免费）。
+    /// 拒绝时两列都不动，awaken_skill_id 仍是 0。
+    /// </summary>
+    public async Task<(string Reason, string Branch, uint SkillId, int Level, bool Duplicate)>
+        AwakenAsync(long characterId, string branchId, AwakenTable table, CancellationToken stopping)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(stopping);
+        await using var transaction = await connection.BeginTransactionAsync(stopping);
+
+        string branch;
+        int level;
+        int awakened;
+        // 与二转同一条纪律：读完这一行再回滚 / 提交，reader 没关就 Rollback 会撞子通道错误。
+        await using (var read = new NpgsqlCommand(
+            "select coalesce(branch, ''), level, awaken_skill_id"
+            + " from \"角色\".character where id = $1 for update",
+            connection, transaction))
+        {
+            read.Parameters.AddWithValue(characterId);
+            await using var reader = await read.ExecuteReaderAsync(stopping);
+            if (!await reader.ReadAsync(stopping))
+            {
+                await reader.DisposeAsync();
+                await transaction.RollbackAsync(stopping);
+                return ("character_not_found", "", 0, 0, false);
+            }
+
+            branch = reader.GetString(0);
+            level = reader.GetInt32(1);
+            awakened = reader.GetInt32(2);
+        }
+
+        // 没选分支就没有可觉醒的路数；分支在表里查不到说明配置与库对不上，也拒。
+        var target = table.ForBranch(branch);
+        if (target is null)
+        {
+            await transaction.RollbackAsync(stopping);
+            return (branch.Length == 0 ? "branch_missing" : "skill_not_found", branch, 0, level, false);
+        }
+
+        // 请求里的分支必须是已经定下的那一条：换一条觉醒等于换职责，一律拒。
+        if (!string.Equals(branch, branchId, StringComparison.Ordinal))
+        {
+            await transaction.RollbackAsync(stopping);
+            return ("branch_locked", branch, 0, level, false);
+        }
+
+        if (awakened != 0)
+        {
+            await transaction.RollbackAsync(stopping);
+            // 同一条技能再点一次只回 duplicate；库里的编号与配置不一致才报 already_awakened。
+            var same = awakened == (int)target.SkillId;
+            return (same ? "" : "already_awakened", branch, (uint)awakened, level, same);
+        }
+
+        if (level < table.MinLevel)
+        {
+            await transaction.RollbackAsync(stopping);
+            return ("not_enough_level", branch, target.SkillId, level, false);
+        }
+
+        await using (var write = new NpgsqlCommand(
+            "update \"角色\".character set awaken_skill_id = $2, awaken_at = now() where id = $1",
+            connection, transaction))
+        {
+            write.Parameters.AddWithValue(characterId);
+            write.Parameters.AddWithValue((int)target.SkillId);
+            await write.ExecuteNonQueryAsync(stopping);
+        }
+
+        await transaction.CommitAsync(stopping);
+        return ("", branch, target.SkillId, level, false);
+    }
+
+
+
     /// <summary>只给核对用：读回分支与二转步数。</summary>
     public async Task<(string Branch, int Step, int Level, string ClassId)?> BranchStateAsync(
         long characterId, CancellationToken stopping)
@@ -529,11 +608,13 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
     /// P2-3b：战场要的只读身份——职业、分支、等级。战场属性按职业表 + 装备折算，
     /// 装备那条线由强化总级给（EnhanceRepository.TotalsAsync）。这里不写库。
     /// </summary>
-    public async Task<(string ClassId, string Branch, int Level, int BranchStep)?> BattleIdentityAsync(
-        long characterId, CancellationToken stopping)
+    public async Task<(string ClassId, string Branch, int Level, int BranchStep, int AwakenSkillId)?>
+        BattleIdentityAsync(long characterId, CancellationToken stopping)
     {
+        // B6：觉醒技编号一起带出去；战斗服进场时据此在三条职业技能之后追加一条。
         await using var command = dataSource.CreateCommand(
-            "select class_id, coalesce(branch, ''), level, branch_step from \"角色\".character where id = $1");
+            "select class_id, coalesce(branch, ''), level, branch_step, awaken_skill_id"
+            + " from \"角色\".character where id = $1");
         command.Parameters.AddWithValue(characterId);
         await using var reader = await command.ExecuteReaderAsync(stopping);
         if (!await reader.ReadAsync(stopping))
@@ -541,7 +622,29 @@ public sealed class CharacterRepository(NpgsqlDataSource dataSource)
             return null;
         }
 
-        return (reader.GetString(0), reader.GetString(1), reader.GetInt32(2), reader.GetInt32(3));
+        return (reader.GetString(0), reader.GetString(1), reader.GetInt32(2), reader.GetInt32(3),
+            reader.GetInt32(4));
+    }
+
+    /// <summary>
+    /// B6：只读觉醒状态。gateway 的 GET /character/awaken、屏幕只读与服务端日志共用这一处；
+    /// 没觉醒时 skill_id = 0、awaken_at 为空。
+    /// </summary>
+    public async Task<(string Branch, uint SkillId, int Level, DateTimeOffset? AwakenAt)?>
+        AwakenStateAsync(long characterId, CancellationToken stopping)
+    {
+        await using var command = dataSource.CreateCommand(
+            "select coalesce(branch, ''), awaken_skill_id, level, awaken_at"
+            + " from \"角色\".character where id = $1");
+        command.Parameters.AddWithValue(characterId);
+        await using var reader = await command.ExecuteReaderAsync(stopping);
+        if (!await reader.ReadAsync(stopping))
+        {
+            return null;
+        }
+
+        return (reader.GetString(0), (uint)reader.GetInt32(1), reader.GetInt32(2),
+            reader.IsDBNull(3) ? null : reader.GetFieldValue<DateTimeOffset>(3));
     }
 
     /// <summary>只给核对用：读一行的等级与归属账号。</summary>

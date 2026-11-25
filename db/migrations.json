@@ -40,7 +40,8 @@
         { "version": 31, "file": "db/character/npc_shop.sql" },
         { "version": 32, "file": "db/character/bag_expand.sql" },
         { "version": 33, "file": "db/character/craft_roll.sql" },
-        { "version": 34, "file": "db/character/mount.sql" }
+        { "version": 34, "file": "db/character/mount.sql" },
+        { "version": 35, "file": "db/character/awaken.sql" }
       ]
     },
     {

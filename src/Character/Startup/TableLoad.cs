@@ -41,6 +41,8 @@ public sealed class CharacterTables
     public required HeroCodexTable HeroCodexTable { get; init; }
     public required MountTable MountTable { get; init; }
     public required SpiritBeastTable SpiritBeastTable { get; init; }
+    /// <summary>B6：觉醒门槛与「哪条分支解锁哪条技能」的正本。</summary>
+    public required AwakenTable AwakenTable { get; init; }
     public required RecipeTable RecipeTable { get; init; }
 
     /// <summary>B3：制作掷点正本（区间 / 权重档 / 附加属性允许表）。</summary>
@@ -96,6 +98,7 @@ public static class TableLoad
         CraftRollTable craftRollTable;
         MountTable mountTable;
         SpiritBeastTable spiritBeastTable;
+        AwakenTable awakenTable;
         CityTaskTable cityTaskTable;
         SeasonPassProgressTable seasonPassProgressTable;
         NameRulesTable nameRulesTable;
@@ -216,6 +219,10 @@ public static class TableLoad
             // 灵兽还要与图鉴合计对一次「一处上限」（hero_codex.json 的 max_total_passive_pct_bps）。
             mountTable = MountTable.Load(config.MountTable, items);
             spiritBeastTable = SpiritBeastTable.Load(config.SpiritBeastTable, items, heroCodexTable);
+            // B6：觉醒。min_level 必须等于满级（exp.json 的 level_cap），
+            // branch_skills 必须正好覆盖 branches.json 的全部 10 条分支；
+            // 技能编号是不是本分支的觉醒技由战斗服启动期按 skills.json 交叉校验。
+            awakenTable = AwakenTable.Load(config.AwakenTable, branches, expTable);
             // Q5/J2：主城修炼 / 境界任务的正本。与启动共用同一份 Load：城池编号必须在
             // config/city.json 里、奖励只能是灵石五档、境界门槛必须在 realms.json 的顺序表里；
             // 缺表降级成「没有任务」，老卡环境照常起。
@@ -277,6 +284,7 @@ public static class TableLoad
             HeroCodexTable = heroCodexTable,
             MountTable = mountTable,
             SpiritBeastTable = spiritBeastTable,
+            AwakenTable = awakenTable,
             RecipeTable = recipeTable,
             CraftRollTable = craftRollTable,
             CityTaskTable = cityTaskTable,

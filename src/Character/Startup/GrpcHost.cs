@@ -55,6 +55,7 @@ public static class GrpcHost
         builder.Services.AddSingleton(services.Crystals);
         builder.Services.AddSingleton(tables.AuctionTable);
         builder.Services.AddSingleton(tables.StallTable);
+        builder.Services.AddSingleton(tables.AwakenTable);
         builder.Services.AddSingleton(tables.ShopTable);
         builder.Services.AddSingleton(tables.HomeCoinShopTable);
         builder.Services.AddSingleton(tables.NpcShopTable);

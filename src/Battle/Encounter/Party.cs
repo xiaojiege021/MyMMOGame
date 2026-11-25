@@ -88,6 +88,17 @@ public sealed partial class Encounter
                 opened.Skills.Add(ToSkillInfo(skill));
             }
 
+            // B6：觉醒技不在上面三条里，只有本分支觉醒之后才追加一条。快照里的编号
+            // 与这条命的分支必须对得上——配置改过之后张冠李戴的情况按没觉醒处理，
+            // 不下发一条别人的技能，也不拒绝整场。
+            if (member.ProfileChecked && member.Profile is { AwakenSkillId: > 0 } profile
+                && _config.Skills.TryGet((uint)profile.AwakenSkillId, out var awaken)
+                && awaken.Awaken
+                && string.Equals(awaken.Branch, profile.Branch, StringComparison.Ordinal))
+            {
+                opened.Skills.Add(ToSkillInfo(awaken));
+            }
+
             foreach (var m in _members.Values.OrderBy(m => m.Id))
             {
                 opened.Party.Add(ToPartyMember(m));

@@ -39,6 +39,13 @@ public sealed class SkillDef
     /// </summary>
     public string Branch { get; init; } = "";
 
+    /// <summary>
+    /// B6：觉醒技。true 表示这条不在「按职业下发的三条」里——ForClass 不下发它，
+    /// 只有本分支觉醒之后由开场包按快照里的 awaken_skill_id 额外追加一条。
+    /// 归属仍按门派与阶走通用校验（现在是法则神通的 tian 阶），这里不写死派名。
+    /// </summary>
+    public bool Awaken { get; init; }
+
     public SkillKind Kind { get; init; }
 
     public double DamageMultiplier { get; init; }
@@ -102,8 +109,16 @@ public sealed class SkillTable
 
     public bool TryGet(uint id, out SkillDef def) => _byId.TryGetValue(id, out def!);
 
+    /// <summary>
+    /// 按职业下发的技能：觉醒技不在其中（B6）。没有 awaken=true 技能时结果与
+    /// v3 逐字相同，老卡的行为不变。
+    /// </summary>
     public IReadOnlyList<SkillDef> ForClass(string classId) =>
-        _byId.Values.Where(s => s.ClassId == classId).OrderBy(s => s.Id).ToList();
+        _byId.Values.Where(s => s.ClassId == classId && !s.Awaken).OrderBy(s => s.Id).ToList();
+
+    /// <summary>B6：这条分支的觉醒技；没有觉醒技的分支回 null。</summary>
+    public SkillDef? AwakenFor(string branchId) =>
+        _byId.Values.FirstOrDefault(s => s.Awaken && s.Branch == branchId);
 
     public IReadOnlyList<SkillDef> ForSchool(string schoolId) =>
         _byId.Values.Where(s => s.School == schoolId).OrderBy(s => s.Id).ToList();
@@ -221,6 +236,22 @@ public sealed class SkillTable
         if (byId.Count == 0)
         {
             throw new ConfigException($"{path}：技能表是空的");
+        }
+
+        // B6：觉醒技的归属。同一分支最多一条（否则「觉醒解锁哪一条」没有唯一答案），
+        // 并且必须挂分支（不挂分支就不知道该发给谁）。
+        var awakenByBranch = new Dictionary<string, uint>(StringComparer.Ordinal);
+        foreach (var def in byId.Values.Where(d => d.Awaken))
+        {
+            if (def.Branch.Length == 0)
+            {
+                throw new ConfigException($"{path}：觉醒技 {def.Id} 必须挂一条分支");
+            }
+            if (!awakenByBranch.TryAdd(def.Branch, def.Id))
+            {
+                throw new ConfigException(
+                    $"{path}：分支 {def.Branch} 有两条觉醒技（{awakenByBranch[def.Branch]} / {def.Id}）");
+            }
         }
 
         if (file.Version <= 0)

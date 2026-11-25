@@ -310,6 +310,9 @@ public sealed partial class CharacterGrpcService
             // 方案 7.2 第二段的两个乘区项，竞技场 / 战场 / 城战三条同样不吃。
             EnhanceCoefBps = enhanceTable.CoefBpsFor(worn.EnhanceTotal),
             CrystalFlatAttack = (int)worn.CrystalFlatAttack,
+            // B6：觉醒过就把那条技能编号带出去（0 = 没觉醒）。战斗服按它在三条
+            // 职业技能之后追加一条，并自己再验一次「确实是这个分支的觉醒技」。
+            AwakenSkillId = identity.Value.AwakenSkillId,
         };
     }
 

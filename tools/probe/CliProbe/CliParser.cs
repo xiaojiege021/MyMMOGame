@@ -45,11 +45,11 @@ internal static class CliParser
             case "--content-list": contentList = true; break;
             case "--item-list": itemList = true; break;
             case "--grade-list": case "--set-list": case "--set-bonus": GradeSetCli.Parse(args, ref i); break;
-            // K3：配方与制作的核对 flag 解析器在 CraftCli.Parse（一个文件一个类型 / 行数闸门）。
+            // K3 / K2+Q13：配方与 NPC 商店的解析器各在自己的 Cli 文件里（一个文件一个类型 / 行数闸门）。
             case "--recipe-list": case "--recipe-table-path": case "--craft-start": case "--craft-finish": case "--craft-state": case "--craft-txn": case "--craft-roll-sample": case "--craft-roll-path": case "--raw-item-write": case "--raw-currency-add": CraftCli.Parse(args, ref i); break;
-            // K2+Q13：NPC 商店的 flag 解析器在 NpcShopCli.Parse（一个文件一个类型 / 行数闸门）。
             case var npcFlag when NpcShopCli.Handles(npcFlag): NpcShopCli.Parse(args, ref i); break;
             case var companionFlag when CompanionCli.Handles(companionFlag): CompanionCli.Parse(args, ref i); break;
+            case var awakenFlag when AwakenCli.Handles(awakenFlag): AwakenCli.Parse(args, ref i); break;
             case var stallFlag when StallCli.Handles(stallFlag): StallCli.Parse(args, ref i); break;
             // B9：穿 / 脱 / 读已穿。解析在 EquipCli.Parse，与 RPC 同一套判定。
             case "--equip": case "--unequip": case "--equip-row": EquipCli.Parse(args, ref i); break;

@@ -170,9 +170,12 @@ printf '%s' "$GOOD" | grep -q "grace_ms=${REPO_GRACE} window_ms=${REPO_WINDOW} p
 
 echo "== 5. 真服 WebSocket（无库）=="
 BOSS="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["boss"]["id"])' "$TMP/cfg/battle.json")"
+# 射程最大的技能要在「默认职业」那一组里选：B6 之后射手觉醒技射程比战士远，
+# 拿全局最大会把一条战士用不了的技能塞给 default_class=warrior 的探针。
 SKILL="$(python3 -c '
 import json
-rows = json.load(open("config/skills.json"))["skills"]
+rows = [s for s in json.load(open("config/skills.json"))["skills"]
+        if s.get("class_id") == "warrior" and not s.get("awaken")]
 print(max(rows, key=lambda x: x.get("range_mm", 0))["id"])')"
 DUNGEON="$(python3 -c '
 import json

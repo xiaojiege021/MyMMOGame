@@ -208,6 +208,12 @@ public sealed partial class Encounter
         return member.Profile;
     }
 
+    /// <summary>
+    /// B6：进场时在锁外把角色快照取一次（觉醒技编号要随开场包下发）。
+    /// Open 里只读这份缓存，锁内不做服间调用——一次 gRPC 超时会把 tick 一起卡住。
+    /// </summary>
+    public void PrimeProfile(Member member) => ProfileOf(member);
+
     /// <summary>单调时钟，毫秒。冷却和前摇都用它算，不受系统时间跳变影响。</summary>
     static long NowMs() => (long)Stopwatch.GetElapsedTime(0).TotalMilliseconds;
 

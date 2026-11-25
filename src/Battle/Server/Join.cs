@@ -255,6 +255,13 @@ public sealed partial class BattleServer
             return;
         }
 
+        // B6：进场时在锁外取一次角色快照，Open 里只读它决定发不发那条觉醒技。
+        // 锁内做服间调用的话，上游不通时一次超时会把整场的 tick 一起卡住。
+        if (member is not null)
+        {
+            party.Encounter.PrimeProfile(member);
+        }
+
         // tick 一场只有一个循环，第二个人进来不另起。
         if (created)
         {

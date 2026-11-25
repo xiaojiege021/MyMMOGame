@@ -198,6 +198,13 @@ service CharacterService {
   // 15 级起只能用本职业兵器（职业可用兵器 = 该职业所有分支的本命兵器并集）。
   rpc CanEquip(CanEquipRequest) returns (CanEquipResponse);
 
+  // B6：觉醒。满级后开放（方案 8.2），一个角色只觉醒一次、不可逆、不洗点。
+  // 请求只带角色与分支：觉醒技编号由角色服按 config/awaken.json 的分支映射现取，
+  // 客户端带不进编号、带不进等级；觉醒不加等级、不推进境界、不另开战斗层。
+  rpc Awaken(AwakenRequest) returns (AwakenResponse);
+  // B6：这个角色觉醒了没有、觉醒的是哪一条。只读；没觉醒回 skill_id = 0。
+  rpc DescribeAwaken(DescribeAwakenRequest) returns (DescribeAwakenResponse);
+
   // B9：穿上一件装备。请求只给背包格号——部位、等级门槛、职业限制全由角色服从
   // 物品表与库里读，客户端带不进任何数值。背包行不动（不删行、不改格号），
   // 只是新增一条「这个部位穿的是哪一行」；因此强化与结晶仍挂在那口背包行上。
@@ -1241,6 +1248,9 @@ message DescribeBattleProfileResponse {
   // B10：已穿装备上攻击类结晶的固定值之和（config/crystal.json 的 fixed_value）。
   // 方案 7.2 第二段把它除以基础攻击当作一项固定值；防御 / 功能两类不进伤害公式。
   int32 crystal_flat_attack = 11;
+  // B6：已觉醒的那条技能编号（config/awaken.json 的分支映射），0 表示没觉醒。
+  // 战斗服进场时按它在三条职业技能之后追加一条，并且只认本分支那一条。
+  int32 awaken_skill_id = 12;
 }
 
 // P2-4a：二转。只推进一步已经选定的分支，不另开分支、不改兵器。
@@ -1260,6 +1270,40 @@ message AdvanceBranchResponse {
   int32 branch_step = 4;
   int32 level = 5;
   bool duplicate = 6;
+}
+
+// B6：觉醒。请求里的分支必须就是 15 级定下的那条；觉醒技编号不在请求里。
+message AwakenRequest {
+  // 网关转发时填令牌账号；服间直连为空时只按角色编号找。
+  string account = 1;
+  uint64 character_id = 2;
+  string branch_id = 3;
+}
+
+message AwakenResponse {
+  bool ok = 1;
+  // character_not_found / not_enough_level / branch_missing / branch_locked /
+  // skill_not_found / already_awakened；空串表示这一笔做成了（或者 duplicate）。
+  string reason = 2;
+  string branch = 3;
+  uint32 skill_id = 4;
+  int32 level = 5;
+  bool duplicate = 6;
+}
+
+message DescribeAwakenRequest {
+  uint64 character_id = 1;
+}
+
+message DescribeAwakenResponse {
+  // 角色不存在时 false，其余字段全是 0，网关据此回 404。
+  bool found = 1;
+  string branch = 2;
+  // 0 表示还没觉醒。
+  uint32 skill_id = 3;
+  int32 level = 4;
+  // 觉醒时刻（服务端时钟，毫秒）；没觉醒就是 0。
+  int64 awaken_at_ms = 5;
 }
 
 // P2-4a：武器锁。请求只带角色与物品，等级与职业都从库里读。

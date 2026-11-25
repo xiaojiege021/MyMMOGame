@@ -11,7 +11,7 @@
 #   bash tools/check/ci.sh --changed  # 日常：只跑改动涉及到的卡（约 1/5 时间）
 #   bash tools/check/ci.sh --list     # 只列出本 CI 覆盖的卡
 #
-# 卡是串行的：47 张卡里有十几张要起进程，端口是固定的（61000 / 62000 / 60001），
+# 卡是串行的：51 张卡里有十几张要起进程，端口是固定的（61000 / 62000 / 60001），
 # 并行会互相抢端口，所以省时间只能靠「少跑几张」，不能靠「同时跑」。
 # 改 proto / 迁移 / 网关入口 / lib-common.sh 时一律用全量，不要用 --changed。
 set -uo pipefail
@@ -23,8 +23,9 @@ DOTNET="${DOTNET:-$HOME/.dotnet/dotnet}"
 [ -x "$DOTNET" ] || DOTNET="$(command -v dotnet || true)"
 
 # 无库段可跑的卡（新增卡只有在「无 gamedb 也能全绿」时才往这里加）。
+# P2-4a 于 B6（2026-11-25）补进来：它的无库段 65/65 全绿，且技能表改动要靠它挡住。
 # contract = D16 契约闸，脚本按 14.11.3 命名为 check-contract.sh。
-CHECKS="b1 b4 b9 b10 c2-realm c4 c5 c6 c7 contract d1a d1b d5 d7 d8 d10 d15 invariants k1 k3 k4 k5 k6 k7 n6 n7 n13 n14 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 s1"
+CHECKS="b1 b4 b9 b10 c2-realm c4 c5 c6 c7 contract d1a d1b d5 d7 d8 d10 d15 invariants k1 k3 k4 k5 k6 k7 n6 n7 n13 n14 p1-5c1 p1-5c2 p1-5c6 p1-5c7 p1-5c8 p1-5d p2-1b p2-1c p2-2a p2-4a q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 s1"
 
 MODE="full"
 case "${1:-}" in

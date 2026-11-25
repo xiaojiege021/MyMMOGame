@@ -14,7 +14,8 @@ namespace Battle;
 /// </summary>
 public sealed record BattleProfile(
     string ClassId, string Branch, int Level, int EnhanceTotal, int EnhanceSlots, int BranchStep,
-    int PassivePctBps = 0, int EquipAttack = 0, int EnhanceCoefBps = 0, int CrystalFlatAttack = 0);
+    int PassivePctBps = 0, int EquipAttack = 0, int EnhanceCoefBps = 0, int CrystalFlatAttack = 0,
+    int AwakenSkillId = 0);
 
 public interface IBattleProfileSource : IDisposable
 {
@@ -58,7 +59,7 @@ public sealed class GrpcBattleProfileSource : IBattleProfileSource
                 ? new BattleProfile(
                     reply.ClassId, reply.Branch, reply.Level, reply.EnhanceTotal,
                     reply.EnhanceSlots, reply.BranchStep, reply.PassivePctBps, reply.EquipAttack,
-                    reply.EnhanceCoefBps, reply.CrystalFlatAttack)
+                    reply.EnhanceCoefBps, reply.CrystalFlatAttack, reply.AwakenSkillId)
                 : null;
         }
         catch (RpcException ex)

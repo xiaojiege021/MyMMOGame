@@ -92,7 +92,9 @@ public sealed partial class CharacterGrpcService(
     // B4：坐骑的档位与速度只在配置里，读写两条口都要它；灵兽只需仓储（只读背包）。
     MountTable mountTable,
     MountRepository mounts,
-    SpiritBeastRepository spiritBeasts) : CharacterService.CharacterServiceBase
+    SpiritBeastRepository spiritBeasts,
+    // B6：觉醒的门槛与「哪条分支解锁哪条技能」的正本；觉醒时只按它取编号。
+    AwakenTable awakenTable) : CharacterService.CharacterServiceBase
 {
 
     // 两张表随服务一起注入：启动加载的正本就是判定用的正本，不另起一套。

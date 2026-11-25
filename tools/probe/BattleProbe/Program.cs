@@ -54,6 +54,10 @@ internal static class Program
         var cleanseSkill = uint.TryParse(Arg(args, "--cleanse"), out var cl) ? cl : 1003U;
         var slowSkill = uint.TryParse(Arg(args, "--slow"), out var sl) ? sl : 1001U;
         var hit2Skill = uint.TryParse(Arg(args, "--hit2"), out var h2) ? h2 : 1002U;
+        // B6：觉醒技下发。--b6-char / --b6-class / --b6-skill，期望条数复用 --expect-units。
+        var b6Char = ulong.TryParse(Arg(args, "--b6-char"), out var b6c) ? b6c : 0UL;
+        var b6Class = Arg(args, "--b6-class") ?? "warrior";
+        var b6Skill = uint.TryParse(Arg(args, "--b6-skill"), out var b6s) ? b6s : 0U;
 
         try
         {
@@ -76,6 +80,8 @@ internal static class Program
                 "p03a_mana" => await CaseP03aManaAsync(url, boss, hit),
                 "p03a_resurrect" => await CaseP03aResurrectAsync(url, boss, party, warriorChar, priestChar, hit, resurrect, second),
                 "p24a_jielv" => await CaseP24aJielvAsync(url, boss, party, warriorChar, priestChar, hit, resurrect),
+                // B6：觉醒后开场包多一条本分支觉醒技；没觉醒仍是三条。
+                "b6_awaken" => await CaseB6AwakenAsync(url, b6Char, b6Class, b6Skill, expectUnits),
                 "p03b_phase" => await CaseP03bPhaseAsync(url, boss, ranged),
                 "p11a2_connect" => await CaseP11a2ConnectAsync(url, boss, hit, waitMs),
                 "p11a2_reject" => await CaseP11a2RejectAsync(url),
@@ -569,6 +575,28 @@ internal static class Program
     /// P2-4a：诫律（牧师分支之一）没有复活这条能力，所以目标还没倒地也要立刻拒，
     /// 不能先等到结算再说「目标不对」。
     /// </summary>
+    /// <summary>
+    /// B6：觉醒技下发。带同一个 char 进场，读开场包里的技能编号：
+    /// 已觉醒 = 三条职业技 + 本分支那一条；未觉醒 = 三条。
+    /// 觉醒技不在 ForClass 里，所以这条断言能抓住「没觉醒也发」与「觉醒没发」两种错。
+    /// </summary>
+    static async Task<int> CaseB6AwakenAsync(
+        string url, ulong charId, string classId, uint skill, int expectSkills)
+    {
+        await using var session = await Session.ConnectAsync(
+            WithQuery(url, "char=" + charId + "&class=" + classId));
+        var opened = session.Opened;
+        var ids = string.Join(",", opened.Skills.Select(s => s.SkillId).OrderBy(x => x));
+        var has = skill != 0 && opened.Skills.Any(s => s.SkillId == skill);
+        var expect = expectSkills > 0 ? expectSkills : (skill != 0 ? 4 : 3);
+        // target=0 的用法是「未觉醒」：条数对、且确实没有觉醒技编号。
+        var ok = opened.Skills.Count == expect && (skill == 0 ? !has : has);
+        Console.WriteLine($"b6_awaken=char={charId} class={classId} skills={opened.Skills.Count}"
+            + $" ids={ids} expect={expect} target={skill} has={has}");
+        Console.WriteLine($"verdict={(ok ? "ok" : "fail")}");
+        return ok ? 0 : 1;
+    }
+
     static async Task<int> CaseP24aJielvAsync(
         string url, ulong boss, string? party, ulong warriorChar, ulong priestChar,
         uint hit, uint resurrect)

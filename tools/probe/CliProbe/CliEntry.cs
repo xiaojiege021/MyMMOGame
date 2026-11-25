@@ -65,6 +65,9 @@ internal static class CliEntry
         code = CompanionCli.TryReadOnly();
         if (code != null) { return code.Value; }
 
+        code = AwakenCli.TryReadOnly();
+        if (code != null) { return code.Value; }
+
         code = StallCli.TryReadOnly();
         if (code != null) { return code.Value; }
 

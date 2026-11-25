@@ -88,8 +88,12 @@ skills = data["skills"]
 schools = {s["id"]: s for s in data.get("schools", [])}
 
 # ① schema / 版本 / 条数
-if data.get("schema") == "skill-table/3" and data.get("version") == 3:
-    ok("技能表升到 skill-table/3")
+# B6 把表升到 v4（觉醒那一组）。这里不钉死版本号，只要求 schema 与 version 一致、
+# 且不低于 S1 当时的 v3——以后再加内容不该让这条变红。
+_schema = str(data.get("schema", ""))
+_ver = data.get("version")
+if _schema.startswith("skill-table/") and _schema.split("/")[-1] == str(_ver) and (_ver or 0) >= 3:
+    ok("技能表 schema 与 version 一致（%s）" % _schema)
 else:
     bad("技能表 schema / version 不是 skill-table/3：%r %r" % (data.get("schema"), data.get("version")))
 
@@ -234,9 +238,10 @@ LIST="$TMP/skill-list.txt"
 LISTU="$TMP/skill-list-utf8.txt"
 utf8 <"$LIST" >"$LISTU"
 SKILLS_N=$(grep -oE 'skills=[0-9]+' "$LIST" | head -1 | cut -d= -f2)
-if grep -qE '^skill_table_version=3 ' "$LIST" && [ "${SKILLS_N:-0}" -ge 15 ] \
+SKILLS_VER="$(python3 -c 'import json;print(json.load(open("config/skills.json", encoding="utf-8"))["version"])')"
+if grep -qE "^skill_table_version=${SKILLS_VER} " "$LIST" && [ "${SKILLS_N:-0}" -ge 15 ] \
    && grep -qE ' schools=2$' "$LIST"; then
-  ok "只读入口报到 skill-table/3、技能不少于 15 条（实际 ${SKILLS_N}）、两派"
+  ok "只读入口报到 skill-table/${SKILLS_VER}、技能不少于 15 条（实际 ${SKILLS_N}）、两派"
 else
   bad "只读入口头部不对：$(head -1 "$LIST")"
 fi
@@ -265,7 +270,17 @@ else
 fi
 
 assert_file_contains "$LISTU" '^skill_school=id=tiandi name=天地玄黄' "只读入口报出天地玄黄这一派"
-assert_file_contains "$LISTU" '^skill_school=id=faze name=法则神通 giver=明霄圣地 / 焦原 tiers=- skills=0' "法则神通在表里但暂时 0 条（待二转 / 觉醒卡）"
+# B6 起法则神通不再空表：阶与条数都从配置现取（觉醒那一组各分支一条）。
+FAZE_WANT="$(python3 - <<'PY' | tr -d '\r'
+import json
+d = json.load(open("config/skills.json", encoding="utf-8"))
+faze = [s for s in d["schools"] if s["id"] == "faze"][0]
+tiers = ",".join(t["id"] for t in faze.get("tiers") or []) or "-"
+n = sum(1 for s in d["skills"] if s["school"] == "faze")
+print("^skill_school=id=faze name=法则神通 giver=明霄圣地 / 焦原 tiers=%s skills=%d" % (tiers, n))
+PY
+)"
+assert_file_contains "$LISTU" "$FAZE_WANT" "法则神通的阶与条数与配置一致（B6 起有觉醒这一组）"
 
 WANT_SUM="$(python3 - <<'PY'
 import json

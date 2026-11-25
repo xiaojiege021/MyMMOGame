@@ -41,6 +41,9 @@ public static partial class CharacterApi
 
     public sealed record DismountBody(ulong? CharacterId);
 
+    // B6：觉醒只带角色与分支；技能编号、等级、金币都读不进请求体。
+    public sealed record AwakenBody(ulong? CharacterId, string? BranchId);
+
     public sealed record CurrencyBody(ulong? CharacterId, string? Kind, long? Delta);
 
     public sealed record GrantEntryBody(CurrencyDeltaBody? Currency, ItemDeltaBody? Item);
@@ -119,6 +122,7 @@ public static partial class CharacterApi
         RegisterExchange(app, client, tokens);
         RegisterCraft(app, client, tokens);
         RegisterCompanion(app, client, tokens);
+        RegisterAwaken(app, client, tokens);
     }
 
     static Task WriteCrystalAsync(HttpContext context, CrystalResponse result) =>

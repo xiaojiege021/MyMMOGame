@@ -85,6 +85,14 @@ internal static class CliFlags
     public static long mountRowOf = 0;
     public static long beastRowOf = 0;
 
+    // B6：觉醒。--awaken-config / --awaken-table-path 只读不连库；
+    // --awaken / --awaken-state 连库核对。
+    public static bool awakenConfig = false;
+    public static string? awakenTablePath = null;
+    public static long awakenOf = 0;
+    public static string? awakenBranch = null;
+    public static long awakenStateOf = 0;
+
     // K3：核对用的原始背包写入（绕过业务规则，只给造料 / 清格用，与 --raw-currency-write 同口径）。
     public static long rawItemWriteId = 0;
     public static int rawItemSlot = 0;

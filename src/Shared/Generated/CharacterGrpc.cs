@@ -219,6 +219,14 @@ namespace Mmo.Proto.Character {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.CanEquipResponse> __Marshaller_mmo_character_CanEquipResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.CanEquipResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AwakenRequest> __Marshaller_mmo_character_AwakenRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AwakenRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.AwakenResponse> __Marshaller_mmo_character_AwakenResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.AwakenResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeAwakenRequest> __Marshaller_mmo_character_DescribeAwakenRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeAwakenRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Mmo.Proto.Character.DescribeAwakenResponse> __Marshaller_mmo_character_DescribeAwakenResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.DescribeAwakenResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.EquipItemRequest> __Marshaller_mmo_character_EquipItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EquipItemRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Mmo.Proto.Character.EquipItemResponse> __Marshaller_mmo_character_EquipItemResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Mmo.Proto.Character.EquipItemResponse.Parser));
@@ -688,6 +696,22 @@ namespace Mmo.Proto.Character {
         "CanEquip",
         __Marshaller_mmo_character_CanEquipRequest,
         __Marshaller_mmo_character_CanEquipResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.AwakenRequest, global::Mmo.Proto.Character.AwakenResponse> __Method_Awaken = new grpc::Method<global::Mmo.Proto.Character.AwakenRequest, global::Mmo.Proto.Character.AwakenResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Awaken",
+        __Marshaller_mmo_character_AwakenRequest,
+        __Marshaller_mmo_character_AwakenResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Mmo.Proto.Character.DescribeAwakenRequest, global::Mmo.Proto.Character.DescribeAwakenResponse> __Method_DescribeAwaken = new grpc::Method<global::Mmo.Proto.Character.DescribeAwakenRequest, global::Mmo.Proto.Character.DescribeAwakenResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DescribeAwaken",
+        __Marshaller_mmo_character_DescribeAwakenRequest,
+        __Marshaller_mmo_character_DescribeAwakenResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Mmo.Proto.Character.EquipItemRequest, global::Mmo.Proto.Character.EquipItemResponse> __Method_EquipItem = new grpc::Method<global::Mmo.Proto.Character.EquipItemRequest, global::Mmo.Proto.Character.EquipItemResponse>(
@@ -1448,6 +1472,32 @@ namespace Mmo.Proto.Character {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.CanEquipResponse> CanEquip(global::Mmo.Proto.Character.CanEquipRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B6：觉醒。满级后开放（方案 8.2），一个角色只觉醒一次、不可逆、不洗点。
+      /// 请求只带角色与分支：觉醒技编号由角色服按 config/awaken.json 的分支映射现取，
+      /// 客户端带不进编号、带不进等级；觉醒不加等级、不推进境界、不另开战斗层。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.AwakenResponse> Awaken(global::Mmo.Proto.Character.AwakenRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      /// <summary>
+      /// B6：这个角色觉醒了没有、觉醒的是哪一条。只读；没觉醒回 skill_id = 0。
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Mmo.Proto.Character.DescribeAwakenResponse> DescribeAwaken(global::Mmo.Proto.Character.DescribeAwakenRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -3836,6 +3886,110 @@ namespace Mmo.Proto.Character {
         return CallInvoker.AsyncUnaryCall(__Method_CanEquip, null, options, request);
       }
       /// <summary>
+      /// B6：觉醒。满级后开放（方案 8.2），一个角色只觉醒一次、不可逆、不洗点。
+      /// 请求只带角色与分支：觉醒技编号由角色服按 config/awaken.json 的分支映射现取，
+      /// 客户端带不进编号、带不进等级；觉醒不加等级、不推进境界、不另开战斗层。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AwakenResponse Awaken(global::Mmo.Proto.Character.AwakenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return Awaken(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B6：觉醒。满级后开放（方案 8.2），一个角色只觉醒一次、不可逆、不洗点。
+      /// 请求只带角色与分支：觉醒技编号由角色服按 config/awaken.json 的分支映射现取，
+      /// 客户端带不进编号、带不进等级；觉醒不加等级、不推进境界、不另开战斗层。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.AwakenResponse Awaken(global::Mmo.Proto.Character.AwakenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_Awaken, null, options, request);
+      }
+      /// <summary>
+      /// B6：觉醒。满级后开放（方案 8.2），一个角色只觉醒一次、不可逆、不洗点。
+      /// 请求只带角色与分支：觉醒技编号由角色服按 config/awaken.json 的分支映射现取，
+      /// 客户端带不进编号、带不进等级；觉醒不加等级、不推进境界、不另开战斗层。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AwakenResponse> AwakenAsync(global::Mmo.Proto.Character.AwakenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return AwakenAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B6：觉醒。满级后开放（方案 8.2），一个角色只觉醒一次、不可逆、不洗点。
+      /// 请求只带角色与分支：觉醒技编号由角色服按 config/awaken.json 的分支映射现取，
+      /// 客户端带不进编号、带不进等级；觉醒不加等级、不推进境界、不另开战斗层。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.AwakenResponse> AwakenAsync(global::Mmo.Proto.Character.AwakenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_Awaken, null, options, request);
+      }
+      /// <summary>
+      /// B6：这个角色觉醒了没有、觉醒的是哪一条。只读；没觉醒回 skill_id = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeAwakenResponse DescribeAwaken(global::Mmo.Proto.Character.DescribeAwakenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeAwaken(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B6：这个角色觉醒了没有、觉醒的是哪一条。只读；没觉醒回 skill_id = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Mmo.Proto.Character.DescribeAwakenResponse DescribeAwaken(global::Mmo.Proto.Character.DescribeAwakenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DescribeAwaken, null, options, request);
+      }
+      /// <summary>
+      /// B6：这个角色觉醒了没有、觉醒的是哪一条。只读；没觉醒回 skill_id = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeAwakenResponse> DescribeAwakenAsync(global::Mmo.Proto.Character.DescribeAwakenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DescribeAwakenAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// B6：这个角色觉醒了没有、觉醒的是哪一条。只读；没觉醒回 skill_id = 0。
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Mmo.Proto.Character.DescribeAwakenResponse> DescribeAwakenAsync(global::Mmo.Proto.Character.DescribeAwakenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DescribeAwaken, null, options, request);
+      }
+      /// <summary>
       /// B9：穿上一件装备。请求只给背包格号——部位、等级门槛、职业限制全由角色服从
       /// 物品表与库里读，客户端带不进任何数值。背包行不动（不删行、不改格号），
       /// 只是新增一条「这个部位穿的是哪一行」；因此强化与结晶仍挂在那口背包行上。
@@ -5504,6 +5658,8 @@ namespace Mmo.Proto.Character {
           .AddMethod(__Method_DescribeBattleProfile, serviceImpl.DescribeBattleProfile)
           .AddMethod(__Method_AdvanceBranch, serviceImpl.AdvanceBranch)
           .AddMethod(__Method_CanEquip, serviceImpl.CanEquip)
+          .AddMethod(__Method_Awaken, serviceImpl.Awaken)
+          .AddMethod(__Method_DescribeAwaken, serviceImpl.DescribeAwaken)
           .AddMethod(__Method_EquipItem, serviceImpl.EquipItem)
           .AddMethod(__Method_UnequipItem, serviceImpl.UnequipItem)
           .AddMethod(__Method_AdvanceRealm, serviceImpl.AdvanceRealm)
@@ -5588,6 +5744,8 @@ namespace Mmo.Proto.Character {
       serviceBinder.AddMethod(__Method_DescribeBattleProfile, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeBattleProfileRequest, global::Mmo.Proto.Character.DescribeBattleProfileResponse>(serviceImpl.DescribeBattleProfile));
       serviceBinder.AddMethod(__Method_AdvanceBranch, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceBranchRequest, global::Mmo.Proto.Character.AdvanceBranchResponse>(serviceImpl.AdvanceBranch));
       serviceBinder.AddMethod(__Method_CanEquip, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.CanEquipRequest, global::Mmo.Proto.Character.CanEquipResponse>(serviceImpl.CanEquip));
+      serviceBinder.AddMethod(__Method_Awaken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AwakenRequest, global::Mmo.Proto.Character.AwakenResponse>(serviceImpl.Awaken));
+      serviceBinder.AddMethod(__Method_DescribeAwaken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.DescribeAwakenRequest, global::Mmo.Proto.Character.DescribeAwakenResponse>(serviceImpl.DescribeAwaken));
       serviceBinder.AddMethod(__Method_EquipItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.EquipItemRequest, global::Mmo.Proto.Character.EquipItemResponse>(serviceImpl.EquipItem));
       serviceBinder.AddMethod(__Method_UnequipItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.UnequipItemRequest, global::Mmo.Proto.Character.UnequipItemResponse>(serviceImpl.UnequipItem));
       serviceBinder.AddMethod(__Method_AdvanceRealm, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Mmo.Proto.Character.AdvanceRealmRequest, global::Mmo.Proto.Character.AdvanceRealmResponse>(serviceImpl.AdvanceRealm));

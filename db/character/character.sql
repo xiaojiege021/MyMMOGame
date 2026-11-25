@@ -874,3 +874,22 @@ CREATE TABLE IF NOT EXISTS "角色".character_mount (
     PRIMARY KEY (character_id),
     UNIQUE (inventory_id)
 );
+
+-- B6：觉醒（同一段也单独在 db/character/awaken.sql，版本 35）。
+-- 0 表示还没觉醒；两列要么一起写、要么都不写（character_awaken_pair）。
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS awaken_skill_id integer NOT NULL DEFAULT 0;
+
+ALTER TABLE "角色".character
+    ADD COLUMN IF NOT EXISTS awaken_at timestamptz;
+
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_awaken_skill_nonnegative;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_awaken_skill_nonnegative CHECK (awaken_skill_id >= 0);
+
+ALTER TABLE "角色".character
+    DROP CONSTRAINT IF EXISTS character_awaken_pair;
+ALTER TABLE "角色".character
+    ADD CONSTRAINT character_awaken_pair
+    CHECK ((awaken_skill_id = 0) = (awaken_at IS NULL));
